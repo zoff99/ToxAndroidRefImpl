@@ -918,8 +918,8 @@ public class HelperFriend
                                 String msg_id_as_hex_string = HelperGeneric.bytesToHex(msg_id_buffer.array(),
                                                                                        msg_id_buffer.arrayOffset(),
                                                                                        msg_id_buffer.limit());
-                                Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
-                                           msg_id_as_hex_string);
+                                // Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
+                                //           msg_id_as_hex_string);
 
                                 try
                                 {
@@ -927,8 +927,8 @@ public class HelperFriend
                                                                                                t_sec_receipt,
                                                                                                msg_id_buffer);
 
-                                    Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:ACK:1:res=" + res + " f=" +
-                                               get_friend_name_from_num(friend_number));
+                                    // Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:ACK:1:res=" + res + " f=" +
+                                    //           get_friend_name_from_num(friend_number));
 
                                     try
                                     {
@@ -942,10 +942,10 @@ public class HelperFriend
                                                     tox_friend_by_public_key__wrapper(relay_for_friend), t_sec_receipt,
                                                     msg_id_buffer);
 
-                                            Log.i(TAG,
-                                                  "send_friend_msg_receipt_v2_wrapper:ACK:2:res_relay=" + res_relay +
-                                                  " f=" + get_friend_name_from_num(
-                                                          tox_friend_by_public_key__wrapper(relay_for_friend)));
+                                            // Log.i(TAG,
+                                            //      "send_friend_msg_receipt_v2_wrapper:ACK:2:res_relay=" + res_relay +
+                                            //      " f=" + get_friend_name_from_num(
+                                            //              tox_friend_by_public_key__wrapper(relay_for_friend)));
 
                                         }
                                     }

@@ -4119,7 +4119,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_read_receipt_message_v2_cb_method(final long friend_number, long ts_sec, byte[] msg_id)
     {
-        Log.i(TAG, "friend_read_receipt_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number));
+        // Log.i(TAG, "friend_read_receipt_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number));
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:003:*PING*");
@@ -4130,7 +4130,7 @@ public class MainActivity extends AppCompatActivity
         final String message_id_hash_as_hex_string = HelperGeneric.bytesToHex(msg_id_buffer.array(),
                                                                               msg_id_buffer.arrayOffset(),
                                                                               msg_id_buffer.limit());
-        Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
+        // Log.i(TAG, "receipt_message_v2_cb:MSGv2HASH:2=" + message_id_hash_as_hex_string);
 
         try
         {
@@ -4162,7 +4162,7 @@ public class MainActivity extends AppCompatActivity
 
                         if (m != null)
                         {
-                            Log.i(TAG, "receipt_message_v2_cb:msgid_via_relay found");
+                            // Log.i(TAG, "receipt_message_v2_cb:msgid_via_relay found");
                             Runnable myRunnable = new Runnable()
                             {
                                 @Override
@@ -4315,7 +4315,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
     {
-        Log.i(TAG, "friend_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length);
+        // Log.i(TAG, "friend_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length);
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:005:*PING*");
@@ -4326,8 +4326,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_lossless_packet_cb_method(long friend_number, byte[] data, long length)
     {
-        Log.i(TAG, "friend_lossless_packet_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length +
-                   " data=" + bytes_to_hex(data));
+        // Log.i(TAG, "friend_lossless_packet_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length +
+        //            " data=" + bytes_to_hex(data));
 
         if (length > 0)
         {
@@ -4347,7 +4347,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_sync_message_v2_cb_method(long friend_number, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length, byte[] raw_data, long raw_data_length)
     {
-        Log.i(TAG, "friend_sync_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number));
+        // Log.i(TAG, "friend_sync_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number));
 
         if (!HelperRelay.is_own_relay(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
         {
@@ -5345,8 +5345,9 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_conference_invite_cb_method(final long friend_number, final int a_TOX_CONFERENCE_TYPE, final byte[] cookie_buffer, final long cookie_length)
     {
-        Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" +
-                   cookie_length + " cookie=" + bytes_to_hex(cookie_buffer));
+        // Log.i(TAG, "conference_invite_cb:fn=" + friend_number + " type=" + a_TOX_CONFERENCE_TYPE + " cookie_length=" +
+        //            cookie_length + " cookie=" + bytes_to_hex(cookie_buffer));
+
         //try
         //{
         //Thread t = new Thread()

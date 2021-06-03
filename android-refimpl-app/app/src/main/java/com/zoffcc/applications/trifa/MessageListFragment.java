@@ -92,7 +92,7 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
         }
 
-        Log.i(TAG, "loaded_messages:start");
+        // Log.i(TAG, "loaded_messages:start");
         try
         {
             if (orma != null)
@@ -150,7 +150,7 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
             // data_values is NULL here!!
         }
-        Log.i(TAG, "loaded_messages:ready");
+        // Log.i(TAG, "loaded_messages:ready");
 
         // --------------
         // --------------
@@ -287,7 +287,7 @@ public class MessageListFragment extends Fragment
 
         is_data_loaded = false;
         MainActivity.message_list_fragment = this;
-        Log.i(TAG, "onResume:099");
+        // Log.i(TAG, "onResume:099");
     }
 
     @Override
@@ -407,7 +407,7 @@ public class MessageListFragment extends Fragment
 
     synchronized void add_message(final Message m)
     {
-        Log.i(TAG, "add_message:001");
+        // Log.i(TAG, "add_message:001");
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -415,7 +415,7 @@ public class MessageListFragment extends Fragment
             {
                 try
                 {
-                    Log.i(TAG, "add_message:002");
+                    // Log.i(TAG, "add_message:002");
                     adapter.add_item(m);
                     if (is_at_bottom)
                     {

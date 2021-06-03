@@ -1521,7 +1521,7 @@ public class TrifaToxService extends Service
                                         orderBySent_timestampDesc().
                                         toList();
 
-                                Log.i(TAG, "send_pending_1-on-1_messages:v2:m_v1=" + m_v1.size());
+                                // Log.i(TAG, "send_pending_1-on-1_messages:v2:m_v1=" + m_v1.size());
 
                                 if ((m_v1 != null) && (m_v1.size() > 0))
                                 {
@@ -1542,9 +1542,9 @@ public class TrifaToxService extends Service
 
                                         // m_resend_v2.raw_msgv2_bytes
 
-                                        Log.i(TAG, "send_pending_1-on-1_messages:v2:f=" +
-                                                   get_friend_name_from_pubkey(m_resend_v2.tox_friendpubkey) + " m=" +
-                                                   m_resend_v2.text);
+                                        // Log.i(TAG, "send_pending_1-on-1_messages:v2:f=" +
+                                        //            get_friend_name_from_pubkey(m_resend_v2.tox_friendpubkey) + " m=" +
+                                        //            m_resend_v2.text);
 
                                         final int raw_data_length = (m_resend_v2.raw_msgv2_bytes.length() / 2);
                                         byte[] raw_msg_resend_data = hex_to_bytes(m_resend_v2.raw_msgv2_bytes);
@@ -1566,7 +1566,7 @@ public class TrifaToxService extends Service
                                                     tox_friend_by_public_key__wrapper(relay),
                                                     msg_text_buffer_resend_v2, raw_data_length);
 
-                                            Log.i(TAG, "send_pending_1-on-1_messages:v2:res_relay=" + res_relay);
+                                            // Log.i(TAG, "send_pending_1-on-1_messages:v2:res_relay=" + res_relay);
                                         }
 
                                         cur_resend_count_per_iteration++;
@@ -1638,7 +1638,7 @@ public class TrifaToxService extends Service
                                                 tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey),
                                                 msg_text_buffer_resend_v2, raw_data_length);
 
-                                        Log.i(TAG, "send_pending_1-on-1_messages:B:v2:res=" + res);
+                                        // Log.i(TAG, "send_pending_1-on-1_messages:B:v2:res=" + res);
 
                                         String relay = get_relay_for_friend(m_resend_v2.tox_friendpubkey);
                                         if (relay != null)
@@ -1647,7 +1647,7 @@ public class TrifaToxService extends Service
                                                     tox_friend_by_public_key__wrapper(relay), msg_text_buffer_resend_v2,
                                                     raw_data_length);
 
-                                            Log.i(TAG, "send_pending_1-on-1_messages:B:v2:res_relay=" + res_relay);
+                                            // Log.i(TAG, "send_pending_1-on-1_messages:B:v2:res_relay=" + res_relay);
                                         }
 
                                         cur_resend_count_per_iteration++;
@@ -1663,7 +1663,7 @@ public class TrifaToxService extends Service
                             catch (Exception e)
                             {
                                 e.printStackTrace();
-                                Log.i(TAG, "send_pending_1-on-1_messages:B:v2:EE:" + e.getMessage());
+                                // Log.i(TAG, "send_pending_1-on-1_messages:B:v2:EE:" + e.getMessage());
                             }
                             // loop through all pending outgoing 1-on-1 text messages V2 (resend the resend) --------------
 

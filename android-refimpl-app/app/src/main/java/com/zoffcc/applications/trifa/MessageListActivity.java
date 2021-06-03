@@ -1305,9 +1305,7 @@ public class MessageListActivity extends AppCompatActivity
             return;
         }
 
-        // Log.i(TAG, "add_outgoing_file:friendnum=" + friendnum);
-
-        Log.i(TAG, "add_outgoing_file:friendnum(2)=" + friendnum);
+        // Log.i(TAG, "add_outgoing_file:friendnum(2)=" + friendnum);
 
         Filetransfer f = new Filetransfer();
         f.tox_public_key_string = tox_friend_get_public_key__wrapper(friendnum);

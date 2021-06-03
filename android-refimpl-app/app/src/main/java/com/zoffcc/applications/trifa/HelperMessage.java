@@ -236,7 +236,7 @@ public class HelperMessage
     {
         try
         {
-            Log.i(TAG, "add_single_message_from_messge_id:1:message_id=" + message_id);
+            // Log.i(TAG, "add_single_message_from_messge_id:1:message_id=" + message_id);
             Thread t = new Thread()
             {
                 @Override
@@ -244,7 +244,7 @@ public class HelperMessage
                 {
                     if (message_id != -1)
                     {
-                        Log.i(TAG, "add_single_message_from_messge_id:2:message_id=" + message_id);
+                        // Log.i(TAG, "add_single_message_from_messge_id:2:message_id=" + message_id);
 
                         try
                         {
@@ -531,7 +531,7 @@ public class HelperMessage
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "set_message_start_queueing_from_id:EE:" + e.getMessage());
+            // Log.i(TAG, "set_message_start_queueing_from_id:EE:" + e.getMessage());
         }
     }
 
@@ -583,7 +583,7 @@ public class HelperMessage
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "set_message_msg_at_relay_from_id:EE:" + e.getMessage());
+            // Log.i(TAG, "set_message_msg_at_relay_from_id:EE:" + e.getMessage());
         }
     }
 
@@ -594,7 +594,7 @@ public class HelperMessage
         //    @Override
         //    public void run()
         //    {
-        Log.i(TAG, "insert_into_message_db:m=" + m);
+        // Log.i(TAG, "insert_into_message_db:m=" + m);
         long row_id = orma.insertIntoMessage(m);
 
         try

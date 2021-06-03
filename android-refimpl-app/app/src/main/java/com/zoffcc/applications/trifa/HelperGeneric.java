@@ -2413,9 +2413,9 @@ public class HelperGeneric
             {
                 // it's a double send, ignore it
                 // send message receipt v2, most likely the other party did not get it yet
-                Log.i(TAG,
-                      "receive_incoming_message:ACK1:" + get_friend_name_from_num(friend_number_real_sender) + " " +
-                      msg_id_as_hex_string);
+                // Log.i(TAG,
+                //      "receive_incoming_message:ACK1:" + get_friend_name_from_num(friend_number_real_sender) + " " +
+                //      msg_id_as_hex_string);
                 HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer,
                                                                 (pin_timestamp / 1000));
                 return;
@@ -2472,8 +2472,8 @@ public class HelperGeneric
             }
 
             // send message receipt v2 to the relay
-            Log.i(TAG, "receive_incoming_message:ACK2:" + get_friend_name_from_num(friend_number_real_sender) + " " +
-                       msg_id_as_hex_string);
+            // Log.i(TAG, "receive_incoming_message:ACK2:" + get_friend_name_from_num(friend_number_real_sender) + " " +
+            //           msg_id_as_hex_string);
             HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer,
                                                             (pin_timestamp / 1000));
 
