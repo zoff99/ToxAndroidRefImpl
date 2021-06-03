@@ -16,4 +16,4 @@ Tox - свободное программное обеспечение. Оно �
 <b>Дополнительная информация:</b><br>
 * <a href="https://tox.zoff.cc">О Tox</a><br>
 * <a href="https://matrix.to/#/#trifa:matrix.org">Присоединяйтесь к обсуждению в Matrix</a><br>.
-* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Присоединяйтесь к IRC-каналу Tox</a><br>
+* <a href="https://matrix.to/#/#toktok:libera.chat">Присоединяйтесь к IRC-каналу Tox</a><br>

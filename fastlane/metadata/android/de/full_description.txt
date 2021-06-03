@@ -16,4 +16,4 @@ Tox ist freie Software. Das ist kostenlos, sowohl in der Freiheit als auch im Pr
 <b>Weitere Informationen:</b><br>
 * <a href="https://tox.zoff.cc">was ist Tox?</a><br>
 * <a href="https://matrix.to/#/#trifa:matrix.org">Nehmen Sie an der Diskussion über Matrix teil</a><br>
-* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Treten Sie dem Tox IRC Channel bei</a><br>
+* <a href="https://matrix.to/#/#toktok:libera.chat">Treten Sie dem Tox IRC Channel bei</a><br>

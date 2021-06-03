@@ -16,4 +16,4 @@ Tox est un logiciel libre. C’est libre comme dans liberté, ainsi que dans le 
 <b>Plus d’informations :</b><br>
 * <a href="https://tox.zoff.cc">sur Tox</a><br>
 * <a href="https://matrix.to/#/#trifa:matrix.org">Participez à la discussion sur Matrix</a><br>
-* <a href="https://matrix.to/#/#freenode_#toktok:matrix.org">Joignez le Canal IRC Tox</a><br>
+* <a href="https://matrix.to/#/#toktok:libera.chat">Joignez le Canal IRC Tox</a><br>
