@@ -27,6 +27,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -56,10 +57,13 @@ import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 
 /*
  *
@@ -186,7 +190,12 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
 
         date_time.setText(long_date_time_format(m.sent_timestamp));
 
+        textView.setVisibility(View.VISIBLE);
+        imageView.setVisibility(View.VISIBLE);
+
         final Message message = m;
+
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
 
         if (message.filedb_id == -1) // tranfser was canceled somewhere
         {
@@ -237,6 +246,17 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
             if (is_image)
             {
                 ft_preview_image.setImageResource(R.drawable.round_loading_animation);
+
+                if (PREF__compact_chatlist)
+                {
+                    textView.setVisibility(View.GONE);
+                    imageView.setVisibility(View.GONE);
+                }
+                else
+                {
+                    textView.setVisibility(View.VISIBLE);
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
+                }
 
                 ft_preview_image.setOnTouchListener(new View.OnTouchListener()
                 {

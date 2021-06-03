@@ -30,6 +30,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,11 +56,14 @@ import info.guardianproject.iocipher.File;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -196,12 +200,17 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         button_cancel.setVisibility(View.GONE);
         ft_progressbar.setVisibility(View.GONE);
         ft_buttons_container.setVisibility(View.GONE);
+        textView.setVisibility(View.VISIBLE);
+        imageView.setVisibility(View.VISIBLE);
 
         final Message message2 = message;
+
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
 
         if (message.filedb_id == -1)
         {
             textView.setAutoLinkText("" + message.text + "\n *canceled*");
+
             ft_preview_image.setImageDrawable(null);
             ft_preview_container.setVisibility(View.GONE);
             ft_preview_image.setVisibility(View.GONE);
@@ -239,6 +248,17 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 // ft_preview_image.setImageDrawable(d3);
                 ft_preview_image.setImageResource(R.drawable.round_loading_animation);
                 // final ImageButton ft_preview_image_ = ft_preview_image;
+
+                if (PREF__compact_chatlist)
+                {
+                    textView.setVisibility(View.GONE);
+                    imageView.setVisibility(View.GONE);
+                }
+                else
+                {
+                    textView.setVisibility(View.VISIBLE);
+                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
+                }
 
                 if (VFS_ENCRYPT)
                 {
