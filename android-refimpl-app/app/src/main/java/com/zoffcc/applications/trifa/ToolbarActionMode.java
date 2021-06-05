@@ -33,6 +33,7 @@ import static com.zoffcc.applications.trifa.HelperConference.delete_selected_con
 import static com.zoffcc.applications.trifa.HelperMessage.copy_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.delete_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.save_selected_messages;
+import static com.zoffcc.applications.trifa.HelperMessage.show_select_conference_message_info;
 import static com.zoffcc.applications.trifa.HelperMessage.show_select_message_info;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
@@ -132,7 +133,17 @@ public class ToolbarActionMode implements ActionMode.Callback
 
             case R.id.action_info:
                 action_active = true;
-                show_select_message_info(context);
+
+                if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
+                {
+                    // normal chat view
+                    show_select_message_info(context);
+                }
+                else
+                {
+                    // conference view
+                    show_select_conference_message_info(context);
+                }
                 mode.finish(); // Finish action mode
                 break;
         }

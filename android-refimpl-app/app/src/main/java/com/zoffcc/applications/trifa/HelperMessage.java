@@ -34,6 +34,7 @@ import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
 
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperMessage
@@ -703,6 +704,94 @@ public class HelperMessage
         }
     }
 
+    static void show_select_conference_message_info(Context c)
+    {
+        try
+        {
+            if (!MainActivity.selected_conference_messages.isEmpty())
+            {
+                // sort ascending (lowest ID on top)
+                Collections.sort(MainActivity.selected_conference_messages, new Comparator<Long>()
+                {
+                    public int compare(Long o1, Long o2)
+                    {
+                        return o1.compareTo(o2);
+                    }
+                });
+                StringBuilder copy_text = new StringBuilder();
+                boolean first = true;
+                Iterator i = MainActivity.selected_conference_messages.iterator();
+
+                if (i.hasNext())
+                {
+                    try
+                    {
+                        final ConferenceMessage m = orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0);
+
+                        // @formatter:off
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(c);
+                        builder.
+                                setMessage(
+                                        "id:"+m.id+"\n"+
+                                        "message_id_tox:"+m.message_id_tox+"\n"+
+                                        "direction:"+m.direction+"\n"+
+                                        "was_synced:"+m.was_synced+"\n"+
+                                        "read:"+m.read+"\n"+
+                                        "tox_peerpubkey:"+m.tox_peerpubkey+"\n"+
+                                        "conference_identifier:"+m.conference_identifier+"\n"+
+                                        "is_new:"+m.is_new+"\n"+
+                                        "sent_timestamp:"+m.sent_timestamp+"\n"+
+                                        "sent_timestamp:"+long_date_time_format_or_empty(m.sent_timestamp)+"\n"+
+                                        "rcvd_timestamp:"+m.rcvd_timestamp+"\n"+
+                                        "rcvd_timestamp:"+long_date_time_format_or_empty(m.rcvd_timestamp)+"\n"+
+                                        "TOX_MESSAGE_TYPE:"+m.TOX_MESSAGE_TYPE+"\n"
+                                ).
+                                setTitle("Message Info").
+                                setCancelable(false).
+                                setPositiveButton("OK", new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        dialog.dismiss();
+                                    }
+                                }).
+                                setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                        final AlertDialog alert = builder.create();
+                        alert.show();
+                        // @formatter:on
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                MainActivity.selected_conference_messages.clear();
+
+                try
+                {
+                    // need to redraw all items again here, to remove the selections
+                    MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
+    }
+
     static void show_select_message_info(Context c)
     {
         try
@@ -744,8 +833,10 @@ public class HelperMessage
                                         "msg_id_hash:"+m.msg_id_hash+"\n"+
                                         "sent_timestamp:"+m.sent_timestamp+"\n"+
                                         "sent_timestamp_ms:"+m.sent_timestamp_ms+"\n"+
+                                        "sent_timestamp:"+long_date_time_format_or_empty(m.sent_timestamp)+"\n"+
                                         "rcvd_timestamp:"+m.rcvd_timestamp+"\n"+
                                         "rcvd_timestamp_ms:"+m.rcvd_timestamp_ms+"\n"+
+                                        "rcvd_timestamp:"+long_date_time_format_or_empty(m.rcvd_timestamp)+"\n"+
                                         "TOX_MESSAGE_TYPE:"+m.TOX_MESSAGE_TYPE+"\n"
                                            ).
                                 setTitle("Message Info").

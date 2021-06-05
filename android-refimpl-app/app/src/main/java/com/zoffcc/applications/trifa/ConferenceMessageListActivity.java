@@ -73,6 +73,8 @@ import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActiv
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_get_name;
@@ -111,6 +113,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
+    static MenuItem amode_info_menu_item = null;
     SearchView messageSearchView = null;
 
     // main drawer ----------
@@ -132,6 +135,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         amode = null;
         amode_save_menu_item = null;
+        amode_info_menu_item = null;
         selected_conference_messages.clear();
 
         try
@@ -765,6 +769,14 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 v.setBackgroundColor(Color.TRANSPARENT);
                 is_selected = false;
                 selected_conference_messages.remove(message_.id);
+                if (selected_conference_messages.size() == 1)
+                {
+                    amode_info_menu_item.setVisible(true);
+                }
+                else
+                {
+                    amode_info_menu_item.setVisible(false);
+                }
 
                 if (selected_conference_messages.isEmpty())
                 {
@@ -786,6 +798,15 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     v.setBackgroundColor(Color.GRAY);
                     is_selected = true;
                     selected_conference_messages.add(message_.id);
+
+                    if (selected_conference_messages.size() == 1)
+                    {
+                        amode_info_menu_item.setVisible(true);
+                    }
+                    else
+                    {
+                        amode_info_menu_item.setVisible(false);
+                    }
 
                     if (amode != null)
                     {
@@ -825,9 +846,19 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         amode = MainActivity.conference_message_list_activity.startSupportActionMode(
                                 new ToolbarActionMode(context));
+                        amode_info_menu_item = amode.getMenu().findItem(R.id.action_info);
                         v.setBackgroundColor(Color.GRAY);
                         ret.is_selected = true;
                         selected_conference_messages.add(message_.id);
+
+                        if (selected_conference_messages.size() == 1)
+                        {
+                            amode_info_menu_item.setVisible(true);
+                        }
+                        else
+                        {
+                            amode_info_menu_item.setVisible(false);
+                        }
 
                         if (amode != null)
                         {
