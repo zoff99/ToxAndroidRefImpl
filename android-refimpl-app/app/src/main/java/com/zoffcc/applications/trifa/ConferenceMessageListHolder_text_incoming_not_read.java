@@ -285,6 +285,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             Log.i(TAG, "bindMessageList:EE:" + e.getMessage());
         }
 
+
         //        textView.setAutoLinkText("" + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
         //                //
         //                m.tox_peerpubkey.length())
@@ -496,6 +497,9 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             // Log.i(TAG, "have_avatar_for_pubkey:00a07:" + have_avatar_for_pubkey);
         }
 
+        img_corner.setVisibility(View.GONE);
+        date_time.setVisibility(View.VISIBLE);
+
         if (is_system_message)
         {
             img_avatar.setVisibility(View.GONE);
@@ -515,9 +519,16 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         {
             // TODO: do we need to reset here? -> yes
             img_avatar.setVisibility(View.VISIBLE);
-            img_corner.setVisibility(View.VISIBLE);
+            if (PREF__compact_chatlist)
+            {
+                img_corner.setVisibility(View.GONE);
+            }
+            else
+            {
+                img_corner.setVisibility(View.VISIBLE);
+            }
             imageView.setVisibility(View.VISIBLE);
-            textView_container.setMinimumHeight((int) dp2px(50));
+            textView_container.setMinimumHeight((int) dp2px(0));
             textView_container.setPadding(0, textView_container.getPaddingTop(), 0,
                                           textView_container.getPaddingBottom()); // left, top, right, bottom
             LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
@@ -525,7 +536,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                                  parameter.bottomMargin); // left, top, right, bottom
             textView_container.setLayoutParams(parameter);
             // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
-            peer_name_text.setVisibility(View.VISIBLE);
 
             if (!have_avatar_for_pubkey)
             {
@@ -544,16 +554,99 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 imageView.setImageResource(R.drawable.circle_green);
             }
 
-            imageView.setVisibility(View.VISIBLE);
 
-            if (PREF__compact_chatlist)
+            // --------- peer name (show only if different from previous message) ---------
+            // --------- peer name (show only if different from previous message) ---------
+            // --------- peer name (show only if different from previous message) ---------
+            peer_name_text.setVisibility(View.GONE);
+            int my_position = this.getAdapterPosition();
+            if (my_position != RecyclerView.NO_POSITION)
             {
-                img_corner.setVisibility(View.GONE);
+                try
+                {
+                    if (MainActivity.conference_message_list_fragment.adapter != null)
+                    {
+                        if (my_position < 1)
+                        {
+                            peer_name_text.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            final String peer_cur = MainActivity.conference_message_list_fragment.adapter.getPrvPeer(
+                                    my_position);
+                            final String peer_prev = MainActivity.conference_message_list_fragment.adapter.getPrvPeer(
+                                    my_position - 1);
+                            if ((peer_cur == null) || (peer_prev == null))
+                            {
+                                peer_name_text.setVisibility(View.VISIBLE);
+                            }
+                            else if (!peer_cur.equals(peer_prev))
+                            {
+                                peer_name_text.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
             }
-            else
+            // --------- peer name (show only if different from previous message) ---------
+            // --------- peer name (show only if different from previous message) ---------
+            // --------- peer name (show only if different from previous message) ---------
+
+            // --------- timestamp (show only if different from previous message) ---------
+            // --------- timestamp (show only if different from previous message) ---------
+            // --------- timestamp (show only if different from previous message) ---------
+            date_time.setVisibility(View.GONE);
+            if (my_position != RecyclerView.NO_POSITION)
             {
-                img_corner.setVisibility(View.VISIBLE);
+                try
+                {
+                    if (MainActivity.conference_message_list_fragment.adapter != null)
+                    {
+                        if (my_position < 1)
+                        {
+                            date_time.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            final ConferenceMessagelistAdapter.DateTime_in_out peer_cur = MainActivity.conference_message_list_fragment.adapter.getDateTime(
+                                    my_position);
+                            final ConferenceMessagelistAdapter.DateTime_in_out peer_prev = MainActivity.conference_message_list_fragment.adapter.getDateTime(
+                                    my_position - 1);
+                            if ((peer_cur == null) || (peer_prev == null))
+                            {
+                                date_time.setVisibility(View.VISIBLE);
+                            }
+                            else if (peer_cur.direction != peer_prev.direction)
+                            {
+                                date_time.setVisibility(View.VISIBLE);
+                            }
+                            else if (!peer_cur.pk.equals(peer_prev.pk))
+                            {
+                                date_time.setVisibility(View.VISIBLE);
+                            }
+                            else
+                            {
+                                // if message is within 20 seconds of previous message and same direction and same peer
+                                // then do not show timestamp
+                                if (peer_cur.timestamp > peer_prev.timestamp + (20 * 1000))
+                                {
+                                    date_time.setVisibility(View.VISIBLE);
+                                }
+                            }
+
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
             }
+            // --------- timestamp (show only if different from previous message) ---------
+            // --------- timestamp (show only if different from previous message) ---------
+            // --------- timestamp (show only if different from previous message) ---------
         }
 
     }

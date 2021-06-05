@@ -104,8 +104,8 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
             case Message_model.TEXT_OUTGOING_HAVE_READ:
                 if (PREF__compact_chatlist)
                 {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read_compact,
-                                                                            parent, false);
+                    view = LayoutInflater.from(parent.getContext()).inflate(
+                            R.layout.message_list_self_entry_read_compact, parent, false);
                 }
                 else
                 {
@@ -377,6 +377,70 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
         {
             e.printStackTrace();
             return " ";
+        }
+    }
+
+    public String getPrvPeer(int position)
+    {
+        try
+        {
+            ConferenceMessage getSectionText_message_object2 = messagelistitems.get(position);
+
+            if (getSectionText_message_object2.direction == 0)
+            {
+                // incoming msg
+                return ("I_" + getSectionText_message_object2.tox_peerpubkey);
+            }
+            else
+            {
+                // outgoing msg
+                return ("O_" + getSectionText_message_object2.tox_peerpubkey);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static class DateTime_in_out
+    {
+        long timestamp;
+        int direction;
+        String pk;
+    }
+
+    public DateTime_in_out getDateTime(int position)
+    {
+        DateTime_in_out ret = new DateTime_in_out();
+
+        try
+        {
+            // direction: 0 -> msg received, 1 -> msg sent
+            ConferenceMessage getSectionText_message_object2 = messagelistitems.get(position);
+
+            if (getSectionText_message_object2.direction == 0)
+            {
+                // incoming msg
+                ret.direction = 0;
+                ret.timestamp = getSectionText_message_object2.rcvd_timestamp;
+                ret.pk = getSectionText_message_object2.tox_peerpubkey;
+                return ret;
+            }
+            else
+            {
+                // outgoing msg
+                ret.direction = 1;
+                ret.timestamp = getSectionText_message_object2.sent_timestamp;
+                ret.pk = getSectionText_message_object2.tox_peerpubkey;
+                return ret;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
         }
     }
 }

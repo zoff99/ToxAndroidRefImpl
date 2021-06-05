@@ -128,9 +128,10 @@
 
                         <TextView
                             android:id="@+id/dummy"
-                            android:layout_width="2dp"
+                            android:layout_width="8dp"
                             android:layout_height="wrap_content"
-                            android:text="" />
+                            android:text=""
+                            android:visibility="visible" />
 
                     </LinearLayout>
 
