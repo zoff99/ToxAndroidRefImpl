@@ -57,6 +57,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
@@ -543,6 +544,16 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 imageView.setImageResource(R.drawable.circle_green);
             }
 
+            imageView.setVisibility(View.VISIBLE);
+
+            if (PREF__compact_chatlist)
+            {
+                img_corner.setVisibility(View.GONE);
+            }
+            else
+            {
+                img_corner.setVisibility(View.VISIBLE);
+            }
         }
 
     }
