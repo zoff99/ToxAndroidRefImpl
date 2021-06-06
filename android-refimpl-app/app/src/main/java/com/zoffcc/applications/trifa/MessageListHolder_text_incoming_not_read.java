@@ -371,6 +371,59 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         {
             e.printStackTrace();
         }
+
+        // --------- timestamp (show only if different from previous message) ---------
+        // --------- timestamp (show only if different from previous message) ---------
+        // --------- timestamp (show only if different from previous message) ---------
+        date_time.setVisibility(View.GONE);
+        if (my_position != RecyclerView.NO_POSITION)
+        {
+            try
+            {
+                if (MainActivity.message_list_fragment.adapter != null)
+                {
+                    if (my_position < 1)
+                    {
+                        date_time.setVisibility(View.VISIBLE);
+                    }
+                    // else if (m.msg_version == 1)
+                    // {
+                    //     date_time.setVisibility(View.VISIBLE);
+                    // }
+                    else
+                    {
+                        final MessagelistAdapter.DateTime_in_out peer_cur = MainActivity.message_list_fragment.adapter.getDateTime(
+                                my_position);
+                        final MessagelistAdapter.DateTime_in_out peer_prev = MainActivity.message_list_fragment.adapter.getDateTime(
+                                my_position - 1);
+                        if ((peer_cur == null) || (peer_prev == null))
+                        {
+                            date_time.setVisibility(View.VISIBLE);
+                        }
+                        // else if (peer_cur.direction != peer_prev.direction)
+                        // {
+                        //     date_time.setVisibility(View.VISIBLE);
+                        // }
+                        else
+                        {
+                            // if message is within 20 seconds of previous message and same direction and same peer
+                            // then do not show timestamp
+                            if (peer_cur.timestamp > peer_prev.timestamp + (20 * 1000))
+                            {
+                                date_time.setVisibility(View.VISIBLE);
+                            }
+                        }
+
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+        // --------- timestamp (show only if different from previous message) ---------
+        // --------- timestamp (show only if different from previous message) ---------
+        // --------- timestamp (show only if different from previous message) ---------
     }
 
     @Override
