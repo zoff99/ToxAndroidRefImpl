@@ -4479,11 +4479,7 @@ public class MainActivity extends AppCompatActivity
                         HelperGeneric.conference_message_add_from_sync(
                                 HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
                                 real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
-                                sync_msg_received_timestamp);
-                        //TODO: bestätigung senden, dass wir die nachricht bekommen haben.
-                        // TOX_FILE_KIND_MESSAGEV2_ANSWER
-                        // send_friend_msg_receipt_v2_wrapper
-                        //ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+                                sync_msg_received_timestamp,real_send_message_id);
 
                         send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
                                                            (System.currentTimeMillis() / 1000));

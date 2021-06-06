@@ -74,7 +74,6 @@ import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x
 import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames_current;
 import static com.zoffcc.applications.trifa.Callstate.java_video_encoder_first_frame_in;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
@@ -319,7 +318,7 @@ public class HelperGeneric
         }
     }
 
-    static void conference_message_add_from_sync(long conference_number, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms)
+    static void conference_message_add_from_sync(long conference_number, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id)
     {
         // Log.i(TAG, "conference_message_add_from_sync:cf_num=" + conference_number + " pnum=" + peer_number2 + " msg=" +
         //            message);
@@ -400,6 +399,7 @@ public class HelperGeneric
         m.sent_timestamp = sent_timestamp_in_ms;
         m.rcvd_timestamp = System.currentTimeMillis();
         m.text = message;
+        m.message_id_tox = message_id;
         m.was_synced = true;
 
         try
