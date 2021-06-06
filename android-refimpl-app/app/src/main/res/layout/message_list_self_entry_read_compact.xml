@@ -14,6 +14,37 @@
         android:padding="0dp">
 
         <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:orientation="horizontal"
+            android:padding="0dp">
+
+            <TextView
+                android:id="@+id/date_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:layout_marginLeft="20dp"
+                android:layout_marginTop="@dimen/message_entry_datetime_bottom_padding_small"
+                android:layout_marginBottom="8dp"
+                android:gravity="top"
+                android:padding="0dp"
+                android:text="2017-06-20 14:00:12"
+                android:textAlignment="gravity"
+                android:textColor="#EFEFEF"
+                android:textSize="9sp" />
+
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="10"
+                android:visibility="invisible" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:id="@+id/layout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -77,37 +108,6 @@
                 app:civ_border_color="#50000000"
                 app:civ_border_width="2dp"
                 app:civ_fill_color="@color/md_grey_400" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="0dp"
-            android:orientation="horizontal"
-            android:padding="0dp">
-
-            <TextView
-                android:id="@+id/date_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="top"
-                android:layout_marginLeft="20dp"
-                android:layout_marginTop="-8dp"
-                android:layout_marginBottom="@dimen/message_entry_datetime_bottom_padding"
-                android:gravity="top"
-                android:padding="0dp"
-                android:text="2017-06-20 14:00:12"
-                android:textAlignment="gravity"
-                android:textColor="#EFEFEF"
-                android:textSize="9sp" />
-
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="1dp"
-                android:layout_weight="10"
-                android:visibility="invisible" />
-
         </LinearLayout>
 
     </LinearLayout>
