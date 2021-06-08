@@ -617,7 +617,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 ret.direction = 1;
                 if (getSectionText_message_object2.msg_version == 1)
                 {
-                    ret.timestamp = getSectionText_message_object2.rcvd_timestamp;
+                    ret.timestamp = getSectionText_message_object2.sent_timestamp;
                 }
                 else
                 {

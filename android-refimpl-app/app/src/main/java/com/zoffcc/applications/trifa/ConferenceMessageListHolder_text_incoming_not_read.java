@@ -644,6 +644,9 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 {
                 }
             }
+            else
+            {
+            }
             // --------- timestamp (show only if different from previous message) ---------
             // --------- timestamp (show only if different from previous message) ---------
             // --------- timestamp (show only if different from previous message) ---------

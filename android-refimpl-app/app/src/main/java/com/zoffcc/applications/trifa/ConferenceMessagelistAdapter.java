@@ -424,7 +424,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
             {
                 // incoming msg
                 ret.direction = 0;
-                ret.timestamp = getSectionText_message_object2.rcvd_timestamp;
+                ret.timestamp = getSectionText_message_object2.sent_timestamp;
                 ret.pk = getSectionText_message_object2.tox_peerpubkey;
                 return ret;
             }
