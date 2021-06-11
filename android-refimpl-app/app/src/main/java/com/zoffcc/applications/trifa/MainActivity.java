@@ -4119,12 +4119,13 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_read_receipt_message_v2_cb_method(final long friend_number, long ts_sec, byte[] msg_id)
     {
-        // Log.i(TAG, "friend_read_receipt_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number));
         if (PREF__X_battery_saving_mode)
         {
-            Log.i(TAG, "global_last_activity_for_battery_savings_ts:003:*PING*");
+            // Log.i(TAG, "friend_read_receipt_message_v2_cb::IN:fn=" + get_friend_name_from_num(friend_number));
+            //**// Log.i(TAG, "global_last_activity_for_battery_savings_ts:003:*PING*");
         }
-        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        //**// global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+
         ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
         msg_id_buffer.put(msg_id, 0, (int) TOX_HASH_LENGTH);
         final String message_id_hash_as_hex_string = HelperGeneric.bytesToHex(msg_id_buffer.array(),
@@ -4479,7 +4480,7 @@ public class MainActivity extends AppCompatActivity
                         HelperGeneric.conference_message_add_from_sync(
                                 HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
                                 real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
-                                sync_msg_received_timestamp,real_send_message_id);
+                                sync_msg_received_timestamp, real_send_message_id);
 
                         send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
                                                            (System.currentTimeMillis() / 1000));
