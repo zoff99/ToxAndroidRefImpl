@@ -57,6 +57,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
@@ -65,6 +66,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORN
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_PUBKEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_TOKTOK_CONFID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -285,6 +288,45 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             Log.i(TAG, "bindMessageList:EE:" + e.getMessage());
         }
 
+        boolean handle_special_name = false;
+
+        if (m.conference_identifier.equals(TOXIRC_TOKTOK_CONFID))
+        {
+            if (m.tox_peerpubkey.equals(TOXIRC_PUBKEY))
+            {
+                // toxirc messages will be displayed in a special way
+                if (m.text.length() > (3 + 1))
+                {
+                    if (m.text.startsWith("<"))
+                    {
+                        int start_pos = m.text.indexOf("<");
+                        int end_pos = m.text.indexOf("> ");
+
+                        if ((start_pos > -1) && (end_pos > -1) && (end_pos > start_pos))
+                        {
+                            try
+                            {
+                                String peer_name_corrected = m.text.substring(start_pos + 1, end_pos);
+                                m.tox_peername = peer_name_corrected;
+                                peer_name_text.setText(peer_name_corrected);
+                                m.text = m.text.substring(end_pos + 2);
+
+                                String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
+                                        TrifaSetPatternActivity.StringToBytes2(
+                                                m.tox_peerpubkey + "--" + peer_name_corrected)));
+
+                                new_fake_pubkey = new_fake_pubkey.substring(1, new_fake_pubkey.length() - 2);
+                                m.tox_peerpubkey = new_fake_pubkey;
+                                handle_special_name = true;
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
         //        textView.setAutoLinkText("" + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
         //                //
@@ -555,11 +597,26 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             }
 
 
+            int my_position = this.getAdapterPosition();
+            /*
+            if (my_position != RecyclerView.NO_POSITION)
+            {
+                if (handle_special_name)
+                {
+                    ConferenceMessage getSectionText_message_object2 = MainActivity.conference_message_list_fragment.adapter.get_item(
+                            my_position);
+                    getSectionText_message_object2.tox_peerpubkey = m.tox_peerpubkey;
+                    getSectionText_message_object2.text = m.text;
+                    getSectionText_message_object2.tox_peername = m.tox_peername;
+                }
+            }
+            */
+
             // --------- peer name (show only if different from previous message) ---------
             // --------- peer name (show only if different from previous message) ---------
             // --------- peer name (show only if different from previous message) ---------
             peer_name_text.setVisibility(View.GONE);
-            int my_position = this.getAdapterPosition();
+            my_position = this.getAdapterPosition();
             if (my_position != RecyclerView.NO_POSITION)
             {
                 try

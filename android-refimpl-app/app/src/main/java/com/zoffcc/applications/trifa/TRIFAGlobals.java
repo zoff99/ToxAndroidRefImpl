@@ -66,6 +66,8 @@ public class TRIFAGlobals
     // https://toxme.io/u/echobot
     //  echobot@toxme.io
     final static String ECHOBOT_TOXID = "76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C48A39218F515C39A6";
+    final static String TOXIRC_TOKTOK_CONFID = "b0d5292414685a53341d8126b67dfe260baf5881c9aff48a6ea211dcf3bfe34f";
+    final static String TOXIRC_PUBKEY = "A922A51E1C91205B9F7992E2273107D47C72E8AE909C61C28A77A4A2A115431B";
     // ----------
 
     final static boolean ADD_BOTS_ON_STARTUP = true;

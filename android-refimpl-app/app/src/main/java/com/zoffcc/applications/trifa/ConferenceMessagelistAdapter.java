@@ -380,6 +380,18 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
         }
     }
 
+    public ConferenceMessage get_item(int position)
+    {
+        try
+        {
+            return messagelistitems.get(position);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
     public String getPrvPeer(int position)
     {
         try
