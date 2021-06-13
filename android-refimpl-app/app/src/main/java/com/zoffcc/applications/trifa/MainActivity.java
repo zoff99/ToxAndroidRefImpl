@@ -418,8 +418,8 @@ public class MainActivity extends AppCompatActivity
     static int PREF__video_cam_resolution = 0;
     static int PREF__global_font_size = 2;
     static boolean PREF__allow_open_encrypted_file_via_intent = false;
-    static boolean PREF__compact_friendlist = true;
-    static boolean PREF__compact_chatlist = false;
+    static boolean PREF__compact_friendlist = false;
+    static boolean PREF__compact_chatlist = true;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -1123,22 +1123,22 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__compact_friendlist = settings.getBoolean("compact_friendlist", true);
+            PREF__compact_friendlist = settings.getBoolean("compact_friendlist", false);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__compact_friendlist = true;
+            PREF__compact_friendlist = false;
         }
 
         try
         {
-            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", false);
+            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", true);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__compact_chatlist = false;
+            PREF__compact_chatlist = true;
         }
 
         // prefs ----------
@@ -2278,22 +2278,22 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__compact_friendlist = settings.getBoolean("compact_friendlist", true);
+            PREF__compact_friendlist = settings.getBoolean("compact_friendlist", false);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__compact_friendlist = true;
+            PREF__compact_friendlist = false;
         }
 
         try
         {
-            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", false);
+            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", true);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__compact_chatlist = false;
+            PREF__compact_chatlist = true;
         }
 
         // prefs ----------
