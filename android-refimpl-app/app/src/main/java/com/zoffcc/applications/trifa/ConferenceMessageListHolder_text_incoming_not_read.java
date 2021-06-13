@@ -123,6 +123,10 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
     {
         message_ = m;
 
+        String message__text = m.text;
+        String message__tox_peername = m.tox_peername;
+        String message__tox_peerpubkey = m.tox_peerpubkey;
+
         swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener()
         {
             @Override
@@ -190,8 +194,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         // Log.i(TAG, "have_avatar_for_pubkey:0000:==========================");
 
-        is_system_message = m.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY);
-        // Log.i(TAG, "is_system_message=" + is_system_message + " m.tox_peerpubkey=" + m.tox_peerpubkey);
+        is_system_message = message__tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY);
+        // Log.i(TAG, "is_system_message=" + is_system_message + " message__tox_peerpubkey=" + message__tox_peerpubkey);
 
         is_selected = false;
         if (selected_messages.isEmpty())
@@ -235,20 +239,20 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         // Log.i(TAG, "bindMessageList");
 
-        // textView.setText("#" + m.id + ":" + m.text);
+        // textView.setText("#" + m.id + ":" + message__text);
         textView.setCustomRegex(TOXURL_PATTERN);
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
                                  AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
 
         try
         {
-            String peer_name = tox_conference_peer_get_name__wrapper(m.conference_identifier, m.tox_peerpubkey);
+            String peer_name = tox_conference_peer_get_name__wrapper(m.conference_identifier, message__tox_peerpubkey);
 
             if (peer_name == null)
             {
-                peer_name = m.tox_peername;
+                peer_name = message__tox_peername;
 
-                if ((peer_name == null) || (m.tox_peername.equals("")) || (peer_name.equals("-1")))
+                if ((peer_name == null) || (message__tox_peername.equals("")) || (peer_name.equals("-1")))
                 {
                     peer_name = "Unknown";
                 }
@@ -257,13 +261,13 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             {
                 if (peer_name.equals("-1"))
                 {
-                    if ((m.tox_peername == null) || (m.tox_peername.equals("")))
+                    if ((message__tox_peername == null) || (message__tox_peername.equals("")))
                     {
                         peer_name = "Unknown";
                     }
                     else
                     {
-                        peer_name = m.tox_peername;
+                        peer_name = message__tox_peername;
                     }
                 }
             }
@@ -271,8 +275,9 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             layout_peer_name_container.setVisibility(View.VISIBLE);
             try
             {
-                peer_name_text.setText(peer_name + " / " + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
-                                                                                      m.tox_peerpubkey.length()));
+                peer_name_text.setText(peer_name + " / " +
+                                       message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
+                                                                         message__tox_peerpubkey.length()));
             }
             catch (Exception e2)
             {
@@ -290,51 +295,29 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         boolean handle_special_name = false;
 
-        if (m.conference_identifier.equals(TOXIRC_TOKTOK_CONFID))
+        name_test_pk res = correct_pubkey(m);
+        if (res.changed)
         {
-            if (m.tox_peerpubkey.equals(TOXIRC_PUBKEY))
+            try
             {
-                // toxirc messages will be displayed in a special way
-                if (m.text.length() > (3 + 1))
-                {
-                    if (m.text.startsWith("<"))
-                    {
-                        int start_pos = m.text.indexOf("<");
-                        int end_pos = m.text.indexOf("> ");
-
-                        if ((start_pos > -1) && (end_pos > -1) && (end_pos > start_pos))
-                        {
-                            try
-                            {
-                                String peer_name_corrected = m.text.substring(start_pos + 1, end_pos);
-                                m.tox_peername = peer_name_corrected;
-                                peer_name_text.setText(peer_name_corrected);
-                                m.text = m.text.substring(end_pos + 2);
-
-                                String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
-                                        TrifaSetPatternActivity.StringToBytes2(
-                                                m.tox_peerpubkey + "--" + peer_name_corrected)));
-
-                                new_fake_pubkey = new_fake_pubkey.substring(1, new_fake_pubkey.length() - 2);
-                                m.tox_peerpubkey = new_fake_pubkey;
-                                handle_special_name = true;
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
-                    }
-                }
+                message__tox_peername = res.tox_peername;
+                peer_name_text.setText(message__tox_peername);
+                message__text = res.text;
+                message__tox_peerpubkey = res.tox_peerpubkey;
+                handle_special_name = true;
+            }
+            catch (Exception e)
+            {
             }
         }
 
-        //        textView.setAutoLinkText("" + m.tox_peerpubkey.substring((m.tox_peerpubkey.length() - 6),
+        //        textView.setAutoLinkText("" + message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
         //                //
-        //                m.tox_peerpubkey.length())
+        //                message__tox_peerpubkey.length())
         //                //
-        //                + ":" + m.text);
+        //                + ":" + message__text);
 
-        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
+        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(message__text))
         {
             // text consits only of emojis -> increase size
             textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_ONLY_EMOJI_SIZE[PREF__global_font_size]));
@@ -363,8 +346,8 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         try
         {
             peer_color_bg = ChatColors.get_shade(
-                    ChatColors.PeerAvatarColors[hash_to_bucket(m.tox_peerpubkey, ChatColors.get_size())],
-                    m.tox_peerpubkey);
+                    ChatColors.PeerAvatarColors[hash_to_bucket(message__tox_peerpubkey, ChatColors.get_size())],
+                    message__tox_peerpubkey);
             // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
             textView.setTextColor(Color.BLACK);
 
@@ -389,11 +372,11 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
 
         if ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0))
         {
-            textView.setAutoLinkText(m.text);
+            textView.setAutoLinkText(message__text);
         }
         else
         {
-            textView.setAutoLinkTextHighlight(m.text, conf_search_messages_text);
+            textView.setAutoLinkTextHighlight(message__text, conf_search_messages_text);
         }
 
         date_time.setText(long_date_time_format(m.sent_timestamp));
@@ -435,10 +418,10 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         FriendList fl_temp = null;
         try
         {
-            // Log.i(TAG, "have_avatar_for_pubkey:00a01x:" + m.tox_peername + ":" + m.tox_peerpubkey);
+            // Log.i(TAG, "have_avatar_for_pubkey:00a01x:" + message__tox_peername + ":" + message__tox_peerpubkey);
 
             fl_temp = orma.selectFromFriendList().
-                    tox_public_key_stringEq(m.tox_peerpubkey).get(0);
+                    tox_public_key_stringEq(message__tox_peerpubkey).get(0);
 
             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))
             {
@@ -597,26 +580,11 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             }
 
 
-            int my_position = this.getAdapterPosition();
-            /*
-            if (my_position != RecyclerView.NO_POSITION)
-            {
-                if (handle_special_name)
-                {
-                    ConferenceMessage getSectionText_message_object2 = MainActivity.conference_message_list_fragment.adapter.get_item(
-                            my_position);
-                    getSectionText_message_object2.tox_peerpubkey = m.tox_peerpubkey;
-                    getSectionText_message_object2.text = m.text;
-                    getSectionText_message_object2.tox_peername = m.tox_peername;
-                }
-            }
-            */
-
             // --------- peer name (show only if different from previous message) ---------
             // --------- peer name (show only if different from previous message) ---------
             // --------- peer name (show only if different from previous message) ---------
             peer_name_text.setVisibility(View.GONE);
-            my_position = this.getAdapterPosition();
+            int my_position = this.getAdapterPosition();
             if (my_position != RecyclerView.NO_POSITION)
             {
                 try
@@ -629,10 +597,36 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                         }
                         else
                         {
-                            final String peer_cur = MainActivity.conference_message_list_fragment.adapter.getPrvPeer(
-                                    my_position);
-                            final String peer_prev = MainActivity.conference_message_list_fragment.adapter.getPrvPeer(
-                                    my_position - 1);
+                            name_test_pk res2 = correct_pubkey(
+                                    MainActivity.conference_message_list_fragment.adapter.get_item(my_position));
+
+                            name_test_pk res3 = correct_pubkey(
+                                    MainActivity.conference_message_list_fragment.adapter.get_item(my_position - 1));
+
+                            String peer_cur = null;
+                            String peer_prev = null;
+
+                            if (res2.changed)
+                            {
+                                peer_cur = res2.tox_peerpubkey;
+                            }
+                            else
+                            {
+                                peer_cur = MainActivity.conference_message_list_fragment.adapter.get_item(
+                                        my_position).tox_peerpubkey;
+                            }
+
+                            if (res3.changed)
+                            {
+                                peer_prev = res3.tox_peerpubkey;
+                            }
+                            else
+                            {
+                                peer_prev = MainActivity.conference_message_list_fragment.adapter.get_item(
+                                        my_position - 1).tox_peerpubkey;
+                            }
+
+
                             if ((peer_cur == null) || (peer_prev == null))
                             {
                                 peer_name_text.setVisibility(View.VISIBLE);
@@ -852,4 +846,57 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             return res.ret_value;
         }
     };
+
+    class name_test_pk
+    {
+        boolean changed;
+        String tox_peername;
+        String text;
+        String tox_peerpubkey;
+    }
+
+    name_test_pk correct_pubkey(ConferenceMessage m)
+    {
+        name_test_pk ret = new name_test_pk();
+        ret.changed = false;
+
+        if (m.conference_identifier.equals(TOXIRC_TOKTOK_CONFID))
+        {
+            if (m.tox_peerpubkey.equals(TOXIRC_PUBKEY))
+            {
+                // toxirc messages will be displayed in a special way
+                if (m.text.length() > (3 + 1))
+                {
+                    if (m.text.startsWith("<"))
+                    {
+                        int start_pos = m.text.indexOf("<");
+                        int end_pos = m.text.indexOf("> ");
+
+                        if ((start_pos > -1) && (end_pos > -1) && (end_pos > start_pos))
+                        {
+                            try
+                            {
+                                String peer_name_corrected = m.text.substring(start_pos + 1, end_pos);
+                                ret.tox_peername = peer_name_corrected;
+                                ret.text = m.text.substring(end_pos + 2);
+
+                                String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
+                                        TrifaSetPatternActivity.StringToBytes2(
+                                                m.tox_peerpubkey + "--" + peer_name_corrected)));
+
+                                new_fake_pubkey = new_fake_pubkey.substring(1, new_fake_pubkey.length() - 2);
+                                ret.tox_peerpubkey = new_fake_pubkey;
+                                ret.changed = true;
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return ret;
+    }
 }
