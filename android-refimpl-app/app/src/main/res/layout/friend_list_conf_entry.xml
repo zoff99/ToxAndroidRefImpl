@@ -93,6 +93,7 @@
             android:layout_toRightOf="@id/f_user_status_icon"
             android:gravity="center_vertical"
             android:maxLines="2"
+            android:textColor="@color/md_black_1000"
             android:paddingRight="5dp"
             android:text="example name long name long name long name long name long name"
             android:textSize="16sp"

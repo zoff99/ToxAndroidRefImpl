@@ -161,9 +161,11 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
 
+        friend_line_container.setBackground(null);
         if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)
         {
-            friend_line_container.setBackgroundResource(R.drawable.friend_list_neveronline_round_bg);
+            // friend_line_container.setBackgroundResource(R.drawable.friend_list_neveronline_round_bg);
+            friend_line_container.setBackgroundColor(context.getResources().getColor(R.color.md_amber_300));
         }
         else
         {
@@ -173,7 +175,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else
             {
-                friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
+                // friend_line_container.setBackgroundResource(R.drawable.friend_list_round_bg);
+                friend_line_container.setBackgroundColor(Color.TRANSPARENT);
             }
         }
 

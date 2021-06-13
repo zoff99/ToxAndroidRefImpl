@@ -141,7 +141,6 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -420,7 +419,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__global_font_size = 2;
     static boolean PREF__allow_open_encrypted_file_via_intent = false;
     static boolean PREF__compact_friendlist = true;
-    static boolean PREF__compact_chatlist = true;
+    static boolean PREF__compact_chatlist = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -1134,12 +1133,12 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", true);
+            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", false);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__compact_chatlist = true;
+            PREF__compact_chatlist = false;
         }
 
         // prefs ----------
@@ -2289,12 +2288,12 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", true);
+            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", false);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__compact_chatlist = true;
+            PREF__compact_chatlist = false;
         }
 
         // prefs ----------
