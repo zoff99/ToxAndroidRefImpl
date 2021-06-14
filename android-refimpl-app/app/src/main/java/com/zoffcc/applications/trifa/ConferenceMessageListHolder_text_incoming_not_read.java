@@ -670,14 +670,14 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                             {
                                 date_time.setVisibility(View.VISIBLE);
                             }
-                            else if (peer_cur.direction != peer_prev.direction)
-                            {
-                                date_time.setVisibility(View.VISIBLE);
-                            }
-                            else if (!peer_cur.pk.equals(peer_prev.pk))
-                            {
-                                date_time.setVisibility(View.VISIBLE);
-                            }
+                            // else if (peer_cur.direction != peer_prev.direction)
+                            // {
+                            //     date_time.setVisibility(View.VISIBLE);
+                            // }
+                            // else if (!peer_cur.pk.equals(peer_prev.pk))
+                            // {
+                            //     date_time.setVisibility(View.VISIBLE);
+                            // }
                             else
                             {
                                 // if message is within 20 seconds of previous message and same direction and same peer
