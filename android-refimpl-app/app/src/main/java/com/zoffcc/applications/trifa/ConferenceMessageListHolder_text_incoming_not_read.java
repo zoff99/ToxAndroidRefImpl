@@ -63,6 +63,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
@@ -126,6 +127,24 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         String message__text = m.text;
         String message__tox_peername = m.tox_peername;
         String message__tox_peerpubkey = m.tox_peerpubkey;
+
+        boolean handle_special_name = false;
+
+        name_test_pk res = correct_pubkey(m);
+        if (res.changed)
+        {
+            try
+            {
+                message__tox_peername = res.tox_peername;
+                peer_name_text.setText(message__tox_peername);
+                message__text = res.text;
+                message__tox_peerpubkey = res.tox_peerpubkey;
+                handle_special_name = true;
+            }
+            catch (Exception e)
+            {
+            }
+        }
 
         swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener()
         {
@@ -291,24 +310,6 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         {
             e.printStackTrace();
             Log.i(TAG, "bindMessageList:EE:" + e.getMessage());
-        }
-
-        boolean handle_special_name = false;
-
-        name_test_pk res = correct_pubkey(m);
-        if (res.changed)
-        {
-            try
-            {
-                message__tox_peername = res.tox_peername;
-                peer_name_text.setText(message__tox_peername);
-                message__text = res.text;
-                message__tox_peerpubkey = res.tox_peerpubkey;
-                handle_special_name = true;
-            }
-            catch (Exception e)
-            {
-            }
         }
 
         //        textView.setAutoLinkText("" + message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
@@ -682,7 +683,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                             {
                                 // if message is within 20 seconds of previous message and same direction and same peer
                                 // then do not show timestamp
-                                if (peer_cur.timestamp > peer_prev.timestamp + (20 * 1000))
+                                if (peer_cur.timestamp > peer_prev.timestamp + (MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS))
                                 {
                                     date_time.setVisibility(View.VISIBLE);
                                 }
