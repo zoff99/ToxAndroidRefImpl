@@ -2948,24 +2948,28 @@ public class HelperGeneric
                 // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
                 //settings.edit().putString("DB_secrect_key", "").commit();
                 // -----------------------------------------
+                //
+                //
+                // -----------------------------------------
                 // wipe database
                 String dbs_path = context.getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-                File f_dbs = new File(dbs_path);
-                f_dbs.delete();
+                //File f_dbs = new File(dbs_path);
+                //f_dbs.delete();
                 // wipe encrypted filesystem
                 String encfs_path = context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
-                File encfs_dbs = new File(encfs_path);
-                encfs_dbs.delete();
+                //File encfs_dbs = new File(encfs_path);
+                //encfs_dbs.delete();
                 //
                 String encfs_path2 =
                         context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-shm";
-                File encfs_dbs2 = new File(encfs_path2);
-                encfs_dbs2.delete();
+                //File encfs_dbs2 = new File(encfs_path2);
+                //encfs_dbs2.delete();
                 //
                 String encfs_path3 =
                         context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-wal";
-                File encfs_dbs3 = new File(encfs_path3);
-                encfs_dbs3.delete();
+                //File encfs_dbs3 = new File(encfs_path3);
+                //encfs_dbs3.delete();
+                // -----------------------------------------
                 //
                 // after importing the file. just stop the app hard
                 // tox_service_fg.stop_me(true);
