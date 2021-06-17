@@ -317,4 +317,8 @@
     <string name="pref_description_start_on_boot">بدء تشغيل التطبيق بعد التمهيد.
 \nجوجل لا يسمح هذا بعد الآن بدءا من الروبوت 10</string>
     <string name="pref_title_start_on_boot">بدء التشغيل على التمهيد</string>
+    <string name="pref_description_compact_chatlist">عرض رسالة الدردشة أكثر ضغطًا مما يوفر مساحة</string>
+    <string name="pref_title_compact_chatlist">قائمة الدردشة المضغوطة</string>
+    <string name="pref_description_compact_friendlist">اجعل قائمة الأصدقاء أكثر إحكاما ، إذا كانت لديك قائمة كبيرة من الأصدقاء</string>
+    <string name="pref_title_compact_friendlist">قائمة الأصدقاء المضغوطة</string>
 </resources>
