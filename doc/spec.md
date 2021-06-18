@@ -362,21 +362,21 @@
 
 |what       |Length               | Contents
 |:----------|:--------------------|:-------------
-|pkt id     | 1                   | `uint8_t` 176
+|pkt id     | 1                   | `uint8_t` 177
 
 
 #### CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH
 
 |what       |Length               | Contents
 |:----------|:--------------------|:-------------
-|pkt id     | 1                   | `uint8_t` 176
+|pkt id     | 1                   | `uint8_t` 178
 
 
 #### CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN
 
 |what       |Length               | Contents
 |:----------|:--------------------|:-------------
-|pkt id     | 1                   | `uint8_t` 176
+|pkt id     | 1                   | `uint8_t` 179
 |friend     | [11, 300]           | `*uint8_t` notification token
 
 
