@@ -4010,10 +4010,11 @@ public class MainActivity extends AppCompatActivity
                                 (TRIFAGlobals.global_notification_token.length() < 300))
                             {
                                 // send my relay the current notification token
-                                String temp_string = "A" + TRIFAGlobals.global_notification_token;
+                                String temp_string = "A" +
+                                                     TRIFAGlobals.global_notification_token; //  "A" is a placeholder to put the pkgID later
                                 byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
                                 int data_bin_len = data_bin.length;
-                                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN.value;
+                                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN.value; // replace "A" with pkgID
                                 tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
                             }
                         }
