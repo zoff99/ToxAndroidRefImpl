@@ -347,7 +347,7 @@
 |what       |Length               | Contents
 |:----------|:--------------------|:-------------
 |pkt id     | 1                   | `uint8_t` 175
-|friend     | TOX_PUBLIC_KEY_SIZE | `*uint8_t` friend pubkey to send to ToxProxy
+|pubkey     | TOX_PUBLIC_KEY_SIZE | `*uint8_t` friend pubkey to send to ToxProxy
 
 
 #### CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND
@@ -355,7 +355,7 @@
 |what       |Length               | Contents
 |:----------|:--------------------|:-------------
 |pkt id     | 1                   | `uint8_t` 176
-|friend     | TOX_PUBLIC_KEY_SIZE | `*uint8_t` ToxProxy pubkey to send to a friend
+|pubkey     | TOX_PUBLIC_KEY_SIZE | `*uint8_t` ToxProxy pubkey to send to a friend
 
 
 #### CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT
@@ -377,7 +377,7 @@
 |what       |Length               | Contents
 |:----------|:--------------------|:-------------
 |pkt id     | 1                   | `uint8_t` 179
-|friend     | [11, 300]           | `*uint8_t` notification token
+|token      | [11, 300]           | `*uint8_t` notification token
 
 
 
