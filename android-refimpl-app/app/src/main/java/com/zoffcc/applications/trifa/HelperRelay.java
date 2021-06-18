@@ -25,6 +25,7 @@ import java.util.List;
 
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -215,8 +216,8 @@ public class HelperRelay
                     for (int i = 0; i < c.size(); i++)
                     {
                         ConferenceDB conf = c.get(i);
-                        int res = MainActivity.tox_conference_invite(
-                                tox_friend_by_public_key__wrapper(relay_public_key_string), conf.tox_conference_number);
+                        int res = tox_conference_invite(tox_friend_by_public_key__wrapper(relay_public_key_string),
+                                                        conf.tox_conference_number);
 
                         // Log.i(TAG,
                         //       "invite_to_all_conferences_own_relay:confnum=" + conf.tox_conference_number + " res=" +
@@ -230,6 +231,12 @@ public class HelperRelay
         {
             e.printStackTrace();
         }
+    }
+
+    static int invite_to_conference_own_relay(long conference_num)
+    {
+        return tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
+                                     conference_num);
     }
 
     static boolean is_any_relay(String friend_pubkey)

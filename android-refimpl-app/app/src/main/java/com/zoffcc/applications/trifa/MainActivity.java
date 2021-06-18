@@ -154,6 +154,7 @@ import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_rel
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection_status_real;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.invite_to_conference_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -3992,7 +3993,10 @@ public class MainActivity extends AppCompatActivity
                         }
                         else
                         {
-                            HelperRelay.invite_to_all_conferences_own_relay(f.tox_public_key_string);
+                            if (HelperRelay.is_own_relay(f.tox_public_key_string))
+                            {
+                                HelperRelay.invite_to_all_conferences_own_relay(HelperRelay.get_own_relay_pubkey());
+                            }
                         }
 
                         if (TRIFAGlobals.global_notification_token == null)
@@ -5332,8 +5336,7 @@ public class MainActivity extends AppCompatActivity
         {
             if (have_own_relay())
             {
-                tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
-                                      conference_number);
+                invite_to_conference_own_relay(conference_number);
             }
         }
         Log.i(TAG, "conference_connected_cb:cf_num=" + conference_number);
@@ -5383,8 +5386,7 @@ public class MainActivity extends AppCompatActivity
         {
             if (have_own_relay())
             {
-                tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
-                                      conference_num);
+                invite_to_conference_own_relay(conference_num);
             }
         }
         // invite also my ToxProxy -------------

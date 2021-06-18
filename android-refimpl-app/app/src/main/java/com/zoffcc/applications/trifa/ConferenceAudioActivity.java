@@ -31,10 +31,6 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -59,6 +55,9 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
@@ -70,13 +69,13 @@ import static com.zoffcc.applications.trifa.HelperConference.is_conference_activ
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
@@ -172,8 +171,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         conference_audio_activity = this;
 
         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-        PREF__audio_group_play_volume_percent = settings_cs1.getInt("audio_group_play_volume_percent",
-                                                                    100);
+        PREF__audio_group_play_volume_percent = settings_cs1.getInt("audio_group_play_volume_percent", 100);
         Log.i(TAG, "pref:get:PREF__audio_play_volume_percent=" + PREF__audio_group_play_volume_percent);
 
         caa = this;
@@ -281,8 +279,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" +
-                                   e.getMessage());
+                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
                     }
                 }
                 else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
@@ -295,8 +292,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     catch (Exception e)
                     {
                         e.printStackTrace();
-                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" +
-                                   e.getMessage());
+                        Log.i(TAG, "group_volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
                     }
                 }
                 return false;
@@ -332,8 +328,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     catch (Exception ee)
                     {
                         ee.printStackTrace();
-                        Log.i(TAG,
-                              "pref:set:PREF__audio_group_play_volume_percent:EE:" + ee.getMessage());
+                        Log.i(TAG, "pref:set:PREF__audio_group_play_volume_percent:EE:" + ee.getMessage());
                     }
                 }
             }
@@ -364,8 +359,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     try
                     {
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg_pressed);
-                        AudioGroupPushToTalkButton.setText(
-                                getString(R.string.ConferenceAudioActivity_18));
+                        AudioGroupPushToTalkButton.setText(getString(R.string.ConferenceAudioActivity_18));
                         push_to_talk_active = true;
                     }
                     catch (Exception e)
@@ -378,8 +372,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     try
                     {
                         AudioGroupPushToTalkButton.setBackgroundResource(R.drawable.button_audio_round_bg);
-                        AudioGroupPushToTalkButton.setText(
-                                getString(R.string.ConferenceAudioActivity_17));
+                        AudioGroupPushToTalkButton.setText(getString(R.string.ConferenceAudioActivity_17));
                         push_to_talk_active = false;
                         update_group_audio_send_icon(0);
                         AudioRecording.global_audio_group_send_res = -999;
@@ -1095,8 +1088,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                             {
                                 ml_maintext.setText(
                                         f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count +
-                                        " " + getString(R.string.GroupActivityOffline) + " " +
-                                        frozen_peer_count);
+                                        " " + getString(R.string.GroupActivityOffline) + " " + frozen_peer_count);
                             }
                             else
                             {
@@ -1281,8 +1273,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                                                 try
                                                 {
                                                     f1 = new info.guardianproject.iocipher.File(
-                                                            fl_temp.avatar_pathname + "/" +
-                                                            fl_temp.avatar_filename);
+                                                            fl_temp.avatar_pathname + "/" + fl_temp.avatar_filename);
                                                     if (f1.length() > 0)
                                                     {
                                                         have_avatar_for_pubkey = true;
@@ -1545,8 +1536,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
                                     if (res_conf_invite < 1)
                                     {
-                                        Log.d(TAG, "onActivityResult:info:tox_conference_invite:ERR:" +
-                                                   res_conf_invite);
+                                        Log.d(TAG,
+                                              "onActivityResult:info:tox_conference_invite:ERR:" + res_conf_invite);
                                     }
                                 }
                             }
