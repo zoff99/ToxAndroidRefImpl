@@ -64,8 +64,8 @@
                      |                                            
                      |                                            
                      +----------------------+                     
-                                            | (2) send all friends Pubkeys to ToxProxy                      
-                                            |                       
+                                            | (2a) send all friends Pubkeys to ToxProxy
+                                            | (2b) invite ToxProxy to all Tox Conferences TRIfA is in
                                             |  
                      Android Device         |                       
                +------------------------+   |    
