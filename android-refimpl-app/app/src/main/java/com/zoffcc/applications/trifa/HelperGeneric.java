@@ -47,6 +47,7 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 import java.math.BigInteger;
@@ -3301,6 +3302,31 @@ public class HelperGeneric
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    public static void touch(File file) throws IOException
+    {
+        if (!file.exists())
+        {
+            File parent = file.getParentFile();
+            if (parent != null)
+            {
+                if (!parent.exists())
+                {
+                    if (!parent.mkdirs())
+                    {
+                        throw new IOException("Cannot create parent directories for file: " + file);
+                    }
+                }
+            }
+            file.createNewFile();
+        }
+
+        boolean success = file.setLastModified(System.currentTimeMillis());
+        if (!success)
+        {
+            throw new IOException("Unable to set the last modification time for " + file);
         }
     }
 }
