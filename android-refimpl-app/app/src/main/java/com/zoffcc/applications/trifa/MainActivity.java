@@ -320,6 +320,7 @@ public class MainActivity extends AppCompatActivity
     static String SD_CARD_STATIC_DIR = "";
     static String SD_CARD_FILES_EXPORT_DIR = "";
     static String SD_CARD_ENC_FILES_EXPORT_DIR = "/unenc_files/";
+    static String SD_CARD_ENC_CHATS_EXPORT_DIR = "/unenc_chats/";
     static String SD_CARD_TMP_DUMMYFILE = null;
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
@@ -359,6 +360,7 @@ public class MainActivity extends AppCompatActivity
     static TrifaToxService tox_service_fg = null;
     static long update_all_messages_global_timestamp = -1;
     final static SimpleDateFormat df_date_time_long = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final static SimpleDateFormat df_date_time_long_for_filename = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
     final static SimpleDateFormat df_date_only = new SimpleDateFormat("yyyy-MM-dd");
     static long last_updated_fps = -1;
     final static long update_fps_every_ms = 1500L; // update every 1.5 seconds

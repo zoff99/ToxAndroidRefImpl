@@ -1581,6 +1581,19 @@ public class HelperGeneric
         }
     }
 
+    static String long_date_time_format_for_filename(long timestamp_in_millis)
+    {
+        try
+        {
+            return MainActivity.df_date_time_long_for_filename.format(new Date(timestamp_in_millis));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "_Datetime_ERROR_";
+        }
+    }
+
     static String long_date_time_format_or_empty(long timestamp_in_millis)
     {
         try
