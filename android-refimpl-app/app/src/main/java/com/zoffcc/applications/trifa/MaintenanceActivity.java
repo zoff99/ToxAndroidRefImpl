@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +29,7 @@ import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +38,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.yariksoffice.lingver.Lingver;
@@ -60,9 +63,11 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_udp_nodes_into_db;
 import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
+import static com.zoffcc.applications.trifa.IOBrowser.getFilesInDir;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SelectLanguageActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_frame_played;
@@ -96,6 +101,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_test_ringtone;
     Button button_iobrowser_start;
     Button button_export_savedata;
+    Button button_export_encrypted_files;
     Button button_import_savedata;
 
     Boolean button_test_ringtone_start = true;
@@ -135,6 +141,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_test_ringtone = (Button) findViewById(R.id.button_test_ringtone);
         button_iobrowser_start = (Button) findViewById(R.id.button_iobrowser_start);
         button_export_savedata = (Button) findViewById(R.id.button_export_savedata);
+        button_export_encrypted_files = (Button) findViewById(R.id.button_export_encrypted_files);
         button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
         debug_output = (TextView) findViewById(R.id.debug_output);
@@ -353,6 +360,39 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 try
                 {
                     export_savedata_unsecure(this_context);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        button_export_encrypted_files.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
+                    builder.setTitle("Export Encrypted Files");
+                    builder.setMessage(
+                            "Your Encrypted received files will be exported unencrypted to this location:" + "\n\n" +
+                            MainActivity.SD_CARD_FILES_EXPORT_DIR + SD_CARD_ENC_FILES_EXPORT_DIR);
+
+                    builder.setPositiveButton("Yes, I want to export", new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            export_encrypted_files_unsecure(this_context);
+                            return;
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", null);
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
                 catch (Exception e)
                 {
@@ -885,6 +925,102 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
         dialog.show();
+    }
+
+    public static void export_encrypted_files_unsecure(final Context context)
+    {
+        try
+        {
+            new export_enc_files_async_task(context).execute();
+        }
+        catch (Exception e)
+        {
+
+        }
+    }
+
+    private static class export_enc_files_async_task extends AsyncTask<Void, Void, Void>
+    {
+        private ProgressDialog dialog;
+        private final Context c;
+
+        public export_enc_files_async_task(Context c)
+        {
+            this.c = c;
+            dialog = new ProgressDialog(c);
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            dialog.setMessage("exporting ...");
+            dialog.setCancelable(false);
+            dialog.show();
+        }
+
+        @Override
+        protected Void doInBackground(Void... args)
+        {
+            String export_dir_string = MainActivity.SD_CARD_FILES_EXPORT_DIR + SD_CARD_ENC_FILES_EXPORT_DIR;
+
+            try
+            {
+                File export_dir = new File(export_dir_string);
+                export_dir.mkdirs();
+                List<IOBrowser.dir_item> l = getFilesInDir("/datadir/files/");
+
+                for (IOBrowser.dir_item friend_dir : l)
+                {
+                    if (friend_dir.get_is_dir())
+                    {
+                        File export_friend_dir = new File(export_dir_string + "/" + friend_dir.get_path());
+                        Log.i(TAG, "export:mkdir1:" + export_friend_dir);
+                        export_friend_dir.mkdirs();
+                        List<IOBrowser.dir_item> f = getFilesInDir("/datadir/files/" + friend_dir.get_path());
+
+                        for (IOBrowser.dir_item friend_file : f)
+                        {
+                            if (!friend_file.get_is_dir())
+                            {
+                                Log.i(TAG, "export:mkdir2:" + export_friend_dir);
+                                export_friend_dir.mkdirs();
+
+                                Log.i(TAG, "export:2:" +
+                                           ("/datadir/files/" + friend_dir.get_path() + "/" + friend_file.get_path()) +
+                                           " --> " + export_friend_dir + "/" + friend_file.get_path());
+
+                                try
+                                {
+                                    HelperGeneric.export_vfs_file_to_real_file("/datadir/files/" + friend_dir.get_path() + "/",
+                                                                               friend_file.get_path(),
+                                                                               export_friend_dir + "/",
+                                                                               friend_file.get_path());
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result)
+        {
+            if (dialog.isShowing())
+            {
+                dialog.dismiss();
+            }
+
+            Toast.makeText(c, "export ready", Toast.LENGTH_LONG).show();
+        }
     }
 
     public static String files_and_sizes_in_dir(File directory)

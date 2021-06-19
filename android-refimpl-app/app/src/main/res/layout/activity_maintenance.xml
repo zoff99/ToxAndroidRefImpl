@@ -177,6 +177,32 @@
                 tools:ignore="HardcodedText" />
 
             <TextView
+                android:id="@+id/dummy_0001a"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text=""
+                android:background="@null"
+                android:textColor="@null"
+                android:textSize="16sp"/>
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_export_encrypted_files"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/rounded_orange_dark_bg"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___export_tox_encrypted_files_unsecure"
+                android:textSize="14sp"
+                tools:ignore="HardcodedText" />
+
+            <TextView
                 android:id="@+id/dummy_0002"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"

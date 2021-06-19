@@ -417,6 +417,7 @@
     <string name="layout___test_ringtone_sound">test Ringtone sound</string>
     <string name="layout___iobrowser_start">browse encrypted Storage</string>
     <string name="layout___export_tox_savedata_unsecure">export tox savedata *unsecure*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">export encrypted files *unsecure*</string>
     <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA *UNSECURE*</string>
     <string name="layout___click_image_to_change_your_avatar">click Image to change your Avatar</string>
     <string name="layout___remove_own_relay">remove own Relay</string>

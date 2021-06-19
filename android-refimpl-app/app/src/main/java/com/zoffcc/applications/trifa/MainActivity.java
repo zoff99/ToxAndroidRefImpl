@@ -319,6 +319,7 @@ public class MainActivity extends AppCompatActivity
     static String SD_CARD_TMP_DIR = "";
     static String SD_CARD_STATIC_DIR = "";
     static String SD_CARD_FILES_EXPORT_DIR = "";
+    static String SD_CARD_ENC_FILES_EXPORT_DIR = "/unenc_files/";
     static String SD_CARD_TMP_DUMMYFILE = null;
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
@@ -6654,7 +6655,6 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 HelperGeneric.export_vfs_file_to_real_file(f.path_name, f.file_name, fname, f.file_name);
-
             }
             catch (Exception e)
             {

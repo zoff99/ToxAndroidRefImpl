@@ -59,8 +59,9 @@ public class IOBrowser extends ListActivity
     private String cur_path = root;
     private boolean at_root_dir = true;
 
-    public class dir_item
+    public static class dir_item
     {
+        private boolean is_dir;
         private String i_name;
         private String i_path;
 
@@ -74,6 +75,11 @@ public class IOBrowser extends ListActivity
             i_path = path;
         }
 
+        void set_is_dir(boolean dir)
+        {
+            is_dir = dir;
+        }
+
         String get_name()
         {
             return i_name;
@@ -82,6 +88,11 @@ public class IOBrowser extends ListActivity
         String get_path()
         {
             return i_path;
+        }
+
+        boolean get_is_dir()
+        {
+            return is_dir;
         }
     }
 
@@ -109,6 +120,27 @@ public class IOBrowser extends ListActivity
         }
         at_root_dir = true;
         getFileList(cur_path);
+    }
+
+
+    public static List<dir_item> getFilesInDir(String dirPath)
+    {
+        List<dir_item> items = new ArrayList<>();
+
+        info.guardianproject.iocipher.File file = new info.guardianproject.iocipher.File(dirPath);
+        info.guardianproject.iocipher.File[] files = file.listFiles();
+        Arrays.sort(files);
+
+        for (info.guardianproject.iocipher.File fileItem : files)
+        {
+            // Log.i(TAG, "file:" + fileItem.getName() + " : " + fileItem.isDirectory());
+            dir_item i = new dir_item();
+            i.set_path(fileItem.getName());
+            i.set_is_dir(fileItem.isDirectory());
+            items.add(i);
+        }
+
+        return items;
     }
 
     public void getFileList(String dirPath)
