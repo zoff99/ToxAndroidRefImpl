@@ -64,9 +64,11 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_
 import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_for_filename;
+import static com.zoffcc.applications.trifa.HelperGeneric.touch;
 import static com.zoffcc.applications.trifa.IOBrowser.getFilesInDir;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_CHATS_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_FILES_EXPORT_DIR;
@@ -86,7 +88,7 @@ import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_iter;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
-import static com.zoffcc.applications.trifa.TrifaSetPatternActivity.filter_out_specials_from_filepath;
+import static com.zoffcc.applications.trifa.TrifaSetPatternActivity.filter_out_specials_from_filepath_stricter;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MaintenanceActivity extends AppCompatActivity implements StrongBuilder.Callback<OkHttpClient>
@@ -241,7 +243,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 }
             }
         });
-
 
         button_sql_analyze.setOnClickListener(new View.OnClickListener()
         {
@@ -1023,7 +1024,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 for (FriendList f : fl)
                 {
                     String dirpath = export_dir_string + "/" + f.tox_public_key_string + "_" +
-                                     filter_out_specials_from_filepath(f.name);
+                                     filter_out_specials_from_filepath_stricter(f.name);
                     // Log.i(TAG, "friend:xxx:F:" + dirpath);
                     new File(dirpath).mkdirs();
 
@@ -1076,7 +1077,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 for (ConferenceDB conf : cl)
                 {
                     String dirpath = export_dir_string + "/" + conf.conference_identifier + "_" +
-                                     filter_out_specials_from_filepath(conf.name);
+                                     filter_out_specials_from_filepath_stricter(conf.name);
                     // Log.i(TAG, "friend:xxx:C:" + dirpath);
                     new File(dirpath).mkdirs();
 
@@ -1107,7 +1108,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         }
                         String msg_path =
                                 dirpath + "/" + long_date_time_format_for_filename(ts) + "_" + msg_type_state + "_" +
-                                cm.tox_peerpubkey + "_" + filter_out_specials_from_filepath(cm.tox_peername) + ".txt";
+                                cm.tox_peerpubkey + "_" + filter_out_specials_from_filepath_stricter(cm.tox_peername) +
+                                ".txt";
                         // Log.i(TAG, "friend:xxx:C:M:" + msg_path);
 
                         try
@@ -1122,9 +1124,31 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     }
                 }
 
+                // now dump the DB to file in SQL format
+                final String dbs_path = c.getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
+                net.sqlcipher.database.SQLiteDatabase database = net.sqlcipher.database.SQLiteDatabase.openDatabase(
+                        dbs_path, PREF__DB_secrect_key, null, net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE);
+
+                final String sql_export_filename = export_dir_string + "/" + "export.sqlite";
+
+                touch(new File(sql_export_filename));
+                String sql = "ATTACH DATABASE '" + sql_export_filename + "' AS export KEY '';";
+                net.sqlcipher.Cursor cursor = database.rawQuery(sql, null);
+
+                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
+                           cursor.getCount());
+                cursor = database.rawQuery("SELECT sqlcipher_export('export');", null);
+                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
+                           cursor.getCount());
+                cursor = database.rawQuery("DETACH DATABASE export;", null);
+                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
+                           cursor.getCount());
+                database.close();
             }
             catch (Exception e)
             {
+                Log.i(TAG, "export:chats:EE01:" + e.getMessage());
+                e.printStackTrace();
             }
 
             return null;
