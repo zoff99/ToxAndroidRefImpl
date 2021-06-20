@@ -73,6 +73,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.documentfile.provider.DocumentFile;
 
 import static android.widget.Toast.LENGTH_LONG;
+import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.insert_into_filetransfer_db;
@@ -89,6 +90,7 @@ import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_not
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -553,6 +555,12 @@ public class MessageListActivity extends AppCompatActivity
         final Drawable d3 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_video).color(
                 getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         ml_video_icon.setImageDrawable(d3);
+
+        if (PREF__window_security)
+        {
+            // prevent screenshots and also dont show the window content in recent activity screen
+            initializeScreenshotSecurity(this);
+        }
 
         final long fn = friendnum;
         Thread t = new Thread()
