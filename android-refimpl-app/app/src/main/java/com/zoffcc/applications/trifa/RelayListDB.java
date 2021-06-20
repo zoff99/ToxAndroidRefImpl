@@ -66,7 +66,7 @@ public class RelayListDB
         try
         {
             return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) +
-                   ", ownder_pubkey=" + tox_public_key_string_of_owner.substring(0, 4) +
+                   ", owner_pubkey=" + tox_public_key_string_of_owner.substring(0, 4) +
                    ", own_relay=" + own_relay +
                    ", TOX_CONNECTION=" + TOX_CONNECTION +
                    ", TOX_CONNECTION_on_off=" + TOX_CONNECTION_on_off
