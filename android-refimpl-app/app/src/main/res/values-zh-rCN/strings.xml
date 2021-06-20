@@ -349,4 +349,6 @@
     <string name="pref_title_compact_chatlist">紧凑式聊天列表</string>
     <string name="pref_description_compact_friendlist">如果你有一个很长的好友列表，那么让好友列表更紧凑</string>
     <string name="pref_title_compact_friendlist">紧凑式好友列表</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">*不安全地*导出加密聊天</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">*不安全地*导出加密文件</string>
 </resources>

@@ -368,4 +368,6 @@
     <string name="pref_title_compact_chatlist">Sohbet Listesini Sıkıştır</string>
     <string name="pref_description_compact_friendlist">Geniş bir arkadaş listeniz varsa, onu daha sıkı hale getirin</string>
     <string name="pref_title_compact_friendlist">Arkadaş Listesini Sıkıştır</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">şifreli sohbetleri dışa aktar *güvenli değil*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">şifreli dosyaları dışa aktar *güvenli değil*</string>
 </resources>
