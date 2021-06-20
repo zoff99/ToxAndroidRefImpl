@@ -26,6 +26,12 @@
 
     <SwitchPreference
         android:defaultValue="true"
+        android:key="window_security"
+        android:summary="@string/pref_description_window_security"
+        android:title="@string/pref_title_window_security" />
+
+    <SwitchPreference
+        android:defaultValue="true"
         android:key="auto_accept_image"
         android:summary="@string/pref_description_auto_accept_image"
         android:title="@string/pref_title_auto_accept_image" />
