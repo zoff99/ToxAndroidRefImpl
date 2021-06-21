@@ -370,4 +370,7 @@
     <string name="pref_title_compact_friendlist">Arkadaş Listesini Sıkıştır</string>
     <string name="layout___export_tox_encrypted_chats_unsecure">şifreli sohbetleri dışa aktar *güvenli değil*</string>
     <string name="layout___export_tox_encrypted_files_unsecure">şifreli dosyaları dışa aktar *güvenli değil*</string>
+    <string name="pref_description_window_security">Bu ayarın etkinleştirilmesi, Etkinliklere FLAG_SECURE ekler.
+\nEkran görüntülerini, ekran kaydını ve içeriğin son uygulamalar ön izlemesinde gösterilmesini engeller</string>
+    <string name="pref_title_window_security">ekran görüntülerini engelle</string>
 </resources>
