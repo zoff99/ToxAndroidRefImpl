@@ -4115,13 +4115,6 @@ public class MainActivity extends AppCompatActivity
 
             HelperGeneric.update_friend_connection_status_helper(a_TOX_CONNECTION, f, false);
 
-            if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)
-            {
-                f.TOX_CONNECTION_real = a_TOX_CONNECTION;
-                f.TOX_CONNECTION_on_off_real = HelperGeneric.get_toxconnection_wrapper(f.TOX_CONNECTION);
-                HelperFriend.update_friend_in_db_connection_status_real(f);
-            }
-
             // update connection status bar color on calling activity
             if (friend_number == tox_friend_by_public_key__wrapper(Callstate.friend_pubkey))
             {
