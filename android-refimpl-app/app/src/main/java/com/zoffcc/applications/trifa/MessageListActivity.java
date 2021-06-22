@@ -1380,7 +1380,7 @@ public class MessageListActivity extends AppCompatActivity
         // ---------- DEBUG ----------
 
         // ---------- DEBUG ----------
-        m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
+        // m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
         // Log.i(TAG, "add_outgoing_file:MM2MM:5:" + m.filetransfer_id + "::" + m_tmp);
         // ---------- DEBUG ----------
 
@@ -1810,7 +1810,7 @@ public class MessageListActivity extends AppCompatActivity
                     amode_save_menu_item.setVisible(false);
                 }
 
-                if ((selected_messages.size() == 1) && (selected_messages_text_only.size() == 1))
+                if (selected_messages.size() == 1)
                 {
                     amode_info_menu_item.setVisible(true);
                 }
@@ -1860,7 +1860,7 @@ public class MessageListActivity extends AppCompatActivity
                         amode_save_menu_item.setVisible(false);
                     }
 
-                    if ((selected_messages.size() == 1) && (selected_messages_text_only.size() == 1))
+                    if (selected_messages.size() == 1)
                     {
                         amode_info_menu_item.setVisible(true);
                     }
@@ -1932,7 +1932,7 @@ public class MessageListActivity extends AppCompatActivity
                             amode_save_menu_item.setVisible(false);
                         }
 
-                        if ((selected_messages.size() == 1) && (selected_messages_text_only.size() == 1))
+                        if (selected_messages.size() == 1)
                         {
                             amode_info_menu_item.setVisible(true);
                         }
