@@ -436,13 +436,6 @@ public class TrifaToxService extends Service
 
         int fc = 0;
         boolean exists_in_db = false;
-        //                try
-        //                {
-        //                    MainActivity.friend_list_fragment.clear_friends();
-        //                }
-        //                catch (Exception e)
-        //                {
-        //                }
 
         for (fc = 0; fc < MainActivity.friends.length; fc++)
         {
@@ -495,31 +488,18 @@ public class TrifaToxService extends Service
                 // the value in the database may be old (and wrong)
                 int status_new = tox_friend_get_connection_status(MainActivity.friends[fc]);
                 int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
+                // TODO: friends with relays need to be handled differently!!
                 f.TOX_CONNECTION = combined_connection_status_;
                 f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
+                f.TOX_CONNECTION_real = combined_connection_status_;
+                f.TOX_CONNECTION_on_off_real = get_toxconnection_wrapper(f.TOX_CONNECTION);
+                // TODO: friends with relays need to be handled differently!!
                 f.added_timestamp = System.currentTimeMillis();
             }
             catch (Exception e)
             {
                 e.printStackTrace();
             }
-
-            // ----- would be double in list -----
-            // ----- would be double in list -----
-            // ----- would be double in list -----
-            //                    if (MainActivity.friend_list_fragment != null)
-            //                    {
-            //                        try
-            //                        {
-            //                            MainActivity.friend_list_fragment.add_friends(f);
-            //                        }
-            //                        catch (Exception e)
-            //                        {
-            //                        }
-            //                    }
-            // ----- would be double in list -----
-            // ----- would be double in list -----
-            // ----- would be double in list -----
 
             if (exists_in_db == false)
             {
@@ -530,10 +510,19 @@ public class TrifaToxService extends Service
             else
             {
                 // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
-                orma.updateFriendList().tox_public_key_stringEq(
-                        tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).name(f.name).status_message(
-                        f.status_message).TOX_CONNECTION(f.TOX_CONNECTION).TOX_CONNECTION_on_off(
-                        get_toxconnection_wrapper(f.TOX_CONNECTION)).TOX_USER_STATUS(f.TOX_USER_STATUS).execute();
+
+                // @formatter:off
+                orma.updateFriendList().
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).
+                        name(f.name).
+                        status_message(f.status_message).
+                        TOX_CONNECTION(f.TOX_CONNECTION).
+                        TOX_CONNECTION_on_off(get_toxconnection_wrapper(f.TOX_CONNECTION)).
+                        TOX_CONNECTION_real(f.TOX_CONNECTION_real).
+                        TOX_CONNECTION_on_off_real(get_toxconnection_wrapper(f.TOX_CONNECTION_real)).
+                        TOX_USER_STATUS(f.TOX_USER_STATUS).
+                        execute();
+                // @formatter:on
                 // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
             }
 
@@ -1217,6 +1206,7 @@ public class TrifaToxService extends Service
                                 // bootstrap_single_wrapper("127.3.2.1",9988, "AAA236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9FFF");
 
                                 int TOX_CONNECTION_a = tox_self_get_connection_status();
+                                global_self_connection_status = TOX_CONNECTION_a;
                                 if (TOX_CONNECTION_a == TOX_CONNECTION_NONE.value)
                                 {
                                     bootstrapping = true;
@@ -1563,8 +1553,8 @@ public class TrifaToxService extends Service
                                         if (relay != null)
                                         {
                                             int res_relay = tox_util_friend_resend_message_v2(
-                                                    tox_friend_by_public_key__wrapper(relay),
-                                                    msg_text_buffer_resend_v2, raw_data_length);
+                                                    tox_friend_by_public_key__wrapper(relay), msg_text_buffer_resend_v2,
+                                                    raw_data_length);
 
                                             // Log.i(TAG, "send_pending_1-on-1_messages:v2:res_relay=" + res_relay);
                                         }
@@ -1682,6 +1672,7 @@ public class TrifaToxService extends Service
                         if ((last_start_queued_fts_ms + (4 * 1000)) < System.currentTimeMillis())
                         {
                             last_start_queued_fts_ms = System.currentTimeMillis();
+                            // Log.i(TAG, "start_queued_outgoing_FTs ============================================");
 
                             try
                             {
@@ -1693,8 +1684,12 @@ public class TrifaToxService extends Service
                                         orderBySent_timestampAsc().
                                         toList();
 
+                                // Log.i(TAG, "start_queued_outgoing_FTs:000:" + m_v1);
+
                                 if ((m_v1 != null) && (m_v1.size() > 0))
                                 {
+                                    // Log.i(TAG, "start_queued_outgoing_FTs:001:" + m_v1.size());
+
                                     Iterator<Message> ii = m_v1.iterator();
                                     while (ii.hasNext())
                                     {
