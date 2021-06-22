@@ -424,6 +424,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_open_encrypted_file_via_intent = false;
     static boolean PREF__compact_friendlist = false;
     static boolean PREF__compact_chatlist = true;
+    static String[] PREF__toxirc_muted_peers = {};
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2300,6 +2301,59 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__compact_chatlist = true;
+        }
+
+
+        try
+        {
+            final String muted_peers_01 = settings.getString("toxirc_muted_peers_01", "");
+            final String muted_peers_02 = settings.getString("toxirc_muted_peers_02", "");
+            final String muted_peers_03 = settings.getString("toxirc_muted_peers_03", "");
+
+            int count_muted = 0;
+            if (muted_peers_01.length() > 0)
+            {
+                count_muted++;
+            }
+            if (muted_peers_02.length() > 0)
+            {
+                count_muted++;
+            }
+            if (muted_peers_03.length() > 0)
+            {
+                count_muted++;
+            }
+
+            if (count_muted > 0)
+            {
+                PREF__toxirc_muted_peers = new String[count_muted];
+                int i = 0;
+                if (muted_peers_01.length() > 0)
+                {
+                    PREF__toxirc_muted_peers[i] = muted_peers_01;
+                    i++;
+                }
+
+                if (muted_peers_02.length() > 0)
+                {
+                    PREF__toxirc_muted_peers[i] = muted_peers_02;
+                    i++;
+                }
+
+                if (muted_peers_03.length() > 0)
+                {
+                    PREF__toxirc_muted_peers[i] = muted_peers_03;
+                    i++;
+                }
+            }
+            else
+            {
+                PREF__toxirc_muted_peers = new String[]{};
+            }
+        }
+        catch (Exception e)
+        {
+            PREF__toxirc_muted_peers = new String[]{};
         }
 
         // prefs ----------

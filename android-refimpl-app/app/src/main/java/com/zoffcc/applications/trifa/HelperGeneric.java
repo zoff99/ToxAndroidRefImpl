@@ -3329,4 +3329,16 @@ public class HelperGeneric
             throw new IOException("Unable to set the last modification time for " + file);
         }
     }
+
+    public static boolean string_is_in_list(String input, String[] list)
+    {
+        try
+        {
+            return (Arrays.asList(list).contains(input));
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 }

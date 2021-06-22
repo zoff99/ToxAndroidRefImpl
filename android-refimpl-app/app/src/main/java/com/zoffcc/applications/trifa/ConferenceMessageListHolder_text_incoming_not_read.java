@@ -57,9 +57,11 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.string_is_in_list;
 import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
@@ -878,8 +880,17 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                             try
                             {
                                 String peer_name_corrected = m.text.substring(start_pos + 1, end_pos);
+
                                 ret.tox_peername = peer_name_corrected;
-                                ret.text = m.text.substring(end_pos + 2);
+
+                                if (string_is_in_list(peer_name_corrected, PREF__toxirc_muted_peers))
+                                {
+                                    ret.text = "** muted **";
+                                }
+                                else
+                                {
+                                    ret.text = m.text.substring(end_pos + 2);
+                                }
 
                                 String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
                                         TrifaSetPatternActivity.StringToBytes2(

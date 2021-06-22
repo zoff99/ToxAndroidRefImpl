@@ -171,6 +171,30 @@
         android:summary="@string/pref_description_force_udp_only"
         android:title="@string/pref_title_force_udp_only" />
 
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="toxirc_muted_peers_01"
+        android:maxLength="100"
+        android:singleLine="true"
+        android:summary="@string/pref_description_toxirc_muted_peers_01"
+        android:title="@string/pref_title_toxirc_muted_peers_01" />
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="toxirc_muted_peers_02"
+        android:maxLength="100"
+        android:singleLine="true"
+        android:summary="@string/pref_description_toxirc_muted_peers_02"
+        android:title="@string/pref_title_toxirc_muted_peers_01" />
+
+    <EditTextPreference
+        android:defaultValue=""
+        android:key="toxirc_muted_peers_03"
+        android:maxLength="100"
+        android:singleLine="true"
+        android:summary="@string/pref_description_toxirc_muted_peers_03"
+        android:title="@string/pref_title_toxirc_muted_peers_01" />
+
     <PreferenceCategory android:title="! unsafe !">
 
         <SwitchPreference
