@@ -523,16 +523,15 @@ public class HelperMessage
         }
     }
 
-    public static void set_message_queueing_from_id(long message_id, boolean ft_outgoing_queued)
+    public static void set_message_queueing_from_id(long message_mid, boolean ft_outgoing_queued)
     {
         try
         {
-            orma.updateMessage().idEq(message_id).ft_outgoing_queued(ft_outgoing_queued).execute();
+            orma.updateMessage().idEq(message_mid).ft_outgoing_queued(ft_outgoing_queued).execute();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            // Log.i(TAG, "set_message_start_queueing_from_id:EE:" + e.getMessage());
         }
     }
 
@@ -806,15 +805,14 @@ public class HelperMessage
                         return o1.compareTo(o2);
                     }
                 });
-                StringBuilder copy_text = new StringBuilder();
-                boolean first = true;
-                Iterator i = MainActivity.selected_messages_text_only.iterator();
+
+                Iterator<Long> i = MainActivity.selected_messages_text_only.iterator();
 
                 if (i.hasNext())
                 {
                     try
                     {
-                        final Message m = orma.selectFromMessage().idEq((Long) i.next()).get(0);
+                        final Message m = orma.selectFromMessage().idEq(i.next()).get(0);
 
                         // @formatter:off
                         final AlertDialog.Builder builder = new AlertDialog.Builder(c);
@@ -840,6 +838,126 @@ public class HelperMessage
                                         "TOX_MESSAGE_TYPE:"+m.TOX_MESSAGE_TYPE+"\n"
                                            ).
                                 setTitle("Message Info").
+                                setCancelable(false).
+                                setPositiveButton("OK", new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        dialog.dismiss();
+                                    }
+                                }).
+                                setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                                {
+                                    public void onClick(DialogInterface dialog, int id)
+                                    {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                        final AlertDialog alert = builder.create();
+                        alert.show();
+                        // @formatter:on
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                MainActivity.selected_messages.clear();
+                MainActivity.selected_messages_incoming_file.clear();
+                MainActivity.selected_messages_text_only.clear();
+
+                try
+                {
+                    // need to redraw all items again here, to remove the selections
+                    MainActivity.message_list_fragment.adapter.redraw_all_items();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+            else // --  filetranser message --
+            {
+                // sort ascending (lowest ID on top)
+                Collections.sort(MainActivity.selected_messages, new Comparator<Long>()
+                {
+                    public int compare(Long o1, Long o2)
+                    {
+                        return o1.compareTo(o2);
+                    }
+                });
+
+                Iterator<Long> i = MainActivity.selected_messages.iterator();
+
+                if (i.hasNext())
+                {
+                    try
+                    {
+                        final Message m = orma.selectFromMessage().idEq(i.next()).get(0);
+                        Filetransfer f = null;
+                        try
+                        {
+                            f = orma.selectFromFiletransfer().idEq(m.filetransfer_id).get(0);
+                        }
+                        catch (Exception e)
+                        {
+                        }
+
+                        // @formatter:off
+                        String ft_data="** NULL **"+"\n";
+                        if (f != null)
+                        {
+                            ft_data = "id:"+f.id+"\n"+
+                                      "message_id:"+f.message_id+"\n"+
+                                      "kind:"+f.kind+"\n"+
+                                      "state:"+f.state+"\n"+
+                                      "direction:"+f.direction+"\n"+
+                                      "file_number:"+f.file_number+"\n"+
+                                      "ft_accepted:"+f.ft_accepted+"\n"+
+                                      "ft_outgoing_started:"+f.ft_outgoing_started+"\n"+
+                                      "filesize:"+f.filesize+"\n"+
+                                      "current_position:"+f.current_position+"\n"+
+                                      "path_name:"+f.path_name+"\n"+
+                                      "storage_frame_work:"+f.storage_frame_work+"\n"
+                                      ;
+                        }
+
+                        final AlertDialog.Builder builder = new AlertDialog.Builder(c);
+                        builder.
+                                setMessage(
+                                        "  ------------ MSG ------------  \n"+
+                                        "id:"+m.id+"\n"+
+                                        "message_id:"+m.message_id+"\n"+
+                                        "direction:"+m.direction+"\n"+
+                                        "state:"+m.state+"\n"+
+                                        "read:"+m.read+"\n"+
+                                        "msg_version:"+m.msg_version+"\n"+
+                                        "msg_at_relay:"+m.msg_at_relay+"\n"+
+                                        "resend_count:"+m.resend_count+"\n"+
+                                        "send_retries:"+m.send_retries+"\n"+
+                                        "is_new:"+m.is_new+"\n"+
+                                        "msg_id_hash:"+m.msg_id_hash+"\n"+
+                                        "sent_timestamp:"+m.sent_timestamp+"\n"+
+                                        "sent_timestamp_ms:"+m.sent_timestamp_ms+"\n"+
+                                        "sent_timestamp:"+long_date_time_format_or_empty(m.sent_timestamp)+"\n"+
+                                        "rcvd_timestamp:"+m.rcvd_timestamp+"\n"+
+                                        "rcvd_timestamp_ms:"+m.rcvd_timestamp_ms+"\n"+
+                                        "rcvd_timestamp:"+long_date_time_format_or_empty(m.rcvd_timestamp)+"\n"+
+                                        "TOX_MESSAGE_TYPE:"+m.TOX_MESSAGE_TYPE+"\n"+
+                                        "  ------------ FTM ------------  \n"+
+                                        "ft_outgoing_queued:"+m.ft_outgoing_queued+"\n"+
+                                        "ft_outgoing_started:"+m.ft_outgoing_started+"\n"+
+                                        "ft_accepted:"+m.ft_accepted+"\n"+
+                                        "storage_frame_work:"+m.storage_frame_work+"\n"+
+                                        "filetransfer_id:"+m.filetransfer_id+"\n"+
+                                        "filedb_id:"+m.filedb_id+"\n"+
+                                        "filename_fullpath:"+m.filename_fullpath+"\n"+
+                                        "  ------------ FTR ------------  \n"+
+                                        ft_data
+                                ).
+                                setTitle("Filetransfer Info").
                                 setCancelable(false).
                                 setPositiveButton("OK", new DialogInterface.OnClickListener()
                                 {
