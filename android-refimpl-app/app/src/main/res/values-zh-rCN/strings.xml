@@ -354,4 +354,8 @@
     <string name="pref_description_window_security">启用此设置会将 FLAG_SECURE 添加到活动。
 \n它可以防止屏幕截图和屏幕录制及在最近预览中显示内容</string>
     <string name="pref_title_window_security">防止截屏</string>
+    <string name="pref_description_toxirc_muted_peers_03">已静音用户 3 (如未使用则留空)</string>
+    <string name="pref_description_toxirc_muted_peers_02">已静音用户 2 (如未使用则留空)</string>
+    <string name="pref_description_toxirc_muted_peers_01">已静音用户 1 (如未使用则留空)</string>
+    <string name="pref_title_toxirc_muted_peers_01">Toxirc 网桥静音用户</string>
 </resources>
