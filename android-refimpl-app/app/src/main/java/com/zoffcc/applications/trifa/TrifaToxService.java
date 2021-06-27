@@ -51,7 +51,6 @@ import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conf
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
@@ -74,6 +73,7 @@ import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_n
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
+import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_cancel;
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change;
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change_wrapper;
@@ -431,20 +431,20 @@ public class TrifaToxService extends Service
     void load_and_add_all_friends()
     {
         // --- load and update all friends ---
-        MainActivity.friends = MainActivity.tox_self_get_friend_list();
-        Log.i(TAG, "loading_friend:number_of_friends=" + MainActivity.friends.length);
+        long[] friends = MainActivity.tox_self_get_friend_list();
+        Log.i(TAG, "loading_friend:number_of_friends=" + friends.length);
 
         int fc = 0;
         boolean exists_in_db = false;
 
-        for (fc = 0; fc < MainActivity.friends.length; fc++)
+        for (fc = 0; fc < friends.length; fc++)
         {
             // Log.i(TAG, "loading_friend:" + fc + " friendnum=" + MainActivity.friends[fc]);
             // Log.i(TAG, "loading_friend:" + fc + " pubkey=" + tox_friend_get_public_key__wrapper(MainActivity.friends[fc]));
 
             FriendList f;
             List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
+                    tox_friend_get_public_key__wrapper(friends[fc])).toList();
 
             // Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
 
@@ -466,7 +466,7 @@ public class TrifaToxService extends Service
                 f.tox_public_key_string = "" + (long) ((Math.random() * 10000000d));
                 try
                 {
-                    f.tox_public_key_string = tox_friend_get_public_key__wrapper(MainActivity.friends[fc]);
+                    f.tox_public_key_string = tox_friend_get_public_key__wrapper(friends[fc]);
                 }
                 catch (Exception e)
                 {
@@ -486,7 +486,7 @@ public class TrifaToxService extends Service
             {
                 // get the real "live" connection status of this friend
                 // the value in the database may be old (and wrong)
-                int status_new = tox_friend_get_connection_status(MainActivity.friends[fc]);
+                int status_new = tox_friend_get_connection_status(friends[fc]);
                 int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
                 // TODO: friends with relays need to be handled differently!!
                 f.TOX_CONNECTION = combined_connection_status_;
@@ -513,7 +513,7 @@ public class TrifaToxService extends Service
 
                 // @formatter:off
                 orma.updateFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).
+                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friends[fc])).
                         name(f.name).
                         status_message(f.status_message).
                         TOX_CONNECTION(f.TOX_CONNECTION).
@@ -526,39 +526,70 @@ public class TrifaToxService extends Service
                 // Log.i(TAG, "loading_friend:1:updateFriendList:" + " f=" + f);
             }
 
-            FriendList f_check;
-            List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(MainActivity.friends[fc])).toList();
-            // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
+            try_update_friend_in_friendlist(friends[fc]);
+        }
+        // --- load and update all friends ---
+
+        // now run thru the list again to account for relays ----------------
+
+        for (fc = 0; fc < friends.length; fc++)
+        {
             try
             {
-                // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
+                List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
+                        tox_friend_get_public_key__wrapper(friends[fc])).toList();
 
-                try
+                if (fl.size() > 0)
                 {
-                    if (MainActivity.friend_list_fragment != null)
+                    final FriendList f = fl.get(0);
+                    if (!is_any_relay(f.tox_public_key_string))
                     {
-                        // reload friend in friendlist
-                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                        cc.is_friend = true;
-                        cc.friend_item = fl_check.get(0);
-                        MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                        final int status_new = tox_friend_get_connection_status(friends[fc]);
+                        HelperGeneric.update_friend_connection_status_helper(status_new, f, false);
+                        try_update_friend_in_friendlist(friends[fc]);
                     }
                 }
-                catch (Exception e)
+            }
+            catch (Exception e)
+            {
+            }
+        }
+        // now run thru the list again to account for relays ----------------
+
+
+    }
+
+    static void try_update_friend_in_friendlist(long friendnum)
+    {
+        FriendList f_check;
+        List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(
+                tox_friend_get_public_key__wrapper(friendnum)).toList();
+        // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
+        try
+        {
+            // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check.get(0));
+
+            try
+            {
+                if (MainActivity.friend_list_fragment != null)
                 {
-                    e.printStackTrace();
+                    // reload friend in friendlist
+                    CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                    cc.is_friend = true;
+                    cc.friend_item = fl_check.get(0);
+                    MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
-
-
             }
             catch (Exception e)
             {
                 e.printStackTrace();
-                Log.i(TAG, "loading_friend:check:EE:" + e.getMessage());
             }
         }
-        // --- load and update all friends ---
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "loading_friend:check:EE:" + e.getMessage());
+        }
     }
 
     void load_and_add_all_conferences()
@@ -571,7 +602,6 @@ public class TrifaToxService extends Service
 
         int conf_ = 0;
         for (conf_ = 0; conf_ < num_conferences; conf_++)
-
         {
             cookie_buf3.clear();
             if (tox_conference_get_id(conference_numbers[conf_], cookie_buf3) == 0)

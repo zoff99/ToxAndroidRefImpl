@@ -307,7 +307,6 @@ public class MainActivity extends AppCompatActivity
     static String channelId_newmessage_silent = null;
     static int NOTIFICATION_ID = 293821038;
     static RemoteViews notification_view = null;
-    static long[] friends = null;
     static FriendListFragment friend_list_fragment = null;
     static MessageListFragment message_list_fragment = null;
     static MessageListActivity message_list_activity = null;
