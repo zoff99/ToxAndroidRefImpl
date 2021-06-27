@@ -51,11 +51,13 @@ import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conf
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_connection_status;
 import static com.zoffcc.applications.trifa.HelperGeneric.battery_saving_can_sleep;
 import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
@@ -545,8 +547,21 @@ public class TrifaToxService extends Service
                     if (!is_any_relay(f.tox_public_key_string))
                     {
                         final int status_new = tox_friend_get_connection_status(friends[fc]);
-                        HelperGeneric.update_friend_connection_status_helper(status_new, f, false);
-                        try_update_friend_in_friendlist(friends[fc]);
+                        final String friends_relay = HelperRelay.get_relay_for_friend(f.tox_public_key_string);
+                        if (friends_relay != null)
+                        {
+                            int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string,
+                                                                                             status_new);
+
+                            // Log.i(TAG,
+                            //      "non_relay_status:" + friends[fc] + " pk=" + get_friend_name_from_pubkey(f.tox_public_key_string) + " status=" +
+                            //      status_new + " combined_connection_status_=" + combined_connection_status_);
+
+                            f.TOX_CONNECTION = combined_connection_status_;
+                            f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
+                            update_friend_in_db_connection_status(f);
+                            try_update_friend_in_friendlist(friends[fc]);
+                        }
                     }
                 }
             }
