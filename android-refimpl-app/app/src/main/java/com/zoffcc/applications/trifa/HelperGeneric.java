@@ -2032,6 +2032,7 @@ public class HelperGeneric
                         (relay_con_status != TOX_CONNECTION_NONE.value))
                     {
                         // if one of them is online, return combined "online" as status
+                        // TODO: do not always return TCP, make this better
                         ret = TOX_CONNECTION_TCP.value;
                     }
                 }
