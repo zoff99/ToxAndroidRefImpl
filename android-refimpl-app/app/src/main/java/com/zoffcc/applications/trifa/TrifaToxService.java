@@ -490,13 +490,20 @@ public class TrifaToxService extends Service
                 // the value in the database may be old (and wrong)
                 int status_new = tox_friend_get_connection_status(friends[fc]);
                 int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string, status_new);
-                // TODO: friends with relays need to be handled differently!!
+
                 f.TOX_CONNECTION = combined_connection_status_;
                 f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
-                f.TOX_CONNECTION_real = combined_connection_status_;
-                f.TOX_CONNECTION_on_off_real = get_toxconnection_wrapper(f.TOX_CONNECTION);
-                // TODO: friends with relays need to be handled differently!!
+                f.TOX_CONNECTION_real = status_new;
+                f.TOX_CONNECTION_on_off_real = get_toxconnection_wrapper(f.TOX_CONNECTION_real);
+
                 f.added_timestamp = System.currentTimeMillis();
+
+                if ((status_new != 0) && (combined_connection_status_ != 0))
+                {
+                    // Log.i(TAG, "non_relay_status:ALL:" + friends[fc] + " pk=" +
+                    //           get_friend_name_from_pubkey(f.tox_public_key_string) + " status=" + status_new +
+                    //           " combined_connection_status_=" + combined_connection_status_);
+                }
             }
             catch (Exception e)
             {
@@ -553,9 +560,9 @@ public class TrifaToxService extends Service
                             int combined_connection_status_ = get_combined_connection_status(f.tox_public_key_string,
                                                                                              status_new);
 
-                            // Log.i(TAG,
-                            //      "non_relay_status:" + friends[fc] + " pk=" + get_friend_name_from_pubkey(f.tox_public_key_string) + " status=" +
-                            //      status_new + " combined_connection_status_=" + combined_connection_status_);
+                            // Log.i(TAG, "non_relay_status:FWR:" + friends[fc] + " pk=" +
+                            //           get_friend_name_from_pubkey(f.tox_public_key_string) + " status=" + status_new +
+                            //           " combined_connection_status_=" + combined_connection_status_);
 
                             f.TOX_CONNECTION = combined_connection_status_;
                             f.TOX_CONNECTION_on_off = get_toxconnection_wrapper(f.TOX_CONNECTION);
