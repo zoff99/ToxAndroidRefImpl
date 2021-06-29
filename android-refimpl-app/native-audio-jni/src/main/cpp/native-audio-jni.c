@@ -1088,11 +1088,13 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 
     if (state.count < 1)
     {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "PlayPCM16:1a:Enqueue:empty_buffer:%p %d", (void *)empty_buffer, (int)nextSize);
         SLresult result;
         result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
                                                  (SLuint32) nextSize);
-        //__android_log_print(ANDROID_LOG_INFO, LOGTAG,
-        //                    "PlayPCM16:1:Enqueue:empty_buffer");
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "PlayPCM16:1b:Enqueue:empty_buffer");
     }
 
     if (nextSize > 0)
@@ -1109,10 +1111,15 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         }
 
         // enque the buffer
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "PlayPCM16:2a:Enqueue:nextBuffer:%p %d", (void *)nextBuffer, (int)nextSize);
         SLresult result;
         playing_state = _PLAYING;
         result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
                                                  (SLuint32) nextSize);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "PlayPCM16:2b:Enqueue:nextBuffer");
+
 
         if (SL_RESULT_SUCCESS != result)
         {
