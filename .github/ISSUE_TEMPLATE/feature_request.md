@@ -15,8 +15,8 @@ A clear and concise description of what you want to happen.
 
 **Your system information:**
  - TRIfA Version: [1.0.62]
- - App from Google-Play / F-Droid / other: [F-Droid]
- - Android OS Version: [e.g. Android 9]
+ - App from Google-Play / F-Droid / Github-Releases / other: [F-Droid]
+ - Android OS Version: [Android 9]
  - Device:
 
 **Describe alternatives you've considered**
