@@ -95,3 +95,13 @@ the latest Development Snapshot can be downloaded from CircleCI, [here](https://
 <img src="https://circleci.com/api/v1/project/zoff99/ToxAndroidRefImpl/latest/artifacts/0/$CIRCLE_ARTIFACTS/capture_app_running_2.png?filter=successful&branch=zoff99%2Fdev003" width="148">
 -->
 
+## License
+
+TRIfA is primarily distributed under the terms of both the GNU General Public License (version 2) and the GNU General Public License (version 3).
+
+See LICENSE-zzGPLv2 and LICENSE-GPLv3 for details.
+
+Translations are under the terms of GNU General Public License (version 2 or later).
+
+See https://hosted.weblate.org/projects/trifa-a-tox-client-for-android/android-application/#information
+and https://hosted.weblate.org/projects/trifa-a-tox-client-for-android/f-droid-texts/#information
