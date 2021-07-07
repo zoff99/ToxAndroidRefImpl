@@ -98,6 +98,7 @@ the latest Development Snapshot can be downloaded from CircleCI, [here](https://
 ## License (Project is dual licensed, you can choose the license)
 
 TRIfA is distributed under the terms of the GNU General Public License (version 2) or the GNU General Public License (version 3).
+You may use TRIfA according to either of these licenses as is most appropriate for your project on a case-by-case basis.
 
 See LICENSE-zzGPLv2 and LICENSE-GPLv3 for details.
 
