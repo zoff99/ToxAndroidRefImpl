@@ -373,4 +373,8 @@
     <string name="pref_description_window_security">Bu ayarın etkinleştirilmesi, Etkinliklere FLAG_SECURE ekler.
 \nEkran görüntülerini, ekran kaydını ve içeriğin son uygulamalar ön izlemesinde gösterilmesini engeller</string>
     <string name="pref_title_window_security">ekran görüntülerini engelle</string>
+    <string name="pref_description_toxirc_muted_peers_03">Sesi Kapatılan Kullanıcı 3 (kullanılmıyorsa boş bırakın)</string>
+    <string name="pref_description_toxirc_muted_peers_02">Sesi Kapatılan Kullanıcı 2 (kullanılmıyorsa boş bırakın)</string>
+    <string name="pref_description_toxirc_muted_peers_01">Sesi Kapatılan Kullanıcı 1 (kullanılmıyorsa boş bırakın)</string>
+    <string name="pref_title_toxirc_muted_peers_01">Toxirc Köprüsü Sesi Kapatılan Kullanıcılar</string>
 </resources>
