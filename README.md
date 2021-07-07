@@ -95,9 +95,9 @@ the latest Development Snapshot can be downloaded from CircleCI, [here](https://
 <img src="https://circleci.com/api/v1/project/zoff99/ToxAndroidRefImpl/latest/artifacts/0/$CIRCLE_ARTIFACTS/capture_app_running_2.png?filter=successful&branch=zoff99%2Fdev003" width="148">
 -->
 
-## License
+## License (Project is dual licensed, you can choose the license)
 
-TRIfA is primarily distributed under the terms of both the GNU General Public License (version 2) and the GNU General Public License (version 3).
+TRIfA is distributed under the terms of the GNU General Public License (version 2) or the GNU General Public License (version 3).
 
 See LICENSE-zzGPLv2 and LICENSE-GPLv3 for details.
 
