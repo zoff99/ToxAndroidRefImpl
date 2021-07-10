@@ -336,4 +336,13 @@
     <string name="pref_title_compact_chatlist">Liste de discussion compacte</string>
     <string name="pref_description_compact_friendlist">Rends la liste d\'amis plus compacte, si vous avez une grande liste d\'amis</string>
     <string name="pref_title_compact_friendlist">Liste d\'amis compacte</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">exporter des conversations cryptées *non sécurisé*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">exporter des fichiers cryptés *non sécurisé*</string>
+    <string name="pref_description_toxirc_muted_peers_03">Utilisateur en sourdine 3 (laisser vide s’il n’est pas utilisé)</string>
+    <string name="pref_description_toxirc_muted_peers_02">Utilisateur en sourdine 2 (laisser vide s’il n’est pas utilisé)</string>
+    <string name="pref_description_toxirc_muted_peers_01">Utilisateur en sourdine 1 (laisser vide s’il n’est pas utilisé)</string>
+    <string name="pref_title_toxirc_muted_peers_01">Utilisateurs en sourdine Toxirc Bridge</string>
+    <string name="pref_description_window_security">L\'activation de ce paramètre ajoute FLAG_SECURE aux activités.
+\nIl empêche les captures d\'écran et l\'enregistrement d\'écran ainsi que l\'affichage du contenu dans l\'aperçu des récents</string>
+    <string name="pref_title_window_security">empêcher les captures d’écran</string>
 </resources>
