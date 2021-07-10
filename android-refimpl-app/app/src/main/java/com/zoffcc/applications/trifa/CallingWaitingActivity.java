@@ -21,8 +21,16 @@ package com.zoffcc.applications.trifa;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.ImageButton;
+
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -32,6 +40,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperMessage.send_text_messge;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
 public class CallingWaitingActivity extends AppCompatActivity
 {
@@ -41,6 +50,7 @@ public class CallingWaitingActivity extends AppCompatActivity
     static boolean running = false;
     static boolean got_online = false;
     static Thread CallWThread = null;
+    ImageButton decline_waiting_button = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -67,6 +77,44 @@ public class CallingWaitingActivity extends AppCompatActivity
         {
             initializeScreenshotSecurity(this);
         }
+
+        decline_waiting_button = (ImageButton) findViewById(R.id.decline_waiting_button);
+
+        final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(
+                Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
+        decline_waiting_button.setImageDrawable(d3);
+
+        decline_waiting_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                Log.i(TAG, "decline_button_pressed:000");
+
+                try
+                {
+                    if (event.getAction() == MotionEvent.ACTION_DOWN)
+                    {
+                        Log.i(TAG, "decline_button_pressed:DOWN");
+                        try
+                        {
+                            Log.i(TAG, "decline_button_pressed:stop_me()");
+                            stop_me();
+                        }
+                        catch (Exception e2)
+                        {
+                            e2.printStackTrace();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                return true;
+            }
+        });
 
         try
         {
@@ -118,12 +166,13 @@ public class CallingWaitingActivity extends AppCompatActivity
                                     }
                                 }
                             }
-                            Thread.sleep(100);
+                            Thread.sleep(60);
                         }
                         catch (Exception ignored)
                         {
                         }
                     }
+                    Log.i(TAG, "finish_me():002");
                     finish_me();
                 }
             };
@@ -134,7 +183,9 @@ public class CallingWaitingActivity extends AppCompatActivity
         }
         else
         {
+            Log.i(TAG, "stop_me():002");
             stop_me();
+            Log.i(TAG, "finish_me():003");
             finish_me();
         }
 
@@ -145,6 +196,7 @@ public class CallingWaitingActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
+        Log.i(TAG, "stop_me():004");
         stop_me();
     }
 

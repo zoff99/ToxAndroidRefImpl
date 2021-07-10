@@ -9,7 +9,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:layout_weight="10" />
+        android:layout_weight="8" />
 
     <TextView
         android:layout_width="match_parent"
@@ -49,6 +49,17 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:layout_weight="20" />
+        android:layout_weight="10" />
+
+    <ImageButton
+        android:id="@+id/decline_waiting_button"
+        android:layout_width="@dimen/calling_activity_bottom_buttons_height"
+        android:layout_height="@dimen/calling_activity_bottom_buttons_height"
+        android:background="@android:color/transparent"
+        android:keepScreenOn="true"
+        android:scaleType="fitXY"
+        android:layout_gravity="center"
+        android:layout_marginBottom="50dp"
+        android:src="@drawable/circle_red" />
 
 </LinearLayout>
