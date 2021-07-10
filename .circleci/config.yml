@@ -13,11 +13,12 @@ jobs:
     #machine:
     #  image: circleci/classic:latest
     docker:
-      - image: ubuntu:16.04
+      - image: ubuntu:20.04
 
     steps:
       - run: &apt_install
           apt update &&
+          export DEBIAN_FRONTEND=noninteractive &&
           apt install -y --no-install-recommends
             clang
             cmake
@@ -29,6 +30,8 @@ jobs:
             git bc wget rsync cmake make pkg-config libtool
             ssh gzip tar
             coreutils
+            python
+            libncurses5
 
       - checkout
       - restore_cache:
