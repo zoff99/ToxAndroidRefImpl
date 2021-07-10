@@ -34,7 +34,11 @@ import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
 
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
+import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperMessage
@@ -1036,5 +1040,68 @@ public class HelperMessage
             e.printStackTrace();
             Log.i(TAG, "save_selected_messages:EE2:" + e.getMessage());
         }
+    }
+
+    static int send_text_messge(final String friend_pubkey, final String message)
+    {
+        int ret = 0;
+
+        final String msg = message.substring(0, (int) Math.min(tox_max_message_length(), message.length()));
+
+        Message m = new Message();
+        m.tox_friendpubkey = friend_pubkey;
+        m.direction = 1; // msg sent
+        m.TOX_MESSAGE_TYPE = 0;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.rcvd_timestamp = 0L;
+        m.is_new = false; // own messages are always "not new"
+        m.sent_timestamp = System.currentTimeMillis();
+        m.read = false;
+        m.text = msg;
+        m.msg_version = 0;
+        m.resend_count = 0; // we have tried to resend this message "0" times
+
+        if ((msg != null) && (!msg.equalsIgnoreCase("")))
+        {
+            MainActivity.send_message_result result = tox_friend_send_message_wrapper(
+                    tox_friend_by_public_key__wrapper(friend_pubkey), 0, msg);
+            long res = result.msg_num;
+            Log.i(TAG, "send_text_messge:result=" + res + " m=" + m);
+
+            if (res > -1) // sending was OK
+            {
+                m.message_id = res;
+                if (!result.msg_hash_hex.equalsIgnoreCase(""))
+                {
+                    // msgV2 message -----------
+                    m.msg_id_hash = result.msg_hash_hex;
+                    m.msg_version = 1;
+                    // msgV2 message -----------
+                }
+
+                if (!result.raw_message_buf_hex.equalsIgnoreCase(""))
+                {
+                    // save raw message bytes of this v2 msg into the database
+                    // we need it if we want to resend it later
+                    m.raw_msgv2_bytes = result.raw_message_buf_hex;
+                }
+
+                m.resend_count = 1; // we sent the message successfully
+
+                long row_id = insert_into_message_db(m, true);
+                m.id = row_id;
+            }
+            else
+            {
+                // sending was NOT ok
+                Log.i(TAG, "tox_friend_send_message_wrapper:store pending message" + m);
+
+                m.message_id = -1;
+                long row_id = insert_into_message_db(m, true);
+                m.id = row_id;
+            }
+        }
+
+        return ret;
     }
 }
