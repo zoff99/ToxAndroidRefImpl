@@ -29,6 +29,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperMessage.send_text_messge;
+import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 
 public class CallingWaitingActivity extends AppCompatActivity
@@ -89,6 +91,7 @@ public class CallingWaitingActivity extends AppCompatActivity
                 {
                     Log.i(TAG, "CallWThread:starting");
 
+                    boolean sent_ping_message = false;
                     while (running)
                     {
                         try
@@ -98,9 +101,26 @@ public class CallingWaitingActivity extends AppCompatActivity
                                 running = false;
                                 got_online = true;
                             }
+                            else
+                            {
+                                if (!sent_ping_message)
+                                {
+                                    final String relay_for_friend = get_relay_for_friend(calling_friend_pk);
+                                    if (relay_for_friend != null)
+                                    {
+                                        if (is_friend_online_real(
+                                                tox_friend_by_public_key__wrapper(relay_for_friend)) != 0)
+                                        {
+                                            send_text_messge(calling_friend_pk, "calling you now ...");
+                                            Log.i(TAG,"send_text_messge:calling you");
+                                            sent_ping_message = true;
+                                        }
+                                    }
+                                }
+                            }
                             Thread.sleep(100);
                         }
-                        catch (Exception e)
+                        catch (Exception ignored)
                         {
                         }
                     }
