@@ -80,6 +80,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.insert_into_filet
 import static com.zoffcc.applications.trifa.HelperFiletransfer.update_filetransfer_db_full;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
@@ -88,6 +89,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_messag
 import static com.zoffcc.applications.trifa.HelperMessage.insert_into_message_db;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.CallingWaitingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
@@ -636,7 +638,7 @@ public class MessageListActivity extends AppCompatActivity
         if (friendnum == -1)
         {
             friendnum = friendnum_prev;
-            Log.i(TAG, "onResume:001:friendnum=" + friendnum);
+            Log.i(TAG, "onResume:001:friendnum(-->friendnum_prev)=" + friendnum);
         }
 
         change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, tox_friend_get_public_key__wrapper(friendnum));
@@ -1266,8 +1268,31 @@ public class MessageListActivity extends AppCompatActivity
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        Log.i(TAG, "onActivityResult:requestCode=" + requestCode + " resultCode=" + resultCode);
+
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == MEDIAPICK_ID_001 && resultCode == Activity.RESULT_OK)
+
+        if (requestCode == CallingWaitingActivity_ID)
+        {
+            Log.i(TAG, "friend_to_call:CallingWaitingActivity_ID returned");
+            if (resultCode == Activity.RESULT_OK)
+            {
+                Log.i(TAG, "friend_to_call came online, call him now ...");
+                try
+                {
+                    friendnum = tox_friend_by_public_key__wrapper(data.getStringExtra("friendnum_pk"));
+                    Log.i(TAG, "friend_to_call:friendnum=" + friendnum + " friendnum_prev=" + friendnum_prev + " pk=" +
+                               data.getStringExtra("friendnum_pk"));
+                    friendnum_prev = friendnum;
+                    start_call_to_friend_real(null);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        else if (requestCode == MEDIAPICK_ID_001 && resultCode == Activity.RESULT_OK)
         {
             if (data == null)
             {
@@ -1411,6 +1436,22 @@ public class MessageListActivity extends AppCompatActivity
 
     public void start_call_to_friend(View view)
     {
+        if (is_friend_online_real(friendnum) == 0)
+        {
+            final long fn = friendnum;
+            final String calling_friend_pk = tox_friend_get_public_key__wrapper(fn);
+            Intent intent = new Intent(context_s, CallingWaitingActivity.class);
+            intent.putExtra("calling_friend_pk", calling_friend_pk);
+            startActivityForResult(intent, CallingWaitingActivity_ID);
+        }
+        else
+        {
+            start_call_to_friend_real(view);
+        }
+    }
+
+    public void start_call_to_friend_real(View view)
+    {
         Log.i(TAG, "start_call_to_friend_real");
 
         if (!is_tox_started)
@@ -1418,6 +1459,8 @@ public class MessageListActivity extends AppCompatActivity
             Log.i(TAG, "TOX:offline");
             return;
         }
+
+        Log.i(TAG, "start_call_to_friend_real:friendnum=" + friendnum);
 
         if (is_friend_online(friendnum) == 0)
         {

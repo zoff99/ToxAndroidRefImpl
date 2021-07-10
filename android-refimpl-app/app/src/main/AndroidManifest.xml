@@ -124,6 +124,12 @@
             tools:ignore="LockedOrientationActivity,UnusedAttribute">
         </activity>
         <activity
+            android:name=".CallingWaitingActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask">
+        </activity>
+        <activity
             android:name=".ProfileActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_profile">

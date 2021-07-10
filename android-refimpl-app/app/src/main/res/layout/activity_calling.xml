@@ -8,6 +8,7 @@
     android:orientation="vertical"
     tools:context="com.zoffcc.applications.trifa.CallingActivity">
 
+
     <!--android:background="#0277bd"-->
 
 
