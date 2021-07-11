@@ -222,4 +222,13 @@
     <string name="pref_title_compact_chatlist">Lista de bate-papo compacta</string>
     <string name="pref_description_compact_friendlist">Torne a Lista de Amigos mais compacta, se você tiver uma grande lista de Amigos</string>
     <string name="pref_title_compact_friendlist">Lista de amigos compacta</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">exportar chats criptografados *inseguro*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">exportar arquivos criptografados *inseguro*</string>
+    <string name="pref_description_toxirc_muted_peers_03">Usuário Silenciado 3 (deixe em branco se não for usado)</string>
+    <string name="pref_description_toxirc_muted_peers_02">Usuário Silenciado 2 (deixe em branco se não for usado)</string>
+    <string name="pref_description_toxirc_muted_peers_01">Usuário Silenciado 1 (deixe em branco se não for usado)</string>
+    <string name="pref_title_toxirc_muted_peers_01">Usuários Silenciados Toxirc Bridge</string>
+    <string name="pref_description_window_security">A ativação desta configuração adiciona FLAG_SECURE às atividades.
+\nImpede capturas de tela, gravação de tela e exibição de conteúdo na visualização de recentes</string>
+    <string name="pref_title_window_security">impedir capturas de tela</string>
 </resources>
