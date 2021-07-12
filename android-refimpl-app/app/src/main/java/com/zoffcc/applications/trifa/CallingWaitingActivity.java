@@ -28,6 +28,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -40,7 +41,6 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperMessage.send_text_messge;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
-import static com.zoffcc.applications.trifa.MainActivity.toxav_call_control;
 
 public class CallingWaitingActivity extends AppCompatActivity
 {
@@ -51,6 +51,7 @@ public class CallingWaitingActivity extends AppCompatActivity
     static boolean got_online = false;
     static Thread CallWThread = null;
     ImageButton decline_waiting_button = null;
+    TextView call_waiting_friend_name = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -78,7 +79,9 @@ public class CallingWaitingActivity extends AppCompatActivity
             initializeScreenshotSecurity(this);
         }
 
-        decline_waiting_button = (ImageButton) findViewById(R.id.decline_waiting_button);
+        decline_waiting_button = findViewById(R.id.decline_waiting_button);
+        call_waiting_friend_name = findViewById(R.id.call_waiting_friend_name);
+        call_waiting_friend_name.setText("");
 
         final Drawable d3 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_highlight_off).backgroundColor(
                 Color.TRANSPARENT).color(Color.parseColor("#A0FF0000")).sizeDp(50);
@@ -122,6 +125,14 @@ public class CallingWaitingActivity extends AppCompatActivity
             if (extras != null)
             {
                 calling_friend_pk = extras.getString("calling_friend_pk", null);
+                if (calling_friend_pk != null)
+                {
+                    final String resolve_name = HelperFriend.resolve_name_for_pubkey(calling_friend_pk, "");
+                    if ((resolve_name.length() > 0) && (resolve_name.length() < 80))
+                    {
+                        call_waiting_friend_name.setText(resolve_name);
+                    }
+                }
             }
         }
         catch (Exception e)
@@ -160,7 +171,7 @@ public class CallingWaitingActivity extends AppCompatActivity
                                                 tox_friend_by_public_key__wrapper(relay_for_friend)) != 0)
                                         {
                                             send_text_messge(calling_friend_pk, "calling you now ...");
-                                            Log.i(TAG,"send_text_messge:calling you");
+                                            Log.i(TAG, "send_text_messge:calling you");
                                             sent_ping_message = true;
                                         }
                                     }

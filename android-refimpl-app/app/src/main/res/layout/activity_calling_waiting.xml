@@ -14,10 +14,33 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="10"
+        android:layout_weight="3"
         android:background="@android:color/transparent"
         android:gravity="center_horizontal|center_vertical"
-        android:text="waiting for friend\n\nto come online ..."
+        android:text="waiting for friend"
+        android:textColor="@color/md_grey_600"
+        android:textSize="25sp"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/call_waiting_friend_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="friend name"
+        android:textColor="@color/md_grey_600"
+        android:textSize="25sp"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:background="@android:color/transparent"
+        android:gravity="center_horizontal|center_vertical"
+        android:text="to come online ..."
         android:textColor="@color/md_grey_600"
         android:textSize="25sp"
         tools:ignore="HardcodedText" />
@@ -49,7 +72,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="10dp"
-        android:layout_weight="10" />
+        android:layout_weight="15" />
 
     <ImageButton
         android:id="@+id/decline_waiting_button"
