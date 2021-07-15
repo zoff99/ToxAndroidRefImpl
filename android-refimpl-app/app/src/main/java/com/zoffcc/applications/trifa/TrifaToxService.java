@@ -28,7 +28,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.os.Process;
 import android.util.Log;
@@ -79,9 +78,11 @@ import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notificati
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change;
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change_wrapper;
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_setup;
+import static com.zoffcc.applications.trifa.MainActivity.DEBUG_BATTERY_OPTIMIZATION_LOGGING;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__force_udp_only;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_DEBUG_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
@@ -117,7 +118,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LA
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP3;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
-import static com.zoffcc.applications.trifa.MainActivity.DEBUG_BATTERY_OPTIMIZATION_LOGGING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
@@ -688,14 +688,13 @@ public class TrifaToxService extends Service
     {
         if (DEBUG_BATTERY_OPTIMIZATION_LOGGING)
         {
-            File sdCard = Environment.getExternalStorageDirectory();
-            File dir = new File(sdCard.getAbsolutePath() + "/trifa/debug/");
-            dir.mkdirs();
-            String filename2 = long_date_time_format(System.currentTimeMillis()) + "_" + filename;
-            File file = new File(dir, filename2);
-
             try
             {
+                File dir = new File(SD_CARD_FILES_DEBUG_DIR);
+                dir.mkdirs();
+                String filename2 = long_date_time_format(System.currentTimeMillis()) + "_" + filename;
+                File file = new File(dir, filename2);
+
                 FileOutputStream f = new FileOutputStream(file);
                 f.write(1);
                 f.close();

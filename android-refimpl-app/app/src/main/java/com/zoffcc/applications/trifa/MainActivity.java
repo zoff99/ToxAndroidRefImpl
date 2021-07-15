@@ -319,6 +319,7 @@ public class MainActivity extends AppCompatActivity
     static String SD_CARD_TMP_DIR = "";
     static String SD_CARD_STATIC_DIR = "";
     static String SD_CARD_FILES_EXPORT_DIR = "";
+    static String SD_CARD_FILES_DEBUG_DIR = "";
     static String SD_CARD_ENC_FILES_EXPORT_DIR = "/unenc_files/";
     static String SD_CARD_ENC_CHATS_EXPORT_DIR = "/unenc_chats/";
     static String SD_CARD_TMP_DUMMYFILE = null;
@@ -733,6 +734,7 @@ public class MainActivity extends AppCompatActivity
         SD_CARD_TMP_DIR = getExternalFilesDir(null).getAbsolutePath() + "/tmpdir/";
         SD_CARD_STATIC_DIR = getExternalFilesDir(null).getAbsolutePath() + "/_staticdir/";
         SD_CARD_FILES_EXPORT_DIR = getExternalFilesDir(null).getAbsolutePath() + "/vfs_export/";
+        SD_CARD_FILES_DEBUG_DIR = getExternalFilesDir(null).getAbsolutePath() + "/debug/";
         // Log.i(TAG, "SD_CARD_FILES_EXPORT_DIR:" + SD_CARD_FILES_EXPORT_DIR);
         SD_CARD_TMP_DUMMYFILE = HelperGeneric.make_some_static_dummy_file(this.getBaseContext());
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
