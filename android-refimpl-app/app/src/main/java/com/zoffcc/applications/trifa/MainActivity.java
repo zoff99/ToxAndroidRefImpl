@@ -3901,6 +3901,7 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "self_connection_status:" + a_TOX_CONNECTION);
         global_self_connection_status = a_TOX_CONNECTION;
+        TrifaToxService.write_debug_file("CB_SELF_CONN_STATUS__cstatus:" + a_TOX_CONNECTION + "_b:" + bootstrapping);
 
         if (bootstrapping)
         {

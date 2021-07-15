@@ -51,7 +51,6 @@ import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conf
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
@@ -889,7 +888,9 @@ public class TrifaToxService extends Service
 
                     try
                     {
+                        TrifaToxService.write_debug_file("STARTUP__start__bootstrapping");
                         bootstrap_me();
+                        TrifaToxService.write_debug_file("STARTUP__finish__bootstrapping");
                     }
                     catch (Exception e)
                     {
@@ -981,7 +982,8 @@ public class TrifaToxService extends Service
 
 
                                 Log.i(TAG, "entering BATTERY SAVINGS MODE ...");
-                                TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__enter");
+                                TrifaToxService.write_debug_file(
+                                        "BATTERY_SAVINGS_MODE__enter:" + tox_self_get_connection_status());
 
                                 long current_timestamp_ = System.currentTimeMillis();
                                 global_self_last_entered_battery_saving_timestamp = current_timestamp_;
@@ -1266,8 +1268,10 @@ public class TrifaToxService extends Service
                                     Log.i(TAG, "BATTERY SAVINGS MODE, bootstrapping");
                                     tox_notification_change_wrapper(TOX_CONNECTION_a,
                                                                     ""); // set to real connection status
+                                    TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__start__bootstrapping");
                                     bootstrap_me();
-                                    TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__bootstrapping");
+                                    TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__finish__bootstrapping:" +
+                                                                     tox_self_get_connection_status());
                                 }
                                 else
                                 {
@@ -1344,7 +1348,10 @@ public class TrifaToxService extends Service
 
                                         try
                                         {
+                                            TrifaToxService.write_debug_file("RUN__start__bootstrapping");
                                             bootstrap_me();
+                                            TrifaToxService.write_debug_file(
+                                                    "RUN__finish__bootstrapping:" + tox_self_get_connection_status());
                                         }
                                         catch (Exception e)
                                         {
