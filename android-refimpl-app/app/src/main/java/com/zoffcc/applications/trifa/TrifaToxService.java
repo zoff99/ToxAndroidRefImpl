@@ -690,6 +690,8 @@ public class TrifaToxService extends Service
         {
             try
             {
+                Log.d("BATTOPTDEBUG", "" + filename);
+
                 File dir = new File(SD_CARD_FILES_DEBUG_DIR);
                 dir.mkdirs();
                 String filename2 = long_date_time_format(System.currentTimeMillis()) + "_" + filename;
