@@ -98,31 +98,58 @@ done
 
 echo "good nodes:"$good_nodes_count
 
+echo "" >> "$outfile"
+echo "" >> "$outfile"
 
 i=0
 while [ $i -lt $nodes_count ]; do
         ipv4=$(jq .nodes["$i"].ipv4 "$nodes_file"|tr -d '"')
-        port=$(jq .nodes["$i"].tcp_ports[0] "$nodes_file"|tr -d '"')
-        pubkey=$(jq .nodes["$i"].public_key "$nodes_file"|tr -d '"')
-        status_tcp=$(jq .nodes["$i"].status_tcp "$nodes_file"|tr -d '"')
 
-        if [ "$status_tcp""x" == "true""x" ]; then
-            if [ "$port""x" != "x" ]; then
-              if [ "$ipv4""x" != "NONEx" ]; then
-                echo -n 'n = BootstrapNodeEntryDB_(false, num_, "'"$ipv4"'",'"$port"',"'"$pubkey"'");' >> "$outfile"
-                echo -n 'insert_node_into_db_real(n);' >> "$outfile"
-                echo -n 'num_++;' >> "$outfile"
-                echo "node #""$i:"
-                if [ $[ $i + 1 ] != $good_nodes_count ]; then
-                        echo -n '' >> "$outfile"
+        ports_count=$(jq '.nodes['"$i"'].tcp_ports|length' "$nodes_file"|tr -d '"')
+        # echo $ports_count
+
+        if [ "$ports_count""x" != "0x" ]; then
+            for tcp_port_index in $(seq 0 $(("$ports_count"-1)) ) ; do
+                port=$(jq .nodes["$i"].tcp_ports["$tcp_port_index"] "$nodes_file"|tr -d '"')
+                # echo "$tcp_port_index"" -> ""$port"
+                if [ "$port""x" == "443x" ]; then
+                    break
                 fi
-                echo '' >> "$outfile"
-              fi
+
+                if [ "$port""x" == "80x" ]; then
+                    break
+                fi
+
+                if [ "$port""x" == "53x" ]; then
+                    break
+                fi
+
+                if [ "$port""x" == "25x" ]; then
+                    break
+                fi
+            done
+
+            pubkey=$(jq .nodes["$i"].public_key "$nodes_file"|tr -d '"')
+            status_tcp=$(jq .nodes["$i"].status_tcp "$nodes_file"|tr -d '"')
+
+            if [ "$status_tcp""x" == "true""x" ]; then
+                if [ "$port""x" != "x" ]; then
+                  if [ "$ipv4""x" != "NONEx" ]; then
+                    echo -n 'n = BootstrapNodeEntryDB_(false, num_, "'"$ipv4"'",'"$port"',"'"$pubkey"'");' >> "$outfile"
+                    echo -n 'insert_node_into_db_real(n);' >> "$outfile"
+                    echo -n 'num_++;' >> "$outfile"
+                    echo "node #""$i:"" -> ""$port"
+                    if [ $[ $i + 1 ] != $good_nodes_count ]; then
+                            echo -n '' >> "$outfile"
+                    fi
+                    echo '' >> "$outfile"
+                  fi
+                fi
+            else
+                    :
+                    # echo "node #""$i:"
+                    # echo "node not OK"
             fi
-        else
-                :
-                # echo "node #""$i:"
-                # echo "node not OK"
         fi
 
         i=$[ $i + 1 ]
