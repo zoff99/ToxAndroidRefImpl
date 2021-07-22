@@ -48,8 +48,9 @@
         android:summary="@string/pref_description_auto_accept_all_upto"
         android:title="@string/pref_title_auto_accept_all_upto" />
 
+    <!-- set default value to PREF_GLOBAL_FONT_SIZE_DEFAULT -->
     <ListPreference
-        android:defaultValue="1"
+        android:defaultValue="2"
         android:entries="@array/pref_global_font_size_titles"
         android:entryValues="@array/pref_global_font_size_values"
         android:key="global_font_size"

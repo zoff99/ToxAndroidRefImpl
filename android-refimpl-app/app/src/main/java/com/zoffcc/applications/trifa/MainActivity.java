@@ -422,7 +422,8 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__auto_accept_video = false;
     static boolean PREF__auto_accept_all_upto = false;
     static int PREF__video_cam_resolution = 0;
-    static int PREF__global_font_size = 2;
+    static final int PREF_GLOBAL_FONT_SIZE_DEFAULT = 2;
+    static int PREF__global_font_size = PREF_GLOBAL_FONT_SIZE_DEFAULT;
     static boolean PREF__allow_open_encrypted_file_via_intent = false;
     static boolean PREF__compact_friendlist = false;
     static boolean PREF__compact_chatlist = true;
@@ -1119,12 +1120,12 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__global_font_size = Integer.parseInt(settings.getString("global_font_size", "" + 2));
+            PREF__global_font_size = Integer.parseInt(settings.getString("global_font_size", "" + PREF_GLOBAL_FONT_SIZE_DEFAULT));
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__global_font_size = 2;
+            PREF__global_font_size = PREF_GLOBAL_FONT_SIZE_DEFAULT;
         }
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
@@ -2276,12 +2277,12 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__global_font_size = Integer.parseInt(settings.getString("global_font_size", "" + 2));
+            PREF__global_font_size = Integer.parseInt(settings.getString("global_font_size", "" + PREF_GLOBAL_FONT_SIZE_DEFAULT));
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__global_font_size = 2;
+            PREF__global_font_size = PREF_GLOBAL_FONT_SIZE_DEFAULT;
         }
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
