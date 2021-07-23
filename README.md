@@ -17,7 +17,7 @@ Build Status
 [![Android CI](https://github.com/zoff99/ToxAndroidRefImpl/workflows/Android%20CI/badge.svg)](https://github.com/zoff99/ToxAndroidRefImpl/actions?query=workflow%3A%22Android+CI%22)
 [![Release](https://jitpack.io/v/zoff99/pkgs_ToxAndroidRefImpl.svg)](https://jitpack.io/#zoff99/pkgs_ToxAndroidRefImpl)
 [![Translations](https://hosted.weblate.org/widgets/trifa-a-tox-client-for-android/-/svg-badge.svg)](https://hosted.weblate.org/engage/trifa-a-tox-client-for-android/)
-[![License](https://img.shields.io/github/license/zoff99/ToxAndroidRefImpl)][license]
+[![License](https://img.shields.io/github/license/zoff99/ToxAndroidRefImpl)](LICENSE)
 
 Help Translate the App in your Language
 =
