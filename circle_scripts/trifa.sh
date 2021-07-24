@@ -277,6 +277,12 @@ echo "###### ------------------------------"
 
 # ----- debug signing key -----
 cd ~/
+
+# use keystore in circleCI Environment Variables -----------------------
+# HINT: create content of env var with: "cat debug.keystore | base64 --wrap=0"
+echo $seckeystore |base64 -d > ~/.android/debug.keystore
+# use keystore in circleCI Environment Variables -----------------------
+
 ls -al ~/.android/debug.keystore
 if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
     echo "*** generating new signer key ***"
@@ -298,7 +304,8 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     :
 else
     echo "Building TRIfA app"
-    ./gradlew :app:dependencies
+    ./gradlew :app:dependencies || echo "OK"
+    # ./gradlew assembleDebug # this is a workaround to build problems, not sure how to fix it otherwise
     ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
 fi
 # --------- GRADLE - build app -------------
@@ -328,7 +335,6 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     cd $_s_/trifa_src/android-refimpl-app/
     ls -al ./gradlew
 
-
     if [[ "$current_git_tag""x"  =~ ^trifajni-.* ]] ; then
         echo "############### ------------ ###################"
         echo "############### ------------ ###################"
@@ -344,11 +350,6 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     else
         echo "not uploading artefact to bintray!! -> not maven branch"
     fi
-
-    # cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; mv build.gradle build.gradle2 ; mv gpr.gradle build.gradle
-    # cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:tasks
-    # cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:publishToMavenLocal
-    # cd $_s_/trifa_src/android-refimpl-app/jnilib/ ; ./gradlew :jnilib:publishGprPublicationToMavenLocal
 
     find ~/.m2/repository -type f -exec ls -al {} \;
 # --------- bintray artefact -------------
