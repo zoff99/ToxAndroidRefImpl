@@ -1,6 +1,6 @@
 dependencyVerification {
     verify = [
-            'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.64:pkgs_ToxAndroidRefImpl-1.0.64.aar:cab6b16b94c41cddc58088965cc69527aeaf5c549dfe8ed5ee8537d0401c56e1',
+            'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.66:pkgs_ToxAndroidRefImpl-1.0.66.aar:e8a02cd2c0ad989b52da83c1914c931048e2e31687df98357c35a5d4bc5c3404',
             'androidx.activity:activity:1.2.3:activity-1.2.3.aar:1dce0705c334a6b2ef03382418dc7586f4e57ee23817267b403ea8cfc36c824e',
             'androidx.annotation:annotation-experimental:1.0.0:annotation-experimental-1.0.0.aar:b219d2b568e7e4ba534e09f8c2fd242343df6ccbdfbbe938846f5d740e6b0b11',
             'androidx.annotation:annotation:1.2.0:annotation-1.2.0.jar:9029262bddce116e6d02be499e4afdba21f24c239087b76b3b57d7e98b490a36',
