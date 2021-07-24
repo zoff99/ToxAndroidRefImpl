@@ -2019,6 +2019,17 @@ void toxav_audio_receive_frame_cb_(ToxAV *av, uint32_t friend_number, const int1
     global_call_audio_last_pts = 0;
     videocall_audio_add_buffer(pcm, (sample_count * channels));
     pthread_mutex_unlock(&group_audio___mutex);
+#ifdef JAVA_LINUX
+    if (sampling_rate > 0)
+    {
+        int want_ms = (int)((sample_count * 1000) / sampling_rate);
+        if ((want_ms > 1) && (want_ms <= 120))
+        {
+            // dbg(9, "toxav_audio_receive_frame_cb_:want_ms=%d", want_ms);
+            process_incoming_videocall_audio_on_iterate(1, want_ms, channels, sampling_rate, 0);
+        }
+    }
+#endif
 }
 
 void toxav_audio_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, const int16_t *pcm, size_t sample_count,
@@ -2050,6 +2061,17 @@ void toxav_audio_receive_frame_pts_cb_(ToxAV *av, uint32_t friend_number, const 
     global_call_audio_last_pts = pts;
     videocall_audio_add_buffer(pcm, (sample_count * channels));
     pthread_mutex_unlock(&group_audio___mutex);
+#ifdef JAVA_LINUX
+    if (sampling_rate > 0)
+    {
+        int want_ms = (int)((sample_count * 1000) / sampling_rate);
+        if ((want_ms > 1) && (want_ms <= 120))
+        {
+            // dbg(9, "toxav_audio_receive_frame_cb_:want_ms=%d", want_ms);
+            process_incoming_videocall_audio_on_iterate(1, want_ms, channels, sampling_rate, 0);
+        }
+    }
+#endif
 }
 
 void android_toxav_callback_video_receive_frame_cb(uint32_t friend_number, uint16_t width, uint16_t height,
@@ -3459,7 +3481,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1messa
 
 /** -----XX-----SPLIT-02-----XX----- */
 
-
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message_1v2(JNIEnv *env,
         jobject thiz, jlong friend_number, jint type, jlong ts_sec,
@@ -3499,7 +3520,39 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
     capacity = (*env)->GetDirectBufferCapacity(env, raw_msg_len_back);
     uint32_t raw_msg_len_back_c;
     const char *message_str = NULL;
+    // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
+
+
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)message);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)message, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
+                  (int)type, (uint32_t) ts_sec,
+                  (const uint8_t *)pBytes, (size_t)plength,
+                  (uint8_t *)raw_message_back_buffer_c, &raw_msg_len_back_c, (uint8_t *)msgid_back_buffer_c,
+                  &error);
+    (*env)->ReleaseStringUTFChars(env, message, message_str);
+    // HINT: give number back as 2 bytes in ByteBuffer
+    //       a bit hacky, but it works
+    raw_msg_len_back_c_2[0] = (uint8_t)(raw_msg_len_back_c % 256); // low byte
+    raw_msg_len_back_c_2[1] = (uint8_t)(raw_msg_len_back_c / 256); // high byte
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+#else
+
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     int64_t res = tox_util_friend_send_message_v2(tox_global, (uint32_t) friend_number,
                   (int)type, (uint32_t) ts_sec,
@@ -3511,6 +3564,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
     //       a bit hacky, but it works
     raw_msg_len_back_c_2[0] = (uint8_t)(raw_msg_len_back_c % 256); // low byte
     raw_msg_len_back_c_2[1] = (uint8_t)(raw_msg_len_back_c / 256); // high byte
+
+#endif
 
     if(res == -1)
     {
@@ -3578,12 +3633,36 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEnv *env, jobject thiz,
         jlong friend_number, jint type, jobject message)
 {
+
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)message);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)message, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)pBytes,
+                                           (size_t)plength, &error);
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+#else
+
     const char *message_str = NULL;
+    // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
     TOX_ERR_FRIEND_SEND_MESSAGE error;
     uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)message_str,
                                            (size_t)strlen(message_str), &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
+
+#endif
 
     if(error != 0)
     {
@@ -3747,12 +3826,37 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env
         return (jint)-1;
     }
 
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)name);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)name, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_SET_INFO error;
+    bool res = tox_self_set_name(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+    return (jint)res;
+
+#else
+
     const char *s = NULL;
+    // TODO: UTF-8
     s = (*env)->GetStringUTFChars(env, name, NULL);
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_name(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
     (*env)->ReleaseStringUTFChars(env, name, s);
     return (jint)res;
+
+#endif
 }
 
 JNIEXPORT jint JNICALL
@@ -3764,12 +3868,38 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(
         return (jint)-1;
     }
 
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)status_message);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)status_message, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_SET_INFO error;
+    bool res = tox_self_set_status_message(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+    return (jint)res;
+
+#else
+
     const char *s = NULL;
+    // TODO: UTF-8
     s = (*env)->GetStringUTFChars(env, status_message, NULL);
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_status_message(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
     (*env)->ReleaseStringUTFChars(env, status_message, s);
     return (jint)res;
+
+#endif
+
 }
 
 JNIEXPORT void JNICALL
@@ -4001,6 +4131,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1get_1file_1id(JNIEnv 
     {
         return 0;
     }
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1sending_1active(JNIEnv *env, jobject thiz, jlong friend_number)
+{
+    if(tox_global == NULL)
+    {
+        return -1;
+    }
+
+    return (jlong)tox_file_sending_active(tox_global, (uint32_t)friend_number);
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1receiving_1active(JNIEnv *env, jobject thiz, jlong friend_number)
+{
+    if(tox_global == NULL)
+    {
+        return -1;
+    }
+
+    return (jlong)tox_file_receiving_active(tox_global, (uint32_t)friend_number);
 }
 
 JNIEXPORT jlong JNICALL
@@ -5033,12 +5185,36 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1send_1message(JNIEnv *env, jobject thiz,
         jlong conference_number, jint type, jobject message)
 {
+
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)message);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)message, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_CONFERENCE_SEND_MESSAGE error;
+    bool res = tox_conference_send_message(tox_global, (uint32_t)conference_number, (int)type, (uint8_t *)pBytes,
+                                           (size_t)plength, &error);
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+#else
+
     const char *message_str = NULL;
+    // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
     TOX_ERR_CONFERENCE_SEND_MESSAGE error;
     bool res = tox_conference_send_message(tox_global, (uint32_t)conference_number, (int)type, (uint8_t *)message_str,
                                            (size_t)strlen(message_str), &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
+
+#endif
 
     if(res == false)
     {
@@ -5918,7 +6094,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1age(J
 
             res = toxav_video_send_frame_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                          (uint16_t)frame_height_px,
-                                         (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error, (uint32_t)age_ms);
+                                         (uint8_t *)video_buffer_2, video_buffer_2_u, video_buffer_2_v, &error, (uint32_t)age_ms + 1);
 
         }
     }
@@ -5943,7 +6119,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264_
         res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                           (uint16_t)frame_height_px,
                                           (uint8_t *)video_buffer_2,
-                                          (uint32_t)data_len, &error, (uint32_t)(age_ms + 1));
+                                          (uint32_t)data_len, &error, (uint32_t)(age_ms));
 
         if ((res == false) && (error == TOXAV_ERR_SEND_FRAME_SYNC))
         {
@@ -5951,7 +6127,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264_
             res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                               (uint16_t)frame_height_px,
                                               (uint8_t *)video_buffer_2,
-                                              (uint32_t)data_len, &error, (uint32_t)(age_ms + 2));
+                                              (uint32_t)data_len, &error, (uint32_t)(age_ms + 1));
         }
     }
 
@@ -6594,33 +6770,22 @@ void Pipe_reset(size_t *_rptr, size_t *_wptr)
 
 size_t Pipe_read(char* data, size_t bytes, void * check_buf, void *_buf, size_t *_rptr, size_t *_wptr)
 {
-
-    // dbg(9, "Pipe_read:001");
-
     if (!data)
     {
-        // dbg(9, "Pipe_read:002");
         return 0;
     }
 
     if (!check_buf)
     {
-        // dbg(9, "Pipe_read:003");
         return 0;
     }
 
-    // dbg(9, "Pipe_read:004");
     bytes = min(bytes, Pipe_getUsed(_rptr, _wptr));
-    // dbg(9, "Pipe_read:005");
     const size_t bytes_read1 = min(bytes, (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2) - (*_rptr));
     // dbg(9, "Pipe_read:006:data=%p check_buf=%p _buf=%p _rptr=%p, _rptr=%d bytes_read1=%d bytes=%d", data, check_buf, _buf, _rptr, (int)(*_rptr), bytes_read1, bytes);
     memcpy(data, (char *)_buf + (*_rptr), bytes_read1);
-    // dbg(9, "Pipe_read:007");
     memcpy(data + bytes_read1, _buf, bytes - bytes_read1);
-    // dbg(9, "Pipe_read:008");
     Pipe_updateIndex(_rptr, bytes);
-    // dbg(9, "Pipe_read:009");
-
 
     return bytes;
 }
