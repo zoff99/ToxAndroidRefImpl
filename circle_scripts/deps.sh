@@ -15,14 +15,31 @@ build_yasm="1"
 ## ----------------------
 
 ## ----------------------
-_FFMPEG_VERSION_="n4.1.6"
+_FFMPEG_VERSION_="n4.3.2"
 _OPUS_VERSION_="v1.3.1"
 _VPX_VERSION_="v1.8.0"
 _LIBSODIUM_VERSION_="1.0.18"
-_X264_VERSION_="1771b556ee45207f8711744ccbd5d42a3949b14c"
+_X264_VERSION_="5db6aa6cab1b146e07b60cc1736a01f21da01154"
+_ANDROID_SDK_FILE_="sdk-tools-linux-4333796.zip"
+_ANDROID_DSK_HASH_="92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9"
+
+_ANDROID_NDK_FILE_="android-ndk-r13b-linux-x86_64.zip"
+_ANDROID_NDK_HASH_="3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c"
+_ANDROID_NDK_UNPACKDIR_="android-ndk-r13b"
+
+#_ANDROID_NDK_FILE_="android-ndk-r20b-linux-x86_64.zip"
+#_ANDROID_NDK_HASH_="8381c440fe61fcbb01e209211ac01b519cd6adf51ab1c2281d5daad6ca4c8c8c"
+#_ANDROID_NDK_UNPACKDIR_="android-ndk-r20b"
+
+#_ANDROID_NDK_FILE_="android-ndk-r21e-linux-x86_64.zip"
+#_ANDROID_NDK_HASH_="ad7ce5467e18d40050dc51b8e7affc3e635c85bd8c59be62de32352328ed467e"
+#_ANDROID_NDK_UNPACKDIR_="android-ndk-r21e"
+
+_ANDOIRD_CMAKE_VER_="3.10.2.4988404"
 ## ----------------------
 
-
+# export ASAN_CLANG_FLAGS=" -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls "
+export ASAN_CLANG_FLAGS=" "
 
 ## set this to make c-toxcore log more verbose -------------
 ## keep this empty for release maven artifact
@@ -44,6 +61,7 @@ export CIRCLE_ARTIFACTS="$_HOME_""/artefacts/"
 mkdir -p $WRKSPACEDIR
 mkdir -p $CIRCLE_ARTIFACTS
 
+mkdir -p .android && touch ~/.android/repositories.cfg
 
 export qqq=""
 
@@ -62,6 +80,7 @@ redirect_cmd() {
 
 
 echo "installing system packages ..."
+export DEBIAN_FRONTEND=noninteractive
 
 redirect_cmd apt-get update $qqq
 
@@ -102,6 +121,9 @@ for i in $pkgs ; do
 done
 
 
+wget "https://raw.githubusercontent.com/libav/gas-preprocessor/master/gas-preprocessor.pl" -O /usr/bin/gas-preprocessor.pl
+chmod a+rx /usr/bin/gas-preprocessor.pl
+
 
 export ORIG_PATH_=$PATH
 
@@ -140,12 +162,25 @@ export AND_TOOLCHAIN_ARCH2="arm-linux-androideabi"
 export AND_PATH="$_toolchain_/arm-linux-androideabi/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
+export AND_AS="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-as"
 export AND_GCC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
 export AND_CXX="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang++"
 export AND_READELF="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-readelf"
 export AND_ARTEFACT_DIR="arm"
 
-
+echo "-------------------------------------------------------"
+echo $_toolchain_
+echo "-------------------------------------------------------"
+echo $AND_PATH
+echo "-------------------------------------------------------"
+echo $AND_CC
+echo "-------------------------------------------------------"
+echo $AND_AS
+echo "-------------------------------------------------------"
+echo $AND_GCC
+echo "-------------------------------------------------------"
+echo $AND_CXX
+echo "-------------------------------------------------------"
 
 export PATH="$_SDK_"/tools/bin:$ORIG_PATH_
 
@@ -161,15 +196,16 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
+        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
 
         cd $WRKSPACEDIR
-        redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+        # redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
     fi
 
     cd $WRKSPACEDIR
     # --- verfiy SDK package ---
-    echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
+    echo "$_ANDROID_DSK_HASH_"'  sdk.zip' \
         > sdk.zip.sha256
     sha256sum -c sdk.zip.sha256 || exit 1
     # --- verfiy SDK package ---
@@ -198,7 +234,7 @@ if [ "$full""x" == "1x" ]; then
     echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
     # -- why is this not just called "cmake" ? --
     # cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;$_ANDOIRD_CMAKE_VER_"
     # -- why is this not just called "cmake" ? --
     # Install Android Build Tool and Libraries ------------------------------
     # Install Android Build Tool and Libraries ------------------------------
@@ -208,21 +244,22 @@ if [ "$full""x" == "1x" ]; then
 
     cd $WRKSPACEDIR
     # --- verfiy NDK package ---
-    echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' \
-        > android-ndk-r13b-linux-x86_64.zip.sha256
-    sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
+    echo "$_ANDROID_NDK_HASH_"'  ndk.zip' \
+        > ndk.zip.sha256
+    sha256sum ndk.zip
+    sha256sum -c ndk.zip.sha256 || exit 1
     # --- verfiy NDK package ---
-    redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
+    redirect_cmd unzip ndk.zip
+    set -x
     rm -Rf "$_NDK_"
-    mv -v android-ndk-r13b "$_NDK_"
-
+    mv -v "$_ANDROID_NDK_UNPACKDIR_" "$_NDK_"
+    set +x
 
 
     echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
     chmod u+x $_HOME_/pp
     rm -Rf "$_s_"
     mkdir -p "$_s_"
-
 
     ## ------- init vars ------- ##
     ## ------- init vars ------- ##
@@ -232,10 +269,13 @@ if [ "$full""x" == "1x" ]; then
     ## ------- init vars ------- ##
     ## ------- init vars ------- ##
 
+    echo "CC=""$CC"
+    echo "GCC=""$GCC"
+    echo "PATH=""$PATH"
 
     mkdir -p "$PKG_CONFIG_PATH"
     redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
-        --install-dir "$_toolchain_"/arm-linux-androideabi --api 12 --force   
+        --install-dir "$_toolchain_"/arm-linux-androideabi --api 16 --force
 
 
     if [ "$build_yasm""x" == "1x" ]; then
@@ -252,7 +292,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_"
     make -j $_CPUS_
     ret_=$?
-    if [ $ret -ne 0 ]; then
+    if [ $ret_ -ne 0 ]; then
         sleep 10
         make clean
         make -j $_CPUS_ || exit 1
@@ -299,6 +339,7 @@ if [ "$full""x" == "1x" ]; then
         --enable-mediacodec \
         --enable-decoder=h264_mediacodec \
         --enable-gpl --enable-decoder=h264 || exit 1
+
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
     # --- LIBAV ---
@@ -327,7 +368,8 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
+                export CFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
         $_s_/libvpx/configure \
           --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
           --sdk-path="$_NDK_" \
@@ -336,12 +378,12 @@ if [ "$full""x" == "1x" ]; then
           --target=armv7-android-gcc \
           --size-limit=16384x16384 \
           --enable-onthefly-bitpacking \
-          --enable-runtime-cpu-detect \
+          --disable-runtime-cpu-detect \
           --enable-realtime-only \
           --enable-multi-res-encoding \
           --enable-temporal-denoising || exit 1
 
-    cd "$_BLD_";make -j $_CPUS_ || exit 1
+    cd "$_BLD_";make V=1 -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
     # --- LIBVPX ---
 
@@ -369,12 +411,13 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -Os -mfloat-abi=softfp -mfpu=vfpv3-d16 -mthumb -marm -march=armv7-a "
     $_s_/libsodium/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
         --disable-shared --disable-soname-versions --host=arm-linux-androideabi \
         --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot --disable-pie
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
+    export CFLAGS=" -g -O3 "
     # --- LIBSODIUM ---
 
 
@@ -689,6 +732,7 @@ export AND_TOOLCHAIN_ARCH3="aarch64-linux-android"
 export AND_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang"
+export AND_AS="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-as"
 export AND_GCC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang"
 export AND_CXX="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-clang++"
 export AND_READELF="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-readelf"
@@ -709,15 +753,15 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
+        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
 
         cd $WRKSPACEDIR
-        redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+        redirect_cmd curl http://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
     fi
 
     cd $WRKSPACEDIR
     # --- verfiy SDK package ---
-    echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
+    echo "$_ANDROID_DSK_HASH_"'  sdk.zip' \
         > sdk.zip.sha256
     sha256sum -c sdk.zip.sha256 || exit 1
     # --- verfiy SDK package ---
@@ -746,7 +790,7 @@ if [ "$full""x" == "1x" ]; then
     echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
     # -- why is this not just called "cmake" ? --
     # cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;$_ANDOIRD_CMAKE_VER_"
     # -- why is this not just called "cmake" ? --
     # Install Android Build Tool and Libraries ------------------------------
     # Install Android Build Tool and Libraries ------------------------------
@@ -756,13 +800,13 @@ if [ "$full""x" == "1x" ]; then
 
     cd $WRKSPACEDIR
     # --- verfiy NDK package ---
-    echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' \
-        > android-ndk-r13b-linux-x86_64.zip.sha256
-    sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
+    echo "$_ANDROID_NDK_HASH_"'  ndk.zip' \
+        > ndk.zip.sha256
+    sha256sum -c ndk.zip.sha256 || exit 1
     # --- verfiy NDK package ---
-    redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
+    redirect_cmd unzip ndk.zip
     rm -Rf "$_NDK_"
-    mv -v android-ndk-r13b "$_NDK_"
+    mv -v "$_ANDROID_NDK_UNPACKDIR_" "$_NDK_"
 
 
 
@@ -881,7 +925,8 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_; patch -p1 < aa.patch
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3  ";export CFLAGS=" -g -O3 $CF2 $CF3  "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
+                export CFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
         $_s_/libvpx/configure \
           --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
           --sdk-path="$_NDK_" \
@@ -890,7 +935,7 @@ if [ "$full""x" == "1x" ]; then
           --target=arm64-android-gcc \
           --size-limit=16384x16384 \
           --enable-onthefly-bitpacking \
-          --enable-runtime-cpu-detect \
+          --disable-runtime-cpu-detect \
           --enable-realtime-only \
           --enable-multi-res-encoding \
           --enable-temporal-denoising || exit 1
@@ -925,12 +970,14 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 "
+    cd "$_BLD_";export CXXFLAGS=" -g -Os -march=armv8-a ";export CFLAGS=" -g -Os -march=armv8-a "
     $_s_/libsodium/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
         --disable-shared --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
         --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot --disable-pie
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
+    export CFLAGS=" -g -O3 "
+    export CXXFLAGS=" -g -O3 "
     # --- LIBSODIUM ---
 
 
@@ -1159,6 +1206,7 @@ set -x
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
     $WARNS \
+    $ASAN_CLANG_FLAGS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
@@ -1243,6 +1291,7 @@ export AND_TOOLCHAIN_ARCH2="x86"
 export AND_PATH="$_toolchain_/x86/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/x86/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/x86/bin/i686-linux-android-clang"
+export AND_AS="$_toolchain_/x86/bin/i686-linux-android-as"
 export AND_GCC="$_toolchain_/x86/bin/i686-linux-android-clang"
 export AND_CXX="$_toolchain_/x86/bin/i686-linux-android-clang++"
 export AND_READELF="$_toolchain_/x86/bin/i686-linux-android-readelf"
@@ -1262,15 +1311,15 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
+        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
 
         cd $WRKSPACEDIR
-        redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+        redirect_cmd curl http://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
     fi
 
     cd $WRKSPACEDIR
     # --- verfiy SDK package ---
-    echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
+    echo "$_ANDROID_DSK_HASH_"'  sdk.zip' \
         > sdk.zip.sha256
     sha256sum -c sdk.zip.sha256 || exit 1
     # --- verfiy SDK package ---
@@ -1299,7 +1348,7 @@ if [ "$full""x" == "1x" ]; then
     echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
     # -- why is this not just called "cmake" ? --
     # cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;$_ANDOIRD_CMAKE_VER_"
     # -- why is this not just called "cmake" ? --
     # Install Android Build Tool and Libraries ------------------------------
     # Install Android Build Tool and Libraries ------------------------------
@@ -1309,13 +1358,13 @@ if [ "$full""x" == "1x" ]; then
 
     cd $WRKSPACEDIR
     # --- verfiy NDK package ---
-    echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' \
-        > android-ndk-r13b-linux-x86_64.zip.sha256
-    sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
+    echo "$_ANDROID_NDK_HASH_"'  ndk.zip' \
+        > ndk.zip.sha256
+    sha256sum -c ndk.zip.sha256 || exit 1
     # --- verfiy NDK package ---
-    redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
+    redirect_cmd unzip ndk.zip
     rm -Rf "$_NDK_"
-    mv -v android-ndk-r13b "$_NDK_"
+    mv -v "$_ANDROID_NDK_UNPACKDIR_" "$_NDK_"
 
 
 
@@ -1336,7 +1385,7 @@ if [ "$full""x" == "1x" ]; then
 
     mkdir -p "$PKG_CONFIG_PATH"
     redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
-        --install-dir "$_toolchain_"/x86 --api 12 --force   
+        --install-dir "$_toolchain_"/x86 --api 16 --force
 
 
     if [ "$build_yasm""x" == "1x" ]; then
@@ -1389,6 +1438,7 @@ if [ "$full""x" == "1x" ]; then
     ECFLAGS="-Os -fpic "
     ELDFLAGS=""
     ARCH_SPECIFIC="--arch=x86 --cross-prefix=i686-linux-android- --enable-cross-compile"
+
 
     $_s_/libav/configure \
         --prefix="$_toolchain_"/x86/sysroot/usr \
@@ -1446,7 +1496,8 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
+                export CFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
         $_s_/libvpx/configure \
           --prefix="$_toolchain_"/x86/sysroot/usr \
           --sdk-path="$_NDK_" \
@@ -1490,12 +1541,13 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -Os -march=i686 "
     $_s_/libsodium/configure --prefix="$_toolchain_"/x86/sysroot/usr \
         --disable-shared --disable-soname-versions --host=x86 \
         --with-sysroot="$_toolchain_"/x86/sysroot --disable-pie
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
+    export CFLAGS=" -g -O3 "
     # --- LIBSODIUM ---
 
 
@@ -1655,6 +1707,7 @@ export AND_TOOLCHAIN_ARCH3="x86_64-linux-android"
 export AND_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang"
+export AND_CS="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang-as"
 export AND_GCC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang"
 export AND_CXX="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang++"
 export AND_READELF="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-readelf"
@@ -1674,15 +1727,15 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
+        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
 
         cd $WRKSPACEDIR
-        redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
+        redirect_cmd curl http://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
     fi
 
     cd $WRKSPACEDIR
     # --- verfiy SDK package ---
-    echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
+    echo "$_ANDROID_DSK_HASH_"'  sdk.zip' \
         > sdk.zip.sha256
     sha256sum -c sdk.zip.sha256 || exit 1
     # --- verfiy SDK package ---
@@ -1711,7 +1764,7 @@ if [ "$full""x" == "1x" ]; then
     echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
     # -- why is this not just called "cmake" ? --
     # cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
-    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
+    echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;$_ANDOIRD_CMAKE_VER_"
     # -- why is this not just called "cmake" ? --
     # Install Android Build Tool and Libraries ------------------------------
     # Install Android Build Tool and Libraries ------------------------------
@@ -1721,13 +1774,13 @@ if [ "$full""x" == "1x" ]; then
 
     cd $WRKSPACEDIR
     # --- verfiy NDK package ---
-    echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' \
-        > android-ndk-r13b-linux-x86_64.zip.sha256
-    sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
+    echo "$_ANDROID_NDK_HASH_"'  ndk.zip' \
+        > ndk.zip.sha256
+    sha256sum -c ndk.zip.sha256 || exit 1
     # --- verfiy NDK package ---
-    redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
+    redirect_cmd unzip ndk.zip
     rm -Rf "$_NDK_"
-    mv -v android-ndk-r13b "$_NDK_"
+    mv -v "$_ANDROID_NDK_UNPACKDIR_" "$_NDK_"
 
 
 
@@ -1802,6 +1855,7 @@ if [ "$full""x" == "1x" ]; then
     ELDFLAGS=""
     ARCH_SPECIFIC="--arch=x86_64 --cross-prefix=x86_64-linux-android- --enable-cross-compile"
 
+
     $_s_/libav/configure \
         --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
         ${ARCH_SPECIFIC} \
@@ -1858,7 +1912,8 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 ";export CFLAGS=" -g -O3 $CF2 $CF3 "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
+                export CFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
         $_s_/libvpx/configure \
           --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
           --sdk-path="$_NDK_" \
@@ -1904,12 +1959,13 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_/libsodium/;autoreconf -fi
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -O3 "
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 ";export CFLAGS=" -g -Os -march=westmere "
     $_s_/libsodium/configure --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
         --disable-shared --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
         --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot --disable-pie
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
+    export CFLAGS=" -g -O3 "
     # --- LIBSODIUM ---
 
 
