@@ -162,6 +162,24 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                layout_message_container.performClick();
+            }
+        });
+        textView.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View view)
+            {
+                layout_message_container.performLongClick();
+                return true;
+            }
+        });
+
         final String unicode_PERSONAL_COMPUTER = "\uD83D\uDCBB";
         final String unicode_INCOMING_ENVELOPE = "\uD83D\uDCE8";
         final String unicode_Mobile_Phone_With_Arrow = "\uD83D\uDCF2";
