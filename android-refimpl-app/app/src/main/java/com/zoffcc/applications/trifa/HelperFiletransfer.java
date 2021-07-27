@@ -37,6 +37,9 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_video;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_send;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
@@ -67,7 +70,8 @@ public class HelperFiletransfer
                 if (PREF__auto_accept_image)
                 {
                     if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                        6 * 1014 * 1024) // if file size is smaller than 6 MByte accept FT
+                        AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB * 1024 *
+                        1024) // if file size is smaller than 12 MByte accept FT
                     {
                         if (mimeType.startsWith("image"))
                         {
@@ -94,7 +98,8 @@ public class HelperFiletransfer
                 if (PREF__auto_accept_video)
                 {
                     if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                        20 * 1014 * 1024) // if file size is smaller than 20 MByte accept FT
+                        AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB * 1024 *
+                        1024) // if file size is smaller than 40 MByte accept FT
                     {
                         if (mimeType.startsWith("video"))
                         {
@@ -122,7 +127,8 @@ public class HelperFiletransfer
             if (PREF__auto_accept_all_upto)
             {
                 if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                    200 * 1014 * 1024) // if file size is smaller than 200 MByte accept FT
+                    AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB * 1014 *
+                    1024) // if file size is smaller than 200 MByte accept FT
                 {
                     if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
                     {

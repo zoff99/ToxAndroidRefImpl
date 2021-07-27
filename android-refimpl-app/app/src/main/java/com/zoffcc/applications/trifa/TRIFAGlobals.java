@@ -54,6 +54,10 @@ public class TRIFAGlobals
     static int BATTERY_OPTIMIZATION_LAST_SLEEP2 = -1;
     static int BATTERY_OPTIMIZATION_LAST_SLEEP3 = -1;
 
+    static int AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB = 12;
+    static int AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB = 40;
+    static int AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB = 200;
+
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
     public static final int CONFERENCE_COOKIE_LENGTH = 35;
     public static final int CONFERENCE_ID_LENGTH = 32;

@@ -28,9 +28,9 @@
     <string name="settings_toolbar_title">Einstellungen</string>
     <string name="pref_header_general">Allgemeines</string>
     <string name="pref_title_auto_accept_image">Bilder automatisch akzeptieren</string>
-    <string name="pref_description_auto_accept_image">Bilder und Fotos mit einer Größe von bis zu 6 MByte automatisch akzeptieren</string>
+    <string name="pref_description_auto_accept_image">Bilder und Fotos mit einer Größe von bis zu 12 MByte automatisch akzeptieren</string>
     <string name="pref_title_auto_accept_video">Videos automatisch akzeptieren</string>
-    <string name="pref_description_auto_accept_video">Videos automatisch mit einer Größe von bis zu 20 MByte akzeptieren</string>
+    <string name="pref_description_auto_accept_video">Videos automatisch mit einer Größe von bis zu 40 MByte akzeptieren</string>
     <string name="pref_title_video_uv_reversed">UV in Video umkehren</string>
     <string name="pref_description_video_uv_reversed">Kehren Sie die Reihenfolge der UV-Ebenen im Kameravideo um</string>
     <string name="pref_title_software_echo_cancel">Echounterdrückung</string>

@@ -37,10 +37,10 @@
     <string name="pref_header_general">General</string>
 
     <string name="pref_title_auto_accept_image">auto accept images</string>
-    <string name="pref_description_auto_accept_image">auto accept Images and Photos up to 6 MByte in size</string>
+    <string name="pref_description_auto_accept_image">auto accept Images and Photos up to 12 MByte in size</string>
 
     <string name="pref_title_auto_accept_video">auto accept videos</string>
-    <string name="pref_description_auto_accept_video">auto accept Videos up to 20 MByte in size</string>
+    <string name="pref_description_auto_accept_video">auto accept Videos up to 40 MByte in size</string>
 
     <string name="pref_title_auto_accept_all_upto">auto accept all files</string>
     <string name="pref_description_auto_accept_all_upto">auto accept all Files up to 200 MByte in size</string>
