@@ -33,6 +33,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_file_sharing_to_trifa_via_intent;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MessageListActivity.add_attachment;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -67,7 +68,7 @@ public class ShareActivity extends AppCompatActivity
         type = intent.getType();
 
         // HINT: disable sharing content via "share" for now. it does not yet work properly!
-        if (2 == 1 + 1)
+        if (!PREF__allow_file_sharing_to_trifa_via_intent)
         {
             return;
         }

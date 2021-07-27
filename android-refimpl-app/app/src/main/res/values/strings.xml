@@ -161,6 +161,9 @@
     <string name="pref_title_U_keep_nospam">keep NoSpam</string>
     <string name="pref_description_U_keep_nospam">keep NoSpam value. This is not safe, only activate if you know what you are doing!</string>
 
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">share files</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">share files to TRIfA via share Intent. This is not fully working yet, you have been warned!</string>
+
     <string name="pref_title_allow_screen_off_in_audio_call">Turn screen off</string>
     <string name="pref_description_allow_screen_off_in_audio_call">If you experience troubles with screen turning off in an Audiocall, set this to off</string>
 

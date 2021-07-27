@@ -209,6 +209,12 @@
 
     <PreferenceCategory android:title="! eXperimental !">
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="allow_file_sharing_to_trifa_via_intent"
+            android:summary="@string/pref_description_allow_file_sharing_to_trifa_via_intent"
+            android:title="@string/pref_title_allow_file_sharing_to_trifa_via_intent" />
+
         <EditTextPreference
             android:defaultValue="80"
             android:key="X_eac_delay_ms_2"

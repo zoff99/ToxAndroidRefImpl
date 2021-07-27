@@ -425,6 +425,7 @@ public class MainActivity extends AppCompatActivity
     static final int PREF_GLOBAL_FONT_SIZE_DEFAULT = 2;
     static int PREF__global_font_size = PREF_GLOBAL_FONT_SIZE_DEFAULT;
     static boolean PREF__allow_open_encrypted_file_via_intent = false;
+    static boolean PREF__allow_file_sharing_to_trifa_via_intent = false;
     static boolean PREF__compact_friendlist = false;
     static boolean PREF__compact_chatlist = true;
     static String[] PREF__toxirc_muted_peers = {};
@@ -1139,6 +1140,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__compact_friendlist = false;
+        }
+
+        try
+        {
+            PREF__allow_file_sharing_to_trifa_via_intent = settings.getBoolean("allow_file_sharing_to_trifa_via_intent", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__allow_file_sharing_to_trifa_via_intent = false;
         }
 
         try
@@ -2295,6 +2306,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__compact_friendlist = false;
+        }
+
+        try
+        {
+            PREF__allow_file_sharing_to_trifa_via_intent = settings.getBoolean("allow_file_sharing_to_trifa_via_intent", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__allow_file_sharing_to_trifa_via_intent = false;
         }
 
         try
