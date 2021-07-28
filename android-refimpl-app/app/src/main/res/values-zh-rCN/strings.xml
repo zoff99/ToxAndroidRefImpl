@@ -30,9 +30,9 @@
     <!-- Strings related to Settings -->
     <string name="pref_header_general">通用</string>
     <string name="pref_title_auto_accept_image">自动接收图片</string>
-    <string name="pref_description_auto_accept_image">自动接收不超过 6 MByte 的图片和照片</string>
+    <string name="pref_description_auto_accept_image">自动接收不超过最大 12 MByte 的图片和照片</string>
     <string name="pref_title_auto_accept_video">自动接收视频</string>
-    <string name="pref_description_auto_accept_video">自动接收不超过 20 MByte 视频</string>
+    <string name="pref_description_auto_accept_video">自动接收最大 40 MByte 的视频</string>
     <string name="pref_title_video_uv_reversed">在视频中反转 UV</string>
     <string name="pref_description_video_uv_reversed">反转摄像机视频中 UV 平面的顺序</string>
     <string name="pref_title_software_echo_cancel">回声消除</string>
@@ -358,4 +358,6 @@
     <string name="pref_description_toxirc_muted_peers_02">已静音用户 2 (如未使用则留空)</string>
     <string name="pref_description_toxirc_muted_peers_01">已静音用户 1 (如未使用则留空)</string>
     <string name="pref_title_toxirc_muted_peers_01">Toxirc 网桥静音用户</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">通过共享意图将文件共享到 TRIfA。警告：此功能尚无法完全工作！</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">分享文件</string>
 </resources>

@@ -29,9 +29,9 @@
     <string name="settings_toolbar_title">Ayarlar</string>
     <string name="pref_header_general">Genel</string>
     <string name="pref_title_auto_accept_image">görüntüleri otomatik kabul et</string>
-    <string name="pref_description_auto_accept_image">6 megabayta kadar olan görüntüleri ve fotoğrafları otomatik olarak kabul et</string>
+    <string name="pref_description_auto_accept_image">boyutu 12 megabayta kadar olan görüntüleri ve fotoğrafları otomatik olarak kabul et</string>
     <string name="pref_title_auto_accept_video">videoları otomatik kabul et</string>
-    <string name="pref_description_auto_accept_video">boyutu 20 megabayta kadar olan videoları otomatik olarak kabul et</string>
+    <string name="pref_description_auto_accept_video">boyutu 40 megabayta kadar olan videoları otomatik olarak kabul et</string>
     <string name="pref_title_video_uv_reversed">Videoda ters UV</string>
     <string name="pref_description_video_uv_reversed">Kamera videosundaki UV düzlemlerinin sırasını ters çevir</string>
     <string name="pref_title_software_echo_cancel">Yankı giderme</string>
@@ -377,4 +377,6 @@
     <string name="pref_description_toxirc_muted_peers_02">Sesi Kapatılan Kullanıcı 2 (kullanılmıyorsa boş bırakın)</string>
     <string name="pref_description_toxirc_muted_peers_01">Sesi Kapatılan Kullanıcı 1 (kullanılmıyorsa boş bırakın)</string>
     <string name="pref_title_toxirc_muted_peers_01">Toxirc Köprüsü Sesi Kapatılan Kullanıcılar</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Dosyaları paylaşma amacı ile TRIFA\'ya paylaşın. Uyarı: Bu özellik henüz tam olarak çalışmıyor!</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">dosyaları paylaş</string>
 </resources>
