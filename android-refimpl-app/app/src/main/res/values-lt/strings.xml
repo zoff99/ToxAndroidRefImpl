@@ -231,4 +231,6 @@
     <string name="MainActivity_yes_button">taip</string>
     <string name="pref_description_auto_accept_all_upto">Automatiškai priimti visus failus iki 200 MBaitų dydžio</string>
     <string name="pref_title_auto_accept_all_upto">Automatiškai priimti visus failus</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">bendrinti failus su TRIfA per bendrinimo ketinimą. Įspėjame, tai dar neveikia iki galo!</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">dalytis failais</string>
 </resources>
