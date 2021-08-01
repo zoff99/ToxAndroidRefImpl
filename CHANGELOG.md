@@ -2,11 +2,31 @@
 
 ## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.111...HEAD)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.112...HEAD)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#285](https://github.com/zoff99/ToxAndroidRefImpl/pull/285) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#284](https://github.com/zoff99/ToxAndroidRefImpl/pull/284) ([weblate](https://github.com/weblate))
+- make dual licensing explicit \(since it was always implicity GPLv2 and GPLv3 because of toxcore\) [\#280](https://github.com/zoff99/ToxAndroidRefImpl/pull/280) ([zoff99](https://github.com/zoff99))
+
+## [1.0.112](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.112) (2021-07-22)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.111...1.0.112)
+
+**Implemented enhancements:**
+
+- update deps and tweak libsodium configure options/flags [\#282](https://github.com/zoff99/ToxAndroidRefImpl/pull/282) ([zoff99](https://github.com/zoff99))
 
 **Fixed bugs:**
 
 - Calls crash from binary-source TRIfA on Broadcom/OpenMAX-based device; source-built TRIfA works fine [\#278](https://github.com/zoff99/ToxAndroidRefImpl/issues/278)
+
+**Merged pull requests:**
+
+- Translations update from Weblate [\#283](https://github.com/zoff99/ToxAndroidRefImpl/pull/283) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#281](https://github.com/zoff99/ToxAndroidRefImpl/pull/281) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#279](https://github.com/zoff99/ToxAndroidRefImpl/pull/279) ([weblate](https://github.com/weblate))
 
 ## [1.0.111](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.111) (2021-07-01)
 
@@ -42,11 +62,15 @@
 
 ## [1.0.108](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.108) (2021-06-18)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.106...1.0.108)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.107...1.0.108)
 
 **Merged pull requests:**
 
 - Translations update from Weblate [\#272](https://github.com/zoff99/ToxAndroidRefImpl/pull/272) ([weblate](https://github.com/weblate))
+
+## [1.0.107](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.107) (2021-06-17)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.106...1.0.107)
 
 ## [1.0.106](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.106) (2021-06-13)
 
