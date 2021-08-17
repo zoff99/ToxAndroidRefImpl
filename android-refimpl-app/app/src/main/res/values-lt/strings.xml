@@ -165,7 +165,7 @@
     <string name="pref_title_fps_half">Mažiau kps (kadrų per sekundę)</string>
     <string name="pref_description_orbot_enabled">Norint naudoti, privalote įdiegti Orbot.
 \nPokyčiui pritaikyti reikia PALEISTI IŠ NAUJO!</string>
-    <string name="pref_title_orbot_enabled">Leisti Tor Tarpininkavimą</string>
+    <string name="pref_title_orbot_enabled">Leisti Tor tarpininkavimą</string>
     <string name="pref_title_udp_enabled">Leisti UDP</string>
     <string name="pref_description_higher_audio_quality">Naudoti geresnę garso kokybę.
 \nPokyčiui pritaikyti būtina PALEISTI IŠ NAUJO!</string>
