@@ -986,6 +986,31 @@ public class TrifaToxService extends Service
                                 TrifaToxService.write_debug_file(
                                         "BATTERY_SAVINGS_MODE__enter:" + tox_self_get_connection_status());
 
+                                // try to fix endless bootstraping (on yellow) bug ----------------
+                                if (tox_self_get_connection_status() == 0)
+                                {
+                                    final int millis_sleep = 100;
+                                    final int seconds_for_bootstrapping = 10;
+                                    TrifaToxService.write_debug_file(
+                                            "BATTERY_SAVINGS_MODE__start_wait_for_bootstrapping:" +
+                                            tox_self_get_connection_status());
+                                    for (int ii = 0; ii < ((seconds_for_bootstrapping * 1000) / millis_sleep); ii++)
+                                    {
+                                        MainActivity.tox_iterate();
+                                        try
+                                        {
+                                            Thread.sleep(millis_sleep);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+                                    }
+                                    TrifaToxService.write_debug_file(
+                                            "BATTERY_SAVINGS_MODE__done_wait_for_bootstrapping:" +
+                                            tox_self_get_connection_status());
+                                }
+                                // try to fix endless bootstraping (on yellow) bug ----------------
+
                                 long current_timestamp_ = System.currentTimeMillis();
                                 global_self_last_entered_battery_saving_timestamp = current_timestamp_;
 
