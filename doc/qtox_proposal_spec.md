@@ -69,7 +69,7 @@
                     v
 
                    (2) send Message normally to Friend
-                       (if Friend is not yet online, faux offline Messaaing
+                       (if Friend is not yet online, faux offline Messaging
                         will send the Message after Friend has woken up)
 
 
