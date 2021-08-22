@@ -243,6 +243,10 @@ public class ShareActivity extends AppCompatActivity
         String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
         if (sharedText != null)
         {
+            // Log.i(TAG, "handleSendText:sharedText=" + sharedText);
+            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey, sharedText);
+            // close this share activity
+            this.finish();
         }
     }
 
@@ -255,7 +259,7 @@ public class ShareActivity extends AppCompatActivity
             intent_fixup.setData(imageUri);
             // Intent { dat=content://com.android.providers.media.documents/document/image:12345 flg=0x43 }
             add_attachment(this, intent_fixup, intent, tox_friend_by_public_key__wrapper(friend_pubkey), false);
-            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey);
+            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey, null);
             // close this share activity
             this.finish();
         }
@@ -272,7 +276,7 @@ public class ShareActivity extends AppCompatActivity
                 intent_fixup.setData(imageUri);
                 add_attachment(this, intent_fixup, intent, tox_friend_by_public_key__wrapper(friend_pubkey), false);
             }
-            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey);
+            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey, null);
             // close this share activity
             this.finish();
         }

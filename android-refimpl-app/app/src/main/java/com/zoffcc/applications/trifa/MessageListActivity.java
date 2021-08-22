@@ -395,7 +395,6 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
-
         setUpEmojiPopup();
 
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
@@ -407,9 +406,7 @@ public class MessageListActivity extends AppCompatActivity
         insert_emoji.setImageDrawable(d1);
         // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
 
-
         insert_emoji.setOnClickListener(new View.OnClickListener()
-
         {
             @Override
             public void onClick(final View v)
@@ -436,6 +433,10 @@ public class MessageListActivity extends AppCompatActivity
             ml_new_message.setImeOptions(EditorInfo.IME_ACTION_SEND);
         }
 
+        // clear input text field
+        ml_new_message.setText("");
+
+        // add text change listener to input text field
         ml_new_message.addTextChangedListener(new TextWatcher()
         {
             public void afterTextChanged(Editable s)
@@ -550,6 +551,20 @@ public class MessageListActivity extends AppCompatActivity
                 // Log.i(TAG,"TextWatcher:onTextChanged");
             }
         });
+
+        // fill out input text field with shared text value
+        try
+        {
+            String fillouttext = intent.getStringExtra("fillouttext");
+            if ((fillouttext != null) && (fillouttext.length() > 0))
+            {
+                ml_new_message.setText("");
+                ml_new_message.append(fillouttext);
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
 
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
                 getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
@@ -2091,9 +2106,13 @@ public class MessageListActivity extends AppCompatActivity
         return ret;
     }
 
-    static void show_messagelist_for_friend(Context c, String friend_pubkey)
+    static void show_messagelist_for_friend(Context c, String friend_pubkey, String fill_out_text)
     {
         Intent intent = new Intent(c, MessageListActivity.class);
+        if (fill_out_text != null)
+        {
+            intent.putExtra("fillouttext", fill_out_text);
+        }
         intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(friend_pubkey));
         c.startActivity(intent);
     }
