@@ -37,6 +37,7 @@ import android.os.Build;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -65,7 +66,6 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
-import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
@@ -1856,34 +1856,18 @@ public class HelperGeneric
         }
     }
 
-    static String fileExt(String url)
+    static String get_fileExt(final String filename)
     {
-        return getFileExtensionFromUrl(url);
-        //        if (url.indexOf("?") > -1)
-        //        {
-        //            url = url.substring(0, url.indexOf("?"));
-        //        }
-        //
-        //        if (url.lastIndexOf(".") == -1)
-        //        {
-        //            return null;
-        //        }
-        //        else
-        //        {
-        //            String ext = url.substring(url.lastIndexOf(".") + 1);
-        //
-        //            if (ext.indexOf("%") > -1)
-        //            {
-        //                ext = ext.substring(0, ext.indexOf("%"));
-        //            }
-        //
-        //            if (ext.indexOf("/") > -1)
-        //            {
-        //                ext = ext.substring(0, ext.indexOf("/"));
-        //            }
-        //
-        //            return ext.toLowerCase();
-        //        }
+        try
+        {
+
+            final Uri f = Uri.fromFile(new File(filename));
+            return MimeTypeMap.getFileExtensionFromUrl(f.toString());
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
     }
 
     static int hash_to_bucket(String hash_value, int number_of_buckets)

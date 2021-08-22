@@ -20,13 +20,21 @@
 package com.zoffcc.applications.trifa;
 
 import android.database.Cursor;
+import android.net.Uri;
 import android.util.Log;
 
+import com.zoffcc.applications.trifa.MessageListActivity.outgoing_file_wrapped;
+
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_fileExt;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_message_accepted_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_queueing_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_start_sending_from_id;
@@ -35,6 +43,8 @@ import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_all_upto;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_video;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_OUTGOING_WRAPPER_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_send;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB;
@@ -835,6 +845,110 @@ public class HelperFiletransfer
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    static String remove_bad_chars_from_outgoing_sdcard_filename(final String in)
+    {
+        try
+        {
+            return in.
+                    replace("/", "_"). // / -> _
+                    replace(":", "_"). // : -> _
+                    replace("..", "_"); // .. -> _
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        return null;
+    }
+
+    static outgoing_file_wrapped copy_outgoing_file_to_sdcard_dir(final String filepath, final String filename, final long filesize)
+    {
+        outgoing_file_wrapped ret = new outgoing_file_wrapped();
+        String filename_sd_card = remove_bad_chars_from_outgoing_sdcard_filename(filepath);
+        Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:" + filename_sd_card + " : " + filepath + " : " + filename);
+
+        if (filename_sd_card == null)
+        {
+            return null;
+        }
+
+        try
+        {
+
+            File dir = new File(SD_CARD_FILES_OUTGOING_WRAPPER_DIR);
+            dir.mkdirs();
+            String filename2 = filename_sd_card;
+            File file = new File(SD_CARD_FILES_OUTGOING_WRAPPER_DIR, filename2);
+
+            long counter = 0;
+            while (file.exists())
+            {
+                String extension = get_fileExt(filename_sd_card);
+                if ((extension != null) && (extension.length() > 0))
+                {
+                    extension = "." + extension;
+                }
+                else
+                {
+                    extension = "";
+                }
+
+                filename2 = remove_bad_chars_from_outgoing_sdcard_filename(
+                        filename_sd_card + (long) ((Math.random() * 10000000d)) + extension);
+
+                if (filename2 == null)
+                {
+                    return null;
+                }
+
+                file = new File(dir, filename2);
+                counter++;
+
+                Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:" + filename2 + " " + SD_CARD_FILES_OUTGOING_WRAPPER_DIR);
+
+                if (counter > 5000)
+                {
+                    return null;
+                }
+            }
+
+            ret.filepath_wrapped = SD_CARD_FILES_OUTGOING_WRAPPER_DIR;
+            ret.filename_wrapped = filename2;
+
+            // now write that contents of the virtual file to the actual file on SD card ----------------
+            InputStream in = context_s.getContentResolver().openInputStream(Uri.parse(filepath));
+            BufferedOutputStream out = new BufferedOutputStream(
+                    new FileOutputStream(SD_CARD_FILES_OUTGOING_WRAPPER_DIR + "/" + filename2));
+
+            final int chunk_size = 4096;
+            byte[] buffer = new byte[chunk_size];
+            int read;
+            while ((read = in.read(buffer)) != -1)
+            {
+                out.write(buffer, 0, read);
+            }
+            in.close();
+            out.flush();
+            out.close();
+            // now write that contents of the virtual file to the actual file on SD card ----------------
+
+            File file2 = new File(SD_CARD_FILES_OUTGOING_WRAPPER_DIR, filename2);
+            ret.file_size_wrapped = file2.length();
+
+            if (ret.file_size_wrapped < 1)
+            {
+                file2.delete();
+                return null;
+            }
+
+            return ret;
+        }
+        catch (Exception e)
+        {
+            return null;
         }
     }
 }
