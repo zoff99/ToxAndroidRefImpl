@@ -1395,7 +1395,7 @@ public class MessageListActivity extends AppCompatActivity
             m.ft_accepted = false;
             m.ft_outgoing_started = false;
             m.ft_outgoing_queued = false;
-            m.filename_fullpath = ofw.filepath_wrapped;
+            m.filename_fullpath = new java.io.File(ofw.filepath_wrapped + "/" + ofw.filename_wrapped).getAbsolutePath();
             m.sent_timestamp = System.currentTimeMillis();
             m.text = ofw.filename_wrapped + "\n" + ofw.file_size_wrapped + " bytes";
             m.storage_frame_work = false;
