@@ -868,7 +868,7 @@ public class HelperFiletransfer
     {
         outgoing_file_wrapped ret = new outgoing_file_wrapped();
         String filename_sd_card = remove_bad_chars_from_outgoing_sdcard_filename(filepath);
-        Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:" + filename_sd_card + " : " + filepath + " : " + filename);
+        // Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:" + filename_sd_card + " : " + filepath + " : " + filename);
 
         if (filename_sd_card == null)
         {
@@ -907,7 +907,7 @@ public class HelperFiletransfer
                 file = new File(dir, filename2);
                 counter++;
 
-                Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:" + filename2 + " " + SD_CARD_FILES_OUTGOING_WRAPPER_DIR);
+                // Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:" + filename2 + " " + SD_CARD_FILES_OUTGOING_WRAPPER_DIR);
 
                 if (counter > 5000)
                 {
