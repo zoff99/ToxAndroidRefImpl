@@ -67,7 +67,7 @@
           +-------------------+                          
           |                   |                          
           |    qTox           +-------~~~>> (1) call Push URL (with any POST "dummy" param)                          
-          |                   |                 and Friend is not online                    
+          |                   |                 if Friend is not online
           +---------+---------+                 (only if friend has Push URL set)                                                     
                     |
                     |
@@ -77,8 +77,6 @@
                    (2) send Message normally to Friend
                        (if Friend is not yet online, faux offline Messaging
                         will send the Message after Friend has woken up)
-
-
 
 
 ```
@@ -105,7 +103,7 @@
 
                    (2a) if Friend is not yet online,
                         show an intermediary call waiting screen.
-                        when friend comes online proceed to calling normally.
+                        when friend comes online proceed to calling automatically.
                         (add button to cancel the intermediary call waiting screen)
 
 
