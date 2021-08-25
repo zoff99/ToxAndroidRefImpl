@@ -142,7 +142,6 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -435,6 +434,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_file_sharing_to_trifa_via_intent = true;
     static boolean PREF__compact_friendlist = false;
     static boolean PREF__compact_chatlist = true;
+    static boolean PREF__use_push_service = false;
     static String[] PREF__toxirc_muted_peers = {};
 
     static String versionName = "";
@@ -1170,6 +1170,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__compact_chatlist = true;
+        }
+
+        try
+        {
+            PREF__use_push_service = settings.getBoolean("use_push_service", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__use_push_service = false;
         }
 
         // prefs ----------
@@ -2340,6 +2350,15 @@ public class MainActivity extends AppCompatActivity
             PREF__compact_chatlist = true;
         }
 
+        try
+        {
+            PREF__use_push_service = settings.getBoolean("use_push_service", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__use_push_service = false;
+        }
 
         try
         {
@@ -4115,28 +4134,32 @@ public class MainActivity extends AppCompatActivity
                     }
                     // else // -- send push URL always
                     {
-                        own_push_token_load();
-
-                        if (TRIFAGlobals.global_notification_token != null)
+                        if (PREF__use_push_service)
                         {
-                            final String notification_push_url = push_token_to_push_url(
-                                    TRIFAGlobals.global_notification_token);
+                            own_push_token_load();
 
-                            if (notification_push_url != null)
+                            if (TRIFAGlobals.global_notification_token != null)
                             {
-                                String temp_string =
-                                        "A" + notification_push_url; //  "A" is a placeholder to put the pkgID later
+                                final String notification_push_url = push_token_to_push_url(
+                                        TRIFAGlobals.global_notification_token);
 
-                                Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
-                                           get_friend_name_from_num(friend_number) + ":send push url:" + temp_string);
+                                if (notification_push_url != null)
+                                {
+                                    String temp_string =
+                                            "A" + notification_push_url; //  "A" is a placeholder to put the pkgID later
 
-                                byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
-                                int data_bin_len = data_bin.length;
-                                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value; // replace "A" with pkgID
-                                final int res = tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
+                                    // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
+                                    //           get_friend_name_from_num(friend_number) + ":send push url:" + temp_string);
 
-                                Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
-                                           get_friend_name_from_num(friend_number) + ":send push url:RES=" + res);
+                                    byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
+                                    int data_bin_len = data_bin.length;
+                                    data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value; // replace "A" with pkgID
+                                    final int res = tox_friend_send_lossless_packet(friend_number, data_bin,
+                                                                                    data_bin_len);
+
+                                    // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
+                                    //           get_friend_name_from_num(friend_number) + ":send push url:RES=" + res);
+                                }
                             }
                         }
                     }
@@ -4441,8 +4464,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_lossless_packet_cb_method(long friend_number, byte[] data, long length)
     {
-        Log.i(TAG, "friend_lossless_packet_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length +
-                   " data=" + bytes_to_hex(data));
+        // Log.i(TAG, "friend_lossless_packet_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length +
+        //           " data=" + bytes_to_hex(data));
 
         if (length > 0)
         {
@@ -4459,15 +4482,15 @@ public class MainActivity extends AppCompatActivity
             }
             else if (data[0] == (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value)
             {
-                Log.i(TAG,
-                      "android_tox_callback_friend_lossless_packet_cb_method:CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND:len=" +
-                      length);
+                //Log.i(TAG,
+                //      "android_tox_callback_friend_lossless_packet_cb_method:CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND:len=" +
+                //      length);
                 if (length > ("https://".length() + 1))
                 {
                     final String pushurl = new String(Arrays.copyOfRange(data, 1, data.length), StandardCharsets.UTF_8);
-                    Log.i(TAG,
-                          "android_tox_callback_friend_lossless_packet_cb_method:CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND:pushurl=" +
-                          pushurl);
+                    //Log.i(TAG,
+                    //      "android_tox_callback_friend_lossless_packet_cb_method:CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND:pushurl=" +
+                    //      pushurl);
                     HelperFriend.add_pushurl_for_friend(pushurl,
                                                         HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
                 }

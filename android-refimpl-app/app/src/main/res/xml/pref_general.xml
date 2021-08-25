@@ -8,6 +8,12 @@
 
     <SwitchPreference
         android:defaultValue="false"
+        android:key="use_push_service"
+        android:summary="@string/pref_description_use_push_service"
+        android:title="@string/pref_title_use_push_service" />
+
+    <SwitchPreference
+        android:defaultValue="false"
         android:key="compact_friendlist"
         android:summary="@string/pref_description_compact_friendlist"
         android:title="@string/pref_title_compact_friendlist" />
