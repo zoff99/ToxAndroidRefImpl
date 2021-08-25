@@ -85,8 +85,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 72
-static const char global_version_string[] = "0.99.72";
+#define VERSION_PATCH 73
+static const char global_version_string[] = "0.99.73";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -1028,6 +1028,7 @@ void init_tox_callbacks()
     tox_utils_callback_friend_lossless_packet(tox_global, friend_lossless_packet_cb);
     tox_callback_friend_lossless_packet_per_pktid(tox_global, tox_utils_friend_lossless_packet_cb, 170);
     tox_callback_friend_lossless_packet_per_pktid(tox_global, friend_lossless_packet_cb, 176);
+    tox_callback_friend_lossless_packet_per_pktid(tox_global, friend_lossless_packet_cb, 181);
     // ----------- custom packets -----------
     tox_utils_callback_file_recv_control(tox_global, file_recv_control_cb);
     tox_callback_file_recv_control(tox_global, tox_utils_file_recv_control_cb);
