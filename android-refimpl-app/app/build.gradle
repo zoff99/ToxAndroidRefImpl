@@ -310,7 +310,7 @@ dependencies {
     //
     //
     // implementation 'com.zoffcc.applications.trifajni:trifa-jni-lib:1.0.61@aar'
-    implementation 'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.67'
+    implementation 'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.68'
     //
     //
     //
