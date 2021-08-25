@@ -415,6 +415,8 @@
     <string name="layout___alias">Alias</string>
     <string name="layout___remove_friends_relay">remove Friends Relay</string>
     <string name="layout___friends_relay_pubkey">Friends Relay Pubkey:</string>
+    <string name="layout___remove_friends_pushurl">remove Friends Push URL</string>
+    <string name="layout___friends_pushurl">Friends Push URL:</string>
     <string name="layout___waiting_for_orbot">waiting for Orbot ...</string>
     <string name="layout___clear_glide_cache">clear Glide Cache</string>
     <string name="layout___set_app_language">set App Language</string>
@@ -434,6 +436,8 @@
     <string name="layout___click_image_to_change_your_avatar">click Image to change your Avatar</string>
     <string name="layout___remove_own_relay">remove own Relay</string>
     <string name="layout___relay_pubkey">Relay Pubkey:</string>
+    <string name="layout___remove_own_pushurl">remove Push URL</string>
+    <string name="layout___own_pushurl">Push URL:</string>
     <string name="layout___new_random_nospam">new Random NOSPAM</string>
     <string name="layout___own_pubkey">Own Pubkey:</string>
     <string name="layout___copy_toxid">copy ToxID</string>

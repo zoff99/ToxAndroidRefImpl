@@ -22,8 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -34,16 +32,21 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar_update;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
+import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
+import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
+import static com.zoffcc.applications.trifa.HelperRelay.remove_friend_pushurl_in_db;
 import static com.zoffcc.applications.trifa.HelperRelay.remove_friend_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendInfoActivity extends AppCompatActivity
@@ -57,6 +60,10 @@ public class FriendInfoActivity extends AppCompatActivity
     TextView fi_relay_pubkey_textview = null;
     TextView fi_relay_text = null;
     Button remove_friend_relay_button = null;
+    TextView fi_pushurl_textview = null;
+    TextView fi_pushurl_text = null;
+    Button remove_friend_pushurl_button = null;
+
     long friendnum = -1;
 
     @Override
@@ -76,6 +83,9 @@ public class FriendInfoActivity extends AppCompatActivity
         fi_relay_pubkey_textview = (TextView) findViewById(R.id.fi_relay_pubkey_textview);
         fi_relay_text = (TextView) findViewById(R.id.fi_relay_text);
         remove_friend_relay_button = (Button) findViewById(R.id.remove_friend_relay_button);
+        fi_pushurl_textview = (TextView) findViewById(R.id.fi_pushurl_textview);
+        fi_pushurl_text = (TextView) findViewById(R.id.fi_pushurl_text);
+        remove_friend_pushurl_button = (Button) findViewById(R.id.remove_friend_pushurl_button);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -146,6 +156,51 @@ public class FriendInfoActivity extends AppCompatActivity
                     }
                 });
                 remove_friend_relay_button.setVisibility(View.VISIBLE);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        String get_pushurl_for_friend = get_pushurl_for_friend(tox_friend_get_public_key__wrapper(friendnum));
+
+        fi_pushurl_textview.setText("");
+
+        try
+        {
+            if (get_pushurl_for_friend == null)
+            {
+                fi_pushurl_text.setVisibility(View.INVISIBLE);
+                fi_pushurl_textview.setVisibility(View.INVISIBLE);
+                remove_friend_pushurl_button.setVisibility(View.INVISIBLE);
+            }
+            else
+            {
+                fi_pushurl_text.setVisibility(View.VISIBLE);
+                fi_pushurl_textview.setVisibility(View.VISIBLE);
+                fi_pushurl_textview.setText(get_pushurl_for_friend);
+
+                remove_friend_pushurl_button.setText("remove Friend Push URL");
+                remove_friend_pushurl_button.setOnClickListener(new View.OnClickListener()
+                {
+                    @Override
+                    public void onClick(View v)
+                    {
+                        try
+                        {
+                            remove_friend_pushurl_in_db(tox_friend_get_public_key__wrapper(friendnum));
+                            remove_friend_pushurl_button.setVisibility(View.INVISIBLE);
+                            fi_pushurl_text.setVisibility(View.INVISIBLE);
+                            fi_pushurl_textview.setVisibility(View.INVISIBLE);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                remove_friend_pushurl_button.setVisibility(View.VISIBLE);
             }
         }
         catch (Exception e)

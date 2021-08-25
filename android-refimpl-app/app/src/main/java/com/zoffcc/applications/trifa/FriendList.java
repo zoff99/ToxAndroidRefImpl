@@ -95,6 +95,10 @@ public class FriendList
     @Nullable
     boolean is_relay = false;
 
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
+    @Nullable
+    String push_url;
+
     static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();
@@ -117,6 +121,7 @@ public class FriendList
         out.is_relay = in.is_relay;
         out.avatar_update_timestamp = in.avatar_update_timestamp;
         out.added_timestamp = in.added_timestamp;
+        out.push_url = in.push_url;
 
         return out;
     }
@@ -132,7 +137,8 @@ public class FriendList
                    ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
                    ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
                    sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name +
-                   ", avatar_update=" + avatar_update + ", added_timestamp=" + added_timestamp;
+                   ", avatar_update=" + avatar_update + ", added_timestamp=" + added_timestamp + ", push_url=" +
+                   "*****";
         }
         catch (Exception e)
         {

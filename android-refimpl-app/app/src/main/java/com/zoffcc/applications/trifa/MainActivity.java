@@ -91,6 +91,7 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,6 +142,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -156,11 +158,14 @@ import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_conference_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
+import static com.zoffcc.applications.trifa.HelperRelay.push_token_to_push_url;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FRIEND_AVATAR_FILENAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -254,7 +259,8 @@ fn=1 res=1 msg=🍔👍😜👍😜 @%\4äö ubnc Ovid n JB von in BK ni ubvzv8 
 
  */
 
-@SuppressWarnings("JniMissingFunction")
+@SuppressWarnings({"UnusedReturnValue", "deprecation", "JniMissingFunction", "unused", "RedundantSuppression", "unchecked", "ConstantConditions", "RedundantCast", "Convert2Lambda", "EmptyCatchBlock", "PointlessBooleanExpression", "SimplifiableIfStatement", "ResultOfMethodCallIgnored"})
+@SuppressLint({"StaticFieldLeak", "SimpleDateFormat", "SetTextI18n"})
 @RuntimePermissions
 public class MainActivity extends AppCompatActivity
 {
@@ -2440,7 +2446,6 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     public void onClick(DialogInterface dialog, int id)
                                     {
-                                        return;
                                     }
                                 }).
                                 setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
@@ -4090,13 +4095,7 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
 
-                        if (TRIFAGlobals.global_notification_token == null)
-                        {
-                            if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY) != null)
-                            {
-                                TRIFAGlobals.global_notification_token = get_g_opts(NOTIFICATION_TOKEN_DB_KEY);
-                            }
-                        }
+                        own_push_token_load();
 
                         if (TRIFAGlobals.global_notification_token != null &&
                             HelperRelay.is_own_relay(f.tox_public_key_string))
@@ -4111,6 +4110,33 @@ public class MainActivity extends AppCompatActivity
                                 int data_bin_len = data_bin.length;
                                 data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN.value; // replace "A" with pkgID
                                 tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
+                            }
+                        }
+                    }
+                    // else // -- send push URL always
+                    {
+                        own_push_token_load();
+
+                        if (TRIFAGlobals.global_notification_token != null)
+                        {
+                            final String notification_push_url = push_token_to_push_url(
+                                    TRIFAGlobals.global_notification_token);
+
+                            if (notification_push_url != null)
+                            {
+                                String temp_string =
+                                        "A" + notification_push_url; //  "A" is a placeholder to put the pkgID later
+
+                                Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
+                                           get_friend_name_from_num(friend_number) + ":send push url:" + temp_string);
+
+                                byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
+                                int data_bin_len = data_bin.length;
+                                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value; // replace "A" with pkgID
+                                final int res = tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
+
+                                Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
+                                           get_friend_name_from_num(friend_number) + ":send push url:RES=" + res);
                             }
                         }
                     }
@@ -4415,8 +4441,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_lossless_packet_cb_method(long friend_number, byte[] data, long length)
     {
-        // Log.i(TAG, "friend_lossless_packet_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length +
-        //            " data=" + bytes_to_hex(data));
+        Log.i(TAG, "friend_lossless_packet_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length +
+                   " data=" + bytes_to_hex(data));
 
         if (length > 0)
         {
@@ -4429,6 +4455,21 @@ public class MainActivity extends AppCompatActivity
                     // Log.i(TAG, "friend_lossless_packet_cb:recevied pubkey:" + relay_pubkey);
                     HelperFriend.add_friend_to_system(relay_pubkey.toUpperCase(), true,
                                                       HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
+                }
+            }
+            else if (data[0] == (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value)
+            {
+                Log.i(TAG,
+                      "android_tox_callback_friend_lossless_packet_cb_method:CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND:len=" +
+                      length);
+                if (length > ("https://".length() + 1))
+                {
+                    final String pushurl = new String(Arrays.copyOfRange(data, 1, data.length), StandardCharsets.UTF_8);
+                    Log.i(TAG,
+                          "android_tox_callback_friend_lossless_packet_cb_method:CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND:pushurl=" +
+                          pushurl);
+                    HelperFriend.add_pushurl_for_friend(pushurl,
+                                                        HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
                 }
             }
         }
@@ -4488,7 +4529,7 @@ public class MainActivity extends AppCompatActivity
             {
                 wrapped_msg_text_as_string = new String(msg_text_buffer_wrapped.array(),
                                                         msg_text_buffer_wrapped.arrayOffset(), (int) text_length,
-                                                        "UTF-8");
+                                                        StandardCharsets.UTF_8);
             }
             catch (Exception e)
             {

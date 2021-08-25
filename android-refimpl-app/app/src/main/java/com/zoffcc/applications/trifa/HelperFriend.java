@@ -551,6 +551,18 @@ public class HelperFriend
         t.start();
     }
 
+    static void add_pushurl_for_friend(final String friend_push_url, final String friend_pubkey)
+    {
+        try
+        {
+            orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).push_url(friend_push_url).execute();
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "add_pushurl_for_friend:EE:" + e.getMessage());
+        }
+    }
+
     synchronized static void insert_into_friendlist_db(final FriendList f)
     {
         //        Thread t = new Thread()
@@ -563,6 +575,7 @@ public class HelperFriend
             if (orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).count() == 0)
             {
                 f.added_timestamp = System.currentTimeMillis();
+                f.push_url = null;
                 orma.insertIntoFriendList(f);
                 // Log.i(TAG, "friend added to DB: " + f.tox_public_key_string);
             }

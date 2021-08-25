@@ -42,6 +42,7 @@ public class TRIFAGlobals
     static String global_notification_token = null;
     final static String NOTIFICATION_TOKEN_DB_KEY = "NotificationToken";
     final static String NOTIFICATION_TOKEN_DB_KEY_NEED_ACK = "NotificationTokenNeedACK";
+    final static String NOTIFICATION_FCM_PUSH_URL_PREFIX = "https://toxcon2020.zoff.cc/toxfcm/fcm.php?id=";
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
@@ -217,7 +218,8 @@ public class TRIFAGlobals
     {
         CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY(175), CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND(
             176), CONTROL_PROXY_MESSAGE_TYPE_ALL_MESSAGES_SENT(177), CONTROL_PROXY_MESSAGE_TYPE_PROXY_KILLSWITCH(
-            178), CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN(179);
+            178), CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN(179), CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND(
+            181);
 
         public int value;
 
