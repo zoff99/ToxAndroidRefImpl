@@ -103,6 +103,7 @@ public class ProfileActivity extends AppCompatActivity
     Button remove_own_pushurl_button = null;
     TextView my_relay_toxid_textview = null;
     TextView my_pushurl_textview = null;
+    TextView my_pushurl_text = null;
     ImageView my_identicon_imageview = null;
     TextView mytox_network_connections = null;
 
@@ -128,6 +129,7 @@ public class ProfileActivity extends AppCompatActivity
         my_relay_toxid_textview = findViewById(R.id.my_relay_toxid_textview);
         remove_own_pushurl_button = findViewById(R.id.remove_own_pushurl_button);
         my_pushurl_textview = findViewById(R.id.my_pushurl_textview);
+        my_pushurl_text = findViewById(R.id.my_pushurl_text);
         copy_toxid_button = findViewById(R.id.copy_toxid_button);
 
         mytox_network_connections = findViewById(R.id.mytox_network_connections);
@@ -233,15 +235,21 @@ public class ProfileActivity extends AppCompatActivity
             }
         }
 
+        remove_own_pushurl_button.setVisibility(View.GONE);
+        my_pushurl_textview.setVisibility(View.GONE);
+        my_pushurl_text.setVisibility(View.GONE);
+
         if (have_own_pushurl())
         {
             own_push_token_load();
-            remove_own_pushurl_button.setVisibility(View.GONE);
+            remove_own_pushurl_button.setVisibility(
+                    View.GONE); // TODO: GONE for now, since pressing it does nothing yet
             final String push_url_temp = push_token_to_push_url(TRIFAGlobals.global_notification_token);
             if (push_url_temp != null)
             {
                 my_pushurl_textview.setText(push_url_temp);
                 my_pushurl_textview.setVisibility(View.VISIBLE);
+                my_pushurl_text.setVisibility(View.VISIBLE);
             }
         }
 
