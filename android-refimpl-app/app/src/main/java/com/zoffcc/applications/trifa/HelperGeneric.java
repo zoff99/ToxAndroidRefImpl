@@ -75,6 +75,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.send_sps_pps_every_x
 import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames;
 import static com.zoffcc.applications.trifa.CallingActivity.set_vdelay_every_x_frames_current;
 import static com.zoffcc.applications.trifa.Callstate.java_video_encoder_first_frame_in;
+import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
@@ -2047,6 +2048,10 @@ public class HelperGeneric
                     // friend has a relay
                     friendnum_to_use = tox_friend_by_public_key__wrapper(relay_pubkey);
                     Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
+                }
+                else // if friend is NOT online and does not have a relay, try if he has a push url
+                {
+                    friend_call_push_url(f.tox_public_key_string);
                 }
             }
         }
