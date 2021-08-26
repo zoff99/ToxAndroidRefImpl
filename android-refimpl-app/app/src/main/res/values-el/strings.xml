@@ -218,4 +218,28 @@
     <string name="layout___active_network_connections">ενεργές συνδέσεις δικτύου:</string>
     <string name="layout___your_toxidenticon">Το ToxIdenticon σας</string>
     <string name="layout___error_getting_active_network_connections">*Σφάλμα κατά τη λήψη ενεργών συνδέσεων δικτύου*</string>
+    <string name="settings_toolbar_title">Ρυθμίσεις</string>
+    <string name="wrong_credentials_error">Λάθος διαπιστευτήρια</string>
+    <string name="title_activity_wrong_credentials">Λάθος διαπιστευτήρια</string>
+    <string name="layout___migdb_do_not_close">ΜΗΝ κλείσετε αυτή την οθόνη</string>
+    <string name="layout___migdb_text">Μετεγκατάσταση αρχείων βάσης δεδομένων</string>
+    <string name="layout___export">Εξαγωγή</string>
+    <string name="layout___copy">Αντιγραφή</string>
+    <string name="layout___online">Συνδεδεμένος</string>
+    <string name="layout___peer_name">ομότιμο όνομα</string>
+    <string name="layout___add_as_toxproxy">προσθήκη ως ToxProxy</string>
+    <string name="layout___create_audio_group">Δημιουργία ομάδας ήχου</string>
+    <string name="layout___create_text_group">Δημιουργία ομάδας κειμένου</string>
+    <string name="layout___info">Πληροφορίες</string>
+    <string name="layout___delete">Διαγραφή</string>
+    <string name="layout___leave">Αποχώρηση</string>
+    <string name="layout___skip">παράλειψη</string>
+    <string name="layout___set_password">Ορίστε κωδικό</string>
+    <string name="layout___password_again">Επανάληψη του κωδικού πρόσβασης</string>
+    <string name="layout___password">Κωδικός πρόσβασης</string>
+    <string name="layout___set_password_or_skip">Ορισμός κωδικού πρόσβασης ή παράλειψη.
+\n
+\nΌταν επιλέγετε να παραλείψετε ένα
+\nκωδικός πρόσβασης θα δημιουργηθεί αυτόματα
+\nΔεν υπάρχει επιλογή ανάκτησης!</string>
 </resources>
