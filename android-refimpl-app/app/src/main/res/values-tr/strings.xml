@@ -380,4 +380,8 @@
     <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Dosyaları paylaşma amacı ile TRIFA\'ya paylaşın. Uyarı: Bu özellik henüz tam olarak çalışmıyor!</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">dosyaları paylaş</string>
     <string name="pref_title_use_push_service">Push Hizmeti Kullan</string>
+    <string name="pref_description_use_push_service">UYARI: Bu, Pil ve Bant genişliğinden tasarruf etmek için Google FCM veya Unified Push kullanacaktır.
+\nUygulama bazı PUSH sunucularına doğrudan HTTPS: bağlantıları yapacaktır (Tox aracılığıyla değil).
+\nBunu yalnızca kabul ediyorsanız etkinleştirin.
+\nBu özellik, Tox Push Mesajı Uygulamasının kurulu olmasını gerektirir.</string>
 </resources>
