@@ -43,6 +43,7 @@ public class TRIFAGlobals
     final static String NOTIFICATION_TOKEN_DB_KEY = "NotificationToken";
     final static String NOTIFICATION_TOKEN_DB_KEY_NEED_ACK = "NotificationTokenNeedACK";
     final static String NOTIFICATION_FCM_PUSH_URL_PREFIX = "https://toxcon2020.zoff.cc/toxfcm/fcm.php?id=";
+    final static String NOTIFICATION_UP_PUSH_URL_PREFIX = "https://gotify1.unifiedpush.org/UP?token=";
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
