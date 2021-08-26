@@ -31,6 +31,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_T
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_UP_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -449,6 +450,30 @@ public class HelperRelay
         }
 
         return ret;
+    }
+
+    static boolean is_valid_pushurl_for_friend_with_whitelist(String push_url)
+    {
+        // whitelist google FCM gateway
+        if (push_url.length() > NOTIFICATION_FCM_PUSH_URL_PREFIX.length())
+        {
+            if (push_url.startsWith(NOTIFICATION_FCM_PUSH_URL_PREFIX))
+            {
+                return true;
+            }
+        }
+
+        // whitelist unified push demo server
+        if (push_url.length() > NOTIFICATION_UP_PUSH_URL_PREFIX.length())
+        {
+            if (push_url.startsWith(NOTIFICATION_UP_PUSH_URL_PREFIX))
+            {
+                return true;
+            }
+        }
+
+        // anything else is not allowed at this time!
+        return false;
     }
 
     static boolean set_friend_as_own_relay_in_db(String friend_public_key)
