@@ -313,4 +313,15 @@
     <string name="pref_title_compact_chatlist">Kompakte Chatliste</string>
     <string name="pref_description_compact_friendlist">Machen Sie die Freundesliste kompakter, wenn Sie eine große Liste von Freunden haben</string>
     <string name="pref_title_compact_friendlist">Kompakte Freundesliste</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Dateien über Share Intent an TRIfA weitergeben.</string>
+    <string name="layout___remove_friends_pushurl">Freunde Push-URL entfernen</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">Verschlüsselte Chats exportieren *unsicher*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">Verschlüsselte Dateien exportieren *unsicher*</string>
+    <string name="layout___remove_own_pushurl">Push-URL entfernen</string>
+    <string name="layout___friends_pushurl">Freunde Push-URL:</string>
+    <string name="pref_title_use_push_service">Push-Dienst verwenden</string>
+    <string name="layout___own_pushurl">Push-URL:</string>
+    <string name="pref_title_toxirc_muted_peers_01">Toxirc Bridge Stummgeschaltete Benutzer</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">Dateien teilen</string>
+    <string name="pref_title_window_security">Screenshots verhindern</string>
 </resources>

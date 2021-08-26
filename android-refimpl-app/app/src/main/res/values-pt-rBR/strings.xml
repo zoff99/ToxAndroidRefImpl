@@ -231,6 +231,15 @@
     <string name="pref_description_window_security">A ativação desta configuração adiciona FLAG_SECURE às atividades.
 \nImpede capturas de tela, gravação de tela e exibição de conteúdo na visualização de recentes</string>
     <string name="pref_title_window_security">impedir capturas de tela</string>
-    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">compartilhar arquivos para o TRIfA via Share Intent. Isto ainda não está funcionando completamente, você foi avisado!</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">compartilhar arquivos para o TRIfA via Share Intent.</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">compartilhar arquivos</string>
+    <string name="layout___own_pushurl">URL de Push:</string>
+    <string name="layout___remove_own_pushurl">remover a URL de Push</string>
+    <string name="layout___friends_pushurl">URL do Push dos Amigos:</string>
+    <string name="layout___remove_friends_pushurl">remover URL de envio de amigos</string>
+    <string name="pref_description_use_push_service">AVISO: isto usará o Google FCM ou Unified Push para economizar bateria e largura de banda.
+\nO aplicativo fará conexões HTTPS com alguns servidores PUSH diretamente (não via Tox).
+\nSomente ative se você aceitar isso.
+\nEste recurso precisa do aplicativo Tox Push Message instalado.</string>
+    <string name="pref_title_use_push_service">Usar o serviço Push</string>
 </resources>
