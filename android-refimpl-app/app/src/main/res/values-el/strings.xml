@@ -7,7 +7,7 @@
     <string name="pref_description_allow_file_sharing_to_trifa_via_intent">μοιραστείτε αρχεία στο TRIfA μέσω της πρόθεσης κοινής χρήσης.</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">κοινοποίηση αρχείων</string>
     <string name="pref_description_U_keep_nospam">κρατήστε την τιμή NoSpam. Αυτό δεν είναι ασφαλές, ενεργοποιήστε το μόνο αν ξέρετε τι κάνετε!</string>
-    <string name="pref_title_U_keep_nospam">κρατήστε το NoSpam</string>
+    <string name="pref_title_U_keep_nospam">NoSpam</string>
     <string name="pref_description_local_discovery_enabled">χρήση κόμβων στο τοπικό LAN για εκκίνηση</string>
     <string name="pref_title_local_discovery_enabled">Ανακάλυψη LAN δικτύου</string>
     <string name="pref_description_conference_show_system_messages">εμφάνιση μηνυμάτων συστήματος σε διασκέψεις</string>
@@ -156,7 +156,7 @@
     <string name="MainActivity_button_ok">Εντάξει</string>
     <string name="MainActivity_notification_new_message2">νέο μήνυμα</string>
     <string name="MainActivity_notification_new_message">νέο μήνυμα</string>
-    <string name="MainActivity_friend_is_typing">ο φίλος πληκτρολογεί ...</string>
+    <string name="MainActivity_friend_is_typing">γίνεται πληκτρολόγηση ...</string>
     <string name="MainActivity_add_to_batt_opt">Παρακαλώ προσθέστε το TRIfA στη λίστα εξαιρέσεων για τη βελτιστοποίηση της μπαταρίας!</string>
     <string name="MainActivity_info_dialog_title">ΠΛΗΡΟΦΟΡΊΕΣ</string>
     <string name="MainActivity_new_noti_token_dialog_text">Λήψη νέου διακριτικού ειδοποίησης. Να χρησιμοποιήσω αυτό το Token;</string>
