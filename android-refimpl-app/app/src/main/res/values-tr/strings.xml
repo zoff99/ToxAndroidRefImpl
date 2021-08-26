@@ -81,7 +81,7 @@
 \nDeğişiklik YENİDEN BAŞLATMA gerektirir!</string>
     <string name="pref_title_fps_half">düşük fps</string>
     <string name="pref_description_fps_half">Video Kare Hızı 1/2: 25fps yerine 12fps</string>
-    <string name="pref_title_set_fps">fps ayarla</string>
+    <string name="pref_title_set_fps">FPS ayarla</string>
     <string name="pref_description_set_fps">15fps video kare hızı ayarlamaya çalış, bu bazı telefonlarda çökebilir</string>
     <string name="pref_title_conference_show_system_messages">Sistem Mesajları</string>
     <string name="pref_description_conference_show_system_messages">Konferanslarda Sistem Mesajlarını Göster</string>
@@ -377,11 +377,15 @@
     <string name="pref_description_toxirc_muted_peers_02">Sesi Kapatılan Kullanıcı 2 (kullanılmıyorsa boş bırakın)</string>
     <string name="pref_description_toxirc_muted_peers_01">Sesi Kapatılan Kullanıcı 1 (kullanılmıyorsa boş bırakın)</string>
     <string name="pref_title_toxirc_muted_peers_01">Toxirc Köprüsü Sesi Kapatılan Kullanıcılar</string>
-    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Dosyaları paylaşma amacı ile TRIFA\'ya paylaşın. Uyarı: Bu özellik henüz tam olarak çalışmıyor!</string>
-    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">dosyaları paylaş</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Dosyaları paylaşma amacı ile TRIFA\'ya paylaşın.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">Dosyaları paylaş</string>
     <string name="pref_title_use_push_service">Push Hizmeti Kullan</string>
     <string name="pref_description_use_push_service">UYARI: Bu, Pil ve Bant genişliğinden tasarruf etmek için Google FCM veya Unified Push kullanacaktır.
 \nUygulama bazı PUSH sunucularına doğrudan HTTPS: bağlantıları yapacaktır (Tox aracılığıyla değil).
 \nBunu yalnızca kabul ediyorsanız etkinleştirin.
 \nBu özellik, Tox Push Mesajı Uygulamasının kurulu olmasını gerektirir.</string>
+    <string name="layout___own_pushurl">Push URL\'si:</string>
+    <string name="layout___remove_own_pushurl">Push URL\'sini kaldır</string>
+    <string name="layout___friends_pushurl">Arkadaşlar Push URL\'si:</string>
+    <string name="layout___remove_friends_pushurl">Arkadaşlar Push URL\'sini kaldır</string>
 </resources>
