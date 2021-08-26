@@ -36,11 +36,13 @@ import com.mikepenz.iconics.IconicsDrawable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
+import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMessage.send_text_messge;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 
 public class CallingWaitingActivity extends AppCompatActivity
 {
@@ -174,6 +176,12 @@ public class CallingWaitingActivity extends AppCompatActivity
                                             Log.i(TAG, "send_text_messge:calling you");
                                             sent_ping_message = true;
                                         }
+                                    }
+                                    else // if friend is NOT online and does not have a relay, try if he has a push url
+                                    {
+                                        friend_call_push_url(calling_friend_pk);
+                                        Log.i(TAG, "sent ping to push url");
+                                        sent_ping_message = true;
                                     }
                                 }
                             }
