@@ -24,9 +24,18 @@ import android.util.Log;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
+import okhttp3.CacheControl;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
+import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
+import static com.zoffcc.applications.trifa.HelperRelay.is_valid_pushurl_for_friend_with_whitelist;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
@@ -1029,6 +1038,65 @@ public class HelperFriend
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    static void friend_call_push_url(final String friend_pubkey)
+    {
+        try
+        {
+            final String pushurl_for_friend = get_pushurl_for_friend(friend_pubkey);
+
+            if (pushurl_for_friend != null)
+            {
+                if (pushurl_for_friend.length() > "https://".length())
+                {
+                    if (is_valid_pushurl_for_friend_with_whitelist(pushurl_for_friend))
+                    {
+
+                        Thread t = new Thread()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    OkHttpClient client = new OkHttpClient.Builder().
+                                            callTimeout(6 * 1000, TimeUnit.MILLISECONDS).
+                                            connectTimeout(5 * 1000, TimeUnit.MILLISECONDS).
+                                            build();
+
+                                    RequestBody formBody = new FormBody.Builder().
+                                            add("ping", "1").
+                                            build();
+
+                                    Request request = new Request.
+                                            Builder().
+                                            cacheControl(new CacheControl.Builder().noCache().build()).
+                                            url(pushurl_for_friend).
+                                            post(formBody).
+                                            build();
+                                    try (Response response = client.newCall(request).execute())
+                                    {
+                                        Log.i(TAG, "friend_call_push_url:RES=" + response.code());
+                                    }
+                                    catch (Exception ignored)
+                                    {
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    Log.i(TAG, "friend_call_push_url:001:EE:" + e.getMessage());
+                                }
+                            }
+                        };
+                        t.start();
+                    }
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
         }
     }
 }
