@@ -7,7 +7,7 @@
     <string name="pref_description_allow_file_sharing_to_trifa_via_intent">μοιραστείτε αρχεία στο TRIfA μέσω της πρόθεσης κοινής χρήσης.</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">κοινοποίηση αρχείων</string>
     <string name="pref_description_U_keep_nospam">κρατήστε την τιμή NoSpam. Αυτό δεν είναι ασφαλές, ενεργοποιήστε το μόνο αν ξέρετε τι κάνετε!</string>
-    <string name="pref_title_U_keep_nospam">κρατήστε το NoSpam</string>
+    <string name="pref_title_U_keep_nospam">NoSpam</string>
     <string name="pref_description_local_discovery_enabled">χρήση κόμβων στο τοπικό LAN για εκκίνηση</string>
     <string name="pref_title_local_discovery_enabled">Ανακάλυψη LAN δικτύου</string>
     <string name="pref_description_conference_show_system_messages">εμφάνιση μηνυμάτων συστήματος σε διασκέψεις</string>
@@ -156,7 +156,7 @@
     <string name="MainActivity_button_ok">Εντάξει</string>
     <string name="MainActivity_notification_new_message2">νέο μήνυμα</string>
     <string name="MainActivity_notification_new_message">νέο μήνυμα</string>
-    <string name="MainActivity_friend_is_typing">ο φίλος πληκτρολογεί ...</string>
+    <string name="MainActivity_friend_is_typing">γίνεται πληκτρολόγηση ...</string>
     <string name="MainActivity_add_to_batt_opt">Παρακαλώ προσθέστε το TRIfA στη λίστα εξαιρέσεων για τη βελτιστοποίηση της μπαταρίας!</string>
     <string name="MainActivity_info_dialog_title">ΠΛΗΡΟΦΟΡΊΕΣ</string>
     <string name="MainActivity_new_noti_token_dialog_text">Λήψη νέου διακριτικού ειδοποίησης. Να χρησιμοποιήσω αυτό το Token;</string>
@@ -218,4 +218,28 @@
     <string name="layout___active_network_connections">ενεργές συνδέσεις δικτύου:</string>
     <string name="layout___your_toxidenticon">Το ToxIdenticon σας</string>
     <string name="layout___error_getting_active_network_connections">*Σφάλμα κατά τη λήψη ενεργών συνδέσεων δικτύου*</string>
+    <string name="settings_toolbar_title">Ρυθμίσεις</string>
+    <string name="wrong_credentials_error">Λάθος διαπιστευτήρια</string>
+    <string name="title_activity_wrong_credentials">Λάθος διαπιστευτήρια</string>
+    <string name="layout___migdb_do_not_close">ΜΗΝ κλείσετε αυτή την οθόνη</string>
+    <string name="layout___migdb_text">Μετεγκατάσταση αρχείων βάσης δεδομένων</string>
+    <string name="layout___export">Εξαγωγή</string>
+    <string name="layout___copy">Αντιγραφή</string>
+    <string name="layout___online">Συνδεδεμένος</string>
+    <string name="layout___peer_name">ομότιμο όνομα</string>
+    <string name="layout___add_as_toxproxy">προσθήκη ως ToxProxy</string>
+    <string name="layout___create_audio_group">Δημιουργία ομάδας ήχου</string>
+    <string name="layout___create_text_group">Δημιουργία ομάδας κειμένου</string>
+    <string name="layout___info">Πληροφορίες</string>
+    <string name="layout___delete">Διαγραφή</string>
+    <string name="layout___leave">Αποχώρηση</string>
+    <string name="layout___skip">παράλειψη</string>
+    <string name="layout___set_password">Ορίστε κωδικό</string>
+    <string name="layout___password_again">Επανάληψη του κωδικού πρόσβασης</string>
+    <string name="layout___password">Κωδικός πρόσβασης</string>
+    <string name="layout___set_password_or_skip">Ορισμός κωδικού πρόσβασης ή παράλειψη.
+\n
+\nΌταν επιλέγετε να παραλείψετε ένα
+\nκωδικός πρόσβασης θα δημιουργηθεί αυτόματα
+\nΔεν υπάρχει επιλογή ανάκτησης!</string>
 </resources>
