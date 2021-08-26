@@ -90,8 +90,8 @@
     <string name="pref_title_vibrate">Vibrar</string>
     <string name="pref_ringtone_silent">Silencioso</string>
     <string name="pref_title_ringtone">Toque de chamada</string>
-    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 6 MB de tamanho</string>
-    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 20 MB de tamanho</string>
+    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 12 MB de tamanho</string>
+    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 40 MB de tamanho</string>
     <string name="pref_title_auto_accept_video">aceitar vídeos automaticamente</string>
     <string name="pref_title_auto_accept_image">aceitar imagens automaticamente</string>
     <string name="pref_header_general">Geral</string>
@@ -231,4 +231,6 @@
     <string name="pref_description_window_security">A ativação desta configuração adiciona FLAG_SECURE às atividades.
 \nImpede capturas de tela, gravação de tela e exibição de conteúdo na visualização de recentes</string>
     <string name="pref_title_window_security">impedir capturas de tela</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">compartilhar arquivos para o TRIfA via Share Intent. Isto ainda não está funcionando completamente, você foi avisado!</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">compartilhar arquivos</string>
 </resources>
