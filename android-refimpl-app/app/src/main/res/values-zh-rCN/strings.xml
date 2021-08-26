@@ -358,6 +358,14 @@
     <string name="pref_description_toxirc_muted_peers_02">已静音用户 2 (如未使用则留空)</string>
     <string name="pref_description_toxirc_muted_peers_01">已静音用户 1 (如未使用则留空)</string>
     <string name="pref_title_toxirc_muted_peers_01">Toxirc 网桥静音用户</string>
-    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">通过共享意图将文件共享到 TRIfA。警告：此功能尚无法完全工作！</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">通过共享意图将文件共享到 TRIfA。</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">分享文件</string>
+    <string name="layout___own_pushurl">推送 URL：</string>
+    <string name="layout___remove_own_pushurl">移除推送 URL</string>
+    <string name="layout___friends_pushurl">好友推送 URL：</string>
+    <string name="layout___remove_friends_pushurl">移除好友推送 URL</string>
+    <string name="pref_description_use_push_service">警告：这将使用 Google FCM 或统一推送来节省电池和带宽。应用将直接通过 HTTPS 连接到某些 PUSH 服务器（而不是通过 Tox）。
+\n
+\n不接受这一点就不要激活此设置。此功能需要安装 Tox 推送消息应用。</string>
+    <string name="pref_title_use_push_service">使用推送服务</string>
 </resources>
