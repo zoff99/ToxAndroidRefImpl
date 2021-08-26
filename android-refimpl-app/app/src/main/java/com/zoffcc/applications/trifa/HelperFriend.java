@@ -1078,7 +1078,8 @@ public class HelperFriend
                                             build();
                                     try (Response response = client.newCall(request).execute())
                                     {
-                                        Log.i(TAG, "friend_call_push_url:RES=" + response.code());
+                                        Log.i(TAG, "friend_call_push_url:url=" + pushurl_for_friend + " RES=" +
+                                                   response.code());
                                     }
                                     catch (Exception ignored)
                                     {
