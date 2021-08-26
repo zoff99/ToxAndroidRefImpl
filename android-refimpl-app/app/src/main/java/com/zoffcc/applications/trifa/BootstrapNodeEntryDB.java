@@ -207,7 +207,7 @@ public class BootstrapNodeEntryDB
             out.print("GET  /" + "json" + " HTTP/1.0\r\n");
             out.print("Host: " + TOX_NODELIST_HOST + ":" + "443" + "\r\n");
             out.print("Accept: */*\r\n");
-            out.print("Connection: Keep-Aliv\r\n");
+            out.print("Connection: Keep-Alive\r\n");
             out.print("Pragma: no-cache\r\n");
             out.print("\r\n");
             out.flush();
