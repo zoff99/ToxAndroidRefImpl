@@ -1,19 +1,119 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:padding="15dp"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/outside_friend_info_container"
+    android:layout_width="fill_parent"
+    android:layout_height="87dp"
+    android:layout_margin="0dp"
+    android:background="@null"
+    android:elevation="0dp"
+    android:orientation="vertical"
+    android:padding="0dip">
 
-    <TextView
-        android:id="@+id/textViewName"
+    <RelativeLayout
+        android:id="@+id/friend_line_container"
+        android:layout_width="fill_parent"
+        android:layout_height="85dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginRight="0dp"
+        android:layout_marginBottom="0dp"
+        android:background="@null"
+        android:elevation="2dp"
+        android:padding="2dip">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/f_avatar_icon"
+            android:layout_width="60dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginRight="6dip"
+            android:src="@drawable/circle_blue"
+            app:civ_border_color="#40000000"
+            app:civ_border_width="4dp" />
+
+        <RelativeLayout
+            android:id="@+id/f_status_container"
+            android:layout_width="18dp"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="6dip"
+            android:layout_toRightOf="@id/f_avatar_icon">
+
+            <ImageView
+                android:id="@+id/f_status_icon"
+                android:layout_width="18dp"
+                android:layout_height="fill_parent"
+                android:scaleType="centerInside"
+                android:src="@drawable/circle_red" />
+
+            <ImageView
+                android:id="@+id/f_relay_icon"
+                android:layout_width="10dp"
+                android:layout_height="fill_parent"
+                android:layout_marginLeft="4dip"
+                android:scaleType="centerInside"
+                android:src="@drawable/circle_red"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:id="@+id/f_status_info_container"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="6dip"
+            android:layout_toRightOf="@id/f_status_container">
+
+            <TextView
+                android:id="@+id/textViewName"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_alignWithParentIfMissing="true"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginTop="0dp"
+                android:layout_marginBottom="0dp"
+                android:gravity="center_vertical"
+                android:maxLines="3"
+                android:paddingRight="5dp"
+                android:paddingBottom="0dp"
+                android:text="example name elfrk powekroekw pewr pokwepo op"
+                android:textColor="@color/md_black_1000"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </RelativeLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:paddingBottom="5dp"
-        android:text="xxxxxxxxxxxxxxxxxxxxxxxxx"
-        android:textAlignment="textStart"
-        android:textSize="20dp"
-        android:textStyle="bold" />
+        android:layout_height="2dp">
 
-</RelativeLayout>
+        <TextView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@null" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="100"
+            android:background="@color/md_grey_300" />
+
+        <TextView
+            android:layout_width="20dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@null" />
+
+    </LinearLayout>
+
+</LinearLayout>
+
