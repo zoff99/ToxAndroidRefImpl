@@ -328,6 +328,7 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
 
                         set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
 
+                        // TODO: cleanup duplicated outgoing files from provider here ************
                         remove_ft_from_cache(message);
 
                         button_ok.setVisibility(View.GONE);

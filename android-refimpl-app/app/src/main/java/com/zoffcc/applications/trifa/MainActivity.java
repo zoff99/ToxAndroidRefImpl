@@ -6533,6 +6533,7 @@ public class MainActivity extends AppCompatActivity
                         {
                             try
                             {
+                                // TODO: cleanup duplicated outgoing files from provider here ************
                                 // FileDB file_ = orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
                                 orma.deleteFromFileDB().idEq(m_to_delete.filedb_id).execute();
                             }
