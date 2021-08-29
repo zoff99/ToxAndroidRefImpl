@@ -79,6 +79,33 @@ public class HelperFriend
         return f;
     }
 
+    static FriendList main_get_friend(String friend_pubkey)
+    {
+        FriendList f = null;
+
+        try
+        {
+            List<FriendList> fl = orma.selectFromFriendList().
+                    tox_public_key_stringEq(friend_pubkey).
+                    toList();
+
+            if (fl.size() > 0)
+            {
+                f = fl.get(0);
+            }
+            else
+            {
+                f = null;
+            }
+        }
+        catch (Exception e)
+        {
+            f = null;
+        }
+
+        return f;
+    }
+
     static int is_friend_online(long friendnum)
     {
         try
