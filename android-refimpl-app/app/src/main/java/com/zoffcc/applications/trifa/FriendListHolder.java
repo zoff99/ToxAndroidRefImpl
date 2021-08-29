@@ -52,6 +52,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_all_conferences_own_relay;
@@ -433,15 +434,25 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         {
             // Log.d(TAG, "004");
 
-            if (fl.TOX_CONNECTION == 0)
+            String get_pushurl_for_friend = get_pushurl_for_friend(fl.tox_public_key_string);
+
+            if ((get_pushurl_for_friend != null) && (get_pushurl_for_friend.length() > "https:".length()))
             {
-                f_status_icon.setImageResource(R.drawable.circle_red);
+                // friend has push support
+                f_relay_icon.setImageResource(R.drawable.circle_orange);
+                f_relay_icon.setVisibility(View.VISIBLE);
             }
             else
             {
-                f_status_icon.setImageResource(R.drawable.circle_green);
+                if (fl.TOX_CONNECTION == 0)
+                {
+                    f_status_icon.setImageResource(R.drawable.circle_red);
+                }
+                else
+                {
+                    f_status_icon.setImageResource(R.drawable.circle_green);
+                }
             }
-
         }
 
 
