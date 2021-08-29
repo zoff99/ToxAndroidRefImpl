@@ -4066,34 +4066,7 @@ public class MainActivity extends AppCompatActivity
         {
             if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)
             {
-                if (a_TOX_CONNECTION == 0)
-                {
-                    Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":went offline");
-                    // TODO: stop any active calls to/from this friend
-                    try
-                    {
-                        Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":stop any calls");
-                        toxav_call_control(friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
-
-                        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) == friend_number)
-                        {
-                            on_call_ended_actions();
-                        }
-                    }
-                    catch (Exception e2)
-                    {
-                        e2.printStackTrace();
-                    }
-                }
-
-                f.TOX_CONNECTION_real = a_TOX_CONNECTION;
-                f.TOX_CONNECTION_on_off_real = HelperGeneric.get_toxconnection_wrapper(f.TOX_CONNECTION);
-                HelperFriend.update_friend_in_db_connection_status_real(f);
-            }
-
-            if (f.TOX_CONNECTION != a_TOX_CONNECTION)
-            {
-                if (f.TOX_CONNECTION == TOX_CONNECTION_NONE.value)
+                if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
                 {
                     // ******** friend just came online ********
                     if (have_own_relay())
@@ -4132,38 +4105,70 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     }
-                    // else // -- send push URL always
+                }
+            }
+
+            if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)
+            {
+                if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
+                {
+                    // ******** friend just came online ********
+                    if (PREF__use_push_service)
                     {
-                        if (PREF__use_push_service)
+                        // -- send push URL always
+                        own_push_token_load();
+
+                        if (TRIFAGlobals.global_notification_token != null)
                         {
-                            own_push_token_load();
+                            final String notification_push_url = push_token_to_push_url(
+                                    TRIFAGlobals.global_notification_token);
 
-                            if (TRIFAGlobals.global_notification_token != null)
+                            if (notification_push_url != null)
                             {
-                                final String notification_push_url = push_token_to_push_url(
-                                        TRIFAGlobals.global_notification_token);
+                                String temp_string =
+                                        "A" + notification_push_url; //  "A" is a placeholder to put the pkgID later
 
-                                if (notification_push_url != null)
-                                {
-                                    String temp_string =
-                                            "A" + notification_push_url; //  "A" is a placeholder to put the pkgID later
+                                // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
+                                //           get_friend_name_from_num(friend_number) + ":send push url:" + temp_string);
 
-                                    // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
-                                    //           get_friend_name_from_num(friend_number) + ":send push url:" + temp_string);
+                                byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
+                                int data_bin_len = data_bin.length;
+                                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value; // replace "A" with pkgID
+                                final int res = tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
 
-                                    byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
-                                    int data_bin_len = data_bin.length;
-                                    data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value; // replace "A" with pkgID
-                                    final int res = tox_friend_send_lossless_packet(friend_number, data_bin,
-                                                                                    data_bin_len);
-
-                                    // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
-                                    //           get_friend_name_from_num(friend_number) + ":send push url:RES=" + res);
-                                }
+                                // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
+                                //           get_friend_name_from_num(friend_number) + ":send push url:RES=" + res);
                             }
                         }
                     }
                 }
+            }
+
+            if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)
+            {
+                if (a_TOX_CONNECTION == 0)
+                {
+                    Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":went offline");
+                    // TODO: stop any active calls to/from this friend
+                    try
+                    {
+                        Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":stop any calls");
+                        toxav_call_control(friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+
+                        if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) == friend_number)
+                        {
+                            on_call_ended_actions();
+                        }
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                    }
+                }
+
+                f.TOX_CONNECTION_real = a_TOX_CONNECTION;
+                f.TOX_CONNECTION_on_off_real = HelperGeneric.get_toxconnection_wrapper(f.TOX_CONNECTION);
+                HelperFriend.update_friend_in_db_connection_status_real(f);
             }
 
             if (is_any_relay(f.tox_public_key_string))
