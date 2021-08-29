@@ -40,6 +40,7 @@ import static com.zoffcc.applications.trifa.HelperMessage.set_message_queueing_f
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_start_sending_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
+import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_all_upto;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_video;
@@ -855,6 +856,9 @@ public class HelperFiletransfer
             return in.
                     replace("/", "_"). // / -> _
                     replace(":", "_"). // : -> _
+                    replace("\n", "_"). // \n -> _
+                    replace("\r", "_"). // \r -> _
+                    replace("\t", "_"). // \t -> _
                     replace("..", "_"); // .. -> _
         }
         catch (Exception ignored)
@@ -867,8 +871,15 @@ public class HelperFiletransfer
     static outgoing_file_wrapped copy_outgoing_file_to_sdcard_dir(final String filepath, final String filename, final long filesize)
     {
         outgoing_file_wrapped ret = new outgoing_file_wrapped();
-        String filename_sd_card = remove_bad_chars_from_outgoing_sdcard_filename(filepath);
-        // Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:" + filename_sd_card + " : " + filepath + " : " + filename);
+
+        String new_fake_filename_prefix = bytesToHex(TrifaSetPatternActivity.
+                sha256(TrifaSetPatternActivity.StringToBytes2(filepath))).
+                substring(1, 5).toLowerCase();
+
+        String filename_sd_card = remove_bad_chars_from_outgoing_sdcard_filename(
+                new_fake_filename_prefix + "_" + filename);
+        //Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:" + filename_sd_card + " : " + new_fake_filename_prefix + " : " +
+        //           filepath + " : " + filename);
 
         if (filename_sd_card == null)
         {
@@ -896,8 +907,10 @@ public class HelperFiletransfer
                     extension = "";
                 }
 
-                filename2 = remove_bad_chars_from_outgoing_sdcard_filename(
-                        filename_sd_card + (long) ((Math.random() * 10000000d)) + extension);
+                //filename2 = remove_bad_chars_from_outgoing_sdcard_filename(
+                //        filename_sd_card + "." + (long) ((Math.random() * 10000000d)) + extension);
+
+                filename2 = (long) ((Math.random() * 1000000d)) + "_" + filename_sd_card;
 
                 if (filename2 == null)
                 {

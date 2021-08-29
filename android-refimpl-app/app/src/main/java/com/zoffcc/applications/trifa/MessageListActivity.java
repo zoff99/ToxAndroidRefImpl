@@ -1167,9 +1167,20 @@ public class MessageListActivity extends AppCompatActivity
                             for (j = 0; j < metaCursor.getColumnNames().length; j++)
                             {
                                 // Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
-                                //            metaCursor.getColumnName(j));
+                                //           metaCursor.getColumnName(j));
                                 // Log.i(TAG,
-                                //       "file_attach_for_send:metaCursor_path:column name=" + metaCursor.getString(j));
+                                //       "file_attach_for_send:metaCursor_path:column data=" + metaCursor.getString(j));
+                                if (metaCursor.getColumnName(j).equals(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                                {
+                                    if (metaCursor.getString(j) != null)
+                                    {
+                                        if (metaCursor.getString(j).length() > 0)
+                                        {
+                                            fileName = metaCursor.getString(j);
+                                            // Log.i(TAG, "file_attach_for_send:filename new=" + fileName);
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -1334,9 +1345,11 @@ public class MessageListActivity extends AppCompatActivity
 
     static void add_outgoing_file(Context c, long friendnum, String filepath, String filename, Uri uri, boolean real_file_path, boolean update_message_view)
     {
-        Log.i(TAG, "add_outgoing_file:001");
+        // Log.i(TAG, "add_outgoing_file:001");
 
-        // Log.i(TAG, "add_outgoing_file:filepath=" + filepath + " uri=" + uri.toString() + " uri2=" + uri);
+        // Log.i(TAG,
+        //      "add_outgoing_file:filepath=" + filepath + " filename=" + filename + " uri=" + uri.toString() + " uri2=" +
+        //      uri);
 
         long file_size = -1;
         try
@@ -1363,7 +1376,7 @@ public class MessageListActivity extends AppCompatActivity
         }
 
 
-        if (file_size < 150 * 1024 * 1024) // less than 105 MByte filesize
+        if (file_size < 300 * 1024 * 1024) // less than 300 MByte filesize
         {
             outgoing_file_wrapped ofw = copy_outgoing_file_to_sdcard_dir(filepath, filename, file_size);
 
