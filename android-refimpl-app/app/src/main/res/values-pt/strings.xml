@@ -179,9 +179,9 @@
     <string name="pref_title_software_echo_cancel">Cancelamento de Eco</string>
     <string name="pref_description_video_uv_reversed">Inverea a ordem dos planos UV no vídeo da câmara</string>
     <string name="pref_title_video_uv_reversed">UV invertido em vídeo</string>
-    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 20 MB de tamanho</string>
+    <string name="pref_description_auto_accept_video">aceitar automaticamente vídeos com até 40 MB de tamanho</string>
     <string name="pref_title_auto_accept_video">aceitar vídeos automaticamente</string>
-    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 6 MB de tamanho</string>
+    <string name="pref_description_auto_accept_image">aceitar automaticamente imagens e fotos de até 12 MB de tamanho</string>
     <string name="pref_title_auto_accept_image">aceitar imagens automaticamente</string>
     <string name="pref_header_general">Geral</string>
     <string name="settings_toolbar_title">Configurações</string>
@@ -218,4 +218,28 @@
     <string name="pref_title_start_on_boot">executar na inicialização</string>
     <string name="pref_description_auto_accept_all_upto">aceitar automaticamente todos os ficheiros de até 200 MB de tamanho</string>
     <string name="pref_title_auto_accept_all_upto">aceitar automaticamente todos os ficheiros</string>
+    <string name="layout___own_pushurl">URL de Push:</string>
+    <string name="layout___remove_own_pushurl">remover a URL de Push</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">exportar chats criptografados *inseguro*</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">exportar ficheiros criptografados *inseguro*</string>
+    <string name="layout___friends_pushurl">URL do Push dos Amigos:</string>
+    <string name="layout___remove_friends_pushurl">remover URL de envio de amigos</string>
+    <string name="pref_description_toxirc_muted_peers_03">Utilizador Silenciado 3 (deixe em branco se não for usado)</string>
+    <string name="pref_description_toxirc_muted_peers_02">Utilizador Silenciado 2 (deixe em branco se não for usado)</string>
+    <string name="pref_description_toxirc_muted_peers_01">Utilizador Silenciado 1 (deixe em branco se não for usado)</string>
+    <string name="pref_title_toxirc_muted_peers_01">Utilizadores Silenciados Toxirc Bridge</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">compartilhar ficheiros para o TRIfA via Share Intent.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">compartilhar ficheiros</string>
+    <string name="pref_description_use_push_service">AVISO: isto usará o Google FCM ou Unified Push para economizar bateria e largura de banda.
+\nA app fará conexões HTTPS com alguns servidores PUSH diretamente (não via Tox).
+\nSomente ative se o aceitar.
+\nEste recurso precisa da app Tox Push Message instalado.</string>
+    <string name="pref_title_use_push_service">Usar o serviço Push</string>
+    <string name="pref_description_compact_chatlist">Exibir mensagem de bate-papo mais compacta, economizando espaço</string>
+    <string name="pref_title_compact_chatlist">Lista de bate-papo compacta</string>
+    <string name="pref_description_compact_friendlist">Torne a Lista de Amigos mais compacta, se tiver uma grande lista de Amigos</string>
+    <string name="pref_title_compact_friendlist">Lista de amigos compacta</string>
+    <string name="pref_description_window_security">A ativação desta configuração adiciona FLAG_SECURE às atividades.
+\nImpede capturas de ecrã, gravação de ecrã e exibição de conteúdo na visualização de recentes</string>
+    <string name="pref_title_window_security">impedir capturas de ecrã</string>
 </resources>
