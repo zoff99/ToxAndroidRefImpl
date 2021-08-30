@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/doc/mockup_004a.png" width="99%">
 
-## Setup PUSH Notification for TRIfA [using Google FCM]
+### Setup PUSH Notification for TRIfA [using Google FCM]
 
 * #### 1) Make sure you have [TRIfA](https://play.google.com/store/apps/details?id=com.zoffcc.applications.trifa) installed and running
 * #### 2) Make sure you have [Google Play Services](https://play.google.com/store/apps/details?id=com.google.android.gms) installed and working
