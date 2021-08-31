@@ -442,19 +442,16 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 f_relay_icon.setImageResource(R.drawable.circle_orange);
                 f_relay_icon.setVisibility(View.VISIBLE);
             }
+
+            if (fl.TOX_CONNECTION == 0)
+            {
+                f_status_icon.setImageResource(R.drawable.circle_red);
+            }
             else
             {
-                if (fl.TOX_CONNECTION == 0)
-                {
-                    f_status_icon.setImageResource(R.drawable.circle_red);
-                }
-                else
-                {
-                    f_status_icon.setImageResource(R.drawable.circle_green);
-                }
+                f_status_icon.setImageResource(R.drawable.circle_green);
             }
         }
-
 
         if (fl.TOX_USER_STATUS == 0)
         {
