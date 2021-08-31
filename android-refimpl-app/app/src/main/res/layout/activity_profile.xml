@@ -107,6 +107,7 @@
                 android:text="@string/layout___remove_own_relay" />
 
             <TextView
+                android:id="@+id/my_relay_toxid_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
