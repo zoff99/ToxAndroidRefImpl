@@ -242,4 +242,5 @@
 \nAktyvuokite tai tik tuo atveju, jei su tuo sutinkate.
 \nŠiai funkcijai reikalinga įdiegta Tox Push Message programa.</string>
     <string name="pref_title_use_push_service">Naudoti Push paslaugą</string>
+    <string name="pref_title_download_push_msg_app">Atsisiųsti Push žinučių programėlę</string>
 </resources>

@@ -368,4 +368,5 @@
 \n
 \n不接受这一点就不要激活此设置。此功能需要安装 Tox 推送消息应用。</string>
     <string name="pref_title_use_push_service">使用推送服务</string>
+    <string name="pref_title_download_push_msg_app">下载推送消息应用</string>
 </resources>
