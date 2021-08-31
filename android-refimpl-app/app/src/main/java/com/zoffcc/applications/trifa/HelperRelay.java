@@ -25,6 +25,7 @@ import java.util.List;
 
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
@@ -595,5 +596,10 @@ public class HelperRelay
         }
 
         return ret;
+    }
+
+    static void remove_own_pushurl_in_db()
+    {
+        del_g_opts(NOTIFICATION_TOKEN_DB_KEY);
     }
 }
