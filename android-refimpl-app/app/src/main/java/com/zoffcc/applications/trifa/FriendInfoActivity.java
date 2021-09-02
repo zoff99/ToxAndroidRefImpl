@@ -42,6 +42,7 @@ import androidx.appcompat.widget.Toolbar;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar_update;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
@@ -120,9 +121,9 @@ public class FriendInfoActivity extends AppCompatActivity
         {
             if (friend_relay_pubkey == null)
             {
-                fi_relay_text.setVisibility(View.INVISIBLE);
-                fi_relay_pubkey_textview.setVisibility(View.INVISIBLE);
-                remove_friend_relay_button.setVisibility(View.INVISIBLE);
+                fi_relay_text.setVisibility(View.GONE);
+                fi_relay_pubkey_textview.setVisibility(View.GONE);
+                remove_friend_relay_button.setVisibility(View.GONE);
             }
             else
             {
@@ -139,9 +140,9 @@ public class FriendInfoActivity extends AppCompatActivity
                         try
                         {
                             remove_friend_relay_in_db(tox_friend_get_public_key__wrapper(friendnum));
-                            remove_friend_relay_button.setVisibility(View.INVISIBLE);
-                            fi_relay_text.setVisibility(View.INVISIBLE);
-                            fi_relay_pubkey_textview.setVisibility(View.INVISIBLE);
+                            remove_friend_relay_button.setVisibility(View.GONE);
+                            fi_relay_text.setVisibility(View.GONE);
+                            fi_relay_pubkey_textview.setVisibility(View.GONE);
                         }
                         catch (Exception e)
                         {
@@ -176,9 +177,9 @@ public class FriendInfoActivity extends AppCompatActivity
         {
             if (pushurl_for_friend == null)
             {
-                fi_pushurl_text.setVisibility(View.INVISIBLE);
-                fi_pushurl_textview.setVisibility(View.INVISIBLE);
-                remove_friend_pushurl_button.setVisibility(View.INVISIBLE);
+                fi_pushurl_text.setVisibility(View.GONE);
+                fi_pushurl_textview.setVisibility(View.GONE);
+                remove_friend_pushurl_button.setVisibility(View.GONE);
             }
             else
             {
@@ -203,6 +204,14 @@ public class FriendInfoActivity extends AppCompatActivity
                                       Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     fi_pushurl_textview.setText(spannable, TextView.BufferType.SPANNABLE);
                 }
+                else
+                {
+                    Spannable spannable = new SpannableString(pushurl_for_friend + "\n" + "( OK )");
+                    spannable.setSpan(new ForegroundColorSpan(darkenColor(Color.GREEN, 0.3f)), pushurl_for_friend.length(),
+                                      (pushurl_for_friend + "\n" + "( OK )").length(),
+                                      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    fi_pushurl_textview.setText(spannable, TextView.BufferType.SPANNABLE);
+                }
 
                 remove_friend_pushurl_button.setText("remove Friend Push URL");
                 remove_friend_pushurl_button.setOnClickListener(new View.OnClickListener()
@@ -213,9 +222,9 @@ public class FriendInfoActivity extends AppCompatActivity
                         try
                         {
                             remove_friend_pushurl_in_db(tox_friend_get_public_key__wrapper(friendnum));
-                            remove_friend_pushurl_button.setVisibility(View.INVISIBLE);
-                            fi_pushurl_text.setVisibility(View.INVISIBLE);
-                            fi_pushurl_textview.setVisibility(View.INVISIBLE);
+                            remove_friend_pushurl_button.setVisibility(View.GONE);
+                            fi_pushurl_text.setVisibility(View.GONE);
+                            fi_pushurl_textview.setVisibility(View.GONE);
                         }
                         catch (Exception e)
                         {
