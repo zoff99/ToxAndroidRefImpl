@@ -58,6 +58,7 @@ import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
+import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -122,6 +123,9 @@ public class HelperGeneric
      */
 
     private static final String TAG = "trifa.Hlp.Generic";
+
+    private static final Pattern PATTERN_IPV4 = Pattern.compile(
+            "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
     static long video_frame_age_mean = 0;
     static int video_frame_age_values_cur_index = 0;
@@ -3325,6 +3329,18 @@ public class HelperGeneric
         try
         {
             return (Arrays.asList(list).contains(input));
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
+    public static boolean validate_ipv4(final String ip)
+    {
+        try
+        {
+            return PATTERN_IPV4.matcher(ip).matches();
         }
         catch (Exception e)
         {
