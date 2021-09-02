@@ -31,6 +31,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_UP_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -459,6 +460,15 @@ public class HelperRelay
         if (push_url.length() > NOTIFICATION_FCM_PUSH_URL_PREFIX.length())
         {
             if (push_url.startsWith(NOTIFICATION_FCM_PUSH_URL_PREFIX))
+            {
+                return true;
+            }
+        }
+
+        // whitelist OLD google FCM gateway
+        if (push_url.length() > NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD.length())
+        {
+            if (push_url.startsWith(NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD))
             {
                 return true;
             }
