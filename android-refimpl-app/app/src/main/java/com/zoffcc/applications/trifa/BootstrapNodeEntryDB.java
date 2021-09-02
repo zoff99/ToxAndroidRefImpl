@@ -179,6 +179,7 @@ public class BootstrapNodeEntryDB
                 return host_or_ip;
             }
 
+            // TODO: TorResolve can NOT resolve IPv6 address like its written now
             String IP_address = TorResolve(host_or_ip);
             Log.i(TAG, "dns_lookup_via_tor:TorResolve:" + host_or_ip + " -> " + IP_address);
 
@@ -205,6 +206,7 @@ public class BootstrapNodeEntryDB
     public static void update_nodelist_from_internet_https_dummy_XXXX()
     {
         // this should be using TOR proxy, if tor is enabled in options!
+        // TODO: TorResolve can NOT resolve IPv6 address like its written now
         String IP_address = TorResolve(TOX_NODELIST_HOST);
         Log.i(TAG, "update_nodelist_from_internet:TorResolve:" + TOX_NODELIST_HOST + " -> " + IP_address);
 
