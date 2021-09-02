@@ -604,6 +604,18 @@ public class HelperFriend
         }
     }
 
+    static void remove_pushurl_for_friend(final String friend_pubkey)
+    {
+        try
+        {
+            orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).push_url(null).execute();
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "remove_pushurl_for_friend:EE:" + e.getMessage());
+        }
+    }
+
     synchronized static void insert_into_friendlist_db(final FriendList f)
     {
         //        Thread t = new Thread()
