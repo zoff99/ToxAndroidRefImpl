@@ -20,9 +20,13 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.Html;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +46,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
+import static com.zoffcc.applications.trifa.HelperRelay.is_valid_pushurl_for_friend_with_whitelist;
 import static com.zoffcc.applications.trifa.HelperRelay.remove_friend_pushurl_in_db;
 import static com.zoffcc.applications.trifa.HelperRelay.remove_friend_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
@@ -163,13 +168,13 @@ public class FriendInfoActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        String get_pushurl_for_friend = get_pushurl_for_friend(tox_friend_get_public_key__wrapper(friendnum));
+        String pushurl_for_friend = get_pushurl_for_friend(tox_friend_get_public_key__wrapper(friendnum));
 
         fi_pushurl_textview.setText("");
 
         try
         {
-            if (get_pushurl_for_friend == null)
+            if (pushurl_for_friend == null)
             {
                 fi_pushurl_text.setVisibility(View.INVISIBLE);
                 fi_pushurl_textview.setVisibility(View.INVISIBLE);
@@ -179,7 +184,25 @@ public class FriendInfoActivity extends AppCompatActivity
             {
                 fi_pushurl_text.setVisibility(View.VISIBLE);
                 fi_pushurl_textview.setVisibility(View.VISIBLE);
-                fi_pushurl_textview.setText(get_pushurl_for_friend);
+                fi_pushurl_textview.setText(pushurl_for_friend);
+
+                boolean is_valid = false;
+                if (pushurl_for_friend.length() > "https://".length())
+                {
+                    if (is_valid_pushurl_for_friend_with_whitelist(pushurl_for_friend))
+                    {
+                        is_valid = true;
+                    }
+                }
+
+                if (!is_valid)
+                {
+                    Spannable spannable = new SpannableString(pushurl_for_friend + "\n" + "(*invalid*)");
+                    spannable.setSpan(new ForegroundColorSpan(Color.RED), pushurl_for_friend.length(),
+                                      (pushurl_for_friend + "\n" + "(*invalid*)").length(),
+                                      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                    fi_pushurl_textview.setText(spannable, TextView.BufferType.SPANNABLE);
+                }
 
                 remove_friend_pushurl_button.setText("remove Friend Push URL");
                 remove_friend_pushurl_button.setOnClickListener(new View.OnClickListener()
@@ -207,7 +230,6 @@ public class FriendInfoActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
-
 
         final Drawable d1 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
                 getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
