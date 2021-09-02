@@ -4499,6 +4499,14 @@ public class MainActivity extends AppCompatActivity
                     HelperFriend.add_pushurl_for_friend(pushurl,
                                                         HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
                 }
+                else
+                {
+                    if (length == 0)
+                    {
+                        HelperFriend.remove_pushurl_for_friend(
+                                HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
+                    }
+                }
             }
         }
     }
