@@ -31,6 +31,7 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Iterator;
 
+import static com.zoffcc.applications.trifa.HelperGeneric.validate_ipv4;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
@@ -167,6 +168,17 @@ public class BootstrapNodeEntryDB
     {
         try
         {
+            if (host_or_ip.equals("127.0.0.1"))
+            {
+                Log.i(TAG, "dns_lookup_via_tor:TorResolve:" + host_or_ip + " == 127.0.0.1");
+                return "127.0.0.1";
+            }
+            else if (validate_ipv4(host_or_ip))
+            {
+                Log.i(TAG, "dns_lookup_via_tor:TorResolve:" + host_or_ip + " is already an IPv4 address");
+                return host_or_ip;
+            }
+
             String IP_address = TorResolve(host_or_ip);
             Log.i(TAG, "dns_lookup_via_tor:TorResolve:" + host_or_ip + " -> " + IP_address);
 
