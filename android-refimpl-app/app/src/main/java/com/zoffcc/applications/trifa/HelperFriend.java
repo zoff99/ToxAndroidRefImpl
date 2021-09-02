@@ -21,6 +21,8 @@ package com.zoffcc.applications.trifa;
 
 import android.util.Log;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.nio.ByteBuffer;
 import java.util.Iterator;
 import java.util.List;
@@ -36,7 +38,10 @@ import okhttp3.Response;
 
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.is_valid_pushurl_for_friend_with_whitelist;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
@@ -1088,10 +1093,27 @@ public class HelperFriend
                             {
                                 try
                                 {
-                                    OkHttpClient client = new OkHttpClient.Builder().
-                                            callTimeout(6 * 1000, TimeUnit.MILLISECONDS).
-                                            connectTimeout(5 * 1000, TimeUnit.MILLISECONDS).
-                                            build();
+                                    OkHttpClient client = null;
+
+                                    if (PREF__orbot_enabled)
+                                    {
+                                        InetSocketAddress proxyAddr = new InetSocketAddress(ORBOT_PROXY_HOST,
+                                                                                            (int) ORBOT_PROXY_PORT);
+                                        Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxyAddr);
+
+                                        client = new OkHttpClient.Builder().
+                                                proxy(proxy).
+                                                callTimeout(6 * 1000, TimeUnit.MILLISECONDS).
+                                                connectTimeout(5 * 1000, TimeUnit.MILLISECONDS).
+                                                build();
+                                    }
+                                    else
+                                    {
+                                        client = new OkHttpClient.Builder().
+                                                callTimeout(6 * 1000, TimeUnit.MILLISECONDS).
+                                                connectTimeout(5 * 1000, TimeUnit.MILLISECONDS).
+                                                build();
+                                    }
 
                                     RequestBody formBody = new FormBody.Builder().
                                             add("ping", "1").
