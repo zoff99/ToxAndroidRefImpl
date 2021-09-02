@@ -388,4 +388,5 @@
     <string name="layout___remove_own_pushurl">Push URL\'sini kaldır</string>
     <string name="layout___friends_pushurl">Arkadaşlar Push URL\'si:</string>
     <string name="layout___remove_friends_pushurl">Arkadaşlar Push URL\'sini kaldır</string>
+    <string name="pref_title_download_push_msg_app">Push Mesajı Uygulamasını İndir</string>
 </resources>
