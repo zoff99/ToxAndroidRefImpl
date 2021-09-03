@@ -2034,14 +2034,14 @@ public class HelperGeneric
     /*************************************************************************/
     public static MainActivity.send_message_result tox_friend_send_message_wrapper(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message)
     {
-        Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
+        // Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
         long friendnum_to_use = friendnum;
         FriendList f = main_get_friend(friendnum);
-        Log.d(TAG, "tox_friend_send_message_wrapper:f=" + f);
+        // Log.d(TAG, "tox_friend_send_message_wrapper:f=" + f);
 
         if (f != null)
         {
-            Log.d(TAG, "tox_friend_send_message_wrapper:f conn" + f.TOX_CONNECTION_real);
+            // Log.d(TAG, "tox_friend_send_message_wrapper:f conn" + f.TOX_CONNECTION_real);
 
             if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
             {
@@ -2051,7 +2051,7 @@ public class HelperGeneric
                 {
                     // friend has a relay
                     friendnum_to_use = tox_friend_by_public_key__wrapper(relay_pubkey);
-                    Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
+                    // Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
                 }
                 else // if friend is NOT online and does not have a relay, try if he has a push url
                 {
@@ -2074,7 +2074,7 @@ public class HelperGeneric
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:002:*PING*");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
-        Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
+        // Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
         int raw_message_length_int = raw_message_length_buf.
                 array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
                 array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
@@ -2090,8 +2090,8 @@ public class HelperGeneric
             result.msg_hash_hex = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit());
             result.raw_message_buf_hex = bytesToHex(raw_message_buf.array(), raw_message_buf.arrayOffset(),
                                                     raw_message_length_int);
-            Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
-                       result.raw_message_buf_hex);
+            // Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
+            //           result.raw_message_buf_hex);
             return result;
         }
         else if (res == -9991)
