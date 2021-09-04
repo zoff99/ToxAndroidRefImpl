@@ -334,17 +334,13 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                 int id = item.getItemId();
                 switch (id)
                 {
-                    //                    case R.id.item_info:
-                    //                        // show conference info page -----------------
-                    //                        long friend_num_temp_safety = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
-                    //
-                    //                        Log.i(TAG, "onMenuItemClick:info:1:fn_safety=" + friend_num_temp_safety);
-                    //
-                    //                        Intent intent = new Intent(v.getContext(), FriendInfoActivity.class);
-                    //                        intent.putExtra("friendnum", friend_num_temp_safety);
-                    //                        v.getContext().startActivity(intent);
-                    //                        // show conference info page -----------------
-                    //                        break;
+                    case R.id.item_info:
+                        // show conference info page -----------------
+                        Intent intent = new Intent(v.getContext(), ConferenceInfoActivity.class);
+                        intent.putExtra("conf_id", f2.conference_identifier);
+                        v.getContext().startActivity(intent);
+                        // show conference info page -----------------
+                        break;
                     case R.id.item_leave:
                         // leave conference -----------------
                         if ((f2.tox_conference_number > -1) && (f2.conference_active))

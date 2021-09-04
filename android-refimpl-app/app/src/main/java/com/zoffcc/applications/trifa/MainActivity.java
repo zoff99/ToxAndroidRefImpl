@@ -2848,6 +2848,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_conference_invite(long friend_number, long conference_number);
 
+    public static native int tox_conference_set_title(long conference_number, String title);
+
     // --------------- Conference -------------
     // --------------- Conference -------------
     // --------------- Conference -------------
