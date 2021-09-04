@@ -5251,6 +5251,68 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1send_1message(J
     }
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1set_1title(JNIEnv *env, jobject thiz,
+        jlong conference_number, jobject title)
+{
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)title);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)title, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    TOX_ERR_CONFERENCE_TITLE error;
+    bool res = tox_conference_set_title(tox_global, (uint32_t)conference_number, (uint8_t *)pBytes,
+                                           (size_t)plength, &error);
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+
+#else
+
+    const char *title_str = NULL;
+    // TODO: UTF-8
+    title_str = (*env)->GetStringUTFChars(env, title, NULL);
+    TOX_ERR_CONFERENCE_TITLE error;
+    bool res = tox_conference_set_title(tox_global, (uint32_t)conference_number, (uint8_t *)title_str,
+                                           (size_t)strlen(title_str), &error);
+    (*env)->ReleaseStringUTFChars(env, title, title_str);
+
+#endif
+
+    if(res == false)
+    {
+        if(error == TOX_ERR_CONFERENCE_TITLE_CONFERENCE_NOT_FOUND)
+        {
+            dbg(9, "tox_conference_set_title:ERROR:TOX_ERR_CONFERENCE_TITLE_CONFERENCE_NOT_FOUND");
+            return (jint)-1;
+        }
+        else if(error == TOX_ERR_CONFERENCE_TITLE_INVALID_LENGTH)
+        {
+            dbg(9, "tox_conference_set_title:ERROR:TOX_ERR_CONFERENCE_TITLE_INVALID_LENGTH");
+            return (jint)-2;
+        }
+        else if(error == TOX_ERR_CONFERENCE_TITLE_FAIL_SEND)
+        {
+            dbg(9, "tox_conference_set_title:ERROR:TOX_ERR_CONFERENCE_TITLE_FAIL_SEND");
+            return (jint)-3;
+        }
+        else
+        {
+            dbg(9, "tox_conference_set_title:ERROR:%d", (int)error);
+            return (jint)-99;
+        }
+    }
+    else
+    {
+        return (jint)res;
+    }
+}
 
 /**
  * Returns the type of conference (TOX_CONFERENCE_TYPE) that conference_number is. Return value is
