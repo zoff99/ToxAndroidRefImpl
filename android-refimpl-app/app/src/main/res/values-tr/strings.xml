@@ -389,4 +389,7 @@
     <string name="layout___friends_pushurl">Arkadaşlar Push URL\'si:</string>
     <string name="layout___remove_friends_pushurl">Arkadaşlar Push URL\'sini kaldır</string>
     <string name="pref_title_download_push_msg_app">Push Mesajı Uygulamasını İndir</string>
+    <string name="layout___conf_title">Başlık:</string>
+    <string name="layout___conf_id">Konferans kimliği:</string>
+    <string name="title_activity_conferenceinfo">Konferans bilgisi</string>
 </resources>
