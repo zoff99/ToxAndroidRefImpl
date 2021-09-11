@@ -324,4 +324,17 @@
     <string name="pref_title_toxirc_muted_peers_01">Toxirc Bridge Stummgeschaltete Benutzer</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">Dateien teilen</string>
     <string name="pref_title_window_security">Screenshots verhindern</string>
+    <string name="layout___conf_title">Titel:</string>
+    <string name="layout___conf_id">Konferenz-ID:</string>
+    <string name="pref_description_toxirc_muted_peers_02">Stummgeschalteter Benutzer 2 (leer lassen, wenn nicht verwendet)</string>
+    <string name="pref_description_toxirc_muted_peers_03">Stummgeschalteter Benutzer 3 (leer lassen, wenn nicht verwendet)</string>
+    <string name="pref_description_toxirc_muted_peers_01">Stummgeschalteter Benutzer 1 (leer lassen, wenn nicht verwendet)</string>
+    <string name="pref_title_download_push_msg_app">Push Message App herunterladen</string>
+    <string name="pref_description_use_push_service">WARNUNG: Dies wird Google FCM oder Unified Push verwenden, um Akku und Bandbreite zu sparen.
+\nDie App stellt HTTPS: Verbindungen zu einigen PUSH-Servern direkt her (nicht über Tox).
+\nAktivieren Sie diese Funktion nur, wenn Sie dies akzeptieren.
+\nFür diese Funktion muss die Tox Push Message App installiert sein.</string>
+    <string name="pref_description_window_security">Durch Aktivieren dieser Einstellung wird FLAG_SECURE zu Aktivitäten hinzugefügt.
+\nEs verhindert Screenshots und Bildschirmaufzeichnungen sowie die Anzeige von Inhalten in der aktuellen Vorschau</string>
+    <string name="title_activity_conferenceinfo">Konferenzinformationen</string>
 </resources>
