@@ -341,4 +341,8 @@
 \nSólo active esto si lo acepta.
 \nEsta función necesita la aplicación Tox Push Message instalada.</string>
     <string name="pref_title_use_push_service">Utilizar el servicio Push</string>
+    <string name="layout___conf_title">Título:</string>
+    <string name="layout___conf_id">Identificación de la conferencia:</string>
+    <string name="pref_title_download_push_msg_app">Descargar la aplicación de mensajes push</string>
+    <string name="title_activity_conferenceinfo">Informaciones sobre la conferencia</string>
 </resources>
