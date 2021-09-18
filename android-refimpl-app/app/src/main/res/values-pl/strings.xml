@@ -34,8 +34,8 @@
     <string name="pref_title_software_echo_cancel">Usuwanie echa</string>
     <string name="pref_description_auto_accept_all_upto">Automatycznie akceptuj pliki do 200MB</string>
     <string name="pref_title_auto_accept_all_upto">Automatycznie akceptuj wszelkie pliki</string>
-    <string name="pref_description_auto_accept_video">Automatycznie pokaż filmy do 20MB</string>
-    <string name="pref_description_auto_accept_image">"Automatycznie  pokaż obrazki powyżej 6MB"</string>
+    <string name="pref_description_auto_accept_video">Akceptuj automatycznie filmy do 40MB</string>
+    <string name="pref_description_auto_accept_image">"Akceptuj automatycznie  obrazki powyżej 12MB"</string>
     <string name="pref_title_auto_accept_image">Automatycznie pokaż obrazki</string>
     <string name="pref_title_auto_accept_video">Automatycznie pokaż filmy</string>
     <string name="pref_header_general">Generalnie</string>
@@ -48,4 +48,7 @@
     <string name="title_activity_maintenance">Konserwacja</string>
     <string name="title_activity_share">Otwórz z TRIfA</string>
     <string name="title_activity_check_password">Wprowadź hasło</string>
+    <string name="pref_title_use_incognito_keyboard">Użyj klawiatury prywatnej</string>
+    <string name="pref_description_orbot_enabled">Musisz zainstalować Orbot aby tego użyć.
+\nZmiana wymaga PONOWNEGO URUCHOMIENIA!</string>
 </resources>
