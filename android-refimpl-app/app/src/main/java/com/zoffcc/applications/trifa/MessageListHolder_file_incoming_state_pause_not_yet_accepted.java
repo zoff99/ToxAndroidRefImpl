@@ -103,6 +103,14 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
 
         date_time.setText(long_date_time_format(m.rcvd_timestamp));
 
+        try
+        {
+            ft_preview_container.setVisibility(View.GONE);
+        }
+        catch (Exception e)
+        {
+        }
+
         final Message message = m;
 
         // --------- message date header (show only if different from previous message) ---------
