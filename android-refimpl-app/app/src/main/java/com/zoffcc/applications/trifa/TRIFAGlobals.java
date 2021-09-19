@@ -178,6 +178,8 @@ public class TRIFAGlobals
 
     static final int[] MESSAGE_TEXT_SIZE = {9, 11, 15, 20}; // values in "sp"
     static final int[] MESSAGE_EMOJI_SIZE = {13, 18, 25, 36}; // values in "dp"
+    static final int MESSAGE_TEXT_SIZE_FT_SMALL = 12;
+    static final int MESSAGE_TEXT_SIZE_FT_NORMAL = 13;
     static final int[] MESSAGE_EMOJI_ONLY_EMOJI_SIZE = {13 * 2, 18 * 2, 25 * 2, 36 * 2}; // values in "dp"
 
     static long LAST_ONLINE_TIMSTAMP_ONLINE_NOW = Long.MAX_VALUE - 1;

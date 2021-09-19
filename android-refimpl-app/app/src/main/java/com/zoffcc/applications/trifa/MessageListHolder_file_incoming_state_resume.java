@@ -45,8 +45,11 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE_FT_SMALL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -173,14 +176,20 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
             ft_progressbar.setProgress(percent);
             // TODO: make text better
             textView.setText("" + message.text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n receiving ...");
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            if (MESSAGE_TEXT_SIZE[PREF__global_font_size] > MESSAGE_TEXT_SIZE_FT_SMALL)
+            {
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE_FT_SMALL);
+            }
         }
         else
         {
             ft_progressbar.setProgress(0);
             // TODO: make text better
             textView.setText("" + message.text + "\n receiving ...");
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 12);
+            if (MESSAGE_TEXT_SIZE[PREF__global_font_size] > MESSAGE_TEXT_SIZE_FT_SMALL)
+            {
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE_FT_SMALL);
+            }
         }
 
         ft_progressbar.setMax(100);

@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Priority;
@@ -64,6 +65,7 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE_FT_NORMAL;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -148,6 +150,12 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             layout_message_container.setBackgroundColor(Color.TRANSPARENT);
         }
 
+        // ft_preview_container.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 150));
+        // ft_preview_image.setLayoutParams(new LinearLayout.LayoutParams(ViewGroup.LayoutParams.FILL_PARENT, 150));
+
+        resize_viewgroup(ft_preview_container, 150);
+        resize_view(ft_preview_image, 150);
+
         // --------- message date header (show only if different from previous message) ---------
         // --------- message date header (show only if different from previous message) ---------
         // --------- message date header (show only if different from previous message) ---------
@@ -210,6 +218,10 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         if (message.filedb_id == -1)
         {
             textView.setAutoLinkText("" + message.text + "\n *canceled*");
+            if (MESSAGE_TEXT_SIZE[PREF__global_font_size] > MESSAGE_TEXT_SIZE_FT_NORMAL)
+            {
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE_FT_NORMAL);
+            }
 
             ft_preview_image.setImageDrawable(null);
             ft_preview_container.setVisibility(View.GONE);
@@ -220,6 +232,10 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         else
         {
             textView.setAutoLinkText("" + message.text + "\n OK");
+            if (MESSAGE_TEXT_SIZE[PREF__global_font_size] > MESSAGE_TEXT_SIZE_FT_NORMAL)
+            {
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE_FT_NORMAL);
+            }
 
             boolean is_image = false;
             try
@@ -316,12 +332,15 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     }
                 }
             }
-            else
+            else // ---- not an image ----
             {
                 final Drawable d3 = new IconicsDrawable(this.context).
                         icon(GoogleMaterial.Icon.gmd_attachment).
                         backgroundColor(Color.TRANSPARENT).
                         color(Color.parseColor("#AA000000")).sizeDp(50);
+
+                resize_viewgroup(ft_preview_container, 60);
+                resize_view(ft_preview_image, 60);
 
                 ft_preview_image.setImageDrawable(d3);
 
@@ -542,4 +561,40 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             return res.ret_value;
         }
     };
+
+    private void resize_viewgroup(ViewGroup vg, int height_in_dp)
+    {
+        try
+        {
+            float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, height_in_dp,
+                                                     vg.getResources().getDisplayMetrics());
+            LinearLayout.LayoutParams params3 = (LinearLayout.LayoutParams) vg.getLayoutParams();
+            if (params3.height != (int) pixels)
+            {
+                params3.height = (int) pixels;
+                vg.setLayoutParams(params3);
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    private void resize_view(View vg, int height_in_dp)
+    {
+        try
+        {
+            float pixels = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, height_in_dp,
+                                                     vg.getResources().getDisplayMetrics());
+            LinearLayout.LayoutParams params3 = (LinearLayout.LayoutParams) vg.getLayoutParams();
+            if (params3.height != (int) pixels)
+            {
+                params3.height = (int) pixels;
+                vg.setLayoutParams(params3);
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
 }
