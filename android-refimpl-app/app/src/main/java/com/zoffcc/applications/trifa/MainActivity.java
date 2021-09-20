@@ -5158,6 +5158,25 @@ public class MainActivity extends AppCompatActivity
                                                                                  HelperFriend.tox_friend_get_public_key__wrapper(
                                                                                          friend_number));
 
+            // --- notification ---
+            // --- notification ---
+            // --- notification ---
+            boolean do_notification = true;
+            boolean do_badge_update = true;
+
+            if (MainActivity.message_list_activity != null)
+            {
+                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number)
+                {
+                    do_notification = false;
+                    do_badge_update = false;
+                }
+            }
+            // --- notification ---
+            // --- notification ---
+            // --- notification ---
+
+
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
             f.direction = TRIFA_FT_DIRECTION_INCOMING.value;
@@ -5175,6 +5194,16 @@ public class MainActivity extends AppCompatActivity
             f.id = ft_id;
             // add FT message to UI
             Message m = new Message();
+
+            if (!do_badge_update)
+            {
+                m.is_new = false;
+            }
+            else
+            {
+                m.is_new = true;
+            }
+
             m.tox_friendpubkey = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
             m.direction = 0; // msg received
             m.TOX_MESSAGE_TYPE = 0;
@@ -5217,12 +5246,28 @@ public class MainActivity extends AppCompatActivity
                 // update "new" status on friendlist fragment
                 FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
                 HelperFriend.update_single_friend_in_friendlist_view(f2);
+
+                if (f2.notification_silent)
+                {
+                    do_notification = false;
+                }
             }
             catch (Exception e)
             {
                 e.printStackTrace();
                 Log.i(TAG, "update *new* status:EE1:" + e.getMessage());
             }
+
+            // --- notification ---
+            // --- notification ---
+            // --- notification ---
+            if (do_notification)
+            {
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
+            }
+            // --- notification ---
+            // --- notification ---
+            // --- notification ---
 
             final Message m2 = m;
 
