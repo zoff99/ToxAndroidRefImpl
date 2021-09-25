@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -48,7 +49,8 @@ import java.util.List;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
 
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_PUSH_MSG_APP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_PUSH_MSG_APP_PLAYSTORE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_PUSH_MSG_APP_WEBDOWNLOAD;
 
 public class SettingsActivity extends AppCompatPreferenceActivity
 {
@@ -306,16 +308,38 @@ public class SettingsActivity extends AppCompatPreferenceActivity
             });
 
             Preference pref_download_push_msg_app = (Preference) findPreference("download_push_msg_app");
-            pref_download_push_msg_app.setSummary(TOX_PUSH_MSG_APP);
+            pref_download_push_msg_app.setSummary(TOX_PUSH_MSG_APP_PLAYSTORE);
 
             pref_download_push_msg_app.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
             {
                 @Override
                 public boolean onPreferenceClick(Preference preference)
                 {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(TOX_PUSH_MSG_APP));
-                    startActivity(i);
+                    String[] destinations = {"Google Play", "Github"};
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+                    builder.setTitle("Download from:");
+                    builder.setItems(destinations, new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which)
+                        {
+                            if (which == 1)
+                            {
+                                Intent i = new Intent(Intent.ACTION_VIEW);
+                                i.setData(Uri.parse(TOX_PUSH_MSG_APP_WEBDOWNLOAD));
+                                startActivity(i);
+                            }
+                            else
+                            {
+                                Intent i = new Intent(Intent.ACTION_VIEW);
+                                i.setData(Uri.parse(TOX_PUSH_MSG_APP_PLAYSTORE));
+                                startActivity(i);
+                            }
+                        }
+                    });
+                    builder.show();
+
                     return true;
                 }
             });
