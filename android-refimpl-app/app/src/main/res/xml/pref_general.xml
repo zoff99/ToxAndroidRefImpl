@@ -7,7 +7,7 @@
         android:title="@string/pref_title_start_on_boot" />
 
     <SwitchPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="use_push_service"
         android:summary="@string/pref_description_use_push_service"
         android:title="@string/pref_title_use_push_service" />

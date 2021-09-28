@@ -1174,12 +1174,12 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__use_push_service = settings.getBoolean("use_push_service", false);
+            PREF__use_push_service = settings.getBoolean("use_push_service", true);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__use_push_service = false;
+            PREF__use_push_service = true;
         }
 
         // prefs ----------
@@ -2352,12 +2352,12 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__use_push_service = settings.getBoolean("use_push_service", false);
+            PREF__use_push_service = settings.getBoolean("use_push_service", true);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__use_push_service = false;
+            PREF__use_push_service = true;
         }
 
         try
