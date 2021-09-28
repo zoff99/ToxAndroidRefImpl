@@ -201,26 +201,8 @@ public class HelperConference
 
     public static String tox_conference_peer_get_public_key__wrapper(long conference_number, long peer_number)
     {
-        if (MainActivity.cache_peernum_pubkey.containsKey("" + conference_number + ":" + peer_number))
-        {
-            // Log.i(TAG, "cache hit:2");
-            return MainActivity.cache_peernum_pubkey.get("" + conference_number + ":" + peer_number);
-        }
-        else
-        {
-            if (MainActivity.cache_peernum_pubkey.size() >= 100)
-            {
-                // TODO: bad!
-                MainActivity.cache_peernum_pubkey.clear();
-            }
-
-            String result = MainActivity.tox_conference_peer_get_public_key(conference_number, peer_number);
-            if ((conference_number != -1) && (peer_number != -1))
-            {
-                MainActivity.cache_peernum_pubkey.put("" + conference_number + ":" + peer_number, result);
-            }
-            return result;
-        }
+        String result = MainActivity.tox_conference_peer_get_public_key(conference_number, peer_number);
+        return result;
     }
 
     public static String tox_conference_peer_get_name__wrapper(String conference_identifier, String peer_pubkey)
@@ -407,6 +389,9 @@ public class HelperConference
         t.start();
     }
 
+    /*
+     this is a bit costly, asking for pubkeys of all conference peers
+     */
     static long get_peernum_from_peer_pubkey(String conference_id, String peer_pubkey)
     {
         try

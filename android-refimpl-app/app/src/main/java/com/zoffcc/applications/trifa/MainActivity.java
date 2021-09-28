@@ -470,7 +470,7 @@ public class MainActivity extends AppCompatActivity
     // ---- lookup cache ----
     static Map<String, Long> cache_pubkey_fnum = new HashMap<String, Long>();
     static Map<Long, String> cache_fnum_pubkey = new HashMap<Long, String>();
-    static Map<String, String> cache_peernum_pubkey = new HashMap<String, String>();
+    // static Map<String, String> cache_peernum_pubkey = new HashMap<String, String>();
     // static Map<String, String> cache_peername_pubkey = new HashMap<String, String>();
     static Map<String, String> cache_peername_pubkey2 = new HashMap<String, String>();
     static Map<String, Long> cache_confid_confnum = new HashMap<String, Long>();
@@ -5840,7 +5840,7 @@ public class MainActivity extends AppCompatActivity
                 // workaround to fix a bug, where messages would appear to be from the wrong user in a conference
                 // because toxcore changes all "peer numbers" when somebody leaves the confrence
                 // but this can happen very often. so for now, clear cache every time
-                cache_peernum_pubkey.clear();
+                // cache_peernum_pubkey.clear();
                 cache_peername_pubkey2.clear();
                 // --------------- BAD !! ---------------
                 // --------------- BAD !! ---------------
@@ -5973,7 +5973,7 @@ public class MainActivity extends AppCompatActivity
             // workaround to fix a bug, where messages would appear to be from the wrong user in a conference
             // because toxcore changes all "peer numbers" when somebody leaves the confrence
             // but this can happen very often. so for now, clear cache every time
-            cache_peernum_pubkey.clear();
+            // cache_peernum_pubkey.clear();
             cache_peername_pubkey2.clear();
             // --------------- BAD !! ---------------
             // --------------- BAD !! ---------------
@@ -6068,7 +6068,7 @@ public class MainActivity extends AppCompatActivity
                 // workaround to fix a bug, where messages would appear to be from the wrong user in a conference
                 // because toxcore changes all "peer numbers" when somebody leaves the confrence
                 // but this can happen very often. so for now, clear cache every time
-                cache_peernum_pubkey.clear();
+                // cache_peernum_pubkey.clear();
                 cache_peername_pubkey2.clear();
                 // --------------- BAD !! ---------------
                 // --------------- BAD !! ---------------
