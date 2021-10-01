@@ -51,4 +51,43 @@
     <string name="pref_title_use_incognito_keyboard">Użyj klawiatury prywatnej</string>
     <string name="pref_description_orbot_enabled">Musisz zainstalować Orbot aby tego użyć.
 \nZmiana wymaga PONOWNEGO URUCHOMIENIA!</string>
+    <string name="pref_title_X_use_native_audio_play">Natywny system audio</string>
+    <string name="pref_description_X_zoom_incoming_video">umożliwiać powiększanie okna wideo za pomocą szczypania. To nie działa w pełni!</string>
+    <string name="pref_title_X_zoom_incoming_video">Powiększ okno wideo</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Jeśli występują problemy z wyłączaniem ekranu podczas połączenia Audiocall, należy ustawić tę opcję na wyłączoną</string>
+    <string name="pref_title_allow_screen_off_in_audio_call">Wyłącz ekran</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">udostępnianie plików w TRIfA za pomocą funkcji udostępniania intencji.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">udostępnianie plików</string>
+    <string name="pref_description_U_keep_nospam">zachowaj wartość NoSpam. To nie jest bezpieczne, aktywuj tylko jeśli wiesz co robisz!</string>
+    <string name="pref_title_U_keep_nospam">utrzymywać NoSpam</string>
+    <string name="pref_description_local_discovery_enabled">użyj węzłów w lokalnej sieci LAN do uruchomienia systemu</string>
+    <string name="pref_title_local_discovery_enabled">Wykrywanie sieci LAN</string>
+    <string name="pref_description_conference_show_system_messages">wyświetlanie komunikatów systemowych w konferencjach</string>
+    <string name="pref_title_conference_show_system_messages">Komunikaty systemowe</string>
+    <string name="pref_description_set_fps">spróbuj ustawić 15fps video framerate, może to spowodować awarię na niektórych telefonach</string>
+    <string name="pref_title_set_fps">Ustaw fps</string>
+    <string name="pref_title_download_push_msg_app">Pobierz aplikację Push Message App</string>
+    <string name="pref_description_use_push_service">UWAGA: Będzie korzystać z Google FCM lub Unified Push do oszczędzania baterii i przepustowości.
+\nAplikacja będzie używać HTTPS: połączenia z niektórymi serwerami PUSH bezpośrednio (nie przez Tox).
+\nAktywuj tę funkcję tylko wtedy, gdy to akceptujesz.
+\nTa funkcja wymaga zainstalowanej aplikacji Tox Push Message App.</string>
+    <string name="pref_title_use_push_service">Użyj usługi Push</string>
+    <string name="pref_description_compact_chatlist">Wyświetlanie wiadomości czatu bardziej kompaktowo, oszczędzając miejsce</string>
+    <string name="pref_title_compact_chatlist">Kompaktowa lista czatów</string>
+    <string name="pref_description_compact_friendlist">Spraw, aby lista kontaktów była bardziej zwarta, jeśli masz dużą listę kontaktów</string>
+    <string name="pref_title_compact_friendlist">Kompaktowa lista kontaktów</string>
+    <string name="pref_description_window_security">Włączenie tego ustawienia powoduje dodanie FLAG_SECURE do działań
+\nUniemożliwia ono wykonywanie zrzutów ekranu i nagrywanie ekranu oraz wyświetlanie zawartości w podglądzie przypomnień</string>
+    <string name="pref_title_window_security">Wyłącz możliwość robienia Zrzutu z ekranu</string>
+    <string name="pref_description_use_incognito_keyboard">wyłącz, aby klawiatura nie uczyła się na podstawie wpisywanych słów</string>
+    <string name="pref_description_start_on_boot">uruchomić aplikację po starcie systemu.
+\nGoogle już na to nie pozwala, począwszy od Androida 10</string>
+    <string name="pref_title_start_on_boot">Uruchom przy starcie</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">Koder H264 powinien używać ramek odświeżania wewnętrznego</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 odświeżanie wewnętrzne</string>
+    <string name="pref_title_fps_half">Najniższy fps</string>
+    <string name="pref_title_orbot_enabled">Włącz pośrednika TOR</string>
+    <string name="pref_description_force_udp_only">wymusi to tryb tylko UDP, niektóre kontakty mogą być nieosiągalne przy włączonym tym ustawieniu
+\nZmiana wymaga RESTARTU!</string>
+    <string name="title_activity_conferenceinfo">Szczegóły</string>
 </resources>
