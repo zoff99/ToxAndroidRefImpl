@@ -110,7 +110,7 @@ dependencyVerification {
             'com.github.lawloretienne:discreteslider:0.0.9:discreteslider-0.0.9.aar:2a5b1a28060d20e070ff8ee2c9538e4427e04d56467453813b5efa05ea9390d1',
             'com.github.medyo:android-about-page:1.2.4:android-about-page-1.2.4.aar:15108c8bdedf5975d2aa60604107017109a4ad3640e0e95fa97fd438d347eb5c',
             'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0:pkgs_armchaAutoLinkTextView-0.3.0.aar:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
-            'com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1:pkgs_guardianprojectIOCipher-0.4.2.1.aar:5556e9bf9e6d1860b368b78ade385957e72e6b6bea7b2354b563b4e7d7286f23',
+            'com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.100:pkgs_guardianprojectIOCipher-0.4.2.100.aar:356718c304ad34fcd1a840dc01761cb0f7a7ceeb225925a5d377076346ab708a',
             'com.github.zoff99:pkgs_guardianprojectNetcipher-okhttp:2.0.0-alpha1:pkgs_guardianprojectNetcipher-okhttp-2.0.0-alpha1.jar:548b24763c57d273e1e3650e9974644f91c6a79350961905476456b6a485c905',
             'com.github.zoff99:pkgs_guardianprojectNetcipher:2.0.0-beta1:pkgs_guardianprojectNetcipher-2.0.0-beta1.jar:ea12ebfc601ac8b6c5d2227367f971ee1059f3901b7791bd291b65dcefb53e5a',
             'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0:pkgs_hotchemiPermissionsdispatcher-processor-3.2.0.jar:f7374192b263a94f63186dee91cb954c9369122519e4f08e055b72969699b52d',
