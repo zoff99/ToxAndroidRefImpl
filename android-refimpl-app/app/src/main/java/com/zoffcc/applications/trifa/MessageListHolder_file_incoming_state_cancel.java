@@ -342,7 +342,15 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 resize_viewgroup(ft_preview_container, 60);
                 resize_view(ft_preview_image, 60);
 
-                ft_preview_image.setImageDrawable(d3);
+                // ft_preview_image.setImageDrawable(d3);
+                GlideApp.
+                        with(context).
+                        load(d3).
+                        diskCacheStrategy(DiskCacheStrategy.NONE).
+                        skipMemoryCache(false).
+                        priority(Priority.LOW).
+                        placeholder(R.drawable.round_loading_animation).
+                        into(ft_preview_image);
 
                 if (PREF__allow_open_encrypted_file_via_intent)
                 {

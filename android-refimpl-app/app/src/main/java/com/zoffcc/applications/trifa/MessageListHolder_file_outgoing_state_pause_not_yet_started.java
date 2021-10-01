@@ -449,7 +449,15 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                     backgroundColor(Color.TRANSPARENT).
                     color(Color.parseColor("#AA000000")).sizeDp(50);
 
-            ft_preview_image.setImageDrawable(d3);
+            // ft_preview_image.setImageDrawable(d3);
+            GlideApp.
+                    with(context).
+                    load(d3).
+                    diskCacheStrategy(DiskCacheStrategy.NONE).
+                    skipMemoryCache(false).
+                    priority(Priority.LOW).
+                    placeholder(R.drawable.round_loading_animation).
+                    into(ft_preview_image);
         }
     }
 
