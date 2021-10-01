@@ -3146,32 +3146,12 @@ public class HelperGeneric
         {
             Log.i(TAG, "VFS:unmount:start[2] ...");
 
-            Runnable myRunnable = new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    if (vfs.isMounted())
-                    {
-                        Log.i(TAG,
-                              "VFS:unmount:" + Thread.currentThread().getId() + ":" + Thread.currentThread().getName());
-                        vfs.unmount();
-                    }
-                    Log.i(TAG, "VFS:unmount:OK");
-                }
-            };
-            //if (main_handler_s != null)
-            //{
-            //    main_handler_s.post(myRunnable);
-            //}
-
             if (vfs.isMounted())
             {
-                Log.i(TAG, "VFS:unmount:" + Thread.currentThread().getId() + ":" + Thread.currentThread().getName());
+                Log.i(TAG, "VFS:unmount:2:" + Thread.currentThread().getId() + ":" + Thread.currentThread().getName());
                 vfs.unmount();
             }
-            Log.i(TAG, "VFS:unmount:OK");
-
+            Log.i(TAG, "VFS:unmount:2:OK");
 
             Thread.sleep(10);
             Log.i(TAG, "VFS:unmount:END");
