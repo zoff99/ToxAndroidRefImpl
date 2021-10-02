@@ -5245,7 +5245,8 @@ public class MainActivity extends AppCompatActivity
             {
                 // update "new" status on friendlist fragment
                 FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                HelperFriend.update_single_friend_in_friendlist_view(f2);
+                // HelperFriend.update_single_friend_in_friendlist_view(f2);
+                HelperFriend.add_all_friends_clear_wrapper(0);
 
                 if (f2.notification_silent)
                 {
@@ -5741,7 +5742,8 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "conference_message_cb:new_msg_id=" + new_msg_id);
         }
 
-        HelperConference.update_single_conference_in_friendlist_view(conf_temp);
+        // HelperConference.update_single_conference_in_friendlist_view(conf_temp);
+        HelperFriend.add_all_friends_clear_wrapper(0);
 
         if (do_notification)
         {

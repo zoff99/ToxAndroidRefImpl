@@ -460,6 +460,83 @@ public class FriendListFragment extends Fragment
                             }
                             // ------------- add friends that were added recently first -------------
 
+                            // ------------- add rest of friends (with new messages) -------------
+                            List<FriendList> fl2m = orma.selectFromFriendList().
+                                    is_relayNotEq(true).
+                                    added_timestampLe(System.currentTimeMillis() - ONE_HOUR_IN_MS).
+                                    orderByTOX_CONNECTION_on_offDesc().
+                                    orderByNotification_silentAsc().
+                                    orderByLast_online_timestampDesc().
+                                    toList();
+
+                            if (fl2m != null)
+                            {
+                                // Log.i(TAG, "add_all_friends_clear:fl.size=" + fl.size());
+                                if (fl2m.size() > 0)
+                                {
+                                    int i = 0;
+                                    for (i = 0; i < fl2m.size(); i++)
+                                    {
+                                        FriendList n = FriendList.deep_copy(fl2m.get(i));
+
+                                        try
+                                        {
+                                            int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
+                                                    n.tox_public_key_string).and().is_newEq(true).count();
+                                            if (new_messages_count > 0)
+                                            {
+                                                CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                                cfac.is_friend = true;
+                                                cfac.friend_item = n;
+                                                adapter.add_item(cfac);
+                                                // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+                                    }
+                                }
+                            }
+                            // ------------- add rest of friends (with new messages) -------------
+
+                            // ------------- add conferences (with new messages) -------------
+                            List<ConferenceDB> confsm = orma.selectFromConferenceDB().
+                                    orderByConference_activeDesc().
+                                    orderByNotification_silentAsc().
+                                    toList();
+
+                            if (confsm != null)
+                            {
+                                if (confsm.size() > 0)
+                                {
+                                    int i = 0;
+                                    for (i = 0; i < confsm.size(); i++)
+                                    {
+                                        ConferenceDB n = ConferenceDB.deep_copy(confsm.get(i));
+
+                                        try
+                                        {
+                                            int new_messages_count = orma.selectFromConferenceMessage().
+                                                    conference_identifierEq(n.conference_identifier).and().is_newEq(
+                                                    true).count();
+
+                                            if (new_messages_count > 0)
+                                            {
+                                                CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                                cfac.is_friend = false;
+                                                cfac.conference_item = n;
+                                                adapter.add_item(cfac);
+                                                // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                            }
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+                                    }
+                                }
+                            }
+                            // ------------- add conferences (with new messages) -------------
 
                             // ------------- add rest of friends  -------------
                             List<FriendList> fl2 = orma.selectFromFriendList().
@@ -479,16 +556,31 @@ public class FriendListFragment extends Fragment
                                     for (i = 0; i < fl2.size(); i++)
                                     {
                                         FriendList n = FriendList.deep_copy(fl2.get(i));
-                                        CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                                        cfac.is_friend = true;
-                                        cfac.friend_item = n;
-                                        adapter.add_item(cfac);
-                                        // Log.i(TAG, "add_all_friends_clear:add:" + n);
+
+                                        int new_messages_count = 0;
+                                        try
+                                        {
+                                            new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
+                                                    n.tox_public_key_string).and().is_newEq(true).count();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+
+                                        if (new_messages_count == 0)
+                                        {
+                                            CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                            cfac.is_friend = true;
+                                            cfac.friend_item = n;
+                                            adapter.add_item(cfac);
+                                            // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                        }
                                     }
                                 }
                             }
                             // ------------- add rest of friends  -------------
 
+                            // ------------- add conferences -------------
                             List<ConferenceDB> confs = orma.selectFromConferenceDB().
                                     orderByConference_activeDesc().
                                     orderByNotification_silentAsc().
@@ -502,15 +594,30 @@ public class FriendListFragment extends Fragment
                                     for (i = 0; i < confs.size(); i++)
                                     {
                                         ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
-                                        CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                                        cfac.is_friend = false;
-                                        cfac.conference_item = n;
-                                        adapter.add_item(cfac);
-                                        // Log.i(TAG, "add_all_friends_clear:add:" + n);
+
+                                        int new_messages_count = 0;
+                                        try
+                                        {
+                                            new_messages_count = orma.selectFromConferenceMessage().
+                                                    conference_identifierEq(n.conference_identifier).and().is_newEq(
+                                                    true).count();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+
+                                        if (new_messages_count == 0)
+                                        {
+                                            CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                            cfac.is_friend = false;
+                                            cfac.conference_item = n;
+                                            adapter.add_item(cfac);
+                                            // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                        }
                                     }
                                 }
                             }
-
+                            // ------------- add conferences -------------
                         }
                     }
                 }

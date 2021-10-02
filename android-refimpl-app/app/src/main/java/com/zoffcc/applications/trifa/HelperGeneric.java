@@ -435,7 +435,8 @@ public class HelperGeneric
             // Log.i(TAG, "conference_message_add_from_sync:new_msg_id=" + new_msg_id);
         }
 
-        HelperConference.update_single_conference_in_friendlist_view(conf_temp);
+        // HelperConference.update_single_conference_in_friendlist_view(conf_temp);
+        HelperFriend.add_all_friends_clear_wrapper(0);
 
         if (do_notification)
         {
@@ -2237,7 +2238,8 @@ public class HelperGeneric
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                HelperFriend.update_single_friend_in_friendlist_view(f);
+                // HelperFriend.update_single_friend_in_friendlist_view(f);
+                HelperFriend.add_all_friends_clear_wrapper(0);
 
                 if (f.notification_silent)
                 {
@@ -2359,7 +2361,8 @@ public class HelperGeneric
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                HelperFriend.update_single_friend_in_friendlist_view(f);
+                // HelperFriend.update_single_friend_in_friendlist_view(f);
+                HelperFriend.add_all_friends_clear_wrapper(0);
 
                 if (f.notification_silent)
                 {
@@ -2489,7 +2492,8 @@ public class HelperGeneric
             {
                 // update "new" status on friendlist fragment
                 FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
-                HelperFriend.update_single_friend_in_friendlist_view(f);
+                // HelperFriend.update_single_friend_in_friendlist_view(f);
+                HelperFriend.add_all_friends_clear_wrapper(0);
 
                 if (f.notification_silent)
                 {
