@@ -249,7 +249,7 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
             {
                 mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
             }
-            if (mimeType.startsWith("image"))
+            if (mimeType.startsWith("image/"))
             {
                 is_image = true;
             }
