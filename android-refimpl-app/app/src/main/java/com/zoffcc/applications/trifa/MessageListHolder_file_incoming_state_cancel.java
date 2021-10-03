@@ -117,6 +117,20 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         ft_export_button = (ImageButton) itemView.findViewById(R.id.ft_export_button);
     }
 
+    public void DetachedFromWindow()
+    {
+        // Log.i(TAG, "DetachedFromWindow");
+
+        try
+        {
+            GlideApp.
+                    with(context).clear(ft_preview_image);
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
     @SuppressLint("ClickableViewAccessibility")
     public void bindMessageList(Message m)
     {
@@ -238,10 +252,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             }
 
             boolean is_image = false;
+            boolean is_video = false;
             try
             {
                 String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
-                if (mimeType.startsWith("image"))
+                if (mimeType.startsWith("image/"))
                 {
                     is_image = true;
                 }
@@ -249,6 +264,22 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             catch (Exception e)
             {
                 e.printStackTrace();
+            }
+
+            if (!is_image)
+            {
+                try
+                {
+                    String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+                    if (mimeType.startsWith("video/"))
+                    {
+                        is_video = true;
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
 
             // Log.i(TAG, "getView:033:STATE:CANCEL:OK:is_image=" + is_image);
@@ -315,6 +346,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 new RoundedCorners((int) dp2px(20)));
                         // apply(glide_options).
 
+                        // loadImageFromUri(context, Uri.fromFile(new File(message2.filename_fullpath)), ft_preview_image,
+                        //                  true);
                         GlideApp.
                                 with(context).
                                 load(f2).
@@ -330,6 +363,33 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     {
                         e.printStackTrace();
                     }
+                }
+            }
+            else if (is_video)  // ---- a video ----
+            {
+                try
+                {
+                    final Drawable d4 = new IconicsDrawable(context).
+                            icon(GoogleMaterial.Icon.gmd_ondemand_video).
+                            backgroundColor(Color.TRANSPARENT).
+                            color(Color.parseColor("#AA000000")).sizeDp(50);
+
+                    resize_viewgroup(ft_preview_container, 60);
+                    resize_view(ft_preview_image, 60);
+
+                    GlideApp.
+                            with(context).
+                            load(d4).
+                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            skipMemoryCache(false).
+                            priority(Priority.LOW).
+                            into(ft_preview_image);
+
+                    ft_preview_image.setOnTouchListener(null);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
             }
             else // ---- not an image ----
