@@ -20,6 +20,8 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.ImageView;
@@ -28,8 +30,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+import com.mikepenz.google_material_typeface_library.GoogleMaterial;
+import com.mikepenz.iconics.IconicsDrawable;
 
-import de.hdodenhof.circleimageview.CircleImageView;
 import info.guardianproject.iocipher.FileInputStream;
 
 public class GlideUtils
@@ -38,43 +41,66 @@ public class GlideUtils
 
     public static RequestOptions noDiskCacheOptions = new RequestOptions().diskCacheStrategy(DiskCacheStrategy.NONE);
 
-    public static boolean loadVideoFromUri(Context context, Uri uri, ImageView imageView, boolean vfs)
+    public static boolean loadVideoFromUri(Context context, String filename_with_path, ImageView imageView, boolean vfs)
     {
         if (vfs)
         {
             try
             {
-                info.guardianproject.iocipher.File fileVideo = new info.guardianproject.iocipher.File(uri.getPath());
+                info.guardianproject.iocipher.File fileVideo = new info.guardianproject.iocipher.File(
+                        filename_with_path);
+
+                Log.w(TAG, "trying to load video: " + filename_with_path);
+
                 if (fileVideo.exists())
                 {
-                    Glide.with(context).load(new info.guardianproject.iocipher.FileInputStream(fileVideo)).apply(
-                            noDiskCacheOptions).into(imageView);
+                    final Drawable d3 = new IconicsDrawable(context).
+                            icon(GoogleMaterial.Icon.gmd_ondemand_video).
+                            backgroundColor(Color.TRANSPARENT).
+                            color(Color.parseColor("#AA000000")).sizeDp(60);
+
+                    long interval = 10 * 1000;
+                    RequestOptions options = new RequestOptions().frame(interval);
+
+                    GlideApp.
+                            with(context).
+                            load(fileVideo).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(false).
+                            priority(Priority.LOW).
+                            placeholder(R.drawable.round_loading_animation).
+                            error(d3).
+                            into(imageView);
+
                     return true;
                 }
                 return false;
             }
             catch (Exception e)
             {
-                Log.w(TAG, "unable to load image: " + uri.toString());
+                Log.w(TAG, "unable to load video: " + filename_with_path);
             }
         }
         else
         {
-            Glide.with(context).load(uri).into(imageView);
+            Glide.with(context).
+                    load(new java.io.File(filename_with_path)).
+                    apply(noDiskCacheOptions).
+                    priority(Priority.LOW).
+                    into(imageView);
             return true;
         }
 
         return false;
     }
 
-    public static void loadImageFromUri(Context context, Uri uri, CircleImageView imageView, boolean vfs)
+    public static void loadImageFromUri(Context context, Uri uri, ImageView imageView, boolean vfs)
     {
         if (vfs)
         {
             try
             {
-
-                Log.i(TAG, "loadImageFromUri:uri=" + uri.getPath());
+                // Log.i(TAG, "loadImageFromUri:uri=" + uri.getPath());
 
                 info.guardianproject.iocipher.File fileImage = new info.guardianproject.iocipher.File(uri.getPath());
                 if (fileImage.exists())
@@ -85,8 +111,8 @@ public class GlideUtils
                     GlideApp.
                             with(context).
                             load(fis).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            priority(Priority.HIGH).
+                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            priority(Priority.LOW).
                             skipMemoryCache(false).
                             apply(glide_options).
                             into(imageView);
