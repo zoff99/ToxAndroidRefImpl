@@ -28,7 +28,7 @@ import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
 
 @GlideModule
-public class MyGlideModule extends AppGlideModule
+public final class MyGlideModule extends AppGlideModule
 {
     private static final String TAG = "trifa.MyGlideModule";
 
@@ -44,6 +44,7 @@ public class MyGlideModule extends AppGlideModule
     {
         super.registerComponents(context, glide, registry);
         Log.i(TAG, "registerComponents");
+        //
         // -- old: migrate away from this --
         registry.prepend(info.guardianproject.iocipher.File.class, java.io.FileInputStream.class,
                          new com.zoffcc.applications.trifa.FileLoader2.StreamFactory());
