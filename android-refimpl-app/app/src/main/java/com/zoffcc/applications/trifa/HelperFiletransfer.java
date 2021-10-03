@@ -84,7 +84,7 @@ public class HelperFiletransfer
                         AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB * 1024 *
                         1024) // if file size is smaller than 12 MByte accept FT
                     {
-                        if (mimeType.startsWith("image"))
+                        if (mimeType.startsWith("image/"))
                         {
                             if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
                             {
@@ -112,7 +112,7 @@ public class HelperFiletransfer
                         AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB * 1024 *
                         1024) // if file size is smaller than 40 MByte accept FT
                     {
-                        if (mimeType.startsWith("video"))
+                        if (mimeType.startsWith("video/"))
                         {
                             if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
                             {
