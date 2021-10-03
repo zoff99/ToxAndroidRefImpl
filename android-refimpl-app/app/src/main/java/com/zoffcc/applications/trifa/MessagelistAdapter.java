@@ -297,6 +297,18 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     }
 
     @Override
+    public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder)
+    {
+        try
+        {
+            ((MessageListHolder_file_incoming_state_cancel) holder).DetachedFromWindow();
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
+    @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
         // Log.i(TAG, "onBindViewHolder:position=" + position);
