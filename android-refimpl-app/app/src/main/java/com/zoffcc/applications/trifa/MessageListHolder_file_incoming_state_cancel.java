@@ -117,20 +117,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         ft_export_button = (ImageButton) itemView.findViewById(R.id.ft_export_button);
     }
 
-    public void DetachedFromWindow()
-    {
-        // Log.i(TAG, "DetachedFromWindow");
-
-        try
-        {
-            GlideApp.
-                    with(context).clear(ft_preview_image);
-        }
-        catch (Exception e)
-        {
-        }
-    }
-
     @SuppressLint("ClickableViewAccessibility")
     public void bindMessageList(Message m)
     {

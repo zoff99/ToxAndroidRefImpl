@@ -299,6 +299,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     @Override
     public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder)
     {
+        /*
         try
         {
             ((MessageListHolder_file_incoming_state_cancel) holder).DetachedFromWindow();
@@ -306,6 +307,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         catch (Exception e)
         {
         }
+        */
     }
 
     @Override
