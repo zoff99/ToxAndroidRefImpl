@@ -374,17 +374,34 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                             backgroundColor(Color.TRANSPARENT).
                             color(Color.parseColor("#AA000000")).sizeDp(50);
 
-                    resize_viewgroup(ft_preview_container, 60);
-                    resize_view(ft_preview_image, 60);
+                    if (1 == 2 - 0)
+                    {
+                        info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
+                                message2.filename_fullpath);
 
-                    GlideApp.
-                            with(context).
-                            load(d4).
-                            diskCacheStrategy(DiskCacheStrategy.NONE).
-                            skipMemoryCache(false).
-                            priority(Priority.LOW).
-                            into(ft_preview_image);
+                        GlideApp.
+                                with(context).
+                                load(f2).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                skipMemoryCache(false).
+                                priority(Priority.LOW).
+                                placeholder(R.drawable.round_loading_animation).
+                                error(d4).
+                                into(ft_preview_image);
+                    }
+                    else
+                    {
+                        resize_viewgroup(ft_preview_container, 60);
+                        resize_view(ft_preview_image, 60);
 
+                        GlideApp.
+                                with(context).
+                                load(d4).
+                                diskCacheStrategy(DiskCacheStrategy.NONE).
+                                skipMemoryCache(false).
+                                priority(Priority.LOW).
+                                into(ft_preview_image);
+                    }
                     ft_preview_image.setOnTouchListener(null);
                 }
                 catch (Exception e)
