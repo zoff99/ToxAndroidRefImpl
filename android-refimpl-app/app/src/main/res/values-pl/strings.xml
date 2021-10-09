@@ -90,4 +90,63 @@
     <string name="pref_description_force_udp_only">wymusi to tryb tylko UDP, niektóre kontakty mogą być nieosiągalne przy włączonym tym ustawieniu
 \nZmiana wymaga RESTARTU!</string>
     <string name="title_activity_conferenceinfo">Szczegóły</string>
+    <string name="pref_description_X_eac_delay_ms">!! Eksperymentalne !!!
+\nOpóźnienie AEC w ms</string>
+    <string name="pref_description_X_audio_recording_frame_size">Domyślne ustawienie to 40 ms</string>
+    <string name="MainActivity_yes_button">Tak</string>
+    <string name="MainActivity_ok_take_me_there_button">OK, zabierz mnie tam</string>
+    <string name="pref_title_toxirc_muted_peers_01">Wycisz użytkowników Toxirc</string>
+    <string name="pref_description_toxirc_muted_peers_02">Wyciszony użytkownik 2 (pozostawić puste, jeśli nie jest używany)</string>
+    <string name="pref_title_add_friends_to_messages">Dodaj znajomych do wiadomości</string>
+    <string name="pref_title_X_battery_saving_timeout">Czas offline w trybie oszczędzania baterii</string>
+    <string name="pref_title_system_sync_settings">Ustawienia synchronizacji systemu</string>
+    <string name="pref_header_notifications">Powiadomienia</string>
+    <string name="pref_title_ringtone">Dzwonek</string>
+    <string name="pref_ringtone_silent">Cichy</string>
+    <string name="pref_title_vibrate">Wibracja</string>
+    <string name="add_friend_activity_add">Dodaj znajomego</string>
+    <string name="cancel">Anuluj</string>
+    <string name="MainActivity_settings">Ustawienia</string>
+    <string name="MainActivity_logout_login">Wyloguj/Zaloguj</string>
+    <string name="MainActivity_info_dialog_title">INFO</string>
+    <string name="MainActivity_away">Zaraz wróce</string>
+    <string name="MainActivity_busy">Zajęty</string>
+    <string name="MainActivity_no_button">Nie</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Token</string>
+    <string name="pref_description_X_misc_button_enabled">!! Eksperymentalne !!!
+\nDodaj Przycisk na Ekranie Połączenia, aby wysłać wiadomość</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">NIE synchronizuj AV</string>
+    <string name="pref_title_X_eac_delay_ms">Opóźnienie AEC</string>
+    <string name="pref_header_data_sync">Dane i synchronizacja</string>
+    <string name="pref_title_sound">Dzwięk</string>
+    <string name="MainActivity_profile">Profil</string>
+    <string name="MainActivity_about">O programie</string>
+    <string name="MainActivity_friend_is_typing">pisze</string>
+    <string name="pref_title_X_battery_saving_mode">Tryb oszczędzania baterii</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! Eksperymentalne !!!
+\nNie synchronizuj obrazu ani dźwięku. Użyj tego ustawienia, jeśli masz problemy z połączeniem video, jako ostateczność.</string>
+    <string name="pref_description_toxirc_muted_peers_03">Wyciszony użytkownik 3 (pozostawić puste, jeśli nie jest używany)</string>
+    <string name="add_friend_activity_help">Wklej Identyfikator Tox znajomego w polu tekstowym powyżej lub dotknij przycisku kodu QR, aby zeskanować kod znajomego za pomocą aparatu.</string>
+    <string name="MainActivity_add_to_batt_opt">Proszę dodać TRIfA do listy wyjątków dla optymalizacji baterii!</string>
+    <string name="pref_description_video_uv_reversed">Odwróć kolejność płaszczyzn w nagraniu wideo z kamery</string>
+    <string name="pref_description_X_use_native_audio_play">!! Eksperymentalne !!!
+\nUżyj natywnego systemu dźwięku do odtwarzania</string>
+    <string name="pref_description_X_battery_saving_mode">!! Eksperymentalne !!!
+\nPozwoli to zaoszczędzić trochę więcej baterii, ale wysyłanie i odbieranie wiadomości będzie trwało dłużej.
+\nPrawdopodobnie również inne złe efekty!</string>
+    <string name="pref_title_video_uv_reversed">Odwróć kamerę</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Bufor odtwarzania dźwięku</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Eksperymentalne !!!
+\nBufor odtwarzania audio w bajtach, ustaw na 0 aby wyłączyć ustawienia własne</string>
+    <string name="pref_description_toxirc_muted_peers_01">Wyciszony użytkownik 1 (pozostawić puste, jeśli nie jest używany)</string>
+    <string name="pref_description_min_audio_samplingrate_out">Domyślne ustawienie to 48000 Hz</string>
+    <string name="pref_title_sync_frequency">Częstotliwość synchronizacji</string>
+    <string name="pref_title_min_audio_samplingrate_out">Próbnik audio</string>
+    <string name="pref_title_X_audio_recording_frame_size">Audionagrywanie Rozmiar ramki</string>
+    <string name="pref_description_X_battery_saving_timeout">Domyślne ustawienie to 15 minut</string>
+    <string name="MainActivity_available">Dostępny</string>
+    <string name="pref_title_new_message_notifications">Powiadomienia nowej wiadomości</string>
+    <string name="MainActivity_maint">Konserwacja</string>
+    <string name="MainActivity_exit">Wyjście</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Otrzymano nowy token powiadomień. Używać tego tokena\?</string>
 </resources>
