@@ -318,7 +318,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         try
         {
             //**//manager.setMode(AudioManager.MODE_NORMAL);
-            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            set_calling_audio_mode();
             manager.setSpeakerphoneOn(true);
             Callstate.audio_speaker = true;
         }

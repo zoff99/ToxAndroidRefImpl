@@ -70,6 +70,7 @@ import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_c
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
@@ -406,7 +407,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
         try
         {
-            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            set_calling_audio_mode();
             manager.setSpeakerphoneOn(true);
             Callstate.audio_speaker = true;
         }

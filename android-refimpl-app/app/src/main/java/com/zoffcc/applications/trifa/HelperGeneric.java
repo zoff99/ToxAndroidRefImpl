@@ -84,6 +84,7 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__speakerphone_tweak;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -3060,7 +3061,14 @@ public class HelperGeneric
     {
         try
         {
-            MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            if (PREF__speakerphone_tweak)
+            {
+                MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_CALL);
+            }
+            else
+            {
+                MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            }
         }
         catch (Exception e)
         {

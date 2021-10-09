@@ -133,6 +133,12 @@
         android:title="@string/pref_title_set_fps" />
 
     <SwitchPreference
+        android:defaultValue="false"
+        android:key="speakerphone_tweak"
+        android:summary="@string/pref_description_speakerphone_tweak"
+        android:title="@string/pref_title_speakerphone_tweak" />
+
+    <SwitchPreference
         android:defaultValue="true"
         android:key="allow_screen_off_in_audio_call"
         android:summary="@string/pref_description_allow_screen_off_in_audio_call"
