@@ -662,9 +662,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             {
                 case KeyEvent.KEYCODE_ENTER:
                 case KeyEvent.KEYCODE_NUMPAD_ENTER:
-                    // Log.i(TAG, "dispatchKeyEvent:KEYCODE_ENTER");
-                    send_message_onclick(null);
-                    return true;
+                    if (!event.isShiftPressed())
+                    {
+                        // Log.i(TAG, "dispatchKeyEvent:KEYCODE_ENTER");
+                        send_message_onclick(null);
+                        return true;
+                    }
             }
         }
         return super.dispatchKeyEvent(event);
