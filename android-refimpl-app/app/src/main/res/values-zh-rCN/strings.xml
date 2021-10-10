@@ -373,4 +373,6 @@
     <string name="layout___conf_title">标题：</string>
     <string name="layout___conf_id">会议 ID：</string>
     <string name="title_activity_conferenceinfo">会议信息</string>
+    <string name="pref_title_speakerphone_tweak">修复通话扬声器</string>
+    <string name="pref_description_speakerphone_tweak">如果应用程序在通话中没有切换到扬声器，那么尝试激活这个修复。</string>
 </resources>
