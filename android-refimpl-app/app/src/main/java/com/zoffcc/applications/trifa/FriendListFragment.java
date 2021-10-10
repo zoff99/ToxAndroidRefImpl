@@ -411,7 +411,7 @@ public class FriendListFragment extends Fragment
         MainActivity.friend_list_fragment = this;
     }
 
-    synchronized void add_all_friends_clear(final int delay)
+    void add_all_friends_clear(final int delay)
     {
         // Log.i(TAG, "add_all_friends_clear");
 
