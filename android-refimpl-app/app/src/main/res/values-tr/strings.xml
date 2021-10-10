@@ -392,4 +392,6 @@
     <string name="layout___conf_title">Başlık:</string>
     <string name="layout___conf_id">Konferans kimliği:</string>
     <string name="title_activity_conferenceinfo">Konferans bilgisi</string>
+    <string name="pref_title_speakerphone_tweak">Aramalar için hoparlör düzeltmesi</string>
+    <string name="pref_description_speakerphone_tweak">Uygulama arama sırasında hoparlöre geçmezse, bu düzeltmeyi etkinleştirmeyi deneyin.</string>
 </resources>
