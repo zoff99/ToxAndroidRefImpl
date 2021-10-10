@@ -427,15 +427,15 @@ public class FriendListFragment extends Fragment
                     {
                         try
                         {
-                            Log.i(TAG, "semaphore_friendlist_ui_01.acquire");
+                            // Log.i(TAG, "semaphore_friendlist_ui_01.acquire");
                             semaphore_friendlist_ui_01.acquire();
-                            Log.i(TAG, "semaphore_friendlist_ui_01.acquire:DONE");
+                            // Log.i(TAG, "semaphore_friendlist_ui_01.acquire:DONE");
                         }
                         catch (InterruptedException e)
                         {
-                            Log.i(TAG, "semaphore_friendlist_ui_01.release:1");
+                            // Log.i(TAG, "semaphore_friendlist_ui_01.release:1");
                             semaphore_friendlist_ui_01.release();
-                            Log.i(TAG, "semaphore_friendlist_ui_01.release:1:DONE");
+                            // Log.i(TAG, "semaphore_friendlist_ui_01.release:1:DONE");
                             return;
                         }
 
@@ -638,9 +638,9 @@ public class FriendListFragment extends Fragment
                             catch (Exception e)
                             {
                             }
-                            Log.i(TAG, "semaphore_friendlist_ui_01.release:2");
+                            // Log.i(TAG, "semaphore_friendlist_ui_01.release:2");
                             semaphore_friendlist_ui_01.release();
-                            Log.i(TAG, "semaphore_friendlist_ui_01.release:2:DONE");
+                            // Log.i(TAG, "semaphore_friendlist_ui_01.release:2:DONE");
                         };
 
                         if (main_handler_s != null)
