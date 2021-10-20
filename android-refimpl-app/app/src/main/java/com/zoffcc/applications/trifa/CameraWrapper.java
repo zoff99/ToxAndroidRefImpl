@@ -1091,19 +1091,14 @@ public class CameraWrapper
             }
         }
 
-        if (1 == 2 - 1)
-        {
-            return output;
-        }
-
         // Rotate the U and V color components
         int size = imageWidth * imageHeight;
         i = size;
-        int j = i;
-        int uv = i / 4;
+        int j = size;
+        int uv = size / 4;
         for (int x = 0; x < (imageWidth / 2); x++)
         {
-            for (int y = (imageHeight / 2); y >= 0; y--)
+            for (int y = (imageHeight / 2) - 1; y >= 0; y--)
             {
                 try
                 {
@@ -1112,8 +1107,9 @@ public class CameraWrapper
                 }
                 catch (Exception e)
                 {
-                    // Log.i(TAG, "iiiiiii=" + i + " " + j + " " + uv + " " + y + " " + x);
-                    e.printStackTrace();
+                    //Log.i(TAG, "iiiiiii:i=" + i + " j=" + j + " uv=" + uv + " y=" + y + " x=" + x + " imageWidth=" +
+                    //           imageWidth);
+                    //e.printStackTrace();
                 }
                 i++;
             }

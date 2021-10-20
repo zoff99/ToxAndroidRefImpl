@@ -42,6 +42,7 @@ import androidx.annotation.RequiresApi;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
+import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 
 public class FrameAnalyser implements ImageAnalysis.Analyzer
@@ -149,7 +150,8 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
 
                                     try
                                     {
-
+                                        // TODO: reverse this process, to only reveal the foreground pixels
+                                        //       so that when an error occurs not the whole image is revealed my mistake!
                                         for (y = 0; y < mheight; y++)
                                         {
                                             for (x = 0; x < mwidth; x++)
@@ -179,11 +181,11 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                     }
                                     catch (Exception e)
                                     {
-                                        e.printStackTrace();
-                                        Log.i(TAG,
-                                              "iiiiii:y_pos=" + y_pos + " u_pos=" + u_pos + " v_pos=" + v_pos + " x=" +
-                                              x + " y=" + y + " x1=" + x1 + " y1=" + y1 + " y_size=" + y_size +
-                                              " u_v_size=" + u_v_size);
+                                        //e.printStackTrace();
+                                        //Log.i(TAG,
+                                        //      "iiiiii:y_pos=" + y_pos + " u_pos=" + u_pos + " v_pos=" + v_pos + " x=" +
+                                        //      x + " y=" + y + " x1=" + x1 + " y1=" + y1 + " y_size=" + y_size +
+                                        //      " u_v_size=" + u_v_size);
                                     }
 
                                     if (MainActivity.video_buffer_2 == null)
@@ -210,13 +212,13 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                     // MainActivity.video_buffer_2.put(YUV_420_888toNV21_x(buf2, 640, 480));
 
 
-                                    // buf3 = YUV420rotate90(buf2, buf3, 640, 480);
-                                    MainActivity.video_buffer_2.put(buf2);
+                                    buf3 = YUV420rotate90(buf2, buf3, 640, 480);
+                                    MainActivity.video_buffer_2.put(buf3);
 
-                                    int res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(buf2,
+                                    int res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(buf3,
                                                                                                        tox_friend_by_public_key__wrapper(
                                                                                                                Callstate.friend_pubkey),
-                                                                                                       640, 480,
+                                                                                                       480, 640,
                                                                                                        System.currentTimeMillis());
                                     // Log.i(TAG, "XXXX:res:" + res);
                                 }
