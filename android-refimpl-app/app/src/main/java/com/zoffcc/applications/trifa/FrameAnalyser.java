@@ -128,8 +128,8 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                         int off_v = (640 * 480) + (640 * 480) / 4;
                                         for (int k = 0; k < ((640 * 480) / 4); k++)
                                         {
-                                            buf2[off_u + k] = u_.get(k * image.getPlanes()[1].getPixelStride());
-                                            buf2[off_v + k] = v_.get(k * image.getPlanes()[2].getPixelStride());
+                                            buf2[off_u + k] = v_.get(k * image.getPlanes()[1].getPixelStride());
+                                            buf2[off_v + k] = u_.get(k * image.getPlanes()[2].getPixelStride());
                                         }
                                     }
                                     else
