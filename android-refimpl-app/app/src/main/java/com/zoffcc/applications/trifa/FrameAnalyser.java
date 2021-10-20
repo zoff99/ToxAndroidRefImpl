@@ -42,8 +42,7 @@ import androidx.annotation.RequiresApi;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
-import static com.zoffcc.applications.trifa.CameraWrapper.NV21rotate90;
-import static com.zoffcc.applications.trifa.CameraWrapper.YUV_420_888toNV21_x;
+import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 
 public class FrameAnalyser implements ImageAnalysis.Analyzer
@@ -108,10 +107,9 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                     ByteBuffer u_ = image.getPlanes()[1].getBuffer();
                                     ByteBuffer v_ = image.getPlanes()[2].getBuffer();
 
-                                    y_.rewind();
-                                    u_.rewind();
-                                    v_.rewind();
-
+                                    // y_.rewind();
+                                    // u_.rewind();
+                                    // v_.rewind();
                                     //Log.i(TAG, "format:0:" +image.getPlanes()[0].getBuffer().limit()+" "+image.getPlanes()[0].getRowStride()+" "+image.getPlanes()[0].getPixelStride());
                                     //Log.i(TAG, "format:1:" +image.getPlanes()[1].getBuffer().limit()+" "+image.getPlanes()[1].getRowStride()+" "+image.getPlanes()[1].getPixelStride());
                                     //Log.i(TAG, "format:2:" +image.getPlanes()[2].getBuffer().limit()+" "+image.getPlanes()[2].getRowStride()+" "+image.getPlanes()[2].getPixelStride());
@@ -134,8 +132,7 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                     }
                                     else
                                     {
-                                        u_.get(buf2, 640 * 480, (640 * 480) / 4);
-                                        v_.get(buf2, ((640 * 480) + (640 * 480) / 4), (640 * 480) / 4);
+                                        // TODO: should not get here
                                     }
 
                                     int y_size = 640 * 480;
@@ -194,6 +191,9 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                     MainActivity.video_buffer_2.rewind();
                                     // MainActivity.video_buffer_2.put(buf3);
                                     // MainActivity.video_buffer_2.put(YUV_420_888toNV21_x(buf2, 640, 480));
+
+
+                                    // buf3 = YUV420rotate90(buf2, buf3, 640, 480);
                                     MainActivity.video_buffer_2.put(buf2);
 
                                     int res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(buf2,

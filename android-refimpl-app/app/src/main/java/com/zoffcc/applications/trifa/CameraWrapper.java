@@ -1090,17 +1090,31 @@ public class CameraWrapper
                 output[i++] = data[y * imageWidth + x];
             }
         }
+
+        if (1 == 2 - 1)
+        {
+            return output;
+        }
+
         // Rotate the U and V color components
         int size = imageWidth * imageHeight;
-        i = size * 3 / 2;
+        i = size;
         int j = i;
         int uv = i / 4;
         for (int x = 0; x < (imageWidth / 2); x++)
         {
             for (int y = (imageHeight / 2); y >= 0; y--)
             {
-                output[i] = data[j + (y * (imageWidth / 2) + x)];
-                output[uv + i] = data[j + uv + (y * (imageWidth / 2) + x)];
+                try
+                {
+                    output[i] = data[j + (y * (imageWidth / 2) + x)];
+                    output[i + uv] = data[j + uv + (y * (imageWidth / 2) + x)];
+                }
+                catch (Exception e)
+                {
+                    // Log.i(TAG, "iiiiiii=" + i + " " + j + " " + uv + " " + y + " " + x);
+                    e.printStackTrace();
+                }
                 i++;
             }
         }
