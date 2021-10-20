@@ -42,7 +42,6 @@ import androidx.annotation.RequiresApi;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
-import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 
 public class FrameAnalyser implements ImageAnalysis.Analyzer
@@ -97,8 +96,8 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                 if (!Callstate.audio_call)
                                 {
                                     buf.rewind();
-                                    byte[] buf2 = new byte[((640 * 480 * 3) / 2)];
-                                    byte[] buf3 = new byte[((640 * 480 * 3) / 2)];
+                                    byte[] buf2 = new byte[((640 * 480) * 3 / 2)];
+                                    byte[] buf3 = new byte[((640 * 480) * 3 / 2)];
 
                                     // Log.i(TAG, "format:" + image.getPlanes().length + " " + image.getFormat() + " " +
                                     //           image.getImageInfo() + " " + image.getPlanes()[1].getPixelStride() +
@@ -139,34 +138,52 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                     int u_v_size = (640 * 480) / 4;
 
                                     float foregroundConfidence;
-                                    int y_pos;
-                                    int u_pos;
-                                    int v_pos;
-                                    int x1;
-                                    int y1;
-                                    for (int y = 0; y < mheight; y++)
-                                    {
-                                        for (int x = 0; x < mwidth; x++)
-                                        {
-                                            // Gets the confidence of the (x,y) pixel in the mask being in the foreground.
-                                            // 1.0 being foreground
-                                            // 0.0 background
-                                            // use values greater than the threshold value 0.9 (90% Confidence)
-                                            foregroundConfidence = buf.getFloat();
-                                            // Log.i(TAG, "x=" + x + " y=" + y + " float=" + foregroundConfidence);
-                                            if (foregroundConfidence < 0.9)
-                                            {
-                                                y1 = mwidth - x;
-                                                x1 = y;
-                                                y_pos = (y1 * 640) + x1;
-                                                u_pos = y_size + (y1 * 640 / 2) + (x1 / 2);
-                                                v_pos = y_size + u_v_size + (y1 * 640 / 2) + (x1 / 2);
+                                    int y_pos = 0;
+                                    int u_pos = 0;
+                                    int v_pos = 0;
+                                    int x1 = 0;
+                                    int y1 = 0;
+                                    int x = 0;
+                                    int y = 0;
+                                    int rotated_width;
 
-                                                // buf2[y_pos] = 0;
-                                                // buf2[u_pos] = (byte) 128;
-                                                // buf2[v_pos] = (byte) 128;
+                                    try
+                                    {
+
+                                        for (y = 0; y < mheight; y++)
+                                        {
+                                            for (x = 0; x < mwidth; x++)
+                                            {
+                                                // Gets the confidence of the (x,y) pixel in the mask being in the foreground.
+                                                // 1.0 being foreground
+                                                // 0.0 background
+                                                // use values greater than the threshold value 0.9 (90% Confidence)
+                                                foregroundConfidence = buf.getFloat();
+                                                // Log.i(TAG, "x=" + x + " y=" + y + " float=" + foregroundConfidence);
+                                                if (foregroundConfidence < 0.9)
+                                                {
+                                                    y1 = mwidth - x - 1;
+                                                    x1 = y;
+                                                    rotated_width = 640;
+                                                    y_pos = (y1 * rotated_width) + x1;
+                                                    u_pos = y_size + (y1 / 2 * rotated_width / 2) + (x1 / 2);
+                                                    v_pos = y_size + u_v_size + (y1 / 2 * rotated_width / 2) + (x1 / 2);
+
+                                                    buf2[y_pos] = 0;
+                                                    buf2[u_pos] = (byte) 128;
+                                                    buf2[v_pos] = (byte) 128;
+                                                    // Log.i(TAG, "iiiiii:" + y_pos + " " + u_pos + " " + v_pos);
+                                                }
                                             }
                                         }
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                        Log.i(TAG,
+                                              "iiiiii:y_pos=" + y_pos + " u_pos=" + u_pos + " v_pos=" + v_pos + " x=" +
+                                              x + " y=" + y + " x1=" + x1 + " y1=" + y1 + " y_size=" + y_size +
+                                              " u_v_size=" + u_v_size);
                                     }
 
                                     if (MainActivity.video_buffer_2 == null)
