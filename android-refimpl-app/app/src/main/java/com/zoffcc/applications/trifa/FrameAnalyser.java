@@ -193,7 +193,8 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
 
                                     MainActivity.video_buffer_2.rewind();
                                     // MainActivity.video_buffer_2.put(buf3);
-                                    MainActivity.video_buffer_2.put(YUV_420_888toNV21_x(buf2, 640, 480));
+                                    // MainActivity.video_buffer_2.put(YUV_420_888toNV21_x(buf2, 640, 480));
+                                    MainActivity.video_buffer_2.put(buf2);
 
                                     int res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(buf2,
                                                                                                        tox_friend_by_public_key__wrapper(
