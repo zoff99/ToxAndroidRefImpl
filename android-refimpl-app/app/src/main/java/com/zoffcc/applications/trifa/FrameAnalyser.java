@@ -43,6 +43,7 @@ import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
 import static com.zoffcc.applications.trifa.CameraWrapper.NV21rotate90;
+import static com.zoffcc.applications.trifa.CameraWrapper.YUV_420_888toNV21_x;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 
 public class FrameAnalyser implements ImageAnalysis.Analyzer
@@ -97,18 +98,45 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                 if (!Callstate.audio_call)
                                 {
                                     buf.rewind();
-                                    byte[] buf2 = new byte[((640 * 480 * 3) / 2) + 1000];
-                                    byte[] buf3 = new byte[((640 * 480 * 3) / 2) + 1000];
+                                    byte[] buf2 = new byte[((640 * 480 * 3) / 2)];
+                                    byte[] buf3 = new byte[((640 * 480 * 3) / 2)];
 
                                     // Log.i(TAG, "format:" + image.getPlanes().length + " " + image.getFormat() + " " +
-                                    //           image.getImageInfo());
+                                    //           image.getImageInfo() + " " + image.getPlanes()[1].getPixelStride() +
+                                    //           " " + image.getPlanes()[1].getRowStride());
                                     ByteBuffer y_ = image.getPlanes()[0].getBuffer();
                                     ByteBuffer u_ = image.getPlanes()[1].getBuffer();
                                     ByteBuffer v_ = image.getPlanes()[2].getBuffer();
 
+                                    y_.rewind();
+                                    u_.rewind();
+                                    v_.rewind();
+
+                                    //Log.i(TAG, "format:0:" +image.getPlanes()[0].getBuffer().limit()+" "+image.getPlanes()[0].getRowStride()+" "+image.getPlanes()[0].getPixelStride());
+                                    //Log.i(TAG, "format:1:" +image.getPlanes()[1].getBuffer().limit()+" "+image.getPlanes()[1].getRowStride()+" "+image.getPlanes()[1].getPixelStride());
+                                    //Log.i(TAG, "format:2:" +image.getPlanes()[2].getBuffer().limit()+" "+image.getPlanes()[2].getRowStride()+" "+image.getPlanes()[2].getPixelStride());
+
+                                    y_.rewind();
+                                    u_.rewind();
+                                    v_.rewind();
+
                                     y_.get(buf2, 0, 640 * 480);
-                                    // u_.get(buf2, 640 * 480, (640 * 480) / 4);
-                                    // v_.get(buf2, (640 * 480) + (640 * 480) / 4, (640 * 480) / 4);
+                                    if ((image.getPlanes()[1].getPixelStride() > 1) ||
+                                        (image.getPlanes()[2].getPixelStride() > 1))
+                                    {
+                                        int off_u = 640 * 480;
+                                        int off_v = (640 * 480) + (640 * 480) / 4;
+                                        for (int k = 0; k < ((640 * 480) / 4); k++)
+                                        {
+                                            buf2[off_u + k] = u_.get(k * image.getPlanes()[1].getPixelStride());
+                                            buf2[off_v + k] = v_.get(k * image.getPlanes()[2].getPixelStride());
+                                        }
+                                    }
+                                    else
+                                    {
+                                        u_.get(buf2, 640 * 480, (640 * 480) / 4);
+                                        v_.get(buf2, ((640 * 480) + (640 * 480) / 4), (640 * 480) / 4);
+                                    }
 
                                     int y_size = 640 * 480;
                                     int u_v_size = (640 * 480) / 4;
@@ -137,9 +165,9 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                                 u_pos = y_size + (y1 * 640 / 2) + (x1 / 2);
                                                 v_pos = y_size + u_v_size + (y1 * 640 / 2) + (x1 / 2);
 
-                                                buf2[y_pos] = 0;
-                                                //buf2[u_pos] = (byte)128;
-                                                //buf2[v_pos] = (byte)128;
+                                                // buf2[y_pos] = 0;
+                                                // buf2[u_pos] = (byte) 128;
+                                                // buf2[v_pos] = (byte) 128;
                                             }
                                         }
                                     }
@@ -159,15 +187,19 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                     {
                                         buf3 = new byte[buf2.length];
                                     }
-                                    buf3 = NV21rotate90(buf2, buf3, 640, 480);
+
+                                    // buf3 = NV21rotate90(YUV_420_888toNV21_x(buf2, 640, 480), buf3, 640, 480);
+                                    // buf3 = NV21rotate90(buf2, buf3, 640, 480);
 
                                     MainActivity.video_buffer_2.rewind();
-                                    MainActivity.video_buffer_2.put(buf3);
+                                    // MainActivity.video_buffer_2.put(buf3);
+                                    MainActivity.video_buffer_2.put(YUV_420_888toNV21_x(buf2, 640, 480));
 
-                                    int res = HelperGeneric.toxav_video_send_frame_wrapper(buf2,
-                                                                                           tox_friend_by_public_key__wrapper(
-                                                                                                   Callstate.friend_pubkey),
-                                                                                           480, 640, -1);
+                                    int res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(buf2,
+                                                                                                       tox_friend_by_public_key__wrapper(
+                                                                                                               Callstate.friend_pubkey),
+                                                                                                       640, 480,
+                                                                                                       System.currentTimeMillis());
                                     // Log.i(TAG, "XXXX:res:" + res);
                                 }
                             }

@@ -20,7 +20,6 @@ dependencyVerification {
             'androidx.constraintlayout:constraintlayout-core:1.0.1:constraintlayout-core-1.0.1.jar:f22caab977be42d06a0b5df1541d54e5f6af1a9699414f0eeb41f417e2b34072',
             'androidx.constraintlayout:constraintlayout:2.1.1:constraintlayout-2.1.1.aar:20879399bd732f67a3445a1ca060b78cb43164aca705b779e385ea2ebd0d3d79',
             'androidx.coordinatorlayout:coordinatorlayout:1.1.0:coordinatorlayout-1.1.0.aar:44a9e30abf56af1025c52a0af506fee9c4131aa55efda52f9fd9451211c5e8cb',
-            'androidx.core:core-ktx:1.6.0:core-ktx-1.6.0.aar:71ef02cee7eba1e905a7f37f313b50ba8a3bee0ec59a0f876d5a78860e1de963',
             'androidx.core:core:1.6.0:core-1.6.0.aar:875dbec888c91b05521575fd180cc08824d2c4d12b10b0261b4f9d6825214ef1',
             'androidx.cursoradapter:cursoradapter:1.0.0:cursoradapter-1.0.0.aar:a81c8fe78815fa47df5b749deb52727ad11f9397da58b16017f4eb2c11e28564',
             'androidx.customview:customview:1.0.0:customview-1.0.0.aar:20e5b8f6526a34595a604f56718da81167c0b40a7a94a57daa355663f2594df2',

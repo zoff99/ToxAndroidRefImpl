@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
+import android.media.Image;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.Display;
@@ -29,7 +30,7 @@ import android.view.SurfaceHolder;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.Arrays;
+import java.nio.ReadOnlyBufferException;
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.CallingActivity.device_orientation;
@@ -749,7 +750,7 @@ public class CameraWrapper
                                         data_new = new byte[data.length];
                                     }
                                     data_new = YV12rotate180(data, data_new, camera_preview_size2.width,
-                                                              camera_preview_size2.height);
+                                                             camera_preview_size2.height);
                                 }
                                 else
                                 {
@@ -762,7 +763,7 @@ public class CameraWrapper
                                         data_new = new byte[data.length];
                                     }
                                     data_new = NV21rotate180(data, data_new, camera_preview_size2.width,
-                                                              camera_preview_size2.height);
+                                                             camera_preview_size2.height);
                                 }
 
 
@@ -1078,6 +1079,34 @@ public class CameraWrapper
         return output;
     }
 
+    public static byte[] YUV420rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    {
+        // Rotate the Y luma
+        int i = 0;
+        for (int x = 0; x < imageWidth; x++)
+        {
+            for (int y = imageHeight - 1; y >= 0; y--)
+            {
+                output[i++] = data[y * imageWidth + x];
+            }
+        }
+        // Rotate the U and V color components
+        int size = imageWidth * imageHeight;
+        i = size * 3 / 2;
+        int j = i;
+        int uv = i / 4;
+        for (int x = 0; x < (imageWidth / 2); x++)
+        {
+            for (int y = (imageHeight / 2); y >= 0; y--)
+            {
+                output[i] = data[j + (y * (imageWidth / 2) + x)];
+                output[uv + i] = data[j + uv + (y * (imageWidth / 2) + x)];
+                i++;
+            }
+        }
+        return output;
+    }
+
     public static byte[] NV21rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
         int count = 0;
@@ -1202,6 +1231,145 @@ public class CameraWrapper
             }
         }
         return output;
+    }
+
+    static byte[] YUV_420_888toNV21_x(byte[] input, int imageWidth, int imageHeight)
+    {
+        int width = imageWidth;
+        int height = imageHeight;
+        int ySize = width * height;
+        int uvSize = width * height / 4;
+
+        byte[] nv21 = new byte[ySize + uvSize * 2];
+
+        int ySize1 = imageWidth * imageHeight;
+        int uSize1 = ySize / 4;
+        int vSize1 = ySize / 4;
+
+        ByteBuffer yBuffer = ByteBuffer.allocateDirect(ySize1);
+        ByteBuffer uBuffer = ByteBuffer.allocateDirect(uSize1);
+        ByteBuffer vBuffer = ByteBuffer.allocateDirect(vSize1);
+        yBuffer.put(input, 0, ySize1);
+        uBuffer.put(input, ySize1, uSize1);
+        vBuffer.put(input, ySize1 + uSize1, vSize1);
+
+        yBuffer.rewind();
+        uBuffer.rewind();
+        vBuffer.rewind();
+
+        int rowStride = width;
+        int pos = 0;
+        yBuffer.get(nv21, 0, ySize);
+        pos += ySize;
+        rowStride = width / 2;
+        int pixelStride = 1;
+
+        for (int row = 0; row < height / 2; row++)
+        {
+            for (int col = 0; col < width / 2; col++)
+            {
+                int vuPos = col * pixelStride + row * rowStride;
+                try
+                {
+                    nv21[pos++] = vBuffer.get(vuPos);
+                    nv21[pos++] = uBuffer.get(vuPos);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return nv21;
+    }
+
+    static byte[] YUV_420_888toNV21(Image image)
+    {
+
+        int width = image.getWidth();
+        int height = image.getHeight();
+        // Log.i(TAG, "iiiiii:" + width + " " + height);
+        int ySize = width * height;
+        int uvSize = width * height / 4;
+
+        byte[] nv21 = new byte[ySize + uvSize * 2];
+
+        ByteBuffer yBuffer = image.getPlanes()[0].getBuffer(); // Y
+        ByteBuffer uBuffer = image.getPlanes()[1].getBuffer(); // U
+        ByteBuffer vBuffer = image.getPlanes()[2].getBuffer(); // V
+        yBuffer.rewind();
+        uBuffer.rewind();
+        vBuffer.rewind();
+
+        int rowStride = image.getPlanes()[0].getRowStride();
+        assert (image.getPlanes()[0].getPixelStride() == 1);
+
+        int pos = 0;
+
+        if (rowStride == width)
+        { // likely
+            yBuffer.get(nv21, 0, ySize);
+            pos += ySize;
+        }
+        else
+        {
+            long yBufferPos = -rowStride; // not an actual position
+            for (; pos < ySize; pos += width)
+            {
+                yBufferPos += rowStride;
+                yBuffer.position((int) yBufferPos);
+                yBuffer.get(nv21, pos, width);
+            }
+        }
+
+        rowStride = image.getPlanes()[2].getRowStride();
+        int pixelStride = image.getPlanes()[2].getPixelStride();
+
+        assert (rowStride == image.getPlanes()[1].getRowStride());
+        assert (pixelStride == image.getPlanes()[1].getPixelStride());
+
+        if (pixelStride == 2 && rowStride == width && uBuffer.get(0) == vBuffer.get(1))
+        {
+            // maybe V an U planes overlap as per NV21, which means vBuffer[1] is alias of uBuffer[0]
+            byte savePixel = vBuffer.get(1);
+            try
+            {
+                vBuffer.put(1, (byte) ~savePixel);
+                if (uBuffer.get(0) == (byte) ~savePixel)
+                {
+                    vBuffer.put(1, savePixel);
+                    vBuffer.position(0);
+                    uBuffer.position(0);
+                    vBuffer.get(nv21, ySize, 1);
+                    uBuffer.get(nv21, ySize + 1, uBuffer.remaining());
+
+                    return nv21; // shortcut
+                }
+            }
+            catch (ReadOnlyBufferException ex)
+            {
+                // unfortunately, we cannot check if vBuffer and uBuffer overlap
+            }
+
+            // unfortunately, the check failed. We must save U and V pixel by pixel
+            vBuffer.put(1, savePixel);
+        }
+
+        // other optimizations could check if (pixelStride == 1) or (pixelStride == 2),
+        // but performance gain would be less significant
+
+        for (int row = 0; row < height / 2; row++)
+        {
+            for (int col = 0; col < width / 2; col++)
+            {
+                int vuPos = col * pixelStride + row * rowStride;
+                nv21[pos++] = vBuffer.get(vuPos);
+                nv21[pos++] = uBuffer.get(vuPos);
+            }
+        }
+
+        return nv21;
     }
 
 }
