@@ -421,6 +421,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_screen_off_in_audio_call = true;
     static boolean PREF__use_H264_hw_encoding = true;
     static String PREF__camera_get_preview_format = "YV12"; // "YV12"; // "NV21";
+    static boolean PREF__use_camera_x = true;
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
     static int PREF__video_play_delay_ms = GLOBAL_INIT_PLAY_DELAY;

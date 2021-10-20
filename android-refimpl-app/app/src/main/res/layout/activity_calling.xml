@@ -37,8 +37,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="3dp"
                 android:layout_marginLeft="0dp"
-                android:elevation="25dp"
                 android:background="#04b431"
+                android:elevation="25dp"
                 android:orientation="vertical">
 
             </LinearLayout>
@@ -332,6 +332,26 @@
                     android:layout_gravity="center"
                     android:background="@drawable/border_001"
                     android:padding="5dp">
+
+                    <androidx.camera.view.PreviewView
+                        android:id="@+id/camera_preview_view"
+                        android:layout_width="120dp"
+                        android:layout_height="160dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="0dp"
+                        android:elevation="12dp"
+                        android:gravity="center"
+                        android:padding="0dp" />
+
+                    <com.zoffcc.applications.trifa.CameraDrawingOverlay
+                        android:id="@+id/camera_drawing_overlay"
+                        android:layout_width="120dp"
+                        android:layout_height="160dp"
+                        android:layout_gravity="center"
+                        android:layout_margin="0dp"
+                        android:elevation="13dp"
+                        android:gravity="center"
+                        android:padding="0dp" />
 
                     <com.zoffcc.applications.trifa.CameraSurfacePreview
                         android:id="@+id/camera_surfaceview"

@@ -1120,7 +1120,6 @@ public class CameraWrapper
         return output;
     }
 
-
     public static byte[] YV12rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
         // Rotate the Y luma
