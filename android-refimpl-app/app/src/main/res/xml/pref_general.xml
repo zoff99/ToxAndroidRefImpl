@@ -232,6 +232,12 @@
 
     <PreferenceCategory android:title="! eXperimental !">
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="use_camera_x"
+            android:summary="@string/pref_description_use_camera_x"
+            android:title="@string/pref_title_use_camera_x" />
+
         <EditTextPreference
             android:defaultValue="80"
             android:key="X_eac_delay_ms_2"

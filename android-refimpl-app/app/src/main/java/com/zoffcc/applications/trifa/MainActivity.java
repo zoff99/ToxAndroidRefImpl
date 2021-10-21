@@ -421,7 +421,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_screen_off_in_audio_call = true;
     static boolean PREF__use_H264_hw_encoding = true;
     static String PREF__camera_get_preview_format = "YV12"; // "YV12"; // "NV21";
-    static boolean PREF__use_camera_x = true;
+    static boolean PREF__use_camera_x = false;
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
     static int PREF__video_play_delay_ms = GLOBAL_INIT_PLAY_DELAY;
@@ -822,7 +822,7 @@ public class MainActivity extends AppCompatActivity
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
         PREF__use_incognito_keyboard = settings.getBoolean("use_incognito_keyboard", true);
-        PREF__speakerphone_tweak= settings.getBoolean("speakerphone_tweak", false);
+        PREF__speakerphone_tweak = settings.getBoolean("speakerphone_tweak", false);
         PREF__window_security = settings.getBoolean("window_security", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
@@ -1183,6 +1183,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__use_push_service = true;
+        }
+
+        try
+        {
+            PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__use_camera_x = false;
         }
 
         // prefs ----------
@@ -2053,7 +2063,7 @@ public class MainActivity extends AppCompatActivity
         PREF__local_discovery_enabled = settings.getBoolean("local_discovery_enabled", false);
         PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
         PREF__use_incognito_keyboard = settings.getBoolean("use_incognito_keyboard", true);
-        PREF__speakerphone_tweak= settings.getBoolean("speakerphone_tweak", false);
+        PREF__speakerphone_tweak = settings.getBoolean("speakerphone_tweak", false);
         PREF__window_security = settings.getBoolean("window_security", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
         PREF__tox_set_do_not_sync_av = settings.getBoolean("X_tox_set_do_not_sync_av", false);
@@ -2362,6 +2372,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__use_push_service = true;
+        }
+
+        try
+        {
+            PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__use_camera_x = false;
         }
 
         try
