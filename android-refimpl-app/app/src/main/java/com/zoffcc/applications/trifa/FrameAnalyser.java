@@ -42,6 +42,8 @@ import androidx.annotation.RequiresApi;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
 
+import static com.zoffcc.applications.trifa.CallingActivity.FRONT_CAMERA_USED;
+import static com.zoffcc.applications.trifa.CallingActivity.active_camera_type;
 import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 
@@ -75,6 +77,8 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
         {
             InputImage inputImage = InputImage.
                     fromMediaImage(frameMediaImage, image.getImageInfo().getRotationDegrees());
+
+            // Log.i(TAG, "RRRRRR:" + image.getImageInfo().getRotationDegrees());
 
             Task<SegmentationMask> result = segmenter.process(inputImage).addOnSuccessListener(
                     new OnSuccessListener<SegmentationMask>()
@@ -133,6 +137,14 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                     else
                                     {
                                         // TODO: should not get here
+                                    }
+
+                                    // TODO: haxx0r, make better and actually check all the angles
+                                    //       and rotate always correctly
+                                    if (active_camera_type == FRONT_CAMERA_USED)
+                                    {
+                                        buf3 = YUV420rotate90(buf2, buf3, 640, 480);
+                                        buf2 = YUV420rotate90(buf3, buf2, 480, 640);
                                     }
 
                                     int y_size = 640 * 480;

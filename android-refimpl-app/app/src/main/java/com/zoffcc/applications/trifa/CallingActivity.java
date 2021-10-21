@@ -44,7 +44,6 @@ import android.os.PowerManager;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
-import android.util.Size;
 import android.view.MotionEvent;
 import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
@@ -137,8 +136,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     // private static final boolean AUTO_HIDE = true;
     // private static final int AUTO_HIDE_DELAY_MILLIS = 1000;
     // private static final int UI_ANIMATION_DELAY = 300;
-    private static final int FRONT_CAMERA_USED = 1;
-    private static final int BACK_CAMERA_USED = 2;
+    static final int FRONT_CAMERA_USED = 1;
+    static final int BACK_CAMERA_USED = 2;
     static int active_camera_type = FRONT_CAMERA_USED;
     static CustomVideoImageView mContentView;
     private Thread Videocall_audio_play_thread = null;
@@ -167,6 +166,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static PreviewView cameraXPreview = null;
     static CameraDrawingOverlay drawingOverlay = null;
     static FrameAnalyser frameAnalyser = null;
+    static ProcessCameraProvider cameraProvider = null;
     static ListenableFuture<ProcessCameraProvider> cameraProviderListenableFuture = null;
     static float mPreviewRate = -1f;
     // static int front_camera_id = -1;
@@ -1128,25 +1128,34 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     camera_toggle_button_pressed = true;
                     Log.i(TAG, "camera_toggle_button_pressed[press start]=" + camera_toggle_button_pressed);
-                    final Thread toggle_thread = new Thread()
+                    if (PREF__use_camera_x)
                     {
-                        @Override
-                        public void run()
+                        toggle_camera();
+                        camera_toggle_button_pressed = false;
+                        Log.i(TAG, "camera_toggle_button_pressed[press end:M]=" + camera_toggle_button_pressed);
+                    }
+                    else
+                    {
+                        final Thread toggle_thread = new Thread()
                         {
-                            try
+                            @Override
+                            public void run()
                             {
-                                Thread.sleep(30);
+                                try
+                                {
+                                    Thread.sleep(30);
+                                }
+                                catch (Exception e)
+                                {
+                                    // e.printStackTrace();
+                                }
+                                toggle_camera();
+                                camera_toggle_button_pressed = false;
+                                Log.i(TAG, "camera_toggle_button_pressed[press end]=" + camera_toggle_button_pressed);
                             }
-                            catch (Exception e)
-                            {
-                                // e.printStackTrace();
-                            }
-                            toggle_camera();
-                            camera_toggle_button_pressed = false;
-                            Log.i(TAG, "camera_toggle_button_pressed[press end]=" + camera_toggle_button_pressed);
-                        }
-                    };
-                    toggle_thread.start();
+                        };
+                        toggle_thread.start();
+                    }
                 }
 
                 return true;
@@ -1783,17 +1792,38 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     void toggle_camera()
     {
-        Thread openThread = new Thread()
+        if (PREF__use_camera_x)
         {
-            @Override
-            public void run()
+            try
             {
-                try
+                cameraProvider.unbindAll();
+
+                if (active_camera_type == FRONT_CAMERA_USED)
                 {
-                    if (PREF__use_camera_x)
-                    {
-                    }
-                    else
+                    active_camera_type = BACK_CAMERA_USED;
+                    Log.i(TAG, "active_camera_type(8a)=" + active_camera_type);
+                    bindImageAnalysis(cameraProvider);
+                }
+                else
+                {
+                    active_camera_type = FRONT_CAMERA_USED;
+                    Log.i(TAG, "active_camera_type(8b)=" + active_camera_type);
+                    bindImageAnalysis(cameraProvider);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            Thread openThread = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
                     {
                         CameraWrapper.getInstance().doStopCamera();
 
@@ -1812,13 +1842,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
                         }
                     }
+                    catch (Exception e)
+                    {
+                        // e.printStackTrace();
+                    }
                 }
-                catch (Exception e)
-                {
-                }
-            }
-        };
-        openThread.start();
+            };
+            openThread.start();
+        }
     }
 
     // -------------------------------------------------------
@@ -1976,6 +2007,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         if (PREF__use_camera_x)
         {
+            active_camera_type = FRONT_CAMERA_USED;
             cameraProviderListenableFuture = ProcessCameraProvider.getInstance(this);
             cameraProviderListenableFuture.addListener(new Runnable()
             {
@@ -1984,7 +2016,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        ProcessCameraProvider cameraProvider = cameraProviderListenableFuture.get();
+                        cameraProvider = cameraProviderListenableFuture.get();
                         bindImageAnalysis(cameraProvider);
                     }
                     catch (Exception e)
@@ -2084,10 +2116,22 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
         {
             Preview preview = new Preview.Builder().build();
-            CameraSelector cameraSelector = new CameraSelector.Builder().
-                    requireLensFacing(CameraSelector.LENS_FACING_BACK).
-                    build();
-            drawingOverlay.flipimage = false;
+
+            CameraSelector cameraSelector = null;
+            if (active_camera_type == FRONT_CAMERA_USED)
+            {
+                cameraSelector = new CameraSelector.Builder().
+                        requireLensFacing(CameraSelector.LENS_FACING_FRONT).
+                        build();
+                drawingOverlay.flipimage = true;
+            }
+            else
+            {
+                cameraSelector = new CameraSelector.Builder().
+                        requireLensFacing(CameraSelector.LENS_FACING_BACK).
+                        build();
+                drawingOverlay.flipimage = false;
+            }
 
             preview.setSurfaceProvider(cameraXPreview.getSurfaceProvider());
             ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().
@@ -2587,6 +2631,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         if (PREF__use_camera_x)
                         {
                             cameraXPreview.setVisibility(View.VISIBLE);
+                            drawingOverlay.setVisibility(View.VISIBLE);
                         }
                         else
                         {
@@ -2614,6 +2659,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         if (PREF__use_camera_x)
                         {
                             cameraXPreview.setVisibility(View.INVISIBLE);
+                            drawingOverlay.setVisibility(View.INVISIBLE);
                         }
                         else
                         {
