@@ -147,7 +147,6 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
         return optimalSize;
     }
 
-
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {

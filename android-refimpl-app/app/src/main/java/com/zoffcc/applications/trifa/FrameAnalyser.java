@@ -47,6 +47,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.active_camera_type;
 import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CAM_REMOVE_BACKGROUND_CONFIDENCE_THRESHOLD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
@@ -186,10 +187,11 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
                                                         // Gets the confidence of the (x,y) pixel in the mask being in the foreground.
                                                         // 1.0 being foreground
                                                         // 0.0 background
-                                                        // use values greater than the threshold value 0.9 (90% Confidence)
+                                                        // use values greater than the threshold value CAM_REMOVE_BACKGROUND_CONFIDENCE_THRESHOLD
                                                         foregroundConfidence = buf.getFloat();
                                                         // Log.i(TAG, "x=" + x + " y=" + y + " float=" + foregroundConfidence);
-                                                        if (foregroundConfidence < 0.9)
+                                                        if (foregroundConfidence <
+                                                            CAM_REMOVE_BACKGROUND_CONFIDENCE_THRESHOLD)
                                                         {
                                                             y1 = mwidth - x - 1;
                                                             x1 = y;

@@ -26,9 +26,13 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.os.Build;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.SurfaceView;
 
 import androidx.annotation.RequiresApi;
+
+import static com.zoffcc.applications.trifa.CallingActivity.toggle_cam_preview;
+import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_views;
 
 public class CameraDrawingOverlay extends SurfaceView
 {
@@ -37,6 +41,7 @@ public class CameraDrawingOverlay extends SurfaceView
     Bitmap maskBitmap = null;
     boolean flipimage = false;
     Rect r = new Rect(0, 0, (int) (480 * 0.75), (int) (640 * 0.75));
+    private float my_alpha = 1.0f;
 
     public CameraDrawingOverlay(Context context)
     {
@@ -57,6 +62,35 @@ public class CameraDrawingOverlay extends SurfaceView
     public CameraDrawingOverlay(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes)
     {
         super(context, attrs, defStyleAttr, defStyleRes);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+        if ((event.getAction() == MotionEvent.ACTION_DOWN) || (event.getAction() == MotionEvent.ACTION_CANCEL))
+        {
+            if (my_alpha == 1.0f)
+            {
+                // make view INVISIBLE (totally transparent)
+                my_alpha = 0.0f;
+                this.setAlpha(0.0f);
+                toggle_cam_preview(false,true);
+                toggle_osd_views(false);
+            }
+            else
+            {
+                // make view visible
+                my_alpha = 1.0f;
+                this.setAlpha(1.0f);
+                toggle_cam_preview(true,true);
+                toggle_osd_views(true);
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     Bitmap flipBitmap(Bitmap source)

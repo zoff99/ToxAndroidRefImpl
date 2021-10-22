@@ -2145,17 +2145,22 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     private void initUI()
     {
+        cameraXPreview = findViewById(R.id.camera_preview_view);
+        drawingOverlay = findViewById(R.id.camera_drawing_overlay);
+        cameraSurfacePreview = (CameraSurfacePreview) findViewById(R.id.camera_surfaceview);
+
         if (PREF__use_camera_x)
         {
-            cameraXPreview = findViewById(R.id.camera_preview_view);
-            drawingOverlay = findViewById(R.id.camera_drawing_overlay);
+            cameraSurfacePreview.setVisibility(View.INVISIBLE);
+            //
             drawingOverlay.setWillNotDraw(false);
             drawingOverlay.setZOrderOnTop(true);
             frameAnalyser = new FrameAnalyser(drawingOverlay);
         }
         else
         {
-            cameraSurfacePreview = (CameraSurfacePreview) findViewById(R.id.camera_surfaceview);
+            cameraXPreview.setVisibility(View.INVISIBLE);
+            drawingOverlay.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -2616,66 +2621,131 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     }
 
-    static void toggle_osd_view_including_cam_preview(boolean visible)
+    static void toggle_cam_preview(boolean visible, boolean alpha_only)
     {
-
-        if (visible)
+        if (alpha_only)
         {
-            Runnable myRunnable = new Runnable()
+            if (visible)
             {
-                @Override
-                public void run()
+                Runnable myRunnable = new Runnable()
                 {
-                    try
+                    @Override
+                    public void run()
                     {
-                        if (PREF__use_camera_x)
+                        try
                         {
-                            cameraXPreview.setVisibility(View.VISIBLE);
-                            drawingOverlay.setVisibility(View.VISIBLE);
+                            if (PREF__use_camera_x)
+                            {
+                                cameraXPreview.setAlpha(1.0f);
+                                drawingOverlay.setAlpha(1.0f);
+                            }
+                            else
+                            {
+                                cameraSurfacePreview.setAlpha(1.0f);
+                            }
                         }
-                        else
+                        catch (Exception e)
                         {
-                            cameraSurfacePreview.setVisibility(View.VISIBLE);
+                            e.printStackTrace();
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
 
-                }
-            };
-            CallingActivity.callactivity_handler_s.post(myRunnable);
+                    }
+                };
+                CallingActivity.callactivity_handler_s.post(myRunnable);
+            }
+            else
+            {
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            if (PREF__use_camera_x)
+                            {
+                                cameraXPreview.setAlpha(0.0f);
+                                drawingOverlay.setAlpha(0.0f);
+                            }
+                            else
+                            {
+                                cameraSurfacePreview.setAlpha(0.0f);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                    }
+                };
+                CallingActivity.callactivity_handler_s.post(myRunnable);
+            }
         }
         else
         {
-            Runnable myRunnable = new Runnable()
+            if (visible)
             {
-                @Override
-                public void run()
+                Runnable myRunnable = new Runnable()
                 {
-                    try
+                    @Override
+                    public void run()
                     {
-                        if (PREF__use_camera_x)
+                        try
                         {
-                            cameraXPreview.setVisibility(View.INVISIBLE);
-                            drawingOverlay.setVisibility(View.INVISIBLE);
+                            if (PREF__use_camera_x)
+                            {
+                                cameraXPreview.setVisibility(View.VISIBLE);
+                                drawingOverlay.setVisibility(View.VISIBLE);
+                            }
+                            else
+                            {
+                                cameraSurfacePreview.setVisibility(View.VISIBLE);
+                            }
                         }
-                        else
+                        catch (Exception e)
                         {
-                            cameraSurfacePreview.setVisibility(View.INVISIBLE);
+                            e.printStackTrace();
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
 
-                }
-            };
-            CallingActivity.callactivity_handler_s.post(myRunnable);
+                    }
+                };
+                CallingActivity.callactivity_handler_s.post(myRunnable);
+            }
+            else
+            {
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            if (PREF__use_camera_x)
+                            {
+                                cameraXPreview.setVisibility(View.INVISIBLE);
+                                drawingOverlay.setVisibility(View.INVISIBLE);
+                            }
+                            else
+                            {
+                                cameraSurfacePreview.setVisibility(View.INVISIBLE);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                    }
+                };
+                CallingActivity.callactivity_handler_s.post(myRunnable);
+            }
         }
+    }
 
+    static void toggle_osd_view_including_cam_preview(boolean visible)
+    {
+        toggle_cam_preview(visible, false);
         toggle_osd_views(visible);
     }
 
