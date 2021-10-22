@@ -705,7 +705,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-
         text_vq_med.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -2018,6 +2017,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         cameraProvider = cameraProviderListenableFuture.get();
                         bindImageAnalysis(cameraProvider);
+                        Callstate.camera_opened = true;
                     }
                     catch (Exception e)
                     {
