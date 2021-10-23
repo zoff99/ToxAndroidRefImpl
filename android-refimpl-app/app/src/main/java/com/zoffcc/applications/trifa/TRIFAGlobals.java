@@ -133,7 +133,7 @@ public class TRIFAGlobals
     final static String GLOBAL_PLAY_DELAY_SETTING_NAME = "video_play_delay_ms4";
 
     static final int CAMPREVIEW_NUM_BUFFERS = 4;
-    static final float CAM_REMOVE_BACKGROUND_CONFIDENCE_THRESHOLD = 0.93f;
+    static final float CAM_REMOVE_BACKGROUND_CONFIDENCE_THRESHOLD = 0.90f;
 
     static final String ORBOT_PROXY_HOST = "127.0.0.1";
     static final long ORBOT_PROXY_PORT = 9050;
