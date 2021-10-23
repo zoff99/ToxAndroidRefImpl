@@ -165,7 +165,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static CameraSurfacePreview cameraSurfacePreview = null;
     static PreviewView cameraXPreview = null;
     static CameraDrawingOverlay drawingOverlay = null;
-    static FrameAnalyser frameAnalyser = null;
+    static VideoFrameAnalyser videoFrameAnalyser = null;
     static ProcessCameraProvider cameraProvider = null;
     static ListenableFuture<ProcessCameraProvider> cameraProviderListenableFuture = null;
     static float mPreviewRate = -1f;
@@ -2138,7 +2138,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888).
                     setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
 
-            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), frameAnalyser);
+            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), videoFrameAnalyser);
             cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, imageAnalysis, preview);
         }
     }
@@ -2155,7 +2155,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             //
             drawingOverlay.setWillNotDraw(false);
             drawingOverlay.setZOrderOnTop(true);
-            frameAnalyser = new FrameAnalyser(drawingOverlay);
+            videoFrameAnalyser = new VideoFrameAnalyser(drawingOverlay);
         }
         else
         {

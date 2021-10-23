@@ -55,7 +55,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXA
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_FINISHED;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE;
 
-public class FrameAnalyser implements ImageAnalysis.Analyzer
+public class VideoFrameAnalyser implements ImageAnalysis.Analyzer
 {
     private static final String TAG = "trifa.FrameAnalyser";
 
@@ -64,7 +64,7 @@ public class FrameAnalyser implements ImageAnalysis.Analyzer
     private Segmenter segmenter;
     private Image frameMediaImage = null;
 
-    FrameAnalyser(CameraDrawingOverlay drawingOverlay)
+    VideoFrameAnalyser(CameraDrawingOverlay drawingOverlay)
     {
         this.drawingOverlay = drawingOverlay;
         options = new SelfieSegmenterOptions.
