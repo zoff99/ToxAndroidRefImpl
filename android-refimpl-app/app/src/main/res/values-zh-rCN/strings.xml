@@ -375,4 +375,8 @@
     <string name="title_activity_conferenceinfo">会议信息</string>
     <string name="pref_title_speakerphone_tweak">修复通话扬声器</string>
     <string name="pref_description_speakerphone_tweak">如果应用程序在通话中没有切换到扬声器，那么尝试激活这个修复。</string>
+    <string name="pref_title_use_camera_x">背景删除</string>
+    <string name="pref_description_use_camera_x">!! 实验性功能 !!
+\n使用 CameraX 并在视频通话中删除背景
+\n此功能可能还不能完全正常工作，请小心，不要总是依赖它来工作！</string>
 </resources>
