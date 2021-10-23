@@ -2136,7 +2136,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             preview.setSurfaceProvider(cameraXPreview.getSurfaceProvider());
             ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().
                     setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888).
-                    setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
+                    setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).
+                    build();
 
             imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), videoFrameAnalyser);
             cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, imageAnalysis, preview);

@@ -47,6 +47,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.active_camera_type;
 import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__UV_reversed;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CAM_REMOVE_BACKGROUND_CONFIDENCE_THRESHOLD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
@@ -97,6 +98,8 @@ public class VideoFrameAnalyser implements ImageAnalysis.Analyzer
                             {
                                 if (!Callstate.audio_call)
                                 {
+                                    final long capture_ts = System.currentTimeMillis();
+
                                     ByteBuffer buf = mask.getBuffer();
                                     int mwidth = mask.getWidth();
                                     int mheight = mask.getHeight();
@@ -139,20 +142,22 @@ public class VideoFrameAnalyser implements ImageAnalysis.Analyzer
                                             v_.rewind();
 
                                             y_.get(buf2, 0, 640 * 480);
+                                            final int off_u = 640 * 480;
+                                            final int off_v = (640 * 480) + (640 * 480) / 4;
                                             if ((image.getPlanes()[1].getPixelStride() > 1) ||
                                                 (image.getPlanes()[2].getPixelStride() > 1))
                                             {
-                                                int off_u = 640 * 480;
-                                                int off_v = (640 * 480) + (640 * 480) / 4;
                                                 for (int k = 0; k < ((640 * 480) / 4); k++)
                                                 {
                                                     buf2[off_u + k] = v_.get(k * image.getPlanes()[1].getPixelStride());
                                                     buf2[off_v + k] = u_.get(k * image.getPlanes()[2].getPixelStride());
                                                 }
                                             }
-                                            else
+                                            else // pixelstrides for u and v both are "1"
                                             {
-                                                // TODO: should not get here
+                                                // Log.i(TAG, "SSSSSSSSSS:" + image.getPlanes()[1].getPixelStride());
+                                                v_.get(buf2, off_u, (640 * 480) / 4);
+                                                u_.get(buf2, off_v, (640 * 480) / 4);
                                             }
 
                                             // TODO: haxx0r, make better and actually check all the angles
@@ -246,11 +251,23 @@ public class VideoFrameAnalyser implements ImageAnalysis.Analyzer
                                             buf3 = YUV420rotate90(buf2, buf3, 640, 480);
                                             MainActivity.video_buffer_2.put(buf3);
 
-                                            int res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(buf3,
-                                                                                                               tox_friend_by_public_key__wrapper(
-                                                                                                                       Callstate.friend_pubkey),
-                                                                                                               480, 640,
-                                                                                                               System.currentTimeMillis());
+                                            if (PREF__UV_reversed)
+                                            {
+                                                int res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(buf3,
+                                                                                                                   tox_friend_by_public_key__wrapper(
+                                                                                                                           Callstate.friend_pubkey),
+                                                                                                                   480,
+                                                                                                                   640,
+                                                                                                                   capture_ts);
+                                            }
+                                            else
+                                            {
+                                                int res = HelperGeneric.toxav_video_send_frame_wrapper(buf3,
+                                                                                                       tox_friend_by_public_key__wrapper(
+                                                                                                               Callstate.friend_pubkey),
+                                                                                                       480, 640,
+                                                                                                       capture_ts);
+                                            }
                                             // Log.i(TAG, "XXXX:res:" + res);
 
                                             if (last_video_frame_sent == -1)
