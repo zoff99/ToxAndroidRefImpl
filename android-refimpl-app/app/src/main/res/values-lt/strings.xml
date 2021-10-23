@@ -248,4 +248,8 @@
     <string name="title_activity_conferenceinfo">Konferencijos informacija</string>
     <string name="pref_title_speakerphone_tweak">Garsiakalbio pataisymas skambučiams</string>
     <string name="pref_description_speakerphone_tweak">Jei skambučio metu programėlė neperjungiama į garsiakalbį, pabandykite įjungti šią pataisą.</string>
+    <string name="pref_title_use_camera_x">Fono pašalinimas</string>
+    <string name="pref_description_use_camera_x">!! Eksperimentinis !!
+\nVaizdo skambučiuose naudokite „CameraX“ ir pašalinkite foną
+\nTai gali neveikti iki galo, būkite atsargūs ir nepasikliaukite, jog tai suveiks visada!</string>
 </resources>
