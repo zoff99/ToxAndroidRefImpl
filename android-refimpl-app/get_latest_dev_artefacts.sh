@@ -1,4 +1,3 @@
-
 #! /bin/bash
 
 _HOME2_=$(dirname $0)

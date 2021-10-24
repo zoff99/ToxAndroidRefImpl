@@ -2141,7 +2141,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             if (MainActivity.IS_GPLAY_VERSION)
             {
-                //**// imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), (VideoFrameAnalyser) videoFrameAnalyser);
+                //*@@VIDEOBGREMOVE@@*// imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), (VideoFrameAnalyser) videoFrameAnalyser);
             }
             cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, imageAnalysis, preview);
         }
@@ -2161,7 +2161,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             drawingOverlay.setZOrderOnTop(true);
             if (MainActivity.IS_GPLAY_VERSION)
             {
-                //**// videoFrameAnalyser = new VideoFrameAnalyser(drawingOverlay);
+                //*@@VIDEOBGREMOVE@@*// videoFrameAnalyser = new VideoFrameAnalyser(drawingOverlay);
             }
         }
         else
