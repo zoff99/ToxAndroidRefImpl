@@ -63,21 +63,21 @@ lintDebug:
   interruptible: true
   stage: build
   script:
-    - cd android-refimpl-app/ ; ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
 
 # Make Project
 assembleDebug:
   interruptible: true
   stage: build
   script:
-    - cd android-refimpl-app/ ; ./gradlew assembleDebug
+    - ./gradlew assembleDebug
   artifacts:
     paths:
-      - android-refimpl-app/app/build/outputs/
+      - app/build/outputs/
 
 # Run all tests, if any fails, interrupt the pipeline(fail it)
 debugTests:
   interruptible: true
   stage: test
   script:
-    - cd android-refimpl-app/ ; ./gradlew -Pci --console=plain :app:testDebug
+    - ./gradlew -Pci --console=plain :app:testDebug
