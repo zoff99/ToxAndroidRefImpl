@@ -53,8 +53,9 @@ before_script:
   - sdkmanager --sdk_root=${ANDROID_HOME} "cmake;3.6.4111459"
   - sdkmanager --sdk_root=${ANDROID_HOME} "ndk;21.3.6528147"
 
+  - ls -al; pwd; id -a
   # Not necessary, but just for surity
-  - chmod +x ./gradlew
+  - cd android-refimpl-app/ ; chmod +x ./gradlew
 
 # Basic android and gradle stuff
 # Check linting
@@ -62,21 +63,21 @@ lintDebug:
   interruptible: true
   stage: build
   script:
-    - ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
+    - cd android-refimpl-app/ ; ./gradlew -Pci --console=plain :app:lintDebug -PbuildDir=lint
 
 # Make Project
 assembleDebug:
   interruptible: true
   stage: build
   script:
-    - ./gradlew assembleDebug
+    - cd android-refimpl-app/ ; ./gradlew assembleDebug
   artifacts:
     paths:
-      - app/build/outputs/
+      - android-refimpl-app/app/build/outputs/
 
 # Run all tests, if any fails, interrupt the pipeline(fail it)
 debugTests:
   interruptible: true
   stage: test
   script:
-    - ./gradlew -Pci --console=plain :app:testDebug
+    - cd android-refimpl-app/ ; ./gradlew -Pci --console=plain :app:testDebug
