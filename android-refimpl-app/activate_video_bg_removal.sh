@@ -11,3 +11,5 @@ sed -i -e 's#VideoFrameAnalyser.java#XXXXXXXYYYYYYY.java#g' ./app/build.gradle
 sed -i -e 's#boolean IS_GPLAY_VERSION = false#boolean IS_GPLAY_VERSION = true#' \
     ./app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
 ./gradlew assembleRelease
+
+ls -al app/build/outputs/apk/release/*apk
