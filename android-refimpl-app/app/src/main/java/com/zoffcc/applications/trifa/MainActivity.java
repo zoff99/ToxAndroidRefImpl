@@ -274,6 +274,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
+    final static boolean IS_GPLAY_VERSION = false; // set "false" on f-droid and "true" for googleplay version
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
@@ -1185,13 +1186,20 @@ public class MainActivity extends AppCompatActivity
             PREF__use_push_service = true;
         }
 
-        try
+        if (MainActivity.IS_GPLAY_VERSION)
         {
-            PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
+            try
+            {
+                PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                PREF__use_camera_x = false;
+            }
         }
-        catch (Exception e)
+        else
         {
-            e.printStackTrace();
             PREF__use_camera_x = false;
         }
 
@@ -2374,13 +2382,20 @@ public class MainActivity extends AppCompatActivity
             PREF__use_push_service = true;
         }
 
-        try
+        if (MainActivity.IS_GPLAY_VERSION)
         {
-            PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
+            try
+            {
+                PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                PREF__use_camera_x = false;
+            }
         }
-        catch (Exception e)
+        else
         {
-            e.printStackTrace();
             PREF__use_camera_x = false;
         }
 
