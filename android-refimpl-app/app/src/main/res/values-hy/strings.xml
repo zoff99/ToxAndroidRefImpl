@@ -49,4 +49,31 @@
     <string name="pref_description_udp_enabled">Շատ հեռախոսների դեպքում UDP օգտագործում է ավելի շատ ինտերնետ
 \nՎԵՐԱԲԱՑԵԼ ծրագիրը փոփոխելուց հետո
 \nԿանխադրված կարգավորումն է ԱՆՋԱՏՎԱԾ</string>
+    <string name="pref_description_force_udp_only">Օգտագործել միայն UDP, այս կարգավորումը միացնելու դեպքում որոշ կոնտակտներ կարող են դառնալ անհասանելի
+\nփոխելու դեպքում ՎԵՐԱԲԵՌՆԵԼ ծրագիրը</string>
+    <string name="pref_title_orbot_enabled">միացնել Tor Պրոքսի</string>
+    <string name="pref_description_orbot_enabled">Այս կարգավորումը օգտագործելու համար պետք է տեղադրել Orbot ծրագիրը
+\nփոխելու դեպքում ՎԵՐԱԲԵՌՆԵԼ ծրագիրը</string>
+    <string name="pref_title_fps_half">իջեցնել կադրերի քանակը</string>
+    <string name="pref_description_fps_half">Իջեցնել կադրերի քանակը 1/2֊ով․ 12 կադր/վայրկյան 25֊ի փոխարեն</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 ներքին թարմեցում</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">H264 կոդավորիչը պետք է օգտագործի ներքին կադրերի թարմեցումը</string>
+    <string name="pref_title_start_on_boot">Բեռնել ծրագիրը ավտոմատ</string>
+    <string name="pref_title_use_incognito_keyboard">ծպտյալ ստեղնաշար</string>
+    <string name="pref_description_compact_friendlist">Ընկերների մեծ ցուցակ ունենալու դեպքում ընկերների ցուցակը դարձնում է հակիրճ</string>
+    <string name="pref_title_compact_chatlist">Կոմպակտ Խոսակցությունների ցուցակ</string>
+    <string name="pref_title_use_push_service">Օգտագործել Push Ծառայությունը</string>
+    <string name="pref_title_download_push_msg_app">Ներբեռնել Push Message ծրագիրը</string>
+    <string name="pref_title_conference_show_system_messages">Համակարգային հաղորդագրություններ</string>
+    <string name="pref_title_local_discovery_enabled">Լոկալ ցանցի հայտնաբերում</string>
+    <string name="pref_description_local_discovery_enabled">Օգտագորխել լոկալ ցանցի սկզբնական հանգույցները</string>
+    <string name="pref_title_U_keep_nospam">պահել NoSpam</string>
+    <string name="pref_title_allow_screen_off_in_audio_call">անջատել էկրանը</string>
+    <string name="pref_title_X_zoom_incoming_video">ՎիդեոԶանգի պատուհանի չափսը</string>
+    <string name="pref_description_use_incognito_keyboard">անջատել, որպեսզի ստեղնաշարը չսովորի մուտքագրած բառերը</string>
+    <string name="pref_title_window_security">արգելել էկրանի պատկեր ստեղծելը</string>
+    <string name="pref_title_compact_friendlist">Կոմպակտ ընկերների ցուցակ</string>
+    <string name="pref_title_set_fps">սահմանել կադրերի քանակը վայրկյանում</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">կիսվել ֆայլերով</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">կիսվել ֆայլերը TRIfA կիսվելու հնարավորությամբ</string>
 </resources>
