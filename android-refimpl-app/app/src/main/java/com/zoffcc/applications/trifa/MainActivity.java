@@ -89,6 +89,7 @@ import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -129,6 +130,7 @@ import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
+import static com.zoffcc.applications.trifa.CallingActivity.loadModelFile;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
@@ -509,6 +511,14 @@ public class MainActivity extends AppCompatActivity
         global_showing_messageview = false;
         global_showing_anygroupview = false;
 
+        try
+        {
+            Log.i(TAG, "M:STARTUP:Thread=" + Thread.currentThread().getName());
+        }
+        catch (Exception e)
+        {
+        }
+
         Log.i(TAG, "M:STARTUP:setContentView start");
         setContentView(R.layout.activity_main);
         Log.i(TAG, "M:STARTUP:setContentView end");
@@ -556,7 +566,6 @@ public class MainActivity extends AppCompatActivity
         main_activity_s = this;
         TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX = (int) HelperGeneric.dp2px(10);
         TRIFAGlobals.CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = (int) HelperGeneric.dp2px(20);
-
 
         if ((!TOX_SERVICE_STARTED) || (orma == null))
         {
@@ -1186,8 +1195,8 @@ public class MainActivity extends AppCompatActivity
             PREF__use_push_service = true;
         }
 
-        if (MainActivity.IS_GPLAY_VERSION)
-        {
+        //if (MainActivity.IS_GPLAY_VERSION)
+        //{
             try
             {
                 PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
@@ -1197,11 +1206,11 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
                 PREF__use_camera_x = false;
             }
-        }
-        else
-        {
-            PREF__use_camera_x = false;
-        }
+        //}
+        //else
+        //{
+        //    PREF__use_camera_x = false;
+        //}
 
         // prefs ----------
 
@@ -2382,8 +2391,8 @@ public class MainActivity extends AppCompatActivity
             PREF__use_push_service = true;
         }
 
-        if (MainActivity.IS_GPLAY_VERSION)
-        {
+        //if (MainActivity.IS_GPLAY_VERSION)
+        //{
             try
             {
                 PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
@@ -2393,11 +2402,11 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
                 PREF__use_camera_x = false;
             }
-        }
-        else
-        {
-            PREF__use_camera_x = false;
-        }
+        //}
+        //else
+        //{
+        //    PREF__use_camera_x = false;
+        //}
 
         try
         {

@@ -74,7 +74,7 @@ public class CameraDrawingOverlay extends SurfaceView
                 // make view INVISIBLE (totally transparent)
                 my_alpha = 0.0f;
                 this.setAlpha(0.0f);
-                toggle_cam_preview(false,true);
+                toggle_cam_preview(false, true);
                 toggle_osd_views(false);
             }
             else
@@ -82,7 +82,7 @@ public class CameraDrawingOverlay extends SurfaceView
                 // make view visible
                 my_alpha = 1.0f;
                 this.setAlpha(1.0f);
-                toggle_cam_preview(true,true);
+                toggle_cam_preview(true, true);
                 toggle_osd_views(true);
             }
             return true;
@@ -116,8 +116,22 @@ public class CameraDrawingOverlay extends SurfaceView
         {
             if (canvas != null)
             {
-                canvas.drawBitmap(flipBitmap(maskBitmap), null, r, null);
+                if (MainActivity.IS_GPLAY_VERSION)
+                {
+                    canvas.drawBitmap(flipBitmap(maskBitmap), null, r, null);
+                }
+                else
+                {
+                    canvas.drawBitmap(RotateBitmap(maskBitmap, 90), null, r, null);
+                }
             }
         }
+    }
+
+    public static Bitmap RotateBitmap(Bitmap source, float angle)
+    {
+        Matrix matrix = new Matrix();
+        matrix.postRotate(angle);
+        return Bitmap.createBitmap(source, 0, 0, source.getWidth(), source.getHeight(), matrix, true);
     }
 }

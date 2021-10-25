@@ -42,6 +42,8 @@
         android:smallScreens="true"
         android:xlargeScreens="true"/>
 
+    <uses-sdk tools:overrideLibrary="src.java.org.tensorflow.lite.task.vision"/>
+
     <uses-permission android:name="android.permission.BLUETOOTH" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />

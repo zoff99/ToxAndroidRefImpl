@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
@@ -63,8 +64,11 @@ import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
@@ -166,6 +170,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static PreviewView cameraXPreview = null;
     static CameraDrawingOverlay drawingOverlay = null;
     static Object videoFrameAnalyser = null;
+    static VideoFrameAnalyserTFLite videoFrameAnalyser_tflite = null;
     static ProcessCameraProvider cameraProvider = null;
     static ListenableFuture<ProcessCameraProvider> cameraProviderListenableFuture = null;
     static float mPreviewRate = -1f;
@@ -2143,9 +2148,29 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 //*@@VIDEOBGREMOVE@@*// imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), (VideoFrameAnalyser) videoFrameAnalyser);
             }
+            else
+            {
+                imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(),
+                                          (VideoFrameAnalyserTFLite) videoFrameAnalyser_tflite);
+            }
             cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, imageAnalysis, preview);
         }
     }
+
+
+    static MappedByteBuffer loadModelFile(Activity activity) throws IOException
+    {
+        // final String tf_model_file = "deeplabv3_257_mv_gpu.tflite";
+        final String tf_model_file = "selfiesegmentation_mlkit-256x256-2021_01_19-v1215.f16.tflite";
+
+        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(tf_model_file);
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+    }
+
 
     private void initUI()
     {
@@ -2162,6 +2187,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if (MainActivity.IS_GPLAY_VERSION)
             {
                 //*@@VIDEOBGREMOVE@@*// videoFrameAnalyser = new VideoFrameAnalyser(drawingOverlay);
+            }
+            else
+            {
+                videoFrameAnalyser_tflite = new VideoFrameAnalyserTFLite(drawingOverlay, this, this);
             }
         }
         else

@@ -28,6 +28,8 @@ buildscript {
 }
 
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
 
 def getGitHash = { ->
     def stdout = new ByteArrayOutputStream()
@@ -47,6 +49,7 @@ android {
     aaptOptions {
         additionalParameters "--no-version-vectors"
         cruncherEnabled = false
+        noCompress "tflite"
     }
 
     sourceSets {
@@ -394,6 +397,13 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:1.0.2"
     implementation "androidx.camera:camera-view:1.0.0-alpha30"
     implementation "androidx.camera:camera-extensions:1.0.0-alpha30"
+    //
+    // implementation 'org.tensorflow:tensorflow-lite:2.6.0'
+    // implementation 'org.tensorflow:tensorflow-lite-gpu:2.6.0'
+    compile(name:'tensorflow-lite', ext:'aar')
+    compile(name:'tensorflow-lite-gpu', ext:'aar')
+    // implementation 'org.tensorflow:tensorflow-lite-support:0.2.0'
+    // implementation 'org.tensorflow:tensorflow-lite-task-vision:0.2.0'
 }
 
 apply from: 'gradle_witness_ng.gradle'
