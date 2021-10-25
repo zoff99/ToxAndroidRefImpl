@@ -69,10 +69,11 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
     private Context c;
     private final int imageSize = 256;
     private final int NUM_CLASSES = 21;
-    private final float IMAGE_MEAN = 127.5f;
+    private final float IMAGE_MEAN = 0f; // 127.5f;
     private final float IMAGE_STD = 127.5f;
     String[] labelsArrays;
     int[] segmentColors;
+    YuvToRgbConverter yuvToRgbConverter;
 
     VideoFrameAnalyserTFLite(CameraDrawingOverlay drawingOverlay, Context c, Activity a)
     {
@@ -82,6 +83,8 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 
         labelsArrays = new String[]{"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "dining table", "dog", "horse", "motorbike", "person", "potted plant", "sheep", "sofa", "train", "tv"};
         segmentColors = new int[NUM_CLASSES];
+
+        yuvToRgbConverter = new YuvToRgbConverter(this.c);
 
         Random random = new Random(System.currentTimeMillis());
         segmentColors[0] = Color.TRANSPARENT;
@@ -172,8 +175,8 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                     final long capture_ts = System.currentTimeMillis();
 
                     long preprocessTime = SystemClock.uptimeMillis();
+                    long overallTime = preprocessTime;
 
-                    YuvToRgbConverter yuvToRgbConverter = new YuvToRgbConverter(this.c);
                     Bitmap bmp = Bitmap.createBitmap(frameMediaImage.getWidth(), frameMediaImage.getHeight(),
                                                      Bitmap.Config.ARGB_8888);
                     yuvToRgbConverter.yuvToRgb(frameMediaImage, bmp);
@@ -188,16 +191,17 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                     segmentationMasks.order(ByteOrder.nativeOrder());
 
                     preprocessTime = SystemClock.uptimeMillis() - preprocessTime;
-                    long imageSegmentationTime = SystemClock.uptimeMillis();
                     Log.i(TAG, "tensor_in_out:" + contentArray.limit() + " " + contentArray.limit() + " " +
                                segmentationMasks.limit());
                     /*
                         The general model operates on a 256x256x3 (HWC) tensor,
                         and outputs a 256x256x1 tensor representing the segmentation mask
                      */
+                    long imageSegmentationTime = SystemClock.uptimeMillis();
                     interpreter.run(contentArray, segmentationMasks);
                     imageSegmentationTime = SystemClock.uptimeMillis() - imageSegmentationTime;
 
+                    long postrocessTime = SystemClock.uptimeMillis();
                     segmentationMasks.limit(imageSize * imageSize * 4);
                     segmentationMasks.rewind();
                     Bitmap bitmap = Bitmap.createBitmap(imageSize, imageSize, Bitmap.Config.ARGB_8888);
@@ -207,7 +211,9 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                     bitmap.copyPixelsFromBuffer(segmentationMasks);
                     drawingOverlay.maskBitmap = bitmap;
                     drawingOverlay.invalidate();
+                    postrocessTime = SystemClock.uptimeMillis() - postrocessTime;
 
+                    overallTime = SystemClock.uptimeMillis() - overallTime;
 
                     /*
                     long maskFlatteningTime = SystemClock.uptimeMillis();
@@ -227,7 +233,9 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                     //drawingOverlay.maskBitmap = bitmap;
                     //drawingOverlay.invalidate();
 
-                    Log.d(TAG, "RUNNNNNNN:" + preprocessTime + " " + imageSegmentationTime);
+                    Log.d(TAG,
+                          "RUNNNNNNN:" + preprocessTime + " " + imageSegmentationTime + " " + postrocessTime + " ALL=" +
+                          overallTime);
 
                     /*
                     ImageProcessor imageProcessor = new ImageProcessor.Builder().
@@ -365,7 +373,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                 // to the range [0.0, 1.0] instead.
                 inputImage.putFloat((((value >> 16) & 0xFF) - mean) / std);
                 inputImage.putFloat((((value >> 8) & 0xFF) - mean) / std);
-                inputImage.putFloat(((value >> 0xFF) - mean) / std);
+                inputImage.putFloat(((value & 0xFF) - mean) / std);
             }
         }
 
