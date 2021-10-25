@@ -32,6 +32,8 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import org.tensorflow.lite.Interpreter;
+import org.tensorflow.lite.gpu.CompatibilityList;
+import org.tensorflow.lite.gpu.GpuDelegate;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -114,9 +116,8 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
         */
 
         Interpreter.Options options = new Interpreter.Options();
-        /*
-        CompatibilityList compatList = new CompatibilityList();
 
+        CompatibilityList compatList = new CompatibilityList();
         if (compatList.isDelegateSupportedOnThisDevice())
         {
             // if the device has a supported GPU, add the GPU delegate
@@ -131,9 +132,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
             options.setNumThreads(4);
             Log.i(TAG, "tflite:use CPU with 4 threads");
         }
-         */
-
-        options.setNumThreads(4);
 
         ByteBuffer tfliteModel = null;
         try
