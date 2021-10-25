@@ -184,7 +184,7 @@ public class VideoFrameAnalyser implements ImageAnalysis.Analyzer
                                             try
                                             {
                                                 // TODO: reverse this process, to only reveal the foreground pixels
-                                                //       so that when an error occurs not the whole image is revealed my mistake!
+                                                //       so that when an error occurs not the whole image is revealed by mistake!
                                                 for (y = 0; y < mheight; y++)
                                                 {
                                                     for (x = 0; x < mwidth; x++)
