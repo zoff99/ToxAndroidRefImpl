@@ -394,4 +394,8 @@
     <string name="title_activity_conferenceinfo">Konferans bilgisi</string>
     <string name="pref_title_speakerphone_tweak">Aramalar için hoparlör düzeltmesi</string>
     <string name="pref_description_speakerphone_tweak">Uygulama arama sırasında hoparlöre geçmezse, bu düzeltmeyi etkinleştirmeyi deneyin.</string>
+    <string name="pref_title_use_camera_x">Arka planı kaldır</string>
+    <string name="pref_description_use_camera_x">!! Deneysel !!
+\nGörüntülü görüşmelerde CameraX kullan ve arka planı kaldır
+\nBu henüz tam olarak çalışmayabilir, lütfen dikkatli olun ve bunun her zaman işe yarayacağına güvenmeyin!</string>
 </resources>
