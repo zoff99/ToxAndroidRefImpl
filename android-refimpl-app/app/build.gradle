@@ -283,10 +283,10 @@ dependencies {
     //
     implementation("com.daimajia.swipelayout:library:1.2.0@aar")
     //
-    implementation ('net.zetetic:android-database-sqlcipher:4.4.3@aar') {
+    implementation('net.zetetic:android-database-sqlcipher:4.4.3@aar') {
         transitive = true
     }
-    implementation ('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
+    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
         transitive = true
     }
     //
@@ -398,12 +398,8 @@ dependencies {
     implementation "androidx.camera:camera-view:1.0.0-alpha30"
     implementation "androidx.camera:camera-extensions:1.0.0-alpha30"
     //
-    // implementation 'org.tensorflow:tensorflow-lite:2.6.0'
-    // implementation 'org.tensorflow:tensorflow-lite-gpu:2.6.0'
-    compile(name:'tensorflow-lite', ext:'aar')
-    compile(name:'tensorflow-lite-gpu', ext:'aar')
-    // implementation 'org.tensorflow:tensorflow-lite-support:0.2.0'
-    // implementation 'org.tensorflow:tensorflow-lite-task-vision:0.2.0'
+    implementation 'com.github.zoff99:pkgs_TensorflowLiteAndroidMediapipeCPU:2.6.0'
+    implementation 'com.github.zoff99:pkgs_TensorflowLiteAndroidMediapipeGPU:2.6.0'
 }
 
 apply from: 'gradle_witness_ng.gradle'
