@@ -105,6 +105,7 @@ android {
         exclude 'kotlin'
         exclude 'META-INF/kotlin*'
         exclude 'META-INF/annotation-experimental_release.kotlin_module'
+        exclude 'META-INF/app_release.kotlin_module'
         exclude 'META-INF/com.yariksoffice*'
         //
         exclude 'lib/armeabi/libRSSupport.so'
