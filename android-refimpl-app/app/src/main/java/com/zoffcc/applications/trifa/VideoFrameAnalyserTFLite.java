@@ -195,11 +195,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                     drawingOverlay.invalidate();
                     postrocessTime = SystemClock.uptimeMillis() - postrocessTime;
 
-                    overallTime = SystemClock.uptimeMillis() - overallTime;
-
-                    Log.d(TAG,
-                          "RUNNNNNNN:" + preprocessTime + " " + imageSegmentationTime + " " + postrocessTime + " ALL=" +
-                          overallTime);
 
                     // only send video frame if call has started
                     if (!((Callstate.tox_call_state == TOXAV_FRIEND_CALL_STATE_NONE.value) ||
@@ -212,11 +207,16 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         byte[] buf2 = new byte[((640 * 480) * 3 / 2)];
                         byte[] buf3 = new byte[((640 * 480) * 3 / 2)];
 
-                        // Log.i(TAG, "format:" + image.getPlanes().length + " " + image.getFormat() + " " +
-                        //           image.getImageInfo() + " " + image.getPlanes()[1].getPixelStride() +
-                        //           " " + image.getPlanes()[1].getRowStride());
+                        // HINT: format "35" --> android.graphics.ImageFormat.YUV_420_888
+                        Log.i(TAG, "format:" + image.getPlanes().length + " " + image.getFormat() + " " +
+                                   image.getPlanes()[1].getPixelStride() + " " + image.getPlanes()[1].getRowStride());
+
+                        // image -->
+                        // Y = w:640 h:480 bytes=640*480
                         ByteBuffer y_ = image.getPlanes()[0].getBuffer();
+                        // Y = w:320 h:240 bytes=320*2*240 (pixelstride == 2)
                         ByteBuffer u_ = image.getPlanes()[1].getBuffer();
+                        // Y = w:320 h:240 bytes=320*2*240 (pixelstride == 2)
                         ByteBuffer v_ = image.getPlanes()[2].getBuffer();
                         y_.rewind();
                         u_.rewind();
@@ -227,10 +227,12 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         final int off_v = (640 * 480) + (640 * 480) / 4;
                         if ((image.getPlanes()[1].getPixelStride() > 1) || (image.getPlanes()[2].getPixelStride() > 1))
                         {
+                            final int pixelstride_1 = image.getPlanes()[1].getPixelStride();
+                            final int pixelstride_2 = image.getPlanes()[2].getPixelStride();
                             for (int k = 0; k < ((640 * 480) / 4); k++)
                             {
-                                buf2[off_u + k] = v_.get(k * image.getPlanes()[1].getPixelStride());
-                                buf2[off_v + k] = u_.get(k * image.getPlanes()[2].getPixelStride());
+                                buf2[off_u + k] = v_.get(k * pixelstride_1);
+                                buf2[off_v + k] = u_.get(k * pixelstride_2);
                             }
                         }
                         else // pixelstrides for u and v both are "1"
@@ -239,6 +241,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                             u_.get(buf2, off_v, (640 * 480) / 4);
                         }
 
+                        // ---------------------------------------------------------------
                         // TODO: haxx0r, make better and actually check all the angles
                         //       and rotate always correctly
                         if (active_camera_type == FRONT_CAMERA_USED)
@@ -246,6 +249,12 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                             buf3 = YUV420rotate90(buf2, buf3, 640, 480);
                             buf2 = YUV420rotate90(buf3, buf2, 480, 640);
                         }
+                        // ---------------------------------------------------------------
+
+                        // ---------------------------------------------------------------
+                        // make the final rotation here
+                        buf3 = YUV420rotate90(buf2, buf3, 640, 480);
+                        // ---------------------------------------------------------------
 
                         int y_size = 640 * 480;
                         int u_v_size = (640 * 480) / 4;
@@ -254,86 +263,70 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         int y_pos = 0;
                         int u_pos = 0;
                         int v_pos = 0;
-                        int x1 = 0;
-                        int y1 = 0;
-                        int _x = 0;
-                        int _y = 0;
-                        int rotated_width;
-                        int buf_pos = 0;
+                        buf.rewind();
 
                         try
                         {
                             final int mwidth = 480;
                             final int mheight = 640;
-                            boolean need_read_float = false;
-                            int count_read = 0;
-                            int last_x_buf = 0;
-                            int tmp = 0;
-                            final float factor = 480f / 256f;
+                            final float factor_w = 255.0f / (float) mwidth;
+                            final float factor_h = 255.0f / (float) mheight;
+                            int read_index_y = 0;
+                            int read_index_xy = 0;
                             // TODO: reverse this process, to only reveal the foreground pixels
                             //       so that when an error occurs not the whole image is revealed by mistake!
                             for (int y = 0; y < mheight; y++)
                             {
+                                read_index_y = (int) (factor_h * (float) y) * 256;
                                 for (int x = 0; x < mwidth; x++)
                                 {
-                                    if (x == 0)
+                                    if (active_camera_type == FRONT_CAMERA_USED)
                                     {
-                                        need_read_float = true;
-                                        count_read = 0;
-                                        last_x_buf = 0;
+                                        // need to flip the mask horizontally for front camera
+                                        read_index_xy = read_index_y + ((int) (factor_w * (float) (mwidth - x - 1)));
                                     }
                                     else
                                     {
-                                        if (count_read >= 255)
-                                        {
-                                            need_read_float = false;
-                                        }
-                                        else
-                                        {
-                                            tmp = (int) ((float) (x) / factor);
-                                            if (tmp > last_x_buf)
-                                            {
-                                                last_x_buf = tmp;
-                                                need_read_float = true;
-                                            }
-                                            else
-                                            {
-                                                need_read_float = false;
-                                            }
-                                        }
+                                        read_index_xy = read_index_y + ((int) (factor_w * (float) x));
                                     }
-
                                     // Gets the confidence of the (x,y) pixel in the mask being in the foreground.
                                     // 1.0 being foreground
                                     // 0.0 background
                                     // use values greater than the threshold value CAM_REMOVE_BACKGROUND_CONFIDENCE_THRESHOLD
-                                    /*
-                                    final float buf_x = 256;
-                                    final float buf_y = 256;
-                                    buf_pos = (int) (buf_y) * (int) ((float) y * (buf_y / (float) mheight)) +
-                                              (int) ((float) x * (buf_x / (float) mwidth));
-                                    foregroundConfidence = buf.getFloat(buf_pos); //buf.getFloat();
-                                     */
 
-                                    if (need_read_float)
+                                    try
                                     {
-                                        foregroundConfidence = buf.getFloat();
-                                        count_read++;
+                                        foregroundConfidence = buf.getFloat(read_index_xy * 4);
+                                    }
+                                    catch (Exception e2)
+                                    {
+                                        e2.printStackTrace();
+                                        foregroundConfidence = 0;
                                     }
 
-                                    // Log.i(TAG, "x=" + x + " y=" + y + " float=" + foregroundConfidence);
+                                    /*
+                                    if (x < 255)
+                                    {
+                                        foregroundConfidence = 1.0f;
+                                    }
+                                    else
+                                    {
+                                        foregroundConfidence = 0.0f;
+                                    }
+                                     */
+
+                                    // Log.i(TAG,
+                                    //       "x=" + x + " y=" + y + " float=" + foregroundConfidence + " read_index_y=" +
+                                    //       read_index_y + " read_index_xy=" + read_index_xy);
                                     if (foregroundConfidence < CAM_REMOVE_BACKGROUND_CONFIDENCE_THRESHOLD)
                                     {
-                                        y1 = mwidth - x - 1;
-                                        x1 = y;
-                                        rotated_width = 640;
-                                        y_pos = (y1 * rotated_width) + x1;
-                                        u_pos = y_size + (y1 / 2 * rotated_width / 2) + (x1 / 2);
-                                        v_pos = y_size + u_v_size + (y1 / 2 * rotated_width / 2) + (x1 / 2);
+                                        y_pos = (y * mwidth) + x;
+                                        u_pos = y_size + (y / 2 * mwidth / 2) + (x / 2);
+                                        v_pos = y_size + u_v_size + (y / 2 * mwidth / 2) + (x / 2);
 
-                                        buf2[y_pos] = 0;
-                                        buf2[u_pos] = (byte) 128;
-                                        buf2[v_pos] = (byte) 128;
+                                        buf3[y_pos] = 0;
+                                        buf3[u_pos] = (byte) 128;
+                                        buf3[v_pos] = (byte) 128;
                                         // Log.i(TAG, "iiiiii:" + y_pos + " " + u_pos + " " + v_pos);
                                     }
                                 }
@@ -341,7 +334,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         }
                         catch (Exception e)
                         {
-                            // e.printStackTrace();
+                            e.printStackTrace();
                         }
 
                         if (MainActivity.video_buffer_2 == null)
@@ -350,17 +343,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                             MainActivity.set_JNI_video_buffer2(MainActivity.video_buffer_2, 480, 640);
                         }
 
-                        if (buf3 == null)
-                        {
-                            buf3 = new byte[buf2.length];
-                        }
-                        else if (buf3.length < buf2.length)
-                        {
-                            buf3 = new byte[buf2.length];
-                        }
-
                         MainActivity.video_buffer_2.rewind();
-                        buf3 = YUV420rotate90(buf2, buf3, 640, 480);
                         MainActivity.video_buffer_2.put(buf3);
 
                         if (PREF__UV_reversed)
@@ -400,6 +383,13 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                             count_video_frame_sent++;
                         }
                     }
+
+                    overallTime = SystemClock.uptimeMillis() - overallTime;
+
+                    Log.d(TAG,
+                          "RUNNNNNNN:" + preprocessTime + " " + imageSegmentationTime + " " + postrocessTime + " ALL=" +
+                          overallTime);
+
                 }
             }
             catch (Exception ea)
