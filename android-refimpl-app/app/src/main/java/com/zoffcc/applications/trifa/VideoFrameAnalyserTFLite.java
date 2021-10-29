@@ -50,6 +50,7 @@ import kotlin.Triple;
 import static com.zoffcc.applications.trifa.CallingActivity.FRONT_CAMERA_USED;
 import static com.zoffcc.applications.trifa.CallingActivity.active_camera_type;
 import static com.zoffcc.applications.trifa.CallingActivity.loadModelFile;
+import static com.zoffcc.applications.trifa.CameraWrapper.YUV420flipHorizontal;
 import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
@@ -256,6 +257,14 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         buf3 = YUV420rotate90(buf2, buf3, 640, 480);
                         // ---------------------------------------------------------------
 
+                        // ---------------------------------------------------------------
+                        // need 1 more horizontal flipping on front camera
+                        if (active_camera_type == FRONT_CAMERA_USED)
+                        {
+                            buf3 = YUV420flipHorizontal(buf3, 480, 640);
+                        }
+                        // ---------------------------------------------------------------
+
                         int y_size = 640 * 480;
                         int u_v_size = (640 * 480) / 4;
 
@@ -280,15 +289,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                                 read_index_y = (int) (factor_h * (float) y) * 256;
                                 for (int x = 0; x < mwidth; x++)
                                 {
-                                    if (active_camera_type == FRONT_CAMERA_USED)
-                                    {
-                                        // need to flip the mask horizontally for front camera
-                                        read_index_xy = read_index_y + ((int) (factor_w * (float) (mwidth - x - 1)));
-                                    }
-                                    else
-                                    {
-                                        read_index_xy = read_index_y + ((int) (factor_w * (float) x));
-                                    }
+                                    read_index_xy = read_index_y + ((int) (factor_w * (float) x));
                                     // Gets the confidence of the (x,y) pixel in the mask being in the foreground.
                                     // 1.0 being foreground
                                     // 0.0 background

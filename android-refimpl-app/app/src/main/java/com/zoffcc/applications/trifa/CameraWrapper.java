@@ -1079,6 +1079,55 @@ public class CameraWrapper
         return output;
     }
 
+    public static byte[] YUV420flipHorizontal(byte[] data, int imageWidth, int imageHeight)
+    {
+        // TODO: optimize me, make me faster!
+
+        // Flip the Y luma
+        byte tmp = 0;
+        int x2 = 0;
+        int temp2 = 0;
+        for (int x = 0; x < (imageWidth / 2); x++)
+        {
+            x2 = imageWidth - x - 1;
+            for (int y = 0; y < imageHeight; y++)
+            {
+                temp2 = y * imageWidth;
+                tmp = data[temp2 + x];
+                data[temp2 + x] = data[temp2 + x2];
+                data[temp2 + x2] = tmp;
+            }
+        }
+
+        // Flip the U and V color components
+        tmp = 0;
+        x2 = 0;
+        temp2 = 0;
+        int y_size = imageWidth * imageHeight;
+        int yu_size = y_size + (y_size / 4);
+        int uv_width = imageWidth / 2;
+        int uv_height = imageHeight / 2;
+        for (int x = 0; x < (uv_width / 2); x++)
+        {
+            x2 = uv_width - x - 1;
+            for (int y = 0; y < uv_height; y++)
+            {
+                // U layer
+                temp2 = y * uv_width;
+                tmp = data[y_size + temp2 + x];
+                data[y_size + temp2 + x] = data[y_size + temp2 + x2];
+                data[y_size + temp2 + x2] = tmp;
+                // V layer
+                temp2 = y * uv_width;
+                tmp = data[yu_size + temp2 + x];
+                data[yu_size + temp2 + x] = data[yu_size + temp2 + x2];
+                data[yu_size + temp2 + x2] = tmp;
+            }
+        }
+
+        return data;
+    }
+
     public static byte[] YUV420rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
         // Rotate the Y luma
