@@ -122,7 +122,8 @@ public class CameraDrawingOverlay extends SurfaceView
                 }
                 else
                 {
-                    canvas.drawBitmap(RotateBitmap(maskBitmap, 90), null, r, null);
+                    // canvas.drawBitmap(RotateBitmap(maskBitmap, 0), null, r, null);
+                    canvas.drawBitmap(maskBitmap, null, r, null);
                 }
             }
         }

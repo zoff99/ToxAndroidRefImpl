@@ -23,7 +23,6 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.media.Image;
@@ -63,14 +62,6 @@ import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXA
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_FINISHED;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE;
 
-/*
-import org.tensorflow.lite.support.image.ImageProcessor;
-import org.tensorflow.lite.support.image.TensorImage;
-import org.tensorflow.lite.support.image.ops.ResizeOp;
-import org.tensorflow.lite.task.vision.segmenter.ImageSegmenter;
-import org.tensorflow.lite.task.vision.segmenter.Segmentation;
-*/
-
 public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 {
     private static final String TAG = "trifa.FrameAnalyserTFL";
@@ -78,16 +69,12 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
     private final CameraDrawingOverlay drawingOverlay;
     private Image frameMediaImage = null;
     static org.tensorflow.lite.Interpreter interpreter = null;
-    // private ImageSegmenter.ImageSegmenterOptions options;
-    // private ImageSegmenter segmenter;
     private Activity a;
     private Context c;
     private final int imageSize = 256;
     private final int NUM_CLASSES = 21;
     private final float IMAGE_MEAN = 0f; // 127.5f;
     private final float IMAGE_STD = 127.5f;
-    String[] labelsArrays;
-    int[] segmentColors;
     YuvToRgbConverter yuvToRgbConverter;
 
     VideoFrameAnalyserTFLite(CameraDrawingOverlay drawingOverlay, Context c, Activity a)
@@ -96,20 +83,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
         this.a = a;
         this.c = c;
 
-        labelsArrays = new String[]{"background", "aeroplane", "bicycle", "bird", "boat", "bottle", "bus", "car", "cat", "chair", "cow", "dining table", "dog", "horse", "motorbike", "person", "potted plant", "sheep", "sofa", "train", "tv"};
-        segmentColors = new int[NUM_CLASSES];
-
         yuvToRgbConverter = new YuvToRgbConverter(this.c);
-
-        Random random = new Random(System.currentTimeMillis());
-        segmentColors[0] = Color.TRANSPARENT;
-        /*
-        for (int i = 1; i < NUM_CLASSES; i++)
-        {
-            segmentColors[i] = Color.argb((128), getRandomRGBInt(random), getRandomRGBInt(random),
-                                          getRandomRGBInt(random));
-        }
-         */
 
         Interpreter.Options options = new Interpreter.Options();
 
@@ -163,8 +137,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
         frameMediaImage = image.getImage();
         if (frameMediaImage != null)
         {
-            // Log.i(TAG, "YYYYY:" + Thread.currentThread().getName());
-
             try
             {
                 if (!Callstate.audio_call)
@@ -178,8 +150,12 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                                                      Bitmap.Config.ARGB_8888);
                     yuvToRgbConverter.yuvToRgb(frameMediaImage, bmp);
 
-                    Log.i(TAG, "bbbb:1:" + bmp.getWidth() + " " + bmp.getHeight() + " " + imageSize);
-                    Bitmap scaledBitmap = scaleBitmapAndKeepRatio(bmp, imageSize, imageSize);
+                    Log.i(TAG, "bbbb:1:" + bmp.getWidth() + " " + bmp.getHeight() + " " + imageSize + " rot=" +
+                               image.getImageInfo().getRotationDegrees());
+
+                    int rotate_input = image.getImageInfo().getRotationDegrees();
+                    Bitmap scaledBitmap = scaleBitmapAndKeepRatio(bmp, imageSize, imageSize, true, rotate_input,
+                                                                  active_camera_type);
                     Log.i(TAG, "bbbb:2:" + scaledBitmap.getWidth() + " " + scaledBitmap.getHeight() + " " + imageSize);
                     ByteBuffer contentArray = bitmapToByteBuffer(scaledBitmap, imageSize, imageSize, IMAGE_MEAN,
                                                                  IMAGE_STD);
@@ -191,15 +167,24 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                     Log.i(TAG, "tensor_in_out:" + contentArray.limit() + " " + contentArray.limit() + " " +
                                segmentationMasks.limit());
                     /*
+                     *
+                     *  Run the TFLite model here --------------------------------
+                     *
+                     */
+                    /*
                         The general model operates on a 256x256x3 (HWC) tensor,
                         and outputs a 256x256x1 tensor representing the segmentation mask
                      */
                     long imageSegmentationTime = SystemClock.uptimeMillis();
                     interpreter.run(contentArray, segmentationMasks);
                     imageSegmentationTime = SystemClock.uptimeMillis() - imageSegmentationTime;
+                    /*
+                     *
+                     *  Run the TFLite model here --------------------------------
+                     *
+                     */
 
                     long postrocessTime = SystemClock.uptimeMillis();
-                    // segmentationMasks.limit(imageSize * imageSize * 4);
                     segmentationMasks.rewind();
                     Bitmap bitmap = Bitmap.createBitmap(imageSize, imageSize, Bitmap.Config.ARGB_8888);
                     Log.i(TAG,
@@ -212,76 +197,9 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 
                     overallTime = SystemClock.uptimeMillis() - overallTime;
 
-                    /*
-                    long maskFlatteningTime = SystemClock.uptimeMillis();
-                    Triple<Bitmap, Bitmap, Map<String, Integer>> ret;
-
-                    ret = convertBytebufferMaskToBitmap(segmentationMasks, imageSize, imageSize, scaledBitmap,
-                                                        segmentColors);
-                    maskFlatteningTime = SystemClock.uptimeMillis() - maskFlatteningTime;
-                    drawingOverlay.maskBitmap = ret.component2();
-                    drawingOverlay.invalidate();
-                     */
-
-                    //segmentationMasks.limit(imageSize * imageSize * 4);
-                    //segmentationMasks.rewind();
-                    //Bitmap bitmap = Bitmap.createBitmap(imageSize, imageSize, Bitmap.Config.ARGB_8888);
-                    //bitmap.copyPixelsFromBuffer(segmentationMasks);
-                    //drawingOverlay.maskBitmap = bitmap;
-                    //drawingOverlay.invalidate();
-
                     Log.d(TAG,
                           "RUNNNNNNN:" + preprocessTime + " " + imageSegmentationTime + " " + postrocessTime + " ALL=" +
                           overallTime);
-
-                    /*
-                    ImageProcessor imageProcessor = new ImageProcessor.Builder().
-                            add(new ResizeOp(224, 224, ResizeOp.ResizeMethod.BILINEAR)).
-                            build();
-
-                    TensorImage tensorImage = new TensorImage(DataType.UINT8);
-                    Log.i(TAG, "YYYYY:1:" + tensorImage);
-                    tensorImage.load(frameMediaImage);
-                    // tensorImage = imageProcessor.process(tensorImage);
-                    Log.i(TAG, "YYYYY:2:" + tensorImage + " segmenter=" + segmenter);
-                    List<Segmentation> results = segmenter.segment(tensorImage);
-
-                    Log.i(TAG, "YYYYY:3:" + results.size() + " " + results.get(0).getMasks().get(0).getWidth() + " " +
-                               results.get(0).getMasks().get(0).getHeight());
-
-                    ByteBuffer buf_mask = results.get(0).getMasks().get(0).getBuffer();
-                    Log.i(TAG, "YYYYY:4:" + buf_mask.limit());
-
-                    buf_mask.rewind();
-                    Bitmap bitmap = Bitmap.createBitmap(results.get(0).getMasks().get(0).getWidth(),
-                                                        results.get(0).getMasks().get(0).getHeight(),
-                                                        Bitmap.Config.ARGB_8888);
-                    // bitmap.copyPixelsFromBuffer(buf_mask);
-                    for (int j = 0; j < results.get(0).getMasks().get(0).getHeight(); j++)
-                    {
-                        for (int i = 0; i < results.get(0).getMasks().get(0).getWidth(); i++)
-                        {
-                            float f = buf_mask.getFloat();
-                            // Log.i(TAG, "f=" + f);
-                            if (f > 0.9)
-                            {
-                                bitmap.setPixel(i, j, Color.RED);
-                            }
-                            else
-                            {
-                                bitmap.setPixel(i, j, Color.BLUE);
-                            }
-                        }
-                    }
-                    drawingOverlay.maskBitmap = bitmap;
-                    drawingOverlay.invalidate();
-
-                     */
-
-                    // final ByteBuffer input = ByteBuffer.allocateDirect(640 * 480 * 3 / 2);
-                    // final ByteBuffer buf = ByteBuffer.allocateDirect(640 * 480 * 4); // 4 byte float output mask buffer
-                    // interpreter.run(input, buf);
-
 
                     // only send video frame if call has started
                     if (!((Callstate.tox_call_state == TOXAV_FRIEND_CALL_STATE_NONE.value) ||
@@ -300,14 +218,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         ByteBuffer y_ = image.getPlanes()[0].getBuffer();
                         ByteBuffer u_ = image.getPlanes()[1].getBuffer();
                         ByteBuffer v_ = image.getPlanes()[2].getBuffer();
-
-                        // y_.rewind();
-                        // u_.rewind();
-                        // v_.rewind();
-                        //Log.i(TAG, "format:0:" +image.getPlanes()[0].getBuffer().limit()+" "+image.getPlanes()[0].getRowStride()+" "+image.getPlanes()[0].getPixelStride());
-                        //Log.i(TAG, "format:1:" +image.getPlanes()[1].getBuffer().limit()+" "+image.getPlanes()[1].getRowStride()+" "+image.getPlanes()[1].getPixelStride());
-                        //Log.i(TAG, "format:2:" +image.getPlanes()[2].getBuffer().limit()+" "+image.getPlanes()[2].getRowStride()+" "+image.getPlanes()[2].getPixelStride());
-
                         y_.rewind();
                         u_.rewind();
                         v_.rewind();
@@ -325,7 +235,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         }
                         else // pixelstrides for u and v both are "1"
                         {
-                            // Log.i(TAG, "SSSSSSSSSS:" + image.getPlanes()[1].getPixelStride());
                             v_.get(buf2, off_u, (640 * 480) / 4);
                             u_.get(buf2, off_v, (640 * 480) / 4);
                         }
@@ -365,10 +274,8 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                             //       so that when an error occurs not the whole image is revealed by mistake!
                             for (int y = 0; y < mheight; y++)
                             {
-                                // Log.i(TAG, "tmp==Y== " + y + " ===");
                                 for (int x = 0; x < mwidth; x++)
                                 {
-                                    // Log.i(TAG, "tmp==X== " + x + " ===");
                                     if (x == 0)
                                     {
                                         need_read_float = true;
@@ -395,10 +302,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                                             }
                                         }
                                     }
-
-                                    // Log.i(TAG, "tmp=" + tmp + " x=" + x + " y=" + y + " count_read=" + count_read +
-                                    //           " last_x_buf=" + last_x_buf);
-
 
                                     // Gets the confidence of the (x,y) pixel in the mask being in the foreground.
                                     // 1.0 being foreground
@@ -439,11 +342,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         catch (Exception e)
                         {
                             // e.printStackTrace();
-                            // Log.i(TAG, "tmp=EEEEEE:" + e.getMessage());
-                            //Log.i(TAG,
-                            //      "iiiiii:y_pos=" + y_pos + " u_pos=" + u_pos + " v_pos=" + v_pos + " x=" + x + " y=" +
-                            //      y + " x1=" + x1 + " y1=" + y1 + " y_size=" + y_size + " u_v_size=" + u_v_size +
-                            //      " buf_pos=" + buf_pos);
                         }
 
                         if (MainActivity.video_buffer_2 == null)
@@ -461,14 +359,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                             buf3 = new byte[buf2.length];
                         }
 
-                        // buf3 = NV21rotate90(YUV_420_888toNV21_x(buf2, 640, 480), buf3, 640, 480);
-                        // buf3 = NV21rotate90(buf2, buf3, 640, 480);
-
                         MainActivity.video_buffer_2.rewind();
-                        // MainActivity.video_buffer_2.put(buf3);
-                        // MainActivity.video_buffer_2.put(YUV_420_888toNV21_x(buf2, 640, 480));
-
-
                         buf3 = YUV420rotate90(buf2, buf3, 640, 480);
                         MainActivity.video_buffer_2.put(buf3);
 
@@ -486,7 +377,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                                                                                            Callstate.friend_pubkey),
                                                                                    480, 640, capture_ts);
                         }
-                        // Log.i(TAG, "XXXX:res:" + res);
 
                         if (last_video_frame_sent == -1)
                         {
@@ -510,8 +400,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                             count_video_frame_sent++;
                         }
                     }
-
-
                 }
             }
             catch (Exception ea)
@@ -566,23 +454,30 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
         return new Triple(resultBitmap, maskBitmap, itemsFound);
     }
 
-    Bitmap scaleBitmapAndKeepRatio(Bitmap targetBmp, int reqHeightInPixels, int reqWidthInPixels)
+    Bitmap scaleBitmapAndKeepRatio(Bitmap targetBmp, int reqHeightInPixels, int reqWidthInPixels, boolean rotate, int rotate_degrees, int camera_type)
     {
-        if (targetBmp.getHeight() == reqHeightInPixels && targetBmp.getWidth() == reqWidthInPixels)
-        {
-            return targetBmp;
-        }
         Matrix matrix = new Matrix();
         matrix.setRectToRect(new RectF(0f, 0f, (float) targetBmp.getWidth(), (float) targetBmp.getHeight()),
                              new RectF(0f, 0f, (float) reqWidthInPixels, (float) reqHeightInPixels),
                              Matrix.ScaleToFit.FILL);
 
+        if (camera_type == FRONT_CAMERA_USED)
+        {
+            // flip image vertically, after scaling
+            matrix.postScale(1, -1, (float) reqWidthInPixels, (float) reqHeightInPixels);
+        }
+
+        if (rotate)
+        {
+            // rotate after scaling
+            matrix.postRotate(rotate_degrees);
+        }
+
         return Bitmap.createBitmap(targetBmp, 0, 0, targetBmp.getWidth(), targetBmp.getHeight(), matrix, true);
     }
 
-    ByteBuffer bitmapToByteBuffer(Bitmap bitmapIn, int width, int height, float mean, float std)
+    ByteBuffer bitmapToByteBuffer(Bitmap bitmap, int width, int height, float mean, float std)
     {
-        Bitmap bitmap = scaleBitmapAndKeepRatio(bitmapIn, width, height);
         ByteBuffer inputImage = ByteBuffer.allocateDirect(1 * width * height * 3 * 4);
         inputImage.order(ByteOrder.nativeOrder());
         inputImage.rewind();
