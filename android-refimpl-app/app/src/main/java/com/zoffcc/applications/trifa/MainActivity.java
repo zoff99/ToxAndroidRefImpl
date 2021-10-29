@@ -89,7 +89,6 @@ import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -130,7 +129,6 @@ import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
-import static com.zoffcc.applications.trifa.CallingActivity.loadModelFile;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
@@ -1197,15 +1195,15 @@ public class MainActivity extends AppCompatActivity
 
         //if (MainActivity.IS_GPLAY_VERSION)
         //{
-            try
-            {
-                PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                PREF__use_camera_x = false;
-            }
+        try
+        {
+            PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__use_camera_x = false;
+        }
         //}
         //else
         //{
@@ -2393,15 +2391,15 @@ public class MainActivity extends AppCompatActivity
 
         //if (MainActivity.IS_GPLAY_VERSION)
         //{
-            try
-            {
-                PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-                PREF__use_camera_x = false;
-            }
+        try
+        {
+            PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__use_camera_x = false;
+        }
         //}
         //else
         //{

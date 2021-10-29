@@ -77,7 +77,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 
     private final CameraDrawingOverlay drawingOverlay;
     private Image frameMediaImage = null;
-    private org.tensorflow.lite.Interpreter interpreter = null;
+    static org.tensorflow.lite.Interpreter interpreter = null;
     // private ImageSegmenter.ImageSegmenterOptions options;
     // private ImageSegmenter segmenter;
     private Activity a;
@@ -103,30 +103,13 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 
         Random random = new Random(System.currentTimeMillis());
         segmentColors[0] = Color.TRANSPARENT;
+        /*
         for (int i = 1; i < NUM_CLASSES; i++)
         {
             segmentColors[i] = Color.argb((128), getRandomRGBInt(random), getRandomRGBInt(random),
                                           getRandomRGBInt(random));
         }
-
-        /*
-        // Initialization
-        options = ImageSegmenter.ImageSegmenterOptions.
-                builder().
-                setNumThreads(4).
-                setOutputType(OutputType.CONFIDENCE_MASK).
-                build();
-
-        try
-        {
-            segmenter = ImageSegmenter.createFromFileAndOptions(c, "deeplabv3_257_mv_gpu.tflite", options);
-        }
-        catch (IOException e)
-        {
-            Log.i(TAG, "segmenter:EE:" + e.getMessage());
-            e.printStackTrace();
-        }
-        */
+         */
 
         Interpreter.Options options = new Interpreter.Options();
 
@@ -156,17 +139,20 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
             e.printStackTrace();
         }
 
-        this.interpreter = new Interpreter(tfliteModel, options);
+        Log.i(TAG, "Interpreter:start:001");
+        // HINT: this is very slow and can take a few seconds
+        // https://github.com/tensorflow/tensorflow/issues/44612
+        // so initialze only once
+        if (interpreter == null)
+        {
+            interpreter = new Interpreter(tfliteModel, options);
+        }
+        Log.i(TAG, "Interpreter:ready:002");
     }
 
     int getRandomRGBInt(Random random)
     {
         return (int) ((255 * random.nextFloat()));
-    }
-
-    public void setInterpreter(Interpreter interpreter)
-    {
-        this.interpreter = interpreter;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -177,7 +163,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
         frameMediaImage = image.getImage();
         if (frameMediaImage != null)
         {
-            Log.i(TAG, "YYYYY:" + Thread.currentThread().getName());
+            // Log.i(TAG, "YYYYY:" + Thread.currentThread().getName());
 
             try
             {

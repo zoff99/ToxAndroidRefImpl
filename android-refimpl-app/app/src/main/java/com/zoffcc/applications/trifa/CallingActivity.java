@@ -1166,8 +1166,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
+        Log.i(TAG,"start:0001");
         initUI();
+        Log.i(TAG,"start:0002");
         initViewParams();
+        Log.i(TAG,"start:0003");
 
         top_text_line_str1 = Callstate.friend_alias_name;
         top_text_line_str2 = "";
@@ -1283,7 +1286,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         });
 
         Log.i(TAG, "onCreate:99");
-
     }
 
     @Override
