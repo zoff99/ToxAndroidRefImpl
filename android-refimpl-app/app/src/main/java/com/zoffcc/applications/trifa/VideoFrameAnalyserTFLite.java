@@ -70,7 +70,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
     private final int imageSize = 256;
     private final float IMAGE_MEAN = 0f; // 127.5f;
     private final float IMAGE_STD = 127.5f;
-    private final YuvToRgbConverter yuvToRgbConverter;
+    private final YuvToRgbConverterJ yuvToRgbConverter;
     private Bitmap camera_video_frame_bitmap = null;
     private ByteBuffer segmentationMasks = null;
     private Bitmap bitmap_for_segmentationmask = null;
@@ -83,7 +83,7 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
         this.a = a;
         this.c = c;
 
-        yuvToRgbConverter = new YuvToRgbConverter(this.c);
+        yuvToRgbConverter = new YuvToRgbConverterJ(this.c);
 
         camera_video_frame_bitmap = null;
         segmentationMasks = ByteBuffer.allocateDirect(imageSize * imageSize * 4);
