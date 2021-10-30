@@ -36,15 +36,11 @@ import org.tensorflow.lite.gpu.GpuDelegate;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.ImageProxy;
-import kotlin.Triple;
 
 import static com.zoffcc.applications.trifa.CallingActivity.FRONT_CAMERA_USED;
 import static com.zoffcc.applications.trifa.CallingActivity.active_camera_type;
@@ -72,7 +68,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
     private Activity a;
     private Context c;
     private final int imageSize = 256;
-    private final int NUM_CLASSES = 21;
     private final float IMAGE_MEAN = 0f; // 127.5f;
     private final float IMAGE_STD = 127.5f;
     private YuvToRgbConverter yuvToRgbConverter;
@@ -134,11 +129,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
             interpreter = new Interpreter(tfliteModel, options);
         }
         Log.i(TAG, "Interpreter:ready:002");
-    }
-
-    int getRandomRGBInt(Random random)
-    {
-        return (int) ((255 * random.nextFloat()));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -421,49 +411,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
         }
     }
 
-    Triple<Bitmap, Bitmap, Map<String, Integer>> convertBytebufferMaskToBitmap(ByteBuffer inputBuffer, int imageWidth, int imageHeight, Bitmap backgroundImage, int[] colors)
-    {
-        Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-        Bitmap maskBitmap = Bitmap.createBitmap(imageWidth, imageHeight, conf);
-        Bitmap resultBitmap = Bitmap.createBitmap(imageWidth, imageHeight, conf);
-        // Bitmap scaledBackgroundImage = scaleBitmapAndKeepRatio(backgroundImage, imageWidth, imageHeight);
-        int[][] mSegmentBits = new int[imageWidth][imageHeight]; //new Array(imageWidth) { IntArray(imageHeight) }
-        HashMap itemsFound = new HashMap<String, Integer>();
-        inputBuffer.rewind();
-
-        // Log.i(TAG, "imageWidth=" + imageWidth + " imageHeight" + imageHeight);
-
-        for (int y = 0; y < imageHeight; y++)
-        {
-            for (int x = 0; x < imageWidth; x++)
-            {
-                float maxVal = 0f;
-                mSegmentBits[x][y] = 0;
-
-                for (int c = 0; c < NUM_CLASSES; c++)
-                // int c = 0;
-                {
-                    float value = inputBuffer.getFloat((y * imageWidth * NUM_CLASSES + x * NUM_CLASSES + c) * 4);
-                    if (c == 0 || value > maxVal)
-                    {
-                        maxVal = value;
-                        mSegmentBits[x][y] = c;
-                    }
-                }
-                // String label = labelsArrays[mSegmentBits[x][y]];
-                // int color = colors[mSegmentBits[x][y]];
-                // itemsFound.put(label, color);
-                //int newPixelColor = ColorUtils.compositeColors(colors[mSegmentBits[x][y]],
-                //                                               scaledBackgroundImage.getPixel(x, y));
-                // resultBitmap.setPixel(x, y, newPixelColor);
-                maskBitmap.setPixel(x, y, colors[mSegmentBits[x][y]]);
-                // maskBitmap.setPixel(x, y, Color.BLUE);
-            }
-        }
-
-        return new Triple(resultBitmap, maskBitmap, itemsFound);
-    }
-
     Bitmap scaleBitmapAndKeepRatio(Bitmap targetBmp, int reqHeightInPixels, int reqWidthInPixels, boolean rotate, int rotate_degrees, int camera_type)
     {
         Matrix matrix = new Matrix();
@@ -512,16 +459,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 
         inputImage.rewind();
         return inputImage;
-    }
-
-    Bitmap createEmptyBitmap(int imageWidth, int imageHeigth, int color)
-    {
-        Bitmap ret = Bitmap.createBitmap(imageWidth, imageHeigth, Bitmap.Config.RGB_565);
-        if (color != 0)
-        {
-            ret.eraseColor(color);
-        }
-        return ret;
     }
 }
 
