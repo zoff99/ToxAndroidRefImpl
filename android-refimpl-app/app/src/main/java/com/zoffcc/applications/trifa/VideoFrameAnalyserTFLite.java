@@ -66,16 +66,21 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 {
     private static final String TAG = "trifa.FrameAnalyserTFL";
 
+    static org.tensorflow.lite.Interpreter interpreter = null;
     private final CameraDrawingOverlay drawingOverlay;
     private Image frameMediaImage = null;
-    static org.tensorflow.lite.Interpreter interpreter = null;
     private Activity a;
     private Context c;
     private final int imageSize = 256;
     private final int NUM_CLASSES = 21;
     private final float IMAGE_MEAN = 0f; // 127.5f;
     private final float IMAGE_STD = 127.5f;
-    YuvToRgbConverter yuvToRgbConverter;
+    private YuvToRgbConverter yuvToRgbConverter;
+    private Bitmap camera_video_frame_bitmap = null;
+    private ByteBuffer segmentationMasks = null;
+    private Bitmap bitmap_for_segmentationmask = null;
+    private byte[] buf2 = null;
+    private byte[] buf3 = null;
 
     VideoFrameAnalyserTFLite(CameraDrawingOverlay drawingOverlay, Context c, Activity a)
     {
@@ -84,6 +89,13 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
         this.c = c;
 
         yuvToRgbConverter = new YuvToRgbConverter(this.c);
+
+        camera_video_frame_bitmap = null;
+        segmentationMasks = ByteBuffer.allocateDirect(imageSize * imageSize * 4);
+        segmentationMasks.order(ByteOrder.nativeOrder());
+        bitmap_for_segmentationmask = Bitmap.createBitmap(imageSize, imageSize, Bitmap.Config.ARGB_8888);
+        buf2 = new byte[((640 * 480) * 3 / 2)];
+        buf3 = new byte[((640 * 480) * 3 / 2)];
 
         Interpreter.Options options = new Interpreter.Options();
 
@@ -146,26 +158,36 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                     // long preprocessTime = SystemClock.uptimeMillis();
                     // long overallTime = preprocessTime;
 
-                    Bitmap bmp = Bitmap.createBitmap(frameMediaImage.getWidth(), frameMediaImage.getHeight(),
-                                                     Bitmap.Config.ARGB_8888);
-                    yuvToRgbConverter.yuvToRgb(frameMediaImage, bmp);
+                    if (camera_video_frame_bitmap == null)
+                    {
+                        camera_video_frame_bitmap = Bitmap.createBitmap(frameMediaImage.getWidth(),
+                                                                        frameMediaImage.getHeight(),
+                                                                        Bitmap.Config.ARGB_8888);
+                    }
+                    else if ((camera_video_frame_bitmap.getWidth() != frameMediaImage.getWidth()) ||
+                             (camera_video_frame_bitmap.getHeight() != frameMediaImage.getHeight()))
+                    {
+                        camera_video_frame_bitmap = Bitmap.createBitmap(frameMediaImage.getWidth(),
+                                                                        frameMediaImage.getHeight(),
+                                                                        Bitmap.Config.ARGB_8888);
+
+                    }
+
+                    yuvToRgbConverter.yuvToRgb(frameMediaImage, camera_video_frame_bitmap);
 
                     // Log.i(TAG, "bbbb:1:" + bmp.getWidth() + " " + bmp.getHeight() + " " + imageSize + " rot=" +
                     //           image.getImageInfo().getRotationDegrees());
 
                     int rotate_input = image.getImageInfo().getRotationDegrees();
-                    Bitmap scaledBitmap = scaleBitmapAndKeepRatio(bmp, imageSize, imageSize, true, rotate_input,
-                                                                  active_camera_type);
+                    Bitmap scaledBitmap = scaleBitmapAndKeepRatio(camera_video_frame_bitmap, imageSize, imageSize, true,
+                                                                  rotate_input, active_camera_type);
                     // Log.i(TAG, "bbbb:2:" + scaledBitmap.getWidth() + " " + scaledBitmap.getHeight() + " " + imageSize);
                     ByteBuffer contentArray = bitmapToByteBuffer(scaledBitmap, imageSize, imageSize, IMAGE_MEAN,
                                                                  IMAGE_STD);
 
-                    ByteBuffer segmentationMasks = ByteBuffer.allocateDirect(imageSize * imageSize * 4);
-                    segmentationMasks.order(ByteOrder.nativeOrder());
 
                     // preprocessTime = SystemClock.uptimeMillis() - preprocessTime;
-                    //Log.i(TAG, "tensor_in_out:" + contentArray.limit() + " " + contentArray.limit() + " " +
-                    //           segmentationMasks.limit());
+                    // Log.i(TAG, "tensor_in_out:" + contentArray.limit() + " " + segmentationMasks.limit());
                     /*
                      *
                      *  Run the TFLite model here --------------------------------
@@ -176,6 +198,8 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
                         and outputs a 256x256x1 tensor representing the segmentation mask
                      */
                     // long imageSegmentationTime = SystemClock.uptimeMillis();
+                    contentArray.rewind();
+                    segmentationMasks.rewind();
                     interpreter.run(contentArray, segmentationMasks);
                     // imageSegmentationTime = SystemClock.uptimeMillis() - imageSegmentationTime;
                     /*
@@ -186,12 +210,11 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 
                     // long postrocessTime = SystemClock.uptimeMillis();
                     segmentationMasks.rewind();
-                    Bitmap bitmap = Bitmap.createBitmap(imageSize, imageSize, Bitmap.Config.ARGB_8888);
                     //Log.i(TAG,
                     //      "tensor_res_bitmaps:" + bitmap.getAllocationByteCount() + " " + bitmap.getByteCount() + " " +
                     //      bitmap.getRowBytes());
-                    bitmap.copyPixelsFromBuffer(segmentationMasks);
-                    drawingOverlay.maskBitmap = bitmap;
+                    bitmap_for_segmentationmask.copyPixelsFromBuffer(segmentationMasks);
+                    drawingOverlay.maskBitmap = bitmap_for_segmentationmask;
                     drawingOverlay.invalidate();
                     // postrocessTime = SystemClock.uptimeMillis() - postrocessTime;
 
@@ -204,8 +227,6 @@ public class VideoFrameAnalyserTFLite implements ImageAnalysis.Analyzer
 
                         ByteBuffer buf = segmentationMasks;
                         buf.rewind();
-                        byte[] buf2 = new byte[((640 * 480) * 3 / 2)];
-                        byte[] buf3 = new byte[((640 * 480) * 3 / 2)];
 
                         // HINT: format "35" --> android.graphics.ImageFormat.YUV_420_888
                         //Log.i(TAG, "format:" + image.getPlanes().length + " " + image.getFormat() + " " +

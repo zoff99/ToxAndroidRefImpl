@@ -50,6 +50,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -503,6 +504,20 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "Lingver_Locale: " + Lingver.getInstance().getLocale());
         Log.d(TAG, "Lingver_Language: " + Lingver.getInstance().getLanguage());
         // Log.d(TAG, "Actual_Language: " + resources.configuration.getLocaleCompat());
+
+        try
+        {
+            if (BuildConfig.DEBUG)
+            {
+                Log.i(TAG, "***** BuildConfig.DEBUG *****");
+                //StrictMode.setVmPolicy(
+                //        new StrictMode.VmPolicy.Builder().detectLeakedClosableObjects().penaltyLog().build());
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         resources = this.getResources();
         metrics = resources.getDisplayMetrics();
