@@ -246,4 +246,10 @@
     <string name="layout___conf_id">Número Identificador da Conferência:</string>
     <string name="pref_title_download_push_msg_app">Baixe o aplicativo de mensagens instantâneas</string>
     <string name="title_activity_conferenceinfo">Informações sobre a conferência</string>
+    <string name="pref_title_use_camera_x">Remoção de fundo</string>
+    <string name="pref_description_use_camera_x">!! Experimental !!!
+\nUsar CameraX e Remoção de fundo em Videochamadas
+\nIsto pode ainda não funcionar totalmente, favor ter cuidado e não depender sempre disto para funcionar!</string>
+    <string name="pref_title_speakerphone_tweak">Correção do alto-falante para chamadas</string>
+    <string name="pref_description_speakerphone_tweak">Se o aplicativo não mudar para o alto-falante em uma chamada, então tente ativar essa correção.</string>
 </resources>
