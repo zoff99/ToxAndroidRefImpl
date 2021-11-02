@@ -345,4 +345,10 @@
     <string name="layout___conf_id">Identificación de la conferencia:</string>
     <string name="pref_title_download_push_msg_app">Descargar la aplicación de mensajes push</string>
     <string name="title_activity_conferenceinfo">Informaciones sobre la conferencia</string>
+    <string name="pref_title_use_camera_x">Eliminar fondo</string>
+    <string name="pref_description_use_camera_x">¡¡!! ¡¡Experimental !!
+\nUsar CameraX y eliminar el fondo en las videollamadas
+\n¡Esto podría no funcionar completamente todavía, por favor tenga cuidado y no dependa siempre de esto para funcionar!</string>
+    <string name="pref_title_speakerphone_tweak">Corrección de altavoz para llamadas</string>
+    <string name="pref_description_speakerphone_tweak">Si la aplicación no cambia al altavoz en una llamada, intente activar esta solución.</string>
 </resources>
