@@ -1,4 +1,4 @@
-﻿/* CoffeeCatch, a tiny native signal handler/catcher for JNI code.
+/* CoffeeCatch, a tiny native signal handler/catcher for JNI code.
  * (especially for Android/Dalvik)
  *
  * Copyright (c) 2013, Xavier Roche (http://www.httrack.com/)
