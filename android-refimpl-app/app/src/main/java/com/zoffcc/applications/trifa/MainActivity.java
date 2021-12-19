@@ -50,7 +50,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -146,6 +145,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_fro
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_capabilities;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
@@ -228,6 +228,8 @@ import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXA
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_A;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE_TO_STRING;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_EXIT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_JOIN;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_STATE_CHANGE.TOX_CONFERENCE_STATE_CHANGE_PEER_NAME_CHANGE;
@@ -374,6 +376,8 @@ public class MainActivity extends AppCompatActivity
     final static SimpleDateFormat df_date_only = new SimpleDateFormat("yyyy-MM-dd");
     static long last_updated_fps = -1;
     final static long update_fps_every_ms = 1500L; // update every 1.5 seconds
+    //
+    static long tox_self_capabilites = 0;
     //
     static boolean PREF__UV_reversed = true; // TODO: on older phones this needs to be "false"
     static boolean PREF__notification_sound = true;
@@ -2794,6 +2798,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native String tox_friend_get_public_key(long friend_number);
 
+    public static native long tox_friend_get_capabilities(long friend_number);
+
     public static native long[] tox_self_get_friend_list();
 
     public static native int tox_self_set_name(@NonNull String name);
@@ -2815,6 +2821,8 @@ public class MainActivity extends AppCompatActivity
     public static native long tox_self_get_status_message_size();
 
     public static native String tox_self_get_status_message();
+
+    public static native long tox_self_get_capabilities();
 
     public static native int tox_friend_send_lossless_packet(long friend_number, @NonNull byte[] data, int data_length);
 
@@ -4127,6 +4135,21 @@ public class MainActivity extends AppCompatActivity
 
         if (f != null)
         {
+            if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)
+            {
+                if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
+                {
+                    // ******** friend just came online ********
+                    // update and save this friends TOX CAPABILITIES
+                    long friend_capabilities = tox_friend_get_capabilities(friend_number);
+                    Log.i(TAG, "friend_capabilities:" + friend_capabilities + " decoded:" +
+                               TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(friend_capabilities)) + " " +
+                               (1L << 63L));
+                    f.capabilities = friend_capabilities;
+                    update_friend_in_db_capabilities(f);
+                }
+            }
+
             if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)
             {
                 if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)

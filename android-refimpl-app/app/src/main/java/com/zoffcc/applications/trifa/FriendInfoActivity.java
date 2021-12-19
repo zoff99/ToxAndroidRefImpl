@@ -39,6 +39,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_capabilities_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar_update;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
@@ -53,6 +54,8 @@ import static com.zoffcc.applications.trifa.HelperRelay.remove_friend_relay_in_d
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE_TO_STRING;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendInfoActivity extends AppCompatActivity
@@ -64,6 +67,7 @@ public class FriendInfoActivity extends AppCompatActivity
     TextView mystatus_message = null;
     EditText alias_text = null;
     TextView fi_relay_pubkey_textview = null;
+    TextView fi_toxcapabilities_textview = null;
     TextView fi_relay_text = null;
     Button remove_friend_relay_button = null;
     TextView fi_pushurl_textview = null;
@@ -92,6 +96,7 @@ public class FriendInfoActivity extends AppCompatActivity
         fi_pushurl_textview = (TextView) findViewById(R.id.fi_pushurl_textview);
         fi_pushurl_text = (TextView) findViewById(R.id.fi_pushurl_text);
         remove_friend_pushurl_button = (Button) findViewById(R.id.remove_friend_pushurl_button);
+        fi_toxcapabilities_textview = (TextView) findViewById(R.id.fi_toxcapabilities_textview);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -112,6 +117,9 @@ public class FriendInfoActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        fi_toxcapabilities_textview.setText(TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(
+                get_friend_capabilities_from_pubkey(tox_friend_get_public_key__wrapper(friendnum)))));
 
         String friend_relay_pubkey = get_relay_for_friend(tox_friend_get_public_key__wrapper(friendnum));
 
@@ -207,8 +215,8 @@ public class FriendInfoActivity extends AppCompatActivity
                 else
                 {
                     Spannable spannable = new SpannableString(pushurl_for_friend + "\n" + "( OK )");
-                    spannable.setSpan(new ForegroundColorSpan(darkenColor(Color.GREEN, 0.3f)), pushurl_for_friend.length(),
-                                      (pushurl_for_friend + "\n" + "( OK )").length(),
+                    spannable.setSpan(new ForegroundColorSpan(darkenColor(Color.GREEN, 0.3f)),
+                                      pushurl_for_friend.length(), (pushurl_for_friend + "\n" + "( OK )").length(),
                                       Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                     fi_pushurl_textview.setText(spannable, TextView.BufferType.SPANNABLE);
                 }

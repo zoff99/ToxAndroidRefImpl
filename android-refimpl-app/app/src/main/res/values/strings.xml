@@ -425,6 +425,7 @@
     <string name="layout___conf_id">Conference ID:</string>
     <string name="layout___conf_title">Title:</string>
     <string name="layout___pubkey">Pubkey:</string>
+    <string name="layout___capabilities">Capabilities:</string>
     <string name="layout___status">Status:</string>
     <string name="layout___alias">Alias</string>
     <string name="layout___remove_friends_relay">remove Friends Relay</string>

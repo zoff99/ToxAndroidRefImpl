@@ -103,6 +103,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_type;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_iteration_interval;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_capabilites;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabilities;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name_size;
@@ -137,6 +139,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_o
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE_TO_STRING;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 
@@ -770,6 +774,11 @@ public class TrifaToxService extends Service
                 cache_pubkey_fnum.clear();
                 cache_fnum_pubkey.clear();
                 cache_confid_confnum.clear();
+
+                tox_self_capabilites = tox_self_get_capabilities();
+                Log.i(TAG, "tox_self_capabilites:" + tox_self_capabilites + " decoded:" +
+                           TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(tox_self_capabilites)) + " " +
+                           (1L << 63L));
 
                 // ----- convert old conference messages which did not contain a sent timestamp -----
                 try

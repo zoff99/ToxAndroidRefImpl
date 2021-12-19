@@ -99,6 +99,9 @@ public class FriendList
     @Nullable
     String push_url;
 
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    long capabilities = 0;
+
     static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();
@@ -122,6 +125,7 @@ public class FriendList
         out.avatar_update_timestamp = in.avatar_update_timestamp;
         out.added_timestamp = in.added_timestamp;
         out.push_url = in.push_url;
+        out.capabilities = in.capabilities;
 
         return out;
     }
@@ -138,7 +142,7 @@ public class FriendList
                    ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
                    sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name +
                    ", avatar_update=" + avatar_update + ", added_timestamp=" + added_timestamp + ", push_url=" +
-                   "*****";
+                   "*****" + ", capabilities=" + capabilities;
         }
         catch (Exception e)
         {

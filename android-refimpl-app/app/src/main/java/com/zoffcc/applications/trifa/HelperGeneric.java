@@ -2039,7 +2039,6 @@ public class HelperGeneric
         // Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
         long friendnum_to_use = friendnum;
         FriendList f = main_get_friend(friendnum);
-        // Log.d(TAG, "tox_friend_send_message_wrapper:f=" + f);
 
         if (f != null)
         {
