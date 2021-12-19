@@ -77,6 +77,7 @@ import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabilities;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_SELF_MAX_BYTE_SIZE;
@@ -84,6 +85,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE_TO_STRING;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NAME_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_STATUS_MESSAGE_LENGTH;
@@ -96,6 +99,7 @@ public class ProfileActivity extends AppCompatActivity
     FloatingActionButton profile_icon_edit = null;
     ImageView mytoxid_imageview = null;
     TextView mytoxid_textview = null;
+    TextView my_toxcapabilities_textview = null;
     EditText mynick_edittext = null;
     EditText mystatus_message_edittext = null;
     Button new_nospam_button = null;
@@ -125,6 +129,7 @@ public class ProfileActivity extends AppCompatActivity
         mynick_edittext = findViewById(R.id.mynick_edittext);
         mystatus_message_edittext = findViewById(R.id.mystatus_message_edittext);
         my_identicon_imageview = findViewById(R.id.my_identicon_imageview);
+        my_toxcapabilities_textview = findViewById(R.id.my_toxcapabilities_textview);
 
         new_nospam_button = findViewById(R.id.new_nospam_button);
         remove_own_relay_button = findViewById(R.id.remove_relay_button);
@@ -137,6 +142,9 @@ public class ProfileActivity extends AppCompatActivity
 
         mytox_network_connections = findViewById(R.id.mytox_network_connections);
         mytox_network_connections.setText(get_network_connections());
+
+        my_toxcapabilities_textview.setText(
+                TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(tox_self_get_capabilities())));
 
         new_nospam_button.setOnClickListener(new View.OnClickListener()
         {

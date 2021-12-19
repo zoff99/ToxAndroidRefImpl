@@ -776,9 +776,9 @@ public class TrifaToxService extends Service
                 cache_confid_confnum.clear();
 
                 tox_self_capabilites = tox_self_get_capabilities();
-                Log.i(TAG, "tox_self_capabilites:" + tox_self_capabilites + " decoded:" +
-                           TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(tox_self_capabilites)) + " " +
-                           (1L << 63L));
+                //Log.i(TAG, "tox_self_capabilites:" + tox_self_capabilites + " decoded:" +
+                //           TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(tox_self_capabilites)) + " " +
+                //           (1L << 63L));
 
                 // ----- convert old conference messages which did not contain a sent timestamp -----
                 try

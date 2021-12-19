@@ -138,6 +138,37 @@
                 android:typeface="monospace"
                 tools:text="TOXID94583458340958309458093850934805830583085389053095DUMMY" />
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text="@string/layout___capabilities"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/my_toxcapabilities_textview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:fontFamily="monospace"
+                android:gravity="center_horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="15dp"
+                android:text="__"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+
             <Button
                 android:id="@+id/remove_own_pushurl_button"
                 android:layout_width="match_parent"

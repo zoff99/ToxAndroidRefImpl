@@ -4142,9 +4142,9 @@ public class MainActivity extends AppCompatActivity
                     // ******** friend just came online ********
                     // update and save this friends TOX CAPABILITIES
                     long friend_capabilities = tox_friend_get_capabilities(friend_number);
-                    Log.i(TAG, "friend_capabilities:" + friend_capabilities + " decoded:" +
-                               TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(friend_capabilities)) + " " +
-                               (1L << 63L));
+                    //Log.i(TAG, "friend_capabilities:" + friend_capabilities + " decoded:" +
+                    //           TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(friend_capabilities)) + " " +
+                    //           (1L << 63L));
                     f.capabilities = friend_capabilities;
                     update_friend_in_db_capabilities(f);
                 }
