@@ -3134,6 +3134,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1connection_1stat
     return (jint)(tox_self_get_connection_status(tox_global));
 }
 
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1capabilities(JNIEnv *env, jobject thiz)
+{
+    return (jlong)(tox_self_get_capabilities());
+}
+
 void Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(JNIEnv *env, jobject thiz)
 {
     dbg(9, "bootstrap");
@@ -3184,8 +3190,25 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv *env, jobjec
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list_1size(JNIEnv *env, jobject thiz)
 {
+    if(tox_global == NULL)
+    {
+        return -1;
+    }
+
     size_t numfriends = tox_self_get_friend_list_size(tox_global);
     return (jlong)(unsigned long long)numfriends;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1capabilities(JNIEnv *env, jobject thiz,
+        jlong friend_number)
+{
+    if(tox_global == NULL)
+    {
+        return -1;
+    }
+
+    return (jlong)(tox_friend_get_capabilities(tox_global, (uint32_t)friend_number));
 }
 
 JNIEXPORT jstring JNICALL
