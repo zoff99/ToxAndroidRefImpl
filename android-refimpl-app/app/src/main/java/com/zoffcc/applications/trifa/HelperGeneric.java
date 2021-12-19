@@ -2164,7 +2164,7 @@ public class HelperGeneric
             ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
             int res_hash = MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
             Log.i(TAG, "hash_v3:" + res_hash + " " + bytebuffer_to_hexstring(hash_bytes, true));
-           MainActivity.send_message_result result = new MainActivity.send_message_result();
+            MainActivity.send_message_result result = new MainActivity.send_message_result();
 
             long t_sec = (System.currentTimeMillis() / 1000);
             long res = MainActivity.tox_messagev3_friend_send_message(friendnum_to_use, a_TOX_MESSAGE_TYPE, message,
