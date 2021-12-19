@@ -844,6 +844,7 @@ public class HelperMessage
                                         "read:"+m.read+"\n"+
                                         "msg_version:"+m.msg_version+"\n"+
                                         "msg_at_relay:"+m.msg_at_relay+"\n"+
+                                        "sent_push:"+m.sent_push+"\n"+
                                         "resend_count:"+m.resend_count+"\n"+
                                         "send_retries:"+m.send_retries+"\n"+
                                         "is_new:"+m.is_new+"\n"+
@@ -954,6 +955,7 @@ public class HelperMessage
                                         "read:"+m.read+"\n"+
                                         "msg_version:"+m.msg_version+"\n"+
                                         "msg_at_relay:"+m.msg_at_relay+"\n"+
+                                        "sent_push:"+m.sent_push+"\n"+
                                         "resend_count:"+m.resend_count+"\n"+
                                         "send_retries:"+m.send_retries+"\n"+
                                         "is_new:"+m.is_new+"\n"+
@@ -1054,6 +1056,38 @@ public class HelperMessage
         {
             e.printStackTrace();
             Log.i(TAG, "save_selected_messages:EE2:" + e.getMessage());
+        }
+    }
+
+    static void update_message_in_db_sent_push_set(final String friend_pubkey, final long sent_timestamp)
+    {
+        final int delta_ms_prev = 100;
+        final int delta_ms_after = 1000;
+
+        try
+        {
+            Message m = orma.selectFromMessage().
+                    tox_friendpubkeyEq(friend_pubkey).
+                    sent_timestampBetween(sent_timestamp - delta_ms_prev, sent_timestamp + delta_ms_after).
+                    directionEq(1).
+                    orderBySent_timestampAsc().
+                    limit(1).toList().get(0);
+
+            // Log.i(TAG, "update_message_in_db_sent_push_set:ts=" + sent_timestamp + " m=" + m);
+
+            orma.updateMessage().
+                    tox_friendpubkeyEq(friend_pubkey).
+                    idEq(m.id).
+                    sent_push(1).
+                    execute();
+
+            m.sent_push = 1;
+
+            update_single_message(m, true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 

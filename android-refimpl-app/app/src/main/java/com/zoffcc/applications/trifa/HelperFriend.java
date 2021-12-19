@@ -36,6 +36,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_sent_push_set;
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.is_valid_pushurl_for_friend_with_whitelist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
@@ -1117,6 +1118,7 @@ public class HelperFriend
     {
         try
         {
+            final long message_timestamp_circa = System.currentTimeMillis();
             final String pushurl_for_friend = get_pushurl_for_friend(friend_pubkey);
 
             if (pushurl_for_friend != null)
@@ -1167,8 +1169,12 @@ public class HelperFriend
                                             build();
                                     try (Response response = client.newCall(request).execute())
                                     {
-                                        Log.i(TAG, "friend_call_push_url:url=" + pushurl_for_friend + " RES=" +
-                                                   response.code());
+                                        // Log.i(TAG, "friend_call_push_url:url=" + pushurl_for_friend + " RES=" +
+                                        //            response.code());
+                                        if (response.code() == 200)
+                                        {
+                                            update_message_in_db_sent_push_set(friend_pubkey, message_timestamp_circa);
+                                        }
                                     }
                                     catch (Exception ignored)
                                     {

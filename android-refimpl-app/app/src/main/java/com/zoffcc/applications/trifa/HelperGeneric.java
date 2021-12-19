@@ -2128,6 +2128,7 @@ public class HelperGeneric
         // Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
         long friendnum_to_use = friendnum;
         FriendList f = main_get_friend(friendnum);
+        boolean need_call_push_url = false;
 
         boolean msgv1 = true;
 
@@ -2152,7 +2153,7 @@ public class HelperGeneric
                 }
                 else // if friend is NOT online and does not have a relay, try if he has a push url
                 {
-                    friend_call_push_url(f.tox_public_key_string);
+                    need_call_push_url = true;
                 }
             }
         }
@@ -2163,7 +2164,7 @@ public class HelperGeneric
 
             ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
             int res_hash = MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
-            Log.i(TAG, "hash_v3:" + res_hash + " " + bytebuffer_to_hexstring(hash_bytes, true));
+            // Log.i(TAG, "hash_v3:" + res_hash + " " + bytebuffer_to_hexstring(hash_bytes, true));
             MainActivity.send_message_result result = new MainActivity.send_message_result();
 
             long t_sec = (System.currentTimeMillis() / 1000);
@@ -2175,6 +2176,12 @@ public class HelperGeneric
             result.msg_hash_hex = "";
             result.msg_hash_v3_hex = bytebuffer_to_hexstring(hash_bytes, true);
             result.raw_message_buf_hex = "";
+
+            if (need_call_push_url)
+            {
+                friend_call_push_url(f.tox_public_key_string);
+            }
+
             return result;
         }
         else
@@ -2212,6 +2219,10 @@ public class HelperGeneric
                                                         raw_message_length_int);
                 // Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
                 //           result.raw_message_buf_hex);
+                if (need_call_push_url)
+                {
+                    friend_call_push_url(f.tox_public_key_string);
+                }
                 return result;
             }
             else if (res == -9991)
@@ -2221,6 +2232,10 @@ public class HelperGeneric
                 result.msg_v2 = true;
                 result.msg_hash_hex = "";
                 result.raw_message_buf_hex = "";
+                if (need_call_push_url)
+                {
+                    friend_call_push_url(f.tox_public_key_string);
+                }
                 return result;
             }
             else
@@ -2230,6 +2245,10 @@ public class HelperGeneric
                 result.msg_v2 = false;
                 result.msg_hash_hex = "";
                 result.raw_message_buf_hex = "";
+                if (need_call_push_url)
+                {
+                    friend_call_push_url(f.tox_public_key_string);
+                }
                 return result;
             }
         }

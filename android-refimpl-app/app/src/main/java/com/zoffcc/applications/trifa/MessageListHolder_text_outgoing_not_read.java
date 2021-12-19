@@ -199,8 +199,16 @@ public class MessageListHolder_text_outgoing_not_read extends RecyclerView.ViewH
             }
             else
             {
-                // not yet read
-                imageView.setImageResource(R.drawable.circle_red);
+                if (m.sent_push > 0)
+                {
+                    // push url called with result OK
+                    imageView.setImageResource(R.drawable.circle_orange);
+                }
+                else
+                {
+                    // not yet read
+                    imageView.setImageResource(R.drawable.circle_red);
+                }
             }
         }
         else
