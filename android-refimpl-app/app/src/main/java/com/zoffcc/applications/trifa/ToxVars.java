@@ -50,6 +50,7 @@ public class ToxVars
         boolean capabilities = false;
         boolean msgv2 = false;
         boolean toxav_h264 = false;
+        boolean msgv3 = false;
         boolean next_implementation = false;
     }
 
@@ -57,6 +58,7 @@ public class ToxVars
     public static long TOX_CAPABILITY_CAPABILITIES = 1 << 0;
     public static long TOX_CAPABILITY_MSGV2 = 1 << 1;
     public static long TOX_CAPABILITY_TOXAV_H264 = 1 << 2;
+    public static long TOX_CAPABILITY_MSGV3 = 1 << 3;
     public static long TOX_CAPABILITY_NEXT_IMPLEMENTATION = (1L << 63L);
 
     public static TOX_CAPABILITY_DECODE_RESULT TOX_CAPABILITY_DECODE(long capabilites_encoded)
@@ -76,6 +78,11 @@ public class ToxVars
         if ((capabilites_encoded & TOX_CAPABILITY_TOXAV_H264) != 0)
         {
             res.toxav_h264 = true;
+        }
+
+        if ((capabilites_encoded & TOX_CAPABILITY_MSGV3) != 0)
+        {
+            res.msgv3 = true;
         }
 
         if ((capabilites_encoded & TOX_CAPABILITY_NEXT_IMPLEMENTATION) != 0)
@@ -108,6 +115,11 @@ public class ToxVars
         if (in.toxav_h264)
         {
             res = res + " TOXAV_H264 ";
+        }
+
+        if (in.msgv3)
+        {
+            res = res + " MSGV3 ";
         }
 
         if (in.next_implementation)
