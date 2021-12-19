@@ -5307,7 +5307,7 @@ public class MainActivity extends AppCompatActivity
             m.rcvd_timestamp = System.currentTimeMillis();
             m.sent_timestamp = m.rcvd_timestamp;
             m.text = filename_corrected + "\n" + file_size + " bytes";
-            m.sent_push = false;
+            m.sent_push = 0;
             long new_msg_id = -1;
 
             if (message_list_activity != null)

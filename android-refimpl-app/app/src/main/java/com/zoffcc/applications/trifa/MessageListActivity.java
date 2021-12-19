@@ -1067,7 +1067,7 @@ public class MessageListActivity extends AppCompatActivity
                 m.text = msg;
                 m.msg_version = 0;
                 m.resend_count = 0; // we have tried to resend this message "0" times
-                m.sent_push = false;
+                m.sent_push = 0;
 
                 if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
@@ -1438,7 +1438,7 @@ public class MessageListActivity extends AppCompatActivity
             m.sent_timestamp = System.currentTimeMillis();
             m.text = ofw.filename_wrapped + "\n" + ofw.file_size_wrapped + " bytes";
             m.storage_frame_work = false;
-            m.sent_push = false;
+            m.sent_push = 0;
 
             long new_msg_id = insert_into_message_db(m, update_message_view);
             m.id = new_msg_id;

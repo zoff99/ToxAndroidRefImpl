@@ -830,6 +830,18 @@ public class TrifaToxService extends Service
                 // ----- convert old NULL's into false -----
 
 
+                // ----- convert old NULL's into 0 -----
+                try
+                {
+                    orma.getConnection().execSQL("update Message set sent_push='0' where sent_push is NULL");
+                    Log.i(TAG, "onCreate:sent_push");
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onCreate:sent_push:EE01");
+                }
+                // ----- convert old NULL's into 0 -----
+
                 // TODO --------
                 String my_tox_id_local = get_my_toxid();
                 global_my_toxid = my_tox_id_local;
@@ -1551,7 +1563,8 @@ public class TrifaToxService extends Service
                                                 m_resend_v1.raw_msgv2_bytes = result.raw_message_buf_hex;
                                             }
 
-                                            if ((result.msg_hash_v3_hex != null) && (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
+                                            if ((result.msg_hash_v3_hex != null) &&
+                                                (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
                                             {
                                                 // msgV3 message -----------
                                                 m_resend_v1.msg_idv3_hash = result.msg_hash_v3_hex;

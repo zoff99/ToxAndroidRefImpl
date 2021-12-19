@@ -125,7 +125,8 @@ public class Message
     String msg_idv3_hash = null; // 32byte hash, used for MessageV3 Messages! and otherwise NULL
 
     @Column(helpers = Column.Helpers.ALL)
-    boolean sent_push = false;
+    @Nullable
+    int sent_push = 0;
 
     static Message deep_copy(Message in)
     {
