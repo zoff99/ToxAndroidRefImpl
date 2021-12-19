@@ -3205,7 +3205,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1capabilities(J
 {
     if(tox_global == NULL)
     {
-        return -1;
+        return 0; // 0 --> TOX_CAPABILITY_BASIC
     }
 
     return (jlong)(tox_friend_get_capabilities(tox_global, (uint32_t)friend_number));
