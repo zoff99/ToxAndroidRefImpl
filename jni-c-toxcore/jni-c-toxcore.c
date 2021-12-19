@@ -3768,6 +3768,19 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1friend_1send_1me
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
     TOX_ERR_FRIEND_SEND_MESSAGE error;
 
+    // make invalid utf-8 for testing!!!!!! DEBUG DEBUG
+    // make invalid utf-8 for testing!!!!!! DEBUG DEBUG
+    // make invalid utf-8 for testing!!!!!! DEBUG DEBUG
+    if (strlen(message_str) > 2)
+    {
+        char *message_str2 = (char *)message_str;
+        message_str2[0] = 195;
+        message_str2[1] = 40;
+    }
+    // make invalid utf-8 for testing!!!!!! DEBUG DEBUG
+    // make invalid utf-8 for testing!!!!!! DEBUG DEBUG
+    // make invalid utf-8 for testing!!!!!! DEBUG DEBUG
+
     if (strlen(message_str) > TOX_MSGV3_MAX_MESSAGE_LENGTH)
     {
         (*env)->ReleaseStringUTFChars(env, message, message_str);
