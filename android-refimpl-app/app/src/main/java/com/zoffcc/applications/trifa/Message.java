@@ -124,6 +124,9 @@ public class Message
     @Nullable
     String msg_idv3_hash = null; // 32byte hash, used for MessageV3 Messages! and otherwise NULL
 
+    @Column(helpers = Column.Helpers.ALL)
+    boolean sent_push = false;
+
     static Message deep_copy(Message in)
     {
         Message out = new Message();
@@ -155,6 +158,7 @@ public class Message
         out.ft_outgoing_queued = in.ft_outgoing_queued;
         out.msg_at_relay = in.msg_at_relay;
         out.msg_idv3_hash = in.msg_idv3_hash;
+        out.sent_push = in.sent_push;
 
         return out;
     }
@@ -169,6 +173,7 @@ public class Message
                ", send_retries=" + send_retries + ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath +
                ", is_new=" + is_new + ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version +
                ", resend_count=" + resend_count + ", raw_msgv2_bytes=" + "xxxxxx" + ", storage_frame_work=" +
-               storage_frame_work + ", ft_outgoing_queued=" + ft_outgoing_queued + ", msg_at_relay=" + msg_at_relay;
+               storage_frame_work + ", ft_outgoing_queued=" + ft_outgoing_queued + ", msg_at_relay=" + msg_at_relay +
+               ", sent_push=" + sent_push;
     }
 }

@@ -2337,6 +2337,7 @@ public class HelperGeneric
             m.sent_timestamp_ms = 0;
             m.text = friend_message_text_utf8;
             m.msg_version = 0;
+            m.sent_push = false;
 
             if (MainActivity.message_list_activity != null)
             {
@@ -2456,6 +2457,7 @@ public class HelperGeneric
             m.text = friend_message_text_utf8;
             m.msg_version = 1;
             m.msg_id_hash = msg_id_as_hex_string;
+            m.sent_push = false;
             Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
 
             if (MainActivity.message_list_activity != null)
@@ -2583,6 +2585,7 @@ public class HelperGeneric
             m.text = friend_message_text_utf8;
             m.msg_version = 1;
             m.msg_id_hash = msg_id_as_hex_string;
+            m.sent_push = false;
             Log.i(TAG,
                   "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
 

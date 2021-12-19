@@ -1075,6 +1075,7 @@ public class HelperMessage
         m.text = msg;
         m.msg_version = 0;
         m.resend_count = 0; // we have tried to resend this message "0" times
+        m.sent_push = false;
 
         if ((msg != null) && (!msg.equalsIgnoreCase("")))
         {
