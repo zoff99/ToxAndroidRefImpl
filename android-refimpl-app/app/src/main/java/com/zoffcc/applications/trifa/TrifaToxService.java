@@ -69,6 +69,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.vfs__unmount;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
+import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_msg_idv3_hash;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
@@ -139,8 +140,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_o
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE_TO_STRING;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 
@@ -1550,6 +1549,14 @@ public class TrifaToxService extends Service
                                                 // save raw message bytes of this v2 msg into the database
                                                 // we need it if we want to resend it later
                                                 m_resend_v1.raw_msgv2_bytes = result.raw_message_buf_hex;
+                                            }
+
+                                            if ((result.msg_hash_v3_hex != null) && (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
+                                            {
+                                                // msgV3 message -----------
+                                                m_resend_v1.msg_idv3_hash = result.msg_hash_v3_hex;
+                                                // msgV3 message -----------
+                                                update_message_in_db_msg_idv3_hash(m_resend_v1);
                                             }
 
                                             if (!result.msg_hash_hex.equalsIgnoreCase(""))

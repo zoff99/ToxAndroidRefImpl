@@ -2869,6 +2869,16 @@ public class MainActivity extends AppCompatActivity
     // --------------- Message V2 -------------
     // --------------- Message V2 -------------
 
+    // --------------- Message V3 -------------
+    // --------------- Message V3 -------------
+    // --------------- Message V3 -------------
+    public static native int tox_messagev3_get_new_message_id(ByteBuffer hash_buffer);
+
+    public static native long tox_messagev3_friend_send_message(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message, @NonNull ByteBuffer mag_hash, long timestamp);
+    // --------------- Message V3 -------------
+    // --------------- Message V3 -------------
+    // --------------- Message V3 -------------
+
 
     // --------------- Conference -------------
     // --------------- Conference -------------
@@ -7134,6 +7144,7 @@ public class MainActivity extends AppCompatActivity
         long msg_num;
         boolean msg_v2;
         String msg_hash_hex;
+        String msg_hash_v3_hex;
         String raw_message_buf_hex;
         long error_num;
     }

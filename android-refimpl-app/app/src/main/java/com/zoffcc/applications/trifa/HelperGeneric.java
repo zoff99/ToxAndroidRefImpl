@@ -55,6 +55,7 @@ import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
@@ -1434,6 +1435,93 @@ public class HelperGeneric
         return null;
     }
 
+    public static ByteBuffer hexstring_to_bytebuffer(String in)
+    {
+        try
+        {
+            byte[] in_bytes = in.getBytes(StandardCharsets.US_ASCII);
+            ByteBuffer ret = ByteBuffer.allocateDirect(in_bytes.length / 2);
+            for (int i = 0; i < in_bytes.length; i = i + 2)
+            {
+                // Log.i(TAG, "hexstring_to_bytebuffer:i=" + i + " byte=" + in_bytes[i] + " byte2=" + in_bytes[i + 1]);
+                byte b1 = in_bytes[i + 1];
+                byte b2 = in_bytes[i];
+                // Log.i(TAG, "hexstring_to_bytebuffer:res=" + two_hex_bytes_to_dec_int(b1, b2));
+                ret.put((byte) two_hex_bytes_to_dec_int(b1, b2));
+            }
+
+            ret.rewind();
+            return ret;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    public static int two_hex_bytes_to_dec_int(byte b1, byte b2)
+    {
+        int res = 0;
+        // ascii:0 .. 9 -> byte:48 ..  57
+        // ascii:A .. F -> byte:65 ..  70
+        // ascii:a .. f -> byte:97 .. 102
+        if (48 <= b1 && b1 <= 57)
+        {
+            res = b1 - 48;
+        }
+        else if ('A' <= b1 && b1 <= 'F')
+        {
+            res = b1 - 65 + 10;
+        }
+        else if ('a' <= b1 && b1 <= 'f')
+        {
+            res = b1 - 97 + 10;
+        }
+
+        if (48 <= b2 && b2 <= 57)
+        {
+            res = res + ((b2 - 48) * 16);
+        }
+        else if ('A' <= b2 && b2 <= 'F')
+        {
+            res = res + ((b2 - 65 + 10) * 16);
+        }
+        else if ('a' <= b2 && b2 <= 'f')
+        {
+            res = res + ((b2 - 97 + 10) * 16);
+        }
+
+        return res;
+    }
+
+    public static String bytebuffer_to_hexstring(ByteBuffer in, boolean upper_case)
+    {
+        try
+        {
+            in.rewind();
+            StringBuilder sb = new StringBuilder("");
+            while (in.hasRemaining())
+            {
+                if (upper_case)
+                {
+                    sb.append(String.format("%02X", in.get()));
+                }
+                else
+                {
+                    sb.append(String.format("%02x", in.get()));
+                }
+            }
+            in.rewind();
+            return sb.toString();
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
     public static ByteBuffer file_to_bytebuffer(String filename_with_fullpath, boolean is_vfs)
     {
         if (is_vfs)
@@ -2072,13 +2160,20 @@ public class HelperGeneric
         if (msgv1)
         {
             // old msgV1 message
-            MainActivity.send_message_result result = new MainActivity.send_message_result();
 
-            long res = MainActivity.tox_friend_send_message(friendnum_to_use, a_TOX_MESSAGE_TYPE, message);
+            ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+            int res_hash = MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
+            Log.i(TAG, "hash_v3:" + res_hash + " " + bytebuffer_to_hexstring(hash_bytes, true));
+           MainActivity.send_message_result result = new MainActivity.send_message_result();
+
+            long t_sec = (System.currentTimeMillis() / 1000);
+            long res = MainActivity.tox_messagev3_friend_send_message(friendnum_to_use, a_TOX_MESSAGE_TYPE, message,
+                                                                      hash_bytes, t_sec);
 
             result.msg_num = res;
             result.msg_v2 = false;
             result.msg_hash_hex = "";
+            result.msg_hash_v3_hex = bytebuffer_to_hexstring(hash_bytes, true);
             result.raw_message_buf_hex = "";
             return result;
         }

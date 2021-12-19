@@ -193,6 +193,21 @@ public class HelperMessage
         }
     }
 
+    static void update_message_in_db_msg_idv3_hash(final Message m)
+    {
+        try
+        {
+            orma.updateMessage().
+                    idEq(m.id).
+                    msg_idv3_hash(m.msg_idv3_hash).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     public static void add_single_conference_message_from_messge_id(final long message_id, final boolean force)
     {
         try
@@ -1077,6 +1092,13 @@ public class HelperMessage
                     m.msg_id_hash = result.msg_hash_hex;
                     m.msg_version = 1;
                     // msgV2 message -----------
+                }
+
+                if ((result.msg_hash_v3_hex != null) && (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
+                {
+                    // msgV3 message -----------
+                    m.msg_idv3_hash = result.msg_hash_v3_hex;
+                    // msgV3 message -----------
                 }
 
                 if (!result.raw_message_buf_hex.equalsIgnoreCase(""))

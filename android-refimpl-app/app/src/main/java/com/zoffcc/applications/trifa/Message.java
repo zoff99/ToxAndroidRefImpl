@@ -120,6 +120,10 @@ public class Message
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     boolean msg_at_relay = false;
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String msg_idv3_hash = null; // 32byte hash, used for MessageV3 Messages! and otherwise NULL
+
     static Message deep_copy(Message in)
     {
         Message out = new Message();
@@ -150,6 +154,7 @@ public class Message
         out.storage_frame_work = in.storage_frame_work;
         out.ft_outgoing_queued = in.ft_outgoing_queued;
         out.msg_at_relay = in.msg_at_relay;
+        out.msg_idv3_hash = in.msg_idv3_hash;
 
         return out;
     }

@@ -1085,6 +1085,13 @@ public class MessageListActivity extends AppCompatActivity
                             // msgV2 message -----------
                         }
 
+                        if ((result.msg_hash_v3_hex != null) && (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
+                        {
+                            // msgV3 message -----------
+                            m.msg_idv3_hash = result.msg_hash_v3_hex;
+                            // msgV3 message -----------
+                        }
+
                         if (!result.raw_message_buf_hex.equalsIgnoreCase(""))
                         {
                             // save raw message bytes of this v2 msg into the database
