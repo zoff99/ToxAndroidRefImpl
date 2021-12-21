@@ -379,4 +379,5 @@
     <string name="pref_description_use_camera_x">!! 实验性功能 !!
 \n使用 CameraX 并在视频通话中删除背景
 \n此功能可能还不能完全正常工作，请小心，不要总是依赖它来工作！</string>
+    <string name="layout___capabilities">功能：</string>
 </resources>
