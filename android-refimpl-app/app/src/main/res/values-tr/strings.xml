@@ -398,4 +398,5 @@
     <string name="pref_description_use_camera_x">!! Deneysel !!
 \nGörüntülü görüşmelerde CameraX kullan ve arka planı kaldır
 \nBu henüz tam olarak çalışmayabilir, lütfen dikkatli olun ve bunun her zaman işe yarayacağına güvenmeyin!</string>
+    <string name="layout___capabilities">Yetenekler:</string>
 </resources>
