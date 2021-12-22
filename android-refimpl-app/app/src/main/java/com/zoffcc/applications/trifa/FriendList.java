@@ -102,6 +102,9 @@ public class FriendList
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     long capabilities = 0;
 
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    long msgv3_capability = 0;
+
     static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();
@@ -126,6 +129,7 @@ public class FriendList
         out.added_timestamp = in.added_timestamp;
         out.push_url = in.push_url;
         out.capabilities = in.capabilities;
+        out.msgv3_capability = in.msgv3_capability;
 
         return out;
     }

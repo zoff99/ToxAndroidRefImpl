@@ -842,6 +842,18 @@ public class TrifaToxService extends Service
                 }
                 // ----- convert old NULL's into 0 -----
 
+                // ----- convert old NULL's into 0 -----
+                try
+                {
+                    orma.getConnection().execSQL("update FriendList set msgv3_capability='0' where msgv3_capability is NULL");
+                    Log.i(TAG, "onCreate:msgv3_capability");
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onCreate:msgv3_capability:EE01");
+                }
+                // ----- convert old NULL's into 0 -----
+
                 // TODO --------
                 String my_tox_id_local = get_my_toxid();
                 global_my_toxid = my_tox_id_local;
