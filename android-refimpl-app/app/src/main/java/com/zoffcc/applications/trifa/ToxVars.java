@@ -552,14 +552,25 @@ public class ToxVars
         /**
          * Normal text message. Similar to PRIVMSG on IRC.
          */
-        TOX_MESSAGE_TYPE_NORMAL,
+        TOX_MESSAGE_TYPE_NORMAL(0),
 
         /**
          * A message describing an user action. This is similar to /me (CTCP ACTION)
          * on IRC.
          */
-        TOX_MESSAGE_TYPE_ACTION,
+        TOX_MESSAGE_TYPE_ACTION(1),
 
+        /**
+         * A high level ACK for MSG ID (MSG V3 functionality)
+         */
+        TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK(2);
+
+        public int value;
+
+        private TOX_MESSAGE_TYPE(int value)
+        {
+            this.value = value;
+        }
     }
 
 
