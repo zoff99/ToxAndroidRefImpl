@@ -115,6 +115,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILETRANSFER_SIZE_MSGV2;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
@@ -2304,16 +2305,45 @@ public class HelperGeneric
         }
     }
 
-    static void receive_incoming_message(int msg_type, long friend_number, String friend_message_text_utf8, byte[] raw_message, long raw_message_length, String original_sender_pubkey)
+    static void receive_incoming_message(int msg_type, int tox_message_type, long friend_number, String friend_message_text_utf8, byte[] raw_message, long raw_message_length, String original_sender_pubkey, byte[] msgV3hash_bin)
     {
         // incoming msg can be:
-        // (msg_type == 0) msgV1 text only message -> msg_type, friend_number, friend_message_text_utf8
+        // (msg_type == 0) msgV1 text only message -> msg_type, friend_number, friend_message_text_utf8 [, msgV3hash_bin]
         // (msg_type == 1) msgV2 direct message    -> msg_type, friend_number, friend_message_text_utf8, raw_message, raw_message_length
         // (msg_type == 2) msgV2 relay message     -> msg_type, friend_number, friend_message_text_utf8, raw_message, raw_message_length, original_sender_pubkey
         if (msg_type == 0)
         {
             // msgV1 text only message
-            // Log.i(TAG, "friend_message:friend:" + friend_number + " message:" + friend_message);
+            Log.i(TAG, "friend_message:friend:" + friend_number + " msgV3hash:" + msgV3hash_bin);
+
+            String msgV3hash_hex_string = null;
+            if (msgV3hash_bin != null)
+            {
+                msgV3hash_hex_string = HelperGeneric.bytesToHex(msgV3hash_bin, 0, msgV3hash_bin.length);
+
+                int got_messages = orma.selectFromMessage().
+                        tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                        directionEq(0).
+                        msg_idv3_hashEq(msgV3hash_hex_string).count();
+
+                Log.i(TAG, "friend_message:friend:" + friend_number + " msgV3hash_hex_string:" + msgV3hash_hex_string +
+                           " got_messages=" + got_messages);
+
+                if (got_messages > 0)
+                {
+                    // HINT: we already have received a message with this hash
+                    // still send the msgV3 high level ACK, and then ignore
+                    HelperMessage.send_msgv3_high_level_ack(friend_number, msgV3hash_hex_string);
+                    return;
+                }
+            }
+
+            if (tox_message_type == TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK.value)
+            {
+                // TODO: ack message in database and update messagelist UI
+                return;
+            }
+
             // if message list for this friend is open, then don't do notification and "new" badge
             boolean do_notification = true;
             boolean do_badge_update = true;
@@ -2356,22 +2386,31 @@ public class HelperGeneric
             m.sent_timestamp_ms = 0;
             m.text = friend_message_text_utf8;
             m.msg_version = 0;
+            m.msg_idv3_hash = msgV3hash_hex_string;
             m.sent_push = 0;
+
+            long db_result = -1;
 
             if (MainActivity.message_list_activity != null)
             {
                 if (MainActivity.message_list_activity.get_current_friendnum() == friend_number)
                 {
-                    HelperMessage.insert_into_message_db(m, true);
+                    db_result = HelperMessage.insert_into_message_db(m, true);
                 }
                 else
                 {
-                    HelperMessage.insert_into_message_db(m, false);
+                    db_result = HelperMessage.insert_into_message_db(m, false);
                 }
             }
             else
             {
-                HelperMessage.insert_into_message_db(m, false);
+                db_result = HelperMessage.insert_into_message_db(m, false);
+            }
+
+            if (db_result == -1)
+            {
+                // error on inserting message into db, most likely msgV3 double message
+                return;
             }
 
             try
@@ -2395,6 +2434,11 @@ public class HelperGeneric
             if (do_notification)
             {
                 change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
+            }
+
+            if (msgV3hash_hex_string!=null)
+            {
+                HelperMessage.send_msgv3_high_level_ack(friend_number, msgV3hash_hex_string);
             }
         }
         else if (msg_type == 1)

@@ -4556,7 +4556,8 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:005:*PING*");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
-        HelperGeneric.receive_incoming_message(1, friend_number, friend_message, raw_message, raw_message_length, null);
+        HelperGeneric.receive_incoming_message(1, 0, friend_number, friend_message, raw_message, raw_message_length,
+                                               null, null);
     }
 
     static void android_tox_callback_friend_lossless_packet_cb_method(long friend_number, byte[] data, long length)
@@ -4755,10 +4756,10 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    HelperGeneric.receive_incoming_message(2,
+                    HelperGeneric.receive_incoming_message(2, 0,
                                                            tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
                                                            wrapped_msg_text_as_string, raw_data, raw_data_length,
-                                                           real_sender_as_hex_string);
+                                                           real_sender_as_hex_string, null);
                 }
             }
             catch (Exception e2)
@@ -4833,14 +4834,15 @@ public class MainActivity extends AppCompatActivity
     // --- incoming message ---
     // --- incoming message ---
     // --- incoming message ---
-    static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length)
+    static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length, byte[] msgV3hash_bin)
     {
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:007:*PING*");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
-        HelperGeneric.receive_incoming_message(0, friend_number, friend_message, null, 0, null);
+        HelperGeneric.receive_incoming_message(0, message_type, friend_number, friend_message, null, 0, null,
+                                               msgV3hash_bin);
     }
     // --- incoming message ---
     // --- incoming message ---

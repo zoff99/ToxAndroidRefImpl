@@ -27,6 +27,7 @@ import android.database.Cursor;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -35,10 +36,13 @@ import java.util.List;
 import androidx.appcompat.app.AlertDialog;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffer;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperMessage
@@ -614,7 +618,15 @@ public class HelperMessage
         //    public void run()
         //    {
         // Log.i(TAG, "insert_into_message_db:m=" + m);
-        long row_id = orma.insertIntoMessage(m);
+        long row_id = -1;
+        try
+        {
+            row_id = orma.insertIntoMessage(m);
+        }
+        catch (Exception e)
+        {
+            return -1;
+        }
 
         try
         {
@@ -1162,5 +1174,18 @@ public class HelperMessage
         }
 
         return ret;
+    }
+
+    static void send_msgv3_high_level_ack(final long friend_number, String msgV3hash_hex_string)
+    {
+        if (msgV3hash_hex_string.length() < TOX_HASH_LENGTH)
+        {
+            return;
+        }
+        ByteBuffer hash_bytes = hexstring_to_bytebuffer(msgV3hash_hex_string);
+
+        long t_sec = (System.currentTimeMillis() / 1000);
+        long res = MainActivity.tox_messagev3_friend_send_message(friend_number, TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK.value,
+                                                                  "_", hash_bytes, t_sec);
     }
 }
