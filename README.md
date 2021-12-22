@@ -68,8 +68,11 @@ saved token:XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 * now in TRIfA goto ```settings``` and activate ```Battery Savings Mode```
 * and set ```Offline Time in Batterysavings mode``` ```to 120 minutes```
 
-<br><br>
-<br><br>
+<br>
+
+Does TRIfA connect to any third party servers?
+=
+TRIfA (exlcuding toxcore) uses the Google Firebase service and a third party server to deliver push notifications to other tox mobile users when they are offline. This makes it possible for Mobile devices to go into sleep mode and save battery and network bandwidth when there is no activity. Rest assured that the push notification does not contain any data, the request that comes from TRIfA includes only the FCM token of your contact(s). No ToxID, name or message data is transfered in the process.
 
 Get in touch
 =
