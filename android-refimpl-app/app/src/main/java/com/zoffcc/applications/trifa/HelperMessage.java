@@ -849,6 +849,7 @@ public class HelperMessage
                                         "send_retries:"+m.send_retries+"\n"+
                                         "is_new:"+m.is_new+"\n"+
                                         "msg_id_hash:"+m.msg_id_hash+"\n"+
+                                        "msg_idv3_hash:"+m.msg_idv3_hash+"\n"+
                                         "sent_timestamp:"+m.sent_timestamp+"\n"+
                                         "sent_timestamp_ms:"+m.sent_timestamp_ms+"\n"+
                                         "sent_timestamp:"+long_date_time_format_or_empty(m.sent_timestamp)+"\n"+
@@ -960,6 +961,7 @@ public class HelperMessage
                                         "send_retries:"+m.send_retries+"\n"+
                                         "is_new:"+m.is_new+"\n"+
                                         "msg_id_hash:"+m.msg_id_hash+"\n"+
+                                        "msg_idv3_hash:"+m.msg_idv3_hash+"\n"+
                                         "sent_timestamp:"+m.sent_timestamp+"\n"+
                                         "sent_timestamp_ms:"+m.sent_timestamp_ms+"\n"+
                                         "sent_timestamp:"+long_date_time_format_or_empty(m.sent_timestamp)+"\n"+
