@@ -341,6 +341,53 @@ public class HelperFriend
                 execute();
     }
 
+    static long get_friend_msgv3_capability(long friend_number)
+    {
+        long ret = 0;
+        try
+        {
+            FriendList f = orma.selectFromFriendList().
+                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    get(0);
+            if (f != null)
+            {
+                ret = f.msgv3_capability;
+            }
+
+            return ret;
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+    }
+
+    static void update_friend_msgv3_capability(long friend_number, int new_value)
+    {
+        try
+        {
+            if ((new_value == 0) || (new_value == 1))
+            {
+                FriendList f = orma.selectFromFriendList().
+                        tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                        get(0);
+                if (f != null)
+                {
+                    if (f.msgv3_capability != new_value)
+                    {
+                        orma.updateFriendList().
+                                tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                                msgv3_capability(new_value).
+                                execute();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
     public static long tox_friend_by_public_key__wrapper(@NonNull String friend_public_key_string)
     {
         if (MainActivity.cache_pubkey_fnum.containsKey(friend_public_key_string))

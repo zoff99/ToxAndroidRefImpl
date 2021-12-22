@@ -80,6 +80,8 @@ import static com.zoffcc.applications.trifa.Callstate.java_video_encoder_first_f
 import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.update_friend_msgv3_capability;
+import static com.zoffcc.applications.trifa.HelperMessage.process_msgv3_high_level_ack;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
@@ -2341,7 +2343,17 @@ public class HelperGeneric
             if (tox_message_type == TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK.value)
             {
                 // TODO: ack message in database and update messagelist UI
+                process_msgv3_high_level_ack(friend_number, msgV3hash_hex_string);
                 return;
+            }
+
+            if (msgV3hash_bin != null)
+            {
+                update_friend_msgv3_capability(friend_number, 1);
+            }
+            else
+            {
+                update_friend_msgv3_capability(friend_number, 0);
             }
 
             // if message list for this friend is open, then don't do notification and "new" badge
@@ -2436,7 +2448,7 @@ public class HelperGeneric
                 change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
             }
 
-            if (msgV3hash_hex_string!=null)
+            if (msgV3hash_hex_string != null)
             {
                 HelperMessage.send_msgv3_high_level_ack(friend_number, msgV3hash_hex_string);
             }

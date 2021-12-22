@@ -142,6 +142,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -4491,6 +4492,13 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
+            if (get_friend_msgv3_capability(friend_number) == 1)
+            {
+                // HINT: friend has msgV3 capability, ignore normal read receipts
+                Log.i(TAG, "friend_read_receipt:msgV3:ignore low level ACK");
+                return;
+            }
+
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
             final Message m = orma.selectFromMessage().
                     message_idEq(message_id).
