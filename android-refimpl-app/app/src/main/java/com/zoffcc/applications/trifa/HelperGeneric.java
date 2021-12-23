@@ -3536,4 +3536,31 @@ public class HelperGeneric
             return false;
         }
     }
+
+    public static String trim_to_utf8_length_bytes(String input_string, final int max_length_in_bytes)
+    {
+        try
+        {
+            do
+            {
+                byte[] valueInBytes = null;
+                valueInBytes = input_string.getBytes(StandardCharsets.UTF_8);
+
+                if (valueInBytes.length > max_length_in_bytes)
+                {
+                    input_string = input_string.substring(0, input_string.length() - 1);
+                }
+                else
+                {
+                    return input_string;
+                }
+            }
+            while (input_string.length() > 0);
+        }
+        catch (Exception e)
+        {
+        }
+
+        return null;
+    }
 }

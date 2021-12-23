@@ -87,6 +87,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_k
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_bytes;
 import static com.zoffcc.applications.trifa.HelperMessage.insert_into_message_db;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
@@ -102,7 +103,6 @@ import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
-import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.MessageListFragment.show_only_files;
@@ -122,6 +122,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_receiv
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MSGV3_MAX_MESSAGE_LENGTH;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
@@ -1052,8 +1053,7 @@ public class MessageListActivity extends AppCompatActivity
             else
             {
                 // send typed message to friend
-                msg = ml_new_message.getText().toString().substring(0, (int) Math.min(tox_max_message_length(),
-                                                                                      ml_new_message.getText().toString().length()));
+                msg = trim_to_utf8_length_bytes(ml_new_message.getText().toString(), TOX_MSGV3_MAX_MESSAGE_LENGTH);
 
                 Message m = new Message();
                 m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);

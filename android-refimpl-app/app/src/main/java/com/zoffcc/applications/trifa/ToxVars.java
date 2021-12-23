@@ -35,10 +35,15 @@ public class ToxVars
     public static final int TOX_SECRET_KEY_SIZE = 32;
     public static final int TOX_NOSPAM_SIZE = sizeof_uint32_t;
     public static final int TOX_ADDRESS_SIZE = TOX_PUBLIC_KEY_SIZE + TOX_NOSPAM_SIZE + sizeof_uint16_t;
-    // public static final int TOX_MAX_MESSAGE_LENGTH = 1372; // -> tox_max_message_length [DONE]
+    public static final int TOX_MAX_MESSAGE_LENGTH = 1372;
     public static final int TOX_HASH_LENGTH = 32;
     public static final int TOX_FILE_ID_LENGTH = 32;
     public static final int TOX_MAX_FILENAME_LENGTH = 255;
+    //
+    public static final int TOX_MSGV3_MSGID_LENGTH = 32;
+    public static final int TOX_MSGV3_TIMESTAMP_LENGTH = 4;
+    public static final int TOX_MSGV3_GUARD = 2;
+    public static final int TOX_MSGV3_MAX_MESSAGE_LENGTH  = (TOX_MAX_MESSAGE_LENGTH - TOX_MSGV3_MSGID_LENGTH - TOX_MSGV3_TIMESTAMP_LENGTH - TOX_MSGV3_GUARD);
     // TODO: get these with the appropriate JNI functions!
     // ------ global defines ------
     // ------ global defines ------
