@@ -108,7 +108,7 @@ public class Message
     @Column(indexed = true, defaultExpr = "0")
     int msg_version; // 0 -> old Message, 1 -> for MessageV2 Message
 
-    @Column(indexed = true, defaultExpr = "10")
+    @Column(indexed = true, defaultExpr = "" + TRIFAGlobals.MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION)
     int resend_count; // how many times we have tried to resend old text messages
 
     @Column(indexed = true, defaultExpr = "false")
