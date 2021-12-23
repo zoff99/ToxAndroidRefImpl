@@ -71,7 +71,7 @@ public class TRIFAGlobals
     public static final String TEXT_QUOTE_STRING_1 = "----\n";
     public static final String TEXT_QUOTE_STRING_2 = "\n----";
 
-    public static final int MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION = 5;
+    public static final int MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION = 2;
 
     // ----------
     // https://toxme.io/u/echobot
