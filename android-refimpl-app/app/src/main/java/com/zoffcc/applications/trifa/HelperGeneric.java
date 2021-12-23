@@ -2349,10 +2349,25 @@ public class HelperGeneric
 
             if (msgV3hash_bin != null)
             {
-                update_friend_msgv3_capability(friend_number, 1);
+                int got_messages_mirrored = orma.selectFromMessage().
+                        tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                        directionEq(1).
+                        msg_idv3_hashEq(msgV3hash_hex_string).count();
+
+                Log.i(TAG, "update_friend_msgv3_capability:got_messages_mirrored=" + got_messages_mirrored + " hash1=" +
+                           msgV3hash_bin + " " + msgV3hash_hex_string);
+                if (got_messages_mirrored > 0)
+                {
+                    update_friend_msgv3_capability(friend_number, 0);
+                }
+                else
+                {
+                    update_friend_msgv3_capability(friend_number, 1);
+                }
             }
             else
             {
+                Log.i(TAG, "update_friend_msgv3_capability:hash0=" + msgV3hash_bin + " " + msgV3hash_hex_string);
                 update_friend_msgv3_capability(friend_number, 0);
             }
 
