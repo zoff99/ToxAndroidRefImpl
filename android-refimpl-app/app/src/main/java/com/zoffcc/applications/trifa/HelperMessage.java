@@ -39,11 +39,13 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffer;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_bytes;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MSGV3_MAX_MESSAGE_LENGTH;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperMessage
@@ -1110,7 +1112,7 @@ public class HelperMessage
     {
         int ret = 0;
 
-        final String msg = message.substring(0, (int) Math.min(tox_max_message_length(), message.length()));
+        final String msg = trim_to_utf8_length_bytes(message, TOX_MSGV3_MAX_MESSAGE_LENGTH);
 
         Message m = new Message();
         m.tox_friendpubkey = friend_pubkey;
