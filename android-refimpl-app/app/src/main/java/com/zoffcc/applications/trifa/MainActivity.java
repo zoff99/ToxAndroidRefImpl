@@ -4379,7 +4379,7 @@ public class MainActivity extends AppCompatActivity
 
             if (m_try < 1)
             {
-                // HINT: it must a an ACK send from a friends toxproxy to singal the receipt of the message on behalf of the friend
+                // HINT: it must be an ACK send from a friends toxproxy to singal the receipt of the message on behalf of the friend
 
                 if (is_any_relay(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)))
                 {
