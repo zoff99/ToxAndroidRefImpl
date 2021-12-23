@@ -108,8 +108,8 @@ public class Message
     @Column(indexed = true, defaultExpr = "0")
     int msg_version; // 0 -> old Message, 1 -> for MessageV2 Message
 
-    @Column(indexed = true, defaultExpr = "2")
-    int resend_count; // 2 -> do not resend msg anymore, 0 or 1 -> resend count
+    @Column(indexed = true, defaultExpr = "10")
+    int resend_count; // how many times we have tried to resend old text messages
 
     @Column(indexed = true, defaultExpr = "false")
     boolean storage_frame_work = false;
