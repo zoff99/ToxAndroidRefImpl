@@ -53,6 +53,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real_and_has_msgv3;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
@@ -1646,7 +1647,7 @@ public class TrifaToxService extends Service
                                     {
                                         Message m_resend_v1 = ii.next();
 
-                                        if (is_friend_online(
+                                        if (is_friend_online_real_and_has_msgv3(
                                                 tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
                                         {
                                             continue;
