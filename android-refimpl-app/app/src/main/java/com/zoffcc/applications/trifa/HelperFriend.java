@@ -351,6 +351,9 @@ public class HelperFriend
                     get(0);
             if (f != null)
             {
+                Log.i(TAG, "get_friend_msgv3_capability:f=" +
+                           get_friend_name_from_pubkey(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)) +
+                           " f=" + f.msgv3_capability);
                 ret = f.msgv3_capability;
             }
 
@@ -375,6 +378,9 @@ public class HelperFriend
                 {
                     if (f.msgv3_capability != new_value)
                     {
+                        Log.i(TAG,
+                              "update_friend_msgv3_capability f=" + get_friend_name_from_num(friend_number) + " new=" +
+                              new_value + " old=" + f.msgv3_capability);
                         orma.updateFriendList().
                                 tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                                 msgv3_capability(new_value).

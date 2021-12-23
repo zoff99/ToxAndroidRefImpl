@@ -143,6 +143,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_file
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -4483,7 +4484,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
     {
-        // Log.i(TAG, "friend_read_receipt:friend:" + friend_number + " message_id:" + message_id);
+        Log.i(TAG,
+              "friend_read_receipt:friend:" + get_friend_name_from_num(friend_number) + " message_id:" + message_id);
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:004:*PING*");
@@ -4513,6 +4515,10 @@ public class MainActivity extends AppCompatActivity
 
             if (m != null)
             {
+                Log.i(TAG,
+                      "friend_read_receipt:friend:" + get_friend_name_from_num(friend_number) + " message:" + m.text +
+                      " m=" + m);
+
                 Runnable myRunnable = new Runnable()
                 {
                     @Override
