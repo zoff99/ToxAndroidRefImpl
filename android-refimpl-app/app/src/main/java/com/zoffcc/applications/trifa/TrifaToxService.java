@@ -50,6 +50,7 @@ import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conf
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
@@ -1554,9 +1555,9 @@ public class TrifaToxService extends Service
                                             continue;
                                         }
 
-                                        //Log.i(TAG, "send_pending_1-on-1_messages:v1:fname=" +
-                                        //           get_friend_name_from_pubkey(m_resend_v1.tox_friendpubkey) + " m=" +
-                                        //           m_resend_v1.text);
+                                        Log.i(TAG, "send_pending_1-on-1_messages:v1:fname=" +
+                                                   get_friend_name_from_pubkey(m_resend_v1.tox_friendpubkey) + " m=" +
+                                                   m_resend_v1.text);
 
                                         MainActivity.send_message_result result = tox_friend_send_message_wrapper(
                                                 tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey), 0,
@@ -1619,7 +1620,7 @@ public class TrifaToxService extends Service
 
                         }
 
-                        if ((last_resend_pending_messages1_ms + (10 * 1000)) < System.currentTimeMillis())
+                        if ((last_resend_pending_messages1_ms + (30 * 1000)) < System.currentTimeMillis())
                         {
                             last_resend_pending_messages1_ms = System.currentTimeMillis();
 
@@ -1650,6 +1651,12 @@ public class TrifaToxService extends Service
                                         {
                                             continue;
                                         }
+
+                                        Log.i(TAG, "RR:resending f=" +
+                                                   get_friend_name_from_pubkey(m_resend_v1.tox_friendpubkey) +
+                                                   " rcount=" + m_resend_v1.resend_count + " read=" + m_resend_v1.read +
+                                                   " t=" + m_resend_v1.text + " m=" + m_resend_v1);
+
                                         MainActivity.send_message_result result = tox_friend_send_message_wrapper(
                                                 tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey), 0,
                                                 m_resend_v1.text);
@@ -1681,6 +1688,7 @@ public class TrifaToxService extends Service
                                                 break;
                                             }
                                         }
+
                                     }
                                 }
                             }
