@@ -40,6 +40,7 @@ import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_s
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.is_valid_pushurl_for_friend_with_whitelist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_push_service;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
@@ -1194,6 +1195,11 @@ public class HelperFriend
     {
         try
         {
+            if (!PREF__use_push_service)
+            {
+                return;
+            }
+
             final long message_timestamp_circa = System.currentTimeMillis();
             final String pushurl_for_friend = get_pushurl_for_friend(friend_pubkey);
 
