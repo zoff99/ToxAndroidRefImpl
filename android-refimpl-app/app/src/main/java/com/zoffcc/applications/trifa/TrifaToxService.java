@@ -1621,7 +1621,7 @@ public class TrifaToxService extends Service
 
                         }
 
-                        if ((last_resend_pending_messages1_ms + (30 * 1000)) < System.currentTimeMillis())
+                        if ((last_resend_pending_messages1_ms + (20 * 1000)) < System.currentTimeMillis())
                         {
                             last_resend_pending_messages1_ms = System.currentTimeMillis();
 
