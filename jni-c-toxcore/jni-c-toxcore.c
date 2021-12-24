@@ -1545,9 +1545,9 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
     int need_free = 0;
     jbyteArray msgV3_hash_jbuffer = NULL;
 
-    dbg(9, "friend_message_cb:------------- len=%d len2=%d msg=%p", length,
-            (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD),
-            message);
+    //dbg(9, "friend_message_cb:------------- len=%d len2=%d msg=%p", length,
+    //        (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD),
+    //        message);
 
     if ((message) && (length > (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD)))
     {
@@ -1557,7 +1557,7 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
         uint8_t g1 = *(message + pos);
         uint8_t g2 = *(message + pos + 1);
 
-        dbg(9, "friend_message_cb:------------- g1=%d g2=%d", g1, g2);
+        // dbg(9, "friend_message_cb:------------- g1=%d g2=%d", g1, g2);
 
         // check for the msgv3 guard
         if ((g1 == 0) && (g2 == 0))
@@ -1577,12 +1577,12 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
             }
 
             msgV3_hash_jbuffer = (*jnienv2)->NewByteArray(jnienv2, (int)TOX_MSGV3_MSGID_LENGTH);
-            dbg(9, "friend_message_cb:msgV3_hash_jbuffer:%p", msgV3_hash_jbuffer);
+            // dbg(9, "friend_message_cb:msgV3_hash_jbuffer:%p", msgV3_hash_jbuffer);
             if(msgV3_hash_jbuffer != NULL)
             {
                 uint8_t *msgV3_hash_buffer_bin = (uint8_t *)(message + pos + 2);
                 (*jnienv2)->SetByteArrayRegion(jnienv2, msgV3_hash_jbuffer, 0, (int)TOX_MSGV3_MSGID_LENGTH, (const jbyte *)msgV3_hash_buffer_bin);
-                dbg(9, "friend_message_cb:msgV3_hash_buffer_bin:%p", msgV3_hash_buffer_bin);
+                // dbg(9, "friend_message_cb:msgV3_hash_buffer_bin:%p", msgV3_hash_buffer_bin);
             }
 
             new_length = pos;
