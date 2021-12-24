@@ -442,7 +442,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_file_sharing_to_trifa_via_intent = true;
     static boolean PREF__compact_friendlist = false;
     static boolean PREF__compact_chatlist = true;
-    static boolean PREF__use_push_service = false;
+    static boolean PREF__use_push_service = true;
     static String[] PREF__toxirc_muted_peers = {};
 
     static String versionName = "";
