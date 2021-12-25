@@ -140,6 +140,9 @@ public class TRIFAGlobals
     static final String ORBOT_PROXY_HOST = "127.0.0.1";
     static final long ORBOT_PROXY_PORT = 9050;
 
+    static final String GENERIC_TOR_USERAGENT = "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0";
+
+
     static final String TOX_NODELIST_HOST = "nodes.tox.chat";
     static final String TOX_NODELIST_URL = "https://" + TOX_NODELIST_HOST + "/json";
 
