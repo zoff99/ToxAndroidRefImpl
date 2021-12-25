@@ -378,4 +378,6 @@
 \n使用 CameraX 并在视频通话中删除背景
 \n此功能可能还不能完全正常工作，请小心，不要总是依赖它来工作！</string>
     <string name="layout___capabilities">功能：</string>
+    <string name="pref_title_use_incognito_keyboard2">隐身键盘</string>
+    <string name="pref_description_use_incognito_keyboard2">打开该开关告诉键盘不要学习你输入的单词</string>
 </resources>
