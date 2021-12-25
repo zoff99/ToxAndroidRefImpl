@@ -566,8 +566,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         }
 
                         video_add_delay_slider_infotext_01.setText(
-                                getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " " +
-                                getString(R.string.CallingActivity_24));
+                                getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " ms");
 
                         SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
                                 getApplicationContext());
@@ -1166,11 +1165,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
         });
 
-        Log.i(TAG,"start:0001");
+        Log.i(TAG, "start:0001");
         initUI();
-        Log.i(TAG,"start:0002");
+        Log.i(TAG, "start:0002");
         initViewParams();
-        Log.i(TAG,"start:0003");
+        Log.i(TAG, "start:0003");
 
         top_text_line_str1 = Callstate.friend_alias_name;
         top_text_line_str2 = "";
@@ -2936,8 +2935,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     video_add_delay_slider_infotext_01.setText(context_s.getString(R.string.
                                                                                            CallingActivity_0) + " " +
-                                                               PREF__video_play_delay_ms + " " +
-                                                               context_s.getString(R.string.CallingActivity_123));
+                                                               PREF__video_play_delay_ms + " ms");
                 }
                 catch (Exception e)
                 {

@@ -61,7 +61,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             AboutPage aboutPage = new AboutPage(this).
                     isRTL(false).
                     setImage(R.drawable.web_hi_res_512).
-                    addWebsite(getString(R.string.Aboutpage_1));
+                    addWebsite("https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/README.md");
 
             aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
                                      MainActivity.versionName + "\n\n" + "TRIfA commit hash:" + BuildConfig.GitHash +
@@ -144,123 +144,123 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_9));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_10)));
+            el2.setTitle("com.github.gfx.android.orma");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/gfx/Android-Orma"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_11));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_12)));
+            el2.setTitle("info.guardianproject.iocipher:IOCipher");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/guardianproject/IOCipher"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_13));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_14)));
+            el2.setTitle("com.l4digital.fastscroll:fastscroll");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/L4Digital/FastScroll"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_15));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_16)));
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_17));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_18)));
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_19));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_20)));
+            el2.setTitle("com.github.bumptech.glide");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bumptech/glide"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_21));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_22)));
+            el2.setTitle("info.guardianproject.netcipher");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/guardianproject/NetCipher"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.mikepenz:fontawesome-typeface");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mikepenz/Android-Iconics"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_23));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_24)));
+            el2.setTitle("com.mikepenz:google-material-typeface");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mikepenz/Android-Iconics"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_25));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_26)));
+            el2.setTitle("com.google.zxing:core");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zxing/zxing"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_27));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_28)));
+            el2.setTitle("com.github.hotchemi:permissionsdispatcher");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/permissions-dispatcher/PermissionsDispatcher"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_29));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_30)));
+            el2.setTitle("com.github.angads25:filepicker");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Angads25/android-filepicker"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_31));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_32)));
+            el2.setTitle("com.vanniktech:emoji-google");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/vanniktech/Emoji"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_33));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_34)));
+            el2.setTitle("com.google.code.gson");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/google/gson"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_35));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_36)));
+            el2.setTitle("com.github.medyo:android-about-page");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/medyo/android-about-page"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_37));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_38)));
+            el2.setTitle("de.hdodenhof:circleimageview");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/hdodenhof/CircleImageView"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_39));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_40)));
+            el2.setTitle("com.github.armcha:AutoLinkTextView");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/armcha/AutoLinkTextView"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_41));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_42)));
+            el2.setTitle("com.github.chrisbanes:PhotoView");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/chrisbanes/PhotoView"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle(getString(R.string.Aboutpage_43));
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.Aboutpage_44)));
+            el2.setTitle("com.squareup.okhttp3");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/square/okhttp"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.daimajia.numberprogressbar");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/daimajia/NumberProgressBar"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
