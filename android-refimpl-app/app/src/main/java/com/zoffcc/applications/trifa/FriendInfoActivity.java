@@ -118,8 +118,25 @@ public class FriendInfoActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        String msgv3_single_cap = "";
+
+        try
+        {
+            final FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
+                    tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
+
+            if (f.msgv3_capability == 1)
+            {
+                msgv3_single_cap = " MSGV3-lite";
+            }
+        }
+        catch (Exception e)
+        {
+        }
+
         fi_toxcapabilities_textview.setText(TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(
-                get_friend_capabilities_from_pubkey(tox_friend_get_public_key__wrapper(friendnum)))));
+                get_friend_capabilities_from_pubkey(tox_friend_get_public_key__wrapper(friendnum)))) +
+                                            msgv3_single_cap);
 
         String friend_relay_pubkey = get_relay_for_friend(tox_friend_get_public_key__wrapper(friendnum));
 
