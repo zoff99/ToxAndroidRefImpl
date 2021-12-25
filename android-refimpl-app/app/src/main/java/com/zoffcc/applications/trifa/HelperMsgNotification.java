@@ -207,8 +207,7 @@ public class HelperMsgNotification
                                 b.setVibrate(vibrate_pattern);
                             }
 
-                            b.setContentTitle(
-                                    context_s.getString(R.string.MainActivity_notification_new_message_title));
+                            b.setContentTitle("TRIfA");
                             b.setAutoCancel(true);
                             b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
                             Notification notification3 = b.build();

@@ -335,7 +335,6 @@
     <string name="MainActivity_add_to_batt_opt">Please add TRIfA to the exception list for Batteryoptimization!</string>
     <string name="MainActivity_friend_is_typing">friend is typing ...</string>
     <string name="MainActivity_notification_new_message">new Message</string>
-    <string name="MainActivity_notification_new_message_title" translatable="false">TRIfA</string>
     <string name="MainActivity_notification_new_message2">new Message</string>
     <string name="MainActivity_button_ok">Ok</string>
     <string name="MainActivity_error_starting_email_app">Error starting Email App</string>

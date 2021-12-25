@@ -66,7 +66,7 @@
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher4"
         android:roundIcon="@mipmap/ic_launcher4_round"
-        android:label="@string/app_name"
+        android:label="TRIfA"
         android:supportsRtl="true"
         android:requestLegacyExternalStorage="false"
         android:theme="@style/AppTheme"
