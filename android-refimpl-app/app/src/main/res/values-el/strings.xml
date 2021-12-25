@@ -26,8 +26,6 @@
     <string name="pref_description_window_security">Η ενεργοποίηση αυτής της ρύθμισης προσθέτει το FLAG_SECURE στις Δραστηριότητες.
 \nΑποτρέπει τα στιγμιότυπα οθόνης και την καταγραφή οθόνης και την προβολή περιεχομένου στην προεπισκόπηση ανακλήσεων</string>
     <string name="pref_title_window_security">Αποτροπή λήψης στιγμιότυπου οθόνης</string>
-    <string name="pref_description_use_incognito_keyboard">απενεργοποιήστε για να πείτε στο πληκτρολόγιο να μην μαθαίνει από τις λέξεις που πληκτρολογήσατε</string>
-    <string name="pref_title_use_incognito_keyboard">Πληκτρολόγιο ανώνυμης περιήγησης</string>
     <string name="pref_description_start_on_boot">έναρξη της εφαρμογής μετά την εκκίνηση.
 \nΗ Google δεν το επιτρέπει πλέον αυτό ξεκινώντας από το Android 10</string>
     <string name="pref_title_start_on_boot">εκκίνηση κατά την εκκίνηση</string>

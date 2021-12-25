@@ -59,7 +59,6 @@
     <string name="pref_title_h264_encoder_use_intra_refresh">H264 ներքին թարմեցում</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">H264 կոդավորիչը պետք է օգտագործի ներքին կադրերի թարմեցումը</string>
     <string name="pref_title_start_on_boot">Բեռնել ծրագիրը ավտոմատ</string>
-    <string name="pref_title_use_incognito_keyboard">ծպտյալ ստեղնաշար</string>
     <string name="pref_description_compact_friendlist">Ընկերների մեծ ցուցակ ունենալու դեպքում ընկերների ցուցակը դարձնում է հակիրճ</string>
     <string name="pref_title_compact_chatlist">Կոմպակտ Խոսակցությունների ցուցակ</string>
     <string name="pref_title_use_push_service">Օգտագործել Push Ծառայությունը</string>
@@ -70,7 +69,6 @@
     <string name="pref_title_U_keep_nospam">պահել NoSpam</string>
     <string name="pref_title_allow_screen_off_in_audio_call">անջատել էկրանը</string>
     <string name="pref_title_X_zoom_incoming_video">ՎիդեոԶանգի պատուհանի չափսը</string>
-    <string name="pref_description_use_incognito_keyboard">անջատել, որպեսզի ստեղնաշարը չսովորի մուտքագրած բառերը</string>
     <string name="pref_title_window_security">արգելել էկրանի պատկեր ստեղծելը</string>
     <string name="pref_title_compact_friendlist">Կոմպակտ ընկերների ցուցակ</string>
     <string name="pref_title_set_fps">սահմանել կադրերի քանակը վայրկյանում</string>

@@ -287,7 +287,6 @@
     <string name="pref_title_video_cam_resolution">أبعاد الكاميرا</string>
     <string name="pref_description_auto_accept_video">قبول تلقائي لمقاطع فيديو يصل حجمها إلى 20 ميغابايت</string>
     <string name="pref_title_auto_accept_video">إقبل الفيديوهات تلقائيا</string>
-    <string name="pref_title_use_incognito_keyboard">وضع التخفّي للوحة المفاتيح</string>
     <string name="conference_audio_activity_player_name">مشغل المؤتمر الصوتي</string>
     <string name="layout___migdb_do_not_close">عدم إغلاق هذه الشاشة</string>
     <string name="layout___migdb_text">ترحيل ملفات قاعدة البيانات</string>
@@ -297,7 +296,6 @@
     <string name="pref_description_X_tox_set_do_not_sync_av">!!التجريبيه !!
 \nلا تقم بمزامنة الفيديو أو الصوت. استخدم هذا الإعداد إذا كانت لديك مشاكل في مكالمة الفيديو ، كحل أخير.</string>
     <string name="pref_title_X_tox_set_do_not_sync_av">لا تزامن AV</string>
-    <string name="pref_description_use_incognito_keyboard">إيقاف تشغيل لإخبار لوحة المفاتيح لا للتعلم من كلماتك التي أدخلتها</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">يجب أن تستخدم أداة ترميز H264 إطارات التحديث الداخلية</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">تحديث داخلي H264</string>
     <string name="pref_description_force_udp_only">هذا سوف يفرض وضع UDP فقط، قد لا يكون الوصول إلى بعض جهات الاتصال مع هذا الإعداد قيد التشغيل

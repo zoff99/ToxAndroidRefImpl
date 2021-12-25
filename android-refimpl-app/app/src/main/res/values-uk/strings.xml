@@ -61,8 +61,6 @@
     <string name="pref_title_conference_show_system_messages">Системні повідомлення</string>
     <string name="pref_description_set_fps">спробуйте встановити частоту кадрів 15 кадрів в секунду, це може зірватися на деяких телефонах</string>
     <string name="pref_title_set_fps">встановити fps</string>
-    <string name="pref_description_use_incognito_keyboard">вимкніть, щоб сказати клавіатурі не вчитися з введених слів</string>
-    <string name="pref_title_use_incognito_keyboard">клавіатура інкогніто</string>
     <string name="pref_description_start_on_boot">запустити програму після завантаження пристрою.
 \nGoogle більше не дозволяє це, починаючи з Android 10</string>
     <string name="pref_title_start_on_boot">запуск під час завантаження пристрою</string>

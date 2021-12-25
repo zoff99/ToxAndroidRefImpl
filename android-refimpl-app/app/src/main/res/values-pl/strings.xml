@@ -48,7 +48,6 @@
     <string name="title_activity_maintenance">Konserwacja</string>
     <string name="title_activity_share">Otwórz z TRIfA</string>
     <string name="title_activity_check_password">Wprowadź hasło</string>
-    <string name="pref_title_use_incognito_keyboard">Użyj klawiatury prywatnej</string>
     <string name="pref_description_orbot_enabled">Musisz zainstalować Orbot aby tego użyć.
 \nZmiana wymaga PONOWNEGO URUCHOMIENIA!</string>
     <string name="pref_title_X_use_native_audio_play">Natywny system audio</string>
@@ -79,7 +78,6 @@
     <string name="pref_description_window_security">Włączenie tego ustawienia powoduje dodanie FLAG_SECURE do działań
 \nUniemożliwia ono wykonywanie zrzutów ekranu i nagrywanie ekranu oraz wyświetlanie zawartości w podglądzie przypomnień</string>
     <string name="pref_title_window_security">Wyłącz możliwość robienia Zrzutu z ekranu</string>
-    <string name="pref_description_use_incognito_keyboard">wyłącz, aby klawiatura nie uczyła się na podstawie wpisywanych słów</string>
     <string name="pref_description_start_on_boot">uruchomić aplikację po starcie systemu.
 \nGoogle już na to nie pozwala, począwszy od Androida 10</string>
     <string name="pref_title_start_on_boot">Uruchom przy starcie</string>

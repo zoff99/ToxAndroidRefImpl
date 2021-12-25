@@ -52,7 +52,6 @@
     <string name="add_friend_activity_add">Adicionar Amigo</string>
     <string name="pref_title_X_audio_recording_frame_size">Tamanho de quadro de recodificação de áudio</string>
     <string name="pref_title_min_audio_samplingrate_out">Taxa de amostragem de áudio</string>
-    <string name="pref_title_use_incognito_keyboard">Teclado Anônimo</string>
     <string name="pref_title_fps_half">reduzir fps</string>
     <string name="pref_title_udp_enabled">habilitar UDP</string>
     <string name="pref_title_higher_audio_quality">Qualidade do Áudio</string>
@@ -185,7 +184,6 @@
 \nProvavelmente também alguns outros efeitos negativos!</string>
     <string name="pref_description_local_discovery_enabled">usar os nós na LAN local para inicializar</string>
     <string name="pref_description_set_fps">tente definir a taxa de quadros de vídeo de 15 fps, isto pode travar em alguns telefones</string>
-    <string name="pref_description_use_incognito_keyboard">desative para dizer ao teclado para não aprender com as palavras digitadas</string>
     <string name="pref_description_fps_half">Taxa de quadros de vídeo 1/2: então 12 fps em vez de 25 fps</string>
     <string name="pref_description_orbot_enabled">Você precisa instalar o Orbot para usar isto.
 \nA mudança precisa REINICIAR!</string>

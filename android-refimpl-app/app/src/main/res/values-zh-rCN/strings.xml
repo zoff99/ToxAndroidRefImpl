@@ -324,8 +324,6 @@
     <string name="pref_description_X_tox_set_do_not_sync_av">!!实验性!!
 \n不要同步视频或音频。如果您有视频通话问题，请使用此设置作为最后的手段。</string>
     <string name="pref_title_X_tox_set_do_not_sync_av">不要同步音视频</string>
-    <string name="pref_description_use_incognito_keyboard">关闭告诉键盘不要从你输入的词汇中进行学习</string>
-    <string name="pref_title_use_incognito_keyboard">隐身键盘</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">H264编码器应该使用内部刷新帧</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">H264 内部刷新</string>
     <string name="pref_description_force_udp_only">这会强制仅UDP模式，此设定开启情况下可能无法联系到某些联系人。

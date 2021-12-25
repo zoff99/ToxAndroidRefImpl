@@ -159,8 +159,6 @@
     <string name="pref_title_conference_show_system_messages">Sistemos pranešimai</string>
     <string name="pref_description_set_fps">Bandyti nustatyti 15kps vaizdo kadrų dažnį, dėl to programa gali neveikti kai kuriuose telefonuose</string>
     <string name="pref_title_set_fps">Nustatyti kps</string>
-    <string name="pref_description_use_incognito_keyboard">Išjunkite, norėdami, kad klaviatūra neįsimintų jūsų įvestų žodžių</string>
-    <string name="pref_title_use_incognito_keyboard">Nestebima klaviatūra</string>
     <string name="pref_description_fps_half">Vaizdo kadrų dažnis 1/2 : 12kps, vietoje 25kps</string>
     <string name="pref_title_fps_half">Mažiau kps (kadrų per sekundę)</string>
     <string name="pref_description_orbot_enabled">Norint naudoti, privalote įdiegti Orbot.

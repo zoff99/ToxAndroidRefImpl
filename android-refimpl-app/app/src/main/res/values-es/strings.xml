@@ -287,8 +287,6 @@
     <string name="pref_description_X_tox_set_do_not_sync_av">!! Experimental !!
 \nNo sincroniza video ni audio. Utilice esta configuración si tiene problemas con las videollamadas, como último recurso.</string>
     <string name="pref_title_X_tox_set_do_not_sync_av">NO sincronizar AV</string>
-    <string name="pref_description_use_incognito_keyboard">desactive para decirle al teclado que no aprenda con las palabras digitadas</string>
-    <string name="pref_title_use_incognito_keyboard">Teclado de incógnito</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">El codificador H264 debe usar marcos de actualización intra</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">Actualización intra H264</string>
     <string name="pref_description_force_udp_only">esto forzará el modo solo UDP, es posible que no se pueda acceder a algunos contactos con esta configuración activada

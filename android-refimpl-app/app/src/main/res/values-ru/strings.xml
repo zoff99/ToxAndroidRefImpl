@@ -301,8 +301,6 @@
     <string name="pref_description_X_tox_set_do_not_sync_av">!! Экспериментальная функция !!
 \nНе синхронизировать аудио и видео. Используйте эту настройку в крайнем случае, если у вас есть проблемы с видеозвонками.</string>
     <string name="pref_title_X_tox_set_do_not_sync_av">не синхронизировать аудио и видео</string>
-    <string name="pref_description_use_incognito_keyboard">выключите, чтобы клавиатура не обучалась введенным словам</string>
-    <string name="pref_title_use_incognito_keyboard">инкогнито-клавиатура</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">Кодировщик H264 должен использовать кадры внутреннего обновления</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">H264 внутреннее обновление</string>
     <string name="pref_description_force_udp_only">принудительно использовать только UDP, при включении этой настройки некоторые контакты могут стать недоступными

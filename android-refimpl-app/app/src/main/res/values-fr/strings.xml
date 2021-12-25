@@ -309,8 +309,6 @@
     <string name="pref_description_X_tox_set_do_not_sync_av">! ! Expérimental ! !
 \nNe pas synchroniser la vidéo ou l\'audio. Utilisez ce paramètre si vous avez des problèmes de vidéoconférence, en dernier recours.</string>
     <string name="pref_title_X_tox_set_do_not_sync_av">NE PAS synchroniser AV</string>
-    <string name="pref_description_use_incognito_keyboard">désactivez pour dire au clavier de ne pas apprendre de vos mots saisis</string>
-    <string name="pref_title_use_incognito_keyboard">Clavier incognito</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">L’encodeur H264 doit utiliser des cadres intra-actualisation</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">Rafraîchissement intra H264</string>
     <string name="pref_description_force_udp_only">cela forcera le mode UDP uniquement, certains contacts peuvent ne pas être joignables avec ce paramètre activé
