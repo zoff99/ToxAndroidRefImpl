@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -49,12 +50,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import info.guardianproject.netcipher.client.StrongBuilder;
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder2;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -86,6 +90,7 @@ import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf_c
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_factor;
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_iter;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_TOR_USERAGENT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaSetPatternActivity.filter_out_specials_from_filepath_stricter;
@@ -130,6 +135,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     //
     // ----------------------------------------------------
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -343,10 +349,24 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     else
                     {
                         Log.i(TAG, "StrongOkHttpClientBuilder:002");
-                        // StrongOkHttpClientBuilder2 bb = StrongOkHttpClientBuilder2.
-                        //        forMaxSecurity(MaintenanceActivity.this);
-                        // bb.build(MaintenanceActivity.this);
-                        onConnected(new OkHttpClient());
+                        onConnected(new OkHttpClient.Builder().
+                                addNetworkInterceptor(new Interceptor()
+                                {
+                                    @NonNull
+                                    @Override
+                                    public Response intercept(@NonNull Chain chain) throws IOException
+                                    {
+                                        Request request = chain.request();
+                                        Request new_request = request.newBuilder().removeHeader("User-Agent").addHeader(
+                                                "User-Agent", GENERIC_TOR_USERAGENT).
+                                                build();
+                                        return chain.proceed(new_request);
+                                    }
+                                }).
+                                connectTimeout(20, TimeUnit.SECONDS).
+                                writeTimeout(20, TimeUnit.SECONDS).
+                                connectTimeout(20, TimeUnit.SECONDS).
+                                build());
                         Log.i(TAG, "StrongOkHttpClientBuilder:003");
                     }
                 }
@@ -743,6 +763,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         debug_output.setText("");
     }
 
+    @SuppressLint("SetTextI18n")
     void debug_output_append(String log_line)
     {
         debug_output.setText(debug_output.getText().toString() + log_line + "\n");
@@ -761,7 +782,10 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 try
                 {
                     Log.i(TAG, "onConnected:002");
-                    Request request = new Request.Builder().url(TOX_NODELIST_URL).
+                    Request request = new Request.
+                            Builder().
+                            url(TOX_NODELIST_URL).
+                            header("User-Agent", GENERIC_TOR_USERAGENT).
                             build();
 
                     Response response = okHttpClient.
