@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.util.Log;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.ByteBuffer;
@@ -31,6 +32,7 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.NonNull;
 import okhttp3.CacheControl;
 import okhttp3.FormBody;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -41,6 +43,7 @@ import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.is_valid_pushurl_for_friend_with_whitelist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_push_service;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_TOR_USERAGENT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
@@ -1226,16 +1229,44 @@ public class HelperFriend
                                         Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxyAddr);
 
                                         client = new OkHttpClient.Builder().
+                                                addNetworkInterceptor(new Interceptor()
+                                                {
+                                                    @NonNull
+                                                    @Override
+                                                    public Response intercept(@NonNull Chain chain) throws IOException
+                                                    {
+                                                        Request request = chain.request();
+                                                        Request new_request = request.newBuilder().removeHeader(
+                                                                "User-Agent").addHeader("User-Agent",
+                                                                                        GENERIC_TOR_USERAGENT).
+                                                                build();
+                                                        return chain.proceed(new_request);
+                                                    }
+                                                }).
                                                 proxy(proxy).
                                                 callTimeout(6 * 1000, TimeUnit.MILLISECONDS).
-                                                connectTimeout(5 * 1000, TimeUnit.MILLISECONDS).
+                                                connectTimeout(8 * 1000, TimeUnit.MILLISECONDS).
                                                 build();
                                     }
                                     else
                                     {
                                         client = new OkHttpClient.Builder().
+                                                addNetworkInterceptor(new Interceptor()
+                                                {
+                                                    @NonNull
+                                                    @Override
+                                                    public Response intercept(@NonNull Chain chain) throws IOException
+                                                    {
+                                                        Request request = chain.request();
+                                                        Request new_request = request.newBuilder().removeHeader(
+                                                                "User-Agent").addHeader("User-Agent",
+                                                                                        GENERIC_TOR_USERAGENT).
+                                                                build();
+                                                        return chain.proceed(new_request);
+                                                    }
+                                                }).
                                                 callTimeout(6 * 1000, TimeUnit.MILLISECONDS).
-                                                connectTimeout(5 * 1000, TimeUnit.MILLISECONDS).
+                                                connectTimeout(8 * 1000, TimeUnit.MILLISECONDS).
                                                 build();
                                     }
 
@@ -1247,24 +1278,28 @@ public class HelperFriend
                                             Builder().
                                             cacheControl(new CacheControl.Builder().noCache().build()).
                                             url(pushurl_for_friend).
+                                            header("User-Agent", GENERIC_TOR_USERAGENT).
                                             post(formBody).
                                             build();
+
                                     try (Response response = client.newCall(request).execute())
                                     {
                                         // Log.i(TAG, "friend_call_push_url:url=" + pushurl_for_friend + " RES=" +
                                         //            response.code());
-                                        if (response.code() == 200)
+                                        if ((response.code() < 300) && (response.code() > 199))
                                         {
                                             update_message_in_db_sent_push_set(friend_pubkey, message_timestamp_circa);
                                         }
                                     }
-                                    catch (Exception ignored)
+                                    catch (Exception e1)
                                     {
+                                        Log.i(TAG, "friend_call_push_url:EE1:" + e1.getMessage());
+                                        e1.printStackTrace();
                                     }
                                 }
                                 catch (Exception e)
                                 {
-                                    Log.i(TAG, "friend_call_push_url:001:EE:" + e.getMessage());
+                                    Log.i(TAG, "friend_call_push_url:EE2:" + e.getMessage());
                                 }
                             }
                         };
