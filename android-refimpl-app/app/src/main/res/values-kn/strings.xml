@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name" translatable="false">TRIfA</string>
     <string name="add_friend_activity_name">ನಿನ್ನ ಗೆಳೆಯನನ್ನು ಸೇರಿಸು</string>
     <string name="message_list_activity_name">ಮಾತಾಡು</string>
     <string name="conference_message_list_activity_name">ಪದ ಮಿಲನ</string>
@@ -282,7 +281,6 @@
     <string name="MainActivity_add_to_batt_opt">Please add TRIfA to the exception list for Batteryoptimization!</string>
     <string name="MainActivity_friend_is_typing">ಗೆಳೆಯ ಟೈಪಿಸುತ್ತಿದ್ದಾನೆ..</string>
     <string name="MainActivity_notification_new_message">ಹೊಸ  ಸಂದೇಶ</string>
-    <string name="MainActivity_notification_new_message_title" translatable="false">TRIfA</string>
     <string name="MainActivity_notification_new_message2">ಹೊಸ ಸಂದೇಶ</string>
     <string name="MainActivity_button_ok">ಸರಿ</string>
     <string name="MainActivity_error_starting_email_app">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಶುರುವಾಗುವಾಗ ತಪ್ಪಿದೆ</string>
@@ -295,57 +293,18 @@
     <string name="MainActivity_notification_new_message5">ಹೊಸ ಸಂದೇಶ</string>
 
     <string name="Aboutpage_0">TRIfA Crashlog</string>
-    <string name="Aboutpage_1" translatable="false">https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/README.md</string>
-    <string name="Aboutpage_10" translatable="false">https://github.com/gfx/Android-Orma</string>
-    <string name="Aboutpage_11" translatable="false">info.guardianproject.iocipher:IOCipher</string>
-    <string name="Aboutpage_12" translatable="false">https://github.com/guardianproject/IOCipher</string>
-    <string name="Aboutpage_13" translatable="false">com.l4digital.fastscroll:fastscroll</string>
-    <string name="Aboutpage_14" translatable="false">https://github.com/L4Digital/FastScroll</string>
-    <string name="Aboutpage_15" translatable="false">com.github.bumptech.glide</string>
-    <string name="Aboutpage_16" translatable="false">https://github.com/bumptech/glide</string>
-    <string name="Aboutpage_17" translatable="false">info.guardianproject.netcipher</string>
-    <string name="Aboutpage_18" translatable="false">https://github.com/guardianproject/NetCipher</string>
-    <string name="Aboutpage_19" translatable="false">com.mikepenz:fontawesome-typeface</string>
     <string name="Aboutpage_2">send Crash report via Email</string>
-    <string name="Aboutpage_20" translatable="false">https://github.com/mikepenz/Android-Iconics</string>
-    <string name="Aboutpage_21" translatable="false">com.mikepenz:google-material-typeface</string>
-    <string name="Aboutpage_22" translatable="false">https://github.com/mikepenz/Android-Iconics</string>
-    <string name="Aboutpage_23" translatable="false">com.google.zxing:core</string>
-    <string name="Aboutpage_24" translatable="false">https://github.com/zxing/zxing</string>
-    <string name="Aboutpage_25" translatable="false">com.github.hotchemi:permissionsdispatcher</string>
-    <string name="Aboutpage_26" translatable="false">https://github.com/permissions-dispatcher/PermissionsDispatcher</string>
-    <string name="Aboutpage_27" translatable="false">com.github.angads25:filepicker</string>
-    <string name="Aboutpage_28" translatable="false">https://github.com/Angads25/android-filepicker</string>
-    <string name="Aboutpage_29" translatable="false">com.vanniktech:emoji-ios</string>
-    <string name="Aboutpage_30" translatable="false">https://github.com/vanniktech/Emoji</string>
-    <string name="Aboutpage_31" translatable="false">com.google.code.gson</string>
-    <string name="Aboutpage_32" translatable="false">https://github.com/google/gson</string>
-    <string name="Aboutpage_33" translatable="false">com.github.medyo:android-about-page</string>
-    <string name="Aboutpage_34" translatable="false">https://github.com/medyo/android-about-page</string>
-    <string name="Aboutpage_35" translatable="false">de.hdodenhof:circleimageview</string>
-    <string name="Aboutpage_36" translatable="false">https://github.com/hdodenhof/CircleImageView</string>
-    <string name="Aboutpage_37" translatable="false">com.github.armcha:AutoLinkTextView</string>
-    <string name="Aboutpage_38" translatable="false">https://github.com/armcha/AutoLinkTextView</string>
-    <string name="Aboutpage_39" translatable="false">com.github.chrisbanes:PhotoView</string>
     <string name="Aboutpage_4">reading crash info ...</string>
-    <string name="Aboutpage_40" translatable="false">https://github.com/chrisbanes/PhotoView</string>
-    <string name="Aboutpage_41" translatable="false">com.squareup.okhttp3</string>
-    <string name="Aboutpage_42" translatable="false">https://github.com/square/okhttp</string>
-    <string name="Aboutpage_43" translatable="false">com.daimajia.numberprogressbar</string>
-    <string name="Aboutpage_44" translatable="false">https://github.com/daimajia/NumberProgressBar</string>
     <string name="Aboutpage_5a">TRIfA a Tox Client for Android</string>
     <string name="Aboutpage_5b">Version:</string>
     <string name="Aboutpage_6">What is Tox?</string>
     <string name="Aboutpage_8">used libraries:</string>
-    <string name="Aboutpage_9" translatable="false">com.github.gfx.android.orma</string>
 
     <string name="AddFriendActivity_3">incorrect ToxID</string>
     <string name="AddFriendActivity_4">No ToxID</string>
 
     <string name="CallingActivity_0">Video Delay:</string>
-    <string name="CallingActivity_123" translatable="false">ms</string>
     <string name="CallingActivity_23">Video Delay:</string>
-    <string name="CallingActivity_24" translatable="false">ms</string>
 
     <string name="ConferenceAudioActivity_10">Userlist</string>
     <string name="ConferenceAudioActivity_17">Push to Talk</string>
