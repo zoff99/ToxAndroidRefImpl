@@ -21,7 +21,6 @@ package com.zoffcc.applications.trifa;
 
 import android.util.Log;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.ByteBuffer;
@@ -32,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.NonNull;
 import okhttp3.CacheControl;
 import okhttp3.FormBody;
-import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -1229,44 +1227,20 @@ public class HelperFriend
                                         Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxyAddr);
 
                                         client = new OkHttpClient.Builder().
-                                                addNetworkInterceptor(new Interceptor()
-                                                {
-                                                    @NonNull
-                                                    @Override
-                                                    public Response intercept(@NonNull Chain chain) throws IOException
-                                                    {
-                                                        Request request = chain.request();
-                                                        Request new_request = request.newBuilder().removeHeader(
-                                                                "User-Agent").addHeader("User-Agent",
-                                                                                        GENERIC_TOR_USERAGENT).
-                                                                build();
-                                                        return chain.proceed(new_request);
-                                                    }
-                                                }).
                                                 proxy(proxy).
-                                                callTimeout(6 * 1000, TimeUnit.MILLISECONDS).
-                                                connectTimeout(8 * 1000, TimeUnit.MILLISECONDS).
+                                                readTimeout(5, TimeUnit.SECONDS).
+                                                callTimeout(6, TimeUnit.SECONDS).
+                                                connectTimeout(8, TimeUnit.SECONDS).
+                                                writeTimeout(5, TimeUnit.SECONDS).
                                                 build();
                                     }
                                     else
                                     {
                                         client = new OkHttpClient.Builder().
-                                                addNetworkInterceptor(new Interceptor()
-                                                {
-                                                    @NonNull
-                                                    @Override
-                                                    public Response intercept(@NonNull Chain chain) throws IOException
-                                                    {
-                                                        Request request = chain.request();
-                                                        Request new_request = request.newBuilder().removeHeader(
-                                                                "User-Agent").addHeader("User-Agent",
-                                                                                        GENERIC_TOR_USERAGENT).
-                                                                build();
-                                                        return chain.proceed(new_request);
-                                                    }
-                                                }).
-                                                callTimeout(6 * 1000, TimeUnit.MILLISECONDS).
-                                                connectTimeout(8 * 1000, TimeUnit.MILLISECONDS).
+                                                readTimeout(5, TimeUnit.SECONDS).
+                                                callTimeout(6, TimeUnit.SECONDS).
+                                                connectTimeout(8, TimeUnit.SECONDS).
+                                                writeTimeout(5, TimeUnit.SECONDS).
                                                 build();
                                     }
 
