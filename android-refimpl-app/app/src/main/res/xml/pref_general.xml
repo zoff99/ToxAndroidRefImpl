@@ -32,8 +32,8 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="use_incognito_keyboard"
-        android:summary="@string/pref_description_use_incognito_keyboard"
-        android:title="@string/pref_title_use_incognito_keyboard" />
+        android:summary="@string/pref_description_use_incognito_keyboard2"
+        android:title="@string/pref_title_use_incognito_keyboard2" />
 
     <SwitchPreference
         android:defaultValue="true"
