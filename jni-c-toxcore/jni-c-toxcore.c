@@ -3781,9 +3781,39 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1friend_1send_1me
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
     jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
+    if (plength > TOX_MSGV3_MAX_MESSAGE_LENGTH)
+    {
+        (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+        (*env)->DeleteLocalRef(env, stringJbytes);
+        dbg(9, "tox_friend_send_message:ERROR:TOX_ERR_FRIEND_SEND_MESSAGE_TOO_LONG:TOX_MSGV3_MAX_MESSAGE_LENGTH");
+        return (jlong)-5;
+    }
+
+    uint8_t *message_str_v3 = (uint8_t *)calloc(1, (size_t)(plength + TOX_MSGV3_GUARD + TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH));
+    if (!message_str_v3)
+    {
+        (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+        (*env)->DeleteLocalRef(env, stringJbytes);
+        dbg(9, "tox_friend_send_message:ERROR:TOX_MSGV3:can not allocate buffer");
+        return (jlong)-5;
+    }
+
+    uint8_t* position = message_str_v3;
+    memcpy(position, pBytes, (size_t)(plength));
+    position = position + plength;
+    position = position + TOX_MSGV3_GUARD;
+    memcpy(position, hash_buffer_c, (size_t)(TOX_MSGV3_MSGID_LENGTH));
+    position = position + TOX_MSGV3_MSGID_LENGTH;
+    memcpy(position, &timestamp_unix, (size_t)(TOX_MSGV3_TIMESTAMP_LENGTH));
+
+    size_t new_len = plength + TOX_MSGV3_GUARD + TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH;
+
     TOX_ERR_FRIEND_SEND_MESSAGE error;
-    uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)pBytes,
-                                           (size_t)plength, &error);
+    uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)message_str_v3,
+                                           (size_t)new_len, &error);
+
+    free(message_str_v3);
+
     (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
     (*env)->DeleteLocalRef(env, stringJbytes);
 
