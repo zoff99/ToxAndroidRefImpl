@@ -41,7 +41,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_bytes;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK;
@@ -1194,15 +1193,24 @@ public class HelperMessage
 
     static void process_msgv3_high_level_ack(final long friend_number, String msgV3hash_hex_string)
     {
-        final Message m = orma.selectFromMessage().
-                msg_idv3_hashEq(msgV3hash_hex_string).
-                tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                directionEq(1).
-                orderByIdDesc().
-                toList().get(0);
+        Message m = null;
+        try
+        {
+            m = orma.selectFromMessage().
+                    msg_idv3_hashEq(msgV3hash_hex_string).
+                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
+                    directionEq(1).
+                    orderByIdDesc().
+                    toList().get(0);
+        }
+        catch (Exception e)
+        {
+        }
 
         if (m != null)
         {
+            final Message m2=m;
+
             Runnable myRunnable = new Runnable()
             {
                 @Override
@@ -1210,10 +1218,10 @@ public class HelperMessage
                 {
                     try
                     {
-                        m.rcvd_timestamp = System.currentTimeMillis();
-                        m.read = true;
-                        HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
-                        HelperMessage.update_single_message(m, true);
+                        m2.rcvd_timestamp = System.currentTimeMillis();
+                        m2.read = true;
+                        HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m2);
+                        HelperMessage.update_single_message(m2, true);
                     }
                     catch (Exception e)
                     {
