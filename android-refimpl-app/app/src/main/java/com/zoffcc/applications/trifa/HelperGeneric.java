@@ -2152,6 +2152,7 @@ public class HelperGeneric
                 {
                     // friend has a relay
                     friendnum_to_use = tox_friend_by_public_key__wrapper(relay_pubkey);
+                    msgv1 = false;
                     // Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
                 }
                 else // if friend is NOT online and does not have a relay, try if he has a push url
