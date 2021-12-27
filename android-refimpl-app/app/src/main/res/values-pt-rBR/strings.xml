@@ -250,4 +250,7 @@
 \nIsto pode ainda não funcionar totalmente, favor ter cuidado e não depender sempre disto para funcionar!</string>
     <string name="pref_title_speakerphone_tweak">Correção do alto-falante para chamadas</string>
     <string name="pref_description_speakerphone_tweak">Se o aplicativo não mudar para o alto-falante em uma chamada, então tente ativar essa correção.</string>
+    <string name="pref_title_use_incognito_keyboard2">Teclado Anônimo</string>
+    <string name="pref_description_use_incognito_keyboard2">ative para dizer ao teclado para não aprender com as palavras introduzidas</string>
+    <string name="layout___capabilities">Capacidades:</string>
 </resources>
