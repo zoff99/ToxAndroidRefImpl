@@ -364,4 +364,7 @@
 \nCela pourrait ne pas encore fonctionner pleinement, soyez prudent et ne dépendez pas de cela pour fonctionner toujours !</string>
     <string name="pref_description_speakerphone_tweak">Si l’application ne passe pas au haut-parleur lors d’un appel, essayez d’activer ce correctif.</string>
     <string name="pref_title_speakerphone_tweak">Correction du haut-parleur pour les appels</string>
+    <string name="pref_title_use_incognito_keyboard2">Clavier incognito</string>
+    <string name="pref_description_use_incognito_keyboard2">activez pour dire au clavier de ne pas apprendre de vos mots saisis</string>
+    <string name="layout___capabilities">Capacités :</string>
 </resources>

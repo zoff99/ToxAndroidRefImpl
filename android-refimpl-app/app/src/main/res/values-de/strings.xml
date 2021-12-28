@@ -335,4 +335,13 @@
     <string name="pref_description_window_security">Durch Aktivieren dieser Einstellung wird FLAG_SECURE zu Aktivitäten hinzugefügt.
 \nEs verhindert Screenshots und Bildschirmaufzeichnungen sowie die Anzeige von Inhalten in der aktuellen Vorschau</string>
     <string name="title_activity_conferenceinfo">Konferenzinformationen</string>
+    <string name="layout___capabilities">Fähigkeiten:</string>
+    <string name="pref_description_speakerphone_tweak">Wenn die App während eines Anrufs nicht auf den Lautsprecher umschaltet, versuchen Sie, diese Korrektur zu aktivieren.</string>
+    <string name="pref_description_use_incognito_keyboard2">einschalten, um der Tastatur mitzuteilen, dass sie nicht aus den von Ihnen eingegebenen Wörtern lernen soll</string>
+    <string name="pref_title_use_incognito_keyboard2">Inkognito-Tastatur</string>
+    <string name="pref_title_use_camera_x">Hintergrund entfernen</string>
+    <string name="pref_description_use_camera_x">!! Experimentell !!
+\nCameraX verwenden und Hintergrund bei Videoanrufen entfernen
+\nDies könnte noch nicht vollständig funktionieren, bitte seien Sie vorsichtig und verlassen Sie sich nicht darauf, dass dies immer funktioniert!</string>
+    <string name="pref_title_speakerphone_tweak">Lautsprecherfixierung für Anrufe</string>
 </resources>

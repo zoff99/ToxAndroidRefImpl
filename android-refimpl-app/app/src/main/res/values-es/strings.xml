@@ -349,4 +349,7 @@
 \n¡Esto podría no funcionar completamente todavía, por favor tenga cuidado y no dependa siempre de esto para funcionar!</string>
     <string name="pref_title_speakerphone_tweak">Corrección de altavoz para llamadas</string>
     <string name="pref_description_speakerphone_tweak">Si la aplicación no cambia al altavoz en una llamada, intente activar esta solución.</string>
+    <string name="pref_title_use_incognito_keyboard2">Teclado incógnito</string>
+    <string name="pref_description_use_incognito_keyboard2">activar para indicar al teclado que no aprenda de las palabras introducidas</string>
+    <string name="layout___capabilities">Capacidades:</string>
 </resources>
