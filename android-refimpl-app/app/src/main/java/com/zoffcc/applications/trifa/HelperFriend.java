@@ -592,9 +592,19 @@ public class HelperFriend
                 long friendnum = MainActivity.tox_friend_add_norequest(friend_public_key); // add friend
                 Log.d(TAG, "add_friend_to_system:fnum add=" + friendnum);
 
-                if (friendnum == 0xffffffff) // 0xffffffff == UINT32_MAX
+                if (friendnum == 4294967295L) // 0xffffffff == UINT32_MAX
                 {
+                    // Log.d(TAG, "add_friend_to_system:fnum add res=0xffffffff as_friends_relay=" + as_friends_relay);
                     // adding friend failed
+                    // if its a relay still try to update it in our DB
+                    if (as_friends_relay)
+                    {
+                        // add relay for friend to DB
+                        // Log.d(TAG, "add_friend_to_system:add_or_update_friend_relay");
+                        HelperRelay.add_or_update_friend_relay(friend_public_key, owner_public_key);
+                        add_all_friends_clear_wrapper(10);
+                    }
+
                     return;
                 }
 
