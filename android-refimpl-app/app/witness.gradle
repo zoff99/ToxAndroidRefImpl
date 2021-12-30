@@ -116,7 +116,7 @@ dependencyVerification {
         'com.github.bumptech.glide:disklrucache:4.12.0:disklrucache-4.12.0.jar:6f0cc9069646ac582ee78dbf621e90303ea200b9ce41c20ac368e925ed456379',
         'com.github.bumptech.glide:gifdecoder:4.12.0:gifdecoder-4.12.0.aar:197a1cd5b76855aa02b230c13974e293229b901dc2b96fab4315201e78baa804',
         'com.github.bumptech.glide:glide:4.12.0:glide-4.12.0.aar:6ae2944adb62977fe53f42c4f86a22bd326c1828b693441ccce430e92f148384',
-        'com.github.chrisbanes:PhotoView:2.1.3:PhotoView-2.1.3.aar:5af30effdb6734e166365f2b296407838c5c6b0a8106195f397b6a9834caf613',
+        'com.github.chrisbanes:PhotoView:2.3.0:PhotoView-2.3.0.aar:6c8989f2945d50ab38b3e0300064f1f8d2d75bbcae1434fe535d9fb6898e9ad6',
         'com.github.lawloretienne:discreteslider:0.0.9:discreteslider-0.0.9.aar:2a5b1a28060d20e070ff8ee2c9538e4427e04d56467453813b5efa05ea9390d1',
         'com.github.medyo:android-about-page:1.2.4:android-about-page-1.2.4.aar:15108c8bdedf5975d2aa60604107017109a4ad3640e0e95fa97fd438d347eb5c',
         'com.github.zoff99:pkgs_TensorflowLiteAndroidMediapipeCPU:2.6.0:pkgs_TensorflowLiteAndroidMediapipeCPU-2.6.0.aar:b80831506ba64f7391a38c6ad34c1359d4953f20528665054ca7e995cd60a380',
