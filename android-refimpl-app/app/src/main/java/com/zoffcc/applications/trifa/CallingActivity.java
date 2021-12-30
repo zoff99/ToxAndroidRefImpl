@@ -2145,15 +2145,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).
                     build();
 
-            if (MainActivity.IS_GPLAY_VERSION)
-            {
-                //*@@VIDEOBGREMOVE@@*// imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(), (VideoFrameAnalyser) videoFrameAnalyser);
-            }
-            else
-            {
-                imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(),
-                                          (VideoFrameAnalyserTFLite) videoFrameAnalyser_tflite);
-            }
+            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(),
+                                      (VideoFrameAnalyserTFLite) videoFrameAnalyser_tflite);
             cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, imageAnalysis, preview);
         }
     }
@@ -2185,14 +2178,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             //
             drawingOverlay.setWillNotDraw(false);
             drawingOverlay.setZOrderOnTop(true);
-            if (MainActivity.IS_GPLAY_VERSION)
-            {
-                //*@@VIDEOBGREMOVE@@*// videoFrameAnalyser = new VideoFrameAnalyser(drawingOverlay);
-            }
-            else
-            {
-                videoFrameAnalyser_tflite = new VideoFrameAnalyserTFLite(drawingOverlay, this, this);
-            }
+            videoFrameAnalyser_tflite = new VideoFrameAnalyserTFLite(drawingOverlay, this, this);
         }
         else
         {

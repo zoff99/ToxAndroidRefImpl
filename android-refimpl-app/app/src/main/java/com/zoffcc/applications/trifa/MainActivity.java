@@ -277,7 +277,6 @@ public class MainActivity extends AppCompatActivity
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
-    final static boolean IS_GPLAY_VERSION = false; // set "false" on f-droid and "true" for googleplay version
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
