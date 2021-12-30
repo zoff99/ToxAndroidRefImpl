@@ -1,5 +1,33 @@
 # Changelog
 
+## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.127...HEAD)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#313](https://github.com/zoff99/ToxAndroidRefImpl/pull/313) ([weblate](https://github.com/weblate))
+
+## [1.0.127](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.127) (2021-12-26)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.126...1.0.127)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#312](https://github.com/zoff99/ToxAndroidRefImpl/pull/312) ([weblate](https://github.com/weblate))
+
+## [1.0.126](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.126) (2021-12-25)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.125...1.0.126)
+
+## [1.0.125](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.125) (2021-12-25)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.124...1.0.125)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#311](https://github.com/zoff99/ToxAndroidRefImpl/pull/311) ([weblate](https://github.com/weblate))
+
 ## [1.0.124](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.124) (2021-12-06)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.123...1.0.124)
@@ -399,6 +427,7 @@
 **Merged pull requests:**
 
 - Translations update from Weblate [\#195](https://github.com/zoff99/ToxAndroidRefImpl/pull/195) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#194](https://github.com/zoff99/ToxAndroidRefImpl/pull/194) ([weblate](https://github.com/weblate))
 
 ## [1.0.76](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.76) (2020-10-25)
 
@@ -435,7 +464,6 @@
 
 **Merged pull requests:**
 
-- Translations update from Weblate [\#194](https://github.com/zoff99/ToxAndroidRefImpl/pull/194) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#190](https://github.com/zoff99/ToxAndroidRefImpl/pull/190) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#189](https://github.com/zoff99/ToxAndroidRefImpl/pull/189) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#188](https://github.com/zoff99/ToxAndroidRefImpl/pull/188) ([weblate](https://github.com/weblate))
@@ -594,6 +622,7 @@
 **Merged pull requests:**
 
 - Issue \#72: delegate onLongClick event to message\_container listener \(part 2\) [\#144](https://github.com/zoff99/ToxAndroidRefImpl/pull/144) ([rainbyte](https://github.com/rainbyte))
+- Fix issue \#72: delegate onLongClick event to message\_container listener [\#143](https://github.com/zoff99/ToxAndroidRefImpl/pull/143) ([rainbyte](https://github.com/rainbyte))
 
 ## [1.0.47](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.47) (2020-05-24)
 
@@ -698,6 +727,10 @@
 - Unable to uplaod avatar, images having size larger  than 5.5 MB.  [\#62](https://github.com/zoff99/ToxAndroidRefImpl/issues/62)
 - Avatar is not getting updated in the contact list. [\#61](https://github.com/zoff99/ToxAndroidRefImpl/issues/61)
 - own Avatar can not be saved sometimes [\#47](https://github.com/zoff99/ToxAndroidRefImpl/issues/47)
+
+**Merged pull requests:**
+
+- Add Simplified Chinese Translation [\#99](https://github.com/zoff99/ToxAndroidRefImpl/pull/99) ([linsui](https://github.com/linsui))
 
 ## [1.0.28](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.28) (2020-02-28)
 
@@ -826,8 +859,6 @@
 
 **Merged pull requests:**
 
-- Fix issue \#72: delegate onLongClick event to message\_container listener [\#143](https://github.com/zoff99/ToxAndroidRefImpl/pull/143) ([rainbyte](https://github.com/rainbyte))
-- Add Simplified Chinese Translation [\#99](https://github.com/zoff99/ToxAndroidRefImpl/pull/99) ([linsui](https://github.com/linsui))
 - Updates [\#54](https://github.com/zoff99/ToxAndroidRefImpl/pull/54) ([zoff99](https://github.com/zoff99))
 - add contact URLs [\#52](https://github.com/zoff99/ToxAndroidRefImpl/pull/52) ([zoff99](https://github.com/zoff99))
 - add url [\#51](https://github.com/zoff99/ToxAndroidRefImpl/pull/51) ([zoff99](https://github.com/zoff99))
