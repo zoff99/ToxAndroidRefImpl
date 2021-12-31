@@ -147,7 +147,7 @@ public class HelperFriend
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             return 0;
         }
     }
@@ -170,7 +170,7 @@ public class HelperFriend
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             return 0;
         }
     }
