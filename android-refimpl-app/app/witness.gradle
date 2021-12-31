@@ -74,7 +74,7 @@ dependencyVerification {
         'androidx.viewpager2:viewpager2:1.0.0:viewpager2-1.0.0.aar:e95c0031d4cc247cd48196c6287e58d2cee54d9c79b85afea7c90920330275af',
         'androidx.viewpager:viewpager:1.0.0:viewpager-1.0.0.aar:147af4e14a1984010d8f155e5e19d781f03c1d70dfed02a8e0d18428b8fc8682',
         'backport-util-concurrent:backport-util-concurrent:3.1:backport-util-concurrent-3.1.jar:f5759b7fcdfc83a525a036deedcbd32e5b536b625ebc282426f16ca137eb5902',
-        'build-tools:29.0.3:renderscript:androidx-rs.jar:174eb53df52a9cca7bf9c396ba93bf4ac0262a48f2a1375f626efddf405d4666',
+        'build-tools:30.0.3:renderscript:androidx-rs.jar:174eb53df52a9cca7bf9c396ba93bf4ac0262a48f2a1375f626efddf405d4666',
         'classworlds:classworlds:1.1-alpha-2:classworlds-1.1-alpha-2.jar:2bf4e59f3acd106fea6145a9a88fe8956509f8b9c0fdd11eb96fee757269e3f3',
         'com.almworks.sqlite4java:sqlite4java:0.282:sqlite4java-0.282.jar:9e1d8dd83ca6003f841e3af878ce2dc7c22497493a7bb6d1b62ec1b0d0a83c05',
         'com.android.tools.analytics-library:protos:27.0.2:protos-27.0.2.jar:016e15406a96440986250f67caa5102ffce8e3849eb0b9c2fe690e7822e54134',
