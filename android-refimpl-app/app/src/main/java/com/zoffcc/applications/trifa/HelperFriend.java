@@ -839,6 +839,13 @@ public class HelperFriend
     {
         // Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
         // add friend ---------------
+        if (friend_tox_id == null)
+        {
+            Log.i(TAG, "add_friend_real:add friend ID = NULL");
+            return;
+        }
+
+        Log.i(TAG, "add_friend_real:add friend ID len:" + friend_tox_id.length());
         long friendnum = MainActivity.tox_friend_add(friend_tox_id, "please add me"); // add friend
         Log.i(TAG, "add_friend_real:add friend  #:" + friendnum);
         HelperGeneric.update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
