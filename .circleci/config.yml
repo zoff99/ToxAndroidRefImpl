@@ -40,9 +40,14 @@ jobs:
 
       - run: mkdir -p ~/work/deploy
       - run: mkdir -p ~/.android/ ; touch ~/.android/debug.keystore
-      - run: if [ -e build_dir ]; then export oo="cache" ; else export oo="" ; fi ; mkdir -p build_dir ; cd build_dir ; pwd ; ls -al ; bash ../circle_scripts/deps.sh "$oo"
-      - run: cd build_dir ; bash ../circle_scripts/trifa.sh '../'
-
+      - run:
+          name: deps
+          no_output_timeout: 30m
+          command: if [ -e build_dir ]; then export oo="cache" ; else export oo="" ; fi ; mkdir -p build_dir ; cd build_dir ; pwd ; ls -al ; bash ../circle_scripts/deps.sh "$oo"
+      - run:
+          name: trifa
+          no_output_timeout: 30m
+          command: cd build_dir ; bash ../circle_scripts/trifa.sh '../'
       - save_cache:
       #    paths: [ "~/work/build_dir" ]
       #    key: ctc-library-dependencies-v2-{{ .Branch }}
