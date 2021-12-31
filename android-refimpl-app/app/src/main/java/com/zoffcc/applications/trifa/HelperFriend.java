@@ -152,6 +152,29 @@ public class HelperFriend
         }
     }
 
+    static int is_friend_online_real_and_hasnot_msgv3(long friendnum)
+    {
+        try
+        {
+            final FriendList f = orma.selectFromFriendList().
+                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    toList().get(0);
+            if ((f.TOX_CONNECTION_real != 0) && (f.msgv3_capability != 1))
+            {
+                return 1;
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return 0;
+        }
+    }
+
     static int is_friend_online_real(long friendnum)
     {
         try

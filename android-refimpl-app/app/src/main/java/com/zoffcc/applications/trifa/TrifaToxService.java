@@ -54,6 +54,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pu
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real_and_has_msgv3;
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real_and_hasnot_msgv3;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
@@ -1520,7 +1521,7 @@ public class TrifaToxService extends Service
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
 
-                        if ((last_resend_pending_messages0_ms + (10 * 1000)) < System.currentTimeMillis())
+                        if ((last_resend_pending_messages0_ms + (30 * 1000)) < System.currentTimeMillis())
                         {
                             // Log.i(TAG, "send_pending_1-on-1_messages ============================================");
                             last_resend_pending_messages0_ms = System.currentTimeMillis();
@@ -1546,13 +1547,12 @@ public class TrifaToxService extends Service
                                     {
                                         Message m_resend_v1 = ii.next();
 
-                                        if (is_friend_online(
+                                        if (is_friend_online_real_and_hasnot_msgv3(
                                                 tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
                                         {
                                             //Log.i(TAG, "send_pending_1-on-1_messages:v1:fname=" +
                                             //           get_friend_name_from_pubkey(m_resend_v1.tox_friendpubkey) +
                                             //           " NOT online m=" + m_resend_v1.text);
-
                                             continue;
                                         }
 
@@ -1621,11 +1621,11 @@ public class TrifaToxService extends Service
 
                         }
 
-                        if ((last_resend_pending_messages1_ms + (20 * 1000)) < System.currentTimeMillis())
+                        if ((last_resend_pending_messages1_ms + (30 * 1000)) < System.currentTimeMillis())
                         {
                             last_resend_pending_messages1_ms = System.currentTimeMillis();
 
-                            // loop through "old msg version" 1-on-1 text messages that have "resend_count==0" --------------
+                            // loop through "old msg version" msgV3 1-on-1 text messages that have "resend_count==0" --------------
                             try
                             {
                                 final int max_resend_count_per_iteration = 40;
@@ -1653,10 +1653,10 @@ public class TrifaToxService extends Service
                                             continue;
                                         }
 
-                                        Log.i(TAG, "RR:resending f=" +
-                                                   get_friend_name_from_pubkey(m_resend_v1.tox_friendpubkey) +
-                                                   " rcount=" + m_resend_v1.resend_count + " read=" + m_resend_v1.read +
-                                                   " t=" + m_resend_v1.text + " m=" + m_resend_v1);
+                                        // Log.i(TAG, "RR:resending f=" +
+                                        //           get_friend_name_from_pubkey(m_resend_v1.tox_friendpubkey) +
+                                        //           " rcount=" + m_resend_v1.resend_count + " read=" + m_resend_v1.read +
+                                        //           " t=" + m_resend_v1.text + " m=" + m_resend_v1);
 
                                         MainActivity.send_message_result result = tox_friend_send_message_wrapper(
                                                 tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey), 0,

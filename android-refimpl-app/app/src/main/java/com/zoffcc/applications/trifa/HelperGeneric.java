@@ -2317,7 +2317,7 @@ public class HelperGeneric
         if (msg_type == 0)
         {
             // msgV1 text only message
-            Log.i(TAG, "friend_message:friend:" + friend_number + " msgV3hash:" + msgV3hash_bin);
+            // Log.i(TAG, "friend_message:friend:" + friend_number + " msgV3hash:" + msgV3hash_bin);
 
             String msgV3hash_hex_string = null;
             if (msgV3hash_bin != null)
@@ -2329,8 +2329,8 @@ public class HelperGeneric
                         directionEq(0).
                         msg_idv3_hashEq(msgV3hash_hex_string).count();
 
-                Log.i(TAG, "friend_message:friend:" + friend_number + " msgV3hash_hex_string:" + msgV3hash_hex_string +
-                           " got_messages=" + got_messages);
+                // Log.i(TAG, "friend_message:friend:" + friend_number + " msgV3hash_hex_string:" + msgV3hash_hex_string +
+                //           " got_messages=" + got_messages);
 
                 if (got_messages > 0)
                 {
