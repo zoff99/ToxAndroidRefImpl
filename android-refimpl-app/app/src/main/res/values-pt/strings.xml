@@ -240,4 +240,17 @@
     <string name="pref_description_window_security">A ativação desta configuração adiciona FLAG_SECURE às atividades.
 \nImpede capturas de ecrã, gravação de ecrã e exibição de conteúdo na visualização de recentes</string>
     <string name="pref_title_window_security">impedir capturas de ecrã</string>
+    <string name="title_activity_conferenceinfo">Informações sobre a conferência</string>
+    <string name="pref_title_use_incognito_keyboard2">Teclado Anônimo</string>
+    <string name="pref_title_use_camera_x">Remoção de fundo</string>
+    <string name="layout___conf_id">Número Identificador da Conferência:</string>
+    <string name="layout___conf_title">Título:</string>
+    <string name="pref_title_download_push_msg_app">Descarregue a app de mensagens instantâneas</string>
+    <string name="pref_description_use_incognito_keyboard2">ative para dizer ao teclado para não aprender com as palavras introduzidas</string>
+    <string name="pref_description_use_camera_x">!! Experimental !!!
+\nUsar CameraX e Remoção de fundo em Videochamadas
+\nIsto pode ainda não funcionar totalmente, favor ter cuidado e não depender sempre disto para funcionar!</string>
+    <string name="layout___capabilities">Capacidades:</string>
+    <string name="pref_title_speakerphone_tweak">Correção do alto-falante para chamadas</string>
+    <string name="pref_description_speakerphone_tweak">Se a app não mudar para o alto-falante numa chamada, então tente ativar essa correção.</string>
 </resources>
