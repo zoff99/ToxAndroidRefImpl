@@ -41,7 +41,7 @@ def getGitHash = { ->
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
     buildToolsVersion "30.0.3"
     compileOptions.encoding = 'UTF-8'
     // generatedDensities = []
@@ -210,7 +210,7 @@ android {
     defaultConfig {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 10129
         versionName "1.0.129"
 
