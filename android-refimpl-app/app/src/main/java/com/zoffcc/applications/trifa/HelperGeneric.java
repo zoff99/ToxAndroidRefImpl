@@ -2205,9 +2205,13 @@ public class HelperGeneric
             }
             global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
             // Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
-            int raw_message_length_int = raw_message_length_buf.
-                    array()[raw_message_length_buf.arrayOffset()] & 0xFF + (raw_message_length_buf.
+
+            final int len_low_byte = raw_message_length_buf.
+                    array()[raw_message_length_buf.arrayOffset()] & 0xFF;
+            final int len_high_byte = (raw_message_length_buf.
                     array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
+            final int raw_message_length_int = len_low_byte + len_high_byte;
+
             // Log.i(TAG,
             //      "tox_friend_send_message_wrapper:message=" + message + " res=" + res + " len=" + raw_message_length_int);
             result.error_num = res;
