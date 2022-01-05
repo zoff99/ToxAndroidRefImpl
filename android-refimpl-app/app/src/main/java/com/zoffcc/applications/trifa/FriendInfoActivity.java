@@ -330,7 +330,7 @@ public class FriendInfoActivity extends AppCompatActivity
             }
             else
             {
-                Log.i(TAG, "indenticon:001");
+                // Log.i(TAG, "indenticon:001");
 
                 final FriendList f = orma.selectFromFriendList().
                         tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).

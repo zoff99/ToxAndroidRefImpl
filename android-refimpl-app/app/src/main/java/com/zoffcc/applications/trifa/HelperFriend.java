@@ -185,7 +185,7 @@ public class HelperFriend
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             return 0;
         }
     }
@@ -399,9 +399,9 @@ public class HelperFriend
                     get(0);
             if (f != null)
             {
-                Log.i(TAG, "get_friend_msgv3_capability:f=" +
-                           get_friend_name_from_pubkey(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)) +
-                           " f=" + f.msgv3_capability);
+                // Log.i(TAG, "get_friend_msgv3_capability:f=" +
+                //           get_friend_name_from_pubkey(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)) +
+                //           " f=" + f.msgv3_capability);
                 ret = f.msgv3_capability;
             }
 

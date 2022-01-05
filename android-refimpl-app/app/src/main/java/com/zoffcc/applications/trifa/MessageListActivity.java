@@ -215,7 +215,7 @@ public class MessageListActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
-        Log.i(TAG, "onCreate:003:friendnum=" + friendnum + " friendnum_prev=" + friendnum_prev);
+        // Log.i(TAG, "onCreate:003:friendnum=" + friendnum + " friendnum_prev=" + friendnum_prev);
         friendnum_prev = friendnum;
 
         setContentView(R.layout.activity_message_list);
@@ -633,9 +633,9 @@ public class MessageListActivity extends AppCompatActivity
 
         // ** // MainActivity.message_list_fragment = null;
         message_list_activity = null;
-        Log.i(TAG, "onPause:001:friendnum=" + friendnum);
+        // Log.i(TAG, "onPause:001:friendnum=" + friendnum);
         friendnum = -1;
-        Log.i(TAG, "onPause:002:friendnum=" + friendnum);
+        // Log.i(TAG, "onPause:002:friendnum=" + friendnum);
     }
 
     @Override
@@ -650,12 +650,12 @@ public class MessageListActivity extends AppCompatActivity
         Log.i(TAG, "onResume");
         super.onResume();
 
-        Log.i(TAG, "onResume:001:friendnum=" + friendnum);
+        // Log.i(TAG, "onResume:001:friendnum=" + friendnum);
 
         if (friendnum == -1)
         {
             friendnum = friendnum_prev;
-            Log.i(TAG, "onResume:001:friendnum(-->friendnum_prev)=" + friendnum);
+            // Log.i(TAG, "onResume:001:friendnum(-->friendnum_prev)=" + friendnum);
         }
 
         change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, tox_friend_get_public_key__wrapper(friendnum));
@@ -771,7 +771,7 @@ public class MessageListActivity extends AppCompatActivity
     {
         try
         {
-            Log.i(TAG, "stop_self_typing_indicator_s");
+            // Log.i(TAG, "stop_self_typing_indicator_s");
             android.os.Message m = new android.os.Message();
             m.what = 1;
             mla_handler_s.handleMessage(m);
@@ -789,7 +789,7 @@ public class MessageListActivity extends AppCompatActivity
             global_typing = 0;  // typing = 0
             try
             {
-                Log.i(TAG, "typing:fn#" + get_current_friendnum() + ":stop_self_typing_indicator");
+                // Log.i(TAG, "typing:fn#" + get_current_friendnum() + ":stop_self_typing_indicator");
                 tox_self_set_typing(get_current_friendnum(), global_typing);
             }
             catch (Exception e)
@@ -839,7 +839,7 @@ public class MessageListActivity extends AppCompatActivity
             @Override
             public void onKeyboardOpen(@Px final int keyBoardHeight)
             {
-                Log.d(TAG, "Opened soft keyboard");
+                // Log.d(TAG, "Opened soft keyboard");
             }
         }).setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener()
         {
@@ -860,7 +860,7 @@ public class MessageListActivity extends AppCompatActivity
             @Override
             public void onKeyboardClose()
             {
-                Log.d(TAG, "Closed soft keyboard");
+                // Log.d(TAG, "Closed soft keyboard");
             }
         }).build(ml_new_message);
     }
@@ -1038,7 +1038,7 @@ public class MessageListActivity extends AppCompatActivity
     /* HINT: send a message to a friend */
     synchronized public void send_message_onclick(View view)
     {
-        Log.i(TAG, "send_message_onclick:---start");
+        // Log.i(TAG, "send_message_onclick:---start");
 
         String msg = "";
         try
@@ -1076,7 +1076,7 @@ public class MessageListActivity extends AppCompatActivity
                 {
                     MainActivity.send_message_result result = tox_friend_send_message_wrapper(friendnum, 0, msg);
                     long res = result.msg_num;
-                    Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res + " m=" + m);
+                    // Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res + " m=" + m);
 
                     if (res > -1) // sending was OK
                     {
@@ -1117,7 +1117,7 @@ public class MessageListActivity extends AppCompatActivity
                     {
                         // sending was NOT ok
 
-                        Log.i(TAG, "tox_friend_send_message_wrapper:store pending message" + m);
+                        // Log.i(TAG, "tox_friend_send_message_wrapper:store pending message" + m);
 
                         m.message_id = -1;
 

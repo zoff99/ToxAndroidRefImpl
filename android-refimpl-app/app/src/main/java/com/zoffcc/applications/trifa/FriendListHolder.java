@@ -305,7 +305,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 if (need_create_identicon)
                 {
                     // no avatar icon? create and use Identicon ------------
-                    Log.i(TAG, "indenticon:002");
+                    // Log.i(TAG, "indenticon:002");
 
                     create_avatar_identicon_for_pubkey(fl.tox_public_key_string);
 

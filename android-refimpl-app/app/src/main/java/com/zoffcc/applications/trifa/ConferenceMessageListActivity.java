@@ -591,7 +591,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             @Override
             public void onKeyboardOpen(@Px final int keyBoardHeight)
             {
-                Log.d(TAG, "Opened soft keyboard");
+                // Log.d(TAG, "Opened soft keyboard");
             }
         }).setOnEmojiPopupDismissListener(new OnEmojiPopupDismissListener()
         {
@@ -612,7 +612,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             @Override
             public void onKeyboardClose()
             {
-                Log.d(TAG, "Closed soft keyboard");
+                // Log.d(TAG, "Closed soft keyboard");
             }
         }).build(ml_new_conf_message);
     }

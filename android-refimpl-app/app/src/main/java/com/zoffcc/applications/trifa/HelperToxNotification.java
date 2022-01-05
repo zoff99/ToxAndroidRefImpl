@@ -303,7 +303,13 @@ public class HelperToxNotification
             b.setContent(notification_view);
             notification2 = b.build();
         }
-        nmn2.notify(ONGOING_NOTIFICATION_ID, notification2);
+        try
+        {
+            nmn2.notify(ONGOING_NOTIFICATION_ID, notification2);
+        }
+        catch(Exception ignored)
+        {
+        }
         Log.i(TAG, "tox_notification_change:end");
     }
 

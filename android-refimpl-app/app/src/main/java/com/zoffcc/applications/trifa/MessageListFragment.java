@@ -72,7 +72,7 @@ public class MessageListFragment extends Fragment
         {
             current_friendnum = mla.get_current_friendnum();
         }
-        Log.i(TAG, "current_friendnum=" + current_friendnum);
+        // Log.i(TAG, "current_friendnum=" + current_friendnum);
 
         // default is: at bottom
         is_at_bottom = true;
@@ -142,7 +142,7 @@ public class MessageListFragment extends Fragment
                                 toList();
                     }
                 }
-                Log.i(TAG, "loading data:001");
+                // Log.i(TAG, "loading data:001");
                 // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
                 // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
             }

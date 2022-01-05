@@ -1167,7 +1167,7 @@ public class HelperMessage
             else
             {
                 // sending was NOT ok
-                Log.i(TAG, "tox_friend_send_message_wrapper:store pending message" + m);
+                // Log.i(TAG, "tox_friend_send_message_wrapper:store pending message" + m);
 
                 m.message_id = -1;
                 long row_id = insert_into_message_db(m, true);

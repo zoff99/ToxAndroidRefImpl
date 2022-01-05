@@ -66,7 +66,7 @@ public class CustomSpinner extends androidx.appcompat.widget.AppCompatSpinner
             }
             catch (Exception e)
             {
-                Log.i(TAG, "EE:01:" + e.getMessage());
+                // Log.i(TAG, "EE:01:" + e.getMessage());
             }
         }
     }

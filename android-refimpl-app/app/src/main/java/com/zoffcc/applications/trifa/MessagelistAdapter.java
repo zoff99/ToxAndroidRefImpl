@@ -370,7 +370,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         }
         catch (Exception e)
         {
-            Log.i(TAG, "onBindViewHolder:EE1:" + e.getMessage());
+            // Log.i(TAG, "onBindViewHolder:EE1:" + e.getMessage());
             e.printStackTrace();
             try
             {
@@ -408,7 +408,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
             this.notifyDataSetChanged();
-            Log.i(TAG, "add_list_clear:002");
+            // Log.i(TAG, "add_list_clear:002");
         }
         catch (Exception e)
         {
@@ -419,7 +419,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     public void add_item(Message new_item)
     {
-        Log.i(TAG, "add_item:" + new_item + ":" + this.messagelistitems.size());
+        // Log.i(TAG, "add_item:" + new_item + ":" + this.messagelistitems.size());
 
         try
         {

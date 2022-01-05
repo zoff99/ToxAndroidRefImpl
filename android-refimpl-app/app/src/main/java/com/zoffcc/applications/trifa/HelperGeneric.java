@@ -716,12 +716,12 @@ public class HelperGeneric
                 f1.renameTo(f2);
             }
 
-            Log.i(TAG, "move_tmp_file_to_real_file:OK");
+            // Log.i(TAG, "move_tmp_file_to_real_file:OK");
         }
         catch (Exception e)
         {
             Log.i(TAG, "move_tmp_file_to_real_file:EE:" + e.getMessage());
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -2132,6 +2132,11 @@ public class HelperGeneric
 
     public static void tox_friend_resend_msgv3_wrapper(Message m)
     {
+        if (m.msg_idv3_hash == null)
+        {
+            return;
+        }
+
         if (m.msg_idv3_hash.length() < TOX_HASH_LENGTH)
         {
             return;
@@ -2381,8 +2386,8 @@ public class HelperGeneric
                         directionEq(1).
                         msg_idv3_hashEq(msgV3hash_hex_string).count();
 
-                Log.i(TAG, "update_friend_msgv3_capability:got_messages_mirrored=" + got_messages_mirrored + " hash1=" +
-                           msgV3hash_bin + " " + msgV3hash_hex_string);
+                //Log.i(TAG, "update_friend_msgv3_capability:got_messages_mirrored=" + got_messages_mirrored + " hash1=" +
+                //           msgV3hash_bin + " " + msgV3hash_hex_string);
                 if (got_messages_mirrored > 0)
                 {
                     update_friend_msgv3_capability(friend_number, 0);
@@ -2394,7 +2399,7 @@ public class HelperGeneric
             }
             else
             {
-                Log.i(TAG, "update_friend_msgv3_capability:hash0=" + msgV3hash_bin + " " + msgV3hash_hex_string);
+                // Log.i(TAG, "update_friend_msgv3_capability:hash0=" + msgV3hash_bin + " " + msgV3hash_hex_string);
                 update_friend_msgv3_capability(friend_number, 0);
             }
 

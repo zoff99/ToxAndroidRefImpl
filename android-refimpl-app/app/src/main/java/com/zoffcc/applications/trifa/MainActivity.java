@@ -4511,8 +4511,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_friend_read_receipt_cb_method(long friend_number, long message_id)
     {
-        Log.i(TAG,
-              "friend_read_receipt:friend:" + get_friend_name_from_num(friend_number) + " message_id:" + message_id);
+        // Log.i(TAG,
+        //s      "friend_read_receipt:friend:" + get_friend_name_from_num(friend_number) + " message_id:" + message_id);
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:004:*PING*");
@@ -4524,7 +4524,7 @@ public class MainActivity extends AppCompatActivity
             if (get_friend_msgv3_capability(friend_number) == 1)
             {
                 // HINT: friend has msgV3 capability, ignore normal read receipts
-                Log.i(TAG, "friend_read_receipt:msgV3:ignore low level ACK");
+                // Log.i(TAG, "friend_read_receipt:msgV3:ignore low level ACK");
                 return;
             }
 
@@ -4542,9 +4542,9 @@ public class MainActivity extends AppCompatActivity
 
             if (m != null)
             {
-                Log.i(TAG,
-                      "friend_read_receipt:friend:" + get_friend_name_from_num(friend_number) + " message:" + m.text +
-                      " m=" + m);
+                // Log.i(TAG,
+                //      "friend_read_receipt:friend:" + get_friend_name_from_num(friend_number) + " message:" + m.text +
+                //      " m=" + m);
 
                 Runnable myRunnable = new Runnable()
                 {
@@ -5232,7 +5232,7 @@ public class MainActivity extends AppCompatActivity
 
         if (a_TOX_FILE_KIND == TOX_FILE_KIND_AVATAR.value)
         {
-            Log.i(TAG, "file_recv:TOX_FILE_KIND_AVATAR");
+            // Log.i(TAG, "file_recv:TOX_FILE_KIND_AVATAR");
 
             if (file_size > AVATAR_INCOMING_MAX_BYTE_SIZE)
             {
@@ -5249,7 +5249,7 @@ public class MainActivity extends AppCompatActivity
             }
             else if (file_size == 0)
             {
-                Log.i(TAG, "file_recv:avatar_size_zero");
+                // Log.i(TAG, "file_recv:avatar_size_zero");
 
                 // friend wants to unset avatar
                 HelperFriend.del_friend_avatar(HelperFriend.tox_friend_get_public_key__wrapper(friend_number),
@@ -5495,7 +5495,7 @@ public class MainActivity extends AppCompatActivity
         {
             try
             {
-                Log.i(TAG, "file_recv_chunk:file fully received");
+                // Log.i(TAG, "file_recv_chunk:file fully received");
 
                 HelperGeneric.move_tmp_file_to_real_file(f.path_name, f.file_name,
                                                          VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string +
