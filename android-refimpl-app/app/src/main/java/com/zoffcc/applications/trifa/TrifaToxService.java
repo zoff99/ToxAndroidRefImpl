@@ -50,6 +50,7 @@ import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conf
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real_and_has_msgv3;
@@ -1805,17 +1806,15 @@ public class TrifaToxService extends Service
                 while (ii.hasNext())
                 {
                     Message m_resend_v1 = ii.next();
-
-                    if (is_friend_online_real_and_hasnot_msgv3(
+                    if (is_friend_online_real_and_has_msgv3(
                             tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
                     {
+                        // Log.i(TAG,"resend_v3_messages:RET:"+m_resend_v1.text+" "+get_friend_name_from_pubkey(m_resend_v1.tox_friendpubkey));
                         continue;
                     }
 
                     tox_friend_resend_msgv3_wrapper(m_resend_v1);
-
                     cur_resend_count_per_iteration++;
-
                     if (cur_resend_count_per_iteration >= max_resend_count_per_iteration)
                     {
                         break;
