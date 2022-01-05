@@ -1068,6 +1068,9 @@ public class MessageListActivity extends AppCompatActivity
                 m.msg_version = 0;
                 m.resend_count = 0; // we have tried to resend this message "0" times
                 m.sent_push = 0;
+                m.msg_idv3_hash = "";
+                m.msg_id_hash = "";
+                m.raw_msgv2_bytes = "";
 
                 if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
@@ -1117,6 +1120,14 @@ public class MessageListActivity extends AppCompatActivity
                         Log.i(TAG, "tox_friend_send_message_wrapper:store pending message" + m);
 
                         m.message_id = -1;
+
+                        if ((result.msg_hash_v3_hex != null) && (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
+                        {
+                            // msgV3 message -----------
+                            m.msg_idv3_hash = result.msg_hash_v3_hex;
+                            // msgV3 message -----------
+                        }
+
                         long row_id = insert_into_message_db(m, true);
                         m.id = row_id;
                         ml_new_message.setText("");
