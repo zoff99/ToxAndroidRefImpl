@@ -68,13 +68,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_resend_msgv3_wrapper;
-import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.vfs__unmount;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_msg_idv3_hash;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
-import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_cancel;
@@ -1764,17 +1758,39 @@ public class TrifaToxService extends Service
         // loop through "old msg version" msgV3 1-on-1 text messages that have "resend_count < MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION" --------------
         try
         {
-            final int max_resend_count_per_iteration = 20;
+            int max_resend_count_per_iteration = 20;
+
+            if (friend_pubkey != null)
+            {
+                max_resend_count_per_iteration = 4;
+            }
+
             int cur_resend_count_per_iteration = 0;
 
-            List<Message> m_v1 = orma.selectFromMessage().
-                    directionEq(1).
-                    msg_versionEq(0).
-                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
-                    resend_countLt(MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION).
-                    readEq(false).
-                    orderBySent_timestampDesc().
-                    toList();
+            List<Message> m_v1 = null;
+            if (friend_pubkey != null)
+            {
+                m_v1 = orma.selectFromMessage().
+                        directionEq(1).
+                        msg_versionEq(0).
+                        tox_friendpubkeyEq(friend_pubkey).
+                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
+                        resend_countLt(MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION).
+                        readEq(false).
+                        orderBySent_timestampDesc().
+                        toList();
+            }
+            else
+            {
+                m_v1 = orma.selectFromMessage().
+                        directionEq(1).
+                        msg_versionEq(0).
+                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
+                        resend_countLt(MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION).
+                        readEq(false).
+                        orderBySent_timestampDesc().
+                        toList();
+            }
 
             if ((m_v1 != null) && (m_v1.size() > 0))
             {
@@ -1790,6 +1806,13 @@ public class TrifaToxService extends Service
                     }
 
                     tox_friend_resend_msgv3_wrapper(m_resend_v1);
+
+                    cur_resend_count_per_iteration++;
+
+                    if (cur_resend_count_per_iteration >= max_resend_count_per_iteration)
+                    {
+                        break;
+                    }
                 }
             }
         }

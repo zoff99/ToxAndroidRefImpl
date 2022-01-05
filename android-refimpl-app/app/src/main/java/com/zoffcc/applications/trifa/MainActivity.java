@@ -256,6 +256,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STA
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.resend_v3_messages;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 // import static com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging;
@@ -4219,47 +4220,7 @@ public class MainActivity extends AppCompatActivity
                     {
                         if (get_friend_msgv3_capability(friend_number) == 1)
                         {
-                            Message m_v1_single = orma.selectFromMessage().
-                                    directionEq(1).
-                                    msg_versionEq(0).
-                                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
-                                    resend_countLt(MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION).
-                                    tox_friendpubkeyEq(f.tox_public_key_string).
-                                    readEq(false).
-                                    orderBySent_timestampDesc().
-                                    toList().get(0);
-
-                            if (m_v1_single != null)
-                            {
-                                // Log.i(TAG, "resend_msvg3_lastest_msg:fn=" +
-                                //           get_friend_name_from_pubkey(f.tox_public_key_string) + " mtext=" +
-                                //           m_v1_single.text);
-
-                                MainActivity.send_message_result result = tox_friend_send_message_wrapper(
-                                        tox_friend_by_public_key__wrapper(m_v1_single.tox_friendpubkey), 0,
-                                        m_v1_single.text);
-                                long res = result.msg_num;
-
-                                if (res > -1) // sending was OK
-                                {
-                                    m_v1_single.message_id = res;
-                                    update_message_in_db_messageid(m_v1_single);
-
-                                    if ((result.msg_hash_v3_hex != null) &&
-                                        (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
-                                    {
-                                        // msgV3 message -----------
-                                        m_v1_single.msg_idv3_hash = result.msg_hash_v3_hex;
-                                        // msgV3 message -----------
-                                        update_message_in_db_msg_idv3_hash(m_v1_single);
-                                    }
-
-                                    m_v1_single.resend_count++; // we sent the message successfully
-                                    update_message_in_db_no_read_recvedts(m_v1_single);
-                                    update_message_in_db_resend_count(m_v1_single);
-                                    update_single_message(m_v1_single, true);
-                                }
-                            }
+                            resend_v3_messages(f.tox_public_key_string);
                         }
                     }
                     catch (Exception e)
