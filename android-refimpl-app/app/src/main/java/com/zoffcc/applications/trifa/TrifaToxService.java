@@ -53,6 +53,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real_and_has_msgv3;
+import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real_and_hasnot_msgv3;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
@@ -1513,6 +1514,12 @@ public class TrifaToxService extends Service
                     // --- send pending 1-on-1 text messages here --------------
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
+                        if ((last_resend_pending_messages0_ms + (30 * 1000)) < System.currentTimeMillis())
+                        {
+                            last_resend_pending_messages0_ms = System.currentTimeMillis();
+                            resend_old_messages();
+                        }
+
                         if ((last_resend_pending_messages1_ms + (30 * 1000)) < System.currentTimeMillis())
                         {
                             last_resend_pending_messages1_ms = System.currentTimeMillis();
@@ -1799,7 +1806,7 @@ public class TrifaToxService extends Service
                 {
                     Message m_resend_v1 = ii.next();
 
-                    if (is_friend_online_real_and_has_msgv3(
+                    if (is_friend_online_real_and_hasnot_msgv3(
                             tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
                     {
                         continue;
@@ -1824,6 +1831,53 @@ public class TrifaToxService extends Service
         // loop through all pending outgoing 1-on-1 text messages --------------
     }
 
+    static void resend_old_messages()
+    {
+        try
+        {
+            final int max_resend_count_per_iteration = 10;
+            int cur_resend_count_per_iteration = 0;
+
+            List<Message> m_v0 = orma.selectFromMessage().
+                    directionEq(1).
+                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
+                    msg_versionEq(0).
+                    readEq(false).
+                    resend_countLt(1).
+                    orderBySent_timestampDesc().
+                    toList();
+
+
+            if ((m_v0 != null) && (m_v0.size() > 0))
+            {
+                Iterator<Message> ii = m_v0.iterator();
+                while (ii.hasNext())
+                {
+                    Message m_resend_v0 = ii.next();
+
+                    if (is_friend_online(tox_friend_by_public_key__wrapper(m_resend_v0.tox_friendpubkey)) == 0)
+                    {
+                        continue;
+                    }
+
+                    tox_friend_resend_msgv3_wrapper(m_resend_v0);
+
+                    cur_resend_count_per_iteration++;
+
+                    if (cur_resend_count_per_iteration >= max_resend_count_per_iteration)
+                    {
+                        break;
+                    }
+
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     static void resend_v2_messages(boolean at_relay)
     {
         // loop through all pending outgoing 1-on-1 text messages V2 (resend the resend) --------------
@@ -1836,8 +1890,8 @@ public class TrifaToxService extends Service
                     directionEq(1).
                     TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
                     msg_versionEq(1).
-                    readEq(at_relay).
-                    msg_at_relayEq(true).
+                    readEq(false).
+                    msg_at_relayEq(at_relay).
                     orderBySent_timestampDesc().
                     toList();
 
