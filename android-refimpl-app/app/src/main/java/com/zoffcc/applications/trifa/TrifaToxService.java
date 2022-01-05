@@ -1784,7 +1784,7 @@ public class TrifaToxService extends Service
                         TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
                         resend_countLt(MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION).
                         readEq(false).
-                        orderBySent_timestampDesc().
+                        orderBySent_timestampAsc().
                         toList();
             }
             else
@@ -1795,7 +1795,7 @@ public class TrifaToxService extends Service
                         TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
                         resend_countLt(MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION).
                         readEq(false).
-                        orderBySent_timestampDesc().
+                        orderBySent_timestampAsc().
                         toList();
             }
 
@@ -1844,7 +1844,7 @@ public class TrifaToxService extends Service
                     msg_versionEq(0).
                     readEq(false).
                     resend_countLt(1).
-                    orderBySent_timestampDesc().
+                    orderBySent_timestampAsc().
                     toList();
 
 
@@ -1892,7 +1892,7 @@ public class TrifaToxService extends Service
                     msg_versionEq(1).
                     readEq(false).
                     msg_at_relayEq(at_relay).
-                    orderBySent_timestampDesc().
+                    orderBySent_timestampAsc().
                     toList();
 
 
