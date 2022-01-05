@@ -4269,11 +4269,11 @@ public class MainActivity extends AppCompatActivity
             {
                 if (a_TOX_CONNECTION == 0)
                 {
-                    Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":went offline");
+                    // Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":went offline");
                     // TODO: stop any active calls to/from this friend
                     try
                     {
-                        Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":stop any calls");
+                        // Log.i(TAG, "friend_connection_status:friend:" + friend_number + ":stop any calls");
                         toxav_call_control(friend_number, ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
 
                         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) == friend_number)
