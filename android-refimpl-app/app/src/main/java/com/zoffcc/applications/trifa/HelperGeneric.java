@@ -82,6 +82,9 @@ import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_msgv3_capability;
 import static com.zoffcc.applications.trifa.HelperMessage.process_msgv3_high_level_ack;
+import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
+import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
+import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
@@ -2126,6 +2129,25 @@ public class HelperGeneric
     }
 
     /*************************************************************************/
+
+    public static void tox_friend_resend_msgv3_wrapper(Message m)
+    {
+        if (m.msg_idv3_hash.length() < TOX_HASH_LENGTH)
+        {
+            return;
+        }
+        ByteBuffer hash_bytes = hexstring_to_bytebuffer(m.msg_idv3_hash);
+        long t_sec = (System.currentTimeMillis() / 1000);
+        long res = MainActivity.tox_messagev3_friend_send_message(tox_friend_by_public_key__wrapper(m.tox_friendpubkey),
+                                                                  TRIFA_MSG_TYPE_TEXT.value, m.text, hash_bytes, t_sec);
+
+        m.resend_count++;
+        m.message_id = res;
+        update_message_in_db_resend_count(m);
+        update_message_in_db_messageid(m);
+        update_single_message(m, true);
+    }
+
     public static MainActivity.send_message_result tox_friend_send_message_wrapper(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message)
     {
         // Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
