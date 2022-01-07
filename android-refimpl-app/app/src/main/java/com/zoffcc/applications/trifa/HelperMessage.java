@@ -41,6 +41,8 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_bytes;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK;
@@ -1075,16 +1077,37 @@ public class HelperMessage
         }
     }
 
-    static void update_message_in_db_sent_push_set(final String friend_pubkey, final long sent_timestamp)
+    static boolean get_message_in_db_sent_push_is_read(final String friend_pubkey, final long sent_timestamp)
     {
-        final int delta_ms_prev = 100;
-        final int delta_ms_after = 1000;
-
+        boolean ret = false;
         try
         {
             Message m = orma.selectFromMessage().
                     tox_friendpubkeyEq(friend_pubkey).
-                    sent_timestampBetween(sent_timestamp - delta_ms_prev, sent_timestamp + delta_ms_after).
+                    sent_timestampBetween(sent_timestamp - PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev,
+                                          sent_timestamp + PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after).
+                    directionEq(1).
+                    orderBySent_timestampAsc().
+                    limit(1).toList().get(0);
+
+            return m.read;
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    static void update_message_in_db_sent_push_set(final String friend_pubkey, final long sent_timestamp)
+    {
+        try
+        {
+            Message m = orma.selectFromMessage().
+                    tox_friendpubkeyEq(friend_pubkey).
+                    sent_timestampBetween(sent_timestamp - PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev,
+                                          sent_timestamp + PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after).
                     directionEq(1).
                     orderBySent_timestampAsc().
                     limit(1).toList().get(0);
@@ -1103,7 +1126,7 @@ public class HelperMessage
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
     }
 
@@ -1209,7 +1232,7 @@ public class HelperMessage
 
         if (m != null)
         {
-            final Message m2=m;
+            final Message m2 = m;
 
             Runnable myRunnable = new Runnable()
             {

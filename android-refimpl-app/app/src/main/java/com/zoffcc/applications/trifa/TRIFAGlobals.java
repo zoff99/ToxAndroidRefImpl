@@ -141,6 +141,11 @@ public class TRIFAGlobals
     static final long ORBOT_PROXY_PORT = 9050;
 
     static final String GENERIC_TOR_USERAGENT = "Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0";
+    static final int PUSH_URL_TRIGGER_AGAIN_MAX_COUNT = 5;
+    static final int PUSH_URL_TRIGGER_AGAIN_SECONDS = 20;
+    static final int PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev = 100;
+    static final int PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after = 1000;
+
 
 
     static final String TOX_NODELIST_HOST = "nodes.tox.chat";

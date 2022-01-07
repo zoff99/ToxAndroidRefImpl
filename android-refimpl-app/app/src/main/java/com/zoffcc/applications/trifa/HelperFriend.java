@@ -36,6 +36,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.zoffcc.applications.trifa.HelperMessage.get_message_in_db_sent_push_is_read;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_sent_push_set;
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.is_valid_pushurl_for_friend_with_whitelist;
@@ -45,6 +46,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_TOR_USERAGENT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_AGAIN_MAX_COUNT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_AGAIN_SECONDS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
@@ -1232,6 +1235,78 @@ public class HelperFriend
         }
     }
 
+    /*
+     * return true if we should stop triggering push notifications
+     *        false otherwise
+     */
+    static boolean friend_do_actual_weburl_call(final String friend_pubkey, final String pushurl_for_friend, final long message_timestamp_circa, final boolean update_message_flag)
+    {
+        OkHttpClient client = null;
+
+        if (!update_message_flag)
+        {
+            if (get_message_in_db_sent_push_is_read(friend_pubkey, message_timestamp_circa))
+            {
+                // message is "read" (received) so stop triggering push notifications
+                return true;
+            }
+        }
+
+        if (PREF__orbot_enabled)
+        {
+            InetSocketAddress proxyAddr = new InetSocketAddress(ORBOT_PROXY_HOST, (int) ORBOT_PROXY_PORT);
+            Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxyAddr);
+
+            client = new OkHttpClient.Builder().
+                    proxy(proxy).
+                    readTimeout(5, TimeUnit.SECONDS).
+                    callTimeout(6, TimeUnit.SECONDS).
+                    connectTimeout(8, TimeUnit.SECONDS).
+                    writeTimeout(5, TimeUnit.SECONDS).
+                    build();
+        }
+        else
+        {
+            client = new OkHttpClient.Builder().
+                    readTimeout(5, TimeUnit.SECONDS).
+                    callTimeout(6, TimeUnit.SECONDS).
+                    connectTimeout(8, TimeUnit.SECONDS).
+                    writeTimeout(5, TimeUnit.SECONDS).
+                    build();
+        }
+
+        RequestBody formBody = new FormBody.Builder().
+                add("ping", "1").
+                build();
+
+        Request request = new Request.
+                Builder().
+                cacheControl(new CacheControl.Builder().noCache().build()).
+                url(pushurl_for_friend).
+                header("User-Agent", GENERIC_TOR_USERAGENT).
+                post(formBody).
+                build();
+
+        try (Response response = client.newCall(request).execute())
+        {
+            Log.i(TAG, "friend_call_push_url"); // :url=" + pushurl_for_friend + " RES=" + response.code());
+            if ((response.code() < 300) && (response.code() > 199))
+            {
+                if (update_message_flag)
+                {
+                    update_message_in_db_sent_push_set(friend_pubkey, message_timestamp_circa);
+                }
+            }
+        }
+        catch (Exception e1)
+        {
+            Log.i(TAG, "friend_call_push_url:EE1:" + e1.getMessage());
+            e1.printStackTrace();
+        }
+
+        return false;
+    }
+
     static void friend_call_push_url(final String friend_pubkey)
     {
         try
@@ -1258,57 +1333,21 @@ public class HelperFriend
                             {
                                 try
                                 {
-                                    OkHttpClient client = null;
-
-                                    if (PREF__orbot_enabled)
+                                    friend_do_actual_weburl_call(friend_pubkey, pushurl_for_friend,
+                                                                 message_timestamp_circa, true);
+                                    // HINT: trigger push again after PUSH_URL_TRIGGER_AGAIN_SECONDS seconds to
+                                    //       make sure iphones actually get online and receive the message
+                                    boolean res = false;
+                                    for (int j = 0; j < PUSH_URL_TRIGGER_AGAIN_MAX_COUNT; j++)
                                     {
-                                        InetSocketAddress proxyAddr = new InetSocketAddress(ORBOT_PROXY_HOST,
-                                                                                            (int) ORBOT_PROXY_PORT);
-                                        Proxy proxy = new Proxy(Proxy.Type.SOCKS, proxyAddr);
-
-                                        client = new OkHttpClient.Builder().
-                                                proxy(proxy).
-                                                readTimeout(5, TimeUnit.SECONDS).
-                                                callTimeout(6, TimeUnit.SECONDS).
-                                                connectTimeout(8, TimeUnit.SECONDS).
-                                                writeTimeout(5, TimeUnit.SECONDS).
-                                                build();
-                                    }
-                                    else
-                                    {
-                                        client = new OkHttpClient.Builder().
-                                                readTimeout(5, TimeUnit.SECONDS).
-                                                callTimeout(6, TimeUnit.SECONDS).
-                                                connectTimeout(8, TimeUnit.SECONDS).
-                                                writeTimeout(5, TimeUnit.SECONDS).
-                                                build();
-                                    }
-
-                                    RequestBody formBody = new FormBody.Builder().
-                                            add("ping", "1").
-                                            build();
-
-                                    Request request = new Request.
-                                            Builder().
-                                            cacheControl(new CacheControl.Builder().noCache().build()).
-                                            url(pushurl_for_friend).
-                                            header("User-Agent", GENERIC_TOR_USERAGENT).
-                                            post(formBody).
-                                            build();
-
-                                    try (Response response = client.newCall(request).execute())
-                                    {
-                                        // Log.i(TAG, "friend_call_push_url:url=" + pushurl_for_friend + " RES=" +
-                                        //            response.code());
-                                        if ((response.code() < 300) && (response.code() > 199))
+                                        Thread.sleep(PUSH_URL_TRIGGER_AGAIN_SECONDS * 1000);
+                                        res = friend_do_actual_weburl_call(friend_pubkey, pushurl_for_friend,
+                                                                           message_timestamp_circa, false);
+                                        if (res)
                                         {
-                                            update_message_in_db_sent_push_set(friend_pubkey, message_timestamp_circa);
+                                            Log.i(TAG, "friend_call_push_url:BREAK");
+                                            break;
                                         }
-                                    }
-                                    catch (Exception e1)
-                                    {
-                                        Log.i(TAG, "friend_call_push_url:EE1:" + e1.getMessage());
-                                        e1.printStackTrace();
                                     }
                                 }
                                 catch (Exception e)
