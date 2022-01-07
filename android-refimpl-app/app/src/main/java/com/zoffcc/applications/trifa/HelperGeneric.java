@@ -2160,6 +2160,8 @@ public class HelperGeneric
         FriendList f = main_get_friend(friendnum);
         boolean need_call_push_url = false;
 
+        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+
         boolean msgv1 = true;
 
         if (f != null)
@@ -2230,7 +2232,6 @@ public class HelperGeneric
             {
                 Log.i(TAG, "global_last_activity_for_battery_savings_ts:002:*PING*");
             }
-            global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
             // Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
 
             final int len_low_byte = raw_message_length_buf.
