@@ -3133,18 +3133,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1capabilities(JNI
     return (jlong)(tox_self_get_capabilities());
 }
 
-void Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(JNIEnv *env, jobject thiz)
-{
-    dbg(9, "bootstrap");
-    bootstrap();
-}
-
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_bootstrap(JNIEnv *env, jobject thiz)
-{
-    Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(env, thiz);
-}
-
 
 void Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks__real(JNIEnv *env, jobject thiz)
 {
