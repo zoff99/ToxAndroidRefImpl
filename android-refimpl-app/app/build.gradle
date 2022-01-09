@@ -99,6 +99,7 @@ android {
         exclude 'transport-api.properties'
         exclude 'transport-backend-cct.properties'
         exclude 'transport-runtime.properties'
+        exclude 'kotlin-tooling-metadata.json'
         //
         exclude 'kotlin/**'
         exclude 'kotlin/*'
@@ -107,6 +108,10 @@ android {
         exclude 'META-INF/annotation-experimental_release.kotlin_module'
         exclude 'META-INF/app_release.kotlin_module'
         exclude 'META-INF/com.yariksoffice*'
+        exclude 'META-INF/core-ktx_release.kotlin_module'
+        exclude 'META-INF/fragment_release.kotlin_module'
+        exclude 'META-INF/okhttp.kotlin_module'
+        exclude 'META-INF/okio.kotlin_module'
         //
         exclude 'lib/armeabi/libRSSupport.so'
         exclude 'lib/armeabi/librsjni.so'
