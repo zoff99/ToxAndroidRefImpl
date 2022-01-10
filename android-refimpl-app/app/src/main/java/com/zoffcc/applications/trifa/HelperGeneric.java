@@ -2532,7 +2532,8 @@ public class HelperGeneric
             long ts_ms = MainActivity.tox_messagev2_get_ts_ms(raw_message_buf);
             String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
                                                      msg_id_buffer.limit());
-            // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
+            // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string + " len=" +
+            //           msg_id_as_hex_string.length());
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
                     msg_id_as_hex_string).count();
@@ -2581,7 +2582,7 @@ public class HelperGeneric
             m.msg_version = 1;
             m.msg_id_hash = msg_id_as_hex_string;
             m.sent_push = 0;
-            Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
+            // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:" + long_date_time_format(m.rcvd_timestamp));
 
             if (MainActivity.message_list_activity != null)
             {

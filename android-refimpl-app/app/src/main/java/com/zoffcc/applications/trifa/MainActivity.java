@@ -143,8 +143,6 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_file
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -154,14 +152,8 @@ import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
-import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_msg_idv3_hash;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
-import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
-import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection_status_real;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
@@ -185,7 +177,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
@@ -4675,7 +4666,8 @@ public class MainActivity extends AppCompatActivity
                                                                msg_id_buffer.limit());
         // Log.i(TAG, "friend_sync_message_v2_cb:MSGv2HASH=" + msg_id_as_hex_string);
         String real_sender_as_hex_string = tox_messagev2_get_sync_message_pubkey(raw_message_buf);
-        // Log.i(TAG, "friend_sync_message_v2_cb:real sender pubkey=" + real_sender_as_hex_string);
+        // Log.i(TAG, "friend_sync_message_v2_cb:real sender pubkey=" + real_sender_as_hex_string + " " +
+        //           get_friend_name_from_pubkey(real_sender_as_hex_string));
         long msgv2_type = tox_messagev2_get_sync_message_type(raw_message_buf);
         // Log.i(TAG, "friend_sync_message_v2_cb:msg type=" + ToxVars.TOX_FILE_KIND.value_str((int) msgv2_type));
         ByteBuffer msg_id_buffer_wrapped = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
@@ -4683,7 +4675,8 @@ public class MainActivity extends AppCompatActivity
         String msg_id_as_hex_string_wrapped = HelperGeneric.bytesToHex(msg_id_buffer_wrapped.array(),
                                                                        msg_id_buffer_wrapped.arrayOffset(),
                                                                        msg_id_buffer_wrapped.limit());
-        // Log.i(TAG, "friend_sync_message_v2_cb:MSGv2HASH=" + msg_id_as_hex_string_wrapped);
+        // Log.i(TAG, "friend_sync_message_v2_cb:MSGv2HASH=" + msg_id_as_hex_string_wrapped + " len=" +
+        //           msg_id_as_hex_string_wrapped.length());
 
         if (msgv2_type == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_SEND.value)
         {
@@ -4822,50 +4815,55 @@ public class MainActivity extends AppCompatActivity
                 // Log.i(TAG, "friend_sync_message_v2_cb:message_id_hash_as_hex_string=" + message_id_hash_as_hex_string +
                 //            " friendpubkey=" + real_sender_as_hex_string);
 
-                final Message m = orma.selectFromMessage().
+                final List<Message> mlist = orma.selectFromMessage().
                         msg_id_hashEq(message_id_hash_as_hex_string).
                         tox_friendpubkeyEq(real_sender_as_hex_string).
                         directionEq(1).
                         readEq(false).
-                        toList().get(0);
+                        toList();
 
-                if (m != null)
+                if (mlist.size() > 0)
                 {
-                    Runnable myRunnable = new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            try
-                            {
-                                long msg_wrapped_sec = tox_messagev2_get_ts_sec(raw_message_buf_wrapped);
-                                long msg_wrapped_ms = tox_messagev2_get_ts_ms(raw_message_buf_wrapped);
-                                m.raw_msgv2_bytes = "";
-                                m.rcvd_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
-                                m.read = true;
-                                HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
-                                m.resend_count = 2;
-                                HelperMessage.update_message_in_db_resend_count(m);
-                                HelperMessage.update_single_message(m, true);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
-                                                               (System.currentTimeMillis() / 1000));
-                        }
-                    };
+                    final Message m = mlist.get(0);
 
-                    if (main_handler_s != null)
+                    if (m != null)
                     {
-                        main_handler_s.post(myRunnable);
+                        Runnable myRunnable = new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    long msg_wrapped_sec = tox_messagev2_get_ts_sec(raw_message_buf_wrapped);
+                                    long msg_wrapped_ms = tox_messagev2_get_ts_ms(raw_message_buf_wrapped);
+                                    m.raw_msgv2_bytes = "";
+                                    m.rcvd_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
+                                    m.read = true;
+                                    HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
+                                    m.resend_count = 2;
+                                    HelperMessage.update_message_in_db_resend_count(m);
+                                    HelperMessage.update_single_message(m, true);
+                                }
+                                catch (Exception e)
+                                {
+                                    e.printStackTrace();
+                                }
+                                send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
+                                                                   (System.currentTimeMillis() / 1000));
+                            }
+                        };
+
+                        if (main_handler_s != null)
+                        {
+                            main_handler_s.post(myRunnable);
+                        }
                     }
                 }
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
                 send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
                                                    (System.currentTimeMillis() / 1000));
             }
@@ -4891,10 +4889,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_control_cb_method(long friend_number, long file_number, int a_TOX_FILE_CONTROL)
     {
-        if (PREF__X_battery_saving_mode)
-        {
-            Log.i(TAG, "global_last_activity_for_battery_savings_ts:008:*PING*");
-        }
+        //if (PREF__X_battery_saving_mode)
+        //{
+        //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:008:*PING*");
+        //}
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG, "file_recv_control:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_CONTROL);
 
@@ -5221,10 +5219,10 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
     {
-        if (PREF__X_battery_saving_mode)
-        {
-            Log.i(TAG, "global_last_activity_for_battery_savings_ts:010:*PING*");
-        }
+        //if (PREF__X_battery_saving_mode)
+        //{
+        //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:010:*PING*");
+        //}
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG,
         //       "file_recv:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" +
