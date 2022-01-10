@@ -4646,10 +4646,10 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        //if (PREF__X_battery_saving_mode)
-        //{
-        //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:006:*PING*");
-        //}
+        if (PREF__X_battery_saving_mode)
+        {
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:006:*PING*");
+        }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " full rawmsg    =" + bytes_to_hex(raw_message));
         // Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " wrapped rawdata=" + bytes_to_hex(raw_data));
