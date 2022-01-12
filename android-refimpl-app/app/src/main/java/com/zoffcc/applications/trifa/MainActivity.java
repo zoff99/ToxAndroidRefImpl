@@ -4777,6 +4777,7 @@ public class MainActivity extends AppCompatActivity
 
                         send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
                                                            (System.currentTimeMillis() / 1000));
+                        return;
                     }
                     else
                     {
@@ -4859,15 +4860,15 @@ public class MainActivity extends AppCompatActivity
                         {
                             main_handler_s.post(myRunnable);
                         }
+                        return;
                     }
                 }
             }
             catch (Exception e)
             {
-                // e.printStackTrace();
-                send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
-                                                   (System.currentTimeMillis() / 1000));
             }
+
+            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer, (System.currentTimeMillis() / 1000));
         }
     }
 
