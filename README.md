@@ -80,6 +80,11 @@ Get in touch
 * <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
 * <a href="https://kiwiirc.com/nextclient/irc.libera.chat/toktok">Join Tox IRC Channel</a><br>
 
+Import/Export
+=
+
+See [import-export.md](./import-export.md)
+
 Compile in Android Studio
 =
 **Open an existing Project:**<br>
