@@ -28,7 +28,9 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_lossless_packet;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD;
@@ -176,7 +178,7 @@ public class HelperRelay
                     friend_num = tox_friend_by_public_key__wrapper(n.tox_public_key_string);
                     byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
                     data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
-                    MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
+                    tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
                 }
             }
         }
@@ -200,7 +202,7 @@ public class HelperRelay
                     FriendList n = fl.get(i);
                     byte[] data = HelperGeneric.hex_to_bytes("FF" + n.tox_public_key_string);
                     data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
-                    MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
+                    tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
                 }
             }
         }
@@ -268,7 +270,7 @@ public class HelperRelay
         byte[] data = HelperGeneric.hex_to_bytes("FF" + friend_pubkey);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
         // Log.d(TAG, "send_friend_pubkey_to_relay:data=" + data);
-        int result = MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
+        int result = tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
         // Log.d(TAG, "send_friend_pubkey_to_relay:res=" + result);
     }
 
@@ -279,7 +281,7 @@ public class HelperRelay
         byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
         data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
         // Log.d(TAG, "send_relay_pubkey_to_friend:data=" + data);
-        int result = MainActivity.tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
+        int result = tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
         // Log.d(TAG, "send_relay_pubkey_to_friend:res=" + result);
     }
 
@@ -611,5 +613,26 @@ public class HelperRelay
     static void remove_own_pushurl_in_db()
     {
         del_g_opts(NOTIFICATION_TOKEN_DB_KEY);
+    }
+
+    static void send_pushtoken_to_relay()
+    {
+        own_push_token_load();
+
+        if (TRIFAGlobals.global_notification_token != null)
+        {
+            if ((TRIFAGlobals.global_notification_token.length() > 10) &&
+                (TRIFAGlobals.global_notification_token.length() < 300))
+            {
+                // send my relay the current notification token
+                String temp_string =
+                        "A" + TRIFAGlobals.global_notification_token; //  "A" is a placeholder to put the pkgID later
+                byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
+                int data_bin_len = data_bin.length;
+                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN.value; // replace "A" with pkgID
+                tox_friend_send_lossless_packet(tox_friend_by_public_key__wrapper(get_own_relay_pubkey()), data_bin,
+                                                data_bin_len);
+            }
+        }
     }
 }

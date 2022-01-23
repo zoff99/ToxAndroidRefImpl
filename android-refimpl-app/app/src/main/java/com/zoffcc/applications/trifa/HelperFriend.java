@@ -40,8 +40,12 @@ import static com.zoffcc.applications.trifa.HelperMessage.get_message_in_db_sent
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_sent_push_set;
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.is_valid_pushurl_for_friend_with_whitelist;
+import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
+import static com.zoffcc.applications.trifa.HelperRelay.push_token_to_push_url;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_push_service;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_lossless_packet;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_TOR_USERAGENT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
@@ -1357,6 +1361,62 @@ public class HelperFriend
                             }
                         };
                         t.start();
+                    }
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+    }
+
+    static void send_pushurl_to_friend(final String friend_pubkey)
+    {
+        own_push_token_load();
+
+        if (TRIFAGlobals.global_notification_token != null)
+        {
+            final String notification_push_url = push_token_to_push_url(TRIFAGlobals.global_notification_token);
+            if (notification_push_url != null)
+            {
+                String temp_string = "A" + notification_push_url; //  "A" is a placeholder to put the pkgID later
+                // Log.i(TAG, "send_pushurl_to_friend:" +
+                //           get_friend_name_from_num(friend_number) + ":send push url:" + temp_string);
+                byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
+                int data_bin_len = data_bin.length;
+                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value; // replace "A" with pkgID
+                final int res = tox_friend_send_lossless_packet(tox_friend_by_public_key__wrapper(friend_pubkey),
+                                                                data_bin, data_bin_len);
+                // Log.i(TAG, "send_pushurl_to_friend:" +
+                //           get_friend_name_from_num(friend_number) + ":send push url:RES=" + res);
+            }
+        }
+    }
+
+    static void send_pushurl_to_all_friends()
+    {
+        own_push_token_load();
+
+        if (TRIFAGlobals.global_notification_token == null)
+        {
+            return;
+        }
+
+        try
+        {
+            List<FriendList> fl = orma.selectFromFriendList().
+                    is_relayNotEq(true).
+                    toList();
+
+            if (fl != null)
+            {
+                if (fl.size() > 0)
+                {
+                    int i = 0;
+                    for (i = 0; i < fl.size(); i++)
+                    {
+                        FriendList n = fl.get(i);
+                        send_pushurl_to_friend(n.tox_public_key_string);
                     }
                 }
             }

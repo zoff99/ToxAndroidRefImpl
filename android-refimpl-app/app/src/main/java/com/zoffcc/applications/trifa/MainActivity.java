@@ -146,6 +146,8 @@ import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capabi
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.send_pushurl_to_all_friends;
+import static com.zoffcc.applications.trifa.HelperFriend.send_pushurl_to_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_capabilities;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
@@ -160,12 +162,10 @@ import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_conference_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
-import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
-import static com.zoffcc.applications.trifa.HelperRelay.push_token_to_push_url;
+import static com.zoffcc.applications.trifa.HelperRelay.send_pushtoken_to_relay;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
@@ -2585,6 +2585,13 @@ public class MainActivity extends AppCompatActivity
                                     String new_token = get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
                                     set_g_opts(NOTIFICATION_TOKEN_DB_KEY, new_token);
                                     del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                                    if (PREF__use_push_service)
+                                    {
+                                        // now send token to all friends
+                                        send_pushurl_to_all_friends();
+                                    }
+                                    // now send token to my relay
+                                    send_pushtoken_to_relay();
                                 }
                                 catch (Exception e)
                                 {
@@ -4181,22 +4188,9 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
 
-                        own_push_token_load();
-
-                        if (TRIFAGlobals.global_notification_token != null &&
-                            HelperRelay.is_own_relay(f.tox_public_key_string))
+                        if (HelperRelay.is_own_relay(f.tox_public_key_string))
                         {
-                            if ((TRIFAGlobals.global_notification_token.length() > 10) &&
-                                (TRIFAGlobals.global_notification_token.length() < 300))
-                            {
-                                // send my relay the current notification token
-                                String temp_string = "A" +
-                                                     TRIFAGlobals.global_notification_token; //  "A" is a placeholder to put the pkgID later
-                                byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
-                                int data_bin_len = data_bin.length;
-                                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN.value; // replace "A" with pkgID
-                                tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
-                            }
+                            send_pushtoken_to_relay();
                         }
                     }
                 }
@@ -4228,30 +4222,9 @@ public class MainActivity extends AppCompatActivity
                     // ******** friend just came online ********
                     if (PREF__use_push_service)
                     {
-                        // -- send push URL always
-                        own_push_token_load();
-
-                        if (TRIFAGlobals.global_notification_token != null)
+                        if (!is_any_relay(f.tox_public_key_string))
                         {
-                            final String notification_push_url = push_token_to_push_url(
-                                    TRIFAGlobals.global_notification_token);
-
-                            if (notification_push_url != null)
-                            {
-                                String temp_string =
-                                        "A" + notification_push_url; //  "A" is a placeholder to put the pkgID later
-
-                                // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
-                                //           get_friend_name_from_num(friend_number) + ":send push url:" + temp_string);
-
-                                byte[] data_bin = temp_string.getBytes(); // TODO: use specific characterset
-                                int data_bin_len = data_bin.length;
-                                data_bin[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND.value; // replace "A" with pkgID
-                                final int res = tox_friend_send_lossless_packet(friend_number, data_bin, data_bin_len);
-
-                                // Log.i(TAG, "android_tox_callback_friend_connection_status_cb_method:" +
-                                //           get_friend_name_from_num(friend_number) + ":send push url:RES=" + res);
-                            }
+                            send_pushurl_to_friend(f.tox_public_key_string);
                         }
                     }
                 }
