@@ -1,1 +1,11 @@
 theme: jekyll-theme-minimal
+plugins:
+  - jekyll-relative-links
+relative_links:
+  enabled: true
+  collections: true
+include:
+  - README.md
+  - CHANGELOG.md
+  - PRIVACY_POLICY.md
+  - PUSH_NOTIFICATION.md
