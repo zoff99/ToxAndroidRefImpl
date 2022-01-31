@@ -1246,7 +1246,6 @@ public class MainActivity extends AppCompatActivity
         top_imageview3 = (ImageView) this.findViewById(R.id.main_maintopimage3);
         top_imageview3.setVisibility(View.GONE);
 
-        own_push_token_load();
         if (PREF__U_keep_nospam == true)
         {
             top_imageview2.setBackgroundColor(Color.TRANSPARENT);
@@ -1264,6 +1263,7 @@ public class MainActivity extends AppCompatActivity
             top_imageview2.setVisibility(View.GONE);
         }
 
+        own_push_token_load();
         if ((PREF__hide_setup_push_tip == false) && (TRIFAGlobals.global_notification_token == null))
         {
             // show icon for PUSH tip
@@ -2211,6 +2211,7 @@ public class MainActivity extends AppCompatActivity
             top_imageview2.setVisibility(View.GONE);
         }
 
+        own_push_token_load();
         if ((PREF__hide_setup_push_tip == false) && (TRIFAGlobals.global_notification_token == null))
         {
             // show icon for PUSH tip
