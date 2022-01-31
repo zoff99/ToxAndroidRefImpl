@@ -1,0 +1,17 @@
+---
+version: 2
+
+workflows:
+  version: 2
+  build_linux:
+    jobs:
+      - build
+
+jobs:
+  build:
+    working_directory: ~/work
+    docker:
+      - image: ubuntu:20.04
+
+    steps:
+      - checkout
