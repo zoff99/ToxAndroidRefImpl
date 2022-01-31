@@ -48,6 +48,7 @@ public class TRIFAGlobals
 
     final static String TOX_PUSH_MSG_APP_WEBDOWNLOAD = "https://github.com/zoff99/tox_push_msg_app/releases/latest/download/play.pushmsg.apk";
     final static String TOX_PUSH_MSG_APP_PLAYSTORE = "https://play.google.com/store/apps/details?id=com.zoffcc.applications.pushmsg";
+    final static String TOX_PUSH_SETUP_HOWTO_URL ="https://zoff99.github.io/ToxAndroidRefImpl/PUSH_NOTIFICATION.html";
 
     final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 

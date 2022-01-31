@@ -162,6 +162,7 @@ import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_conference_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
 import static com.zoffcc.applications.trifa.HelperRelay.send_pushtoken_to_relay;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -186,6 +187,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_K
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_PUSH_SETUP_HOWTO_URL;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
@@ -284,6 +286,8 @@ public class MainActivity extends AppCompatActivity
 
     static TextView mt = null;
     static ImageView top_imageview = null;
+    static ImageView top_imageview2 = null;
+    static ImageView top_imageview3 = null;
     static boolean native_lib_loaded = false;
     static boolean native_audio_lib_loaded = false;
     static String app_files_directory = "";
@@ -444,6 +448,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__compact_chatlist = true;
     static boolean PREF__use_push_service = true;
     static String[] PREF__toxirc_muted_peers = {};
+    static boolean PREF__hide_setup_push_tip = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -1235,20 +1240,45 @@ public class MainActivity extends AppCompatActivity
         top_imageview = (ImageView) this.findViewById(R.id.main_maintopimage);
         top_imageview.setVisibility(View.GONE);
 
+        top_imageview2 = (ImageView) this.findViewById(R.id.main_maintopimage2);
+        top_imageview2.setVisibility(View.GONE);
+
+        top_imageview3 = (ImageView) this.findViewById(R.id.main_maintopimage3);
+        top_imageview3.setVisibility(View.GONE);
+
+        own_push_token_load();
         if (PREF__U_keep_nospam == true)
         {
-            top_imageview.setBackgroundColor(Color.TRANSPARENT);
+            top_imageview2.setBackgroundColor(Color.TRANSPARENT);
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
             final Drawable d1 = new IconicsDrawable(this).
                     icon(FontAwesome.Icon.faw_exclamation_circle).
-                    paddingDp(20).
+                    paddingDp(15).
                     color(getResources().getColor(R.color.md_red_600)).
                     sizeDp(100);
-            top_imageview.setImageDrawable(d1);
+            top_imageview2.setImageDrawable(d1);
+            fadeInAndShowImage(top_imageview2, 5000);
         }
         else
         {
-            draw_main_top_icon(top_imageview, this, Color.GRAY, true);
+            top_imageview2.setVisibility(View.GONE);
+        }
+
+        if ((PREF__hide_setup_push_tip == false) && (TRIFAGlobals.global_notification_token == null))
+        {
+            // show icon for PUSH tip
+            top_imageview3.setBackgroundColor(Color.TRANSPARENT);
+            final Drawable d1 = new IconicsDrawable(this).
+                    icon(FontAwesome.Icon.faw_info_circle).
+                    paddingDp(15).
+                    color(getResources().getColor(R.color.md_yellow_600)).
+                    sizeDp(100);
+            top_imageview3.setImageDrawable(d1);
+            fadeInAndShowImage(top_imageview3, 5000);
+        }
+        else
+        {
+            top_imageview3.setVisibility(View.GONE);
         }
 
         fadeInAndShowImage(top_imageview, 5000);
@@ -2166,45 +2196,108 @@ public class MainActivity extends AppCompatActivity
 
         if (PREF__U_keep_nospam == true)
         {
-            top_imageview.setBackgroundColor(Color.TRANSPARENT);
+            top_imageview2.setBackgroundColor(Color.TRANSPARENT);
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
             final Drawable d1 = new IconicsDrawable(this).
                     icon(FontAwesome.Icon.faw_exclamation_circle).
-                    paddingDp(20).
+                    paddingDp(15).
                     color(getResources().getColor(R.color.md_red_600)).
                     sizeDp(100);
-            top_imageview.setImageDrawable(d1);
+            top_imageview2.setImageDrawable(d1);
+            top_imageview2.setVisibility(View.VISIBLE);
         }
         else
         {
-            try
-            {
-                if (have_own_relay())
-                {
-                    int relay_connection_status_real = get_own_relay_connection_status_real();
+            top_imageview2.setVisibility(View.GONE);
+        }
 
-                    if (relay_connection_status_real == 2)
-                    {
-                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#04b431"), true);
-                    }
-                    else if (relay_connection_status_real == 1)
-                    {
-                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#ffce00"), true);
-                    }
-                    else
-                    {
-                        draw_main_top_icon(top_imageview, context_s, Color.parseColor("#ff0000"), true);
-                    }
+        if ((PREF__hide_setup_push_tip == false) && (TRIFAGlobals.global_notification_token == null))
+        {
+            // show icon for PUSH tip
+            top_imageview3.setBackgroundColor(Color.TRANSPARENT);
+            final Drawable d1 = new IconicsDrawable(this).
+                    icon(FontAwesome.Icon.faw_info_circle).
+                    paddingDp(15).
+                    color(getResources().getColor(R.color.md_yellow_600)).
+                    sizeDp(100);
+            top_imageview3.setImageDrawable(d1);
+            top_imageview3.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            top_imageview3.setVisibility(View.GONE);
+        }
+
+        top_imageview3.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                try
+                {
+                    AlertDialog ad = new AlertDialog.Builder(view.getContext()).
+                            setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                }
+                            }).
+                            setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
+                                              new DialogInterface.OnClickListener()
+                                              {
+                                                  public void onClick(DialogInterface dialog, int id)
+                                                  {
+                                                      try
+                                                      {
+                                                          Intent i = new Intent(Intent.ACTION_VIEW);
+                                                          i.setData(Uri.parse(TOX_PUSH_SETUP_HOWTO_URL));
+                                                          startActivity(i);
+                                                      }
+                                                      catch (Exception e)
+                                                      {
+                                                      }
+                                                  }
+                                              }).create();
+                    ad.setTitle(getString(R.string.MainActivity_setup_push_tip_title));
+                    ad.setMessage(getString(R.string.MainActivity_setup_push_tip_text));
+                    ad.setCancelable(false);
+                    ad.setCanceledOnTouchOutside(false);
+                    ad.show();
+                }
+                catch (Exception ee2)
+                {
+                }
+            }
+        });
+
+        try
+        {
+            if (have_own_relay())
+            {
+                int relay_connection_status_real = get_own_relay_connection_status_real();
+
+                if (relay_connection_status_real == 2)
+                {
+                    draw_main_top_icon(top_imageview, context_s, Color.parseColor("#04b431"), true);
+                }
+                else if (relay_connection_status_real == 1)
+                {
+                    draw_main_top_icon(top_imageview, context_s, Color.parseColor("#ffce00"), true);
                 }
                 else
                 {
-                    draw_main_top_icon(top_imageview, this, Color.GRAY, true);
+                    draw_main_top_icon(top_imageview, context_s, Color.parseColor("#ff0000"), true);
                 }
             }
-            catch (Exception e)
+            else
             {
+                draw_main_top_icon(top_imageview, this, Color.GRAY, true);
             }
         }
+        catch (Exception e)
+        {
+        }
+
 
         boolean tmp1 = settings.getBoolean("udp_enabled", false);
 

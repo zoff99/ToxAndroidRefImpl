@@ -345,6 +345,9 @@
     <string name="MainActivity_notification_new_message3">new Message</string>
     <string name="MainActivity_notification_new_message4">new Message</string>
     <string name="MainActivity_notification_new_message5">new Message</string>
+    <string name="MainActivity_setup_push_tip_title">Setup Push Notification</string>
+    <string name="MainActivity_setup_push_tip_text">You have not installed the Push Notification App and setup Push Notification. TRIfA will fully work without Push Notification, but it needs to be online constantly to receive Messages.With Push Notification you can save Battery and Internetbandwidth.\n\nDo you want to see how you can Setup Push Notification now?
+    </string>
 
     <string name="Aboutpage_0">TRIfA Crashlog</string>
     <string name="Aboutpage_2">send Crash report via Email</string>
