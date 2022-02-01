@@ -205,6 +205,7 @@ public class TRIFAGlobals
     static int CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = 20;
 
     static int MESSAGE_SYNC_DOUBLE_INTERVAL_SECS = 20;
+    static long MESSAGE_V2_MSG_SENT_OK = (Long.MAX_VALUE - 1);
 
     public static enum TRIFA_FT_DIRECTION
     {

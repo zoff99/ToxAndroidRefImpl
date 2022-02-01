@@ -35,7 +35,6 @@ import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
 
-import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffer;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
@@ -1152,8 +1151,8 @@ public class HelperMessage
 
         if ((msg != null) && (!msg.equalsIgnoreCase("")))
         {
-            MainActivity.send_message_result result = tox_friend_send_message_wrapper(
-                    tox_friend_by_public_key__wrapper(friend_pubkey), 0, msg);
+            MainActivity.send_message_result result = tox_friend_send_message_wrapper(friend_pubkey, 0, msg,
+                                                                                      (m.sent_timestamp / 1000));
             long res = result.msg_num;
             Log.i(TAG, "send_text_messge:result=" + res + " m=" + m);
 

@@ -96,6 +96,7 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_V2_MSG_SENT_OK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
@@ -2153,56 +2154,69 @@ public class HelperGeneric
         update_single_message(m, true);
     }
 
-    public static MainActivity.send_message_result tox_friend_send_message_wrapper(long friendnum, int a_TOX_MESSAGE_TYPE, @NonNull String message)
+    /*
+     * returns: send_message_result class
+     *
+     *    send_message_result: NULL (if friend does not exist)
+     *
+     *    long msg_num: -98 (msgv3 error), -1 -2 -3 -4 -5 -6 (msgv3 error), -99 (msgv3 error),
+     *                  "0..(UINT32_MAX-1)" (message sent OK)
+     *
+     *    long msg_num: -1 -2 -3 -4 -5 -6 -99 (msgv2 error),
+     *                  MESSAGE_V2_MSG_SENT_OK (msgv2 sent OK), "0..(UINT32_MAX-1)" (message "old" sent OK)
+     *
+     *    boolean msg_v2: true if msgv2 was used, false otherwise
+     *
+     */
+    public static MainActivity.send_message_result tox_friend_send_message_wrapper(final String friend_pubkey, int a_TOX_MESSAGE_TYPE, @NonNull String message, long timestamp_unixtime_seconds)
     {
-        // Log.d(TAG, "tox_friend_send_message_wrapper:" + friendnum);
-        long friendnum_to_use = friendnum;
-        FriendList f = main_get_friend(friendnum);
+        // Log.d(TAG, "tox_friend_send_message_wrapper:" + friend_pubkey);
+        FriendList f = main_get_friend(friend_pubkey);
+        long friendnum_to_use = tox_friend_by_public_key__wrapper(friend_pubkey);
         boolean need_call_push_url = false;
 
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
         boolean msgv1 = true;
 
-        if (f != null)
+        if (f == null)
         {
-            if ((f.capabilities & TOX_CAPABILITY_MSGV2) != 0)
+            return null;
+        }
+
+        if ((f.capabilities & TOX_CAPABILITY_MSGV2) != 0)
+        {
+            msgv1 = false;
+        }
+
+        // Log.d(TAG, "tox_friend_send_message_wrapper:f conn" + f.TOX_CONNECTION_real);
+        if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
+        {
+            String relay_pubkey = HelperRelay.get_relay_for_friend(f.tox_public_key_string);
+
+            if (relay_pubkey != null)
             {
+                // friend has a relay
+                friendnum_to_use = tox_friend_by_public_key__wrapper(relay_pubkey);
                 msgv1 = false;
+                // Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
             }
-
-            // Log.d(TAG, "tox_friend_send_message_wrapper:f conn" + f.TOX_CONNECTION_real);
-
-            if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
+            else // if friend is NOT online and does not have a relay, try if he has a push url
             {
-                String relay_pubkey = HelperRelay.get_relay_for_friend(f.tox_public_key_string);
-
-                if (relay_pubkey != null)
-                {
-                    // friend has a relay
-                    friendnum_to_use = tox_friend_by_public_key__wrapper(relay_pubkey);
-                    msgv1 = false;
-                    // Log.d(TAG, "tox_friend_send_message_wrapper:friendnum_to_use=" + friendnum_to_use);
-                }
-                else // if friend is NOT online and does not have a relay, try if he has a push url
-                {
-                    need_call_push_url = true;
-                }
+                need_call_push_url = true;
             }
         }
 
         if (msgv1)
         {
-            // old msgV1 message
-
+            // old msgV1 message (but always send msgV3 format)
             ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
-            int res_hash = MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
-            // Log.i(TAG, "hash_v3:" + res_hash + " " + bytebuffer_to_hexstring(hash_bytes, true));
+            MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
             MainActivity.send_message_result result = new MainActivity.send_message_result();
 
-            long t_sec = (System.currentTimeMillis() / 1000);
+            // long t_sec = (System.currentTimeMillis() / 1000);
             long res = MainActivity.tox_messagev3_friend_send_message(friendnum_to_use, a_TOX_MESSAGE_TYPE, message,
-                                                                      hash_bytes, t_sec);
+                                                                      hash_bytes, timestamp_unixtime_seconds);
 
             result.msg_num = res;
             result.msg_v2 = false;
@@ -2217,57 +2231,39 @@ public class HelperGeneric
 
             return result;
         }
-        else
+        else // use msgV2
         {
             MainActivity.send_message_result result = new MainActivity.send_message_result();
             ByteBuffer raw_message_buf = ByteBuffer.allocateDirect((int) TOX_MAX_FILETRANSFER_SIZE_MSGV2);
             ByteBuffer raw_message_length_buf = ByteBuffer.allocateDirect((int) 2); // 2 bytes for length
             ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
             // use msg V2 API Call
-            long t_sec = (System.currentTimeMillis() / 1000);
-            long res = MainActivity.tox_util_friend_send_message_v2(friendnum_to_use, a_TOX_MESSAGE_TYPE, t_sec,
-                                                                    message, message.length(), raw_message_buf,
+            // long t_sec = (System.currentTimeMillis() / 1000);
+            long res = MainActivity.tox_util_friend_send_message_v2(friendnum_to_use, a_TOX_MESSAGE_TYPE,
+                                                                    timestamp_unixtime_seconds, message,
+                                                                    message.length(), raw_message_buf,
                                                                     raw_message_length_buf, msg_id_buffer);
             if (PREF__X_battery_saving_mode)
             {
                 Log.i(TAG, "global_last_activity_for_battery_savings_ts:002:*PING*");
             }
-            // Log.d(TAG, "tox_friend_send_message_wrapper:res=" + res);
-
             final int len_low_byte = raw_message_length_buf.
                     array()[raw_message_length_buf.arrayOffset()] & 0xFF;
             final int len_high_byte = (raw_message_length_buf.
                     array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
             final int raw_message_length_int = len_low_byte + len_high_byte;
 
-            // Log.i(TAG,
-            //      "tox_friend_send_message_wrapper:message=" + message + " res=" + res + " len=" + raw_message_length_int);
             result.error_num = res;
 
             if (res == -9999)
             {
                 // msg V2 OK
-                result.msg_num = (Long.MAX_VALUE - 1);
+                result.msg_num = MESSAGE_V2_MSG_SENT_OK;
                 result.msg_v2 = true;
                 result.msg_hash_hex = bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(),
                                                  msg_id_buffer.limit());
                 result.raw_message_buf_hex = bytesToHex(raw_message_buf.array(), raw_message_buf.arrayOffset(),
                                                         raw_message_length_int);
-                // Log.i(TAG, "tox_friend_send_message_wrapper:hash_hex=" + result.msg_hash_hex + " raw_msg_hex" +
-                //           result.raw_message_buf_hex);
-                if (need_call_push_url)
-                {
-                    friend_call_push_url(f.tox_public_key_string);
-                }
-                return result;
-            }
-            else if (res == -9991)
-            {
-                // msg V2 error
-                result.msg_num = -1;
-                result.msg_v2 = true;
-                result.msg_hash_hex = "";
-                result.raw_message_buf_hex = "";
                 if (need_call_push_url)
                 {
                     friend_call_push_url(f.tox_public_key_string);
@@ -2276,9 +2272,18 @@ public class HelperGeneric
             }
             else
             {
-                // old message
-                result.msg_num = res;
-                result.msg_v2 = false;
+                if (res == -9991)
+                {
+                    Log.i(TAG, "tox_friend_send_message_wrapper:should never get here:001");
+                    result.msg_num = -1;
+                }
+                else
+                {
+                    Log.i(TAG, "tox_friend_send_message_wrapper:should never get here:002:res=" + res);
+                    result.msg_num = res;
+                }
+
+                result.msg_v2 = true;
                 result.msg_hash_hex = "";
                 result.raw_message_buf_hex = "";
                 if (need_call_push_url)

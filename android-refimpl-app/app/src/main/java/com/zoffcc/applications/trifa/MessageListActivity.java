@@ -1035,11 +1035,92 @@ public class MessageListActivity extends AppCompatActivity
         }
     }
 
+    public void send_text_message(final String friend_pubkey, final String message)
+    {
+        // send typed message to friend
+        String msg = trim_to_utf8_length_bytes(message, TOX_MSGV3_MAX_MESSAGE_LENGTH);
+
+        Message m = new Message();
+        m.tox_friendpubkey = friend_pubkey;
+        m.direction = 1; // msg sent
+        m.TOX_MESSAGE_TYPE = 0;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.rcvd_timestamp = 0L;
+        m.is_new = false; // own messages are always "not new"
+        m.sent_timestamp = System.currentTimeMillis();
+        m.read = false;
+        m.text = msg;
+        m.msg_version = 0;
+        m.resend_count = 0; // we have tried to resend this message "0" times
+        m.sent_push = 0;
+        m.msg_idv3_hash = "";
+        m.msg_id_hash = "";
+        m.raw_msgv2_bytes = "";
+
+        if ((msg != null) && (!msg.equalsIgnoreCase("")))
+        {
+            MainActivity.send_message_result result = tox_friend_send_message_wrapper(friend_pubkey, 0, msg,
+                                                                                      (m.sent_timestamp / 1000));
+
+            if (result == null)
+            {
+                return;
+            }
+
+            long res = result.msg_num;
+
+            if (res > -1)
+            {
+                m.resend_count = 1; // we sent the message successfully
+                m.message_id = res;
+            }
+            else
+            {
+                m.resend_count = 0; // sending was NOT successfull
+                m.message_id = -1;
+            }
+
+            if (result.msg_v2)
+            {
+                m.msg_version = 1;
+            }
+            else
+            {
+                m.msg_version = 0;
+            }
+
+            if ((result.msg_hash_hex != null) && (!result.msg_hash_hex.equalsIgnoreCase("")))
+            {
+                // msgV2 message -----------
+                m.msg_id_hash = result.msg_hash_hex;
+                // msgV2 message -----------
+            }
+
+            if ((result.msg_hash_v3_hex != null) && (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
+            {
+                // msgV3 message -----------
+                m.msg_idv3_hash = result.msg_hash_v3_hex;
+                // msgV3 message -----------
+            }
+
+            if ((result.raw_message_buf_hex != null) && (!result.raw_message_buf_hex.equalsIgnoreCase("")))
+            {
+                // save raw message bytes of this v2 msg into the database
+                // we need it if we want to resend it later
+                m.raw_msgv2_bytes = result.raw_message_buf_hex;
+            }
+
+            long row_id = insert_into_message_db(m, true);
+            m.id = row_id;
+            ml_new_message.setText("");
+            stop_self_typing_indicator_s();
+        }
+    }
+
     /* HINT: send a message to a friend */
     synchronized public void send_message_onclick(View view)
     {
         // Log.i(TAG, "send_message_onclick:---start");
-
         String msg = "";
         try
         {
@@ -1052,96 +1133,13 @@ public class MessageListActivity extends AppCompatActivity
             }
             else
             {
-                // send typed message to friend
-                msg = trim_to_utf8_length_bytes(ml_new_message.getText().toString(), TOX_MSGV3_MAX_MESSAGE_LENGTH);
-
-                Message m = new Message();
-                m.tox_friendpubkey = tox_friend_get_public_key__wrapper(friendnum);
-                m.direction = 1; // msg sent
-                m.TOX_MESSAGE_TYPE = 0;
-                m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
-                m.rcvd_timestamp = 0L;
-                m.is_new = false; // own messages are always "not new"
-                m.sent_timestamp = System.currentTimeMillis();
-                m.read = false;
-                m.text = msg;
-                m.msg_version = 0;
-                m.resend_count = 0; // we have tried to resend this message "0" times
-                m.sent_push = 0;
-                m.msg_idv3_hash = "";
-                m.msg_id_hash = "";
-                m.raw_msgv2_bytes = "";
-
-                if ((msg != null) && (!msg.equalsIgnoreCase("")))
-                {
-                    MainActivity.send_message_result result = tox_friend_send_message_wrapper(friendnum, 0, msg);
-                    long res = result.msg_num;
-                    // Log.i(TAG, "tox_friend_send_message_wrapper:result=" + res + " m=" + m);
-
-                    if (res > -1) // sending was OK
-                    {
-                        m.message_id = res;
-                        if (!result.msg_hash_hex.equalsIgnoreCase(""))
-                        {
-                            // msgV2 message -----------
-                            m.msg_id_hash = result.msg_hash_hex;
-                            m.msg_version = 1;
-                            // msgV2 message -----------
-                        }
-
-                        if ((result.msg_hash_v3_hex != null) && (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
-                        {
-                            // msgV3 message -----------
-                            m.msg_idv3_hash = result.msg_hash_v3_hex;
-                            // msgV3 message -----------
-                        }
-
-                        if (!result.raw_message_buf_hex.equalsIgnoreCase(""))
-                        {
-                            // save raw message bytes of this v2 msg into the database
-                            // we need it if we want to resend it later
-                            m.raw_msgv2_bytes = result.raw_message_buf_hex;
-                        }
-
-                        m.resend_count = 1; // we sent the message successfully
-
-                        long row_id = insert_into_message_db(m, true);
-                        m.id = row_id;
-                        // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3=" + m.msg_id_hash);
-                        // Log.i(TAG, "MESSAGEV2_SEND:MSGv2HASH:3raw=" + m.raw_msgv2_bytes);
-                        ml_new_message.setText("");
-
-                        stop_self_typing_indicator_s();
-                    }
-                    else
-                    {
-                        // sending was NOT ok
-
-                        // Log.i(TAG, "tox_friend_send_message_wrapper:store pending message" + m);
-
-                        m.message_id = -1;
-
-                        if ((result.msg_hash_v3_hex != null) && (!result.msg_hash_v3_hex.equalsIgnoreCase("")))
-                        {
-                            // msgV3 message -----------
-                            m.msg_idv3_hash = result.msg_hash_v3_hex;
-                            // msgV3 message -----------
-                        }
-
-                        long row_id = insert_into_message_db(m, true);
-                        m.id = row_id;
-                        ml_new_message.setText("");
-                        stop_self_typing_indicator_s();
-                    }
-                }
+                send_text_message(tox_friend_get_public_key__wrapper(friendnum), ml_new_message.getText().toString());
             }
         }
         catch (Exception e)
         {
-            msg = "";
             e.printStackTrace();
         }
-
         // Log.i(TAG,"send_message_onclick:---end");
     }
 
