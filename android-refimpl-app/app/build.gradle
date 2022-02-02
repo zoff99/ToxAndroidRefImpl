@@ -292,7 +292,7 @@ dependencies {
     implementation('net.zetetic:android-database-sqlcipher:4.5.0@aar') {
         transitive = true
     }
-    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
+    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.100') {
         transitive = true
     }
     //
