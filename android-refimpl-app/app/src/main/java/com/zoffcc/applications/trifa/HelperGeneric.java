@@ -2274,12 +2274,10 @@ public class HelperGeneric
             {
                 if (res == -9991)
                 {
-                    Log.i(TAG, "tox_friend_send_message_wrapper:should never get here:001");
                     result.msg_num = -1;
                 }
                 else
                 {
-                    Log.i(TAG, "tox_friend_send_message_wrapper:should never get here:002:res=" + res);
                     result.msg_num = res;
                 }
 
