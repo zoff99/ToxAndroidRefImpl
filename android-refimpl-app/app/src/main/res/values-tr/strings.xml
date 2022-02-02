@@ -358,4 +358,8 @@
     <string name="layout___capabilities">Yetenekler:</string>
     <string name="pref_title_use_incognito_keyboard2">Gizli Klavye</string>
     <string name="pref_description_use_incognito_keyboard2">klavyenin girdiğiniz kelimelerden öğrenmemesini belirtmek için açın</string>
+    <string name="MainActivity_setup_push_tip_title">Anında Bildirim Kurulumu</string>
+    <string name="MainActivity_setup_push_tip_text">Anında Bildirim Uygulamasını kurmadınız ve Anında Bildirimi ayarlamadınız. TRIfA, Anında Bildirim olmadan tamamen çalışacaktır, ancak mesajları alabilmek için sürekli çevrim içi olması gerekir. Anında Bildirim ile pil ve internet bant genişliğinden tasarruf edebilirsiniz.
+\n
+\nAnında Bildirimi şimdi nasıl kurabileceğinizi görmek ister misiniz\?</string>
 </resources>
