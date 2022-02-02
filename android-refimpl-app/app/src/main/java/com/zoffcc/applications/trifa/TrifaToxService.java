@@ -1913,8 +1913,8 @@ public class TrifaToxService extends Service
                     if ((m_resend_v2.msg_id_hash == null) ||
                         (m_resend_v2.msg_id_hash.equalsIgnoreCase(""))) // resend msgV2 WITHOUT hash
                     {
-                        Log.i(TAG, "resend_msgV2_WITHOUT_hash:f=" +
-                                   get_friend_name_from_pubkey(m_resend_v2.tox_friendpubkey) + " m=" + m_resend_v2);
+                        // Log.i(TAG, "resend_msgV2_WITHOUT_hash:f=" +
+                        //           get_friend_name_from_pubkey(m_resend_v2.tox_friendpubkey) + " m=" + m_resend_v2);
                         MainActivity.send_message_result result = tox_friend_send_message_wrapper(
                                 m_resend_v2.tox_friendpubkey, 0, m_resend_v2.text, (m_resend_v2.sent_timestamp / 1000));
 

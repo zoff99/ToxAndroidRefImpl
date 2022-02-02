@@ -39,10 +39,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshot
 import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
-import static com.zoffcc.applications.trifa.HelperMessage.send_text_messge;
-import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 
 public class CallingWaitingActivity extends AppCompatActivity
 {
@@ -166,23 +163,9 @@ public class CallingWaitingActivity extends AppCompatActivity
                             {
                                 if (!sent_ping_message)
                                 {
-                                    final String relay_for_friend = get_relay_for_friend(calling_friend_pk);
-                                    if (relay_for_friend != null)
-                                    {
-                                        if (is_friend_online_real(
-                                                tox_friend_by_public_key__wrapper(relay_for_friend)) != 0)
-                                        {
-                                            send_text_messge(calling_friend_pk, "calling you now ...");
-                                            Log.i(TAG, "send_text_messge:calling you");
-                                            sent_ping_message = true;
-                                        }
-                                    }
-                                    else // if friend is NOT online and does not have a relay, try if he has a push url
-                                    {
-                                        friend_call_push_url(calling_friend_pk);
-                                        Log.i(TAG, "sent ping to push url");
-                                        sent_ping_message = true;
-                                    }
+                                    friend_call_push_url(calling_friend_pk);
+                                    Log.i(TAG, "sent ping to push url");
+                                    sent_ping_message = true;
                                 }
                             }
                             Thread.sleep(60);
