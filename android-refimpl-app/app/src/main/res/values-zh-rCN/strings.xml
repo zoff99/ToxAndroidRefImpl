@@ -380,4 +380,8 @@
     <string name="layout___capabilities">功能：</string>
     <string name="pref_title_use_incognito_keyboard2">隐身键盘</string>
     <string name="pref_description_use_incognito_keyboard2">打开该开关告诉键盘不要学习你输入的单词</string>
+    <string name="MainActivity_setup_push_tip_title">设置推送通知</string>
+    <string name="MainActivity_setup_push_tip_text">你还没有安装推送通知应用程序和设置推送通知。没有推送通知，TRIfA 也可正常工作，但它需要始终在线接收消息。推送通知可以节省电池和互联网带宽。
+\n
+\n你想马上看看如何设置推送通知吗？</string>
 </resources>
