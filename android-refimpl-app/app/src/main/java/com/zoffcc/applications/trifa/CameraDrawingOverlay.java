@@ -75,7 +75,7 @@ public class CameraDrawingOverlay extends SurfaceView
                 my_alpha = 0.0f;
                 this.setAlpha(0.0f);
                 toggle_cam_preview(false, true);
-                toggle_osd_views(false);
+                toggle_osd_views(false, false);
             }
             else
             {
@@ -83,7 +83,7 @@ public class CameraDrawingOverlay extends SurfaceView
                 my_alpha = 1.0f;
                 this.setAlpha(1.0f);
                 toggle_cam_preview(true, true);
-                toggle_osd_views(true);
+                toggle_osd_views(true, false);
             }
             return true;
         }

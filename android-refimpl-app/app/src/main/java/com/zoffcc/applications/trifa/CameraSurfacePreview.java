@@ -157,14 +157,14 @@ public class CameraSurfacePreview extends SurfaceView implements SurfaceHolder.C
                 // make view INVISIBLE (totally transparent)
                 my_alpha = 0.0f;
                 this.setAlpha(0.0f);
-                toggle_osd_views(false);
+                toggle_osd_views(false, false);
             }
             else
             {
                 // make view visible
                 my_alpha = 1.0f;
                 this.setAlpha(1.0f);
-                toggle_osd_views(true);
+                toggle_osd_views(true, false);
             }
             return true;
         }

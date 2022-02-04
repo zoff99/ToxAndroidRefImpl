@@ -188,12 +188,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     PowerManager pm = null;
     PowerManager.WakeLock wl1 = null;
     PowerManager.WakeLock wl2 = null;
-    TextView right_top_text_1 = null;
-    TextView right_top_text_1b = null;
-    TextView right_top_text_2 = null;
-    TextView right_top_text_3 = null;
-    TextView right_top_text_4 = null;
-    TextView right_left_text_1 = null;
+    static TextView right_top_text_1 = null;
+    static TextView right_top_text_1b = null;
+    static TextView right_top_text_2 = null;
+    static TextView right_top_text_3 = null;
+    static TextView right_top_text_4 = null;
+    static TextView right_left_text_1 = null;
     static TextView debug001_text = null;
     static View box_right_volumeslider_01 = null;
     static SeekBar volume_slider_seekbar_01 = null;
@@ -2808,10 +2808,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static void toggle_osd_view_including_cam_preview(boolean visible)
     {
         toggle_cam_preview(visible, false);
-        toggle_osd_views(visible);
+        toggle_osd_views(visible, true);
     }
 
-    static void toggle_osd_views(boolean visible)
+    static void toggle_osd_views(boolean visible, boolean for_audio_call)
     {
         if (visible)
         {
@@ -2823,8 +2823,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     try
                     {
                         CallingActivity.video_box_left_top_01.setVisibility(View.VISIBLE);
+
                         CallingActivity.video_box_right_top_01.setVisibility(View.VISIBLE);
+                        CallingActivity.right_top_text_1.setVisibility(View.VISIBLE);
+                        CallingActivity.right_top_text_1b.setVisibility(View.VISIBLE);
+                        CallingActivity.right_top_text_2.setVisibility(View.VISIBLE);
+                        CallingActivity.right_top_text_3.setVisibility(View.VISIBLE);
+                        CallingActivity.right_top_text_4.setVisibility(View.VISIBLE);
                         CallingActivity.box_right_volumeslider_01.setVisibility(View.VISIBLE);
+
                         CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.VISIBLE);
                         CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.VISIBLE);
                     }
@@ -2846,11 +2853,29 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        CallingActivity.video_box_left_top_01.setVisibility(View.INVISIBLE);
-                        CallingActivity.video_box_right_top_01.setVisibility(View.INVISIBLE);
-                        CallingActivity.box_right_volumeslider_01.setVisibility(View.INVISIBLE);
-                        CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
-                        CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
+                        if (for_audio_call)
+                        {
+                            CallingActivity.video_box_left_top_01.setVisibility(View.INVISIBLE);
+
+                            CallingActivity.video_box_right_top_01.setVisibility(View.VISIBLE);
+                            CallingActivity.right_top_text_1.setVisibility(View.INVISIBLE);
+                            CallingActivity.right_top_text_1b.setVisibility(View.INVISIBLE);
+                            CallingActivity.right_top_text_2.setVisibility(View.INVISIBLE);
+                            CallingActivity.right_top_text_3.setVisibility(View.INVISIBLE);
+                            CallingActivity.right_top_text_4.setVisibility(View.INVISIBLE);
+                            CallingActivity.box_right_volumeslider_01.setVisibility(View.VISIBLE);
+
+                            CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
+                            CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
+                        }
+                        else
+                        {
+                            CallingActivity.video_box_left_top_01.setVisibility(View.INVISIBLE);
+                            CallingActivity.video_box_right_top_01.setVisibility(View.INVISIBLE);
+                            CallingActivity.box_right_volumeslider_01.setVisibility(View.INVISIBLE);
+                            CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
+                            CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
+                        }
                     }
                     catch (Exception e)
                     {
