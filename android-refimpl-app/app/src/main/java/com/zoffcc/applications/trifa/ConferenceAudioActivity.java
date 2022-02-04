@@ -425,40 +425,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
             e2.printStackTrace();
         }
 
-        try
-        {
-            if (dha._Detect())
-            {
-                if (isBluetoothConnected())
-                {
-                    Log.i(TAG, "startBluetoothSco");
-                    manager.startBluetoothSco();
-                }
-                else
-                {
-                    // headset plugged in
-                    Log.i(TAG, "onReceive:headset:plugged in");
-                    manager.setSpeakerphoneOn(false);
-                    manager.setWiredHeadsetOn(true);
-                    Callstate.audio_device = 1;
-                    Callstate.audio_speaker = false;
-                    update_group_audio_device_icon();
-                    manager.setBluetoothScoOn(false);
-                }
-            }
-            else
-            {
-                group_audio_device_icon.setImageDrawable(null);
-                Log.i(TAG, "onReceive:headset:setImageDrawable:null1");
-            }
-        }
-        catch (Exception ee)
-        {
-            ee.printStackTrace();
-            group_audio_device_icon.setImageDrawable(null);
-            Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
-        }
-
         update_group_audio_send_icon(0);
 
         group_audio_player_icon = (ImageButton) findViewById(R.id.group_audio_player_icon);
@@ -526,6 +492,49 @@ public class ConferenceAudioActivity extends AppCompatActivity
         global_showing_anygroupview = true;
 
         aquire_all_locks(this);
+
+        // ------ set audio device ------
+        // ------ set audio device ------
+        // ------ set audio device ------
+        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        try
+        {
+            if (dha._Detect())
+            {
+                if (isBluetoothConnected())
+                {
+                    Log.i(TAG, "startBluetoothSco");
+                    manager.startBluetoothSco();
+                    Callstate.audio_device = 2;
+                    update_group_audio_device_icon();
+                }
+                else
+                {
+                    // headset plugged in
+                    Log.i(TAG, "onReceive:headset:plugged in");
+                    manager.setSpeakerphoneOn(false);
+                    manager.setWiredHeadsetOn(true);
+                    Callstate.audio_device = 1;
+                    Callstate.audio_speaker = false;
+                    update_group_audio_device_icon();
+                    manager.setBluetoothScoOn(false);
+                }
+            }
+            else
+            {
+                group_audio_device_icon.setImageDrawable(null);
+                Log.i(TAG, "onReceive:headset:setImageDrawable:null1");
+            }
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+            group_audio_device_icon.setImageDrawable(null);
+            Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
+        }
+        // ------ set audio device ------
+        // ------ set audio device ------
+        // ------ set audio device ------
 
         Log.i(TAG, "LC:onResume:2");
 
@@ -806,6 +815,28 @@ public class ConferenceAudioActivity extends AppCompatActivity
         {
             need_close_activity = false;
         }
+
+        // ------ shutdown audio device ------
+        // ------ shutdown audio device ------
+        // ------ shutdown audio device ------
+        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        try
+        {
+            if (dha._Detect())
+            {
+                if (isBluetoothConnected())
+                {
+                    Log.i(TAG, "stopBluetoothSco");
+                    manager.stopBluetoothSco();
+                }
+            }
+        }
+        catch (Exception ee)
+        {
+        }
+        // ------ shutdown audio device ------
+        // ------ shutdown audio device ------
+        // ------ shutdown audio device ------
 
         reset_audio_mode();
 
@@ -1498,6 +1529,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SelectFriendSingleActivity_ID)
         {
             if (resultCode == RESULT_OK)

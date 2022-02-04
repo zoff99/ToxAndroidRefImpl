@@ -74,7 +74,6 @@ import java.util.concurrent.Executors;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
-import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
 import androidx.camera.core.Preview;
 import androidx.camera.lifecycle.ProcessCameraProvider;
@@ -92,6 +91,7 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
+import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.format_timeduration_from_seconds;
@@ -361,35 +361,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             e2.printStackTrace();
         }
 
-        // Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_headset).backgroundColor(Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        // audio_device_icon.setImageDrawable(null);
-        audio_device_icon.setVisibility(View.VISIBLE);
-
-        try
-        {
-            if (dh._Detect())
-            {
-                // headset plugged in
-                Log.i(TAG, "onReceive:headset:plugged in");
-                manager.setSpeakerphoneOn(false);
-                manager.setWiredHeadsetOn(true);
-                Callstate.audio_device = 1;
-                Callstate.audio_speaker = false;
-                update_audio_device_icon();
-                manager.setBluetoothScoOn(false);
-            }
-            else
-            {
-                audio_device_icon.setImageDrawable(null);
-                Log.i(TAG, "onReceive:headset:setImageDrawable:null1");
-            }
-        }
-        catch (Exception ee)
-        {
-            ee.printStackTrace();
-            audio_device_icon.setImageDrawable(null);
-            Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
-        }
         // set volume control -------------
 
         boolean mVisible = true;
@@ -1618,6 +1589,50 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
         activity_state = 1;
 
+        // ------ set audio device ------
+        // ------ set audio device ------
+        // ------ set audio device ------
+        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        audio_device_icon.setVisibility(View.VISIBLE);
+        try
+        {
+            if (dh._Detect())
+            {
+                if (isBluetoothConnected())
+                {
+                    Log.i(TAG, "startBluetoothSco");
+                    manager.startBluetoothSco();
+                    Callstate.audio_device = 2;
+                    update_audio_device_icon();
+                }
+                else
+                {
+                    // headset plugged in
+                    Log.i(TAG, "onReceive:headset:plugged in");
+                    manager.setSpeakerphoneOn(false);
+                    manager.setWiredHeadsetOn(true);
+                    Callstate.audio_device = 1;
+                    Callstate.audio_speaker = false;
+                    update_audio_device_icon();
+                    manager.setBluetoothScoOn(false);
+                }
+            }
+            else
+            {
+                audio_device_icon.setImageDrawable(null);
+                Log.i(TAG, "onReceive:headset:setImageDrawable:null1");
+            }
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+            audio_device_icon.setImageDrawable(null);
+            Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
+        }
+        // ------ set audio device ------
+        // ------ set audio device ------
+        // ------ set audio device ------
+
         sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensor_manager.registerListener(this, accelerometer_sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
@@ -1993,6 +2008,29 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+
+        // ------ shutdown audio device ------
+        // ------ shutdown audio device ------
+        // ------ shutdown audio device ------
+        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        try
+        {
+            if (dh._Detect())
+            {
+                if (isBluetoothConnected())
+                {
+                    Log.i(TAG, "stopBluetoothSco");
+                    manager.stopBluetoothSco();
+                }
+            }
+        }
+        catch (Exception ee)
+        {
+        }
+        // ------ shutdown audio device ------
+        // ------ shutdown audio device ------
+        // ------ shutdown audio device ------
+
 
         reset_audio_mode();
 
