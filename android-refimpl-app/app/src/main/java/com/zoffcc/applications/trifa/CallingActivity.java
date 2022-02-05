@@ -2855,8 +2855,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         if (for_audio_call)
                         {
-                            CallingActivity.video_box_left_top_01.setVisibility(View.INVISIBLE);
-
+                            CallingActivity.video_box_left_top_01.setVisibility(View.VISIBLE);
                             CallingActivity.video_box_right_top_01.setVisibility(View.VISIBLE);
                             CallingActivity.right_top_text_1.setVisibility(View.INVISIBLE);
                             CallingActivity.right_top_text_1b.setVisibility(View.INVISIBLE);
