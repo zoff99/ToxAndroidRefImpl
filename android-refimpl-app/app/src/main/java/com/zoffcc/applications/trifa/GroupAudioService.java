@@ -110,7 +110,7 @@ public class GroupAudioService extends Service
             e.printStackTrace();
         }
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     @Override
@@ -552,19 +552,19 @@ public class GroupAudioService extends Service
             {
                 System.out.println("ButtonReceiver:" + intent.getAction());
 
-                if (intent.getAction() == ACTION_STOP)
+                if (intent.getAction().equals(ACTION_STOP))
                 {
                     global_gas_status = GAS_PAUSED;
                     stop_me();
                 }
-                else if (intent.getAction() == ACTION_PLAY)
+                else if (intent.getAction().equals(ACTION_PLAY))
                 {
                     if (global_gas_status == GAS_PAUSED)
                     {
                         do_play();
                     }
                 }
-                else if (intent.getAction() == ACTION_PAUSE)
+                else if (intent.getAction().equals(ACTION_PAUSE))
                 {
                     if (global_gas_status == GAS_PLAYING)
                     {

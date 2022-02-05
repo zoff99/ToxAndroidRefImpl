@@ -22,7 +22,10 @@ package com.zoffcc.applications.trifa;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.KeyguardManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
@@ -42,7 +45,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -62,7 +64,6 @@ import com.google.speech.levelmeter.BarLevelDrawable;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
-import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -185,6 +186,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private Sensor accelerometer_sensor = null;
     static int device_orientation = 0;
     static AudioProcessing ap = null;
+    public static String channelId = "";
+    static NotificationChannel notification_channel_call_audio_play_service = null;
+    static NotificationManager nmn3 = null;
     PowerManager pm = null;
     PowerManager.WakeLock wl1 = null;
     PowerManager.WakeLock wl2 = null;
@@ -234,7 +238,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static MediaCodec.BufferInfo mBufferInfo_h264_decoder;
     private static MediaCodec mDecoder_h264;
     private static MediaFormat video_decoder_h264_format = null;
-    private DetectHeadset dh = null;
+    private static DetectHeadset dh = null;
     public static long calling_activity_start_ms = 0;
     private static int BUFFER_DEQUEUE_TIMEOUT_US = 0; // "us" fetch encoded data from encoder
     private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 0; // "us" feed raw data to encoder
@@ -1244,7 +1248,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             e2.printStackTrace();
                         }
                         Log.i(TAG, "decline_button_pressed:on_call_ended_actions");
-                        on_call_ended_actions();
+                        CallAudioService.stop_me();
                     }
                 }
                 catch (Exception e)
@@ -1512,53 +1516,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     protected void onPostCreate(Bundle savedInstanceState)
     {
         super.onPostCreate(savedInstanceState);
-        // delayedHide(100);
     }
-
-    //    private void toggle()
-    //    {
-    //        if (mVisible)
-    //        {
-    //            hide();
-    //        }
-    //        else
-    //        {
-    //            show();
-    //        }
-    //    }
-
-    //    private void hide()
-    //    {
-    //        // Hide UI first
-    //        ActionBar actionBar = getSupportActionBar();
-    //        if (actionBar != null)
-    //        {
-    //            actionBar.hide();
-    //        }
-    //        mVisible = false;
-    //
-    //        // Schedule a runnable to remove the status and navigation bar after a delay
-    //        mHideHandler.removeCallbacks(mShowPart2Runnable);
-    //        mHideHandler.postDelayed(mHidePart2Runnable, UI_ANIMATION_DELAY);
-    //    }
-
-    //    @SuppressLint("InlinedApi")
-    //    private void show()
-    //    {
-    //        // Show the system bar
-    //        mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
-    //        mVisible = true;
-    //
-    //        // Schedule a runnable to display UI elements after a delay
-    //        mHideHandler.removeCallbacks(mHidePart2Runnable);
-    //        mHideHandler.postDelayed(mShowPart2Runnable, UI_ANIMATION_DELAY);
-    //    }
-
-    //    private void delayedHide(int delayMillis)
-    //    {
-    //        mHideHandler.removeCallbacks(mHideRunnable);
-    //        mHideHandler.postDelayed(mHideRunnable, delayMillis);
-    //    }
 
     @Override
     protected void onResume()
@@ -1740,73 +1698,31 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             toggle_osd_view_including_cam_preview(!Callstate.audio_call);
         }
 
-
-        Videocall_audio_play_thread = new Thread()
+        // ------- start audio calling service and notification -------
+        Log.i(TAG, "call_audio_service:start");
+        NotificationManager nmn3 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    this.setName("t_va_play");
-                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-                    // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    Log.i(TAG, "Videocall_audio_play_thread:starting ...");
-                    int delta = 0;
-                    final int sleep_millis = NativeAudio.n_buf_iterate_ms; // "x" ms is what native audio wants
-                    int sleep_millis_current = sleep_millis;
-                    Videocall_audio_play_thread_running = true;
-                    long d1 = 0;
-                    long d2 = 0;
-                    int res = 0;
-
-                    while (Videocall_audio_play_thread_running)
-                    {
-                        d1 = SystemClock.uptimeMillis();
-
-                        res = MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
-                                                                       NativeAudio.sampling_rate, 0);
-                        if (res == -1)
-                        {
-                            Thread.sleep(5);
-                            MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
-                                                                     NativeAudio.sampling_rate, 1);
-                        }
-
-                        delta = (int) (SystemClock.uptimeMillis() - d1);
-
-                        sleep_millis_current = sleep_millis - delta;
-                        if (sleep_millis_current < 1)
-                        {
-                            sleep_millis_current = 1;
-                        }
-                        else if (sleep_millis_current > sleep_millis + 5)
-                        {
-                            sleep_millis_current = sleep_millis + 5;
-                        }
-
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 300)); // sleep
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                Log.i(TAG, "Videocall_audio_play_thread:finished");
-            }
-        };
-
-        Videocall_audio_play_thread.start();
+            String channelName = "Tox Call";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            channelId = "trifa_call_audio_play";
+            notification_channel_call_audio_play_service = new NotificationChannel(channelId, channelName, importance);
+            notification_channel_call_audio_play_service.setDescription(channelId);
+            notification_channel_call_audio_play_service.setSound(null, null);
+            notification_channel_call_audio_play_service.enableVibration(false);
+            nmn3.createNotificationChannel(notification_channel_call_audio_play_service);
+        }
+        try
+        {
+            Intent i = new Intent(this, CallAudioService.class);
+            startService(i);
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "call_audio_service:EE01:" + e.getMessage());
+            e.printStackTrace();
+        }
+        // ------- start audio calling service and notification -------
 
         Log.i(TAG, "onResume:99");
     }
@@ -1904,33 +1820,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @Override
     protected void onPause()
     {
-        // singal group audio play thread to stop
-        Videocall_audio_play_thread_running = false;
-        try
-        {
-            Log.i(TAG, "Videocall_audio_play_thread:waiting to stop ...");
-            Videocall_audio_play_thread.join();
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        Videocall_audio_play_thread = null;
-        Log.i(TAG, "Videocall_audio_play_thread:done");
-
         super.onPause();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
-        {
-            if (PREF__use_H264_hw_encoding)
-            {
-                releaseEncoder();
-                // releaseDecoder_h264();
-            }
-        }
-        sensor_manager.unregisterListener(this);
-        activity_state = 0;
 
-        stop_ringtone();
+        sensor_manager.unregisterListener(this);
 
         try
         {
@@ -1961,6 +1853,22 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             e.printStackTrace();
         }
+    }
+
+    static void stop_active_call()
+    {
+        activity_state = 0;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
+        {
+            if (PREF__use_H264_hw_encoding)
+            {
+                releaseEncoder();
+                // releaseDecoder_h264();
+            }
+        }
+
+        stop_ringtone();
 
         try
         {
@@ -2012,7 +1920,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // ------ shutdown audio device ------
         // ------ shutdown audio device ------
         // ------ shutdown audio device ------
-        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        AudioManager manager = (AudioManager) context_s.getSystemService(Context.AUDIO_SERVICE);
         try
         {
             if (dh._Detect())
@@ -2031,14 +1939,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // ------ shutdown audio device ------
         // ------ shutdown audio device ------
 
-
         reset_audio_mode();
 
         Log.i(TAG, "onPause:on_call_ended_actions");
         on_call_ended_actions();
 
         tox_set_onion_active(1);
-
     }
 
     // ---------------
@@ -2190,7 +2096,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
     }
 
-
     static MappedByteBuffer loadModelFile(Activity activity) throws IOException
     {
         // final String tf_model_file = "deeplabv3_257_mv_gpu.tflite";
@@ -2203,7 +2108,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         long declaredLength = fileDescriptor.getDeclaredLength();
         return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
     }
-
 
     private void initUI()
     {

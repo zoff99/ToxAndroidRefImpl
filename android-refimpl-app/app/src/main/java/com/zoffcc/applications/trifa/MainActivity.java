@@ -1500,6 +1500,15 @@ public class MainActivity extends AppCompatActivity
 
                             try
                             {
+                                CallAudioService.stop_me();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            try
+                            {
                                 if (is_tox_started)
                                 {
                                     tox_service_fg.stop_tox_fg(true);
@@ -1984,6 +1993,15 @@ public class MainActivity extends AppCompatActivity
         try
         {
             GroupAudioService.stop_me();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            CallAudioService.stop_me();
         }
         catch (Exception e)
         {

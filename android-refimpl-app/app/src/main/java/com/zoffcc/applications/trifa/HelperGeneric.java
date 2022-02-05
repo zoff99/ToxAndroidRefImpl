@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.Notification;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
@@ -39,9 +40,11 @@ import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
+import android.widget.RemoteViews;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.request.target.NotificationTarget;
 
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
@@ -1177,6 +1180,78 @@ public class HelperGeneric
         {
             e.printStackTrace();
             Log.i(TAG, "put_vfs_image_on_imageview:EE1:" + e.getMessage());
+        }
+    }
+
+    static void put_vfs_image_on_imageview_real_remoteviews(Context c, Notification notification, int notification_id, int viewid, RemoteViews rv, Drawable placholder, String vfs_image_filename, boolean force_update, boolean is_friend_avatar, FriendList fl)
+    {
+        try
+        {
+            NotificationTarget notificationTarget = new NotificationTarget(c, viewid, rv, notification,
+                                                                           notification_id);
+
+            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(vfs_image_filename);
+            if (placholder == null)
+            {
+                if (is_friend_avatar)
+                {
+                    GlideApp.
+                            with(c).
+                            asBitmap().
+                            load(f1).
+                            placeholder(R.drawable.round_loading_animation).
+                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                    "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                    fl.avatar_update_timestamp)).
+                            skipMemoryCache(false).
+                            into(notificationTarget);
+                }
+                else
+                {
+                    GlideApp.
+                            with(c).
+                            asBitmap().
+                            load(f1).
+                            placeholder(R.drawable.round_loading_animation).
+                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            skipMemoryCache(force_update).
+                            into(notificationTarget);
+                }
+            }
+            else
+            {
+                if (is_friend_avatar)
+                {
+                    GlideApp.
+                            with(c).
+                            asBitmap().
+                            load(f1).
+                            placeholder(placholder).
+                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                    "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                    fl.avatar_update_timestamp)).
+                            skipMemoryCache(false).
+                            into(notificationTarget);
+                }
+                else
+                {
+                    GlideApp.
+                            with(c).
+                            asBitmap().
+                            load(f1).
+                            placeholder(placholder).
+                            diskCacheStrategy(DiskCacheStrategy.NONE).
+                            skipMemoryCache(force_update).
+                            into(notificationTarget);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "put_vfs_image_on_imageview_real_remoteviews:EE1:" + e.getMessage());
         }
     }
 

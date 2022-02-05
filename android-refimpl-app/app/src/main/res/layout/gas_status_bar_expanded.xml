@@ -10,6 +10,7 @@
         android:layout_height="@dimen/notification_expanded_height"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:padding="2dp"
         android:scaleType="fitCenter"
         android:src="@drawable/i_emoji_google_1f601" />
 

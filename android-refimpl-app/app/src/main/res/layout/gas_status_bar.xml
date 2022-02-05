@@ -8,6 +8,7 @@
         android:id="@+id/status_bar_album_art"
         android:layout_width="@dimen/status_bar_album_art"
         android:layout_height="@dimen/status_bar_album_art"
+        android:padding="2dp"
         android:gravity="center"
         android:src="@drawable/i_emoji_google_1f601" />
 

@@ -28,7 +28,7 @@ class HeadsetStateReceiver extends BroadcastReceiver
             Log.i(TAG, "onReceive:" + intent + " isBluetoothConnected=" + isBluetoothConnected());
 
             if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1) ||
-                (GroupAudioService.activity_state == 1))
+                (GroupAudioService.activity_state == 1) || (CallAudioService.activity_state == 1))
             {
                 if (intent.getAction().equals("android.intent.action.HEADSET_PLUG"))
                 {

@@ -142,6 +142,15 @@ public class ConferenceAudioActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        try
+        {
+            CallAudioService.stop_me();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         if (Build.VERSION.SDK_INT >= 27)
         {
             setTurnScreenOn(true);

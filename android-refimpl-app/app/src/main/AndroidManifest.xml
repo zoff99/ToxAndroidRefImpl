@@ -279,7 +279,16 @@
             android:exported="false">
         </service>
 
+        <service
+            android:name=".CallAudioService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+
         <receiver android:name=".GroupAudioService$ButtonReceiver" android:enabled="true">
+        </receiver>
+
+        <receiver android:name=".CallAudioService$ButtonReceiver" android:enabled="true">
         </receiver>
 
         <receiver android:name=".WakeupAlarmReceiver" android:enabled="true">
