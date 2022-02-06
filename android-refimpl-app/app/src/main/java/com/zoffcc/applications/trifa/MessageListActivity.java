@@ -965,6 +965,7 @@ public class MessageListActivity extends AppCompatActivity
         // intent.setType("image/*");
         intent.setType("*/*");
 
+        // HINT: rework this to not use FLAG_GRANT_PERSISTABLE_URI_PERMISSION anymore
         intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
