@@ -61,11 +61,13 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Pattern;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
+import androidx.exifinterface.media.ExifInterface;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.blue;
@@ -654,6 +656,97 @@ public class HelperGeneric
             }
         };
         new_thread.start();
+    }
+
+    public static Bitmap rotate_image_to_exif(Bitmap bitmap, String filename_with_path)
+    {
+        try
+        {
+            ExifInterface exifInterface = new ExifInterface(filename_with_path);
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                                            ExifInterface.ORIENTATION_UNDEFINED);
+            Matrix matrix = new Matrix();
+            switch (orientation)
+            {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    matrix.setRotate(90);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    matrix.setRotate(180);
+                    break;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    matrix.setRotate(270);
+                    break;
+                default:
+            }
+            return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return bitmap;
+        }
+    }
+
+    public static Bitmap scale_bitmap_keep_aspect(Bitmap originalImage, int width, int height)
+    {
+        Bitmap background = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+
+        float originalWidth = originalImage.getWidth();
+        float originalHeight = originalImage.getHeight();
+
+        Log.i(TAG, "scale_bitmap_keep_aspect:orig w x h=" + originalWidth + " " + originalHeight);
+
+        Canvas canvas = new Canvas(background);
+
+        float scale = width / originalWidth;
+
+        float xTranslation = 0.0f;
+        float yTranslation = (height - originalHeight * scale) / 2.0f;
+
+        Matrix transformation = new Matrix();
+        transformation.postTranslate(xTranslation, yTranslation);
+        transformation.preScale(scale, scale);
+
+        Paint paint = new Paint();
+        paint.setFilterBitmap(true);
+
+        canvas.drawBitmap(originalImage, transformation, paint);
+
+        Log.i(TAG, "scale_bitmap_keep_aspect:new w x h=" + background.getWidth() + " " + background.getHeight());
+
+        return background;
+    }
+
+    public static void send_avatar_to_all_friends()
+    {
+        try
+        {
+            List<FriendList> fl = orma.selectFromFriendList().
+                    toList();
+
+            if (fl != null)
+            {
+                if (fl.size() > 0)
+                {
+                    int i = 0;
+                    for (i = 0; i < fl.size(); i++)
+                    {
+                        FriendList n = fl.get(i);
+                        // iterate over all online friends, and send them our new avatar
+                        if (n.TOX_CONNECTION != TOX_CONNECTION_NONE.value)
+                        {
+                            // Log.i(TAG, "select_avatar:send_avatar_to_friend:online:i=" + i);
+                            send_avatar_to_friend(
+                                    HelperFriend.tox_friend_by_public_key__wrapper(n.tox_public_key_string));
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
     }
 
     public static void del_own_avatar()

@@ -19,15 +19,22 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.app.Activity;
 import android.content.ClipData;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
+import android.provider.DocumentsContract;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -38,10 +45,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.angads25.filepicker.controller.DialogSelectionListener;
-import com.github.angads25.filepicker.model.DialogConfigs;
-import com.github.angads25.filepicker.model.DialogProperties;
-import com.github.angads25.filepicker.view.FilePickerDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -50,24 +53,24 @@ import com.google.zxing.common.BitMatrix;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import java.io.File;
-import java.net.URLConnection;
-import java.util.List;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.documentfile.provider.DocumentFile;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.copy_outgoing_file_to_sdcard_dir;
 import static com.zoffcc.applications.trifa.HelperGeneric.copy_real_file_to_vfs_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_network_connections;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
-import static com.zoffcc.applications.trifa.HelperGeneric.send_avatar_to_friend;
+import static com.zoffcc.applications.trifa.HelperGeneric.rotate_image_to_exif;
+import static com.zoffcc.applications.trifa.HelperGeneric.scale_bitmap_keep_aspect;
+import static com.zoffcc.applications.trifa.HelperGeneric.send_avatar_to_all_friends;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_new_random_nospam_value;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
@@ -84,17 +87,14 @@ import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabilities;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_SELF_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE_TO_STRING;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NAME_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_STATUS_MESSAGE_LENGTH;
-import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ProfileActivity extends AppCompatActivity
 {
@@ -117,6 +117,7 @@ public class ProfileActivity extends AppCompatActivity
     TextView my_pushurl_text = null;
     ImageView my_identicon_imageview = null;
     TextView mytox_network_connections = null;
+    static final int MEDIAPICK_ID_002 = 8003;
 
     static Handler profile_handler_s = null;
     Identicon.Identicon_data id_data = null;
@@ -343,104 +344,15 @@ public class ProfileActivity extends AppCompatActivity
 
         profile_icon_edit.setOnClickListener(v -> {
             // select new avatar image
-            DialogProperties properties = new DialogProperties();
-            properties.selection_mode = DialogConfigs.SINGLE_MODE;
-            properties.selection_type = DialogConfigs.FILE_SELECT;
-            properties.root = new File("/");
-            properties.error_dir = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-            properties.offset = new File(Environment.getExternalStorageDirectory().getAbsolutePath());
-            // TODO: hardcoded is always bad
-            properties.extensions = new String[]{"jpg", "jpeg", "png", "gif", "JPG", "PNG", "GIF"};
-            FilePickerDialog dialog = new FilePickerDialog(ProfileActivity.this, properties);
-            dialog.setTitle("Select Avatar");
-
-            dialog.setDialogSelectionListener(new DialogSelectionListener()
+            Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+            intent.setType("*/*");
+            intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             {
-                @Override
-                public void onSelectedFilePaths(String[] files)
-                {
-                    try
-                    {
-                        Log.i(TAG, "select_avatar:" + files);
-                        String src_path = new File(new File(files[0]).getAbsolutePath()).getParent();
-                        String src_filename = new File(files[0]).getName();
-
-                        File f_real = new File(src_path + "/" + src_filename);
-                        if (f_real.canRead())
-                        {
-                            if (f_real.length() <= AVATAR_SELF_MAX_BYTE_SIZE)
-                            {
-                                if (f_real.length() > 0)
-                                {
-
-                                    String avatar_file_name_corrected = TrifaSetPatternActivity.filter_out_specials_from_filepath(
-                                            src_filename.toLowerCase());
-
-                                    Log.i(TAG, "select_avatar:p=" + src_path + " f=" + avatar_file_name_corrected);
-                                    copy_real_file_to_vfs_file(src_path, src_filename, VFS_PREFIX + VFS_OWN_AVATAR_DIR,
-                                                               "avatar.png");
-
-                                    String mimeType = URLConnection.guessContentTypeFromName(
-                                            avatar_file_name_corrected.toLowerCase());
-
-                                    set_g_opts("VFS_OWN_AVATAR_FNAME",
-                                               VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
-
-                                    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".png");
-
-                                    put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d1,
-                                                                    VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
-                                                                    "avatar.png", true, false, null);
-                                    Log.i(TAG, "select_avatar:put_vfs_image_on_imageview");
-
-
-                                    List<FriendList> fl = orma.selectFromFriendList().
-                                            toList();
-
-                                    if (fl != null)
-                                    {
-                                        if (fl.size() > 0)
-                                        {
-                                            int i = 0;
-                                            for (i = 0; i < fl.size(); i++)
-                                            {
-                                                FriendList n = fl.get(i);
-
-                                                // Log.i(TAG, "select_avatar:send_avatar_to_friend:i=" + i);
-
-                                                // iterate over all online friends, and send them our new avatar
-                                                if (n.TOX_CONNECTION != TOX_CONNECTION_NONE.value)
-                                                {
-                                                    Log.i(TAG, "select_avatar:send_avatar_to_friend:online:i=" + i);
-
-                                                    send_avatar_to_friend(
-                                                            HelperFriend.tox_friend_by_public_key__wrapper(
-                                                                    n.tox_public_key_string));
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Log.i(TAG, "select_avatar:TOO BIG:" + f_real.length());
-                            }
-                        }
-                        else
-                        {
-                            Log.i(TAG, "select_avatar:CAN NOT READ:" + src_path + " f=" + src_filename);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "select_avatar:EE1:" + e.getMessage());
-                    }
-                }
-            });
-
-            dialog.show();
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, "*/*");
+            }
+            startActivityForResult(intent, MEDIAPICK_ID_002);
         });
 
         profile_icon_remove.setOnClickListener(v -> {
@@ -511,6 +423,144 @@ public class ProfileActivity extends AppCompatActivity
         }
 
         profile_handler_s = profile_handler;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == MEDIAPICK_ID_002 && resultCode == Activity.RESULT_OK)
+        {
+            if (data == null)
+            {
+                //Display an error
+                return;
+            }
+            else
+            {
+                try
+                {
+                    String fileName1 = null;
+
+                    try
+                    {
+                        DocumentFile documentFile = DocumentFile.fromSingleUri(this.getApplicationContext(),
+                                                                               data.getData());
+                        fileName1 = documentFile.getName();
+                        ContentResolver cr = getApplicationContext().getContentResolver();
+                        Cursor metaCursor = cr.query(data.getData(), null, null, null, null);
+                        if (metaCursor != null)
+                        {
+                            try
+                            {
+                                if (metaCursor.moveToFirst())
+                                {
+                                    int j;
+                                    for (j = 0; j < metaCursor.getColumnNames().length; j++)
+                                    {
+                                        if (metaCursor.getColumnName(j).equals(
+                                                DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                                        {
+                                            if (metaCursor.getString(j) != null)
+                                            {
+                                                if (metaCursor.getString(j).length() > 0)
+                                                {
+                                                    fileName1 = metaCursor.getString(j);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            finally
+                            {
+                                metaCursor.close();
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    final String fileName_ = fileName1;
+
+                    if (fileName_ != null)
+                    {
+                        final Uri uri = data.getData();
+                        long file_size = -1;
+                        try
+                        {
+                            DocumentFile documentFile = DocumentFile.fromSingleUri(this.getApplicationContext(), uri);
+                            file_size = documentFile.length();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            // file length unknown?
+                            return;
+                        }
+
+                        if (file_size < 1)
+                        {
+                            // file length "zero"?
+                            return;
+                        }
+
+                        MessageListActivity.outgoing_file_wrapped ofw = copy_outgoing_file_to_sdcard_dir(
+                                data.getData().toString(), fileName_, file_size);
+                        if (ofw == null)
+                        {
+                            return;
+                        }
+
+                        if (file_size >= 400 * 1024) // bigger than 400kbytes filesize
+                        {
+                            Bitmap b = BitmapFactory.decodeFile(ofw.filepath_wrapped + "/" + ofw.filename_wrapped);
+                            Bitmap out = scale_bitmap_keep_aspect(
+                                    rotate_image_to_exif(b, ofw.filepath_wrapped + "/" + ofw.filename_wrapped), 640,
+                                    640);
+                            java.io.File file = new java.io.File(ofw.filepath_wrapped, ofw.filename_wrapped);
+                            java.io.FileOutputStream fOut;
+                            try
+                            {
+                                fOut = new java.io.FileOutputStream(file);
+                                out.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+                                fOut.flush();
+                                fOut.close();
+                                b.recycle();
+                                out.recycle();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        Log.i(TAG, "select_avatar:p=" + ofw.filepath_wrapped + " f=" + ofw.filename_wrapped);
+                        copy_real_file_to_vfs_file(ofw.filepath_wrapped, ofw.filename_wrapped,
+                                                   VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
+
+                        set_g_opts("VFS_OWN_AVATAR_FNAME", VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+
+                        set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".png");
+
+                        final Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+                        put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d2,
+                                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png", true,
+                                                        false, null);
+
+                        send_avatar_to_all_friends();
+
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     static void update_toxid_display_s()
