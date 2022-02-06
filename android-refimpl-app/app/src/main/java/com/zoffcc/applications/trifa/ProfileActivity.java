@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.ClipData;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -53,6 +54,7 @@ import java.io.File;
 import java.net.URLConnection;
 import java.util.List;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -60,6 +62,8 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import static android.graphics.Color.BLACK;
 import static android.graphics.Color.WHITE;
 import static com.zoffcc.applications.trifa.HelperGeneric.copy_real_file_to_vfs_file;
+import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.del_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_network_connections;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
@@ -97,6 +101,7 @@ public class ProfileActivity extends AppCompatActivity
     static final String TAG = "trifa.ProfileActy";
     CircleImageView profile_icon = null;
     FloatingActionButton profile_icon_edit = null;
+    FloatingActionButton profile_icon_remove = null;
     ImageView mytoxid_imageview = null;
     TextView mytoxid_textview = null;
     TextView my_toxcapabilities_textview = null;
@@ -124,6 +129,7 @@ public class ProfileActivity extends AppCompatActivity
 
         profile_icon = findViewById(R.id.profile_icon);
         profile_icon_edit = findViewById(R.id.profile_icon_edit);
+        profile_icon_remove = findViewById(R.id.profile_icon_remove);
         mytoxid_imageview = findViewById(R.id.mytoxid_imageview);
         mytoxid_textview = findViewById(R.id.mytoxid_textview);
         mynick_edittext = findViewById(R.id.mynick_edittext);
@@ -380,18 +386,7 @@ public class ProfileActivity extends AppCompatActivity
                                     set_g_opts("VFS_OWN_AVATAR_FNAME",
                                                VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
 
-                                    //if (mimeType.equalsIgnoreCase("image/gif"))
-                                    //{
-                                    //    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".gif");
-                                    //}
-                                    //else if (mimeType.equalsIgnoreCase("image/jpeg"))
-                                    //{
-                                    //    set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".jpg");
-                                    //}
-                                    //else
-                                    //{
                                     set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".png");
-                                    //}
 
                                     put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d1,
                                                                     VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
@@ -425,8 +420,6 @@ public class ProfileActivity extends AppCompatActivity
                                             }
                                         }
                                     }
-
-
                                 }
                             }
                             else
@@ -448,6 +441,60 @@ public class ProfileActivity extends AppCompatActivity
             });
 
             dialog.show();
+        });
+
+        profile_icon_remove.setOnClickListener(v -> {
+            try
+            {
+                AlertDialog ad = new AlertDialog.Builder(v.getContext()).
+                        setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
+                        {
+                            public void onClick(DialogInterface dialog, int id)
+                            {
+                            }
+                        }).
+                        setPositiveButton(R.string.MainActivity_button_ok, new DialogInterface.OnClickListener()
+                        {
+                            public void onClick(DialogInterface dialog, int id)
+                            {
+                                try
+                                {
+                                    del_own_avatar();
+                                }
+                                catch (Exception ignored)
+                                {
+                                }
+
+                                try
+                                {
+                                    del_g_opts("VFS_OWN_AVATAR_FNAME");
+                                    del_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION");
+                                }
+                                catch (Exception ignored)
+                                {
+                                }
+
+                                try
+                                {
+                                    final Drawable d1 = new IconicsDrawable(v.getContext()).icon(
+                                            GoogleMaterial.Icon.gmd_face).color(
+                                            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+                                    profile_icon.setImageDrawable(d1);
+                                }
+                                catch (Exception ignored)
+                                {
+                                }
+                            }
+                        }).create();
+                ad.setTitle(getString(R.string.ProfileActivity_delete_avatar_dialog_title));
+                ad.setMessage(getString(R.string.ProfileActivity_delete_avatar_dialog_text));
+                ad.setCancelable(false);
+                ad.setCanceledOnTouchOutside(false);
+                ad.show();
+            }
+            catch (Exception ignored)
+            {
+            }
         });
 
         try

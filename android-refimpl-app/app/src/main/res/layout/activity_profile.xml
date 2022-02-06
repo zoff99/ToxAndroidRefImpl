@@ -56,6 +56,17 @@
                     android:layout_marginBottom="10dp"
                     android:tint="@color/design_default_color_on_primary"
                     app:srcCompat="@drawable/ic_baseline_edit_24" />
+
+                <com.google.android.material.floatingactionbutton.FloatingActionButton
+                    android:id="@+id/profile_icon_remove"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@id/profile_icon"
+                    android:layout_alignBottom="@id/profile_icon"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginBottom="10dp"
+                    android:tint="@color/design_default_color_on_primary"
+                    app:srcCompat="@drawable/ic_baseline_clear_24" />
             </RelativeLayout>
 
             <com.google.android.material.textfield.TextInputLayout
