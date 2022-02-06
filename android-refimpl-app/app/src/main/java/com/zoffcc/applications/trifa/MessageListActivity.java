@@ -1153,18 +1153,6 @@ public class MessageListActivity extends AppCompatActivity
 
             try
             {
-                // Log.i(TAG, "xxxxxxxxxx1:" + data);
-                // Log.i(TAG, "xxxxxxxxxx2:" + data.getData());
-                try
-                {
-                    // HINT: we don't need that anymore, since virtual file content is duplicated
-                    // c.getContentResolver().takePersistableUriPermission(orig_intent.getData(),
-                    //                                                     Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                }
-                catch (Exception e_persist)
-                {
-                    Log.i(TAG, "No persistable permission grants found");
-                }
                 DocumentFile documentFile = DocumentFile.fromSingleUri(c, data.getData());
 
                 fileName = documentFile.getName();
