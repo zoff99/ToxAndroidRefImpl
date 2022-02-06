@@ -89,6 +89,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabiliti
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR_FILE_EXTENSION;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
@@ -347,11 +349,11 @@ public class ProfileActivity extends AppCompatActivity
             // select new avatar image
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
             intent.addCategory(Intent.CATEGORY_OPENABLE);
-            intent.setType("*/*");
+            intent.setType("image/*");
             intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
             {
-                intent.putExtra(Intent.EXTRA_MIME_TYPES, "*/*");
+                intent.putExtra(Intent.EXTRA_MIME_TYPES, "image/*");
             }
             startActivityForResult(intent, MEDIAPICK_ID_002);
         });
@@ -552,17 +554,19 @@ public class ProfileActivity extends AppCompatActivity
 
                         Log.i(TAG, "select_avatar:p=" + ofw.filepath_wrapped + " f=" + ofw.filename_wrapped);
                         copy_real_file_to_vfs_file(ofw.filepath_wrapped, ofw.filename_wrapped,
-                                                   VFS_PREFIX + VFS_OWN_AVATAR_DIR, "avatar.png");
+                                                   VFS_PREFIX + VFS_OWN_AVATAR_DIR,
+                                                   VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION);
 
-                        set_g_opts("VFS_OWN_AVATAR_FNAME", VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png");
+                        set_g_opts("VFS_OWN_AVATAR_FNAME",
+                                   VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION);
 
-                        set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", ".png");
+                        set_g_opts("VFS_OWN_AVATAR_FILE_EXTENSION", VFS_OWN_AVATAR_DIR_FILE_EXTENSION);
 
                         final Drawable d2 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_face).color(
                                 getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
                         put_vfs_image_on_imageview_real(ProfileActivity.this, profile_icon, d2,
-                                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + "avatar.png", true,
-                                                        false, null);
+                                                        VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" +
+                                                        VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION, true, false, null);
 
                         send_avatar_to_all_friends();
 

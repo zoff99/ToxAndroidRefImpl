@@ -48,9 +48,7 @@ public class TRIFAGlobals
 
     final static String TOX_PUSH_MSG_APP_WEBDOWNLOAD = "https://github.com/zoff99/tox_push_msg_app/releases/latest/download/play.pushmsg.apk";
     final static String TOX_PUSH_MSG_APP_PLAYSTORE = "https://play.google.com/store/apps/details?id=com.zoffcc.applications.pushmsg";
-    final static String TOX_PUSH_SETUP_HOWTO_URL ="https://zoff99.github.io/ToxAndroidRefImpl/PUSH_NOTIFICATION.html";
-
-    final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
+    final static String TOX_PUSH_SETUP_HOWTO_URL = "https://zoff99.github.io/ToxAndroidRefImpl/PUSH_NOTIFICATION.html";
 
     static boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =
@@ -89,7 +87,13 @@ public class TRIFAGlobals
     // final static String VFS_TMP_AVATAR_DIR = "/avatar_tempdir/files/"; // TODO: avatar should get their own directory!
     final static String VFS_FILE_DIR = "/datadir/files/";
     final static String VFS_OWN_AVATAR_DIR = "/datadir/myavatar/";
+    final static String VFS_OWN_AVATAR_DIR_FILE_EXTENSION = ".png";
+    final static String VFS_OWN_AVATAR_DIR_FILENAME_NO_EXTENSION = "avatar";
+    final static String VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION =
+            VFS_OWN_AVATAR_DIR_FILENAME_NO_EXTENSION + VFS_OWN_AVATAR_DIR_FILE_EXTENSION;
     static String VFS_PREFIX = ""; // only set for normal (unencrypted) storage
+
+    final static String FRIEND_AVATAR_FILENAME = "_____xyz____avatar.png";
 
     final static long AVATAR_INCOMING_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
     final static long AVATAR_SELF_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
@@ -146,7 +150,6 @@ public class TRIFAGlobals
     static final int PUSH_URL_TRIGGER_AGAIN_SECONDS = 20;
     static final int PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev = 100;
     static final int PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after = 1000;
-
 
 
     static final String TOX_NODELIST_HOST = "nodes.tox.chat";

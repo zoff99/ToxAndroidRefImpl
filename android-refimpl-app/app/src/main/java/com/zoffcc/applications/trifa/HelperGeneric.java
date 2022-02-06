@@ -107,6 +107,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H264;
@@ -784,7 +785,7 @@ public class HelperGeneric
 
     public static void del_own_avatar()
     {
-        delete_vfs_file(VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/", "avatar.png");
+        delete_vfs_file(VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/", VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION);
     }
 
     public static void set_message_accepted_from_id(long message_id)
