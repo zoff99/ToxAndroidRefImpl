@@ -67,7 +67,6 @@ public class ShareActivity extends AppCompatActivity
         action = intent.getAction();
         type = intent.getType();
 
-        // HINT: disable sharing content via "share" for now. it does not yet work properly!
         if (!PREF__allow_file_sharing_to_trifa_via_intent)
         {
             return;
@@ -84,14 +83,12 @@ public class ShareActivity extends AppCompatActivity
             {
                 if ("text/plain".equals(type))
                 {
-                    // Log.i(TAG, "select friend to share to ...");
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
                     intent_friend_selection.putExtra("offline", 1);
                     startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
                 }
-                else if ((type.startsWith("image/")) || (type.startsWith("video/")) || (type.startsWith("audio/")))
+                else
                 {
-                    // Log.i(TAG, "select friend to share to ...");
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
                     intent_friend_selection.putExtra("offline", 1);
                     startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
@@ -99,13 +96,9 @@ public class ShareActivity extends AppCompatActivity
             }
             else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null)
             {
-                if ((type.startsWith("image/")) || (type.startsWith("video/")) || (type.startsWith("audio/")))
-                {
-                    // Log.i(TAG, "select friend to share to ...");
-                    Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
-                    intent_friend_selection.putExtra("offline", 1);
-                    startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
-                }
+                Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
+                intent_friend_selection.putExtra("offline", 1);
+                startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
             }
             else if (Intent.ACTION_VIEW.equals(action))
             {
@@ -198,15 +191,7 @@ public class ShareActivity extends AppCompatActivity
                                 {
                                     handleSendText(intent, result_friend_pubkey);
                                 }
-                                else if (type.startsWith("image/"))
-                                {
-                                    handleSendImage(intent, result_friend_pubkey);
-                                }
-                                else if (type.startsWith("audio/"))
-                                {
-                                    handleSendImage(intent, result_friend_pubkey);
-                                }
-                                else if (type.startsWith("video/"))
+                                else
                                 {
                                     handleSendImage(intent, result_friend_pubkey);
                                 }
@@ -218,11 +203,7 @@ public class ShareActivity extends AppCompatActivity
                                 {
                                     handleSendMultipleImages(intent, result_friend_pubkey);
                                 }
-                                else if (type.startsWith("audio/"))
-                                {
-                                    handleSendMultipleImages(intent, result_friend_pubkey);
-                                }
-                                else if (type.startsWith("video/"))
+                                else
                                 {
                                     handleSendMultipleImages(intent, result_friend_pubkey);
                                 }
@@ -231,7 +212,7 @@ public class ShareActivity extends AppCompatActivity
                         }
                     }
                 }
-                catch (Exception e)
+                catch (Exception ignored)
                 {
                 }
             }
