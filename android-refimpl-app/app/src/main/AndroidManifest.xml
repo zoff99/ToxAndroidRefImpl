@@ -241,7 +241,7 @@
 
         <activity
             android:name=".WrongCredentials"
-            android:label="@string/title_activity_wrong_credentials" >
+            android:label="@string/title_activity_wrong_credentials">
         </activity>
 
         <activity
