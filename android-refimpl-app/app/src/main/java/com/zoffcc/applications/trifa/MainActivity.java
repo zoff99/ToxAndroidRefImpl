@@ -129,7 +129,6 @@ import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
-import static com.zoffcc.applications.trifa.CallingActivity.on_call_ended_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_actions;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_view_including_cam_preview;
@@ -1500,7 +1499,7 @@ public class MainActivity extends AppCompatActivity
 
                             try
                             {
-                                CallAudioService.stop_me();
+                                CallAudioService.stop_me(true);
                             }
                             catch (Exception e)
                             {
@@ -2001,7 +2000,7 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            CallAudioService.stop_me();
+            CallAudioService.stop_me(true);
         }
         catch (Exception e)
         {
@@ -3491,18 +3490,18 @@ public class MainActivity extends AppCompatActivity
             else if ((a_TOXAV_FRIEND_CALL_STATE & (TOXAV_FRIEND_CALL_STATE_FINISHED.value)) > 0)
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending(1)");
-                on_call_ended_actions();
+                CallAudioService.stop_me(false);
             }
             else if ((old_value > TOXAV_FRIEND_CALL_STATE_NONE.value) &&
                      (a_TOXAV_FRIEND_CALL_STATE == TOXAV_FRIEND_CALL_STATE_NONE.value))
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ending(2)");
-                on_call_ended_actions();
+                CallAudioService.stop_me(false);
             }
             else if ((a_TOXAV_FRIEND_CALL_STATE & (TOXAV_FRIEND_CALL_STATE_ERROR.value)) > 0)
             {
                 Log.i(TAG, "toxav_call_state:from=" + friend_number + " call ERROR(3)");
-                on_call_ended_actions();
+                CallAudioService.stop_me(false);
             }
         }
     }
@@ -4355,7 +4354,7 @@ public class MainActivity extends AppCompatActivity
 
                         if (tox_friend_by_public_key__wrapper(Callstate.friend_pubkey) == friend_number)
                         {
-                            on_call_ended_actions();
+                            CallAudioService.stop_me(false);
                         }
                     }
                     catch (Exception e2)

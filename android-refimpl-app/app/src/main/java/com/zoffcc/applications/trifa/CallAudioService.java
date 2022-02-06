@@ -376,7 +376,7 @@ public class CallAudioService extends Service
         }
     }
 
-    public static void stop_me()
+    public static void stop_me(boolean cancel_toxav_call)
     {
         running = false;
         try
@@ -413,14 +413,17 @@ public class CallAudioService extends Service
 
         removeNotification();
 
-        try
+        if (cancel_toxav_call)
         {
-            toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                               ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
-        }
-        catch (Exception e2)
-        {
-            e2.printStackTrace();
+            try
+            {
+                toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                   ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+            }
         }
 
         try
@@ -547,7 +550,7 @@ public class CallAudioService extends Service
 
                 if (intent.getAction().equals(ACTION_STOP))
                 {
-                    stop_me();
+                    stop_me(true);
                 }
                 else if (intent.getAction().equals(ACTION_MUTE))
                 {

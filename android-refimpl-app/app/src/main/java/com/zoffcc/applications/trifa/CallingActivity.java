@@ -1238,17 +1238,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     if (event.getAction() == MotionEvent.ACTION_DOWN)
                     {
                         Log.i(TAG, "decline_button_pressed:DOWN");
-                        try
-                        {
-                            toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                               ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
-                        }
-                        catch (Exception e2)
-                        {
-                            e2.printStackTrace();
-                        }
                         Log.i(TAG, "decline_button_pressed:on_call_ended_actions");
-                        CallAudioService.stop_me();
+                        CallAudioService.stop_me(true);
                     }
                 }
                 catch (Exception e)
@@ -1890,18 +1881,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 AudioReceiver.close();
                 audio_receiver_thread.join();
             }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            // HINT: of we should for any reason leave the callscreen activity, end any active call
-            // TODO: make this nicer, let the user return to an active call
-            toxav_call_control(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                               ToxVars.TOXAV_CALL_CONTROL.TOXAV_CALL_CONTROL_CANCEL.value);
         }
         catch (Exception e)
         {

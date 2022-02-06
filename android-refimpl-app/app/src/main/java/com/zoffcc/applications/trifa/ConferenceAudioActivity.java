@@ -144,7 +144,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         try
         {
-            CallAudioService.stop_me();
+            CallAudioService.stop_me(true);
         }
         catch (Exception e)
         {
