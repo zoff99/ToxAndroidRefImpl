@@ -67,6 +67,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_network_connections;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.HelperGeneric.need_rotate_image_to_exif;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.rotate_image_to_exif;
 import static com.zoffcc.applications.trifa.HelperGeneric.scale_bitmap_keep_aspect;
@@ -501,9 +502,15 @@ public class ProfileActivity extends AppCompatActivity
                             return;
                         }
 
-                        if (file_size < 1)
+                        if (file_size < 100)
                         {
-                            // file length "zero"?
+                            // file length very small?
+                            return;
+                        }
+
+                        if (file_size > 10 * 1024 * 1024)
+                        {
+                            // file size too large
                             return;
                         }
 
@@ -514,27 +521,33 @@ public class ProfileActivity extends AppCompatActivity
                             return;
                         }
 
-                        if (file_size >= 400 * 1024) // bigger than 400kbytes filesize
+                        Bitmap out = null;
+                        Bitmap b = BitmapFactory.decodeFile(ofw.filepath_wrapped + "/" + ofw.filename_wrapped);
+                        if (need_rotate_image_to_exif(b, ofw.filepath_wrapped + "/" + ofw.filename_wrapped))
                         {
-                            Bitmap b = BitmapFactory.decodeFile(ofw.filepath_wrapped + "/" + ofw.filename_wrapped);
-                            Bitmap out = scale_bitmap_keep_aspect(
+                            out = scale_bitmap_keep_aspect(
                                     rotate_image_to_exif(b, ofw.filepath_wrapped + "/" + ofw.filename_wrapped), 640,
                                     640);
-                            java.io.File file = new java.io.File(ofw.filepath_wrapped, ofw.filename_wrapped);
-                            java.io.FileOutputStream fOut;
-                            try
-                            {
-                                fOut = new java.io.FileOutputStream(file);
-                                out.compress(Bitmap.CompressFormat.PNG, 100, fOut);
-                                fOut.flush();
-                                fOut.close();
-                                b.recycle();
-                                out.recycle();
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
+                        }
+                        else
+                        {
+                            out = scale_bitmap_keep_aspect(b, 640, 640);
+                        }
+                        java.io.File file = new java.io.File(ofw.filepath_wrapped, ofw.filename_wrapped);
+                        Log.i(TAG, "profile_avatar:1:w x h=" + out.getWidth() + " " + out.getHeight());
+                        java.io.FileOutputStream fOut;
+                        try
+                        {
+                            fOut = new java.io.FileOutputStream(file);
+                            out.compress(Bitmap.CompressFormat.JPEG, 80, fOut);
+                            fOut.flush();
+                            fOut.close();
+                            b.recycle();
+                            out.recycle();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
                         }
 
                         Log.i(TAG, "select_avatar:p=" + ofw.filepath_wrapped + " f=" + ofw.filename_wrapped);

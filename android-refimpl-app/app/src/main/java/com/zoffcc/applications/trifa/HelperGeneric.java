@@ -658,6 +658,31 @@ public class HelperGeneric
         new_thread.start();
     }
 
+    public static boolean need_rotate_image_to_exif(Bitmap bitmap, String filename_with_path)
+    {
+        try
+        {
+            ExifInterface exifInterface = new ExifInterface(filename_with_path);
+            int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                                                            ExifInterface.ORIENTATION_UNDEFINED);
+            switch (orientation)
+            {
+                case ExifInterface.ORIENTATION_ROTATE_90:
+                    return true;
+                case ExifInterface.ORIENTATION_ROTATE_180:
+                    return true;
+                case ExifInterface.ORIENTATION_ROTATE_270:
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
+
     public static Bitmap rotate_image_to_exif(Bitmap bitmap, String filename_with_path)
     {
         try
@@ -666,20 +691,28 @@ public class HelperGeneric
             int orientation = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION,
                                                             ExifInterface.ORIENTATION_UNDEFINED);
             Matrix matrix = new Matrix();
+            int w = bitmap.getWidth();
+            int h = bitmap.getHeight();
+
+            // Log.i(TAG, "rotate_image_to_exif:orig w x h=" + w + " " + h);
+
             switch (orientation)
             {
                 case ExifInterface.ORIENTATION_ROTATE_90:
-                    matrix.setRotate(90);
+                    matrix.postRotate(90);
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_180:
-                    matrix.setRotate(180);
+                    matrix.postRotate(180);
                     break;
                 case ExifInterface.ORIENTATION_ROTATE_270:
-                    matrix.setRotate(270);
+                    matrix.postRotate(270);
                     break;
                 default:
+                    return bitmap;
             }
-            return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            Bitmap out = Bitmap.createBitmap(bitmap, 0, 0, w, h, matrix, true);
+            // Log.i(TAG, "rotate_image_to_exif:new w x h=" + out.getWidth() + " " + out.getHeight());
+            return out;
         }
         catch (Exception e)
         {
@@ -695,7 +728,7 @@ public class HelperGeneric
         float originalWidth = originalImage.getWidth();
         float originalHeight = originalImage.getHeight();
 
-        Log.i(TAG, "scale_bitmap_keep_aspect:orig w x h=" + originalWidth + " " + originalHeight);
+        // Log.i(TAG, "scale_bitmap_keep_aspect:orig w x h=" + originalWidth + " " + originalHeight);
 
         Canvas canvas = new Canvas(background);
 
@@ -713,7 +746,7 @@ public class HelperGeneric
 
         canvas.drawBitmap(originalImage, transformation, paint);
 
-        Log.i(TAG, "scale_bitmap_keep_aspect:new w x h=" + background.getWidth() + " " + background.getHeight());
+        // Log.i(TAG, "scale_bitmap_keep_aspect:new w x h=" + background.getWidth() + " " + background.getHeight());
 
         return background;
     }
