@@ -362,4 +362,6 @@
     <string name="MainActivity_setup_push_tip_text">Anında Bildirim Uygulamasını kurmadınız ve Anında Bildirimi ayarlamadınız. TRIfA, Anında Bildirim olmadan tamamen çalışacaktır, ancak mesajları alabilmek için sürekli çevrim içi olması gerekir. Anında Bildirim ile pil ve internet bant genişliğinden tasarruf edebilirsiniz.
 \n
 \nAnında Bildirimi şimdi nasıl kurabileceğinizi görmek ister misiniz\?</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Profil resminizi kaldırmak istiyor musunuz\?</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Profil Resmini Kaldır</string>
 </resources>

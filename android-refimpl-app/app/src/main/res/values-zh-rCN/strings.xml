@@ -384,4 +384,6 @@
     <string name="MainActivity_setup_push_tip_text">你还没有安装推送通知应用程序和设置推送通知。没有推送通知，TRIfA 也可正常工作，但它需要始终在线接收消息。推送通知可以节省电池和互联网带宽。
 \n
 \n你想马上看看如何设置推送通知吗？</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">你想删除个人资料图片吗？</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">删除个人资料图片</string>
 </resources>
