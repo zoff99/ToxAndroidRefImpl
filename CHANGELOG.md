@@ -2,7 +2,82 @@
 
 ## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.127...HEAD)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.138...HEAD)
+
+**Implemented enhancements:**
+
+- Push "Tox Push Message App" to F-droid [\#319](https://github.com/zoff99/ToxAndroidRefImpl/issues/319)
+
+**Fixed bugs:**
+
+- BUG: selecting more than one photo for transfer does not work [\#166](https://github.com/zoff99/ToxAndroidRefImpl/issues/166)
+- BUG: sharing via Android sharing does not work [\#164](https://github.com/zoff99/ToxAndroidRefImpl/issues/164)
+- sending files other than photos does not work [\#163](https://github.com/zoff99/ToxAndroidRefImpl/issues/163)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#320](https://github.com/zoff99/ToxAndroidRefImpl/pull/320) ([weblate](https://github.com/weblate))
+
+## [1.0.138](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.138) (2022-02-06)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.137...1.0.138)
+
+## [1.0.137](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.137) (2022-02-06)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.136...1.0.137)
+
+## [1.0.136](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.136) (2022-02-06)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.135...1.0.136)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#318](https://github.com/zoff99/ToxAndroidRefImpl/pull/318) ([weblate](https://github.com/weblate))
+
+## [1.0.135](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.135) (2022-02-02)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.134...1.0.135)
+
+## [1.0.134](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.134) (2022-01-31)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.133...1.0.134)
+
+**Implemented enhancements:**
+
+- Clarify how the import feature works [\#315](https://github.com/zoff99/ToxAndroidRefImpl/issues/315)
+- How to use c-toxcore inside my own java tox application [\#273](https://github.com/zoff99/ToxAndroidRefImpl/issues/273)
+
+**Fixed bugs:**
+
+- Consider migrating to libera.chat instead freenode [\#276](https://github.com/zoff99/ToxAndroidRefImpl/issues/276)
+
+**Merged pull requests:**
+
+- Add Import/Export section to README.md [\#316](https://github.com/zoff99/ToxAndroidRefImpl/pull/316) ([xliiv](https://github.com/xliiv))
+
+## [1.0.133](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.133) (2022-01-12)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.132...1.0.133)
+
+## [1.0.132](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.132) (2022-01-05)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.130...1.0.132)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#314](https://github.com/zoff99/ToxAndroidRefImpl/pull/314) ([weblate](https://github.com/weblate))
+
+## [1.0.130](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.130) (2022-01-02)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.129...1.0.130)
+
+## [1.0.129](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.129) (2021-12-31)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.128...1.0.129)
+
+## [1.0.128](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.128) (2021-12-31)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.127...1.0.128)
 
 **Merged pull requests:**
 
@@ -728,10 +803,6 @@
 - Avatar is not getting updated in the contact list. [\#61](https://github.com/zoff99/ToxAndroidRefImpl/issues/61)
 - own Avatar can not be saved sometimes [\#47](https://github.com/zoff99/ToxAndroidRefImpl/issues/47)
 
-**Merged pull requests:**
-
-- Add Simplified Chinese Translation [\#99](https://github.com/zoff99/ToxAndroidRefImpl/pull/99) ([linsui](https://github.com/linsui))
-
 ## [1.0.28](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.28) (2020-02-28)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.27...1.0.28)
@@ -774,6 +845,7 @@
 
 **Merged pull requests:**
 
+- add contact URLs [\#52](https://github.com/zoff99/ToxAndroidRefImpl/pull/52) ([zoff99](https://github.com/zoff99))
 - Add .editorconfig file [\#27](https://github.com/zoff99/ToxAndroidRefImpl/pull/27) ([gjedeer](https://github.com/gjedeer))
 
 ## [1.0.24](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.24) (2019-07-27)
@@ -860,7 +932,6 @@
 **Merged pull requests:**
 
 - Updates [\#54](https://github.com/zoff99/ToxAndroidRefImpl/pull/54) ([zoff99](https://github.com/zoff99))
-- add contact URLs [\#52](https://github.com/zoff99/ToxAndroidRefImpl/pull/52) ([zoff99](https://github.com/zoff99))
 - add url [\#51](https://github.com/zoff99/ToxAndroidRefImpl/pull/51) ([zoff99](https://github.com/zoff99))
 - add f-droid metadata [\#50](https://github.com/zoff99/ToxAndroidRefImpl/pull/50) ([zoff99](https://github.com/zoff99))
 - add AEC \(software echo cancellation\) [\#43](https://github.com/zoff99/ToxAndroidRefImpl/pull/43) ([zoff99](https://github.com/zoff99))
