@@ -1,4 +1,4 @@
-Offline Messages \*NEW\* \*NEW\*
+Offline Messages
 =
 To get offline messages for your TRIfA App, install ToxProxy on a Linux Box at home and leave it running 0:00-24:00.<br>
 ### Installation instructions [using Google FCM for Push Messages]:
