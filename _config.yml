@@ -5,3 +5,6 @@ relative_links:
   collections: true
 include:
   - PUSH_NOTIFICATION.md
+  - README.md
+
+
