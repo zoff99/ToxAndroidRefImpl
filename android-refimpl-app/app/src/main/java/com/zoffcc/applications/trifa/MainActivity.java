@@ -249,6 +249,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STA
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.resend_old_messages;
 import static com.zoffcc.applications.trifa.TrifaToxService.resend_v3_messages;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
@@ -4318,6 +4319,10 @@ public class MainActivity extends AppCompatActivity
                         if (get_friend_msgv3_capability(friend_number) == 1)
                         {
                             resend_v3_messages(f.tox_public_key_string);
+                        }
+                        else
+                        {
+                            resend_old_messages(f.tox_public_key_string);
                         }
                     }
                     catch (Exception e)

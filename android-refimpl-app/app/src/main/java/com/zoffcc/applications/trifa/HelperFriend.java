@@ -396,6 +396,27 @@ public class HelperFriend
                 execute();
     }
 
+    static long get_friend_msgv3_capability(@NonNull String friend_public_key_string)
+    {
+        long ret = 0;
+        try
+        {
+            FriendList f = orma.selectFromFriendList().
+                    tox_public_key_stringEq(friend_public_key_string).
+                    get(0);
+            if (f != null)
+            {
+                ret = f.msgv3_capability;
+            }
+
+            return ret;
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
+    }
+
     static long get_friend_msgv3_capability(long friend_number)
     {
         long ret = 0;
