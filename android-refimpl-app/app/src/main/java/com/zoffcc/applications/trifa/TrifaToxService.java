@@ -51,6 +51,7 @@ import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
@@ -1808,9 +1809,12 @@ public class TrifaToxService extends Service
                 while (ii.hasNext())
                 {
                     Message m_resend_v1 = ii.next();
-                    if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
+                    if (friend_pubkey == null)
                     {
-                        continue;
+                        if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
+                        {
+                            continue;
+                        }
                     }
 
                     if (get_friend_msgv3_capability(m_resend_v1.tox_friendpubkey) != 1)
@@ -1881,9 +1885,12 @@ public class TrifaToxService extends Service
                 {
                     Message m_resend_v0 = ii.next();
 
-                    if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_v0.tox_friendpubkey)) == 0)
+                    if (friend_pubkey == null)
                     {
-                        continue;
+                        if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_v0.tox_friendpubkey)) == 0)
+                        {
+                            continue;
+                        }
                     }
 
                     if (get_friend_msgv3_capability(m_resend_v0.tox_friendpubkey) == 1)

@@ -4258,9 +4258,8 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
     {
         FriendList f = main_get_friend(friend_number);
-        //Log.i(TAG,
-        //      "friend_connection_status:friend:" + friend_number + " connection status:" + a_TOX_CONNECTION + " f=" +
-        //      f);
+        // Log.i(TAG, "friend_connection_status:friend:" + get_friend_name_from_pubkey(f.tox_public_key_string) +
+        //           " connection status:" + a_TOX_CONNECTION);
 
         if (f != null)
         {
