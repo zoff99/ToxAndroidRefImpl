@@ -239,6 +239,7 @@ public class GroupAudioService extends Service
                         {
                             Log.i(TAG, "startBluetoothSco");
                             manager.startBluetoothSco();
+                            // manager.setBluetoothScoOn(true);
                         }
                         else
                         {
@@ -248,7 +249,7 @@ public class GroupAudioService extends Service
                             manager.setWiredHeadsetOn(true);
                             Callstate.audio_device = 1;
                             Callstate.audio_speaker = false;
-                            manager.setBluetoothScoOn(false);
+                            // manager.setBluetoothScoOn(false);
                         }
                     }
                     else

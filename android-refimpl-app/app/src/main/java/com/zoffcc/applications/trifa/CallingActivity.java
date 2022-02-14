@@ -1551,6 +1551,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     Log.i(TAG, "startBluetoothSco");
                     manager.startBluetoothSco();
+                    // manager.setBluetoothScoOn(true);
                     Callstate.audio_device = 2;
                     update_audio_device_icon();
                 }
@@ -1563,7 +1564,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     Callstate.audio_device = 1;
                     Callstate.audio_speaker = false;
                     update_audio_device_icon();
-                    manager.setBluetoothScoOn(false);
+                    // manager.setBluetoothScoOn(false);
                 }
             }
             else
@@ -1906,13 +1907,18 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (isBluetoothConnected())
                 {
-                    Log.i(TAG, "stopBluetoothSco");
+                    Log.i(TAG, "stopBluetoothSco:2");
+                    // manager.setBluetoothScoOn(false);
+                    Callstate.audio_device = 0;
+                    Callstate.audio_speaker = true;
+                    audio_manager_s.setSpeakerphoneOn(true);
                     manager.stopBluetoothSco();
                 }
             }
         }
         catch (Exception ee)
         {
+            ee.printStackTrace();
         }
         // ------ shutdown audio device ------
         // ------ shutdown audio device ------
@@ -1920,10 +1926,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         reset_audio_mode();
 
+        tox_set_onion_active(1);
+
         Log.i(TAG, "onPause:on_call_ended_actions");
         on_call_ended_actions();
-
-        tox_set_onion_active(1);
     }
 
     // ---------------

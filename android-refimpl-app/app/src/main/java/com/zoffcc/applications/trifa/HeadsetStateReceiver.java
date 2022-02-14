@@ -55,7 +55,7 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         catch (Exception e2)
                         {
                         }
-                        audio_manager_s.setBluetoothScoOn(false);
+                        // audio_manager_s.setBluetoothScoOn(false);
                     }
                     else
                     {

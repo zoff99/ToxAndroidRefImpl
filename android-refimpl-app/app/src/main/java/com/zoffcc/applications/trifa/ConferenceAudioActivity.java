@@ -526,7 +526,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     Callstate.audio_device = 1;
                     Callstate.audio_speaker = false;
                     update_group_audio_device_icon();
-                    manager.setBluetoothScoOn(false);
+                    // manager.setBluetoothScoOn(false);
                 }
             }
             else
@@ -835,13 +835,15 @@ public class ConferenceAudioActivity extends AppCompatActivity
             {
                 if (isBluetoothConnected())
                 {
-                    Log.i(TAG, "stopBluetoothSco");
+                    Log.i(TAG, "stopBluetoothSco:1");
+                    // manager.setBluetoothScoOn(false);
                     manager.stopBluetoothSco();
                 }
             }
         }
         catch (Exception ee)
         {
+            ee.printStackTrace();
         }
         // ------ shutdown audio device ------
         // ------ shutdown audio device ------
