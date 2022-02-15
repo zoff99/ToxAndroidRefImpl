@@ -2339,16 +2339,20 @@ public class HelperGeneric
 
     /*************************************************************************/
 
-    public static void tox_friend_resend_msgv3_wrapper(Message m)
+    public static boolean tox_friend_resend_msgv3_wrapper(Message m)
     {
         if (m.msg_idv3_hash == null)
         {
-            return;
+            m.resend_count++;
+            update_message_in_db_resend_count(m);
+            return false;
         }
 
         if (m.msg_idv3_hash.length() < TOX_HASH_LENGTH)
         {
-            return;
+            m.resend_count++;
+            update_message_in_db_resend_count(m);
+            return false;
         }
         ByteBuffer hash_bytes = hexstring_to_bytebuffer(m.msg_idv3_hash);
         long t_sec = (System.currentTimeMillis() / 1000);
@@ -2360,6 +2364,8 @@ public class HelperGeneric
         update_message_in_db_resend_count(m);
         update_message_in_db_messageid(m);
         update_single_message(m, true);
+
+        return true;
     }
 
     /*

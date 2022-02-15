@@ -1773,7 +1773,7 @@ public class TrifaToxService extends Service
 
             if (friend_pubkey != null)
             {
-                max_resend_count_per_iteration = 5;
+                max_resend_count_per_iteration = 20;
             }
 
             int cur_resend_count_per_iteration = 0;
@@ -1834,7 +1834,7 @@ public class TrifaToxService extends Service
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "send_pending_1-on-1_messages:v1:EE:" + e.getMessage());
+            Log.i(TAG, "resend_v3_messages:EE:" + e.getMessage());
         }
         // loop through all pending outgoing 1-on-1 text messages --------------
     }
@@ -1847,7 +1847,7 @@ public class TrifaToxService extends Service
 
             if (friend_pubkey != null)
             {
-                max_resend_count_per_iteration = 5;
+                max_resend_count_per_iteration = 20;
             }
 
             int cur_resend_count_per_iteration = 0;
@@ -1889,15 +1889,21 @@ public class TrifaToxService extends Service
                     {
                         if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_v0.tox_friendpubkey)) == 0)
                         {
+                            // Log.i(TAG, "resend_old_messages:RET:01:" +
+                            //            get_friend_name_from_pubkey(m_resend_v0.tox_friendpubkey));
                             continue;
                         }
                     }
 
                     if (get_friend_msgv3_capability(m_resend_v0.tox_friendpubkey) == 1)
                     {
+                        // Log.i(TAG, "resend_old_messages:RET:02:" +
+                        //            get_friend_name_from_pubkey(m_resend_v0.tox_friendpubkey));
                         continue;
                     }
 
+                    // Log.i(TAG, "resend_old_messages:tox_friend_resend_msgv3_wrapper:" + m_resend_v0.text + " : m=" +
+                    //            m_resend_v0 + " : " + get_friend_name_from_pubkey(m_resend_v0.tox_friendpubkey));
                     tox_friend_resend_msgv3_wrapper(m_resend_v0);
 
                     cur_resend_count_per_iteration++;

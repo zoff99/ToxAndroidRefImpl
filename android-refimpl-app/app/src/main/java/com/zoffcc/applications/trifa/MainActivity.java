@@ -4259,7 +4259,7 @@ public class MainActivity extends AppCompatActivity
     {
         FriendList f = main_get_friend(friend_number);
         // Log.i(TAG, "friend_connection_status:friend:" + get_friend_name_from_pubkey(f.tox_public_key_string) +
-        //           " connection status:" + a_TOX_CONNECTION);
+        //            " connection status:" + a_TOX_CONNECTION);
 
         if (f != null)
         {
@@ -4321,6 +4321,8 @@ public class MainActivity extends AppCompatActivity
                         }
                         else
                         {
+                            // Log.i(TAG, "friend_connection_status:resend_old_messages" +
+                            //            get_friend_name_from_pubkey(f.tox_public_key_string));
                             resend_old_messages(f.tox_public_key_string);
                         }
                     }
