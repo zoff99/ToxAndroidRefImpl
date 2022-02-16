@@ -51,7 +51,6 @@ import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
@@ -1852,10 +1851,15 @@ public class TrifaToxService extends Service
 
             int cur_resend_count_per_iteration = 0;
 
+            // HINT: cutoff time "now" minus 25 seconds
+            final long cutoff_sent_time = System.currentTimeMillis() - (25 * 1000);
             List<Message> m_v0 = null;
 
             if (friend_pubkey != null)
             {
+                // HINT: this is the generic resend for all friends, that happens in regular intervals
+                //       only resend if the original sent timestamp is at least 25 seconds in the past
+                //       to try to avoid resending when the read receipt is very late.
                 m_v0 = orma.selectFromMessage().
                         directionEq(1).
                         TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
@@ -1864,10 +1868,12 @@ public class TrifaToxService extends Service
                         readEq(false).
                         resend_countLt(2).
                         orderBySent_timestampAsc().
+                        sent_timestampLt(cutoff_sent_time).
                         toList();
             }
             else
             {
+                // HINT: this is the specific resend for 1 friend only, when that friend comes online
                 m_v0 = orma.selectFromMessage().
                         directionEq(1).
                         TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
