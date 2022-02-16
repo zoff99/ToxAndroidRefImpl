@@ -27,7 +27,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/acktoken.png" height="200">
 
 <br>
+
 ### Push Messages work with:
-TRIfA (Android)
-Antidote (iPhone)
-qTox(*) (Linux, Windows currently only with a patched Version of qTox)
+TRIfA (Android)<br>
+Antidote (iPhone)<br>
+qTox(*) (Linux, Windows currently only with a patched Version of qTox)<br>
