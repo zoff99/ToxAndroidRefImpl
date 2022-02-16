@@ -29,6 +29,6 @@
 <br>
 
 ### Push Messages work with:
-TRIfA (Android)<br>
-Antidote (iPhone)<br>
-qTox(*) (Linux, Windows, MacOS currently only with a <a href="https://github.com/zoff99/qTox/actions/runs/1702325439">patched Version of qTox</a>. <b>Use at your own risk!!</b>)<br>
+* TRIfA (Android)<br>
+* <a href="https://github.com/Zoxcore/Antidote">Antidote (iPhone)</a><br>
+* qTox(*) (Linux, Windows, MacOS currently only with a <a href="https://github.com/zoff99/qTox/actions/runs/1702325439">patched Version of qTox</a>. <b>Use at your own risk!!</b>)<br>
