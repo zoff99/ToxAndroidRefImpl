@@ -66,7 +66,7 @@ public class Message
 
     @Column(helpers = Column.Helpers.ALL, defaultExpr = "0")
     @Nullable
-    long sent_timestamp = 0L;
+    long sent_timestamp = 0L; // the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC
 
     @Column(helpers = Column.Helpers.ALL, defaultExpr = "0")
     @Nullable
@@ -74,7 +74,7 @@ public class Message
 
     @Column(indexed = true, defaultExpr = "0")
     @Nullable
-    long rcvd_timestamp = 0L;
+    long rcvd_timestamp = 0L; // the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC
 
     @Column(indexed = true, defaultExpr = "0")
     @Nullable
