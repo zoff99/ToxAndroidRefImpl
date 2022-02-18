@@ -11,7 +11,7 @@ related to Trifa Tox Client.
 
 # What are the circles next to a contact?
 
-There are two circles next to a contact, see
+There are 3 circles on the contact item, see
 
 ![Example Trifa Contact List](./doc/trifa-contact-list.png)
 
@@ -19,11 +19,11 @@ There are two circles next to a contact, see
     * <span style="background-color: green; color: white">green</span> -> friend is online via UDP
     * <span style="background-color: yellow; color: black">yellow</span> -> friend is online via TCP
     * <span style="background-color: gray; color: white">gray</span> -> friend is offline
-* the bigger circle (`2`) tells the conncetion status, like
+* the medium circle (`2`) tells the conncetion status, like
     * <span style="background-color: green; color: white">green</span> -> friend has toxproxy (for offline messages) and proxy is online
     * <span style="background-color: yellow; color: black">yellow</span> -> friend has PUSH notification feature
     * <span style="background-color: red; color: white">red</span> -> friend has toxproxy (for offline messages) but it is offline
-* the smaller circle (`3`) tells the contact/user status, like
+* the smallest circle (`3`) tells the contact/user status, like
     * <span style="background-color: green; color: white">green</span> -> friend set status to "I'm available"
     * <span style="background-color: yellow; color: black">yellow</span> -> friend set status to "I'm away"
     * <span style="background-color: red; color: white">red</span> -> friend set status to "I'm busy"
