@@ -35,12 +35,14 @@ android {
         }
     }
 
+    /*
     flavorDimensions "version"
     productFlavors {
         full {
             dimension "version"
         }
     }
+    */
 
     externalNativeBuild {
         cmake {

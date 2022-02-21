@@ -1,4 +1,4 @@
 include ':app'
 include ':native-audio-jni'
 include ':orma_processor'
-// include ':loggingstdout'
+include ':loggingstdout'

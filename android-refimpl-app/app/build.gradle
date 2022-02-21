@@ -264,7 +264,7 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':native-audio-jni', configuration: 'default')
-    // implementation project(path: ':loggingstdout', configuration: 'default')
+    implementation project(path: ':loggingstdout', configuration: 'default')
     annotationProcessor project(':orma_processor')
     //
     //

@@ -253,8 +253,6 @@ import static com.zoffcc.applications.trifa.TrifaToxService.resend_old_messages;
 import static com.zoffcc.applications.trifa.TrifaToxService.resend_v3_messages;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
-// import static com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging;
-
 /*
 
 first actually relayed message via ToxProxy
@@ -6592,11 +6590,10 @@ public class MainActivity extends AppCompatActivity
         if (NDK_STDOUT_LOGGING)
         {
             try
-
             {
-                //System.loadLibrary("loggingstdout");
-                //Log.i(TAG, "successfully loaded loggingstdout library");
-                //start_logging();
+                System.loadLibrary("loggingstdout");
+                Log.i(TAG, "successfully loaded loggingstdout library");
+                com.zoffcc.applications.loggingstdout.LoggingStdout.start_logging();
             }
             catch (java.lang.UnsatisfiedLinkError e)
             {
