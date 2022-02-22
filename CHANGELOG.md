@@ -1,8 +1,20 @@
 # Changelog
 
-## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
+## [1.0.142](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.142) (2022-02-17)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.138...HEAD)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.141...1.0.142)
+
+## [1.0.141](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.141) (2022-02-15)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.140...1.0.141)
+
+## [1.0.140](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.140) (2022-02-14)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.139...1.0.140)
+
+## [1.0.139](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.139) (2022-02-11)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.138...1.0.139)
 
 **Implemented enhancements:**
 
@@ -256,6 +268,7 @@
 
 - Translations update from Weblate [\#275](https://github.com/zoff99/ToxAndroidRefImpl/pull/275) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#274](https://github.com/zoff99/ToxAndroidRefImpl/pull/274) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#269](https://github.com/zoff99/ToxAndroidRefImpl/pull/269) ([weblate](https://github.com/weblate))
 
 ## [1.0.108](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.108) (2021-06-18)
 
@@ -293,7 +306,6 @@
 
 - Translations update from Weblate [\#271](https://github.com/zoff99/ToxAndroidRefImpl/pull/271) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#270](https://github.com/zoff99/ToxAndroidRefImpl/pull/270) ([weblate](https://github.com/weblate))
-- Translations update from Weblate [\#269](https://github.com/zoff99/ToxAndroidRefImpl/pull/269) ([weblate](https://github.com/weblate))
 
 ## [1.0.101](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.101) (2021-05-26)
 
@@ -803,6 +815,10 @@
 - Avatar is not getting updated in the contact list. [\#61](https://github.com/zoff99/ToxAndroidRefImpl/issues/61)
 - own Avatar can not be saved sometimes [\#47](https://github.com/zoff99/ToxAndroidRefImpl/issues/47)
 
+**Merged pull requests:**
+
+- Add Simplified Chinese Translation [\#99](https://github.com/zoff99/ToxAndroidRefImpl/pull/99) ([linsui](https://github.com/linsui))
+
 ## [1.0.28](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.28) (2020-02-28)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.27...1.0.28)
@@ -845,7 +861,6 @@
 
 **Merged pull requests:**
 
-- add contact URLs [\#52](https://github.com/zoff99/ToxAndroidRefImpl/pull/52) ([zoff99](https://github.com/zoff99))
 - Add .editorconfig file [\#27](https://github.com/zoff99/ToxAndroidRefImpl/pull/27) ([gjedeer](https://github.com/gjedeer))
 
 ## [1.0.24](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.24) (2019-07-27)
@@ -932,6 +947,7 @@
 **Merged pull requests:**
 
 - Updates [\#54](https://github.com/zoff99/ToxAndroidRefImpl/pull/54) ([zoff99](https://github.com/zoff99))
+- add contact URLs [\#52](https://github.com/zoff99/ToxAndroidRefImpl/pull/52) ([zoff99](https://github.com/zoff99))
 - add url [\#51](https://github.com/zoff99/ToxAndroidRefImpl/pull/51) ([zoff99](https://github.com/zoff99))
 - add f-droid metadata [\#50](https://github.com/zoff99/ToxAndroidRefImpl/pull/50) ([zoff99](https://github.com/zoff99))
 - add AEC \(software echo cancellation\) [\#43](https://github.com/zoff99/ToxAndroidRefImpl/pull/43) ([zoff99](https://github.com/zoff99))
