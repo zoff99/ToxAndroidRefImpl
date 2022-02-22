@@ -16,7 +16,7 @@ defaults:
 jobs:
   gen-changelog:
     runs-on: ubuntu-latest
-    environment: genlog_gen_token
+    environment: genlog_gen_token_trifa
     steps:
     - uses: actions/checkout@v2
 
