@@ -36,10 +36,13 @@ jobs:
     - name: run github-changelog-generator
       env:
             CHANGELOG_GEN_TOKEN: ${{ secrets.CHANGELOG_GEN_TOKEN }}
+
+# --exclude-tags "$(git tag -l 'trifajni*'| tr '\n' ',')" \
+
       run:  |
             pwd
             $(which ruby) $(which github_changelog_generator) -u zoff99 -p ToxAndroidRefImpl \
-               --exclude-tags "$(git tag -l 'trifajni*'| tr '\n' ',')" \
+            --exclude-tags "trifajni-1.0.10,trifajni-1.0.11,trifajni-1.0.12,trifajni-1.0.13,trifajni-1.0.16,trifajni-1.0.17,trifajni-1.0.2,trifajni-1.0.20,trifajni-1.0.21,trifajni-1.0.22,trifajni-1.0.23,trifajni-1.0.24,trifajni-1.0.25,trifajni-1.0.26,trifajni-1.0.27,trifajni-1.0.28,trifajni-1.0.29,trifajni-1.0.30,trifajni-1.0.31,trifajni-1.0.32,trifajni-1.0.33,trifajni-1.0.34,trifajni-1.0.35,trifajni-1.0.36,trifajni-1.0.37,trifajni-1.0.38,trifajni-1.0.39,trifajni-1.0.40,trifajni-1.0.41,trifajni-1.0.42,trifajni-1.0.43,trifajni-1.0.44,trifajni-1.0.45,trifajni-1.0.46,trifajni-1.0.47,trifajni-1.0.48,trifajni-1.0.49,trifajni-1.0.50,trifajni-1.0.51,trifajni-1.0.52,trifajni-1.0.53,trifajni-1.0.54,trifajni-1.0.55,trifajni-1.0.56,trifajni-1.0.57,trifajni-1.0.58,trifajni-1.0.59,trifajni-1.0.6,trifajni-1.0.60,trifajni-1.0.61,trifajni-1.0.62,trifajni-1.0.63,trifajni-1.0.64,trifajni-1.0.65,trifajni-1.0.66,trifajni-1.0.67,trifajni-1.0.68,trifajni-1.0.69,trifajni-1.0.7,trifajni-1.0.70,trifajni-1.0.71,trifajni-1.0.72,trifajni-1.0.8" \
                --token "$CHANGELOG_GEN_TOKEN"
 
     - name: chmod
