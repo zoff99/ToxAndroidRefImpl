@@ -1,0 +1,56 @@
+name: Generate Changelog
+
+on:
+  release:
+    types: [published, edited]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  gen-changelog:
+    runs-on: ubuntu-latest
+    environment: genlog_gen_token
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: install pkgs
+      run:  |
+            export DEBIAN_FRONTEND=noninteractive
+            sudo apt update && sudo apt install -y zip grep sudo ruby rubygems git ssh ruby-dev gcc make
+            sudo $(which gem) install specific_install
+
+    - name: install github-changelog-generator
+      run:  |
+            git clone https://github.com/ameir/github-changelog-generator.git -b v1.15.2-fixes
+            cd github-changelog-generator/
+            sudo $(which gem) build github_changelog_generator.gemspec
+            sudo $(which gem) install -N github_changelog_generator-1.15.2.gem
+
+    - name: run github-changelog-generator
+      env:
+            CHANGELOG_GEN_TOKEN: ${{ secrets.CHANGELOG_GEN_TOKEN }}
+      run:  |
+            pwd
+            $(which ruby) $(which github_changelog_generator) -u zoff99 -p ToxAndroidRefImpl \
+               --exclude-tags "1.0.0-rc.1,1.0.0-rc.2,1.0.0-rc.3,1.0.0-rc.4,1.1.0,1.2.0,1.2.0-build-2,1.3.0,1.3.1,1.3.2,1.3.3,1.3.4,1.3.5,,0.1,0.10.0,0.10.1,0.10.2,0.10.3,0.10.4,0.10.4-2,0.2,0.2.1,0.2.2,0.2.3,0.2.4,0.2.5,0.3.0,0.4.0,0.5.0,0.6.0,0.6.1," \
+               --token "$CHANGELOG_GEN_TOKEN"
+
+    - name: chmod
+      run:  |
+            sudo chmod a+r /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/CHANGELOG.md
+            ls -rattlh
+
+    - name: upload Changelog file
+      uses: actions/upload-artifact@v2
+      with:
+        name: Changelog
+        path: |
+          /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/CHANGELOG.md
+
