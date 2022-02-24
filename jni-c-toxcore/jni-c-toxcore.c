@@ -853,81 +853,6 @@ void export_savedata_file_unsecure(const Tox *tox, const uint8_t *passphrase, si
 }
 
 
-int bin_id_to_string(const char *bin_id, size_t bin_id_size, char *output, size_t output_size)
-{
-    if(bin_id_size != TOX_ADDRESS_SIZE || output_size < (TOX_ADDRESS_SIZE * 2 + 1))
-    {
-        return -1;
-    }
-
-    size_t i;
-
-    for(i = 0; i < TOX_ADDRESS_SIZE; ++i)
-    {
-        snprintf(&output[i * 2], output_size - (i * 2), "%02X", bin_id[i] & 0xff);
-    }
-
-    return 0;
-}
-
-void bootstrap_real(Tox *tox)
-{
-#if 0
-    // OLD
-    DHT_node nodes[] =
-    {
-        {"178.62.250.138",             33445, "788236D34978D1D5BD822F0A5BEBD2C53C64CC31CD3149350EE27D4D9A2F9B6B", {0}},
-        {"nodes.tox.chat",             33445, "6FC41E2BD381D37E9748FC0E0328CE086AF9598BECC8FEB7DDF2E440475F300E", {0}},
-        {"130.133.110.14",             33445, "461FA3776EF0FA655F1A05477DF1B3B614F7D6B124F7DB1DD4FE3C08B03B640F", {0}},
-        {"tox.zodiaclabs.org",         33445, "A09162D68618E742FFBCA1C2C70385E6679604B2D80EA6E84AD0996A1AC8A074", {0}},
-        {"163.172.136.118",            33445, "2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
-        {"217.182.143.254",             443, "7AED21F94D82B05774F697B209628CD5A9AD17E0C073D9329076A4C28ED28147", {0}},
-        {"185.14.30.213",               443,  "2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
-        {"136.243.141.187",             443,  "6EE1FADE9F55CC7938234CC07C864081FC606D8FE7B751EDA217F268F1078A39", {0}},
-        {"128.199.199.197",            33445, "B05C8869DBB4EDDD308F43C1A974A20A725A36EACCA123862FDE9945BF9D3E09", {0}},
-        // {"192.168.0.20",   33447, "578E5F044C98290D0368F425E0E957056B30FB995F53DEB21C3E23D7A3B4E679", {0}} ,
-        // {"192.168.0.22",   33447, "578E5F044C98290D0368F425E0E957056B30FB995F53DEB21C3E23D7A3B4E679", {0}} ,
-        {"biribiri.org",               33445, "F404ABAA1C99A9D37D61AB54898F56793E1DEF8BD46B1038B9D822E8460FAB67", {0}}
-    };
-#else
-    // current bootstrap nodes
-    DHT_node nodes[] =
-    {
-        {"85.172.30.117",33445,"8E7D0B859922EF569298B4D261A8CCB5FEA14FB91ED412A7603A585A25698832", {0}},
-        {"tox.verdict.gg",33445,"1C5293AEF2114717547B39DA8EA6F1E331E5E358B35F9B6B5F19317911C5F976", {0}},
-        {"163.172.136.118",33445,"2C289F9F37C20D09DA83565588BF496FAB3764853FA38141817A72E3F18ACA0B", {0}},
-        {"78.46.73.141",33445,"02807CF4F8BB8FB390CC3794BDF1E8449E9A8392C5D3F2200019DA9F1E812E46", {0}},
-        {"tox.initramfs.io",33445,"3F0A45A268367C1BEA652F258C85F4A66DA76BCAA667A49E770BCC4917AB6A25", {0}},
-        {"46.229.52.198",33445,"813C8F4187833EF0655B10F7752141A352248462A567529A38B6BBF73E979307", {0}},
-        {"tox.neuland.technology",33445,"15E9C309CFCB79FDDF0EBA057DABB49FE15F3803B1BFF06536AE2E5BA5E4690E", {0}},
-        {"144.217.167.73",33445,"7E5668E0EE09E19F320AD47902419331FFEE147BB3606769CFBE921A2A2FD34C", {0}},
-        {"tox.abilinski.com",33445,"10C00EB250C3233E343E2AEBA07115A5C28920E9C8D29492F6D00B29049EDC7E", {0}},
-        {"37.48.122.22",33445,"1B5A8AB25FFFB66620A531C4646B47F0F32B74C547B30AF8BD8266CA50A3AB59", {0}},
-        {"tox.novg.net",33445,"D527E5847F8330D628DAB1814F0A422F6DC9D0A300E6C357634EE2DA88C35463", {0}},
-        {"95.31.18.227",33445,"257744DBF57BE3E117FE05D145B5F806089428D4DCE4E3D0D50616AA16D9417E", {0}},
-        {"185.14.30.213",443,"2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
-        {"185.14.30.213",3389,"2555763C8C460495B14157D234DD56B86300A2395554BCAE4621AC345B8C1B1B", {0}},
-        {"198.199.98.108",33445,"BEF0CFB37AF874BD17B9A8F9FE64C75521DB95A37D33C5BDB00E9CF58659C04F", {0}},
-        {"52.53.185.100",33445,"A04F5FE1D006871588C8EC163676458C1EC75B20B4A147433D271E1E85DAF839", {0}},
-        {"tox.kurnevsky.net",33445,"82EF82BA33445A1F91A7DB27189ECFC0C013E06E3DA71F588ED692BED625EC23", {0}},
-        {"116.196.77.132",443,"040326E850DDCB49B1B2D9E3E2789D425774E4C5D783A55C09A024D05D2A8A66", {0}},
-        {"116.196.77.132",33445,"040326E850DDCB49B1B2D9E3E2789D425774E4C5D783A55C09A024D05D2A8A66", {0}},
-        {"116.196.77.132",3389,"040326E850DDCB49B1B2D9E3E2789D425774E4C5D783A55C09A024D05D2A8A66", {0}},
-        {"87.118.126.207",33445,"0D303B1778CA102035DA01334E7B1855A45C3EFBC9A83B9D916FFDEBC6DD3B2E", {0}},
-        {"81.169.136.229",33445,"D031DAC44F00464D3C9636F9850BF0064BC37FEB55789A13B6F59052CAE8A958", {0}}
-    };
-#endif
-
-    for(size_t i = 0; i < sizeof(nodes)/sizeof(DHT_node); i ++)
-    {
-        sodium_hex2bin(nodes[i].key_bin, sizeof(nodes[i].key_bin),
-                       nodes[i].key_hex, sizeof(nodes[i].key_hex)-1, NULL, NULL, NULL);
-        tox_bootstrap(tox, nodes[i].ip, nodes[i].port, nodes[i].key_bin, NULL);
-        tox_add_tcp_relay(tox, nodes[i].ip, nodes[i].port, nodes[i].key_bin, NULL); // also try as TCP relay
-    }
-}
-
-
 // fill string with toxid in upper case hex.
 // size of toxid_str needs to be: [TOX_ADDRESS_SIZE*2 + 1] !!
 void get_my_toxid(Tox *tox, char *toxid_str)
@@ -987,13 +912,9 @@ void toxpk_bin_to_hex(const uint8_t *public_key, char *public_key_str)
 void print_tox_id(Tox *tox)
 {
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
+    CLEAR(tox_id_hex);
     get_my_toxid(tox, tox_id_hex);
     // dbg(2, "MyToxID:%s", tox_id_hex);
-}
-
-void bootstrap()
-{
-    bootstrap_real(tox_global);
 }
 
 void init_tox_callbacks()
@@ -3179,6 +3100,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
     jstring result;
     // dbg(9, "get_my_toxid");
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
+    CLEAR(tox_id_hex);
 
     if(tox_global == NULL)
     {
@@ -3209,18 +3131,6 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1capabilities(JNIEnv *env, jobject thiz)
 {
     return (jlong)(tox_self_get_capabilities());
-}
-
-void Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(JNIEnv *env, jobject thiz)
-{
-    dbg(9, "bootstrap");
-    bootstrap();
-}
-
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_bootstrap(JNIEnv *env, jobject thiz)
-{
-    Java_com_zoffcc_applications_trifa_MainActivity_bootstrap__real(env, thiz);
 }
 
 
