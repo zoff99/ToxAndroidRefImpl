@@ -71,6 +71,16 @@ public class BootstrapNodeEntryDB
         return "" + num + ":" + ip + " port=" + port + " udp_node=" + udp_node + "\n";
     }
 
+    public long get_port()
+    {
+        return port;
+    }
+
+    public String get_ip()
+    {
+        return ip;
+    }
+
     static void insert_node_into_db_real(BootstrapNodeEntryDB n)
     {
         try

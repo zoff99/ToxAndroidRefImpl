@@ -278,6 +278,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
+    public final static boolean DEBUG_BSN_ON_PROFILE = false; // set "false" for release builds
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------

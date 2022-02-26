@@ -45,6 +45,8 @@
 
 package org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis;
 
+import android.util.Log;
+
 import org.secuso.privacyfriendlynetmonitor.Assistant.Const;
 import org.secuso.privacyfriendlynetmonitor.Assistant.ExecCom;
 import org.secuso.privacyfriendlynetmonitor.Assistant.TLType;
@@ -65,6 +67,7 @@ import java.util.List;
 
 public class Detector
 {
+    private static final String TAG = "trifa.Detector";
 
     //Members
     //Get commands for shell readin

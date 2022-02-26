@@ -190,7 +190,7 @@ public class TRIFAGlobals
     // ---- lookup cache ----
 
     static List<BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<>();
-    static List<BootstrapNodeEntryDB> tcprelay_node_list = new ArrayList<>();
+    public static List<BootstrapNodeEntryDB> tcprelay_node_list = new ArrayList<>();
 
     static final int[] MESSAGE_TEXT_SIZE = {9, 11, 15, 20}; // values in "sp"
     static final int[] MESSAGE_EMOJI_SIZE = {13, 18, 25, 36}; // values in "dp"

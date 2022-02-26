@@ -49,7 +49,10 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.os.StrictMode;
 import android.util.Log;
+
+import com.zoffcc.applications.trifa.BootstrapNodeEntryDB;
 
 import org.secuso.privacyfriendlynetmonitor.Assistant.Const;
 import org.secuso.privacyfriendlynetmonitor.Assistant.KnownPorts;
@@ -61,18 +64,24 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_my_pkg_info;
+import static com.zoffcc.applications.trifa.MainActivity.DEBUG_BSN_ON_PROFILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MY_PACKAGE_NAME;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
 
 
 /**
@@ -82,6 +91,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.MY_PACKAGE_NAME;
  */
 public class Collector
 {
+    private static final String TAG = "trifa.Collector";
 
     //application caches
     private static HashMap<Integer, PackageInfo> sCachePackage = new HashMap<>();
@@ -331,6 +341,14 @@ public class Collector
         // String ret = "active Network Connections:\n";
         String ret = "";
 
+        if (DEBUG_BSN_ON_PROFILE)
+        {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
+
+        get_tcprelay_nodelist_from_db();
+
         for (int i = 0; i < sReportList.size(); i++)
         {
             Report r = sReportList.get(i);
@@ -348,8 +366,64 @@ public class Collector
                 {
                     if (r.packageName.equals(MY_PACKAGE_NAME))
                     {
-                        ret = ret + "l -> " + r.localAdd.getHostAddress() + ":" + r.localPort + "\n" + "r -> " +
-                              r.remoteAdd.getHostAddress() + ":" + r.remotePort + "/" + r.type + "\n\n";
+                        if (DEBUG_BSN_ON_PROFILE)
+                        {
+                            if (r.type == TLType.tcp)
+                            {
+                                boolean found_in_bootstrap_list = false;
+                                Iterator i2 = tcprelay_node_list.iterator();
+                                BootstrapNodeEntryDB ee;
+                                String ip_addr = "";
+
+                                Log.i(TAG, "looking:" + r.remoteAdd.getHostName() + ":" + r.remotePort);
+
+                                while (i2.hasNext())
+                                {
+                                    ee = (BootstrapNodeEntryDB) i2.next();
+                                    ip_addr = ee.get_ip();
+                                    try
+                                    {
+                                        ip_addr = InetAddress.getByName(ip_addr).getHostAddress();
+                                    }
+                                    catch (UnknownHostException e)
+                                    {
+                                    }
+
+                                    // Log.i(TAG, "comparing:" + ip_addr + ":" + ee.get_port());
+
+                                    if ((ip_addr.equals(r.remoteAdd.getHostAddress())) &&
+                                        (ee.get_port() == r.remotePort))
+                                    {
+                                        Log.i(TAG, "found:" + ip_addr + ":" + ee.get_port() + " --> " +
+                                                   r.remoteAdd.getHostAddress() + ":" + r.remotePort);
+                                        found_in_bootstrap_list = true;
+                                    }
+                                }
+
+                                if (found_in_bootstrap_list)
+                                {
+                                    ret = ret + "l -> " + r.localAdd.getHostAddress() + ":" + r.localPort + "\n" +
+                                          "r -> " + r.remoteAdd.getHostAddress() + ":" + r.remotePort + "/" + r.type +
+                                          "\n\n";
+                                }
+                                else
+                                {
+                                    ret = ret + "[**] l -> " + r.localAdd.getHostAddress() + ":" + r.localPort + "\n" +
+                                          "r -> " + r.remoteAdd.getHostAddress() + ":" + r.remotePort + "/" + r.type +
+                                          "\n\n";
+                                }
+                            }
+                            else
+                            {
+                                ret = ret + "l -> " + r.localAdd.getHostAddress() + ":" + r.localPort + "\n" + "r -> " +
+                                      r.remoteAdd.getHostAddress() + ":" + r.remotePort + "/" + r.type + "\n\n";
+                            }
+                        }
+                        else
+                        {
+                            ret = ret + "l -> " + r.localAdd.getHostAddress() + ":" + r.localPort + "\n" + "r -> " +
+                                  r.remoteAdd.getHostAddress() + ":" + r.remotePort + "/" + r.type + "\n\n";
+                        }
                     }
                 }
             }
