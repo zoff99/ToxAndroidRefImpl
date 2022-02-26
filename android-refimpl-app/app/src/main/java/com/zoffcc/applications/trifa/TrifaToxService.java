@@ -1288,6 +1288,13 @@ public class TrifaToxService extends Service
 
                                 Log.i(TAG, "BATTERY SAVINGS MODE, load_and_add_all_conferences");
 
+                                // ---- always bootstrap after we went offline from battery savings mode ----
+                                TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__alwaysstart__bootstrapping");
+                                bootstrap_me();
+                                TrifaToxService.write_debug_file("BATTERY_SAVINGS_MODE__alwaysfinish__bootstrapping:" +
+                                                                 tox_self_get_connection_status());
+                                // ---- always bootstrap after we went offline from battery savings mode ----
+
                                 // iterate a few times ---------------------
                                 MainActivity.tox_iterate();
                                 try
