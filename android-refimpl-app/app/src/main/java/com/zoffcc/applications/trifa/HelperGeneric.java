@@ -2440,7 +2440,7 @@ public class HelperGeneric
 
             if (need_call_push_url)
             {
-                friend_call_push_url(f.tox_public_key_string);
+                friend_call_push_url(f.tox_public_key_string, System.currentTimeMillis());
             }
 
             return result;
@@ -2480,7 +2480,7 @@ public class HelperGeneric
                                                         raw_message_length_int);
                 if (need_call_push_url)
                 {
-                    friend_call_push_url(f.tox_public_key_string);
+                    friend_call_push_url(f.tox_public_key_string, System.currentTimeMillis());
                 }
                 return result;
             }
@@ -2500,7 +2500,7 @@ public class HelperGeneric
                 result.raw_message_buf_hex = "";
                 if (need_call_push_url)
                 {
-                    friend_call_push_url(f.tox_public_key_string);
+                    friend_call_push_url(f.tox_public_key_string, System.currentTimeMillis());
                 }
                 return result;
             }

@@ -163,7 +163,7 @@ public class CallingWaitingActivity extends AppCompatActivity
                             {
                                 if (!sent_ping_message)
                                 {
-                                    friend_call_push_url(calling_friend_pk);
+                                    friend_call_push_url(calling_friend_pk, System.currentTimeMillis());
                                     Log.i(TAG, "sent ping to push url");
                                     sent_ping_message = true;
                                 }

@@ -1332,7 +1332,7 @@ public class HelperFriend
         return false;
     }
 
-    static void friend_call_push_url(final String friend_pubkey)
+    static void friend_call_push_url(final String friend_pubkey, final long message_timestamp_circa)
     {
         try
         {
@@ -1341,7 +1341,6 @@ public class HelperFriend
                 return;
             }
 
-            final long message_timestamp_circa = System.currentTimeMillis();
             final String pushurl_for_friend = get_pushurl_for_friend(friend_pubkey);
 
             if (pushurl_for_friend != null)

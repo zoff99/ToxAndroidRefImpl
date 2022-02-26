@@ -50,6 +50,7 @@ import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conf
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
@@ -83,6 +84,7 @@ import static com.zoffcc.applications.trifa.MainActivity.DEBUG_BATTERY_OPTIMIZAT
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__force_udp_only;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_push_service;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_DEBUG_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
@@ -162,6 +164,7 @@ public class TrifaToxService extends Service
     static long last_resend_pending_messages1_ms = -1;
     static long last_resend_pending_messages2_ms = -1;
     static long last_resend_pending_messages3_ms = -1;
+    static long last_resend_pending_messages4_ms = -1;
     static long last_start_queued_fts_ms = -1;
     static boolean need_wakeup_now = false;
     static int tox_thread_starting_up = 0;
@@ -1524,6 +1527,12 @@ public class TrifaToxService extends Service
                     // --- send pending 1-on-1 text messages here --------------
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
+                        if ((last_resend_pending_messages4_ms + (5 * 1000)) < System.currentTimeMillis())
+                        {
+                            last_resend_pending_messages4_ms = System.currentTimeMillis();
+                            resend_push_for_v3_messages();
+                        }
+
                         if ((last_resend_pending_messages0_ms + (30 * 1000)) < System.currentTimeMillis())
                         {
                             last_resend_pending_messages0_ms = System.currentTimeMillis();
@@ -1768,6 +1777,49 @@ public class TrifaToxService extends Service
         // ----- TCP mobile ------
         // Log.i(TAG, "add_tcp_relay_single:res=" + MainActivity.add_tcp_relay_single_wrapper("127.0.0.1", 33447, "252E6D7F8168682363BC473C3951357FB2E28BC9A7B7E1F4CB3B302DC331BDAA".substring(0, (TOX_PUBLIC_KEY_SIZE * 2) - 0)));
         // ----- TCP mobile ------
+    }
+
+    static void resend_push_for_v3_messages()
+    {
+        try
+        {
+            if (!PREF__use_push_service)
+            {
+                return;
+            }
+
+            // HINT: if we have not received a "read receipt" for msgV3 within 10 seconds, then we trigger a push again
+            final long cutoff_sent_time = System.currentTimeMillis() - (10 * 1000);
+
+            List<Message> m_push = orma.selectFromMessage().
+                    directionEq(1).
+                    msg_versionEq(0).
+                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
+                    sent_pushEq(0).
+                    readEq(false).
+                    orderBySent_timestampAsc().
+                    sent_timestampLt(cutoff_sent_time).
+                    toList();
+
+            if ((m_push != null) && (m_push.size() > 0))
+            {
+                Iterator<Message> ii = m_push.iterator();
+                while (ii.hasNext())
+                {
+                    Message m_resend_push = ii.next();
+                    if ((m_resend_push.msg_idv3_hash != null) && (m_resend_push.msg_idv3_hash.length() > 3))
+                    {
+                        friend_call_push_url(m_resend_push.tox_friendpubkey, m_resend_push.sent_timestamp);
+                    }
+                }
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "resend_push_for_v3_messages:EE:" + e.getMessage());
+        }
     }
 
     static void resend_v3_messages(final String friend_pubkey)
