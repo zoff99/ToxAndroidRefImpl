@@ -52,6 +52,10 @@ android {
         noCompress "tflite"
     }
 
+    android {
+        ndkVersion "20.1.5948944"
+    }
+
     sourceSets {
         main {
             jni.srcDirs = []
