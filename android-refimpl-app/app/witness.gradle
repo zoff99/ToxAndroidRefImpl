@@ -202,7 +202,7 @@ dependencyVerification {
         'net.java.dev.jna:jna:5.6.0:jna-5.6.0.jar:5557e235a8aa2f9766d5dc609d67948f2a8832c2d796cea9ef1d6cbe0b3b7eaf',
         'net.sf.jopt-simple:jopt-simple:4.9:jopt-simple-4.9.jar:26c5856e954b5f864db76f13b86919b59c6eecf9fd930b96baa8884626baf2f5',
         'net.sf.kxml:kxml2:2.3.0:kxml2-2.3.0.jar:f264dd9f79a1fde10ce5ecc53221eff24be4c9331c830b7d52f2f08a7b633de2',
-        'net.zetetic:android-database-sqlcipher:4.5.0:android-database-sqlcipher-4.5.0.aar:d3e79ccf6323c525286ab10900d215d2719851db487eb98e1b204644f7ffdb46',
+        'net.zetetic:android-database-sqlcipher:4.5.1:android-database-sqlcipher-4.5.1.aar:ab6cd7336f047f743f842bbbc659126ae3524d805b6690fe15cb904960241bbb',
         'org.antlr:antlr4-runtime:4.6:antlr4-runtime-4.6.jar:08b519ce8883f9e0c92d5e16b911dbbb3d29faa434efc4c3c62435341ec4b332',
         'org.apache.ant:ant-launcher:1.8.0:ant-launcher-1.8.0.jar:da9fd92eacdf63daf0be52eb71accc10ff7943a85d7aac9ea96cf7e03ee3d3cc',
         'org.apache.ant:ant:1.8.0:ant-1.8.0.jar:0251dbb938740ace07a53675113eee753ba389db65aebc814b175af50321620e',
