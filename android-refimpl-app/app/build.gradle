@@ -42,7 +42,7 @@ def getGitHash = { ->
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "32.0.0"
+    buildToolsVersion "30.0.3"
     compileOptions.encoding = 'UTF-8'
     // generatedDensities = []
 

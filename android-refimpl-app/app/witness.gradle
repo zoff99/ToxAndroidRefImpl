@@ -83,7 +83,7 @@ dependencyVerification {
         'androidx.viewpager2:viewpager2:1.0.0:viewpager2-1.0.0.aar:e95c0031d4cc247cd48196c6287e58d2cee54d9c79b85afea7c90920330275af',
         'androidx.viewpager:viewpager:1.0.0:viewpager-1.0.0.aar:147af4e14a1984010d8f155e5e19d781f03c1d70dfed02a8e0d18428b8fc8682',
         'androidx.window:window:1.0.0:window-1.0.0.aar:3212985be4127373ca4d0ea7f8b81a250ae2105e924f7940105d067a0f9ac130',
-        'build-tools:32.0.0:renderscript:androidx-rs.jar:174eb53df52a9cca7bf9c396ba93bf4ac0262a48f2a1375f626efddf405d4666',
+        'build-tools:30.0.3:renderscript:androidx-rs.jar:174eb53df52a9cca7bf9c396ba93bf4ac0262a48f2a1375f626efddf405d4666',
         'com.almworks.sqlite4java:sqlite4java:1.0.392:sqlite4java-1.0.392.jar:243a64470fda0e86a6fddeb0af4c7aa9426ce84e68cbfe18d75ee5da4b7e0b92',
         'com.android.tools.analytics-library:protos:27.0.2:protos-27.0.2.jar:016e15406a96440986250f67caa5102ffce8e3849eb0b9c2fe690e7822e54134',
         'com.android.tools.analytics-library:shared:27.0.2:shared-27.0.2.jar:e5eee573e3b7ee796967d7fae0ed48798597c0f0fedeb3fd5d244047d6bf955c',
