@@ -52,7 +52,8 @@ jobs:
       with:
         api-level: 29
         # ndk: 16.1.4479499
-        ndk: 21.0.6113669
+        # ndk: 21.0.6113669
+        ndk: 20.1.5948944
         emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
