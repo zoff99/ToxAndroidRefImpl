@@ -153,6 +153,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
@@ -4964,12 +4965,14 @@ public class MainActivity extends AppCompatActivity
     // --- incoming message ---
     // --- incoming message ---
     // --- incoming message ---
-    static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length, byte[] msgV3hash_bin)
+    static void android_tox_callback_friend_message_cb_method(long friend_number, int message_type, String friend_message, long length, byte[] msgV3hash_bin, long message_timestamp)
     {
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:007:*PING*");
         }
+        // Log.i(TAG, "tox_callback_friend_message_cb:msg=" + friend_message + " " + message_timestamp + " " +
+        //           long_date_time_format(message_timestamp * 1000));
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         HelperGeneric.receive_incoming_message(0, message_type, friend_number, friend_message, null, 0, null,
                                                msgV3hash_bin);
