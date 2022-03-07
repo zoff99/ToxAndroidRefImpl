@@ -2559,10 +2559,10 @@ public class HelperGeneric
         }
     }
 
-    static void receive_incoming_message(int msg_type, int tox_message_type, long friend_number, String friend_message_text_utf8, byte[] raw_message, long raw_message_length, String original_sender_pubkey, byte[] msgV3hash_bin)
+    static void receive_incoming_message(int msg_type, int tox_message_type, long friend_number, String friend_message_text_utf8, byte[] raw_message, long raw_message_length, String original_sender_pubkey, byte[] msgV3hash_bin, long message_timestamp)
     {
         // incoming msg can be:
-        // (msg_type == 0) msgV1 text only message -> msg_type, friend_number, friend_message_text_utf8 [, msgV3hash_bin]
+        // (msg_type == 0) msgV1 text only message -> msg_type, friend_number, friend_message_text_utf8 [, msgV3hash_bin, message_timestamp]
         // (msg_type == 1) msgV2 direct message    -> msg_type, friend_number, friend_message_text_utf8, raw_message, raw_message_length
         // (msg_type == 2) msgV2 relay message     -> msg_type, friend_number, friend_message_text_utf8, raw_message, raw_message_length, original_sender_pubkey
         if (msg_type == 0)
@@ -2595,7 +2595,7 @@ public class HelperGeneric
             if (tox_message_type == TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK.value)
             {
                 // TODO: ack message in database and update messagelist UI
-                process_msgv3_high_level_ack(friend_number, msgV3hash_hex_string);
+                process_msgv3_high_level_ack(friend_number, msgV3hash_hex_string, message_timestamp);
                 return;
             }
 
@@ -2661,7 +2661,14 @@ public class HelperGeneric
             m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
             m.rcvd_timestamp = System.currentTimeMillis();
             m.rcvd_timestamp_ms = 0;
-            m.sent_timestamp = System.currentTimeMillis();
+            if (message_timestamp > 0)
+            {
+                m.sent_timestamp = message_timestamp * 1000;
+            }
+            else
+            {
+                m.sent_timestamp = System.currentTimeMillis();
+            }
             m.sent_timestamp_ms = 0;
             m.text = friend_message_text_utf8;
             m.msg_version = 0;

@@ -153,7 +153,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
-import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
@@ -4680,7 +4679,7 @@ public class MainActivity extends AppCompatActivity
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         HelperGeneric.receive_incoming_message(1, 0, friend_number, friend_message, raw_message, raw_message_length,
-                                               null, null);
+                                               null, null, 0);
     }
 
     static void android_tox_callback_friend_lossless_packet_cb_method(long friend_number, byte[] data, long length)
@@ -4885,7 +4884,7 @@ public class MainActivity extends AppCompatActivity
                     HelperGeneric.receive_incoming_message(2, 0,
                                                            tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
                                                            wrapped_msg_text_as_string, raw_data, raw_data_length,
-                                                           real_sender_as_hex_string, null);
+                                                           real_sender_as_hex_string, null, 0);
                 }
             }
             catch (Exception e2)
@@ -4975,7 +4974,7 @@ public class MainActivity extends AppCompatActivity
         //           long_date_time_format(message_timestamp * 1000));
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         HelperGeneric.receive_incoming_message(0, message_type, friend_number, friend_message, null, 0, null,
-                                               msgV3hash_bin);
+                                               msgV3hash_bin, message_timestamp);
     }
     // --- incoming message ---
     // --- incoming message ---

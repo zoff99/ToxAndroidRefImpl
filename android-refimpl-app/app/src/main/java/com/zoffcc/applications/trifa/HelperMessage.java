@@ -1138,7 +1138,7 @@ public class HelperMessage
                                                                   "_", hash_bytes, t_sec);
     }
 
-    static void process_msgv3_high_level_ack(final long friend_number, String msgV3hash_hex_string)
+    static void process_msgv3_high_level_ack(final long friend_number, String msgV3hash_hex_string, long message_timestamp)
     {
         Message m = null;
         try
@@ -1147,11 +1147,13 @@ public class HelperMessage
                     msg_idv3_hashEq(msgV3hash_hex_string).
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     directionEq(1).
+                    readEq(false).
                     orderByIdDesc().
                     toList().get(0);
         }
         catch (Exception e)
         {
+            return;
         }
 
         if (m != null)
@@ -1165,7 +1167,14 @@ public class HelperMessage
                 {
                     try
                     {
-                        m2.rcvd_timestamp = System.currentTimeMillis();
+                        if (message_timestamp > 0)
+                        {
+                            m2.rcvd_timestamp = message_timestamp * 1000;
+                        }
+                        else
+                        {
+                            m2.rcvd_timestamp = System.currentTimeMillis();
+                        }
                         m2.read = true;
                         HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m2);
                         HelperMessage.update_single_message(m2, true);
