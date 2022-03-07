@@ -2431,6 +2431,8 @@ public class HelperGeneric
             // long t_sec = (System.currentTimeMillis() / 1000);
             long res = MainActivity.tox_messagev3_friend_send_message(friendnum_to_use, a_TOX_MESSAGE_TYPE, message,
                                                                       hash_bytes, timestamp_unixtime_seconds);
+            // Log.i(TAG, "tox_friend_send_message_wrapper:msg=" + message + " " + timestamp_unixtime_seconds + " " +
+            //           long_date_time_format(timestamp_unixtime_seconds * 1000));
 
             result.msg_num = res;
             result.msg_v2 = false;
