@@ -513,6 +513,39 @@ static uint64_t current_time_monotonic_default()
     return time;
 }
 
+size_t xnet_pack_u16(uint8_t *bytes, uint16_t v)
+{
+    bytes[0] = (v >> 8) & 0xff;
+    bytes[1] = v & 0xff;
+    return sizeof(v);
+}
+
+size_t xnet_pack_u32(uint8_t *bytes, uint32_t v)
+{
+    uint8_t *p = bytes;
+    p += xnet_pack_u16(p, (v >> 16) & 0xffff);
+    p += xnet_pack_u16(p, v & 0xffff);
+    return p - bytes;
+}
+
+size_t xnet_unpack_u16(const uint8_t *bytes, uint16_t *v)
+{
+    uint8_t hi = bytes[0];
+    uint8_t lo = bytes[1];
+    *v = ((uint16_t)hi << 8) | lo;
+    return sizeof(*v);
+}
+
+size_t xnet_unpack_u32(const uint8_t *bytes, uint32_t *v)
+{
+    const uint8_t *p = bytes;
+    uint16_t hi;
+    uint16_t lo;
+    p += xnet_unpack_u16(p, &hi);
+    p += xnet_unpack_u16(p, &lo);
+    *v = ((uint32_t)hi << 16) | lo;
+    return p - bytes;
+}
 
 Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port,
                 int local_discovery_enabled_, const uint8_t *passphrase, size_t passphrase_len,
@@ -1465,6 +1498,7 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
     size_t new_length = length;
     int need_free = 0;
     jbyteArray msgV3_hash_jbuffer = NULL;
+    uint32_t msgV3_timestamp = 0;
 
     //dbg(9, "friend_message_cb:------------- len=%d len2=%d msg=%p", length,
     //        (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD),
@@ -1506,6 +1540,10 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
                 // dbg(9, "friend_message_cb:msgV3_hash_buffer_bin:%p", msgV3_hash_buffer_bin);
             }
 
+            const uint8_t *p = (uint8_t *)(message + pos + 2);
+            p = p + 32;
+            p += xnet_unpack_u32(p, &msgV3_timestamp);
+
             new_length = pos;
             memcpy(message_copy, message, new_length);
             // NULL out the extra data
@@ -1523,7 +1561,8 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
                                      (jint) type,
                                      js1,
                                      (jlong)(unsigned long long)new_length,
-                                     msgV3_hash_jbuffer);
+                                     msgV3_hash_jbuffer,
+                                     (jlong)msgV3_timestamp);
 
     (*jnienv2)->DeleteLocalRef(jnienv2, js1);
 
@@ -2718,7 +2757,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     android_tox_callback_friend_request_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_request_cb_method", "(Ljava/lang/String;Ljava/lang/String;J)V");
     android_tox_callback_friend_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
-            "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J[B)V");
+            "android_tox_callback_friend_message_cb_method", "(JILjava/lang/String;J[BJ)V");
     android_tox_callback_friend_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_friend_message_v2_cb_method", "(JLjava/lang/String;JJJ[BJ)V");
     android_tox_callback_friend_sync_message_v2_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -3678,6 +3717,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1friend_1send_1me
     }
 
     uint32_t timestamp_unix = (uint32_t)timestamp;
+    uint32_t timestamp_unix_buf = 0;
+    xnet_pack_u32((uint8_t *)&timestamp_unix_buf, timestamp_unix);
 
 #ifdef JAVA_LINUX
 
@@ -3714,7 +3755,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1friend_1send_1me
     position = position + TOX_MSGV3_GUARD;
     memcpy(position, hash_buffer_c, (size_t)(TOX_MSGV3_MSGID_LENGTH));
     position = position + TOX_MSGV3_MSGID_LENGTH;
-    memcpy(position, &timestamp_unix, (size_t)(TOX_MSGV3_TIMESTAMP_LENGTH));
+    memcpy(position, &timestamp_unix_buf, (size_t)(TOX_MSGV3_TIMESTAMP_LENGTH));
 
     size_t new_len = plength + TOX_MSGV3_GUARD + TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH;
 
@@ -3755,7 +3796,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1friend_1send_1me
     position = position + TOX_MSGV3_GUARD;
     memcpy(position, hash_buffer_c, (size_t)(TOX_MSGV3_MSGID_LENGTH));
     position = position + TOX_MSGV3_MSGID_LENGTH;
-    memcpy(position, &timestamp_unix, (size_t)(TOX_MSGV3_TIMESTAMP_LENGTH));
+    memcpy(position, &timestamp_unix_buf, (size_t)(TOX_MSGV3_TIMESTAMP_LENGTH));
 
     size_t new_len = strlen(message_str) + TOX_MSGV3_GUARD + TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH;
 
