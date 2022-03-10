@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="conference_audio_activity_name">Audio conferentie</string>
+    <string name="set_password_message_empty">Wachtwoord is leeg</string>
+    <string name="set_password_message_password_invalid">Wachtwoord is tekort</string>
+    <string name="set_password_message_password_dont_match">Wachtwoord is niet het zelfde</string>
+    <string name="title_activity_calling">Bellen</string>
+    <string name="title_activity_profile">Profiel</string>
+    <string name="title_activity_settings">Instellingen</string>
+    <string name="title_activity_crash">Vastlopen</string>
+    <string name="title_activity_friendinfo">Vriendinfo</string>
+    <string name="title_activity_conferenceinfo">Conferentie info</string>
+    <string name="title_activity_conferencepeerinfo">Gebruiker info</string>
+    <string name="title_activity_aboutpage">Over</string>
+    <string name="title_activity_set_password">Zet wachtwoord</string>
+    <string name="title_activity_check_password">Geef wachtwoord</string>
+    <string name="title_activity_share">Open met TRIFA</string>
+    <string name="settings_toolbar_title">Instellingen</string>
+    <string name="pref_header_general">Basis</string>
+    <string name="add_friend_activity_name">Voeg een vriend toe</string>
+    <string name="message_list_activity_name">Chat</string>
+    <string name="conference_message_list_activity_name">Tekst conferentie</string>
+    <string name="conference_audio_activity_player_name">Geluid conferentie speler</string>
+</resources>

@@ -253,4 +253,10 @@
     <string name="pref_title_use_incognito_keyboard2">Teclado Anônimo</string>
     <string name="pref_description_use_incognito_keyboard2">ative para dizer ao teclado para não aprender com as palavras introduzidas</string>
     <string name="layout___capabilities">Capacidades:</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Deseja remover sua foto de perfil\?</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Remover foto do perfil</string>
+    <string name="MainActivity_setup_push_tip_title">Configurações de notificação por push</string>
+    <string name="MainActivity_setup_push_tip_text">Você não instalou o Aplicativo de Notificação por Push nem configurou a Notificação por Push. O TRIfA funcionará plenamente sem a Notificação por Push, mas precisa estar conectado constantemente para receber mensagens. Com a Notificação por Push você pode economizar bateria e largura de banda de internet.
+\n
+\nDeseja ver como você pode configurar a Notificação por Push agora\?</string>
 </resources>
