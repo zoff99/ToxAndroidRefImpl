@@ -43,8 +43,8 @@ sed -i -e 's#maven_artefact_int_version".*#maven_artefact_int_version", '"$next_
 sed -i -e 's#maven_artefact_version = .*#maven_artefact_version = '"'""$next_m_version""'"'#' "$f1"
 
 commit_message="jni ""$next_m_version"
-tag_name="trifajni-$next_m_version"
+tag_name="trifajni-""$next_m_version"
 
 git commit -m "$commit_message" "$f1"
-echo git tag -a "$next_m_version" -m "$next_m_version"
+git tag -a "$next_m_version" -m "$tag_name"
 
