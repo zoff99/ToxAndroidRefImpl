@@ -22,7 +22,9 @@ jobs:
         java-version: 1.8
 
     - name: Install NDK
-      run: echo "y" | sudo /usr/local/lib/android/sdk/tools/bin/sdkmanager --install "ndk;21.0.6113669" --sdk_root=${ANDROID_SDK_ROOT}
+      run: |
+           echo "y" | sudo /usr/local/lib/android/sdk/tools/bin/sdkmanager --install "ndk;21.0.6113669" --sdk_root=${ANDROID_SDK_ROOT}
+           echo "y" | sudo /usr/local/lib/android/sdk/tools/bin/sdkmanager --install "ndk;20.1.5948944" --sdk_root=${ANDROID_SDK_ROOT}
 
     - name: Build with Gradle
       run: cd android-refimpl-app ; ./gradlew assembleRelease
@@ -57,7 +59,8 @@ jobs:
       with:
         api-level: 29
         # ndk: 16.1.4479499
-        ndk: 21.0.6113669
+        # ndk: 21.0.6113669
+        ndk: 20.1.5948944
         emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
