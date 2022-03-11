@@ -46,5 +46,5 @@ commit_message="jni ""$next_m_version"
 tag_name="trifajni-""$next_m_version"
 
 git commit -m "$commit_message" "$f1"
-git tag -a "$next_m_version" -m "$tag_name"
+git tag -a "$tag_name" -m "$tag_name"
 
