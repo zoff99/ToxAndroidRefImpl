@@ -2355,9 +2355,8 @@ public class HelperGeneric
             return false;
         }
         ByteBuffer hash_bytes = hexstring_to_bytebuffer(m.msg_idv3_hash);
-        long t_sec = (System.currentTimeMillis() / 1000);
         long res = MainActivity.tox_messagev3_friend_send_message(tox_friend_by_public_key__wrapper(m.tox_friendpubkey),
-                                                                  TRIFA_MSG_TYPE_TEXT.value, m.text, hash_bytes, t_sec);
+                                                                  TRIFA_MSG_TYPE_TEXT.value, m.text, hash_bytes, (m.sent_timestamp / 1000));
 
         m.resend_count++;
         m.message_id = res;
