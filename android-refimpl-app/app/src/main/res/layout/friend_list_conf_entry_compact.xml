@@ -79,7 +79,7 @@
             android:paddingRight="5dp"
             android:singleLine="true"
             android:text="this is my status message long line this is my status message long line this is my status message long line"
-            android:textColor="@color/md_black_1000"
+            android:textColor="@color/friend_list_text_color"
             android:textSize="10sp"
             android:typeface="monospace"
             android:visibility="visible" />

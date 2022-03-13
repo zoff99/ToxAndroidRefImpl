@@ -127,7 +127,7 @@
                 android:paddingBottom="0dp"
                 android:singleLine="true"
                 android:text="2017-02-02 16:30:15"
-                android:textColor="@color/md_black_1000"
+                android:textColor="@color/friend_list_text_color"
                 android:textSize="10sp"
                 android:textStyle="bold"
                 android:typeface="serif" />

@@ -16,6 +16,7 @@
     <!-- google's material design colours from
     http://www.google.com/design/spec/style/color.html#color-ui-color-palette -->
 
+    <color name="friend_list_text_color">#8A000000</color>
     <color name="gray">#606060</color>
     <color name="icon_colors">#303F9F</color>
 

@@ -114,7 +114,7 @@
                             android:layout_weight="1"
                             android:paddingBottom="3dp"
                             android:text="..."
-                            android:textColor="#434343"
+                            android:textColor="#8A000000"
                             android:textColorLink="@color/textblock_link_color_for_orange"
                             android:textSize="20sp"
                             app:emojiSize="@dimen/emoji_size_in_textview" />
