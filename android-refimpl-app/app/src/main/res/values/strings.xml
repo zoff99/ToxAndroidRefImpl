@@ -37,6 +37,17 @@
     <!-- Strings related to Settings -->
     <string name="pref_header_general">General</string>
 
+    <string-array name="pref_dark_mode_titles">
+        <item>System default</item>
+        <item>Dark</item>
+        <item>Light</item>
+    </string-array>
+    <string-array name="pref_dark_mode_values">
+    <item>0</item>
+    <item>1</item>
+    <item>2</item>
+    </string-array>
+
     <string name="pref_title_auto_accept_image">auto accept images</string>
     <string name="pref_description_auto_accept_image">auto accept Images and Photos up to 12 MByte in size</string>
 

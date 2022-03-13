@@ -67,7 +67,7 @@
                     android:layout_gravity="center_vertical"
                     android:padding="8dp"
                     android:text="@string/layout___name"
-                    android:textColor="@android:color/primary_text_light"
+                    android:textColor="@color/md_black_1000"
                     android:textSize="15sp" />
 
             </LinearLayout>
@@ -185,6 +185,7 @@
                         android:background="@drawable/button_audio_round_bg"
                         android:elevation="20dp"
                         android:text="@string/layout___push_to_talk"
+                        android:textColor="@android:color/black"
                         android:textAlignment="center"
                         android:textSize="15sp" />
 

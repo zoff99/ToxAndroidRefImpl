@@ -78,6 +78,7 @@
                         android:layout_alignParentRight="true"
                         android:layout_toRightOf="@id/m_icon"
                         android:text="..."
+                        android:textColor="@android:color/black"
                         android:textColorLink="@color/textblock_link_color_for_orange"
                         android:textSize="8sp"
                         app:emojiSize="@dimen/emoji_size_in_textview" />
@@ -280,7 +281,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="100"
-            android:background="@color/md_white_1000" />
+            android:background="#FFFFFF" />
 
         <TextView
             android:id="@+id/message_text_date_string"
@@ -297,7 +298,7 @@
             android:paddingRight="@dimen/padding_small"
             android:paddingBottom="2dp"
             android:text="2017-05-14"
-            android:textColor="@color/md_white_1000"
+            android:textColor="#FFFFFF"
             android:textSize="@dimen/text_small" />
 
         <ImageView
@@ -307,7 +308,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="100"
-            android:background="@color/md_white_1000" />
+            android:background="#FFFFFF" />
 
     </LinearLayout>
 

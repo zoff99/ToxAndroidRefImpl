@@ -132,7 +132,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             final Drawable d_notification = new IconicsDrawable(context).
                     icon(GoogleMaterial.Icon.gmd_notifications_off).
                     color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).
+                            getColor(R.color.icon_colors)).
                     alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
@@ -142,7 +142,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             final Drawable d_notification = new IconicsDrawable(context).
                     icon(GoogleMaterial.Icon.gmd_notifications_active).
                     color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).
+                            getColor(R.color.icon_colors)).
                     alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
@@ -152,14 +152,14 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         {
             f_conf_container_parent.setBackgroundResource(R.drawable.friend_list_conf_av_round_bg);
             final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_music_note).
-                    color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                    color(context.getResources().getColor(R.color.icon_colors)).sizeDp(80);
             avatar.setImageDrawable(d_lock);
         }
         else
         {
             f_conf_container_parent.setBackgroundResource(R.drawable.friend_list_conf_round_bg);
             final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_group).
-                    color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                    color(context.getResources().getColor(R.color.icon_colors)).sizeDp(80);
             avatar.setImageDrawable(d_lock);
         }
 
@@ -260,7 +260,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                     final Drawable d_notification = new IconicsDrawable(context).
                             icon(GoogleMaterial.Icon.gmd_notifications_off).
                             color(context.getResources().
-                                    getColor(R.color.colorPrimaryDark)).
+                                    getColor(R.color.icon_colors)).
                             alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(
                             FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
                     f_notification.setImageDrawable(d_notification);
@@ -274,7 +274,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                     final Drawable d_notification = new IconicsDrawable(context).
                             icon(GoogleMaterial.Icon.gmd_notifications_active).
                             color(context.getResources().
-                                    getColor(R.color.colorPrimaryDark)).
+                                    getColor(R.color.icon_colors)).
                             alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
                     f_notification.setImageDrawable(d_notification);
                 }

@@ -350,7 +350,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
                 icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                 color(getResources().
-                        getColor(R.color.colorPrimaryDark)).
+                        getColor(R.color.icon_colors)).
                 sizeDp(80);
 
         insert_emoji.setImageDrawable(d1);
@@ -366,13 +366,13 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.icon_colors)).sizeDp(80);
 
         attachemnt_instead_of_send = true;
         ml_button_01.setImageDrawable(send_message_icon);
 
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.icon_colors)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
         if (PREF__use_incognito_keyboard)
@@ -580,7 +580,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
                         icon(FontAwesome.Icon.faw_keyboard).
                         color(getResources().
-                                getColor(R.color.colorPrimaryDark)).
+                                getColor(R.color.icon_colors)).
                         sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
@@ -601,7 +601,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
                         icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                         color(getResources().
-                                getColor(R.color.colorPrimaryDark)).
+                                getColor(R.color.icon_colors)).
                         sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);

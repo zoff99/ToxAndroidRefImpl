@@ -204,7 +204,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             final Drawable d_notification = new IconicsDrawable(context).
                     icon(GoogleMaterial.Icon.gmd_notifications_off).
                     color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).
+                            getColor(R.color.icon_colors)).
                     alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
@@ -214,7 +214,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             final Drawable d_notification = new IconicsDrawable(context).
                     icon(GoogleMaterial.Icon.gmd_notifications_active).
                     color(context.getResources().
-                            getColor(R.color.colorPrimaryDark)).
+                            getColor(R.color.icon_colors)).
                     alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
             f_notification.setImageDrawable(d_notification);
             f_notification.setOnClickListener(this);
@@ -536,7 +536,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     final Drawable d_notification = new IconicsDrawable(context).
                             icon(GoogleMaterial.Icon.gmd_notifications_off).
                             color(context.getResources().
-                                    getColor(R.color.colorPrimaryDark)).
+                                    getColor(R.color.icon_colors)).
                             alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(
                             FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
                     f_notification.setImageDrawable(d_notification);
@@ -574,7 +574,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                     final Drawable d_notification = new IconicsDrawable(context).
                             icon(GoogleMaterial.Icon.gmd_notifications_active).
                             color(context.getResources().
-                                    getColor(R.color.colorPrimaryDark)).
+                                    getColor(R.color.icon_colors)).
                             alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
                     f_notification.setImageDrawable(d_notification);
 

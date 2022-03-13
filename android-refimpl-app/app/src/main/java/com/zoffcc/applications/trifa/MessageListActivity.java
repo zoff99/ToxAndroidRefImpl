@@ -401,7 +401,7 @@ public class MessageListActivity extends AppCompatActivity
         final Drawable d1 = new IconicsDrawable(getBaseContext()).
                 icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                 color(getResources().
-                        getColor(R.color.colorPrimaryDark)).
+                        getColor(R.color.icon_colors)).
                 sizeDp(80);
 
         insert_emoji.setImageDrawable(d1);
@@ -417,9 +417,9 @@ public class MessageListActivity extends AppCompatActivity
         });
 
         final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.icon_colors)).sizeDp(80);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.icon_colors)).sizeDp(80);
 
         ml_friend_typing.setText("");
         attachemnt_instead_of_send = true;
@@ -568,11 +568,11 @@ public class MessageListActivity extends AppCompatActivity
         }
 
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.icon_colors)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
 
         final Drawable d3 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_video).color(
-                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
+                getResources().getColor(R.color.icon_colors)).sizeDp(80);
         ml_video_icon.setImageDrawable(d3);
 
         if (PREF__window_security)
@@ -828,7 +828,7 @@ public class MessageListActivity extends AppCompatActivity
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
                         icon(FontAwesome.Icon.faw_keyboard).
                         color(getResources().
-                                getColor(R.color.colorPrimaryDark)).
+                                getColor(R.color.icon_colors)).
                         sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
@@ -849,7 +849,7 @@ public class MessageListActivity extends AppCompatActivity
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).
                         icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
                         color(getResources().
-                                getColor(R.color.colorPrimaryDark)).
+                                getColor(R.color.icon_colors)).
                         sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);

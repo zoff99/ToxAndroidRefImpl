@@ -48,6 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             app:emojiSize="@dimen/emoji_size_in_textview"
+            android:textColor="@android:color/black"
             android:textColorLink="@color/textblock_link_color_for_orange"
             android:text="..."
             android:textSize="20sp"/>

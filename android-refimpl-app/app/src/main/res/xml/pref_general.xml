@@ -1,5 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <ListPreference
+        android:defaultValue="0"
+        android:entries="@array/pref_dark_mode_titles"
+        android:entryValues="@array/pref_dark_mode_values"
+        android:key="dark_mode_pref"
+        android:summary="change default theme to dark mode"
+        android:title="Dark Mode" />
+
     <SwitchPreference
         android:defaultValue="false"
         android:key="start_on_boot"

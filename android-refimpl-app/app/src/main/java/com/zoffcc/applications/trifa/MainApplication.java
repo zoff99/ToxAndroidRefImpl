@@ -25,6 +25,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Environment;
@@ -47,6 +48,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDex;
 
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_cancel;
@@ -75,6 +77,11 @@ public class MainApplication extends Application
     @Override
     public void onCreate()
     {
+        // implementation of dark mode
+        SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(this.getApplicationContext());
+        updateTheme(sp);
+        sp.registerOnSharedPreferenceChangeListener(sp_change_listener);
+
         // Lingver.init(this, Locale.ENGLISH);
         //
         if (Locale.getDefault().getLanguage().equals(new Locale("ar").getLanguage()))
@@ -388,5 +395,34 @@ public class MainApplication extends Application
         System.exit(2);
         System.out.println("MainApplication:" + randnum + ":" + "xx4");
 
+    }
+
+    private final SharedPreferences.OnSharedPreferenceChangeListener sp_change_listener = (sharedPreferences, key) -> {
+        if (key.equals("dark_mode_pref"))
+        {
+            updateTheme(sharedPreferences);
+        }
+    };
+
+    private void updateTheme(SharedPreferences sharedPreferences)
+    {
+        switch (sharedPreferences.getString("dark_mode_pref", "0"))
+        {
+            case "0":
+            {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                break;
+            }
+            case "1":
+            {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                break;
+            }
+            default:
+            {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                break;
+            }
+        }
     }
 }

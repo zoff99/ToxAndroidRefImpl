@@ -16,8 +16,9 @@
     <!-- google's material design colours from
     http://www.google.com/design/spec/style/color.html#color-ui-color-palette -->
 
-    <color name="gray">#606060</color>
-    <color name="icon_colors">#303F9F</color>
+    <color name="gray">#838383</color>
+    <color name="icon_colors">#FFFFFF</color>
+
 
     <!--reds-->
     <color name="md_red_50">#FFEBEE</color>
@@ -117,9 +118,9 @@
 
     <!-- light blue-->
     <color name="md_light_blue_50">#E1F5FE</color>
-    <color name="md_light_blue_100">#B3E5FC</color>
+    <color name="md_light_blue_100">#003f88</color>  ///
     <color name="md_light_blue_200">#81D4fA</color>
-    <color name="md_light_blue_300">#4fC3F7</color>
+    <color name="md_light_blue_300">#030C50</color>  /////// stroke
     <color name="md_light_blue_400">#29B6FC</color>
     <color name="md_light_blue_500">#03A9F4</color>
     <color name="md_light_blue_600">#039BE5</color>
@@ -181,9 +182,9 @@
 
     <!--light green-->
     <color name="md_light_green_50">#F1F8E9</color>
-    <color name="md_light_green_100">#DCEDC8</color>
+    <color name="md_light_green_100">#3c6d0e</color>   ///
     <color name="md_light_green_200">#C5E1A5</color>
-    <color name="md_light_green_300">#AED581</color>
+    <color name="md_light_green_300">#373A63</color>   ///// stroke
     <color name="md_light_green_400">#9CCC65</color>
     <color name="md_light_green_500">#8BC34A</color>
     <color name="md_light_green_600">#7CB342</color>
@@ -231,11 +232,11 @@
     <color name="md_amber_50">#FFF8E1</color>
     <color name="md_amber_100">#FFECB3</color>
     <color name="md_amber_200">#FFE082</color>
-    <color name="md_amber_300">#FFD54F</color>
+    <color name="md_amber_300">#4e3644</color>   ///
     <color name="md_amber_400">#FFCA28</color>
     <color name="md_amber_500">#FFC107</color>
     <color name="md_amber_600">#FFB300</color>
-    <color name="md_amber_700">#FFA000</color>
+    <color name="md_amber_700">#df6813</color>   ///
     <color name="md_amber_800">#FF8F00</color>
     <color name="md_amber_900">#FF6F00</color>
     <color name="md_amber_A100">#FFE57F</color>
@@ -291,15 +292,15 @@
     <color name="md_grey_50">#FAFAFA</color>
     <color name="md_grey_100">#F5F5F5</color>
     <color name="md_grey_200">#EEEEEE</color>
-    <color name="md_grey_300">#E0E0E0</color>
+    <color name="md_grey_300">#292929</color>    /// underline
     <color name="md_grey_400">#BDBDBD</color>
     <color name="md_grey_500">#9E9E9E</color>
     <color name="md_grey_600">#757575</color>
     <color name="md_grey_700">#616161</color>
     <color name="md_grey_800">#424242</color>
-    <color name="md_grey_900">#212121</color>
-    <color name="md_black_1000">#000000</color>
-    <color name="md_white_1000">#ffffff</color>
+    <color name="md_grey_900">#FFFFFF</color>
+    <color name="md_black_1000">#FFFFFF</color>
+    <color name="md_white_1000">#292929</color>
 
     <!--blue grey-->
     <color name="md_blue_grey_50">#ECEFF1</color>
