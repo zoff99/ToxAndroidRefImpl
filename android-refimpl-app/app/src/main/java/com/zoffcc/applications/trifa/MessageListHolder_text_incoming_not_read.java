@@ -425,6 +425,26 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
+
+
+        // ***************
+        //  get text color of a textview
+        // ***************
+        // int color = textView.getCurrentTextColor();
+        // int a = Color.alpha(color);
+        // int r = Color.red(color);
+        // int g = Color.green(color);
+        // int b = Color.blue(color);
+        // Log.i(TAG, "bindMessageList1: " + a + " " + r + " " + g + " " + b);
+        // ***************
+        // textView.setTextColor(0x8AFF0000);
+        // color = textView.getCurrentTextColor();
+        // a = Color.alpha(color);
+        // r = Color.red(color);
+        // g = Color.green(color);
+        // b = Color.blue(color);
+        // Log.i(TAG, "bindMessageList2: " + a + " " + r + " " + g + " " + b);
+        // ***************
     }
 
     @Override
