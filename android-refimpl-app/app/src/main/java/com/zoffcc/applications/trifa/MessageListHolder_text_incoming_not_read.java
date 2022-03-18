@@ -289,7 +289,15 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         }
         else
         {
-            date_time.setText(long_date_time_format(m.rcvd_timestamp));
+            if ((m.sent_timestamp > 0) && (m.msg_idv3_hash != null) && (m.msg_idv3_hash.length() > 1))
+            {
+                date_time.setText(unicode_ARROW_LEFT + long_date_time_format(m.sent_timestamp) + "\n" +
+                                  unicode_Mobile_Phone_With_Arrow + long_date_time_format(m.rcvd_timestamp));
+            }
+            else
+            {
+                date_time.setText(long_date_time_format(m.rcvd_timestamp));
+            }
         }
 
         textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
