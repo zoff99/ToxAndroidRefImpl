@@ -1,2 +1,261 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="Aboutpage_8">използвани библиотеки:</string>
+    <string name="pref_title_fps_half">по-ниски стойности на fps</string>
+    <string name="pref_title_start_on_boot">стартиране при зареждане</string>
+    <string name="add_friend_activity_name">Добави Приятел</string>
+    <string name="message_list_activity_name">Разговор</string>
+    <string name="conference_message_list_activity_name">Текстова конференция</string>
+    <string name="conference_audio_activity_name">Аудио конференция</string>
+    <string name="conference_audio_activity_player_name">Плейър за аудио конференции</string>
+    <string name="set_password_message_empty">Паролата е празна</string>
+    <string name="set_password_message_password_invalid">Твърде кратка парола</string>
+    <string name="set_password_message_password_dont_match">Паролите НЕ съвпадат</string>
+    <string name="title_activity_calling">Обаждане</string>
+    <string name="title_activity_profile">Профил</string>
+    <string name="title_activity_crash">Срив</string>
+    <string name="title_activity_friendinfo">Приятелинфо</string>
+    <string name="title_activity_conferenceinfo">Информация за конференцията</string>
+    <string name="title_activity_conferencepeerinfo">Peer информация</string>
+    <string name="title_activity_aboutpage">За програмата</string>
+    <string name="title_activity_set_password">Задаване на парола</string>
+    <string name="title_activity_check_password">Въведете парола</string>
+    <string name="title_activity_share">отворен с TRIfA</string>
+    <string name="title_activity_maintenance">Поддръжка</string>
+    <string name="settings_toolbar_title">Настройки</string>
+    <string name="pref_header_general">Общи настройки</string>
+    <string name="pref_title_auto_accept_image">автоматично приемане на изображения</string>
+    <string name="pref_description_auto_accept_image">автоматично приема изображения и снимки с размер до 12 MB</string>
+    <string name="pref_title_auto_accept_video">автоматично приемане на видеоклипове</string>
+    <string name="pref_description_auto_accept_video">автоматично приемане Видеоклипове с размер до 40 MByte</string>
+    <string name="pref_title_auto_accept_all_upto">автоматично приемане на всички файлове</string>
+    <string name="pref_description_auto_accept_all_upto">автоматично приемане на всички Файлове с размер до 200 MByte</string>
+    <string name="pref_title_video_uv_reversed">обратно UV във видео</string>
+    <string name="pref_description_video_uv_reversed">Обърнете реда на UV равнините във видеото на камерата</string>
+    <string name="pref_title_software_echo_cancel">Ехо Анулиране</string>
+    <string name="pref_description_software_echo_cancel">Използвайте софтуерно премахване на ехото</string>
+    <string name="pref_title_higher_video_quality">Видео качество</string>
+    <string name="pref_description_higher_video_quality">Използвайте по-добро качество на видеото.
+\nПромяната се нуждае от РЕСТАРТ!</string>
+    <string name="pref_title_video_cam_resolution">Резолюция на камерата</string>
+    <string name="pref_description_video_cam_resolution">Каква разделителна способност да използвате за видеоразговори</string>
+    <string name="pref_title_global_font_size">Размер на шрифта</string>
+    <string name="pref_description_global_font_size">Изберете Размер на шрифта</string>
+    <string name="pref_title_camera_get_preview_format">Формат за преглед на камерата</string>
+    <string name="pref_description_camera_get_preview_format">Форматът за преглед на камерата изглежда е в грешен формат на някои телефони</string>
+    <string name="pref_title_mic_gain_factor">Усилване на микрофона</string>
+    <string name="pref_description_mic_gain_factor">Задаване на по-висока Печалба, ако микрофонът ви записва с нисък обем</string>
+    <string name="pref_title_higher_audio_quality">Качество на звука</string>
+    <string name="pref_description_higher_audio_quality">Използвайте по-добро качество на видеото.
+\nПромяната се нуждае от РЕСТАРТ!</string>
+    <string name="pref_title_udp_enabled">активиране на UDP</string>
+    <string name="pref_title_force_udp_only">принудителен режим на UDP</string>
+    <string name="pref_description_orbot_enabled">Трябва да инсталирате Orbot, за да го използвате.
+\nПромяната се нуждае от РЕСТАРТ!</string>
+    <string name="pref_title_window_security">предотврати Снимки от екрана</string>
+    <string name="pref_description_window_security">Активирането на тази настройка добавя FLAG_SECURE към дейностите.
+\nТя предотвратява правенето на скрийншоти и запис на екрана, както и показването на съдържание в преглед на последните</string>
+    <string name="pref_title_compact_friendlist">Компактен списък на приятелите</string>
+    <string name="pref_description_compact_friendlist">Направете списъка с приятели по-компактен, ако имате голям списък с приятели</string>
+    <string name="pref_title_compact_chatlist">Компактен чатлист</string>
+    <string name="pref_description_compact_chatlist">Показване на Chatmessage по-компактно спестяване на място</string>
+    <string name="pref_title_use_push_service">Използване на услугата Push</string>
+    <string name="pref_title_download_push_msg_app">Изтеглете приложението Push Message</string>
+    <string name="pref_title_set_fps">задайте fps</string>
+    <string name="pref_description_set_fps">опитайте се да зададете 15 кадъра в секунда, това може да доведе до срив при някои телефони</string>
+    <string name="pref_title_conference_show_system_messages">Системни съобщения</string>
+    <string name="pref_description_conference_show_system_messages">показване на системни съобщения в конференциите</string>
+    <string name="pref_title_local_discovery_enabled">LAN откритие</string>
+    <string name="pref_description_local_discovery_enabled">използване на възли в локалната LAN за зареждане</string>
+    <string name="pref_description_U_keep_nospam">запазване на стойността на NoSpam. Това не е безопасно, активирайте го само ако знаете какво правите!</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">споделяте файлове към TRIfA чрез share Intent.</string>
+    <string name="pref_title_allow_screen_off_in_audio_call">Изключване на екрана</string>
+    <string name="pref_title_speakerphone_tweak">Корекция на високоговорителя за разговори</string>
+    <string name="pref_description_speakerphone_tweak">Ако приложението не превключва на високоговорител по време на повикване, опитайте да активирате тази поправка.</string>
+    <string name="pref_title_X_zoom_incoming_video">Увеличаване на прозореца за видеоразговори</string>
+    <string name="pref_title_X_use_native_audio_play">Основна аудиосистема</string>
+    <string name="pref_description_X_use_native_audio_play">!! Експериментален!!
+\nИзползване на native аудио за възпроизвеждане на звук</string>
+    <string name="pref_title_X_misc_button_enabled">Разни. Бутони</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">НЕ синхронизирайте AV</string>
+    <string name="pref_title_X_eac_delay_ms">AEC забавяне</string>
+    <string name="pref_description_X_eac_delay_ms">!! Експериментално!!
+\nAEC забавяне в мс</string>
+    <string name="pref_title_use_camera_x">Премахване на фона</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Буфер за аудио възпроизвеждане</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! Експериментален !!
+\nБуфер за възпроизвеждане на аудио в байтове, задайте 0, за да деактивирате потребителската настройка</string>
+    <string name="pref_title_toxirc_muted_peers_01">Toxirc Bridge Заглушени потребители</string>
+    <string name="pref_title_add_friends_to_messages">Добавяне на приятели към съобщенията</string>
+    <string name="pref_header_data_sync">Данни &amp; синхронизация</string>
+    <string name="pref_title_sync_frequency">Честота на синхронизация</string>
+    <string name="pref_title_min_audio_samplingrate_out">Аудио дискретизация</string>
+    <string name="pref_description_min_audio_samplingrate_out">Настройката по подразбиране е 48000 Hz</string>
+    <string name="pref_title_X_battery_saving_timeout">Офлайн време в режим \"Пестене на батерии\"</string>
+    <string name="pref_description_X_battery_saving_timeout">Настройка по подразбиране е 15 минути</string>
+    <string name="pref_title_system_sync_settings">Настройки за синхронизиране на системата</string>
+    <string name="pref_header_notifications">Известия</string>
+    <string name="pref_ringtone_silent">Безшумен</string>
+    <string name="pref_title_vibrate">Вибрирай</string>
+    <string name="pref_title_sound">Звук</string>
+    <string name="add_friend_activity_add">Добави Приятел</string>
+    <string name="cancel">Отмяна</string>
+    <string name="MainActivity_profile">Профил</string>
+    <string name="MainActivity_settings">Настройки</string>
+    <string name="MainActivity_logout_login">Излизане/Вход</string>
+    <string name="MainActivity_maint">Поддръжка</string>
+    <string name="MainActivity_about">За програмата</string>
+    <string name="MainActivity_exit">Изход</string>
+    <string name="MainActivity_available">Наличен</string>
+    <string name="MainActivity_away">Отсъства</string>
+    <string name="MainActivity_busy">Зает</string>
+    <string name="MainActivity_no_button">не</string>
+    <string name="MainActivity_yes_button">да</string>
+    <string name="MainActivity_ok_take_me_there_button">OK, заведи ме там</string>
+    <string name="MainActivity_new_noti_token_dialog_title">Токен</string>
+    <string name="MainActivity_new_noti_token_dialog_text">Получено е ново известие. Да използвате този токен\?</string>
+    <string name="MainActivity_info_dialog_title">ИНФО</string>
+    <string name="MainActivity_add_to_batt_opt">Моля, добавете TRIfA към списъка с изключения за оптимизиране на батериите!</string>
+    <string name="MainActivity_friend_is_typing">приятел пише...</string>
+    <string name="MainActivity_notification_new_message">ново Съобщение</string>
+    <string name="MainActivity_notification_new_message2">ново Съобщение</string>
+    <string name="MainActivity_button_ok">Ок</string>
+    <string name="MainActivity_error_starting_email_app">Грешка при стартиране на приложение за имейл</string>
+    <string name="MainActivity_no_email_app_found">Не е намерено приложение за електронна поща</string>
+    <string name="MainActivity_toast_msg_deleted">Съобщенията са изтрити</string>
+    <string name="MainActivity_toast_msgs_deleted">Съобщенията са изтрити</string>
+    <string name="MainActivity_notification_new_message3">ново Съобщение</string>
+    <string name="MainActivity_notification_new_message5">ново Съобщение</string>
+    <string name="MainActivity_setup_push_tip_title">Настройка на Push Notification</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Премахване на профилна снимка</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Искате ли да премахнете снимката на вашия профил\?</string>
+    <string name="Aboutpage_0">Дневник за аварии на TRIfA</string>
+    <string name="Aboutpage_2">изпрати доклад за срив по имейл</string>
+    <string name="Aboutpage_4">четене на информация за срив...</string>
+    <string name="Aboutpage_5a">TRIfA Токс клиент за Android</string>
+    <string name="Aboutpage_5b">Версия:</string>
+    <string name="Aboutpage_6">Какво е Tox\?</string>
+    <string name="AddFriendActivity_3">неправилен ToxID</string>
+    <string name="AddFriendActivity_4">НямаToxID</string>
+    <string name="CallingActivity_0">Видео закъснение:</string>
+    <string name="CallingActivity_23">Видео закъснение:</string>
+    <string name="ConferenceAudioActivity_10">Списък на потребителите</string>
+    <string name="ConferenceAudioActivity_17">Натискане за говорене</string>
+    <string name="ConferenceAudioActivity_18">говорене...</string>
+    <string name="GroupActivityOffline">Извън линия:</string>
+    <string name="messages_search_default_text">търсене ...</string>
+    <string name="layout___scan_qr_code">Сканирай QR код</string>
+    <string name="layout___enter_pass_longtext">Въведете паролата
+\nНЯМА опция за възстановяване!</string>
+    <string name="layout___unlock">Отключване</string>
+    <string name="layout___name">Име</string>
+    <string name="layout___push_to_talk">Натиснете, за да говорите</string>
+    <string name="layout___nick">Прякор:</string>
+    <string name="layout___conf_title">Заглавие:</string>
+    <string name="layout___pubkey">Публичен ключ:</string>
+    <string name="layout___capabilities">Възможности:</string>
+    <string name="layout___status">Статус:</string>
+    <string name="layout___alias">Псевдоним</string>
+    <string name="layout___remove_friends_relay">премахнете Friends Relay</string>
+    <string name="layout___friends_pushurl">Приятели Push URL:</string>
+    <string name="layout___clear_glide_cache">изчистване на кеша на Glide</string>
+    <string name="layout___set_app_language">задаване на език на приложението</string>
+    <string name="layout___reset_favorite_emoji_list">нулиране на любимия Списък с емотикони</string>
+    <string name="layout___delete_all_avatar_icons">изтриване на всички икони на аватари</string>
+    <string name="layout___update_bootstrapnodes_from_internet">актуализиране на Bootstrapnodes от интернет</string>
+    <string name="layout___reset_bootstrapnodes_to_default">нулиране bootstrapnodes по подразбиране</string>
+    <string name="layout___test_ringtone_sound">тест Звук на звънене</string>
+    <string name="layout___iobrowser_start">преглеждайте криптирано хранилище</string>
+    <string name="layout___export_tox_savedata_unsecure">експортиране на tox savedata *несигурно*</string>
+    <string name="layout___remove_own_relay">премахване на собствен Relay</string>
+    <string name="layout___relay_pubkey">Relay Публичен Ключ:</string>
+    <string name="layout___remove_own_pushurl">премахване на Push URL</string>
+    <string name="layout___own_pushurl">Push URL:</string>
+    <string name="layout___new_random_nospam">нов Случаен NOSPAM</string>
+    <string name="layout___own_pubkey">Собствен Публичен ключ Pubkey:</string>
+    <string name="layout___copy_toxid">копиране на ToxID</string>
+    <string name="layout___your_toxidenticon">Вашият ToxIdenticon</string>
+    <string name="layout___error_getting_active_network_connections">*грешка при активиране на мрежова връзка*</string>
+    <string name="layout___password">Парола</string>
+    <string name="layout___password_again">Парола отново</string>
+    <string name="layout___set_password">Задаване на парола</string>
+    <string name="layout___skip">пропуснете</string>
+    <string name="layout___leave">Напускане</string>
+    <string name="layout___delete">Изтриване</string>
+    <string name="layout___info">Инфо</string>
+    <string name="layout___create_text_group">Създаване на текстова група</string>
+    <string name="layout___create_audio_group">Създаване на аудио група</string>
+    <string name="layout___add_as_toxproxy">добави като ToxProxy</string>
+    <string name="layout___peer_name">име на партньор</string>
+    <string name="layout___online">Онлайн</string>
+    <string name="layout___copy">Копирай</string>
+    <string name="layout___export">Експорт</string>
+    <string name="layout___migdb_text">Мигриране на файловете на базата данни</string>
+    <string name="title_activity_wrong_credentials">Грешни идентификационни данни</string>
+    <string name="pref_description_X_misc_button_enabled">!! Експериментален !!
+\nдобавяне на бутон на екрана за повикване за изпращане на фиксирано съобщение</string>
+    <string name="pref_title_ringtone">Мелодия на звънене</string>
+    <string name="pref_title_orbot_enabled">активирайте Tor Proxy</string>
+    <string name="pref_description_start_on_boot">стартиране на приложението след зареждане.
+\nGoogle вече не позволява това, като се започне с Android 10</string>
+    <string name="pref_description_use_incognito_keyboard2">включeте, за да забраните на клавиатурата да се учи от въведените от вас думи</string>
+    <string name="pref_description_udp_enabled">за повечето мобилни устройства UDP ще предизвика много по-голям интернет трафик.
+\nПромяната се нуждае от РЕСТАРТ!
+\nНастройката по подразбиране е OFF</string>
+    <string name="pref_description_force_udp_only">това ще наложи режим само на UDP, някои контакти може да не са достъпни с тази настройка.
+\nПромяната изисква РЕСТАРТ!</string>
+    <string name="pref_description_fps_half">Скорост на кадрите на видеото 1/2 : 12 кадъра в секунда вместо 25 кадъра в секунда</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">Вътрешно опресняване на H264</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">H264 енкодерът трябва да използва кадри с вътрешно опресняване</string>
+    <string name="pref_title_use_incognito_keyboard2">инкогнито Клавиатура</string>
+    <string name="pref_description_use_push_service">ПРЕДУПРЕЖДЕНИЕ: При това ще се използва Google FCM или Unified Push, за да се пести батерия и трафик.
+\nПриложението ще осъществява HTTPS: връзки към някои PUSH сървъри директно (не чрез Tox).
+\nАктивирайте това само ако приемате това.
+\nТази функция се нуждае от инсталиране на приложението Tox Push Message App.</string>
+    <string name="pref_title_U_keep_nospam">запазване на NoSpam</string>
+    <string name="pref_description_use_camera_x">!! Експериментален !!
+\nИзползване на CameraX и премахване на фона при видеоразговори
+\nВъзможно е това все още да не работи напълно, моля, бъдете внимателни и не разчитайте, че това ще работи винаги!</string>
+    <string name="pref_description_toxirc_muted_peers_01">Заглушен потребител 1 (оставете празно, ако не се използва)</string>
+    <string name="pref_description_toxirc_muted_peers_03">Заглушен потребител 3 (оставете празно, ако не се използва)</string>
+    <string name="pref_title_X_audio_recording_frame_size">Аудиокодиране Размер на кадъра</string>
+    <string name="pref_description_X_audio_recording_frame_size">Настройката по подразбиране е 40 ms</string>
+    <string name="add_friend_activity_help">Поставете Tox ID на приятел\' в текстовото поле по-горе или докоснете бутона QR код, за да сканирате кода на приятел\' с камера.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">споделяне на файлове</string>
+    <string name="pref_description_toxirc_muted_peers_02">Заглушен потребител 1 (оставете празно, ако не се използва)</string>
+    <string name="layout___toxid">ToxID</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Ако имате проблеми с изключването на екрана при обаждане, задайте тази стойност като изключена.</string>
+    <string name="pref_description_X_zoom_incoming_video">да увеличите прозореца за видеоразговори с щипка. Това не работи напълно!</string>
+    <string name="pref_title_X_battery_saving_mode">Режим на пестене на батерията</string>
+    <string name="pref_description_X_battery_saving_mode">!! Експериментален !!
+\nТова ще спести малко повече батерия, но изпращането и получаването на съобщение ще отнеме повече време.
+\nВероятно ще има и други лоши ефекти!</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! Експериментален !!
+\nНе синхронизирайте видео или аудио. Използвайте тази настройка, ако имате проблеми с Videocall, в краен случай.</string>
+    <string name="pref_title_new_message_notifications">Известия за нови съобщения</string>
+    <string name="MainActivity_toast_msg_exported">Съобщения, експортирани</string>
+    <string name="MainActivity_notification_new_message4">ново Съобщение</string>
+    <string name="GroupActivityActive">Активен:</string>
+    <string name="layout___conf_id">ID на конференцията:</string>
+    <string name="layout___friends_relay_pubkey">Friends Relay Рubkey:</string>
+    <string name="layout___waiting_for_orbot">чакаме за Orbot ...</string>
+    <string name="MainActivity_setup_push_tip_text">Не сте инсталирали приложението Push Notification и не сте настроили Push Notification. TRIfA работи пълноценно и без Push Notification, но трябва да е постоянно онлайн, за да получава съобщения.С Push Notification можете да спестите батерия и интернет трафик.
+\n
+\nИскате ли да видите как можете да настроите Push Notification сега\?</string>
+    <string name="layout___remove_friends_pushurl">премахнете Friends Push URL</string>
+    <string name="layout___run_vacuum_on_sql_database">стартиране на VACUUM на база данни Sql</string>
+    <string name="layout___run_analyze_on_sql_database">стартирайте ANALYZE на Sql база данни</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">експортиране на криптирани файлове *несигурни*</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">експорт на криптирани чатове *несигурен*</string>
+    <string name="layout___click_image_to_change_your_avatar">кликнете върху Изображение, за да промените своя аватар</string>
+    <string name="layout___set_password_or_skip">Задайте парола или пропуснете.
+\n
+\nКогато изберете да пропуснете
+\nпаролата ще бъде генерирана автоматично.
+\nНяма опция за възстановяване!</string>
+    <string name="layout___test_notification_sound">тест Звук за уведомяване</string>
+    <string name="layout___im_port_tox_savadata_unsecure">IM-порт TOX SAVADATA *НЕСИГУРНО*</string>
+    <string name="layout___migdb_do_not_close">НЕ затваряйте този екран</string>
+    <string name="layout___active_network_connections">активни Мрежови връзки:</string>
+    <string name="wrong_credentials_error">Грешни идентификационни данни</string>
+</resources>
