@@ -14,7 +14,11 @@ cd "$basedir"
 if [[ $(git status --porcelain --untracked-files=no) ]]; then
 	echo "ERROR: git repo has changes."
 	echo "please commit or cleanup the git repo."
-	exit 1
+	if [ "$1""x" == "-fx" ]; then
+		echo "** force mode **"
+	else
+		exit 1
+	fi
 else
 	echo "git repo clean."
 fi
