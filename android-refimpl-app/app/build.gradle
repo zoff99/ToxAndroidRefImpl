@@ -74,6 +74,9 @@ android {
     packagingOptions {
         exclude 'LICENSE.txt'
         //
+        doNotStrip "*/armeabi-v7a/*.so"
+        doNotStrip "*/arm64-v8a/*.so"
+        //
         pickFirst 'lib/armeabi-v7a/libsqlcipher.so'
         pickFirst 'lib/arm64-v8a/libsqlcipher.so'
         pickFirst 'lib/x86/libsqlcipher.so'
