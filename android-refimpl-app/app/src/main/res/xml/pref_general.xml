@@ -1,7 +1,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <ListPreference
-        android:defaultValue="0"
+        android:defaultValue="2"
         android:entries="@array/pref_dark_mode_titles"
         android:entryValues="@array/pref_dark_mode_values"
         android:key="dark_mode_pref"

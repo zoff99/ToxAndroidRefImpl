@@ -85,6 +85,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_bytes;
@@ -810,7 +811,6 @@ public class MessageListActivity extends AppCompatActivity
         //            Log.d(TAG, "Clicked on emoji");
         //        }})
 
-
         emojiPopup = EmojiPopup.Builder.fromRootView(rootView).setOnEmojiBackspaceClickListener(
                 new OnEmojiBackspaceClickListener()
                 {
@@ -862,7 +862,9 @@ public class MessageListActivity extends AppCompatActivity
             {
                 // Log.d(TAG, "Closed soft keyboard");
             }
-        }).build(ml_new_message);
+        }).
+                setBackgroundColor(getResources().getColor(R.color.md_grey_800)).
+                build(ml_new_message);
     }
 
     long get_current_friendnum()

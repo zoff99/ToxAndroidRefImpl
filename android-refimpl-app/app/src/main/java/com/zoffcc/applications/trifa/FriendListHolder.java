@@ -50,6 +50,8 @@ import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_filet
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_messages;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
@@ -474,11 +476,41 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else if (fl.TOX_CONNECTION_real == TOX_CONNECTION_TCP.value)
             {
-                avatar.setBorderColor(Color.parseColor("#FFCE00"));
+                if (is_nightmode_active(context))
+                {
+                    avatar.setBorderColor(Color.parseColor("#A8FFCE00"));
+                }
+                else
+                {
+                    avatar.setBorderColor(Color.parseColor("#FFCE00"));
+                }
             }
             else // UDP
             {
-                avatar.setBorderColor(Color.parseColor("#04B431"));
+                if (is_nightmode_active(context))
+                {
+                    avatar.setBorderColor(Color.parseColor("#A804B431"));
+                }
+                else
+                {
+                    avatar.setBorderColor(Color.parseColor("#04B431"));
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (is_nightmode_active(context))
+            {
+                avatar.setBorderWidth((int) dp2px(4));
+            }
+            else
+            {
+                avatar.setBorderWidth((int) dp2px(4));
             }
         }
         catch (Exception e)

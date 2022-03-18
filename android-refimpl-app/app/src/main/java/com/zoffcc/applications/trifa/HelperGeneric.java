@@ -23,6 +23,7 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.PackageInfo;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.BlurMaskFilter;
@@ -2356,7 +2357,8 @@ public class HelperGeneric
         }
         ByteBuffer hash_bytes = hexstring_to_bytebuffer(m.msg_idv3_hash);
         long res = MainActivity.tox_messagev3_friend_send_message(tox_friend_by_public_key__wrapper(m.tox_friendpubkey),
-                                                                  TRIFA_MSG_TYPE_TEXT.value, m.text, hash_bytes, (m.sent_timestamp / 1000));
+                                                                  TRIFA_MSG_TYPE_TEXT.value, m.text, hash_bytes,
+                                                                  (m.sent_timestamp / 1000));
 
         m.resend_count++;
         m.message_id = res;
@@ -3706,7 +3708,14 @@ public class HelperGeneric
                 Bitmap bm = bm1.copy(bm1.getConfig(), true);
 
                 Bitmap alpha = bm.extractAlpha();
-                BlurMaskFilter blurMaskFilter = new BlurMaskFilter(35, BlurMaskFilter.Blur.OUTER);
+
+                int radius = 40;
+                if (is_nightmode_active(c))
+                {
+                    radius = 80;
+                }
+
+                BlurMaskFilter blurMaskFilter = new BlurMaskFilter(radius, BlurMaskFilter.Blur.OUTER);
 
                 Paint paint = new Paint();
                 paint.setMaskFilter(blurMaskFilter);
@@ -3836,5 +3845,27 @@ public class HelperGeneric
         }
 
         return null;
+    }
+
+    static boolean is_nightmode_active(final Context c)
+    {
+        try
+        {
+            final int nightModeFlags = c.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            switch (nightModeFlags)
+            {
+                case Configuration.UI_MODE_NIGHT_YES:
+                    return true;
+                case Configuration.UI_MODE_NIGHT_NO:
+                    return false;
+                case Configuration.UI_MODE_NIGHT_UNDEFINED:
+                    return false;
+            }
+        }
+        catch (Exception e)
+        {
+
+        }
+        return false;
     }
 }

@@ -125,6 +125,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:onClick="cancel_clicked"
+            android:textColor="@color/md_black_1000"
             android:text="@string/cancel"/>
 
         <View
@@ -142,6 +143,7 @@
             android:layout_weight="1"
             android:enabled="false"
             android:onClick="add_friend_clicked"
+            android:textColor="@color/md_black_1000"
             android:text="@string/add_friend_activity_add"/>
     </LinearLayout>
 

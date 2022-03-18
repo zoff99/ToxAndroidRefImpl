@@ -20,9 +20,11 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.text.Html;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -45,6 +47,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar_updat
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
+import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
 import static com.zoffcc.applications.trifa.HelperRelay.get_relay_for_friend;
@@ -292,6 +295,12 @@ public class FriendInfoActivity extends AppCompatActivity
                                     String pubkey_temp = f.tox_public_key_string;
                                     String color_pkey = "<font color=\"#331bc5\">";
                                     String ec = "</font>";
+
+                                    if (is_nightmode_active(getApplicationContext()))
+                                    {
+                                        color_pkey = "<font color=\"#8affffff\">";
+                                    }
+
                                     mytoxid.setText(Html.fromHtml(color_pkey + pubkey_temp + ec));
 
                                     mynick.setText(f.name);

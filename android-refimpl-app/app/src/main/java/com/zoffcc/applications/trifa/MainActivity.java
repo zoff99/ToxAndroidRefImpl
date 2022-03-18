@@ -153,6 +153,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
@@ -531,6 +532,8 @@ public class MainActivity extends AppCompatActivity
         metrics = resources.getDisplayMetrics();
         global_showing_messageview = false;
         global_showing_anygroupview = false;
+
+        Log.i(TAG, "is_nightmode_active:" + is_nightmode_active(this));
 
         try
         {

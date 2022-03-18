@@ -67,6 +67,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_network_connections;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
+import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.need_rotate_image_to_exif;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.rotate_image_to_exif;
@@ -621,6 +622,12 @@ public class ProfileActivity extends AppCompatActivity
             String color_nospam = "<font color=\"#990d45\">";
             String color_chksum = "<font color=\"#006600\">";
             String ec = "</font>";
+
+            if (is_nightmode_active(getApplicationContext()))
+            {
+                color_pkey = "<font color=\"#8affffff\">";
+            }
+
             mytoxid_textview.setText(Html.fromHtml(
                     color_pkey + my_pk_key_temp + ec + color_nospam + my_nospam_temp + ec + color_chksum +
                     my_chksum_temp + ec));

@@ -406,7 +406,7 @@ public class MainApplication extends Application
 
     private void updateTheme(SharedPreferences sharedPreferences)
     {
-        switch (sharedPreferences.getString("dark_mode_pref", "0"))
+        switch (sharedPreferences.getString("dark_mode_pref", "2"))
         {
             case "0":
             {

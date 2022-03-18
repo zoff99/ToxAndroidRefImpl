@@ -47,6 +47,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_PUSH_MSG_APP_PLAYSTORE;
@@ -340,6 +341,38 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                     });
                     builder.show();
 
+                    return true;
+                }
+            });
+
+
+            final ListPreference pref_dark_mode_pref = (ListPreference) findPreference("dark_mode_pref");
+
+            pref_dark_mode_pref.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
+            {
+                @Override
+                public boolean onPreferenceChange(Preference preference, Object newValue)
+                {
+                    try
+                    {
+                        if (((String) newValue).equals("0"))
+                        {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM);
+                        }
+                        else if (((String) newValue).equals("1"))
+                        {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        }
+                        else
+                        {
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        }
+                        getActivity().recreate();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                     return true;
                 }
             });
