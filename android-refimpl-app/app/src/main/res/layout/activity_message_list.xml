@@ -144,7 +144,7 @@
             android:cursorVisible="true"
             android:singleLine="true"
             android:text=""
-            android:textColor="@android:color/primary_text_light"
+            android:textColor="@color/md_black_1000"
             android:textSize="12sp" />
     </LinearLayout>
 
