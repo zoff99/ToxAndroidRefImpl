@@ -16,11 +16,9 @@
     <!-- google's material design colours from
     http://www.google.com/design/spec/style/color.html#color-ui-color-palette -->
 
-
-    <color name="friend_list_text_color">#FFFFFF</color>
+    <color name="friend_list_text_color">#8AFFFFFF</color>
     <color name="gray">#838383</color>
-    <color name="icon_colors">#FFFFFF</color>
-
+    <color name="icon_colors">#8AFFFFFF</color>
 
     <!--reds-->
     <color name="md_red_50">#FFEBEE</color>
@@ -301,7 +299,7 @@
     <color name="md_grey_700">#616161</color>
     <color name="md_grey_800">#424242</color>
     <color name="md_grey_900">#FFFFFF</color>
-    <color name="md_black_1000">#FFFFFF</color>
+    <color name="md_black_1000">#8AFFFFFF</color>
     <color name="md_white_1000">#292929</color>
 
     <!--blue grey-->

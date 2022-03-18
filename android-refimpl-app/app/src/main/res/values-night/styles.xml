@@ -13,7 +13,8 @@
         <item name="material_drawer_primary_text">@color/md_black_1000</item>
         <item name="material_drawer_primary_icon">@color/gray</item>
 
-        <item name="android:textColorPrimary">@android:color/white</item>
+        <!--<item name="android:textColorPrimary">@android:color/white</item>-->
+        <item name="android:textColorPrimary">@color/md_grey_50</item>
         <item name="android:textColorSecondary">@color/gray</item>
 
     </style>
