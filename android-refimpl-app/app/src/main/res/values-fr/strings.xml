@@ -359,7 +359,7 @@
     <string name="pref_title_download_push_msg_app">Télécharger l\'application Push Message</string>
     <string name="title_activity_conferenceinfo">Infos sur la conférence</string>
     <string name="pref_title_use_camera_x">Suppression de l\'arrière-plan</string>
-    <string name="pref_description_use_camera_x">! ! Expérimental !!
+    <string name="pref_description_use_camera_x">! ! Expérimental ! !
 \nUtiliser CameraX et supprimer l’arrière-plan dans les appels vidéo
 \nCela pourrait ne pas encore fonctionner pleinement, soyez prudent et ne dépendez pas de cela pour fonctionner toujours !</string>
     <string name="pref_description_speakerphone_tweak">Si l’application ne passe pas au haut-parleur lors d’un appel, essayez d’activer ce correctif.</string>
@@ -367,4 +367,10 @@
     <string name="pref_title_use_incognito_keyboard2">Clavier incognito</string>
     <string name="pref_description_use_incognito_keyboard2">activez pour dire au clavier de ne pas apprendre de vos mots saisis</string>
     <string name="layout___capabilities">Capacités :</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Supprimer l\'image du profil</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Voulez-vous supprimer votre photo de profil \?</string>
+    <string name="MainActivity_setup_push_tip_text">Vous n\'avez pas installé l\'application de Notification Push et n\'avez pas configuré la Notification Push. TRIfA fonctionnera pleinement sans la notification Push, mais il doit être en ligne en permanence pour recevoir des messages. Avec la notification Push, vous pouvez économiser la batterie et la bande passante Internet.
+\n
+\nVoulez-vous voir comment vous pouvez configurer la Notification Push maintenant \?</string>
+    <string name="MainActivity_setup_push_tip_title">Configurer la notification push</string>
 </resources>
