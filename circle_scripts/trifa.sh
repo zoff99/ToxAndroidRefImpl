@@ -248,6 +248,15 @@ echo "current_git_tag: $current_git_tag"
 echo "##########################################"
 echo "##########################################"
 echo "##########################################"
+latest_git_tag=$(git describe --tags --abbrev=0|sed -e 's#trifajni-##')
+echo "##########################################"
+echo "##########################################"
+echo "##########################################"
+echo "latest_git_tag: $latest_git_tag"
+echo "##########################################"
+echo "##########################################"
+echo "##########################################"
+
 
 # copy the source ----------
 cp -av /root/work/android-refimpl-app $_s_/trifa_src/
@@ -364,6 +373,8 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     cat ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.pom
     cat ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/maven-metadata-local.xml
 
+    zip -r $CIRCLE_ARTIFACTS/local_maven.zip ~/.m2
+    zip -r $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$latest_git_tag".zip ~/.m2
 
     cd $_s_/trifa_src/android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar
     cd $_s_/trifa_src/android-refimpl-app/ ; sha256sum ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar
