@@ -344,4 +344,10 @@
 \nCameraX verwenden und Hintergrund bei Videoanrufen entfernen
 \nDies könnte noch nicht vollständig funktionieren, bitte seien Sie vorsichtig und verlassen Sie sich nicht darauf, dass dies immer funktioniert!</string>
     <string name="pref_title_speakerphone_tweak">Lautsprecherfixierung für Anrufe</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Profilbild entfernen</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Möchtest du dein Profilbild entfernen\?</string>
+    <string name="MainActivity_setup_push_tip_title">Push-Benachrichtigung einrichten</string>
+    <string name="MainActivity_setup_push_tip_text">Du hast die Push-Benachrichtigungs-App nicht installiert und die Push-Benachrichtigung nicht eingerichtet. TRIfA funktioniert auch ohne Push-Benachrichtigung, aber es muss ständig online sein, um Nachrichten zu empfangen. Mit Push-Benachrichtigung kannst du Akku und Internetbandbreite sparen.
+\n
+\nMöchtest du sehen, wie du die Push-Benachrichtigung jetzt einrichten kannst\?</string>
 </resources>
