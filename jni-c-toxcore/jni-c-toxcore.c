@@ -5769,7 +5769,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1number_1i
 
     if(error != TOX_ERR_CONFERENCE_PEER_QUERY_OK)
     {
-        dbg(0, "tox_conference_peer_number_is_ours:ERROR=%d", (int)error);
+        // dbg(0, "tox_conference_peer_number_is_ours:ERROR=%d", (int)error);
         return (jint)-1;
     }
 
