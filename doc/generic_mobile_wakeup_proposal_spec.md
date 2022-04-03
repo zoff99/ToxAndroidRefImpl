@@ -123,6 +123,8 @@
 |pkt id     | 1                   | `uint8_t` 181
 |Push URL   | [0, 1000]           | `*uint8_t` Push Token (an HTTPS: URL)
 
+## Calling Push URL
+* always use this generic String as HTTP USERAGENT ```Mozilla/5.0 (Windows NT 6.1; rv:60.0) Gecko/20100101 Firefox/60.0```
 
 ## Sanity checks on Push URL
 
