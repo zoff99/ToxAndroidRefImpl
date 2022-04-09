@@ -34,7 +34,6 @@ import com.bumptech.glide.signature.ObjectKey;
 import java.io.File;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.copy_vfs_file_to_real_file;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_fileExt;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 
 public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.File, java.io.InputStream>

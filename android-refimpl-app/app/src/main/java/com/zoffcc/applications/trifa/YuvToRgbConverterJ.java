@@ -27,7 +27,6 @@ import android.renderscript.Element;
 import android.renderscript.RenderScript;
 import android.renderscript.ScriptIntrinsicYuvToRGB;
 import android.renderscript.Type.Builder;
-import android.util.Log;
 
 import org.jetbrains.annotations.NotNull;
 
