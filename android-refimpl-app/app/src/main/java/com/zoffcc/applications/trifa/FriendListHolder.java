@@ -63,6 +63,7 @@ import static com.zoffcc.applications.trifa.HelperRelay.send_all_friend_pubkeys_
 import static com.zoffcc.applications.trifa.HelperRelay.send_relay_pubkey_to_all_friends;
 import static com.zoffcc.applications.trifa.HelperRelay.set_friend_as_own_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__show_friendnumber_on_friendlist;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
@@ -226,14 +227,21 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 icon(FontAwesome.Icon.faw_lock).color(context.getResources().
                 getColor(R.color.colorPrimaryDark)).sizeDp(80);
 
-        textView.setText(fl.name);
+        String name_prefix = "";
+
+        if (PREF__show_friendnumber_on_friendlist)
+        {
+            name_prefix = "" + tox_friend_by_public_key__wrapper(fl.tox_public_key_string) + " ";
+        }
+
+        textView.setText(name_prefix + fl.name);
         try
         {
             if (fl.alias_name != null)
             {
                 if (fl.alias_name.length() > 0)
                 {
-                    textView.setText(fl.alias_name);
+                    textView.setText(name_prefix + fl.alias_name);
                 }
             }
         }
