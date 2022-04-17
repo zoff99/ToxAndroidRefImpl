@@ -2796,13 +2796,13 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     start_filter_audio(recording_samling_rate);
     set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
     // -------- resumable FTs: not working fully yet, so turn it off --------
-    tox_set_filetransfer_resumable(true);
+    //**NEW**// tox_set_filetransfer_resumable(true);
     // tox_set_filetransfer_resumable(false);
     // -------- resumable FTs: not working fully yet, so turn it off --------
 
     if (force_udp_mode == 1)
     {
-        tox_set_force_udp_only_mode(true);
+        //**NEW**//tox_set_force_udp_only_mode(true);
     }
 
     // ----------- create Tox instance -----------
@@ -4366,7 +4366,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1sending_1active(JNIEn
         return -1;
     }
 
-    return (jlong)tox_file_sending_active(tox_global, (uint32_t)friend_number);
+    return (jlong)0; //**NEW**// tox_file_sending_active(tox_global, (uint32_t)friend_number);
 }
 
 JNIEXPORT jlong JNICALL
@@ -4377,7 +4377,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1receiving_1active(JNI
         return -1;
     }
 
-    return (jlong)tox_file_receiving_active(tox_global, (uint32_t)friend_number);
+    return (jlong)0; //**NEW**// tox_file_receiving_active(tox_global, (uint32_t)friend_number);
 }
 
 JNIEXPORT jlong JNICALL
@@ -4534,11 +4534,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1do_1not_1sync_1av(JNIE
 {
     if (do_not_sync_av == 1)
     {
-        tox_set_do_not_sync_av(true);
+        //**NEW**//tox_set_do_not_sync_av(true);
     }
     else
     {
-        tox_set_do_not_sync_av(false);
+        //**NEW**//tox_set_do_not_sync_av(false);
     }
 }
 
@@ -4547,11 +4547,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1onion_1active(JNIEnv *
 {
     if (active == 1)
     {
-        tox_set_onion_active(true);
+        //**NEW**//tox_set_onion_active(true);
     }
     else
     {
-        tox_set_onion_active(false);
+        //**NEW**//tox_set_onion_active(false);
     }
 }
 
