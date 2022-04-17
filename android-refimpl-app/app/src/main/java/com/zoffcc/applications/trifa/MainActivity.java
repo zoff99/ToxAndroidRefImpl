@@ -449,6 +449,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_push_service = true;
     static String[] PREF__toxirc_muted_peers = {};
     static boolean PREF__hide_setup_push_tip = false;
+    static boolean PREF__show_friendnumber_on_friendlist = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -4853,7 +4854,7 @@ public class MainActivity extends AppCompatActivity
                         {
                             if (cm.text.equals(real_sender_text))
                             {
-                                Log.i(TAG, "friend_sync_message_v2_cb:potentially double message");
+                                Log.i(TAG, "friend_sync_message_v2_cb:potentially double message:1");
                                 // ok it's a "potentially" double message
                                 // just ignore it, but still send "receipt" to proxy so it won't send this message again
                                 send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
@@ -5937,7 +5938,7 @@ public class MainActivity extends AppCompatActivity
         {
             if (cm.text.equals(message_))
             {
-                Log.i(TAG, "conference_message_cb:potentially double message");
+                Log.i(TAG, "conference_message_cb:potentially double message:2");
                 // ok it's a "potentially" double message
                 return;
             }
