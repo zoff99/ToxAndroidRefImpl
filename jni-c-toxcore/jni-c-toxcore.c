@@ -2802,7 +2802,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 
     if (force_udp_mode == 1)
     {
-        //**NEW**//tox_set_force_udp_only_mode(true);
+        tox_set_force_udp_only_mode(true);
     }
 
     // ----------- create Tox instance -----------
@@ -4534,11 +4534,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1do_1not_1sync_1av(JNIE
 {
     if (do_not_sync_av == 1)
     {
-        //**NEW**//tox_set_do_not_sync_av(true);
+        tox_set_do_not_sync_av(true);
     }
     else
     {
-        //**NEW**//tox_set_do_not_sync_av(false);
+        tox_set_do_not_sync_av(false);
     }
 }
 
@@ -4547,11 +4547,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1onion_1active(JNIEnv *
 {
     if (active == 1)
     {
-        //**NEW**//tox_set_onion_active(true);
+        tox_set_onion_active(true);
     }
     else
     {
-        //**NEW**//tox_set_onion_active(false);
+        tox_set_onion_active(false);
     }
 }
 
