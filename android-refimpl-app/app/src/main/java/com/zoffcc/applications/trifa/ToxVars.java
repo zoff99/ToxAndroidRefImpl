@@ -40,10 +40,20 @@ public class ToxVars
     public static final int TOX_FILE_ID_LENGTH = 32;
     public static final int TOX_MAX_FILENAME_LENGTH = 255;
     //
+    // -- Group chat numeric constants
+    public static final int TOX_GROUP_MAX_TOPIC_LENGTH = 512;
+    public static final int TOX_GROUP_MAX_PART_LENGTH = 128;
+    public static final int TOX_GROUP_MAX_GROUP_NAME_LENGTH = 48;
+    public static final int TOX_GROUP_MAX_PASSWORD_SIZE = 32;
+    public static final int TOX_GROUP_CHAT_ID_SIZE = 32;
+    public static final int TOX_GROUP_PEER_PUBLIC_KEY_SIZE = 32;
+    // -- Group chat numeric constants
+    //
     public static final int TOX_MSGV3_MSGID_LENGTH = 32;
     public static final int TOX_MSGV3_TIMESTAMP_LENGTH = 4;
     public static final int TOX_MSGV3_GUARD = 2;
-    public static final int TOX_MSGV3_MAX_MESSAGE_LENGTH  = (TOX_MAX_MESSAGE_LENGTH - TOX_MSGV3_MSGID_LENGTH - TOX_MSGV3_TIMESTAMP_LENGTH - TOX_MSGV3_GUARD);
+    public static final int TOX_MSGV3_MAX_MESSAGE_LENGTH = (TOX_MAX_MESSAGE_LENGTH - TOX_MSGV3_MSGID_LENGTH -
+                                                            TOX_MSGV3_TIMESTAMP_LENGTH - TOX_MSGV3_GUARD);
     // TODO: get these with the appropriate JNI functions!
     // ------ global defines ------
     // ------ global defines ------
@@ -1528,7 +1538,7 @@ public class ToxVars
             3), TOXAV_CALL_COMM_ENCODER_IN_USE_H264_OMX_PI(6), TOXAV_CALL_COMM_DECODER_CURRENT_BITRATE(
             4), TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE(5), TOXAV_CALL_COMM_NETWORK_ROUND_TRIP_MS(
             7), TOXAV_CALL_COMM_PLAY_DELAY(8), TOXAV_CALL_COMM_PLAY_BUFFER_ENTRIES(9), TOXAV_CALL_COMM_INCOMING_FPS(
-            10), TOXAV_CALL_COMM_REMOTE_RECORD_DELAY(11);;
+            10), TOXAV_CALL_COMM_REMOTE_RECORD_DELAY(11);
 
         public int value;
 
@@ -1537,6 +1547,38 @@ public class ToxVars
             this.value = value;
         }
     }
+
+    public static enum TOX_GROUP_PRIVACY_STATE
+    {
+
+        /**
+         * The group is considered to be public. Anyone may join the group using the Chat ID.
+         * <p>
+         * If the group is in this state, even if the Chat ID is never explicitly shared
+         * with someone outside of the group, information including the Chat ID, IP addresses,
+         * and peer ID's (but not Tox ID's) is visible to anyone with access to a node
+         * storing a DHT entry for the given group.
+         */
+        TOX_GROUP_PRIVACY_STATE_PUBLIC(0),
+
+        /**
+         * The group is considered to be private. The only way to join the group is by having
+         * someone in your contact list send you an invite.
+         * <p>
+         * If the group is in this state, no group information (mentioned above) is present in the DHT;
+         * the DHT is not used for any purpose at all. If a public group is set to private,
+         * all DHT information related to the group will expire shortly.
+         */
+        TOX_GROUP_PRIVACY_STATE_PRIVATE(1);
+
+        public int value;
+
+        private TOX_GROUP_PRIVACY_STATE(int value)
+        {
+            this.value = value;
+        }
+    }
+
     // ---------- TOX -------------
     // ---------- TOX -------------
     // ---------- TOX -------------

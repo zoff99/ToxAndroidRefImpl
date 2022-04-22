@@ -3055,6 +3055,106 @@ public class MainActivity extends AppCompatActivity
     // --------------- Conference -------------
     // --------------- Conference -------------
 
+    // --------------- new Groups -------------
+    // --------------- new Groups -------------
+    // --------------- new Groups -------------
+
+    /**
+     * Creates a new group chat.
+     * <p>
+     * This function creates a new group chat object and adds it to the chats array.
+     * <p>
+     * The caller of this function has Founder role privileges.
+     * <p>
+     * The client should initiate its peer list with self info after calling this function, as
+     * the peer_join callback will not be triggered.
+     *
+     * @param a_TOX_GROUP_PRIVACY_STATE The privacy state of the group. If this is set to TOX_GROUP_PRIVACY_STATE_PUBLIC,
+     *                                  the group will attempt to announce itself to the DHT and anyone with the Chat ID may join.
+     *                                  Otherwise a friend invite will be required to join the group.
+     * @param group_name                The name of the group. The name must be non-NULL.
+     * @param my_peer_name              The name of the peer creating the group.
+     * @return group_number on success, UINT32_MAX on failure.
+     */
+    public static native long tox_group_new(int a_TOX_GROUP_PRIVACY_STATE, String group_name, String my_peer_name);
+
+    /**
+     * Joins a group chat with specified Chat ID.
+     * <p>
+     * This function creates a new group chat object, adds it to the chats array, and sends
+     * a DHT announcement to find peers in the group associated with chat_id. Once a peer has been
+     * found a join attempt will be initiated.
+     *
+     * @param chat_id_buffer The Chat ID of the group you wish to join. This must be TOX_GROUP_CHAT_ID_SIZE bytes.
+     * @param password       The password required to join the group. Set to NULL if no password is required.
+     * @param my_peer_name   The name of the peer joining the group.
+     * @return group_number on success, UINT32_MAX on failure.
+     */
+    public static native long tox_group_join(ByteBuffer chat_id_buffer, String my_peer_name, String password);
+
+    public static native int tox_group_leave(long group_number, String part_message);
+
+    public static native long tox_group_self_get_peer_id(long group_number);
+
+    public static native String tox_group_self_get_public_key(long group_number);
+
+    public static native int tox_group_get_chat_id(long group_number, ByteBuffer chat_id_buffer);
+
+    public static native long tox_group_get_number_groups();
+
+    public static native int tox_group_get_privacy_state(long group_number);
+
+    /**
+     * Send a text chat message to the group.
+     * <p>
+     * This function creates a group message packet and pushes it into the send
+     * queue.
+     * <p>
+     * The message length may not exceed TOX_MAX_MESSAGE_LENGTH. Larger messages
+     * must be split by the client and sent as separate messages. Other clients can
+     * then reassemble the fragments. Messages may not be empty.
+     *
+     * @param group_number       The group number of the group the message is intended for.
+     * @param a_TOX_MESSAGE_TYPE Message type (normal, action, ...).
+     * @param message            A non-NULL pointer to the first element of a byte array
+     *                           containing the message text.
+     * @return true on success.
+     */
+    public static native int tox_group_send_message(long group_number, int a_TOX_MESSAGE_TYPE, String message);
+
+    /**
+     * Send a text chat message to the specified peer in the specified group.
+     * <p>
+     * This function creates a group private message packet and pushes it into the send
+     * queue.
+     * <p>
+     * The message length may not exceed TOX_MAX_MESSAGE_LENGTH. Larger messages
+     * must be split by the client and sent as separate messages. Other clients can
+     * then reassemble the fragments. Messages may not be empty.
+     *
+     * @param group_number The group number of the group the message is intended for.
+     * @param peer_id      The ID of the peer the message is intended for.
+     * @param message      A non-NULL pointer to the first element of a byte array
+     *                     containing the message text.
+     * @return true on success.
+     */
+    public static native int tox_group_send_private_message(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message);
+
+    /**
+     * Accept an invite to a group chat that the client previously received from a friend. The invite
+     * is only valid while the inviter is present in the group.
+     *
+     * @param invite_data_buffer The invite data received from the `group_invite` event.
+     * @param my_peer_name       The name of the peer joining the group.
+     * @param password           The password required to join the group. Set to NULL if no password is required.
+     * @return the group_number on success, UINT32_MAX on failure.
+     */
+    public static native long tox_group_invite_accept(long friend_number, ByteBuffer invite_data_buffer, String my_peer_name, String password);
+    // --------------- new Groups -------------
+    // --------------- new Groups -------------
+    // --------------- new Groups -------------
+
+
     // --------------- AV - Conference --------
     // --------------- AV - Conference --------
     // --------------- AV - Conference --------
@@ -6560,6 +6660,28 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native Conference methods --------
     // -------- called by native Conference methods --------
 
+    // -------- called by native new Group methods --------
+    // -------- called by native new Group methods --------
+    // -------- called by native new Group methods --------
+
+    static void android_tox_callback_group_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
+    {
+
+    }
+
+    static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
+    {
+
+    }
+
+    static void android_tox_callback_group_invite_cb_method(long friend_number, ByteBuffer invite_data_buffer, String group_name)
+    {
+
+    }
+
+    // -------- called by native new Group methods --------
+    // -------- called by native new Group methods --------
+    // -------- called by native new Group methods --------
 
     /*
      * this is used to load the native library on
