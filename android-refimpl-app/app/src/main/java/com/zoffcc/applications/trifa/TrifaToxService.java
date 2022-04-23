@@ -46,6 +46,7 @@ import info.guardianproject.iocipher.VirtualFileSystem;
 
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conference;
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
@@ -609,7 +610,7 @@ public class TrifaToxService extends Service
                 {
                     // reload friend in friendlist
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = true;
+                    cc.is_friend = COMBINED_IS_FRIEND;
                     cc.friend_item = fl_check.get(0);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }

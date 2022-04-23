@@ -34,6 +34,8 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_AV;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
@@ -634,7 +636,7 @@ public class HelperConference
                         conference_identifierEq(conference_identifier).toList().get(0);
                 // update or add to "friendlist"
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = false;
+                cc.is_friend = COMBINED_IS_CONFERENCE;
                 cc.conference_item = ConferenceDB.deep_copy(conf3);
                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
@@ -669,7 +671,7 @@ public class HelperConference
                 {
                     // update or add to "friendlist"
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = false;
+                    cc.is_friend = COMBINED_IS_CONFERENCE;
                     cc.conference_item = ConferenceDB.deep_copy(conf_new);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
@@ -695,7 +697,7 @@ public class HelperConference
             if (conf != null)
             {
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = false;
+                cc.is_friend = COMBINED_IS_CONFERENCE;
                 cc.conference_item = conf;
                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }

@@ -36,6 +36,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.HelperMessage.get_message_in_db_sent_push_is_read;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_sent_push_set;
 import static com.zoffcc.applications.trifa.HelperRelay.get_pushurl_for_friend;
@@ -1250,7 +1251,7 @@ public class HelperFriend
             if (MainActivity.friend_list_fragment != null)
             {
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = true;
+                cc.is_friend = COMBINED_IS_FRIEND;
                 cc.friend_item = f;
                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }

@@ -35,6 +35,8 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ONE_HOUR_IN_MS;
@@ -123,11 +125,11 @@ public class FriendListFragment extends Fragment
         Log.i(TAG, "onAttach(Activity)");
     }
 
-    synchronized void modify_friend(final CombinedFriendsAndConferences c, boolean is_friend)
+    synchronized void modify_friend(final CombinedFriendsAndConferences c, int is_friend)
     {
         // Log.i(TAG, "modify_friend");
 
-        if (is_friend)
+        if (is_friend == COMBINED_IS_FRIEND)
         {
             final FriendList f = c.friend_item;
 
@@ -153,7 +155,7 @@ public class FriendListFragment extends Fragment
                         {
                             FriendList n = deep_copy(f2);
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                            cfac.is_friend = true;
+                            cfac.is_friend = COMBINED_IS_FRIEND;
                             cfac.friend_item = n;
                             boolean found_friend = adapter.update_item(cfac, cfac.is_friend);
                             // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
@@ -207,7 +209,7 @@ public class FriendListFragment extends Fragment
                         {
                             ConferenceDB n = ConferenceDB.deep_copy(conf2);
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                            cfac.is_friend = false;
+                            cfac.is_friend = COMBINED_IS_CONFERENCE;
                             cfac.conference_item = n;
                             boolean found_friend = adapter.update_item(cfac, cfac.is_friend);
                             // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
@@ -301,7 +303,7 @@ public class FriendListFragment extends Fragment
                             {
                                 FriendList n = deep_copy(fl.get(i));
                                 final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                                cc.is_friend = true;
+                                cc.is_friend = COMBINED_IS_FRIEND;
                                 cc.friend_item = n;
                                 modify_friend(cc, cc.is_friend);
                                 // Log.i(TAG, "onResume:modify_friend:" + n);
@@ -324,7 +326,7 @@ public class FriendListFragment extends Fragment
                             {
                                 ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
                                 CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                                cfac.is_friend = false;
+                                cfac.is_friend = COMBINED_IS_CONFERENCE;
                                 cfac.conference_item = n;
                                 modify_friend(cfac, cfac.is_friend);
                                 // Log.i(TAG, "onResume:modify_friend:" + n);
@@ -369,7 +371,7 @@ public class FriendListFragment extends Fragment
                         {
                             FriendList n = deep_copy(fl.get(i));
                             final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                            cc.is_friend = true;
+                            cc.is_friend = COMBINED_IS_FRIEND;
                             cc.friend_item = n;
                             modify_friend(cc, cc.is_friend);
                             // Log.i(TAG, "onResume:modify_friend:" + n);
@@ -392,7 +394,7 @@ public class FriendListFragment extends Fragment
                         {
                             ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                            cfac.is_friend = false;
+                            cfac.is_friend = COMBINED_IS_CONFERENCE;
                             cfac.conference_item = n;
                             modify_friend(cfac, cfac.is_friend);
                             // Log.i(TAG, "onResume:modify_friend:" + n);
@@ -465,7 +467,7 @@ public class FriendListFragment extends Fragment
                                         {
                                             FriendList n = FriendList.deep_copy(fl.get(i));
                                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                                            cfac.is_friend = true;
+                                            cfac.is_friend = COMBINED_IS_FRIEND;
                                             cfac.friend_item = n;
                                             adapter.add_item(cfac);
                                             // Log.i(TAG, "add_all_friends_clear:add:" + n);
@@ -500,7 +502,7 @@ public class FriendListFragment extends Fragment
                                                 if (new_messages_count > 0)
                                                 {
                                                     CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                                                    cfac.is_friend = true;
+                                                    cfac.is_friend = COMBINED_IS_FRIEND;
                                                     cfac.friend_item = n;
                                                     adapter.add_item(cfac);
                                                     // Log.i(TAG, "add_all_friends_clear:add:" + n);
@@ -538,7 +540,7 @@ public class FriendListFragment extends Fragment
                                                 if (new_messages_count > 0)
                                                 {
                                                     CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                                                    cfac.is_friend = false;
+                                                    cfac.is_friend = COMBINED_IS_CONFERENCE;
                                                     cfac.conference_item = n;
                                                     adapter.add_item(cfac);
                                                     // Log.i(TAG, "add_all_friends_clear:add:" + n);
@@ -584,7 +586,7 @@ public class FriendListFragment extends Fragment
                                             if (new_messages_count == 0)
                                             {
                                                 CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                                                cfac.is_friend = true;
+                                                cfac.is_friend = COMBINED_IS_FRIEND;
                                                 cfac.friend_item = n;
                                                 adapter.add_item(cfac);
                                                 // Log.i(TAG, "add_all_friends_clear:add:" + n);
@@ -623,7 +625,7 @@ public class FriendListFragment extends Fragment
                                             if (new_messages_count == 0)
                                             {
                                                 CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
-                                                cfac.is_friend = false;
+                                                cfac.is_friend = COMBINED_IS_CONFERENCE;
                                                 cfac.conference_item = n;
                                                 adapter.add_item(cfac);
                                                 // Log.i(TAG, "add_all_friends_clear:add:" + n);

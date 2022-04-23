@@ -32,6 +32,9 @@ import java.util.List;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_friendlist;
 
 public class FriendlistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
@@ -93,9 +96,13 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
     {
         CombinedFriendsAndConferences my_item = this.friendlistitems.get(position);
 
-        if (my_item.is_friend)
+        if (my_item.is_friend == COMBINED_IS_FRIEND)
         {
             return CombinedFriendsAndConferences_model.ITEM_IS_FRIEND;
+        }
+        else if (my_item.is_friend == COMBINED_IS_GROUP)
+        {
+            return 0;
         }
         else // is conference
         {
@@ -173,7 +180,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         this.notifyDataSetChanged();
     }
 
-    public boolean update_item(CombinedFriendsAndConferences new_item_combined, boolean is_friend)
+    public boolean update_item(CombinedFriendsAndConferences new_item_combined, int is_friend)
     {
         // Log.i(TAG, "update_item:" + new_item);
         boolean found_item = false;
@@ -185,9 +192,9 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
             {
                 CombinedFriendsAndConferences f_combined = (CombinedFriendsAndConferences) it.next();
 
-                if (is_friend)
+                if (is_friend == COMBINED_IS_FRIEND)
                 {
-                    if (f_combined.is_friend)
+                    if (f_combined.is_friend == COMBINED_IS_FRIEND)
                     {
                         FriendList f = f_combined.friend_item;
                         FriendList new_item = new_item_combined.friend_item;
@@ -202,9 +209,13 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
                         }
                     }
                 }
+                else if (is_friend == COMBINED_IS_GROUP)
+                {
+
+                }
                 else // is conference
                 {
-                    if (!f_combined.is_friend)
+                    if (f_combined.is_friend == COMBINED_IS_CONFERENCE)
                     {
                         ConferenceDB f = f_combined.conference_item;
                         ConferenceDB new_item = new_item_combined.conference_item;

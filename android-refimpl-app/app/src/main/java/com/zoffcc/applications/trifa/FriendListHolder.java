@@ -43,6 +43,8 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.HelperConference.add_conference_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_files;
@@ -590,7 +592,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             if (!sorted_reload)
                             {
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                                cc.is_friend = true;
+                                cc.is_friend = COMBINED_IS_FRIEND;
                                 cc.friend_item = this.friendlist;
                                 friend_list_fragment.modify_friend(cc, cc.is_friend);
                             }
@@ -627,7 +629,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                             if (!sorted_reload)
                             {
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                                cc.is_friend = true;
+                                cc.is_friend = COMBINED_IS_FRIEND;
                                 cc.friend_item = this.friendlist;
                                 friend_list_fragment.modify_friend(cc, cc.is_friend);
                             }
