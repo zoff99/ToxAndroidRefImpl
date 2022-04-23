@@ -23,9 +23,11 @@ import android.database.Cursor;
 import android.util.Log;
 
 import java.nio.ByteBuffer;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
@@ -57,6 +59,21 @@ public class HelperGroup
             //Log.i(TAG, "add_conference_wrapper:error=" + conference_num + " joining conference");
         }
 
+        try
+        {
+            if (MainActivity.group_message_list_activity != null)
+            {
+                if (MainActivity.group_message_list_activity.get_current_group_id().equals(group_identifier))
+                {
+                    MainActivity.group_message_list_activity.set_group_connection_status_icon();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         // save tox savedate file
         HelperGeneric.update_savedata_file_wrapper();
     }
@@ -79,14 +96,11 @@ public class HelperGroup
                 Log.i(TAG, "new_or_updated_group:*update*");
                 final GroupDB conf3 = orma.selectFromGroupDB().
                         group_identifierEq(group_identifier).toList().get(0);
-                // TODO: add to main friendlist
                 // update or add to "friendlist"
-                /*
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = false;
-                cc.conference_item = ConferenceDB.deep_copy(conf3);
+                cc.is_friend = COMBINED_IS_CONFERENCE;
+                cc.group_item = GroupDB.deep_copy(conf3);
                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
-                */
             }
             catch (Exception e3)
             {
@@ -116,14 +130,10 @@ public class HelperGroup
 
                 try
                 {
-                    // TODO: add to main friendlist
-                    // update or add to "friendlist"
-                    /*
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = false;
-                    cc.conference_item = ConferenceDB.deep_copy(conf_new);
+                    cc.is_friend = COMBINED_IS_CONFERENCE;
+                    cc.group_item = GroupDB.deep_copy(conf_new);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
-                    */
                 }
                 catch (Exception e4)
                 {
@@ -212,8 +222,7 @@ public class HelperGroup
                         {
                             try
                             {
-                                GroupMessage m = orma.selectFromGroupMessage().idEq(
-                                        message_id).orderByIdDesc().get(0);
+                                GroupMessage m = orma.selectFromGroupMessage().idEq(message_id).orderByIdDesc().get(0);
 
                                 if (m.id != -1)
                                 {
@@ -247,4 +256,24 @@ public class HelperGroup
         return "some peer";
     }
 
+    static String group_identifier_short(String group_identifier, boolean uppercase_result)
+    {
+        try
+        {
+            if (uppercase_result)
+            {
+                return (group_identifier.substring(group_identifier.length() - 6,
+                                                   group_identifier.length())).toUpperCase(Locale.ENGLISH);
+            }
+            else
+            {
+                return group_identifier.substring(group_identifier.length() - 6, group_identifier.length());
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return group_identifier;
+        }
+    }
 }

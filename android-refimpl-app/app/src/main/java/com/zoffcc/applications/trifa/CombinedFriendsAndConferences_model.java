@@ -24,6 +24,7 @@ public class CombinedFriendsAndConferences_model
 {
     public static final int ITEM_IS_FRIEND = 1001;
     public static final int ITEM_IS_CONFERENCE = 1002;
+    public static final int ITEM_IS_GROUP = 1003;
 
     public static final int ERROR_UNKNOWN = 9999;
 }

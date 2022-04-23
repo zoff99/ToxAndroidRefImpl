@@ -37,6 +37,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ONE_HOUR_IN_MS;
@@ -157,6 +158,60 @@ public class FriendListFragment extends Fragment
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                             cfac.is_friend = COMBINED_IS_FRIEND;
                             cfac.friend_item = n;
+                            boolean found_friend = adapter.update_item(cfac, cfac.is_friend);
+                            // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
+
+                            if (!found_friend)
+                            {
+                                adapter.add_item(cfac);
+                                // Log.i(TAG, "modify_friend:add_item");
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+
+            try
+            {
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "modify_friend:EE1:" + e.getMessage());
+            }
+        }
+        else if (is_friend == COMBINED_IS_GROUP)
+        {
+            final GroupDB cc = c.group_item;
+
+            // Log.i(TAG, "modify_friend:start");
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
+                        // and().
+                        final GroupDB conf2 = orma.selectFromGroupDB().
+                                group_identifierEq(cc.group_identifier).
+                                toList().get(0);
+
+                        if (conf2 != null)
+                        {
+                            GroupDB n = GroupDB.deep_copy(conf2);
+                            CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                            cfac.is_friend = COMBINED_IS_GROUP;
+                            cfac.group_item = n;
                             boolean found_friend = adapter.update_item(cfac, cfac.is_friend);
                             // Log.i(TAG, "modify_friend:found_friend=" + found_friend + " n=" + n);
 
@@ -334,6 +389,29 @@ public class FriendListFragment extends Fragment
                         }
                     }
 
+                    // reload groups
+                    List<GroupDB> groups = orma.selectFromGroupDB().
+                            orderByNotification_silentAsc().
+                            toList();
+
+                    if (groups != null)
+                    {
+                        if (groups.size() > 0)
+                        {
+                            int i = 0;
+                            for (i = 0; i < groups.size(); i++)
+                            {
+                                GroupDB n = GroupDB.deep_copy(groups.get(i));
+                                CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                cfac.is_friend = COMBINED_IS_GROUP;
+                                cfac.group_item = n;
+                                modify_friend(cfac, cfac.is_friend);
+                                // Log.i(TAG, "onResume:modify_friend:" + n);
+                            }
+                        }
+                    }
+
+
                     Log.i(TAG, "onResume:BB");
                 }
                 catch (Exception e)
@@ -396,6 +474,28 @@ public class FriendListFragment extends Fragment
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                             cfac.is_friend = COMBINED_IS_CONFERENCE;
                             cfac.conference_item = n;
+                            modify_friend(cfac, cfac.is_friend);
+                            // Log.i(TAG, "onResume:modify_friend:" + n);
+                        }
+                    }
+                }
+
+                // reload groups
+                List<GroupDB> groups = orma.selectFromGroupDB().
+                        orderByNotification_silentAsc().
+                        toList();
+
+                if (groups != null)
+                {
+                    if (groups.size() > 0)
+                    {
+                        int i = 0;
+                        for (i = 0; i < groups.size(); i++)
+                        {
+                            GroupDB n = GroupDB.deep_copy(groups.get(i));
+                            CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                            cfac.is_friend = COMBINED_IS_GROUP;
+                            cfac.group_item = n;
                             modify_friend(cfac, cfac.is_friend);
                             // Log.i(TAG, "onResume:modify_friend:" + n);
                         }
@@ -554,6 +654,43 @@ public class FriendListFragment extends Fragment
                                 }
                                 // ------------- add conferences (with new messages) -------------
 
+                                // ------------- add groups (with new messages) -------------
+                                List<GroupDB> groupsm = orma.selectFromGroupDB().
+                                        orderByNotification_silentAsc().
+                                        toList();
+
+                                if (groupsm != null)
+                                {
+                                    if (groupsm.size() > 0)
+                                    {
+                                        int i = 0;
+                                        for (i = 0; i < groupsm.size(); i++)
+                                        {
+                                            GroupDB n = GroupDB.deep_copy(groupsm.get(i));
+
+                                            try
+                                            {
+                                                int new_messages_count = orma.selectFromGroupMessage().
+                                                        group_identifierEq(n.group_identifier).and().is_newEq(
+                                                        true).count();
+
+                                                if (new_messages_count > 0)
+                                                {
+                                                    CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                                    cfac.is_friend = COMBINED_IS_GROUP;
+                                                    cfac.group_item = n;
+                                                    adapter.add_item(cfac);
+                                                    // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+                                        }
+                                    }
+                                }
+                                // ------------- add groups (with new messages) -------------
+
                                 // ------------- add rest of friends  -------------
                                 List<FriendList> fl2 = orma.selectFromFriendList().
                                         is_relayNotEq(true).
@@ -635,7 +772,43 @@ public class FriendListFragment extends Fragment
                                 }
                                 // ------------- add conferences -------------
 
+                                // ------------- add groups -------------
+                                List<GroupDB> groups = orma.selectFromGroupDB().
+                                        orderByNotification_silentAsc().
+                                        toList();
 
+                                if (groups != null)
+                                {
+                                    if (groups.size() > 0)
+                                    {
+                                        int i = 0;
+                                        for (i = 0; i < groups.size(); i++)
+                                        {
+                                            GroupDB n = GroupDB.deep_copy(groups.get(i));
+
+                                            int new_messages_count = 0;
+                                            try
+                                            {
+                                                new_messages_count = orma.selectFromGroupMessage().
+                                                        group_identifierEq(n.group_identifier).and().is_newEq(
+                                                        true).count();
+                                            }
+                                            catch (Exception e)
+                                            {
+                                            }
+
+                                            if (new_messages_count == 0)
+                                            {
+                                                CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
+                                                cfac.is_friend = COMBINED_IS_GROUP;
+                                                cfac.group_item = n;
+                                                adapter.add_item(cfac);
+                                                // Log.i(TAG, "add_all_friends_clear:add:" + n);
+                                            }
+                                        }
+                                    }
+                                }
+                                // ------------- add groups -------------
                             }
                             catch (Exception e)
                             {

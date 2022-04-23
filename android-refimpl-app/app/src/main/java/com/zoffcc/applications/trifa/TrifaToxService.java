@@ -96,6 +96,7 @@ import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activi
 import static com.zoffcc.applications.trifa.MainActivity.conference_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.get_my_toxid;
+import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.receiver1;
 import static com.zoffcc.applications.trifa.MainActivity.receiver2;
@@ -722,6 +723,21 @@ public class TrifaToxService extends Service
 
                 new_or_updated_group(conf_, tox_friend_get_public_key__wrapper(0), group_identifier,
                                      tox_group_get_privacy_state(conf_));
+
+                try
+                {
+                    if (group_message_list_activity != null)
+                    {
+                        if (group_message_list_activity.get_current_group_id().equals(group_identifier))
+                        {
+                            group_message_list_activity.set_group_connection_status_icon();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
     }
