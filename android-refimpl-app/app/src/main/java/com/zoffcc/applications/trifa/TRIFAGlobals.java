@@ -66,11 +66,14 @@ public class TRIFAGlobals
     public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
     public static final int CONFERENCE_COOKIE_LENGTH = 35;
     public static final int CONFERENCE_ID_LENGTH = 32;
+    public static final int GROUP_ID_LENGTH = 32;
 
     public static final String TEXT_QUOTE_STRING_1 = "----\n";
     public static final String TEXT_QUOTE_STRING_2 = "\n----";
 
     public static final int MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION = 4;
+
+    public static final long UINT32_MAX_JAVA = 4294967295L; // 0xffffffff == UINT32_MAX
 
     // ----------
     // https://toxme.io/u/echobot

@@ -53,6 +53,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_AGAIN_MAX_COUNT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_AGAIN_SECONDS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -643,7 +644,7 @@ public class HelperFriend
                 long friendnum = MainActivity.tox_friend_add_norequest(friend_public_key); // add friend
                 Log.d(TAG, "add_friend_to_system:fnum add=" + friendnum);
 
-                if (friendnum == 4294967295L) // 0xffffffff == UINT32_MAX
+                if (friendnum == UINT32_MAX_JAVA) // 0xffffffff == UINT32_MAX
                 {
                     // Log.d(TAG, "add_friend_to_system:fnum add res=0xffffffff as_friends_relay=" + as_friends_relay);
                     // adding friend failed
