@@ -328,6 +328,8 @@ public class MainActivity extends AppCompatActivity
     static MessageListActivity message_list_activity = null;
     static ConferenceMessageListFragment conference_message_list_fragment = null;
     static ConferenceMessageListActivity conference_message_list_activity = null;
+    static GroupMessageListFragment group_message_list_fragment = null;
+    static GroupMessageListActivity group_message_list_activity = null;
     static ConferenceAudioActivity conference_audio_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
@@ -473,6 +475,7 @@ public class MainActivity extends AppCompatActivity
     static List<Long> selected_messages_text_only = new ArrayList<Long>();
     static List<Long> selected_messages_incoming_file = new ArrayList<Long>();
     static List<Long> selected_conference_messages = new ArrayList<Long>();
+    static List<Long> selected_group_messages = new ArrayList<Long>();
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;

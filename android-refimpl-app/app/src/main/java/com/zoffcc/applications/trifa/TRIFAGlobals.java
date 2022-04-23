@@ -37,6 +37,7 @@ public class TRIFAGlobals
     static long global_self_last_entered_battery_saving_timestamp = -1;
     static boolean global_showing_messageview = false;
     static boolean global_showing_anygroupview = false;
+    static boolean global_showing_anynewgroupview = false;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
     static String global_notification_token = null;

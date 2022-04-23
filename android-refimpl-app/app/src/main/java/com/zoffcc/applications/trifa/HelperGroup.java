@@ -19,8 +19,17 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.database.Cursor;
 import android.util.Log;
 
+import java.nio.ByteBuffer;
+
+import androidx.annotation.NonNull;
+
+import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperGroup
@@ -130,4 +139,112 @@ public class HelperGroup
             }
         }
     }
+
+    public static long tox_group_by_confid__wrapper(@NonNull String group_id_string)
+    {
+        // TODO: add API call to toxcore to get groupnumber by groupid string
+        long num_groups = tox_group_get_number_groups();
+        Log.i(TAG, "tox_group_by_confid__wrapper: all groups count=" + num_groups);
+
+        ByteBuffer groupid_buf3 = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
+
+        int conf_ = 0;
+        for (conf_ = 0; conf_ < num_groups; conf_++)
+        {
+            groupid_buf3.clear();
+            if (tox_group_get_chat_id(conf_, groupid_buf3) == 0)
+            {
+                byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
+                groupid_buf3.get(groupid_buffer, 0, GROUP_ID_LENGTH);
+                String group_identifier = bytes_to_hex(groupid_buffer);
+
+                Log.i(TAG, "tox_group_by_confid__wrapper: compare:" + group_identifier.toLowerCase() + " " +
+                           group_id_string.toLowerCase());
+                if (group_identifier.toLowerCase().equals(group_id_string.toLowerCase()))
+                {
+                    return (long) conf_;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+
+    static long insert_into_group_message_db(final GroupMessage m, final boolean update_group_view_flag)
+    {
+        long row_id = orma.insertIntoGroupMessage(m);
+
+        try
+        {
+            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM GroupMessage where rowid='" + row_id + "'");
+            cursor.moveToFirst();
+            //Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
+            long msg_id = cursor.getLong(0);
+            cursor.close();
+
+            if (update_group_view_flag)
+            {
+                add_single_group_message_from_messge_id(msg_id, true);
+            }
+
+            return msg_id;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return -1;
+        }
+    }
+
+    public static void add_single_group_message_from_messge_id(final long message_id, final boolean force)
+    {
+        try
+        {
+            if (MainActivity.group_message_list_fragment != null)
+            {
+                Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        if (message_id != -1)
+                        {
+                            try
+                            {
+                                GroupMessage m = orma.selectFromGroupMessage().idEq(
+                                        message_id).orderByIdDesc().get(0);
+
+                                if (m.id != -1)
+                                {
+                                    if ((force) || (MainActivity.update_all_messages_global_timestamp +
+                                                    MainActivity.UPDATE_MESSAGES_NORMAL_MILLIS <
+                                                    System.currentTimeMillis()))
+                                    {
+                                        MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
+                                        MainActivity.group_message_list_fragment.add_message(m);
+                                    }
+                                }
+                            }
+                            catch (Exception e2)
+                            {
+                            }
+                        }
+                    }
+                };
+                t.start();
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+        }
+    }
+
+    public static String tox_conference_peer_get_name__wrapper(String group_identifier, String group_peer_pubkey)
+    {
+        // TODO: write me
+        return "some peer";
+    }
+
 }
