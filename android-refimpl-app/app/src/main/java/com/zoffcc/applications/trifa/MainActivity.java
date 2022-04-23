@@ -3149,7 +3149,7 @@ public class MainActivity extends AppCompatActivity
      * @param password           The password required to join the group. Set to NULL if no password is required.
      * @return the group_number on success, UINT32_MAX on failure.
      */
-    public static native long tox_group_invite_accept(long friend_number, ByteBuffer invite_data_buffer, String my_peer_name, String password);
+    public static native long tox_group_invite_accept(long friend_number, ByteBuffer invite_data_buffer, long invite_data_length, String my_peer_name, String password);
     // --------------- new Groups -------------
     // --------------- new Groups -------------
     // --------------- new Groups -------------
@@ -6666,17 +6666,27 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_group_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
     {
-
+        Log.i(TAG, "group_message_cb:gn=" + group_number + " peerid=" + peer_id + " message=" + message_orig);
     }
 
     static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
     {
-
+        Log.i(TAG, "group_private_message_cb:gn=" + group_number + " peerid=" + peer_id + " message=" + message_orig);
     }
 
-    static void android_tox_callback_group_invite_cb_method(long friend_number, ByteBuffer invite_data_buffer, String group_name)
+    static void android_tox_callback_group_invite_cb_method(long friend_number, final byte[] invite_data, final long invite_data_length, String group_name)
     {
+        Log.i(TAG,
+              "group_invite_cb:fn=" + friend_number + " invite_data_length=" + invite_data_length + " invite_data=" +
+              bytes_to_hex(invite_data) + " groupname=" + group_name);
 
+        final ByteBuffer invite_data_buf_wrapped = ByteBuffer.allocateDirect((int) invite_data_length);
+        invite_data_buf_wrapped.put(invite_data, 0, (int) invite_data_length);
+        invite_data_buf_wrapped.rewind();
+        long new_group_num = tox_group_invite_accept(friend_number, invite_data_buf_wrapped, invite_data_length, "name",
+                                                     null);
+
+        Log.i(TAG, "group_invite_cb:fn=" + friend_number + " got invited to group num=" + new_group_num);
     }
 
     // -------- called by native new Group methods --------
