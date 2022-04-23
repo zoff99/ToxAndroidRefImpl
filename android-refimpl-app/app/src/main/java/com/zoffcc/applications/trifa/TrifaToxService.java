@@ -71,6 +71,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_resend_msgv3_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.vfs__unmount;
+import static com.zoffcc.applications.trifa.HelperGroup.new_or_updated_group;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
@@ -105,6 +106,9 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chat
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_type;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_privacy_state;
 import static com.zoffcc.applications.trifa.MainActivity.tox_iteration_interval;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_capabilites;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabilities;
@@ -124,6 +128,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LA
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
@@ -692,6 +697,34 @@ public class TrifaToxService extends Service
         }
     }
 
+    void load_and_add_all_groups()
+    {
+        long num_groups = tox_group_get_number_groups();
+        Log.i(TAG, "load groups at startup: num=" + num_groups);
+
+        ByteBuffer groupid_buf3 = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
+
+        int conf_ = 0;
+        for (conf_ = 0; conf_ < num_groups; conf_++)
+        {
+            groupid_buf3.clear();
+            if (tox_group_get_chat_id(conf_, groupid_buf3) == 0)
+            {
+                byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
+                groupid_buf3.get(groupid_buffer, 0, GROUP_ID_LENGTH);
+                String group_identifier = bytes_to_hex(groupid_buffer);
+                Log.i(TAG, "load group num=" + conf_ + " group_id=" + group_identifier + " offset=" +
+                           groupid_buf3.arrayOffset());
+
+                final GroupDB conf2 = orma.selectFromGroupDB().toList().get(0);
+                Log.i(TAG, "group 0 in db:" + conf2.group_identifier + " " + conf2.tox_group_number + " " + conf2.name);
+
+                new_or_updated_group(conf_, tox_friend_get_public_key__wrapper(0), group_identifier,
+                                     tox_group_get_privacy_state(conf_));
+            }
+        }
+    }
+
     static void write_debug_file(String filename)
     {
         if (DEBUG_BATTERY_OPTIMIZATION_LOGGING)
@@ -981,6 +1014,14 @@ public class TrifaToxService extends Service
                 try
                 {
                     load_and_add_all_conferences();
+                }
+                catch (Exception e)
+                {
+                }
+
+                try
+                {
+                    load_and_add_all_groups();
                 }
                 catch (Exception e)
                 {
@@ -1284,6 +1325,14 @@ public class TrifaToxService extends Service
                                 try
                                 {
                                     load_and_add_all_conferences();
+                                }
+                                catch (Exception e)
+                                {
+                                }
+                                // load groups again
+                                try
+                                {
+                                    load_and_add_all_groups();
                                 }
                                 catch (Exception e)
                                 {

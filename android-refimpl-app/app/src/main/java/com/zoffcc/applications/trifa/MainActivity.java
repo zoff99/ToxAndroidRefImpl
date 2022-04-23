@@ -3078,7 +3078,7 @@ public class MainActivity extends AppCompatActivity
      * @param my_peer_name              The name of the peer creating the group.
      * @return group_number on success, UINT32_MAX on failure.
      */
-    public static native long tox_group_new(int a_TOX_GROUP_PRIVACY_STATE, String group_name, String my_peer_name);
+    public static native long tox_group_new(int a_TOX_GROUP_PRIVACY_STATE, @NonNull String group_name, @NonNull String my_peer_name);
 
     /**
      * Joins a group chat with specified Chat ID.
@@ -3092,7 +3092,7 @@ public class MainActivity extends AppCompatActivity
      * @param my_peer_name   The name of the peer joining the group.
      * @return group_number on success, UINT32_MAX on failure.
      */
-    public static native long tox_group_join(ByteBuffer chat_id_buffer, String my_peer_name, String password);
+    public static native long tox_group_join(@NonNull ByteBuffer chat_id_buffer, long chat_id_length, @NonNull String my_peer_name, String password);
 
     public static native int tox_group_leave(long group_number, String part_message);
 
@@ -3100,11 +3100,13 @@ public class MainActivity extends AppCompatActivity
 
     public static native String tox_group_self_get_public_key(long group_number);
 
-    public static native int tox_group_get_chat_id(long group_number, ByteBuffer chat_id_buffer);
+    public static native int tox_group_get_chat_id(long group_number, @NonNull ByteBuffer chat_id_buffer);
 
     public static native long tox_group_get_number_groups();
 
     public static native int tox_group_get_privacy_state(long group_number);
+
+    public static native String tox_group_peer_get_public_key(long group_number, long peer_id);
 
     /**
      * Send a text chat message to the group.
@@ -3122,7 +3124,7 @@ public class MainActivity extends AppCompatActivity
      *                           containing the message text.
      * @return true on success.
      */
-    public static native int tox_group_send_message(long group_number, int a_TOX_MESSAGE_TYPE, String message);
+    public static native int tox_group_send_message(long group_number, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
     /**
      * Send a text chat message to the specified peer in the specified group.
@@ -3140,7 +3142,7 @@ public class MainActivity extends AppCompatActivity
      *                     containing the message text.
      * @return true on success.
      */
-    public static native int tox_group_send_private_message(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message);
+    public static native int tox_group_send_private_message(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
     /**
      * Accept an invite to a group chat that the client previously received from a friend. The invite
@@ -3151,7 +3153,7 @@ public class MainActivity extends AppCompatActivity
      * @param password           The password required to join the group. Set to NULL if no password is required.
      * @return the group_number on success, UINT32_MAX on failure.
      */
-    public static native long tox_group_invite_accept(long friend_number, ByteBuffer invite_data_buffer, long invite_data_length, String my_peer_name, String password);
+    public static native long tox_group_invite_accept(long friend_number, @NonNull ByteBuffer invite_data_buffer, long invite_data_length, @NonNull String my_peer_name, String password);
     // --------------- new Groups -------------
     // --------------- new Groups -------------
     // --------------- new Groups -------------
