@@ -3168,6 +3168,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native long[] tox_group_get_grouplist();
 
+    public static native long tox_group_peer_count(long group_number);
+
+    public static native long[] tox_group_get_peerlist(long group_number);
+
     public static native long tox_group_by_chat_id(@NonNull ByteBuffer chat_id_buffer);
 
     public static native int tox_group_get_privacy_state(long group_number);
@@ -6884,6 +6888,25 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_group_peer_join_cb_method(long group_number, long peer_id)
     {
         Log.i(TAG, "group_peer_join_cb:group_number=" + group_number + " peer_id=" + peer_id);
+
+        try
+        {
+            if (group_message_list_activity != null)
+            {
+                final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
+                if (temp_group_identifier != null)
+                {
+                    if (group_message_list_activity.get_current_group_id().equals(temp_group_identifier))
+                    {
+                        group_message_list_activity.update_group_all_users();
+                    }
+                }
+            }
+        }
+        catch (Exception e3)
+        {
+            e3.printStackTrace();
+        }
     }
 
     static void android_tox_callback_group_join_fail_cb_method(long group_number, int a_Tox_Group_Join_Fail)

@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,6 +42,7 @@ import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
+import com.mikepenz.materialdrawer.holder.BadgeStyle;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
@@ -59,7 +61,6 @@ import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
-import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
@@ -69,9 +70,13 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
@@ -385,12 +390,86 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     synchronized void set_peer_count_header()
     {
-        // TODO: write me
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                final String f_name = "Group";
+                final long conference_num = tox_group_by_confid__wrapper(group_id);
+
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            long peer_count = tox_group_peer_count(conference_num);
+
+                            if (peer_count > -1)
+                            {
+                                ml_maintext.setText(
+                                        f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count);
+                            }
+                            else
+                            {
+                                ml_maintext.setText(f_name);
+                                // ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+        };
+        t.start();
     }
 
     synchronized void set_peer_names_and_avatars()
     {
-        // TODO: write me
+        try
+        {
+            remove_group_all_users();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        // Log.d(TAG, "set_peer_names_and_avatars:002");
+
+        final long conference_num = tox_group_by_confid__wrapper(group_id);
+        long num_peers = tox_group_peer_count(conference_num);
+
+        if (num_peers > 0)
+        {
+            long[] peers = tox_group_get_peerlist(conference_num);
+            if (peers != null)
+            {
+                long i = 0;
+                for (i = 0; i < num_peers; i++)
+                {
+                    try
+                    {
+                        String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, peers[(int) i]);
+                        String peer_name_temp = "" + peers[(int) i] + ": " + peer_pubkey_temp.substring(0, 6);
+                        add_group_user(peer_pubkey_temp, i, peer_name_temp, false);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            }
+        }
     }
 
     @Override
@@ -668,7 +747,54 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     synchronized void remove_group_all_users()
     {
-        // TODO: write me
+        try
+        {
+            Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Runnable myRunnable = new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    lookup_peer_listnum_pubkey.clear();
+                                    group_message_drawer.removeAllItems();
+                                }
+                                catch (Exception e2)
+                                {
+                                    e2.printStackTrace();
+                                }
+                            }
+                        };
+
+                        if (group_handler_s != null)
+                        {
+                            group_handler_s.post(myRunnable);
+                        }
+
+                        // TODO: hack to be synced with additions later
+                        Thread.sleep(120);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            t.start();
+            t.join();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "remove_group_user:EE:" + e.getMessage());
+        }
     }
 
     synchronized void remove_group_user(String peer_pubkey)
@@ -678,7 +804,113 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     synchronized void add_group_user(final String peer_pubkey, final long peernum, String name, boolean offline)
     {
-        // TODO: write me
+        try
+        {
+            Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Runnable myRunnable = new Runnable()
+                        {
+                            @Override
+                            public void run()
+                            {
+                                try
+                                {
+                                    ConferenceCustomDrawerPeerItem new_item = null;
+                                    boolean have_avatar_for_pubkey = false;
+
+                                    try
+                                    {
+                                        int badge_color = R.color.md_green_700;
+                                        if (offline)
+                                        {
+                                            badge_color = R.color.md_red_700;
+                                        }
+
+                                        new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
+                                                                                      peer_pubkey).
+                                                withIdentifier(peernum).
+                                                withName(name).
+                                                withBadge("" + peernum).withBadgeStyle(
+                                                new BadgeStyle().withTextColor(Color.WHITE).withColorRes(badge_color)).
+                                                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                                                {
+                                                    @Override
+                                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                    {
+                                                        /*
+                                                        Intent intent = new Intent(view.getContext(),
+                                                                                   ConferencePeerInfoActivity.class);
+                                                        intent.putExtra("peer_pubkey", peer_pubkey);
+                                                        intent.putExtra("group_id", group_id);
+                                                        intent.putExtra("offline", offline);
+                                                        view.getContext().startActivity(intent);
+                                                        */
+                                                        return true;
+                                                    }
+                                                });
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                        new_item = new ConferenceCustomDrawerPeerItem(false, null).
+                                                withIdentifier(peernum).
+                                                withName(name).
+                                                withIcon(GoogleMaterial.Icon.gmd_face).
+                                                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                                                {
+                                                    @Override
+                                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                                    {
+                                                        /*
+                                                        Intent intent = new Intent(view.getContext(),
+                                                                                   ConferencePeerInfoActivity.class);
+                                                        intent.putExtra("peer_pubkey", peer_pubkey);
+                                                        intent.putExtra("group_id", group_id);
+                                                        intent.putExtra("offline", offline);
+                                                        view.getContext().startActivity(intent);
+                                                        */
+                                                        return true;
+                                                    }
+                                                });
+                                    }
+
+                                    // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
+                                    group_message_drawer.addItem(new_item);
+                                }
+                                catch (Exception e2)
+                                {
+                                    e2.printStackTrace();
+                                    Log.i(TAG, "add_group_user:EE2:" + e2.getMessage());
+                                }
+                            }
+                        };
+
+                        if (group_handler_s != null)
+                        {
+                            group_handler_s.post(myRunnable);
+                        }
+
+                    }
+                    catch (Exception e3)
+                    {
+                        e3.printStackTrace();
+                        Log.i(TAG, "add_group_user:EE3:" + e3.getMessage());
+                    }
+                }
+            };
+            t.start();
+            t.join();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "add_group_user:EE:" + e.getMessage());
+        }
     }
 
     public void show_add_friend_group(View view)
@@ -723,7 +955,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 if (group_num > -1)
                                 {
                                     int res_conf_invite = tox_group_invite_friend(group_num, friend_num_temp_safety2);
-                                    Log.d(TAG, "onActivityResult:info:tox_group_invite_friend:res_conf_invite=" + res_conf_invite);
+                                    Log.d(TAG, "onActivityResult:info:tox_group_invite_friend:res_conf_invite=" +
+                                               res_conf_invite);
                                     if (res_conf_invite != 1)
                                     {
                                         Log.d(TAG,
