@@ -6678,6 +6678,116 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_group_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
     {
         Log.i(TAG, "group_message_cb:gn=" + group_number + " peerid=" + peer_id + " message=" + message_orig);
+
+        long res = tox_group_self_get_peer_id(group_number);
+        if (res == peer_id)
+        {
+            // HINT: do not add our own messages, they are already in the DB!
+            Log.i(TAG, "group_message_cb:gn=" + group_number + " peerid=" + peer_id + " ignoring own message");
+            return;
+        }
+
+        // TODO: add message ID later --------
+        String message_ = "";
+        String message_id_ = "";
+        message_ = message_orig;
+        message_id_ = "";
+        // TODO: add message ID later --------
+
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        String group_id = "-1";
+        GroupDB group_temp = null;
+
+        try
+        {
+            // TODO: cache me!!
+            group_temp = orma.selectFromGroupDB().
+                    tox_group_numberEq(group_number).
+                    toList().get(0);
+            group_id = group_temp.group_identifier;
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+        }
+
+        try
+        {
+            if (group_temp.notification_silent)
+            {
+                do_notification = false;
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+            do_notification = false;
+        }
+
+
+        if (group_message_list_activity != null)
+        {
+            Log.i(TAG,
+                  "noti_and_badge:002group:" + group_message_list_activity.get_current_group_id() + ":" + group_id);
+
+            if (conference_message_list_activity.get_current_conf_id().equals(group_id))
+            {
+                // no notifcation and no badge update
+                do_notification = false;
+                do_badge_update = false;
+            }
+        }
+
+        GroupMessage m = new GroupMessage();
+        m.is_new = do_badge_update;
+        // m.tox_friendnum = friend_number;
+        m.tox_group_peer_pubkey = HelperGroup.tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+        m.direction = 0; // msg received
+        m.TOX_MESSAGE_TYPE = 0;
+        m.read = false;
+        m.tox_group_peername = null;
+        m.group_identifier = group_id.toLowerCase();
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.rcvd_timestamp = System.currentTimeMillis();
+        m.sent_timestamp = System.currentTimeMillis();
+        m.text = message_;
+        m.message_id_tox = message_id_;
+        m.was_synced = false;
+
+        try
+        {
+            m.tox_group_peername = HelperGroup.tox_group_peer_get_name__wrapper(m.group_identifier,
+                                                                                m.tox_group_peer_pubkey);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (group_message_list_activity != null)
+        {
+            if (group_message_list_activity.get_current_group_id().equals(group_id.toLowerCase()))
+            {
+                HelperGroup.insert_into_group_message_db(m, true);
+            }
+            else
+            {
+                HelperGroup.insert_into_group_message_db(m, false);
+            }
+        }
+        else
+        {
+            long new_msg_id = HelperGroup.insert_into_group_message_db(m, false);
+            Log.i(TAG, "group_message_cb:new_msg_id=" + new_msg_id);
+        }
+
+        HelperFriend.add_all_friends_clear_wrapper(0);
+
+        if (do_notification)
+        {
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+        }
     }
 
     static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)

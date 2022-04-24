@@ -54,7 +54,7 @@ public class HelperMsgNotification
 
     /*
      * action: NOTIFICATION_EDIT_ACTION
-     * key: either a friend pubkey or a conference id, both as uppercase hex string representation
+     * key: either a friend pubkey or a conference id or a group id, both as hex string representation
      */
     static synchronized void change_msg_notification(int action, String key)
     {

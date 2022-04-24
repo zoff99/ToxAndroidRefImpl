@@ -241,11 +241,18 @@ public class HelperGroup
         }
     }
 
-    public static String tox_conference_peer_get_name__wrapper(String group_identifier, String group_peer_pubkey)
+    public static String tox_group_peer_get_name__wrapper(String group_identifier, String group_peer_pubkey)
     {
         // TODO: write me
         return "some peer";
     }
+
+    public static String tox_group_peer_get_public_key__wrapper(long group_num, long peer_number)
+    {
+        String result = MainActivity.tox_group_peer_get_public_key(group_num, peer_number);
+        return result;
+    }
+
 
     static String group_identifier_short(String group_identifier, boolean uppercase_result)
     {
