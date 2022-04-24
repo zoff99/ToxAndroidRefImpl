@@ -6542,6 +6542,75 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1chat_1id(JNIEnv
 }
 
 JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1by_1chat_1id(JNIEnv *env, jobject thiz,
+        jobject chat_id_buffer)
+{
+#ifndef HAVE_TOX_NGC
+    return (jlong)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    uint8_t *chat_id_buffer_c = NULL;
+    long capacity = 0;
+
+    if(chat_id_buffer == NULL)
+    {
+        return (jlong)-21;
+    }
+
+    chat_id_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, chat_id_buffer);
+    capacity = (*env)->GetDirectBufferCapacity(env, chat_id_buffer);
+    long res = tox_group_by_chat_id(tox_global, (uint8_t *)chat_id_buffer_c, NULL);
+
+    if(res == UINT32_MAX)
+    {
+        return (jlong)-1;
+    }
+    else
+    {
+        return (jlong)res;
+    }
+#endif
+}
+
+JNIEXPORT jlongArray JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1grouplist(JNIEnv *env, jobject thiz)
+{
+    uint32_t numgroups = tox_group_get_number_groups(tox_global);
+    size_t memsize = (numgroups * sizeof(uint32_t));
+    uint32_t *groups_list = malloc(memsize);
+    uint32_t *groups_list_iter = groups_list;
+    jlongArray result;
+    tox_group_get_grouplist(tox_global, groups_list);
+    result = (*env)->NewLongArray(env, numgroups);
+
+    if(result == NULL)
+    {
+        // TODO this would be bad!!
+    }
+
+    jlong buffer[numgroups];
+    size_t i = 0;
+
+    for(i=0; i<numgroups; i++)
+    {
+        buffer[i] = (long)groups_list_iter[i];
+    }
+
+    (*env)->SetLongArrayRegion(env, result, 0, numgroups, buffer);
+
+    if(groups_list)
+    {
+        free(groups_list);
+    }
+
+    return result;
+}
+
+JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1number_1groups(JNIEnv *env, jobject thiz)
 {
 #ifndef HAVE_TOX_NGC
