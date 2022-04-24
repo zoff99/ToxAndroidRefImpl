@@ -3107,6 +3107,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_group_get_number_groups();
 
+    public static native long[] tox_group_get_grouplist();
+
+    public static native long tox_group_by_chat_id(@NonNull ByteBuffer chat_id_buffer);
+
     public static native int tox_group_get_privacy_state(long group_number);
 
     public static native String tox_group_peer_get_public_key(long group_number, long peer_id);

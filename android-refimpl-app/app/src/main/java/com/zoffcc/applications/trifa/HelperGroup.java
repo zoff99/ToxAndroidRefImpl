@@ -28,10 +28,9 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
-import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperGroup
@@ -152,32 +151,24 @@ public class HelperGroup
 
     public static long tox_group_by_confid__wrapper(@NonNull String group_id_string)
     {
-        // TODO: add API call to toxcore to get groupnumber by groupid string
-        long num_groups = tox_group_get_number_groups();
-        Log.i(TAG, "tox_group_by_confid__wrapper: all groups count=" + num_groups);
+        ByteBuffer group_id_buffer = ByteBuffer.allocateDirect(GROUP_ID_LENGTH);
+        byte[] data = HelperGeneric.hex_to_bytes(group_id_string.toUpperCase());
+        group_id_buffer.put(data);
+        group_id_buffer.rewind();
 
-        ByteBuffer groupid_buf3 = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
-
-        int conf_ = 0;
-        for (conf_ = 0; conf_ < num_groups; conf_++)
+        long res = tox_group_by_chat_id(group_id_buffer);
+        if (res == UINT32_MAX_JAVA)
         {
-            groupid_buf3.clear();
-            if (tox_group_get_chat_id(conf_, groupid_buf3) == 0)
-            {
-                byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
-                groupid_buf3.get(groupid_buffer, 0, GROUP_ID_LENGTH);
-                String group_identifier = bytes_to_hex(groupid_buffer);
-
-                Log.i(TAG, "tox_group_by_confid__wrapper: compare:" + group_identifier.toLowerCase() + " " +
-                           group_id_string.toLowerCase());
-                if (group_identifier.toLowerCase().equals(group_id_string.toLowerCase()))
-                {
-                    return (long) conf_;
-                }
-            }
+            return -1;
         }
-
-        return -1;
+        else if (res < 0)
+        {
+            return -1;
+        }
+        else
+        {
+            return res;
+        }
     }
 
 
