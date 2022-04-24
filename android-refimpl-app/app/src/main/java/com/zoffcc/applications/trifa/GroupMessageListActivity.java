@@ -584,7 +584,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
                     int res = tox_group_send_message(tox_group_by_confid__wrapper(group_id), 0, msg);
-                    // Log.i(TAG, "tox_conference_send_message:result=" + res + " m=" + m);
+                    Log.i(TAG, "tox_group_send_message:result=" + res + " m=" + m);
                     if (PREF__X_battery_saving_mode)
                     {
                         Log.i(TAG, "global_last_activity_for_battery_savings_ts:001:*PING*");

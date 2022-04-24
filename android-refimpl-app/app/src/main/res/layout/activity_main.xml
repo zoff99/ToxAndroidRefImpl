@@ -160,8 +160,6 @@
         </FrameLayout>
     </FrameLayout>
 
-    <include layout="@layout/floating_action_button" />
-
 </RelativeLayout>
 
 

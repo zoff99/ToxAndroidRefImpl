@@ -59,21 +59,21 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
     private ImageView imageView2;
     private ImageView f_notification;
     private ViewGroup f_conf_container_parent;
-    static ProgressDialog progressDialog = null;
+    static ProgressDialog group_progressDialog = null;
 
     synchronized static void remove_progress_dialog()
     {
         try
         {
-            if (progressDialog != null)
+            if (group_progressDialog != null)
             {
-                if (GroupListHolder.progressDialog.isShowing())
+                if (GroupListHolder.group_progressDialog.isShowing())
                 {
-                    progressDialog.dismiss();
+                    group_progressDialog.dismiss();
                 }
             }
 
-            progressDialog = null;
+            group_progressDialog = null;
         }
         catch (Exception e)
         {
@@ -255,14 +255,14 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             {
                 try
                 {
-                    if (progressDialog == null)
+                    if (group_progressDialog == null)
                     {
-                        progressDialog = new ProgressDialog(this.context);
-                        progressDialog.setIndeterminate(true);
-                        progressDialog.setMessage("");
-                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        group_progressDialog = new ProgressDialog(this.context);
+                        group_progressDialog.setIndeterminate(true);
+                        group_progressDialog.setMessage("");
+                        group_progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     }
-                    progressDialog.show();
+                    group_progressDialog.show();
                 }
                 catch (Exception e)
                 {

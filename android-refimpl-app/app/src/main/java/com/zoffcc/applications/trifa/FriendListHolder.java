@@ -43,7 +43,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.HelperConference.add_conference_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend;
@@ -108,21 +107,21 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private ImageView f_relay_icon;
     private TextView f_last_online_timestamp;
     private ViewGroup friend_line_container;
-    static ProgressDialog progressDialog = null;
+    static ProgressDialog friend_progressDialog = null;
 
     synchronized static void remove_progress_dialog()
     {
         try
         {
-            if (progressDialog != null)
+            if (friend_progressDialog != null)
             {
-                if (FriendListHolder.progressDialog.isShowing())
+                if (FriendListHolder.friend_progressDialog.isShowing())
                 {
-                    progressDialog.dismiss();
+                    friend_progressDialog.dismiss();
                 }
             }
 
-            progressDialog = null;
+            friend_progressDialog = null;
         }
         catch (Exception e)
         {
@@ -935,14 +934,14 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     {
         try
         {
-            if (progressDialog == null)
+            if (friend_progressDialog == null)
             {
-                progressDialog = new ProgressDialog(c);
-                progressDialog.setIndeterminate(true);
-                progressDialog.setMessage("");
-                progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                friend_progressDialog = new ProgressDialog(c);
+                friend_progressDialog.setIndeterminate(true);
+                friend_progressDialog.setMessage("");
+                friend_progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
             }
-            progressDialog.show();
+            friend_progressDialog.show();
         }
         catch (Exception e)
         {

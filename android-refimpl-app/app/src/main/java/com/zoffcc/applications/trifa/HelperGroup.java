@@ -171,7 +171,6 @@ public class HelperGroup
         }
     }
 
-
     static long insert_into_group_message_db(final GroupMessage m, final boolean update_group_view_flag)
     {
         long row_id = orma.insertIntoGroupMessage(m);

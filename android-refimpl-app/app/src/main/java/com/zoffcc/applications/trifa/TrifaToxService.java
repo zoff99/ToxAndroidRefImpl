@@ -649,7 +649,7 @@ public class TrifaToxService extends Service
                 // Log.i(TAG, "load conference num=" + conference_numbers[conf_] + " cookie=" + conference_identifier +
                 //           " offset=" + cookie_buf3.arrayOffset());
 
-                final ConferenceDB conf2 = orma.selectFromConferenceDB().toList().get(0);
+                // final ConferenceDB conf2 = orma.selectFromConferenceDB().toList().get(0);
                 //Log.i(TAG,
                 //      "conference 0 in db:" + conf2.conference_identifier + " " + conf2.tox_conference_number + " " +
                 //      conf2.name);
@@ -721,8 +721,8 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "load group num=" + group_numbers[conf_] + " group_id=" + group_identifier + " offset=" +
                            groupid_buf3.arrayOffset());
 
-                final GroupDB conf2 = orma.selectFromGroupDB().toList().get(0);
-                Log.i(TAG, "group 0 in db:" + conf2.group_identifier + " " + conf2.tox_group_number + " " + conf2.name);
+                // final GroupDB conf2 = orma.selectFromGroupDB().toList().get(0);
+                // Log.i(TAG, "group 0 in db:" + conf2.group_identifier + " " + conf2.tox_group_number + " " + conf2.name);
 
                 new_or_updated_group(group_numbers[conf_], tox_friend_get_public_key__wrapper(0), group_identifier,
                                      tox_group_get_privacy_state(group_numbers[conf_]));

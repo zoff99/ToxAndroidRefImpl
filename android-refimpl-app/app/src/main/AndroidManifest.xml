@@ -93,6 +93,11 @@
             android:label="@string/add_friend_activity_name">
         </activity>
         <activity
+            android:name=".AddGroupActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/add_group_activity_name">
+        </activity>
+        <activity
             android:name=".MessageListActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/message_list_activity_name">
@@ -101,6 +106,11 @@
             android:name=".ConferenceMessageListActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/conference_message_list_activity_name">
+        </activity>
+        <activity
+            android:name=".GroupMessageListActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/group_message_list_activity_name">
         </activity>
         <activity
             android:name=".ConferenceAudioActivity"

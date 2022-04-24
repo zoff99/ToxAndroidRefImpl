@@ -1761,7 +1761,7 @@ public class HelperGeneric
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
                 Log.i(TAG, "file_to_bytebuffer:EE01:" + e.getMessage());
             }
         }

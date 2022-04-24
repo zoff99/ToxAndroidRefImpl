@@ -72,6 +72,19 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
                 }
                 return new FriendListHolder(view, this.context);
 
+            case CombinedFriendsAndConferences_model.ITEM_IS_GROUP:
+                if (PREF__compact_friendlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_conf_entry_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.friend_list_conf_entry, parent,
+                                                                            false);
+                }
+                return new GroupListHolder(view, this.context);
+
             case CombinedFriendsAndConferences_model.ITEM_IS_CONFERENCE:
                 if (PREF__compact_friendlist)
                 {

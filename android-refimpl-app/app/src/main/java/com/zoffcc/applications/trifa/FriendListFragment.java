@@ -330,6 +330,15 @@ public class FriendListFragment extends Fragment
             e.printStackTrace();
         }
 
+        try
+        {
+            GroupListHolder.remove_progress_dialog();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         Log.i(TAG, "onResume");
 
         try

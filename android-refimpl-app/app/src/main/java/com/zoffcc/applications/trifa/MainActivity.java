@@ -54,6 +54,8 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
@@ -351,6 +353,7 @@ public class MainActivity extends AppCompatActivity
     final static int SelectFriendSingleActivity_ID = 10009;
     final static int SelectLanguageActivity_ID = 10010;
     final static int CallingWaitingActivity_ID = 10011;
+    final static int AddGroupActivity_ID = 10012;
     final static int Notification_new_message_ID = 10023;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
@@ -676,61 +679,6 @@ public class MainActivity extends AppCompatActivity
             // ----- Clear all messages from DB -----
             // ----- Clear all messages from DB -----
             // ----- Clear all messages from DB -----
-        }
-
-
-        try
-        {
-            if (FriendListHolder.progressDialog != null)
-            {
-                if (FriendListHolder.progressDialog.isShowing())
-                {
-                    FriendListHolder.progressDialog.dismiss();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (FriendListHolder.progressDialog != null)
-            {
-                FriendListHolder.progressDialog = null;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (ConferenceListHolder.progressDialog != null)
-            {
-                if (ConferenceListHolder.progressDialog.isShowing())
-                {
-                    ConferenceListHolder.progressDialog.dismiss();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (ConferenceListHolder.progressDialog != null)
-            {
-                ConferenceListHolder.progressDialog = null;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
         }
 
         if (PREF__window_security)
@@ -1738,6 +1686,114 @@ public class MainActivity extends AppCompatActivity
         MainActivity.set_av_call_status(Callstate.state);
 
         Log.i(TAG, "M:STARTUP:-- DONE --");
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    void remove_all_progressDialogs()
+    {
+        try
+        {
+            if (FriendListHolder.friend_progressDialog != null)
+            {
+                if (FriendListHolder.friend_progressDialog.isShowing())
+                {
+                    FriendListHolder.friend_progressDialog.dismiss();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (FriendListHolder.friend_progressDialog != null)
+            {
+                FriendListHolder.friend_progressDialog = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (ConferenceListHolder.conference_progressDialog != null)
+            {
+                if (ConferenceListHolder.conference_progressDialog.isShowing())
+                {
+                    ConferenceListHolder.conference_progressDialog.dismiss();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (ConferenceListHolder.conference_progressDialog != null)
+            {
+                ConferenceListHolder.conference_progressDialog = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (GroupListHolder.group_progressDialog != null)
+            {
+                if (GroupListHolder.group_progressDialog.isShowing())
+                {
+                    GroupListHolder.group_progressDialog.dismiss();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (GroupListHolder.group_progressDialog != null)
+            {
+                GroupListHolder.group_progressDialog = null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item)
+    {
+        switch (item.getItemId())
+        {
+            case R.id.item_addfriend:
+                Intent intent = new Intent(this, AddFriendActivity.class);
+                startActivityForResult(intent, AddFriendActivity_ID);
+                break;
+            case R.id.item_create_group_private:
+                Intent intent2 = new Intent(this, AddGroupActivity.class);
+                startActivityForResult(intent2, AddGroupActivity_ID);
+                break;
+        }
+        return true;
     }
 
     public void vfs_listFilesAndFilesSubDirectories(String directoryName, int depth, String parent)
@@ -6897,6 +6953,48 @@ public class MainActivity extends AppCompatActivity
                 friend_tox_id = friend_tox_id1.toUpperCase().replace(" ", "").replaceFirst("tox:", "").replaceFirst(
                         "TOX:", "").replaceFirst("Tox:", "");
                 HelperFriend.add_friend_real(friend_tox_id);
+            }
+            else
+            {
+                // (resultCode == RESULT_CANCELED)
+            }
+        }
+        else if (requestCode == AddGroupActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                try
+                {
+
+                    String group_name = data.getStringExtra("group_name");
+                    Log.i(TAG, "create_group:name:>" + group_name + "<");
+                    long new_group_num = tox_group_new(
+                            ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PRIVATE.value, group_name,
+                            "peer " + getRandomString(10));
+
+                    Log.i(TAG, "create_group:new groupnum:=" + new_group_num);
+
+                    if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
+                    {
+                        ByteBuffer groupid_buf = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
+                        if (tox_group_get_chat_id(new_group_num, groupid_buf) == 0)
+                        {
+                            byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
+                            groupid_buf.get(groupid_buffer, 0, GROUP_ID_LENGTH);
+                            String group_identifier = bytes_to_hex(groupid_buffer);
+
+                            Log.i(TAG, "create_group:group num=" + new_group_num + " group_id=" + group_identifier +
+                                       " offset=" + groupid_buf.arrayOffset());
+
+                            HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, 1);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "create_group:EE01:" + e.getMessage());
+                }
             }
             else
             {

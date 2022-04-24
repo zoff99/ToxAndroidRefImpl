@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,21 +71,21 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
     private ImageView imageView2;
     private ImageView f_notification;
     private ViewGroup f_conf_container_parent;
-    static ProgressDialog progressDialog = null;
+    static ProgressDialog conference_progressDialog = null;
 
     synchronized static void remove_progress_dialog()
     {
         try
         {
-            if (progressDialog != null)
+            if (conference_progressDialog != null)
             {
-                if (ConferenceListHolder.progressDialog.isShowing())
+                if (ConferenceListHolder.conference_progressDialog.isShowing())
                 {
-                    progressDialog.dismiss();
+                    conference_progressDialog.dismiss();
                 }
             }
 
-            progressDialog = null;
+            conference_progressDialog = null;
         }
         catch (Exception e)
         {
@@ -283,14 +284,14 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             {
                 try
                 {
-                    if (progressDialog == null)
+                    if (conference_progressDialog == null)
                     {
-                        progressDialog = new ProgressDialog(this.context);
-                        progressDialog.setIndeterminate(true);
-                        progressDialog.setMessage("");
-                        progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                        conference_progressDialog = new ProgressDialog(this.context);
+                        conference_progressDialog.setIndeterminate(true);
+                        conference_progressDialog.setMessage("");
+                        conference_progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
                     }
-                    progressDialog.show();
+                    conference_progressDialog.show();
                 }
                 catch (Exception e)
                 {

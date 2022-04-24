@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/item_addfriend"
+        android:title="@string/layout___add_friend"
+        android:icon="@drawable/ic_plus_sign"
+        android:visible="true"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/item_create_group_private"
+        android:title="@string/layout___create_new_private_group"
+        android:visible="true"
+        android:icon="@drawable/emoji_google_category_smileysandpeople"
+        app:showAsAction="never" />
+</menu>
