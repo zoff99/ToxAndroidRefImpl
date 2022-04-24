@@ -325,7 +325,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                 return true;
             }
         });
-        menu.inflate(R.menu.menu_conferencelist_item);
+        menu.inflate(R.menu.menu_grouplist_item);
 
         menu.show();
 

@@ -59,13 +59,16 @@ import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
+import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
@@ -649,10 +652,64 @@ public class GroupMessageListActivity extends AppCompatActivity
         // TODO: write me
     }
 
+    public void show_add_friend_group(View view)
+    {
+        Log.i(TAG, "show_add_friend_group");
+        Intent intent = new Intent(this, FriendSelectSingleActivity.class);
+        intent.putExtra("group_id", group_id);
+        startActivityForResult(intent, SelectFriendSingleActivity_ID);
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // TODO: write me
+        if (requestCode == SelectFriendSingleActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                try
+                {
+                    String result_friend_pubkey = data.getData().toString();
+                    if (result_friend_pubkey != null)
+                    {
+                        if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)
+                        {
+                            Log.i(TAG, "onActivityResult:tox_group_invite_friend:result_friend_pubkey:" +
+                                       result_friend_pubkey);
+
+                            long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(result_friend_pubkey);
+                            if (friend_num_temp_safety2 > 0)
+                            {
+                                if (group_id.equals("-1"))
+                                {
+                                    group_id = group_id_prev;
+                                    // Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id);
+                                }
+
+                                final long group_num = tox_group_by_confid__wrapper(group_id);
+
+                                Log.d(TAG, "onActivityResult:info:tox_group_invite_friend:group_num=" + group_num);
+
+                                if (group_num > -1)
+                                {
+                                    int res_conf_invite = tox_group_invite_friend(group_num, friend_num_temp_safety2);
+                                    Log.d(TAG, "onActivityResult:info:tox_group_invite_friend:res_conf_invite=" + res_conf_invite);
+                                    if (res_conf_invite != 1)
+                                    {
+                                        Log.d(TAG,
+                                              "onActivityResult:info:tox_group_invite_friend:ERR:" + res_conf_invite);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

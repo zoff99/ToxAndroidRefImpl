@@ -3171,6 +3171,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native String tox_group_peer_get_public_key(long group_number, long peer_id);
 
+    public static native int tox_group_invite_friend(long group_number, long friend_number);
+
     /**
      * Send a text chat message to the group.
      * <p>
