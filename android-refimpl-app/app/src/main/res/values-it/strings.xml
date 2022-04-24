@@ -326,4 +326,36 @@
     <string name="pref_title_window_security">Preveni gli screenshot</string>
     <string name="pref_description_window_security">Abilitando questa impostazione aggiunge FLAG_SECURE alle attività.
 \nPreviene screenshot e registrazioni allo schermo e le preview di contenuti.</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Rimuovere l\'immagine del profilo</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Vuoi rimuovere la tua immagine del profilo\?</string>
+    <string name="layout___capabilities">Capacità:</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">Esporta chat criptate *non sicuro*</string>
+    <string name="pref_title_download_push_msg_app">Scarica l\'app Push Message</string>
+    <string name="pref_title_toxirc_muted_peers_01">Utenti disattivati di Toxirc Bridge</string>
+    <string name="pref_description_toxirc_muted_peers_01">Utente 1 silenziato (lasciare vuoto se non usato)</string>
+    <string name="pref_description_toxirc_muted_peers_02">Utente 2 silenziato (lasciare vuoto se non usato)</string>
+    <string name="pref_description_toxirc_muted_peers_03">Utente 3 silenziato (lasciare vuoto se non usato)</string>
+    <string name="pref_title_use_camera_x">Rimuovi lo sfondo</string>
+    <string name="pref_description_use_camera_x">!!!Sperimentale!!!
+\nUsa CameraX e rimuovi lo sfondo nelle chiamate video.
+\nQuesto potrebbe non funzionare ancora bene, non dipendere da questa opzione</string>
+    <string name="layout___conf_id">ID conferenza:</string>
+    <string name="layout___conf_title">Titolo:</string>
+    <string name="layout___friends_pushurl">URL push degli amici:</string>
+    <string name="layout___remove_friends_pushurl">rimuovi l\'URL push di amici</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">Esporta file criptati *non sicuro*</string>
+    <string name="pref_description_use_push_service">ATTENZIONE: Questo userà Google FCM o Unified Push per salvare batteria e larghezza di banda.
+\nL\'app farà connessioni HTTPS direttamente ad alcuni server PUSH (non via Tox).
+\nAttiva questo solo se accetti questo.
+\nQuesta funzionalità ha bisogno che l\'app Tox Message App sia installata.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">condividere file</string>
+    <string name="layout___remove_own_pushurl">Rimuovi URL Push</string>
+    <string name="layout___own_pushurl">URL push:</string>
+    <string name="pref_title_speakerphone_tweak">Correzione degli altoparlanti per le chiamate</string>
+    <string name="MainActivity_setup_push_tip_title">Impostare la notifica push</string>
+    <string name="MainActivity_setup_push_tip_text">Non hai installato l\'app di notifica push e non hai impostato la notifica push. TRIfA funzionerà completamente senza Push Notification, ma deve essere costantemente online per ricevere messaggi. Con Push Notification puoi risparmiare batteria e larghezza di banda Internet.
+\n
+\nVuoi vedere come puoi impostare la notifica push ora\?</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Condividi file a TRIfa attraverso l\'intento di condivisione</string>
+    <string name="pref_description_speakerphone_tweak">Se l\'app non cambia altoparlante in chiamata, allora attiva questa fix</string>
 </resources>
