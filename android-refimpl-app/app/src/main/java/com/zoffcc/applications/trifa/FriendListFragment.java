@@ -278,7 +278,7 @@ public class FriendListFragment extends Fragment
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
+                        // e.printStackTrace();
                     }
                 }
             };

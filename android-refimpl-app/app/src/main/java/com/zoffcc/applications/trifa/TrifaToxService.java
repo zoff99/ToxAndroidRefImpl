@@ -112,6 +112,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_grouplist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_privacy_state;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_reconnect;
 import static com.zoffcc.applications.trifa.MainActivity.tox_iteration_interval;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_capabilites;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabilities;
@@ -718,8 +720,17 @@ public class TrifaToxService extends Service
                 byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
                 groupid_buf3.get(groupid_buffer, 0, GROUP_ID_LENGTH);
                 String group_identifier = bytes_to_hex(groupid_buffer);
-                Log.i(TAG, "load group num=" + group_numbers[conf_] + " group_id=" + group_identifier + " offset=" +
-                           groupid_buf3.arrayOffset());
+                int is_connected = tox_group_is_connected(conf_);
+                Log.i(TAG, "load group num=" + group_numbers[conf_] + " connected=" + is_connected + " group_id=" +
+                           group_identifier + " offset=" + groupid_buf3.arrayOffset());
+
+                if (is_connected == 0)
+                {
+                    int reconnect_result = tox_group_reconnect(conf_);
+                    Log.i(TAG,
+                          "load group num=" + group_numbers[conf_] + " reconnect=" + reconnect_result + " group_id=" +
+                          group_identifier + " offset=" + groupid_buf3.arrayOffset());
+                }
 
                 // final GroupDB conf2 = orma.selectFromGroupDB().toList().get(0);
                 // Log.i(TAG, "group 0 in db:" + conf2.group_identifier + " " + conf2.tox_group_number + " " + conf2.name);

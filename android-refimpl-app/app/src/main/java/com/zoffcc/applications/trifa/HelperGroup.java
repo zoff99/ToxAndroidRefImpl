@@ -110,7 +110,7 @@ public class HelperGroup
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            // e.printStackTrace();
             Log.i(TAG, "new_or_updated_group:EE1:" + e.getMessage());
 
             // conference is new -> add

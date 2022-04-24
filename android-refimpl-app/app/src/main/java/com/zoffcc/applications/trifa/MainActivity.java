@@ -3173,6 +3173,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_group_invite_friend(long group_number, long friend_number);
 
+    public static native int tox_group_is_connected(long group_number);
+
+    public static native int tox_group_reconnect(long group_number);
+
     /**
      * Send a text chat message to the group.
      * <p>
@@ -6788,8 +6792,7 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG,
                   "noti_and_badge:002group:" + group_message_list_activity.get_current_group_id() + ":" + group_id);
-
-            if (conference_message_list_activity.get_current_conf_id().equals(group_id))
+            if (group_message_list_activity.get_current_group_id().equals(group_id))
             {
                 // no notifcation and no badge update
                 do_notification = false;
@@ -6873,6 +6876,21 @@ public class MainActivity extends AppCompatActivity
             String group_identifier = bytes_to_hex(Arrays.copyOfRange(invite_data, 0, GROUP_ID_LENGTH));
             HelperGroup.add_group_wrapper(friend_number, new_group_num, group_identifier, 0);
         }
+    }
+
+    static void android_tox_callback_group_peer_join_cb_method(long group_number, long peer_id)
+    {
+        Log.i(TAG, "group_peer_join_cb:group_number=" + group_number + " peer_id=" + peer_id);
+    }
+
+    static void android_tox_callback_group_join_fail_cb_method(long group_number, int a_Tox_Group_Join_Fail)
+    {
+        Log.i(TAG, "group_join_fail_cb:group_number=" + group_number + " fail=" + a_Tox_Group_Join_Fail);
+    }
+
+    static void android_tox_callback_group_self_join_cb_method(long group_number)
+    {
+        Log.i(TAG, "group_self_join_cb:group_number=" + group_number);
     }
 
     // -------- called by native new Group methods --------
