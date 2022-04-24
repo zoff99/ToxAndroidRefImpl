@@ -73,6 +73,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_resend_msgv
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.vfs__unmount;
 import static com.zoffcc.applications.trifa.HelperGroup.new_or_updated_group;
+import static com.zoffcc.applications.trifa.HelperGroup.set_group_inactive;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
@@ -724,13 +725,16 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "load group num=" + group_numbers[conf_] + " connected=" + is_connected + " group_id=" +
                            group_identifier + " offset=" + groupid_buf3.arrayOffset());
 
+                /*
                 if (is_connected == 0)
                 {
+                    set_group_inactive(group_identifier);
                     int reconnect_result = tox_group_reconnect(conf_);
                     Log.i(TAG,
                           "load group num=" + group_numbers[conf_] + " reconnect=" + reconnect_result + " group_id=" +
                           group_identifier + " offset=" + groupid_buf3.arrayOffset());
                 }
+                */
 
                 // final GroupDB conf2 = orma.selectFromGroupDB().toList().get(0);
                 // Log.i(TAG, "group 0 in db:" + conf2.group_identifier + " " + conf2.tox_group_number + " " + conf2.name);

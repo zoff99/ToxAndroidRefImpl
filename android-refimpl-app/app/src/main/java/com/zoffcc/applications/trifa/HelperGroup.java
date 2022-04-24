@@ -28,7 +28,9 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -122,6 +124,7 @@ public class HelperGroup
                 conf_new.peer_count = -1;
                 conf_new.own_peer_number = -1;
                 conf_new.privacy_state = privacy_state;
+                conf_new.group_active = false;
                 conf_new.tox_group_number = group_num;
                 //
                 orma.insertIntoGroupDB(conf_new);
@@ -168,6 +171,29 @@ public class HelperGroup
         else
         {
             return res;
+        }
+    }
+
+    public static String tox_group_by_groupnum__wrapper(long groupnum)
+    {
+        try
+        {
+            ByteBuffer groupid_buf = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
+            if (tox_group_get_chat_id(groupnum, groupid_buf) == 0)
+            {
+                byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
+                groupid_buf.get(groupid_buffer, 0, GROUP_ID_LENGTH);
+                return bytes_to_hex(groupid_buffer);
+            }
+            else
+            {
+                return null;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return null;
         }
     }
 
@@ -252,6 +278,52 @@ public class HelperGroup
         return result;
     }
 
+    static boolean is_group_active(String group_identifier)
+    {
+        try
+        {
+            return (orma.selectFromGroupDB().
+                    group_identifierEq(group_identifier).
+                    toList().get(0).group_active);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    static void set_group_active(String group_identifier)
+    {
+        try
+        {
+            orma.updateGroupDB().
+                    group_identifierEq(group_identifier).
+                    group_active(true).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "set_group_active:EE:" + e.getMessage());
+        }
+    }
+
+    static void set_group_inactive(String group_identifier)
+    {
+        try
+        {
+            orma.updateGroupDB().
+                    group_identifierEq(group_identifier).
+                    group_active(false).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+            // Log.i(TAG, "set_group_inactive:EE:" + e.getMessage());
+        }
+    }
 
     static String group_identifier_short(String group_identifier, boolean uppercase_result)
     {

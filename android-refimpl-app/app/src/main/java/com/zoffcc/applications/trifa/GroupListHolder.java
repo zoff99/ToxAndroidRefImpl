@@ -176,7 +176,14 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             statusText.setText("#" + fl.tox_group_number);
         }
 
-        imageView.setImageResource(R.drawable.circle_green);
+        if (fl.group_active)
+        {
+            imageView.setImageResource(R.drawable.circle_green);
+        }
+        else
+        {
+            imageView.setImageResource(R.drawable.circle_red);
+        }
 
         // TODO: write me
         textView.setText("group title");

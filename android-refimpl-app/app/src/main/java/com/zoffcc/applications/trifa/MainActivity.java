@@ -135,6 +135,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.on_call_started_acti
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_view_including_cam_preview;
 import static com.zoffcc.applications.trifa.CallingActivity.update_calling_friend_connection_status;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.GroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
@@ -158,6 +159,8 @@ import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
+import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupnum__wrapper;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection_status_real;
@@ -6891,6 +6894,38 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_group_self_join_cb_method(long group_number)
     {
         Log.i(TAG, "group_self_join_cb:group_number=" + group_number);
+        final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
+
+        set_group_active(group_identifier);
+
+        try
+        {
+            if (MainActivity.group_message_list_activity != null)
+            {
+                if (MainActivity.group_message_list_activity.get_current_group_id().equals(group_identifier))
+                {
+                    MainActivity.group_message_list_activity.set_group_connection_status_icon();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            final GroupDB conf3 = orma.selectFromGroupDB().
+                    group_identifierEq(group_identifier).toList().get(0);
+            CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+            cc.is_friend = COMBINED_IS_CONFERENCE;
+            cc.group_item = GroupDB.deep_copy(conf3);
+            MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+        }
+        catch (Exception e3)
+        {
+            e3.printStackTrace();
+        }
     }
 
     // -------- called by native new Group methods --------
@@ -7003,10 +7038,27 @@ public class MainActivity extends AppCompatActivity
                             groupid_buf.get(groupid_buffer, 0, GROUP_ID_LENGTH);
                             String group_identifier = bytes_to_hex(groupid_buffer);
 
-                            Log.i(TAG, "create_group:group num=" + new_group_num + " group_id=" + group_identifier +
-                                       " offset=" + groupid_buf.arrayOffset());
+                            int privacy_state = tox_group_get_privacy_state(new_group_num);
+
+                            Log.i(TAG, "create_group:group num=" + new_group_num + " privacy_state=" + privacy_state +
+                                       " group_id=" + group_identifier + " offset=" + groupid_buf.arrayOffset());
 
                             HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, 1);
+
+                            set_group_active(group_identifier);
+                            try
+                            {
+                                final GroupDB conf3 = orma.selectFromGroupDB().
+                                        group_identifierEq(group_identifier).toList().get(0);
+                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                                cc.is_friend = COMBINED_IS_CONFERENCE;
+                                cc.group_item = GroupDB.deep_copy(conf3);
+                                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                            }
+                            catch (Exception e3)
+                            {
+                                e3.printStackTrace();
+                            }
                         }
                     }
                 }

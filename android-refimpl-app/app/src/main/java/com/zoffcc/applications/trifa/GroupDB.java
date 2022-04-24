@@ -55,6 +55,9 @@ public class GroupDB
     long tox_group_number = -1; // this changes often!!
 
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    boolean group_active = false; // is this conference active now? are we invited?
+
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     @Nullable
     boolean notification_silent = false; // show notifications for this conference?
 
@@ -68,6 +71,7 @@ public class GroupDB
         out.privacy_state = in.privacy_state;
         out.who_invited__tox_public_key_string = in.who_invited__tox_public_key_string;
         out.tox_group_number = in.tox_group_number;
+        out.group_active = in.group_active;
         out.notification_silent = in.notification_silent;
 
         return out;
@@ -79,6 +83,6 @@ public class GroupDB
         return "tox_group_number=" + tox_group_number + ", group_identifier=" + group_identifier +
                ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name +
                ", privacy_state=" + privacy_state + ", peer_count=" + peer_count + ", own_peer_number=" +
-               own_peer_number + ", notification_silent=" + notification_silent;
+               own_peer_number + ", notification_silent=" + notification_silent + ", group_active=" + group_active;
     }
 }
