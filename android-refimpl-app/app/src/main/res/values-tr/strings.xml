@@ -364,4 +364,11 @@
 \nAnında Bildirimi şimdi nasıl kurabileceğinizi görmek ister misiniz\?</string>
     <string name="ProfileActivity_delete_avatar_dialog_text">Profil resminizi kaldırmak istiyor musunuz\?</string>
     <string name="ProfileActivity_delete_avatar_dialog_title">Profil Resmini Kaldır</string>
+    <string name="add_group_activity_name">Grup Oluştur</string>
+    <string name="group_message_list_activity_name">Grup</string>
+    <string name="add_group_activity_help">Belirli bir grup adıyla yeni bir grup oluşturun.</string>
+    <string name="add_group_activity_add">Grup Oluştur</string>
+    <string name="layout___group_name">Grup Adı</string>
+    <string name="layout___add_friend">Arkadaş Ekle</string>
+    <string name="layout___create_new_private_group">Yeni özel grup oluştur</string>
 </resources>
