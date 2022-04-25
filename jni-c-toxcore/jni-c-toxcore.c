@@ -6583,7 +6583,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1by_1chat_1id(JNIEnv 
     capacity = (*env)->GetDirectBufferCapacity(env, chat_id_buffer);
     long res = tox_group_by_chat_id(tox_global, (uint8_t *)chat_id_buffer_c, NULL);
 
-    if(res == UINT32_MAX)
+    if(res == (long)(UINT32_MAX))
     {
         return (jlong)-1;
     }
