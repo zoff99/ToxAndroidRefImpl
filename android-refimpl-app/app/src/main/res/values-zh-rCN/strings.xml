@@ -386,4 +386,11 @@
 \n你想马上看看如何设置推送通知吗？</string>
     <string name="ProfileActivity_delete_avatar_dialog_text">你想删除个人资料图片吗？</string>
     <string name="ProfileActivity_delete_avatar_dialog_title">删除个人资料图片</string>
+    <string name="group_message_list_activity_name">群组</string>
+    <string name="layout___group_name">群组名</string>
+    <string name="layout___add_friend">加好友</string>
+    <string name="layout___create_new_private_group">创建新的私密群</string>
+    <string name="add_group_activity_name">建群</string>
+    <string name="add_group_activity_help">使用给定的群组名创建一个新群。</string>
+    <string name="add_group_activity_add">建群</string>
 </resources>
