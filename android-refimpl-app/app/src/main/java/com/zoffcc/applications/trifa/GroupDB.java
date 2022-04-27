@@ -40,7 +40,7 @@ public class GroupDB
 
     @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
     @Nullable
-    String name = ""; // saved for backup, when conference is offline!
+    String name = ""; // == group topic // saved for backup, when conference is offline!
 
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long peer_count = -1;

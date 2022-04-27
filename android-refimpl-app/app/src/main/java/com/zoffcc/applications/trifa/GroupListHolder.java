@@ -38,6 +38,9 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGroup.group_identifier_short;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_confid__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_topic;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED;
@@ -113,6 +116,8 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
 
         this.group = fl;
 
+        long group_number = tox_group_by_confid__wrapper(fl.group_identifier);
+
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
 
@@ -155,7 +160,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
         try
         {
             // TODO: write me
-            long user_count = 1;
+            long user_count = tox_group_peer_count(group_number);
             long offline_user_count = 0;
 
             if (user_count < 0)
@@ -185,8 +190,12 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             imageView.setImageResource(R.drawable.circle_red);
         }
 
-        // TODO: write me
-        textView.setText("group title");
+        String group_title = tox_group_get_topic(group_number);
+        if (group_title == null)
+        {
+            group_title = "";
+        }
+        textView.setText(group_title);
 
         imageView2.setVisibility(View.INVISIBLE);
 

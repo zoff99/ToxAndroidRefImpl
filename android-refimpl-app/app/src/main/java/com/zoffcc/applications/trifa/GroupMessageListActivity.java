@@ -74,8 +74,11 @@ import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pub
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_topic;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_connection_status;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -395,8 +398,13 @@ public class GroupMessageListActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                final String f_name = "Group";
                 final long conference_num = tox_group_by_confid__wrapper(group_id);
+                String group_topic = tox_group_get_topic(conference_num);
+                if (group_topic == null)
+                {
+                    group_topic = "";
+                }
+                final String f_name = group_topic;
 
                 Runnable myRunnable = new Runnable()
                 {
@@ -461,8 +469,14 @@ public class GroupMessageListActivity extends AppCompatActivity
                     try
                     {
                         String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, peers[(int) i]);
-                        String peer_name_temp = "" + peers[(int) i] + ": " + peer_pubkey_temp.substring(0, 6);
-                        add_group_user(peer_pubkey_temp, i, peer_name_temp, false);
+                        String peer_name = tox_group_peer_get_name(conference_num, peers[(int) i]);
+                        Log.i(TAG,
+                              "groupnum=" + conference_num + " peernum=" + peers[(int) i] + " peer_name=" + peer_name);
+                        String peer_name_temp =
+                                "" + peer_name + " :" + peers[(int) i] + ": " + peer_pubkey_temp.substring(0, 6);
+
+                        add_group_user(peer_pubkey_temp, i, peer_name_temp,
+                                       tox_group_peer_get_connection_status(conference_num, peers[(int) i]));
                     }
                     catch (Exception e)
                     {
@@ -802,7 +816,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         // TODO: write me
     }
 
-    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name, boolean offline)
+    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name, int connection_status)
     {
         try
         {
@@ -826,9 +840,13 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     try
                                     {
                                         int badge_color = R.color.md_green_700;
-                                        if (offline)
+                                        if (connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value)
                                         {
                                             badge_color = R.color.md_red_700;
+                                        }
+                                        else if (connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value)
+                                        {
+                                            badge_color = R.color.md_orange_700;
                                         }
 
                                         new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,

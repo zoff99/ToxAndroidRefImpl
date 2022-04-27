@@ -161,6 +161,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupnum__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_topic;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection_status_real;
@@ -3177,6 +3178,12 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_group_get_privacy_state(long group_number);
 
     public static native String tox_group_peer_get_public_key(long group_number, long peer_id);
+
+    public static native String tox_group_peer_get_name(long group_number, long peer_id);
+
+    public static native String tox_group_get_topic(long group_number);
+
+    public static native int tox_group_peer_get_connection_status(long group_number, long peer_id);
 
     public static native int tox_group_invite_friend(long group_number, long friend_number);
 
@@ -6909,6 +6916,30 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a)
+    {
+        Log.i(TAG, "group_peer_exit_cb:group_number=" + group_number + " peer_id=" + peer_id+" a="+a);
+
+        try
+        {
+            if (group_message_list_activity != null)
+            {
+                final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
+                if (temp_group_identifier != null)
+                {
+                    if (group_message_list_activity.get_current_group_id().equals(temp_group_identifier))
+                    {
+                        group_message_list_activity.update_group_all_users();
+                    }
+                }
+            }
+        }
+        catch (Exception e3)
+        {
+            e3.printStackTrace();
+        }
+    }
+
     static void android_tox_callback_group_join_fail_cb_method(long group_number, int a_Tox_Group_Join_Fail)
     {
         Log.i(TAG, "group_join_fail_cb:group_number=" + group_number + " fail=" + a_Tox_Group_Join_Fail);
@@ -6949,6 +6980,17 @@ public class MainActivity extends AppCompatActivity
         {
             e3.printStackTrace();
         }
+    }
+
+    static void android_tox_callback_group_topic_cb_method(long group_number, long peer_id, String topic, long topic_length)
+    {
+        Log.i(TAG, "group_topic_cb: groupnum=" + group_number + " peer=" + peer_id + " topic=" + topic);
+        if (topic == null)
+        {
+            topic = "";
+        }
+        final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
+        update_group_in_db_topic(group_identifier, topic);
     }
 
     // -------- called by native new Group methods --------
@@ -7048,7 +7090,7 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "create_group:name:>" + group_name + "<");
                     long new_group_num = tox_group_new(
                             ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PRIVATE.value, group_name,
-                            "peer " + getRandomString(10));
+                            "peer " + getRandomString(4));
 
                     Log.i(TAG, "create_group:new groupnum:=" + new_group_num);
 

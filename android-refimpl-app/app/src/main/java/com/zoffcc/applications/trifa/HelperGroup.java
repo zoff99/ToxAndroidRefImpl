@@ -106,6 +106,7 @@ public class HelperGroup
             catch (Exception e3)
             {
                 Log.i(TAG, "new_or_updated_group:EE3:" + e3.getMessage());
+                e3.printStackTrace();
             }
 
             return;
@@ -344,5 +345,13 @@ public class HelperGroup
             e.printStackTrace();
             return group_identifier;
         }
+    }
+
+    static void update_group_in_db_topic(final String group_identifier, final String name)
+    {
+        orma.updateGroupDB().
+                group_identifierEq(group_identifier).
+                name(name).
+                execute();
     }
 }

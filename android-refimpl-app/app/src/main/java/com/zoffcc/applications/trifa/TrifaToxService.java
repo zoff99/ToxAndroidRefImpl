@@ -73,7 +73,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_resend_msgv
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.vfs__unmount;
 import static com.zoffcc.applications.trifa.HelperGroup.new_or_updated_group;
-import static com.zoffcc.applications.trifa.HelperGroup.set_group_inactive;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_topic;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
@@ -113,8 +113,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_grouplist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_privacy_state;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_topic;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_reconnect;
 import static com.zoffcc.applications.trifa.MainActivity.tox_iteration_interval;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_capabilites;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabilities;
@@ -741,6 +741,14 @@ public class TrifaToxService extends Service
 
                 new_or_updated_group(group_numbers[conf_], tox_friend_get_public_key__wrapper(0), group_identifier,
                                      tox_group_get_privacy_state(group_numbers[conf_]));
+
+                String group_topic = tox_group_get_topic(group_numbers[conf_]);
+                if (group_topic == null)
+                {
+                    group_topic = "";
+                }
+                update_group_in_db_topic(group_identifier, group_topic);
+
 
                 try
                 {
