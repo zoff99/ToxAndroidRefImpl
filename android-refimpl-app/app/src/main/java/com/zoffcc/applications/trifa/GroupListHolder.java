@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
@@ -34,6 +35,7 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -334,60 +336,16 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                         // show group info page -----------------
                         break;
                     case R.id.item_leave:
-                        // leave conference -----------------
+                        // leave group -----------------
                         // TODO: write me
-                        // leave conference -----------------
+                        // leave group -----------------
+                        break;
+                    case R.id.item_dummy01:
                         break;
                     case R.id.item_delete:
-                        // delete conference -----------------
-                        if (f2.group_identifier != null)
-                        {
-                            final long group_num = tox_group_by_confid__wrapper(f2.group_identifier);
-                            tox_group_leave(group_num, "bye");
-                            cache_confid_confnum.clear();
-                            update_savedata_file_wrapper(); // after deleteing a conference
-                        }
-
-                        Log.i(TAG, "onMenuItemClick:info:33");
-                        group_conference_all_messages(f2.group_identifier);
-                        delete_group(f2.group_identifier);
-                        Log.i(TAG, "onMenuItemClick:info:34");
-
-                        Runnable myRunnable2 = new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                try
-                                {
-                                    try
-                                    {
-                                        if (MainActivity.friend_list_fragment != null)
-                                        {
-                                            // reload friendlist
-                                            // TODO: only remove 1 item, don't clear all!! this can crash
-                                            MainActivity.friend_list_fragment.add_all_friends_clear(200);
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                    Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
-                                }
-                            }
-                        };
-
-                        // TODO: use own handler
-                        if (main_handler_s != null)
-                        {
-                            main_handler_s.post(myRunnable2);
-                        }
-                        // delete conference -----------------
+                        // delete group -----------------
+                        show_confirm_group_del_dialog(v, f2);
+                        // delete group -----------------
                         break;
                 }
                 return true;
@@ -400,4 +358,71 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
         return true;
 
     }
+
+    public void show_confirm_group_del_dialog(final View view, final GroupDB f2)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setTitle("Delete Group?");
+        builder.setMessage("Do you want to delete this Group including all Messages?");
+
+        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("Yes", new DialogInterface.OnClickListener()
+        {
+            @Override
+            public void onClick(DialogInterface dialog, int which)
+            {
+                if (f2.group_identifier != null)
+                {
+                    final long group_num = tox_group_by_confid__wrapper(f2.group_identifier);
+                    tox_group_leave(group_num, "bye");
+                    cache_confid_confnum.clear();
+                    update_savedata_file_wrapper(); // after deleteing a conference
+                }
+
+                Log.i(TAG, "onMenuItemClick:info:33");
+                group_conference_all_messages(f2.group_identifier);
+                delete_group(f2.group_identifier);
+                Log.i(TAG, "onMenuItemClick:info:34");
+
+                Runnable myRunnable2 = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            try
+                            {
+                                if (MainActivity.friend_list_fragment != null)
+                                {
+                                    // reload friendlist
+                                    // TODO: only remove 1 item, don't clear all!! this can crash
+                                    MainActivity.friend_list_fragment.add_all_friends_clear(200);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "onMenuItemClick:8:EE:" + e.getMessage());
+                        }
+                    }
+                };
+
+                // TODO: use own handler
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable2);
+                }
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
 }

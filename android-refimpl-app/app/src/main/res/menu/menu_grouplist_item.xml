@@ -7,10 +7,19 @@
         android:visible="true"
         app:showAsAction="ifRoom|withText" />
     <item
+        android:id="@+id/item_dummy01"
+        android:background="@color/md_red_400"
+        android:icon="@drawable/ic_delete_white_24dp"
+        android:title="   ---   "
+        android:visible="true"
+        app:showAsAction="ifRoom" />
+    <!--
+    <item
         android:id="@+id/item_leave"
         android:title="@string/layout___leave"
         android:visible="true"
         app:showAsAction="ifRoom|withText" />
+    -->
     <item
         android:id="@+id/item_delete"
         android:title="@string/layout___delete"
