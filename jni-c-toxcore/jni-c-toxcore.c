@@ -6577,6 +6577,45 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1name(JNIE
 }
 
 JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1name(JNIEnv *env, jobject thiz,
+        jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jstring)NULL;
+#else
+
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    Tox_Err_Group_State_Queries error;
+    size_t length = tox_group_get_name_size(tox_global, (uint32_t)group_number, &error);
+
+    if(error != TOX_ERR_GROUP_STATE_QUERIES_OK)
+    {
+        return (jstring)NULL;
+    }
+    else
+    {
+        char title[length + 1];
+        CLEAR(title);
+        bool res = tox_group_get_name(tox_global, (uint32_t)group_number, (uint8_t *)title, &error);
+
+        if(res == false)
+        {
+            return (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+        }
+        else
+        {
+            jstring js1 = c_safe_string_from_java((char *)title, length);
+            return js1;
+        }
+    }
+#endif
+}
+
+JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1topic(JNIEnv *env, jobject thiz,
         jlong group_number)
 {
