@@ -6916,9 +6916,10 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a)
+    static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a_Tox_Group_Exit_Type)
     {
-        Log.i(TAG, "group_peer_exit_cb:group_number=" + group_number + " peer_id=" + peer_id+" a="+a);
+        Log.i(TAG, "group_peer_exit_cb:group_number=" + group_number + " peer_id=" + peer_id + " exit_type=" +
+                   a_Tox_Group_Exit_Type);
 
         try
         {

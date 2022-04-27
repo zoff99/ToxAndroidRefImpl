@@ -1548,6 +1548,47 @@ public class ToxVars
         }
     }
 
+    public static enum Tox_Group_Exit_Type
+    {
+        /**
+         * The peer has quit the group.
+         */
+        TOX_GROUP_EXIT_TYPE_QUIT(0),
+
+        /**
+         * Your connection with this peer has timed out.
+         */
+        TOX_GROUP_EXIT_TYPE_TIMEOUT(1),
+
+        /**
+         * Your connection with this peer has been severed.
+         */
+        TOX_GROUP_EXIT_TYPE_DISCONNECTED(2),
+
+        /**
+         * Your connection with all peers has been severed. This will occur when you are kicked from
+         * a group, rejoin a group, or manually disconnect from a group.
+         */
+        TOX_GROUP_EXIT_TYPE_SELF_DISCONNECTED(3),
+
+        /**
+         * The peer has been kicked.
+         */
+        TOX_GROUP_EXIT_TYPE_KICK(4),
+
+        /**
+         * The peer provided invalid group sync information.
+         */
+        TOX_GROUP_EXIT_TYPE_SYNC_ERROR(5);
+
+        public int value;
+
+        private Tox_Group_Exit_Type(int value)
+        {
+            this.value = value;
+        }
+    }
+
     public static enum TOX_GROUP_PRIVACY_STATE
     {
 

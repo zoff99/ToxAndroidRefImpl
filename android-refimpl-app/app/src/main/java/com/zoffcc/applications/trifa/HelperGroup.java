@@ -28,6 +28,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
@@ -99,7 +100,7 @@ public class HelperGroup
                         group_identifierEq(group_identifier).toList().get(0);
                 // update or add to "friendlist"
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                cc.is_friend = COMBINED_IS_CONFERENCE;
+                cc.is_friend = COMBINED_IS_GROUP;
                 cc.group_item = GroupDB.deep_copy(conf3);
                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
@@ -134,7 +135,7 @@ public class HelperGroup
                 try
                 {
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                    cc.is_friend = COMBINED_IS_CONFERENCE;
+                    cc.is_friend = COMBINED_IS_GROUP;
                     cc.group_item = GroupDB.deep_copy(conf_new);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
