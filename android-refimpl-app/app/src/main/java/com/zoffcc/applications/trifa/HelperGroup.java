@@ -355,4 +355,40 @@ public class HelperGroup
                 name(name).
                 execute();
     }
+
+    static void group_conference_all_messages(final String group_identifier)
+    {
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Log.i(TAG, "group_conference_all_messages:del");
+                    orma.deleteFromGroupMessage().group_identifierEq(group_identifier).execute();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "group_conference_all_messages:EE:" + e.getMessage());
+                }
+            }
+        };
+        t.start();
+    }
+
+    static void delete_group(final String group_identifier)
+    {
+        try
+        {
+            Log.i(TAG, "delete_group:del");
+            orma.deleteFromGroupDB().group_identifierEq(group_identifier).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "delete_group:EE:" + e.getMessage());
+        }
+    }
 }
