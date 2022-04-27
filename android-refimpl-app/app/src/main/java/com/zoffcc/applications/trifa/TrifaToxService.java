@@ -113,7 +113,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_grouplist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_privacy_state;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_topic;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
 import static com.zoffcc.applications.trifa.MainActivity.tox_iteration_interval;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_capabilites;
@@ -742,7 +742,7 @@ public class TrifaToxService extends Service
                 new_or_updated_group(group_numbers[conf_], tox_friend_get_public_key__wrapper(0), group_identifier,
                                      tox_group_get_privacy_state(group_numbers[conf_]));
 
-                String group_topic = tox_group_get_topic(group_numbers[conf_]);
+                String group_topic = tox_group_get_name(group_numbers[conf_]);
                 if (group_topic == null)
                 {
                     group_topic = "";

@@ -46,7 +46,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.group_identifier_short;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_topic;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_leave;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
@@ -198,7 +198,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             imageView.setImageResource(R.drawable.circle_red);
         }
 
-        String group_title = tox_group_get_topic(group_number);
+        String group_title = tox_group_get_name(group_number);
         if (group_title == null)
         {
             group_title = "";

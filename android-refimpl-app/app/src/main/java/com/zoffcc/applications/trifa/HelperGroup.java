@@ -27,11 +27,11 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
-import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -120,6 +120,22 @@ public class HelperGroup
             // conference is new -> add
             try
             {
+                String group_topic = "";
+                try
+                {
+                    group_topic = tox_group_get_name(group_num);
+                    Log.i(TAG, "new_or_updated_group:group_topic=" + group_topic);
+                    if (group_topic == null)
+                    {
+                        group_topic = "";
+                    }
+                }
+                catch (Exception e6)
+                {
+                    e6.printStackTrace();
+                    Log.i(TAG, "new_or_updated_group:EE6:" + e6.getMessage());
+                }
+
                 GroupDB conf_new = new GroupDB();
                 conf_new.group_identifier = group_identifier;
                 conf_new.who_invited__tox_public_key_string = who_invited_public_key;
@@ -128,6 +144,7 @@ public class HelperGroup
                 conf_new.privacy_state = privacy_state;
                 conf_new.group_active = false;
                 conf_new.tox_group_number = group_num;
+                conf_new.name = group_topic;
                 //
                 orma.insertIntoGroupDB(conf_new);
                 Log.i(TAG, "new_or_updated_group:+ADD+");
@@ -137,10 +154,13 @@ public class HelperGroup
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = COMBINED_IS_GROUP;
                     cc.group_item = GroupDB.deep_copy(conf_new);
+                    Log.i(TAG, "new_or_updated_group:EE4__:" + MainActivity.friend_list_fragment + " " + cc);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    //!! if we are coming from another activity the friend_list_fragment might not be initialized yet!!
                 }
                 catch (Exception e4)
                 {
+                    e4.printStackTrace();
                     Log.i(TAG, "new_or_updated_group:EE4:" + e4.getMessage());
                 }
 

@@ -3181,6 +3181,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native String tox_group_peer_get_name(long group_number, long peer_id);
 
+    public static native String tox_group_get_name(long group_number);
+
     public static native String tox_group_get_topic(long group_number);
 
     public static native int tox_group_peer_get_connection_status(long group_number, long peer_id);

@@ -74,7 +74,7 @@ import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pub
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_topic;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_connection_status;
@@ -399,7 +399,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             public void run()
             {
                 final long conference_num = tox_group_by_confid__wrapper(group_id);
-                String group_topic = tox_group_get_topic(conference_num);
+                String group_topic = tox_group_get_name(conference_num);
                 if (group_topic == null)
                 {
                     group_topic = "";
