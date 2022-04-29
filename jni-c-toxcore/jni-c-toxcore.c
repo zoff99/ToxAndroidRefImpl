@@ -277,6 +277,7 @@ jmethodID android_tox_callback_group_peer_exit_cb_method = NULL;
 jmethodID android_tox_callback_group_join_fail_cb_method = NULL;
 jmethodID android_tox_callback_group_self_join_cb_method = NULL;
 jmethodID android_tox_callback_group_topic_cb_method = NULL;
+jmethodID android_tox_callback_group_privacy_state_cb_method = NULL;
 // -------- _newGroup-callbacks_ -----
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
@@ -374,6 +375,9 @@ void group_self_join_cb(Tox *tox, uint32_t group_number, void *user_data);
 
 void group_topic_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *topic, size_t length,
                         void *user_data);
+
+void group_privacy_state_cb(Tox *tox, uint32_t group_number, Tox_Group_Privacy_State privacy_state,
+                            void *user_data);
 // ------- new Group Callback forward defintions -------
 
 
@@ -1086,6 +1090,7 @@ void init_tox_callbacks()
     tox_callback_group_join_fail(tox_global, group_join_fail_cb);
     tox_callback_group_self_join(tox_global, group_self_join_cb);
     tox_callback_group_topic(tox_global, group_topic_cb);
+    tox_callback_group_privacy_state(tox_global, group_privacy_state_cb);
 #endif
     // -------- newGroups _callbacks_ --------
 
@@ -2871,6 +2876,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_group_self_join_cb_method", "(J)V");
     android_tox_callback_group_topic_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_topic_cb_method", "(JJLjava/lang/String;J)V");
+    android_tox_callback_group_privacy_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_privacy_state_cb_method", "(JI)V");
     // -------- _newGroup _callbacks_ --------
 
     dbg(9, "linking callbacks ... READY");
@@ -7402,6 +7409,24 @@ void group_topic_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uin
 {
     android_tox_callback_group_topic_cb(group_number, peer_id, topic, length);
 }
+
+void android_tox_callback_group_privacy_state_cb(uint32_t group_number, uint32_t privacy_state)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_privacy_state_cb_method,
+                                     (jlong)group_number,
+                                     (jint)privacy_state);
+}
+
+void group_privacy_state_cb(Tox *tox, uint32_t group_number, Tox_Group_Privacy_State privacy_state,
+                            void *user_data)
+{
+    android_tox_callback_group_privacy_state_cb(group_number, privacy_state);
+}
+
+
 
 // ------------------- new Groups -------------------
 // ------------------- new Groups -------------------
