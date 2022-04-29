@@ -73,7 +73,8 @@ import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_resend_msgv
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.vfs__unmount;
 import static com.zoffcc.applications.trifa.HelperGroup.new_or_updated_group;
-import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_topic;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_name;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_privacy_state;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_messageid;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_no_read_recvedts;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
@@ -111,9 +112,9 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_type
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_grouplist;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_privacy_state;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
 import static com.zoffcc.applications.trifa.MainActivity.tox_iteration_interval;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_capabilites;
@@ -725,30 +726,18 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "load group num=" + group_numbers[conf_] + " connected=" + is_connected + " group_id=" +
                            group_identifier + " offset=" + groupid_buf3.arrayOffset());
 
-                /*
-                if (is_connected == 0)
-                {
-                    set_group_inactive(group_identifier);
-                    int reconnect_result = tox_group_reconnect(conf_);
-                    Log.i(TAG,
-                          "load group num=" + group_numbers[conf_] + " reconnect=" + reconnect_result + " group_id=" +
-                          group_identifier + " offset=" + groupid_buf3.arrayOffset());
-                }
-                */
-
-                // final GroupDB conf2 = orma.selectFromGroupDB().toList().get(0);
-                // Log.i(TAG, "group 0 in db:" + conf2.group_identifier + " " + conf2.tox_group_number + " " + conf2.name);
-
                 new_or_updated_group(group_numbers[conf_], tox_friend_get_public_key__wrapper(0), group_identifier,
                                      tox_group_get_privacy_state(group_numbers[conf_]));
 
-                String group_topic = tox_group_get_name(group_numbers[conf_]);
-                if (group_topic == null)
+                String group_name = tox_group_get_name(group_numbers[conf_]);
+                if (group_name == null)
                 {
-                    group_topic = "";
+                    group_name = "";
                 }
-                update_group_in_db_topic(group_identifier, group_topic);
+                update_group_in_db_name(group_identifier, group_name);
 
+                final int new_privacy_state = tox_group_get_privacy_state(group_numbers[conf_]);
+                update_group_in_db_privacy_state(group_identifier, new_privacy_state);
 
                 try
                 {

@@ -699,6 +699,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 m.TOX_MESSAGE_TYPE = 0;
                 m.read = true; // !!!! there is not "read status" with conferences in Tox !!!!
                 m.tox_group_peername = null;
+                m.private_message = 0;
                 m.group_identifier = group_id;
                 m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
                 m.sent_timestamp = System.currentTimeMillis();

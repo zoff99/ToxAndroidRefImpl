@@ -153,7 +153,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
         if (fl.privacy_state == ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value)
         {
             f_conf_container_parent.setBackgroundResource(R.drawable.friend_list_conf_round_bg);
-            final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_group).
+            final Drawable d_lock = new IconicsDrawable(context).icon(GoogleMaterial.Icon.gmd_public).
                     color(context.getResources().getColor(R.color.icon_colors)).sizeDp(80);
             avatar.setImageDrawable(d_lock);
         }

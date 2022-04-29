@@ -43,6 +43,10 @@ public class GroupMessage
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String tox_group_peer_pubkey;
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    int private_message = 0; // 0 -> message to group, 1 -> msg privately to/from peer
+
     @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
     @Nullable
     String tox_group_peername = ""; // saved for backup, when conference is offline!
@@ -85,6 +89,7 @@ public class GroupMessage
         out.message_id_tox = in.message_id_tox;
         out.group_identifier = in.group_identifier;
         out.tox_group_peer_pubkey = in.tox_group_peer_pubkey;
+        out.private_message = in.private_message;
         out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
         out.TRIFA_MESSAGE_TYPE = in.TRIFA_MESSAGE_TYPE;
@@ -103,9 +108,9 @@ public class GroupMessage
     public String toString()
     {
         return "id=" + id + ", message_id_tox=" + message_id_tox + ", tox_group_peername=" + tox_group_peername +
-               ", tox_peerpubkey=" + "*tox_peerpubkey*" + ", direction=" + direction + ", TRIFA_MESSAGE_TYPE=" +
-               TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE + ", sent_timestamp=" + sent_timestamp +
-               ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read + ", text=" + "xxxxxx" + ", is_new=" + is_new +
-               ", was_synced=" + was_synced;
+               ", tox_peerpubkey=" + "*tox_peerpubkey*" + ", private_message=" + private_message + ", direction=" +
+               direction + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE +
+               ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
+               ", text=" + "xxxxxx" + ", is_new=" + is_new + ", was_synced=" + was_synced;
     }
 }

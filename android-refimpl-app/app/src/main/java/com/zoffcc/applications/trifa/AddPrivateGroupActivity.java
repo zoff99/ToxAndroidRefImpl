@@ -36,7 +36,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
 
-public class AddGroupActivity extends AppCompatActivity
+public class AddPrivateGroupActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.AddGrpActivity";
     EditText groupname_text = null;

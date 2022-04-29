@@ -13,4 +13,17 @@
         android:visible="true"
         android:icon="@drawable/emoji_google_category_smileysandpeople"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/item_create_group_public"
+        android:title="@string/layout___create_new_public_group"
+        android:visible="true"
+        android:icon="@drawable/emoji_google_category_smileysandpeople"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/item_join_group_public"
+        android:title="@string/layout___join_public_group"
+        android:visible="true"
+        android:icon="@drawable/emoji_google_category_smileysandpeople"
+        app:showAsAction="never" />
+
 </menu>

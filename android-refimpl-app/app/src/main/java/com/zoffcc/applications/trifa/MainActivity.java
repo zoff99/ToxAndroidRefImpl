@@ -161,7 +161,9 @@ import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupnum__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_privacy_state;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_topic;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_friendlist;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection_status_real;
@@ -250,6 +252,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_AWAY;
@@ -357,7 +360,9 @@ public class MainActivity extends AppCompatActivity
     final static int SelectFriendSingleActivity_ID = 10009;
     final static int SelectLanguageActivity_ID = 10010;
     final static int CallingWaitingActivity_ID = 10011;
-    final static int AddGroupActivity_ID = 10012;
+    final static int AddPrivateGroupActivity_ID = 10012;
+    final static int AddPublicGroupActivity_ID = 10013;
+    final static int JoinPublicGroupActivity_ID = 10014;
     final static int Notification_new_message_ID = 10023;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
@@ -1789,12 +1794,20 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId())
         {
             case R.id.item_addfriend:
-                Intent intent = new Intent(this, AddFriendActivity.class);
+                final Intent intent = new Intent(this, AddFriendActivity.class);
                 startActivityForResult(intent, AddFriendActivity_ID);
                 break;
             case R.id.item_create_group_private:
-                Intent intent2 = new Intent(this, AddGroupActivity.class);
-                startActivityForResult(intent2, AddGroupActivity_ID);
+                final Intent intent2 = new Intent(this, AddPrivateGroupActivity.class);
+                startActivityForResult(intent2, AddPrivateGroupActivity_ID);
+                break;
+            case R.id.item_create_group_public:
+                final Intent intent3 = new Intent(this, AddPublicGroupActivity.class);
+                startActivityForResult(intent3, AddPublicGroupActivity_ID);
+                break;
+            case R.id.item_join_group_public:
+                final Intent intent4 = new Intent(this, JoinPublicGroupActivity.class);
+                startActivityForResult(intent4, JoinPublicGroupActivity_ID);
                 break;
         }
         return true;
@@ -6779,11 +6792,7 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            // TODO: cache me!!
-            group_temp = orma.selectFromGroupDB().
-                    tox_group_numberEq(group_number).
-                    toList().get(0);
-            group_id = group_temp.group_identifier;
+            tox_group_by_groupnum__wrapper(group_number);
         }
         catch (Exception e)
         {
@@ -6824,6 +6833,7 @@ public class MainActivity extends AppCompatActivity
         m.TOX_MESSAGE_TYPE = 0;
         m.read = false;
         m.tox_group_peername = null;
+        m.private_message = 0;
         m.group_identifier = group_id.toLowerCase();
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.rcvd_timestamp = System.currentTimeMillis();
@@ -6870,6 +6880,16 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
     {
         Log.i(TAG, "group_private_message_cb:gn=" + group_number + " peerid=" + peer_id + " message=" + message_orig);
+        final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
+    }
+
+    static void android_tox_callback_group_privacy_state_cb_method(long group_number, final int a_TOX_GROUP_PRIVACY_STATE)
+    {
+        Log.i(TAG,
+              "group_privacy_state_cb:group_number=" + group_number + " privacy_state=" + a_TOX_GROUP_PRIVACY_STATE);
+        final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
+        update_group_in_db_privacy_state(group_identifier, a_TOX_GROUP_PRIVACY_STATE);
+        update_group_in_friendlist(group_identifier);
     }
 
     static void android_tox_callback_group_invite_cb_method(long friend_number, final byte[] invite_data, final long invite_data_length, String group_name)
@@ -6891,6 +6911,9 @@ public class MainActivity extends AppCompatActivity
             // TODO: get real group_identifier and privacy_state, get it via API call
             String group_identifier = bytes_to_hex(Arrays.copyOfRange(invite_data, 0, GROUP_ID_LENGTH));
             HelperGroup.add_group_wrapper(friend_number, new_group_num, group_identifier, 0);
+            final int new_privacy_state = tox_group_get_privacy_state(new_group_num);
+            update_group_in_db_privacy_state(group_identifier, new_privacy_state);
+            update_group_in_friendlist(group_identifier);
         }
     }
 
@@ -6946,6 +6969,7 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_group_join_fail_cb_method(long group_number, int a_Tox_Group_Join_Fail)
     {
         Log.i(TAG, "group_join_fail_cb:group_number=" + group_number + " fail=" + a_Tox_Group_Join_Fail);
+        final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
     }
 
     static void android_tox_callback_group_self_join_cb_method(long group_number)
@@ -7082,7 +7106,7 @@ public class MainActivity extends AppCompatActivity
                 // (resultCode == RESULT_CANCELED)
             }
         }
-        else if (requestCode == AddGroupActivity_ID)
+        else if (requestCode == AddPrivateGroupActivity_ID)
         {
             if (resultCode == RESULT_OK)
             {
@@ -7111,7 +7135,7 @@ public class MainActivity extends AppCompatActivity
                             Log.i(TAG, "create_group:group num=" + new_group_num + " privacy_state=" + privacy_state +
                                        " group_id=" + group_identifier + " offset=" + groupid_buf.arrayOffset());
 
-                            HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, 1);
+                            HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, privacy_state);
 
                             set_group_active(group_identifier);
                             try
@@ -7134,6 +7158,129 @@ public class MainActivity extends AppCompatActivity
                 {
                     e.printStackTrace();
                     Log.i(TAG, "create_group:EE01:" + e.getMessage());
+                }
+            }
+            else
+            {
+                // (resultCode == RESULT_CANCELED)
+            }
+        }
+        else if (requestCode == AddPublicGroupActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                try
+                {
+
+                    String group_name = data.getStringExtra("group_name");
+                    Log.i(TAG, "create_group:name:>" + group_name + "<");
+                    long new_group_num = tox_group_new(
+                            ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value, group_name,
+                            "peer " + getRandomString(4));
+
+                    Log.i(TAG, "create_group:new groupnum:=" + new_group_num);
+
+                    if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
+                    {
+                        ByteBuffer groupid_buf = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
+                        if (tox_group_get_chat_id(new_group_num, groupid_buf) == 0)
+                        {
+                            byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
+                            groupid_buf.get(groupid_buffer, 0, GROUP_ID_LENGTH);
+                            String group_identifier = bytes_to_hex(groupid_buffer);
+
+                            int privacy_state = tox_group_get_privacy_state(new_group_num);
+
+                            Log.i(TAG, "create_group:group num=" + new_group_num + " privacy_state=" + privacy_state +
+                                       " group_id=" + group_identifier + " offset=" + groupid_buf.arrayOffset());
+
+                            HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, privacy_state);
+
+                            set_group_active(group_identifier);
+                            try
+                            {
+                                final GroupDB conf3 = orma.selectFromGroupDB().
+                                        group_identifierEq(group_identifier).toList().get(0);
+                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                                cc.is_friend = COMBINED_IS_CONFERENCE;
+                                cc.group_item = GroupDB.deep_copy(conf3);
+                                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                            }
+                            catch (Exception e3)
+                            {
+                                e3.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "create_group:EE01:" + e.getMessage());
+                }
+            }
+            else
+            {
+                // (resultCode == RESULT_CANCELED)
+            }
+        }
+        else if (requestCode == JoinPublicGroupActivity_ID)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                try
+                {
+
+                    String group_id = data.getStringExtra("group_id");
+                    Log.i(TAG, "join_group:group_id:>" + group_id + "<");
+
+                    ByteBuffer join_chat_id_buffer = ByteBuffer.allocateDirect(TOX_GROUP_CHAT_ID_SIZE);
+                    byte[] data_join = HelperGeneric.hex_to_bytes(group_id.toUpperCase());
+                    join_chat_id_buffer.put(data_join);
+                    join_chat_id_buffer.rewind();
+
+                    long new_group_num = tox_group_join(join_chat_id_buffer, TOX_GROUP_CHAT_ID_SIZE,
+                                                        "peer " + getRandomString(4), null);
+
+                    Log.i(TAG, "join_group:new groupnum:=" + new_group_num);
+
+                    if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
+                    {
+                        ByteBuffer groupid_buf = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
+                        if (tox_group_get_chat_id(new_group_num, groupid_buf) == 0)
+                        {
+                            byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
+                            groupid_buf.get(groupid_buffer, 0, GROUP_ID_LENGTH);
+                            String group_identifier = bytes_to_hex(groupid_buffer);
+
+                            int privacy_state = tox_group_get_privacy_state(new_group_num);
+
+                            Log.i(TAG, "join_group:group num=" + new_group_num + " privacy_state=" + privacy_state +
+                                       " group_id=" + group_identifier + " offset=" + groupid_buf.arrayOffset());
+
+                            HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, privacy_state);
+
+                            set_group_active(group_identifier);
+                            try
+                            {
+                                final GroupDB conf3 = orma.selectFromGroupDB().
+                                        group_identifierEq(group_identifier).toList().get(0);
+                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                                cc.is_friend = COMBINED_IS_CONFERENCE;
+                                cc.group_item = GroupDB.deep_copy(conf3);
+                                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                            }
+                            catch (Exception e3)
+                            {
+                                e3.printStackTrace();
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "join_group:EE01:" + e.getMessage());
                 }
             }
             else

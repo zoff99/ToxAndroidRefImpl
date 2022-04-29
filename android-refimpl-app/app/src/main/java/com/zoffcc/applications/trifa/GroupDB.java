@@ -40,7 +40,11 @@ public class GroupDB
 
     @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
     @Nullable
-    String name = ""; // == group topic // saved for backup, when conference is offline!
+    String name = "";
+
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
+    @Nullable
+    String topic = "";
 
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long peer_count = -1;
@@ -66,6 +70,7 @@ public class GroupDB
         GroupDB out = new GroupDB();
         out.group_identifier = in.group_identifier;
         out.name = in.name;
+        out.topic = in.topic;
         out.peer_count = in.peer_count;
         out.own_peer_number = in.own_peer_number;
         out.privacy_state = in.privacy_state;
@@ -82,7 +87,8 @@ public class GroupDB
     {
         return "tox_group_number=" + tox_group_number + ", group_identifier=" + group_identifier +
                ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name +
-               ", privacy_state=" + privacy_state + ", peer_count=" + peer_count + ", own_peer_number=" +
-               own_peer_number + ", notification_silent=" + notification_silent + ", group_active=" + group_active;
+               ", topic=" + topic + ", privacy_state=" + privacy_state + ", peer_count=" + peer_count +
+               ", own_peer_number=" + own_peer_number + ", notification_silent=" + notification_silent +
+               ", group_active=" + group_active;
     }
 }

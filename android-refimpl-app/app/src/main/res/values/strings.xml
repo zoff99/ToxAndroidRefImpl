@@ -1,7 +1,9 @@
 <resources>
     <string name="app_name" translatable="false">TRIfA</string>
     <string name="add_friend_activity_name">Add Friend</string>
-    <string name="add_group_activity_name">Create Group</string>
+    <string name="add_group_activity_name">Create Private Group</string>
+    <string name="add_public_group_activity_name">Create Public Group</string>
+    <string name="join_public_activity_name">Join Public Group</string>
     <string name="message_list_activity_name">Chat</string>
     <string name="conference_message_list_activity_name">Text Conference</string>
     <string name="group_message_list_activity_name">Group</string>
@@ -321,8 +323,11 @@
     <string name="add_friend_activity_help">Paste friend\'s Tox ID in the text box above or tap the
     QR code button to scan friend\'s code with a camera.</string>
     <string name="add_friend_activity_add">Add Friend</string>
-    <string name="add_group_activity_help">Create a new Group with a given group name.</string>
+    <string name="add_group_activity_help">Create a new Private (invite only) Group with a given Group Name.</string>
+    <string name="add_public_group_activity_help">Create a new Public Group with a given Group Name.</string>
+    <string name="join_public_group_activity_help">Join a Public Group with the given Group ID.</string>
     <string name="add_group_activity_add">Create Group</string>
+    <string name="join_group_activity_join">Join Group</string>
     <string name="cancel">Cancel</string>
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
@@ -397,6 +402,7 @@
     <!-- Layout texts -->
     <string name="layout___toxid">ToxID</string>
     <string name="layout___group_name">Group Name</string>
+    <string name="layout___group_id">Group ID</string>
     <string name="layout___scan_qr_code">scan QR Code</string>
     <string name="layout___enter_pass_longtext">Enter Password\nThere is NO recovery option!</string>
     <string name="layout___unlock">Unlock</string>
@@ -461,6 +467,8 @@
     <string name="wrong_credentials_error">Wrong Credentials</string>
     <string name="layout___add_friend">Add Friend</string>
     <string name="layout___create_new_private_group">Create new Private Group</string>
+    <string name="layout___create_new_public_group">Create new Public Group</string>
+    <string name="layout___join_public_group">Join a Public Group</string>
     <!-- Layout texts -->
     <!-- Layout texts -->
     <!-- Layout texts -->

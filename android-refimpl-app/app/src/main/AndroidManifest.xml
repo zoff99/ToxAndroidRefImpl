@@ -93,9 +93,19 @@
             android:label="@string/add_friend_activity_name">
         </activity>
         <activity
-            android:name=".AddGroupActivity"
+            android:name=".AddPrivateGroupActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/add_group_activity_name">
+        </activity>
+        <activity
+            android:name=".AddPublicGroupActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/add_public_group_activity_name">
+        </activity>
+        <activity
+            android:name=".JoinPublicGroupActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/join_public_activity_name">
         </activity>
         <activity
             android:name=".MessageListActivity"

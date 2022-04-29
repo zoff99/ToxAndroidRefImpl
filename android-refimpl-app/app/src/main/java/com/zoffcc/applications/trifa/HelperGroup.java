@@ -368,12 +368,46 @@ public class HelperGroup
         }
     }
 
-    static void update_group_in_db_topic(final String group_identifier, final String name)
+    static void update_group_in_db_name(final String group_identifier, final String name)
     {
-        orma.updateGroupDB().
-                group_identifierEq(group_identifier).
-                name(name).
-                execute();
+        try
+        {
+            orma.updateGroupDB().
+                    group_identifierEq(group_identifier).
+                    name(name).
+                    execute();
+        }
+        catch (Exception ignored)
+        {
+        }
+    }
+
+    static void update_group_in_db_topic(final String group_identifier, final String topic)
+    {
+        try
+        {
+            orma.updateGroupDB().
+                    group_identifierEq(group_identifier).
+                    topic(topic).
+                    execute();
+        }
+        catch (Exception ignored)
+        {
+        }
+    }
+
+    static void update_group_in_db_privacy_state(final String group_identifier, final int a_TOX_GROUP_PRIVACY_STATE)
+    {
+        try
+        {
+            orma.updateGroupDB().
+                    group_identifierEq(group_identifier).
+                    privacy_state(a_TOX_GROUP_PRIVACY_STATE).
+                    execute();
+        }
+        catch (Exception ignored)
+        {
+        }
     }
 
     static void group_conference_all_messages(final String group_identifier)
@@ -409,6 +443,25 @@ public class HelperGroup
         {
             e.printStackTrace();
             Log.i(TAG, "delete_group:EE:" + e.getMessage());
+        }
+    }
+
+    static void update_group_in_friendlist(final String group_identifier)
+    {
+        try
+        {
+            final GroupDB conf3 = orma.selectFromGroupDB().
+                    group_identifierEq(group_identifier).toList().get(0);
+
+            CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+            cc.is_friend = COMBINED_IS_GROUP;
+            cc.group_item = GroupDB.deep_copy(conf3);
+            MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+        }
+        catch (Exception e1)
+        {
+            Log.i(TAG, "update_group_in_friendlist:EE1:" + e1.getMessage());
+            e1.printStackTrace();
         }
     }
 }
