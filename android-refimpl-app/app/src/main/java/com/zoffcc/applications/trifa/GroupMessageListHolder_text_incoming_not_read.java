@@ -62,6 +62,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJ
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
 
 public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -268,9 +269,15 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
             layout_peer_name_container.setVisibility(View.VISIBLE);
             try
             {
-                peer_name_text.setText(peer_name + " / " +
-                                       message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
-                                                                         message__tox_peerpubkey.length()));
+                if (message__tox_peerpubkey.compareTo("-1")==0)
+                {
+                    peer_name_text.setText("-system-");
+                }
+                else
+                {
+                    peer_name_text.setText(peer_name + " / " + message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
+                                                                                                 message__tox_peerpubkey.length()));
+                }
             }
             catch (Exception e2)
             {
@@ -320,9 +327,15 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
 
         try
         {
-            peer_color_bg = ChatColors.get_shade(
-                    ChatColors.PeerAvatarColors[hash_to_bucket(message__tox_peerpubkey, ChatColors.get_size())],
-                    message__tox_peerpubkey);
+            if (message__tox_peerpubkey.compareTo("-1") == 0)
+            {
+                peer_color_bg= TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
+            }
+            else
+            {
+                peer_color_bg = ChatColors.get_shade(ChatColors.PeerAvatarColors[hash_to_bucket(message__tox_peerpubkey, ChatColors.get_size())],
+                                                     message__tox_peerpubkey);
+            }
             // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
             textView.setTextColor(Color.BLACK);
 

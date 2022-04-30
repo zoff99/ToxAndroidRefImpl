@@ -134,10 +134,24 @@ public class FriendListFragment extends Fragment
         {
             final FriendList f = c.friend_item;
 
-            if (f.is_relay == true)
+            if (f == null)
             {
-                // do not update anything if this is a relay
+                Log.i(TAG, "modify_friend:EE02:" + f+ " FRIEND is NULL, this should not happen!!");
                 return;
+            }
+
+            try
+            {
+                if (f.is_relay == true)
+                {
+                    // do not update anything if this is a relay
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "modify_friend:EE01:" + e.getMessage());
             }
 
             // Log.i(TAG, "modify_friend:start");
@@ -203,7 +217,7 @@ public class FriendListFragment extends Fragment
                         // who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
                         // and().
                         final GroupDB conf2 = orma.selectFromGroupDB().
-                                group_identifierEq(cc.group_identifier).
+                                group_identifierEq(cc.group_identifier.toLowerCase()).
                                 toList().get(0);
 
                         if (conf2 != null)
@@ -680,7 +694,8 @@ public class FriendListFragment extends Fragment
                                             try
                                             {
                                                 int new_messages_count = orma.selectFromGroupMessage().
-                                                        group_identifierEq(n.group_identifier).and().is_newEq(
+                                                        group_identifierEq(
+                                                                n.group_identifier.toLowerCase()).and().is_newEq(
                                                         true).count();
 
                                                 if (new_messages_count > 0)
@@ -799,7 +814,8 @@ public class FriendListFragment extends Fragment
                                             try
                                             {
                                                 new_messages_count = orma.selectFromGroupMessage().
-                                                        group_identifierEq(n.group_identifier).and().is_newEq(
+                                                        group_identifierEq(
+                                                                n.group_identifier.toLowerCase()).and().is_newEq(
                                                         true).count();
                                             }
                                             catch (Exception e)

@@ -3875,7 +3875,22 @@ public class HelperGeneric
     {
         try
         {
-            new Handler().postDelayed(() -> Toast.makeText(context_s, toast_text, Toast.LENGTH_SHORT).show(), delay_ms);
+            int toast_length = Toast.LENGTH_SHORT;
+
+            if (length_long)
+            {
+                toast_length = Toast.LENGTH_LONG;
+            }
+
+            if (delay_ms == 0)
+            {
+                Toast.makeText(context_s, toast_text, toast_length).show();
+            }
+            else
+            {
+                final int toast_length2 = toast_length;
+                new Handler().postDelayed(() -> Toast.makeText(context_s, toast_text, toast_length2).show(), delay_ms);
+            }
         }
         catch (Exception e)
         {

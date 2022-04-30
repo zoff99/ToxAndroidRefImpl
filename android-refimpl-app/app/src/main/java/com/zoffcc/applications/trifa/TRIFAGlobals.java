@@ -19,6 +19,8 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.graphics.Color;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -169,6 +171,7 @@ public class TRIFAGlobals
 
     static final int FILE_PICK_METHOD = 2;
     static final String TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY = "-1";
+    static final int TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR = Color.parseColor("#C35838"); // red-ish
 
     static final int FL_NOTIFICATION_ICON_ALPHA_SELECTED = 135;
     static final int FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED = 50;

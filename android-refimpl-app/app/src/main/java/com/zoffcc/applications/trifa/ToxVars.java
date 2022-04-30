@@ -1587,6 +1587,35 @@ public class ToxVars
         {
             this.value = value;
         }
+
+        public static String value_str(int value)
+        {
+            if (value == TOX_GROUP_EXIT_TYPE_QUIT.value)
+            {
+                return "TOX_GROUP_EXIT_TYPE_QUIT";
+            }
+            else if (value == TOX_GROUP_EXIT_TYPE_TIMEOUT.value)
+            {
+                return "TOX_GROUP_EXIT_TYPE_TIMEOUT";
+            }
+            else if (value == TOX_GROUP_EXIT_TYPE_DISCONNECTED.value)
+            {
+                return "TOX_GROUP_EXIT_TYPE_DISCONNECTED";
+            }
+            else if (value == TOX_GROUP_EXIT_TYPE_SELF_DISCONNECTED.value)
+            {
+                return "TOX_GROUP_EXIT_TYPE_SELF_DISCONNECTED";
+            }
+            else if (value == TOX_GROUP_EXIT_TYPE_KICK.value)
+            {
+                return "TOX_GROUP_EXIT_TYPE_KICK";
+            }
+            else if (value == TOX_GROUP_EXIT_TYPE_SYNC_ERROR.value)
+            {
+                return "TOX_GROUP_EXIT_TYPE_SYNC_ERROR";
+            }
+            return "UNKNOWN";
+        }
     }
 
     public static enum TOX_GROUP_PRIVACY_STATE

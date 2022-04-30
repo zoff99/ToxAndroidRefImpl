@@ -210,7 +210,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
         try
         {
             int new_messages_count = orma.selectFromGroupMessage().
-                    group_identifierEq(fl.group_identifier).and().is_newEq(true).count();
+                    group_identifierEq(fl.group_identifier.toLowerCase()).and().is_newEq(true).count();
 
             if (new_messages_count > 0)
             {
@@ -250,7 +250,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                 if (!this.group.notification_silent)
                 {
                     this.group.notification_silent = true;
-                    orma.updateGroupDB().group_identifierEq(this.group.group_identifier).
+                    orma.updateGroupDB().group_identifierEq(this.group.group_identifier.toLowerCase()).
                             notification_silent(this.group.notification_silent).execute();
 
                     final Drawable d_notification = new IconicsDrawable(context).
@@ -264,7 +264,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                 else
                 {
                     this.group.notification_silent = false;
-                    orma.updateGroupDB().group_identifierEq(this.group.group_identifier).
+                    orma.updateGroupDB().group_identifierEq(this.group.group_identifier.toLowerCase()).
                             notification_silent(this.group.notification_silent).execute();
 
                     final Drawable d_notification = new IconicsDrawable(context).

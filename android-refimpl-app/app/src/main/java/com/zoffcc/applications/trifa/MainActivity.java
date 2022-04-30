@@ -159,7 +159,9 @@ import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
+import static com.zoffcc.applications.trifa.HelperGroup.add_system_message_to_group_chat;
 import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupnum__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_privacy_state;
@@ -6793,11 +6795,25 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            tox_group_by_groupnum__wrapper(group_number);
+            group_id = tox_group_by_groupnum__wrapper(group_number);
+            group_temp = orma.selectFromGroupDB().
+                    group_identifierEq(group_id.toLowerCase()).
+                    toList().get(0);
         }
         catch (Exception e)
         {
-            // e.printStackTrace();
+        }
+
+        if (group_id.compareTo("-1") == 0)
+        {
+            display_toast("ERROR 001 with incoming Group Message!", true, 0);
+            return;
+        }
+
+        if (group_temp.group_identifier.toLowerCase().compareTo(group_id.toLowerCase()) != 0)
+        {
+            display_toast("ERROR 002 with incoming Group Message!", true, 0);
+            return;
         }
 
         try
@@ -6903,9 +6919,10 @@ public class MainActivity extends AppCompatActivity
         invite_data_buf_wrapped.put(invite_data, 0, (int) invite_data_length);
         invite_data_buf_wrapped.rewind();
         long new_group_num = tox_group_invite_accept(friend_number, invite_data_buf_wrapped, invite_data_length,
-                                                     "name" + getRandomString(4), null);
+                                                     "name " + getRandomString(4), null);
 
         Log.i(TAG, "group_invite_cb:fn=" + friend_number + " got invited to group num=" + new_group_num);
+        update_savedata_file_wrapper();
 
         if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
         {
@@ -6913,6 +6930,8 @@ public class MainActivity extends AppCompatActivity
             String group_identifier = bytes_to_hex(Arrays.copyOfRange(invite_data, 0, GROUP_ID_LENGTH));
             HelperGroup.add_group_wrapper(friend_number, new_group_num, group_identifier, 0);
             final int new_privacy_state = tox_group_get_privacy_state(new_group_num);
+            Log.i(TAG, "group_invite_cb:fn=" + friend_number + " got invited to group num=" + new_group_num +
+                       " new_privacy_state=" + new_privacy_state);
             update_group_in_db_privacy_state(group_identifier, new_privacy_state);
             update_group_in_friendlist(group_identifier);
         }
@@ -6922,11 +6941,15 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "group_peer_join_cb:group_number=" + group_number + " peer_id=" + peer_id);
 
+        final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
+        update_group_in_friendlist(temp_group_identifier);
+
+        add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " joined to group");
+
         try
         {
             if (group_message_list_activity != null)
             {
-                final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
                 if (temp_group_identifier != null)
                 {
                     if (group_message_list_activity.get_current_group_id().equals(temp_group_identifier))
@@ -6947,11 +6970,17 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "group_peer_exit_cb:group_number=" + group_number + " peer_id=" + peer_id + " exit_type=" +
                    a_Tox_Group_Exit_Type);
 
+        final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
+        update_group_in_friendlist(temp_group_identifier);
+
+        add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " left to group: " +
+                                                                ToxVars.Tox_Group_Exit_Type.value_str(
+                                                                        a_Tox_Group_Exit_Type));
+
         try
         {
             if (group_message_list_activity != null)
             {
-                final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
                 if (temp_group_identifier != null)
                 {
                     if (group_message_list_activity.get_current_group_id().equals(temp_group_identifier))
@@ -6995,19 +7024,8 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        try
-        {
-            final GroupDB conf3 = orma.selectFromGroupDB().
-                    group_identifierEq(group_identifier).toList().get(0);
-            CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-            cc.is_friend = COMBINED_IS_CONFERENCE;
-            cc.group_item = GroupDB.deep_copy(conf3);
-            MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
-        }
-        catch (Exception e3)
-        {
-            e3.printStackTrace();
-        }
+        update_savedata_file_wrapper();
+        update_group_in_friendlist(group_identifier);
     }
 
     static void android_tox_callback_group_topic_cb_method(long group_number, long peer_id, String topic, long topic_length)
@@ -7019,6 +7037,7 @@ public class MainActivity extends AppCompatActivity
         }
         final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
         update_group_in_db_topic(group_identifier, topic);
+        update_group_in_friendlist(group_identifier);
     }
 
     // -------- called by native new Group methods --------
@@ -7143,7 +7162,7 @@ public class MainActivity extends AppCompatActivity
                             try
                             {
                                 final GroupDB conf3 = orma.selectFromGroupDB().
-                                        group_identifierEq(group_identifier).toList().get(0);
+                                        group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
                                 cc.group_item = GroupDB.deep_copy(conf3);
@@ -7207,7 +7226,7 @@ public class MainActivity extends AppCompatActivity
                             try
                             {
                                 final GroupDB conf3 = orma.selectFromGroupDB().
-                                        group_identifierEq(group_identifier).toList().get(0);
+                                        group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
                                 cc.group_item = GroupDB.deep_copy(conf3);
@@ -7276,7 +7295,7 @@ public class MainActivity extends AppCompatActivity
                             try
                             {
                                 final GroupDB conf3 = orma.selectFromGroupDB().
-                                        group_identifierEq(group_identifier).toList().get(0);
+                                        group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
                                 cc.group_item = GroupDB.deep_copy(conf3);

@@ -78,7 +78,7 @@ public class GroupMessageListFragment extends Fragment
             if (orma != null)
             {
                 orma.updateGroupMessage().
-                        group_identifierEq(current_group_id).
+                        group_identifierEq(current_group_id.toLowerCase()).
                         is_new(false).execute();
             }
             // reset "new" flags for messages -------
@@ -97,7 +97,7 @@ public class GroupMessageListFragment extends Fragment
                     {
                         // TODO: sort by sent_timestamp ?
                         data_values = orma.selectFromGroupMessage().
-                                group_identifierEq(current_group_id).
+                                group_identifierEq(current_group_id.toLowerCase()).
                                 orderBySent_timestampAsc().
                                 toList();
                     }
@@ -114,7 +114,7 @@ public class GroupMessageListFragment extends Fragment
                          the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                          */
                         data_values = orma.selectFromGroupMessage().
-                                group_identifierEq(current_group_id).
+                                group_identifierEq(current_group_id.toLowerCase()).
                                 orderBySent_timestampAsc().
                                 where(" like('" + get_sqlite_search_string(group_search_messages_text) +
                                       "', text, '\\')").
@@ -306,7 +306,7 @@ public class GroupMessageListFragment extends Fragment
             if (orma != null)
             {
                 orma.updateGroupMessage().
-                        group_identifierEq(current_group_id).
+                        group_identifierEq(current_group_id.toLowerCase()).
                         is_new(false).execute();
             }
             // reset "new" flags for messages -------
@@ -333,7 +333,7 @@ public class GroupMessageListFragment extends Fragment
                 if ((group_search_messages_text == null) || (group_search_messages_text.length() == 0))
                 {
                     adapter.add_list_clear(orma.selectFromGroupMessage().
-                            group_identifierEq(current_group_id).
+                            group_identifierEq(current_group_id.toLowerCase()).
                             orderBySent_timestampAsc().
                             toList());
                 }
@@ -349,7 +349,7 @@ public class GroupMessageListFragment extends Fragment
                      the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                      */
                     adapter.add_list_clear(orma.selectFromGroupMessage().
-                            group_identifierEq(current_group_id).
+                            group_identifierEq(current_group_id.toLowerCase()).
                             orderBySent_timestampAsc().
                             where(" like('" + get_sqlite_search_string(group_search_messages_text) + "', text, '\\')").
                             toList());
