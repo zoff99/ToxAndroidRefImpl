@@ -6374,7 +6374,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1public_1k
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_group_join(JNIEnv *env, jobject thiz,
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1join(JNIEnv *env, jobject thiz,
         jobject chat_id_buffer, jlong chat_id_length, jobject my_peer_name, jobject password)
 {
 #ifndef HAVE_TOX_NGC
