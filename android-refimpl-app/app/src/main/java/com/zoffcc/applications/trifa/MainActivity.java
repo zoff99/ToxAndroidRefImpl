@@ -6907,6 +6907,9 @@ public class MainActivity extends AppCompatActivity
         final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
         update_group_in_db_privacy_state(group_identifier, a_TOX_GROUP_PRIVACY_STATE);
         update_group_in_friendlist(group_identifier);
+        add_system_message_to_group_chat(group_identifier, "privacy state changed to: " +
+                                                           ToxVars.TOX_GROUP_PRIVACY_STATE.value_str(
+                                                                   a_TOX_GROUP_PRIVACY_STATE));
     }
 
     static void android_tox_callback_group_invite_cb_method(long friend_number, final byte[] invite_data, final long invite_data_length, String group_name)
@@ -6944,7 +6947,7 @@ public class MainActivity extends AppCompatActivity
         final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
         update_group_in_friendlist(temp_group_identifier);
 
-        add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " joined to group");
+        add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " joined the group");
 
         try
         {
@@ -7008,6 +7011,8 @@ public class MainActivity extends AppCompatActivity
         final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
 
         set_group_active(group_identifier);
+
+        add_system_message_to_group_chat(group_identifier, "You joined the group");
 
         try
         {

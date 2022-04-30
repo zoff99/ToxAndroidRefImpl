@@ -1647,6 +1647,19 @@ public class ToxVars
         {
             this.value = value;
         }
+
+        public static String value_str(int value)
+        {
+            if (value == TOX_GROUP_PRIVACY_STATE_PUBLIC.value)
+            {
+                return "TOX_GROUP_PRIVACY_STATE_PUBLIC";
+            }
+            else if (value == TOX_GROUP_PRIVACY_STATE_PRIVATE.value)
+            {
+                return "TOX_GROUP_PRIVACY_STATE_PRIVATE";
+            }
+            return "UNKNOWN";
+        }
     }
 
     // ---------- TOX -------------
