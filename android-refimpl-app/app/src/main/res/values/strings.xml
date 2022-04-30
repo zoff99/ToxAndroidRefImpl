@@ -329,6 +329,14 @@
     <string name="add_group_activity_add">Create Group</string>
     <string name="join_group_activity_join">Join Group</string>
     <string name="cancel">Cancel</string>
+    <string name="join_public_group_failed">Joining the Public Group failed</string>
+    <string name="join_public_group_joined">You have joined the Public Group</string>
+    <string name="add_public_group_failed">Creating a Public Group failed</string>
+    <string name="add_public_group_success">You have created a Public Group</string>
+    <string name="add_private_group_failed">Creating a Private Group failed</string>
+    <string name="add_private_group_success">You have created a Private Group</string>
+    <string name="add_friend_failed">adding Friend failed</string>
+    <string name="add_friend_success">You have added a new Friend</string>
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
