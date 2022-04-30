@@ -31,6 +31,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_confid__wra
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_role;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class GroupInfoActivity extends AppCompatActivity
@@ -39,7 +40,8 @@ public class GroupInfoActivity extends AppCompatActivity
     TextView this_group_id = null;
     EditText this_title = null;
     EditText group_myname_text = null;
-    TextView this_privacy_state_text = null;
+    TextView this_privacy_status_text = null;
+    TextView group_myrole_text = null;
     TextView group_mypubkey_text = null;
     String group_id = "-1";
 
@@ -56,7 +58,8 @@ public class GroupInfoActivity extends AppCompatActivity
         group_mypubkey_text = (TextView) findViewById(R.id.group_mypubkey_text);
         this_title = (EditText) findViewById(R.id.group_name_text);
         group_myname_text = (EditText) findViewById(R.id.group_myname_text);
-        this_privacy_state_text = (TextView) findViewById(R.id.group_privacy_status_text);
+        this_privacy_status_text = (TextView) findViewById(R.id.group_privacy_status_text);
+        group_myrole_text = (TextView) findViewById(R.id.group_myrole_text);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -133,6 +136,16 @@ public class GroupInfoActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        this_privacy_state_text.setText(privacy_state_text);
+        this_privacy_status_text.setText(privacy_state_text);
+
+        try
+        {
+            final int myrole = tox_group_self_get_role(group_num);
+            group_myrole_text.setText(ToxVars.Tox_Group_Role.value_str(myrole));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }
