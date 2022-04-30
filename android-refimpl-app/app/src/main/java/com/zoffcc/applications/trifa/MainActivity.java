@@ -6860,7 +6860,7 @@ public class MainActivity extends AppCompatActivity
         final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
         update_group_in_friendlist(temp_group_identifier);
 
-        add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " left to group: " +
+        add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " left the group: " +
                                                                 ToxVars.Tox_Group_Exit_Type.value_str(
                                                                         a_Tox_Group_Exit_Type));
 
