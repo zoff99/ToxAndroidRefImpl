@@ -172,6 +172,11 @@
             android:label="@string/title_activity_conferenceinfo">
         </activity>
         <activity
+            android:name=".GroupInfoActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_conferenceinfo">
+        </activity>
+        <activity
             android:name=".ConferencePeerInfoActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/title_activity_conferencepeerinfo">

@@ -20,6 +20,7 @@
     <string name="title_activity_crash">Crash</string>
     <string name="title_activity_friendinfo">Friendinfo</string>
     <string name="title_activity_conferenceinfo">Conferenceinfo</string>
+    <string name="title_activity_groupinfo">Groupinfo</string>
     <string name="title_activity_conferencepeerinfo">Peerinfo</string>
     <string name="title_activity_aboutpage">About</string>
     <string name="title_activity_set_password">Set Password</string>
@@ -419,6 +420,8 @@
     <string name="layout___nick">Nick:</string>
     <string name="layout___conf_id">Conference ID:</string>
     <string name="layout___conf_title">Title:</string>
+    <string name="layout___group_id2">Group ID:</string>
+    <string name="layout___group_name2">Group Name:</string>
     <string name="layout___pubkey">Pubkey:</string>
     <string name="layout___capabilities">Capabilities:</string>
     <string name="layout___status">Status:</string>

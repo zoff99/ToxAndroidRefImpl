@@ -332,7 +332,9 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                 {
                     case R.id.item_info:
                         // show group info page -----------------
-                        // TODO: write me
+                        Intent intent = new Intent(v.getContext(), GroupInfoActivity.class);
+                        intent.putExtra("group_id", f2.group_identifier);
+                        v.getContext().startActivity(intent);
                         // show group info page -----------------
                         break;
                     case R.id.item_leave:
