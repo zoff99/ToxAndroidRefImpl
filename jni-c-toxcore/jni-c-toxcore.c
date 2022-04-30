@@ -6688,6 +6688,31 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1connectio
 }
 
 JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1role(JNIEnv *env, jobject thiz, jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Self_Query error;
+    uint32_t res = tox_group_self_get_role(tox_global, (uint32_t)group_number, &error);
+
+    if (error != TOX_ERR_GROUP_SELF_QUERY_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1chat_1id(JNIEnv *env, jobject thiz,
         jlong group_number, jobject chat_id_buffer)
 {
