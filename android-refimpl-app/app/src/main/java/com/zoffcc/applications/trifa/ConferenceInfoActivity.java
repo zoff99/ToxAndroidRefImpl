@@ -35,7 +35,6 @@ import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 public class ConferenceInfoActivity extends AppCompatActivity
 {
     static final String TAG = "trifa.ConfInfoActy";
-    de.hdodenhof.circleimageview.CircleImageView profile_icon = null;
     TextView this_conf_id = null;
     EditText this_title = null;
     String conf_id = "-1";
