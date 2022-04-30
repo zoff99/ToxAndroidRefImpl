@@ -364,11 +364,19 @@
 \nAnında Bildirimi şimdi nasıl kurabileceğinizi görmek ister misiniz\?</string>
     <string name="ProfileActivity_delete_avatar_dialog_text">Profil resminizi kaldırmak istiyor musunuz\?</string>
     <string name="ProfileActivity_delete_avatar_dialog_title">Profil Resmini Kaldır</string>
-    <string name="add_group_activity_name">Grup Oluştur</string>
+    <string name="add_group_activity_name">Özel Grup Oluştur</string>
     <string name="group_message_list_activity_name">Grup</string>
-    <string name="add_group_activity_help">Belirli bir grup adıyla yeni bir grup oluşturun.</string>
+    <string name="add_group_activity_help">Belirli bir grup adı ile yeni bir Özel (yalnızca davetli) Grup oluşturun.</string>
     <string name="add_group_activity_add">Grup Oluştur</string>
     <string name="layout___group_name">Grup Adı</string>
     <string name="layout___add_friend">Arkadaş Ekle</string>
     <string name="layout___create_new_private_group">Yeni özel grup oluştur</string>
+    <string name="add_public_group_activity_name">Herkese Açık Grup Oluştur</string>
+    <string name="join_public_activity_name">Herkese Açık Gruba Katıl</string>
+    <string name="layout___join_public_group">Herkese Açık Bir Gruba Katıl</string>
+    <string name="add_public_group_activity_help">Belirli bir grup adı ile yeni bir Herkese Açık Grup oluşturun.</string>
+    <string name="join_group_activity_join">Gruba Katıl</string>
+    <string name="layout___group_id">Grup Kimliği</string>
+    <string name="join_public_group_activity_help">Verilen grup kimliğine sahip Herkese Açık Gruba katılın.</string>
+    <string name="layout___create_new_public_group">Yeni Herkese Açık Grup Oluştur</string>
 </resources>
