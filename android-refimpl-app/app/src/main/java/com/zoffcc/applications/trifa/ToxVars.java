@@ -1662,6 +1662,59 @@ public class ToxVars
         }
     }
 
+    public static enum Tox_Group_Role
+    {
+        /**
+         * May kick all other peers as well as set their role to anything (except founder).
+         * Founders may also set the group password, toggle the privacy state, and set the peer limit.
+         */
+        TOX_GROUP_ROLE_FOUNDER(0),
+
+        /**
+         * May kick and set the user and observer roles for peers below this role.
+         * May also set the group topic.
+         */
+        TOX_GROUP_ROLE_MODERATOR(1),
+
+        /**
+         * May communicate with other peers normally.
+         */
+        TOX_GROUP_ROLE_USER(2),
+
+        /**
+         * May observe the group and ignore peers; may not communicate with other peers or with the group.
+         */
+        TOX_GROUP_ROLE_OBSERVER(3);
+
+        public int value;
+
+        private Tox_Group_Role(int value)
+        {
+            this.value = value;
+        }
+
+        public static String value_str(int value)
+        {
+            if (value == TOX_GROUP_ROLE_FOUNDER.value)
+            {
+                return "TOX_GROUP_ROLE_FOUNDER";
+            }
+            else if (value == TOX_GROUP_ROLE_MODERATOR.value)
+            {
+                return "TOX_GROUP_ROLE_MODERATOR";
+            }
+            else if (value == TOX_GROUP_ROLE_USER.value)
+            {
+                return "TOX_GROUP_ROLE_USER";
+            }
+            else if (value == TOX_GROUP_ROLE_OBSERVER.value)
+            {
+                return "TOX_GROUP_ROLE_OBSERVER";
+            }
+            return "UNKNOWN";
+        }
+    }
+
     // ---------- TOX -------------
     // ---------- TOX -------------
     // ---------- TOX -------------

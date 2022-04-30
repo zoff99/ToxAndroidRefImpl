@@ -29,11 +29,18 @@ import androidx.annotation.NonNull;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
+import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
@@ -293,13 +300,72 @@ public class HelperGroup
 
     public static String tox_group_peer_get_name__wrapper(String group_identifier, String group_peer_pubkey)
     {
-        // TODO: write me
-        return "some peer";
+        try
+        {
+            return tox_group_peer_get_name(tox_group_by_confid__wrapper(group_identifier),
+                                           get_group_peernum_from_peer_pubkey(group_identifier, group_peer_pubkey));
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
     }
+
+    /*
+   this is a bit costly, asking for pubkeys of all group peers
+   */
+    static long get_group_peernum_from_peer_pubkey(final String group_identifier, final String peer_pubkey)
+    {
+        try
+        {
+            long group_num = tox_group_by_confid__wrapper(group_identifier);
+            long num_peers = MainActivity.tox_group_peer_count(group_num);
+
+            if (num_peers > 0)
+            {
+                long[] peers = tox_group_get_peerlist(group_num);
+                if (peers != null)
+                {
+                    long i = 0;
+                    for (i = 0; i < num_peers; i++)
+                    {
+                        try
+                        {
+                            String pubkey_try = tox_group_peer_get_public_key(group_num, peers[(int) i]);
+                            if (pubkey_try != null)
+                            {
+                                if (pubkey_try.equals(peer_pubkey))
+                                {
+                                    // we found the peer number
+                                    return peers[(int) i];
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                    }
+                }
+            }
+            return -2;
+        }
+        catch (Exception e)
+        {
+            return -2;
+        }
+    }
+
 
     public static String tox_group_peer_get_public_key__wrapper(long group_num, long peer_number)
     {
-        String result = MainActivity.tox_group_peer_get_public_key(group_num, peer_number);
+        String result = null;
+        try
+        {
+            result = MainActivity.tox_group_peer_get_public_key(group_num, peer_number);
+        }
+        catch (Exception ignored)
+        {
+        }
         return result;
     }
 
@@ -500,6 +566,139 @@ public class HelperGroup
         else
         {
             long new_msg_id = HelperGroup.insert_into_group_message_db(m, false);
+        }
+    }
+
+    static void android_tox_callback_group_message_cb_method_wrapper(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length, boolean is_private_message)
+    {
+        Log.i(TAG, "android_tox_callback_group_message_cb_method_wrapper:gn=" + group_number + " peerid=" + peer_id +
+                   " message=" + message_orig + " is_private_message=" + is_private_message);
+
+        long res = tox_group_self_get_peer_id(group_number);
+        if (res == peer_id)
+        {
+            // HINT: do not add our own messages, they are already in the DB!
+            Log.i(TAG, "group_message_cb:gn=" + group_number + " peerid=" + peer_id + " ignoring own message");
+            return;
+        }
+
+        // TODO: add message ID later --------
+        String message_ = "";
+        String message_id_ = "";
+        message_ = message_orig;
+        message_id_ = "";
+        // TODO: add message ID later --------
+
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        String group_id = "-1";
+        GroupDB group_temp = null;
+
+        try
+        {
+            group_id = tox_group_by_groupnum__wrapper(group_number);
+            group_temp = orma.selectFromGroupDB().
+                    group_identifierEq(group_id.toLowerCase()).
+                    toList().get(0);
+        }
+        catch (Exception e)
+        {
+        }
+
+        if (group_id.compareTo("-1") == 0)
+        {
+            display_toast("ERROR 001 with incoming Group Message!", true, 0);
+            return;
+        }
+
+        if (group_temp.group_identifier.toLowerCase().compareTo(group_id.toLowerCase()) != 0)
+        {
+            display_toast("ERROR 002 with incoming Group Message!", true, 0);
+            return;
+        }
+
+        try
+        {
+            if (group_temp.notification_silent)
+            {
+                do_notification = false;
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+            do_notification = false;
+        }
+
+
+        if (group_message_list_activity != null)
+        {
+            Log.i(TAG,
+                  "noti_and_badge:002group:" + group_message_list_activity.get_current_group_id() + ":" + group_id);
+            if (group_message_list_activity.get_current_group_id().equals(group_id))
+            {
+                // no notifcation and no badge update
+                do_notification = false;
+                do_badge_update = false;
+            }
+        }
+
+        GroupMessage m = new GroupMessage();
+        m.is_new = do_badge_update;
+        // m.tox_friendnum = friend_number;
+        m.tox_group_peer_pubkey = HelperGroup.tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+        m.direction = 0; // msg received
+        m.TOX_MESSAGE_TYPE = 0;
+        m.read = false;
+        m.tox_group_peername = null;
+        if (is_private_message)
+        {
+            m.private_message = 0;
+        }
+        else
+        {
+            m.private_message = 0;
+        }
+        m.group_identifier = group_id.toLowerCase();
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.rcvd_timestamp = System.currentTimeMillis();
+        m.sent_timestamp = System.currentTimeMillis();
+        m.text = message_;
+        m.message_id_tox = message_id_;
+        m.was_synced = false;
+
+        try
+        {
+            m.tox_group_peername = HelperGroup.tox_group_peer_get_name__wrapper(m.group_identifier,
+                                                                                m.tox_group_peer_pubkey);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (group_message_list_activity != null)
+        {
+            if (group_message_list_activity.get_current_group_id().equals(group_id.toLowerCase()))
+            {
+                HelperGroup.insert_into_group_message_db(m, true);
+            }
+            else
+            {
+                HelperGroup.insert_into_group_message_db(m, false);
+            }
+        }
+        else
+        {
+            long new_msg_id = HelperGroup.insert_into_group_message_db(m, false);
+            Log.i(TAG, "group_message_cb:new_msg_id=" + new_msg_id);
+        }
+
+        HelperFriend.add_all_friends_clear_wrapper(0);
+
+        if (do_notification)
+        {
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
         }
     }
 }

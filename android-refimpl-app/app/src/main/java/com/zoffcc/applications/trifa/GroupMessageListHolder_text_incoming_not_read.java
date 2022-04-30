@@ -46,7 +46,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.add_quote_group_message_text;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
-import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
@@ -54,6 +53,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
@@ -63,6 +63,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 
 public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
 {
@@ -116,26 +117,14 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         message_ = m;
 
         String message__text = m.text;
+
+        if (m.private_message == 1)
+        {
+            message__text = "Private Message:\n" + m.text;
+        }
+
         String message__tox_peername = m.tox_group_peername;
         String message__tox_peerpubkey = m.tox_group_peer_pubkey;
-
-        boolean handle_special_name = false;
-
-        name_test_pk res = correct_pubkey(m);
-        if (res.changed)
-        {
-            try
-            {
-                message__tox_peername = res.tox_peername;
-                peer_name_text.setText(message__tox_peername);
-                message__text = res.text;
-                message__tox_peerpubkey = res.tox_peerpubkey;
-                handle_special_name = true;
-            }
-            catch (Exception e)
-            {
-            }
-        }
 
         swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener()
         {
@@ -204,7 +193,7 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
 
         // Log.i(TAG, "have_avatar_for_pubkey:0000:==========================");
 
-        is_system_message = false;
+        is_system_message = message__tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY);
         // Log.i(TAG, "is_system_message=" + is_system_message + " message__tox_peerpubkey=" + message__tox_peerpubkey);
 
         is_selected = false;
@@ -221,6 +210,7 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
                 layout_message_container.performClick();
             }
         });
+
         textView.setOnLongClickListener(new View.OnLongClickListener()
         {
             @Override
@@ -240,7 +230,7 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
 
         try
         {
-            String peer_name = tox_conference_peer_get_name__wrapper(m.group_identifier, message__tox_peerpubkey);
+            String peer_name = tox_group_peer_get_name__wrapper(m.group_identifier, message__tox_peerpubkey);
 
             if (peer_name == null)
             {
@@ -269,14 +259,15 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
             layout_peer_name_container.setVisibility(View.VISIBLE);
             try
             {
-                if (message__tox_peerpubkey.compareTo("-1")==0)
+                if (message__tox_peerpubkey.compareTo("-1") == 0)
                 {
                     peer_name_text.setText("-system-");
                 }
                 else
                 {
-                    peer_name_text.setText(peer_name + " / " + message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
-                                                                                                 message__tox_peerpubkey.length()));
+                    peer_name_text.setText(peer_name + " / " +
+                                           message__tox_peerpubkey.substring((message__tox_peerpubkey.length() - 6),
+                                                                             message__tox_peerpubkey.length()));
                 }
             }
             catch (Exception e2)
@@ -329,12 +320,13 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         {
             if (message__tox_peerpubkey.compareTo("-1") == 0)
             {
-                peer_color_bg= TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
+                peer_color_bg = TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
             }
             else
             {
-                peer_color_bg = ChatColors.get_shade(ChatColors.PeerAvatarColors[hash_to_bucket(message__tox_peerpubkey, ChatColors.get_size())],
-                                                     message__tox_peerpubkey);
+                peer_color_bg = ChatColors.get_shade(
+                        ChatColors.PeerAvatarColors[hash_to_bucket(message__tox_peerpubkey, ChatColors.get_size())],
+                        message__tox_peerpubkey);
             }
             // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
             textView.setTextColor(Color.BLACK);
@@ -420,39 +412,67 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         img_corner.setVisibility(View.GONE);
         date_time.setVisibility(View.VISIBLE);
 
-        // TODO: do we need to reset here? -> yes
-        img_avatar.setVisibility(View.VISIBLE);
-        if (PREF__compact_chatlist)
+        if (is_system_message)
         {
+            img_avatar.setVisibility(View.GONE);
             img_corner.setVisibility(View.GONE);
+            imageView.setVisibility(View.GONE);
+            textView_container.setMinimumHeight(4);
+            textView_container.setPadding((int) dp2px(4), textView_container.getPaddingTop(), (int) dp2px(4),
+                                          textView_container.getPaddingBottom()); // left, top, right, bottom
+            LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
+            parameter.setMargins((int) dp2px(20), parameter.topMargin, parameter.rightMargin,
+                                 parameter.bottomMargin); // left, top, right, bottom
+            textView_container.setLayoutParams(parameter);
+            // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 10);
+
+            // -------------------------------
+            // make text smaller for system messages
+            int system_font_size_used = MESSAGE_TEXT_SIZE[PREF__global_font_size] - 5;
+            if (system_font_size_used < 9)
+            {
+                system_font_size_used = 9;
+            }
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, system_font_size_used);
+            // -------------------------------
         }
         else
         {
-            img_corner.setVisibility(View.VISIBLE);
-        }
-        imageView.setVisibility(View.VISIBLE);
-        textView_container.setMinimumHeight((int) dp2px(0));
-        textView_container.setPadding(0, textView_container.getPaddingTop(), 0,
-                                      textView_container.getPaddingBottom()); // left, top, right, bottom
-        LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
-        parameter.setMargins(0, parameter.topMargin, parameter.rightMargin,
-                             parameter.bottomMargin); // left, top, right, bottom
-        textView_container.setLayoutParams(parameter);
-        // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
 
-        img_avatar.setImageDrawable(smiley_face);
+            // TODO: do we need to reset here? -> yes
+            img_avatar.setVisibility(View.VISIBLE);
+            if (PREF__compact_chatlist)
+            {
+                img_corner.setVisibility(View.GONE);
+            }
+            else
+            {
+                img_corner.setVisibility(View.VISIBLE);
+            }
+            imageView.setVisibility(View.VISIBLE);
+            textView_container.setMinimumHeight((int) dp2px(0));
+            textView_container.setPadding(0, textView_container.getPaddingTop(), 0,
+                                          textView_container.getPaddingBottom()); // left, top, right, bottom
+            LinearLayout.LayoutParams parameter = (LinearLayout.LayoutParams) textView_container.getLayoutParams();
+            parameter.setMargins(0, parameter.topMargin, parameter.rightMargin,
+                                 parameter.bottomMargin); // left, top, right, bottom
+            textView_container.setLayoutParams(parameter);
+            // peer_name_text.setTextSize(TypedValue.COMPLEX_UNIT_SP, 13);
 
-        if (m.was_synced)
-        {
-            // synced from ToxProxy
-            imageView.setImageResource(R.drawable.circle_orange);
-        }
-        else
-        {
-            // received directly
-            imageView.setImageResource(R.drawable.circle_green);
-        }
+            img_avatar.setImageDrawable(smiley_face);
 
+            if (m.was_synced)
+            {
+                // synced from ToxProxy
+                imageView.setImageResource(R.drawable.circle_orange);
+            }
+            else
+            {
+                // received directly
+                imageView.setImageResource(R.drawable.circle_green);
+            }
+
+        }
 
         // --------- peer name (show only if different from previous message) ---------
         // --------- peer name (show only if different from previous message) ---------
@@ -463,7 +483,7 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         {
             try
             {
-                if (MainActivity.conference_message_list_fragment.adapter != null)
+                if (MainActivity.group_message_list_fragment.adapter != null)
                 {
                     if (my_position < 1)
                     {

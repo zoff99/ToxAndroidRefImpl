@@ -422,6 +422,8 @@
     <string name="layout___conf_title">Title:</string>
     <string name="layout___group_id2">Group ID:</string>
     <string name="layout___group_name2">Group Name:</string>
+    <string name="layout___group_myname2">my Name in the Group:</string>
+    <string name="layout___group_mypubjkey2">My Pubkey:</string>
     <string name="layout___pubkey">Pubkey:</string>
     <string name="layout___capabilities">Capabilities:</string>
     <string name="layout___status">Status:</string>

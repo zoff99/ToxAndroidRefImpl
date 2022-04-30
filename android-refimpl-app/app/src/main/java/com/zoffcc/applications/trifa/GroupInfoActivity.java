@@ -27,6 +27,10 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_confid__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class GroupInfoActivity extends AppCompatActivity
@@ -34,7 +38,9 @@ public class GroupInfoActivity extends AppCompatActivity
     static final String TAG = "trifa.GrpInfoActy";
     TextView this_group_id = null;
     EditText this_title = null;
+    EditText group_myname_text = null;
     TextView this_privacy_state_text = null;
+    TextView group_mypubkey_text = null;
     String group_id = "-1";
 
     @Override
@@ -47,7 +53,9 @@ public class GroupInfoActivity extends AppCompatActivity
         group_id = intent.getStringExtra("group_id");
 
         this_group_id = (TextView) findViewById(R.id.group_id_text);
+        group_mypubkey_text = (TextView) findViewById(R.id.group_mypubkey_text);
         this_title = (EditText) findViewById(R.id.group_name_text);
+        group_myname_text = (EditText) findViewById(R.id.group_myname_text);
         this_privacy_state_text = (TextView) findViewById(R.id.group_privacy_status_text);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -62,6 +70,35 @@ public class GroupInfoActivity extends AppCompatActivity
             this_group_id.setText(group_id.toLowerCase());
         }
         this_title.setText("*error*");
+
+        long group_num = -1;
+
+        try
+        {
+            group_num = tox_group_by_confid__wrapper(group_id);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            group_myname_text.setText(tox_group_peer_get_name(group_num, tox_group_self_get_peer_id(group_num)));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            group_mypubkey_text.setText(tox_group_self_get_public_key(group_num));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
         try
         {
