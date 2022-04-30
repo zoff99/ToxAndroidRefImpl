@@ -390,7 +390,15 @@
     <string name="layout___group_name">群组名</string>
     <string name="layout___add_friend">加好友</string>
     <string name="layout___create_new_private_group">创建新的私密群</string>
-    <string name="add_group_activity_name">建群</string>
-    <string name="add_group_activity_help">使用给定的群组名创建一个新群。</string>
+    <string name="add_group_activity_name">建私密群</string>
+    <string name="add_group_activity_help">用给定名称建立新的私密群（仅邀请）。</string>
     <string name="add_group_activity_add">建群</string>
+    <string name="join_public_activity_name">加入公共群</string>
+    <string name="add_public_group_activity_name">建公共群</string>
+    <string name="layout___join_public_group">加入公共群</string>
+    <string name="add_public_group_activity_help">用给定名称建立新的公共群。</string>
+    <string name="join_public_group_activity_help">用给定群 ID 加入公共群。</string>
+    <string name="layout___group_id">群 ID</string>
+    <string name="join_group_activity_join">加群</string>
+    <string name="layout___create_new_public_group">创建新公共群</string>
 </resources>
