@@ -255,6 +255,7 @@ public class MessageListFragment extends Fragment
         super.onAttach(activity);
     }
 
+    @SuppressLint("WrongThread")
     @Override
     public void onResume()
     {

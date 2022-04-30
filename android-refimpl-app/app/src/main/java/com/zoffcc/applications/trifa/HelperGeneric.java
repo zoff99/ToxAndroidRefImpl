@@ -36,12 +36,14 @@ import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -3867,5 +3869,18 @@ public class HelperGeneric
 
         }
         return false;
+    }
+
+    static void display_toast(final String toast_text, final boolean length_long, final int delay_ms)
+    {
+        try
+        {
+            new Handler().postDelayed(() -> Toast.makeText(context_s, toast_text, Toast.LENGTH_SHORT).show(), delay_ms);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "display_toast:EE01:" + e.getMessage());
+        }
     }
 }

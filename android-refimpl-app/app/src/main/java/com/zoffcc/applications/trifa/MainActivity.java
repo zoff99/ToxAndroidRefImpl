@@ -154,6 +154,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_capabilities;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
@@ -283,7 +284,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
-    final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
+    final static boolean CTOXCORE_NATIVE_LOGGING = true; // set "false" for release builds
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
@@ -7137,6 +7138,7 @@ public class MainActivity extends AppCompatActivity
 
                             HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, privacy_state);
 
+                            display_toast(getString(R.string.add_private_group_success), false, 300);
                             set_group_active(group_identifier);
                             try
                             {
@@ -7152,6 +7154,10 @@ public class MainActivity extends AppCompatActivity
                                 e3.printStackTrace();
                             }
                         }
+                    }
+                    else
+                    {
+                        display_toast(getString(R.string.add_private_group_failed), false, 300);
                     }
                 }
                 catch (Exception e)
@@ -7196,6 +7202,7 @@ public class MainActivity extends AppCompatActivity
 
                             HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, privacy_state);
 
+                            display_toast(getString(R.string.add_public_group_success), false, 300);
                             set_group_active(group_identifier);
                             try
                             {
@@ -7211,6 +7218,10 @@ public class MainActivity extends AppCompatActivity
                                 e3.printStackTrace();
                             }
                         }
+                    }
+                    else
+                    {
+                        display_toast(getString(R.string.add_public_group_failed), false, 300);
                     }
                 }
                 catch (Exception e)
@@ -7260,6 +7271,7 @@ public class MainActivity extends AppCompatActivity
 
                             HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, privacy_state);
 
+                            display_toast(getString(R.string.join_public_group_joined), false, 300);
                             set_group_active(group_identifier);
                             try
                             {
@@ -7276,6 +7288,10 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     }
+                    else
+                    {
+                        display_toast(getString(R.string.join_public_group_failed), false, 300);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -7289,7 +7305,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
 
     void sendEmailWithAttachment(Context c, final String recipient, final String subject, final String message, final String full_file_name, final String full_file_name_suppl)
     {
