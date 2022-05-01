@@ -6832,11 +6832,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1number_1groups(
 #endif
 }
 
-
-
-void tox_group_get_peerlist(const Tox *tox, uint32_t group_number, uint32_t *peerlist, Tox_Err_Group_Peer_Query *error);
-
-
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peerlist(JNIEnv *env, jobject thiz, jlong group_number)
 {
@@ -6888,6 +6883,57 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peerlist(JNIEnv
     return result;
 }
 
+JNIEXPORT jlongArray JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1offline_1peerlist(JNIEnv *env, jobject thiz, jlong group_number)
+{
+    Tox_Err_Group_Peer_Query error;
+    size_t numpeers = tox_group_offline_peer_count(tox_global, (uint32_t)group_number, &error);
+    if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
+    {
+        return NULL;
+    }
+
+    size_t memsize = (numpeers * sizeof(uint32_t));
+    uint32_t *peer_list = malloc(memsize);
+    uint32_t *peer_list_iter = peer_list;
+    jlongArray result;
+    Tox_Err_Group_Peer_Query error2;
+    tox_group_get_offline_peerlist(tox_global, (uint32_t)group_number, peer_list, &error2);
+
+    if (error2 != TOX_ERR_GROUP_PEER_QUERY_OK)
+    {
+        if(peer_list)
+        {
+            free(peer_list);
+        }
+        return NULL;
+    }
+
+    result = (*env)->NewLongArray(env, numpeers);
+
+    if(result == NULL)
+    {
+        // TODO this would be bad!!
+    }
+
+    jlong buffer[numpeers];
+    size_t i = 0;
+
+    for(i=0; i<numpeers; i++)
+    {
+        buffer[i] = (long)peer_list_iter[i];
+    }
+
+    (*env)->SetLongArrayRegion(env, result, 0, numpeers, buffer);
+
+    if(peer_list)
+    {
+        free(peer_list);
+    }
+
+    return result;
+}
+
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1count(JNIEnv *env, jobject thiz, jlong group_number)
 {
@@ -6901,6 +6947,30 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1count(JNIEnv *
 
     Tox_Err_Group_Peer_Query error;
     size_t res = tox_group_peer_count(tox_global, (uint32_t)group_number, &error);
+    if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
+    {
+        return (jlong)-98;
+    }
+    else
+    {
+        return (jlong)res;
+    }
+#endif
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1offline_1peer_1count(JNIEnv *env, jobject thiz, jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jlong)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    Tox_Err_Group_Peer_Query error;
+    size_t res = tox_group_offline_peer_count(tox_global, (uint32_t)group_number, &error);
     if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
     {
         return (jlong)-98;
