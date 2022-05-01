@@ -6885,6 +6885,13 @@ public class MainActivity extends AppCompatActivity
                                                                         a_Tox_Group_Exit_Type));
     }
 
+    static void android_tox_callback_group_peer_name_cb_method(long group_number, long peer_id)
+    {
+        final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
+        update_group_in_groupmessagelist(temp_group_identifier);
+        add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " changed name");
+    }
+
     static void android_tox_callback_group_join_fail_cb_method(long group_number, int a_Tox_Group_Join_Fail)
     {
         Log.i(TAG, "group_join_fail_cb:group_number=" + group_number + " fail=" + a_Tox_Group_Join_Fail);
