@@ -73,9 +73,11 @@ import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActiv
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_offline_peerlist;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
@@ -414,11 +416,13 @@ public class GroupMessageListActivity extends AppCompatActivity
                         try
                         {
                             long peer_count = tox_group_peer_count(conference_num);
+                            long frozen_peer_count = tox_group_offline_peer_count(conference_num);
 
                             if (peer_count > -1)
                             {
                                 ml_maintext.setText(
-                                        f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count);
+                                        f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count +
+                                        " " + getString(R.string.GroupActivityOffline) + " " + frozen_peer_count);
                             }
                             else
                             {
@@ -484,6 +488,36 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
             }
         }
+
+        long offline_num_peers = tox_group_offline_peer_count(conference_num);
+
+        if (offline_num_peers > 0)
+        {
+            long[] offline_peers = tox_group_get_offline_peerlist(conference_num);
+            if (offline_peers != null)
+            {
+                long i = 0;
+                for (i = 0; i < offline_num_peers; i++)
+                {
+                    try
+                    {
+                        String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, offline_peers[(int) i]);
+                        String peer_name = tox_group_peer_get_name(conference_num, offline_peers[(int) i]);
+                        Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
+                                   peer_name);
+                        String peer_name_temp = "" + peer_name + " :" + offline_peers[(int) i] + ": " +
+                                                peer_pubkey_temp.substring(0, 6);
+
+                        add_group_user(peer_pubkey_temp, i, peer_name_temp,
+                                       ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            }
+        }
+
     }
 
     @Override

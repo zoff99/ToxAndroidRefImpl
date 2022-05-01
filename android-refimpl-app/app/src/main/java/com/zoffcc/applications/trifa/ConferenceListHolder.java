@@ -45,6 +45,7 @@ import static com.zoffcc.applications.trifa.HelperConference.delete_conference_a
 import static com.zoffcc.applications.trifa.HelperConference.get_conference_title_from_confid;
 import static com.zoffcc.applications.trifa.HelperConference.set_conference_inactive;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__dark_mode_pref;
 import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
@@ -177,12 +178,24 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                     user_count = 0;
                 }
 
+                String peer_num_text_color = "#000000";
+                if (PREF__dark_mode_pref == 1)
+                {
+                    peer_num_text_color = "#ffffff";
+                }
+
+                String peer_num_text_color_text = "<font color=\"" + peer_num_text_color + "\">";
+                String peer_num_text_color_text_end = "</font>";
+                peer_num_text_color_text="";
+                peer_num_text_color_text_end="";
+
                 statusText.setText(Html.fromHtml("#" + fl.tox_conference_number + " "
                                                  //
                                                  + conference_identifier_short(fl.conference_identifier, true)
                                                  //
-                                                 + " " + "<b><font color=\"#000000\">Users:" + user_count +
-                                                 "</font></b>" + "(" + offline_user_count + ")"));
+                                                 + " " + "<b>" + peer_num_text_color_text + "Users:" + user_count +
+                                                 "(" + offline_user_count + ")" + peer_num_text_color_text_end +
+                                                 "</b>"));
             }
             else
             {

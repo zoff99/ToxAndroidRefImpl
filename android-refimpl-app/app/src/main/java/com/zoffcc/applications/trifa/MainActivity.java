@@ -39,6 +39,7 @@ import android.content.pm.LabeledIntent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -470,6 +471,7 @@ public class MainActivity extends AppCompatActivity
     static String[] PREF__toxirc_muted_peers = {};
     static boolean PREF__hide_setup_push_tip = false;
     static boolean PREF__show_friendnumber_on_friendlist = false;
+    static int PREF__dark_mode_pref = 0;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2553,6 +2555,33 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
+            PREF__dark_mode_pref = Integer.parseInt(settings.getString("dark_mode_pref", "" + 0));
+        }
+        catch (Exception e)
+        {
+            PREF__dark_mode_pref = 0;
+        }
+
+        if (PREF__dark_mode_pref == 0)
+        {
+            // follow system. try to guess if we actually have dark mode active now
+            int currentNightMode = getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+            switch (currentNightMode)
+            {
+                case Configuration.UI_MODE_NIGHT_NO:// Night mode is not active, we're in day time
+                    PREF__dark_mode_pref = 2;
+                    break;
+                case Configuration.UI_MODE_NIGHT_YES:// Night mode is active, we're at night!
+                    PREF__dark_mode_pref = 1;
+                    break;
+                case Configuration.UI_MODE_NIGHT_UNDEFINED:// We don't know what mode we're in, assume notnight
+                    PREF__dark_mode_pref = 1;
+                    break;
+            }
+        }
+
+        try
+        {
             PREF__global_font_size = Integer.parseInt(
                     settings.getString("global_font_size", "" + PREF_GLOBAL_FONT_SIZE_DEFAULT));
         }
@@ -3190,7 +3219,11 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_group_peer_count(long group_number);
 
+    public static native long tox_group_offline_peer_count(long group_number);
+
     public static native long[] tox_group_get_peerlist(long group_number);
+
+    public static native long[] tox_group_get_offline_peerlist(long group_number);
 
     public static native long tox_group_by_chat_id(@NonNull ByteBuffer chat_id_buffer);
 
