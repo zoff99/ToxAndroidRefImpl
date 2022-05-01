@@ -274,6 +274,7 @@ jmethodID android_tox_callback_group_private_message_cb_method = NULL;
 jmethodID android_tox_callback_group_invite_cb_method = NULL;
 jmethodID android_tox_callback_group_peer_join_cb_method = NULL;
 jmethodID android_tox_callback_group_peer_exit_cb_method = NULL;
+jmethodID android_tox_callback_group_peer_name_cb_method = NULL;
 jmethodID android_tox_callback_group_join_fail_cb_method = NULL;
 jmethodID android_tox_callback_group_self_join_cb_method = NULL;
 jmethodID android_tox_callback_group_topic_cb_method = NULL;
@@ -368,6 +369,9 @@ void group_peer_join_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, void 
 
 void group_peer_exit_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_Group_Exit_Type exit_type,
                         const uint8_t *name, size_t name_length, const uint8_t *part_message, size_t length, void *user_data);
+
+void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *name,
+                                    size_t length, void *user_data);
 
 void group_join_fail_cb(Tox *tox, uint32_t group_number, Tox_Group_Join_Fail fail_type, void *user_data);
 
@@ -1089,6 +1093,7 @@ void init_tox_callbacks()
     tox_callback_group_peer_exit(tox_global, group_peer_exit_cb);
     tox_callback_group_join_fail(tox_global, group_join_fail_cb);
     tox_callback_group_self_join(tox_global, group_self_join_cb);
+    tox_callback_group_peer_name(tox_global, group_peer_name_cb);
     tox_callback_group_topic(tox_global, group_topic_cb);
     tox_callback_group_privacy_state(tox_global, group_privacy_state_cb);
 #endif
@@ -2870,6 +2875,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_group_peer_join_cb_method", "(JJ)V");
     android_tox_callback_group_peer_exit_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_peer_exit_cb_method", "(JJI)V");
+    android_tox_callback_group_peer_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_peer_name_cb_method", "(JJ)V");
     android_tox_callback_group_join_fail_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_join_fail_cb_method", "(JI)V");
     android_tox_callback_group_self_join_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -7509,6 +7516,25 @@ void group_peer_exit_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_G
 
 {
     android_tox_callback_group_peer_exit_cb(group_number, peer_id, exit_type);
+}
+
+void android_tox_callback_group_peer_name_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *name, size_t length)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+
+    // TODO: give back acutal name aswell
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_peer_name_cb_method,
+                                     (jlong)group_number,
+                                     (jlong)peer_id);
+}
+
+void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *name,
+                                    size_t length, void *user_data)
+
+{
+    android_tox_callback_group_peer_name_cb(group_number, peer_id, name, length);
 }
 
 void android_tox_callback_group_join_fail_cb(uint32_t group_number, Tox_Group_Join_Fail fail_type)
