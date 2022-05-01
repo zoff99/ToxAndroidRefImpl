@@ -43,7 +43,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_w
 import static com.zoffcc.applications.trifa.HelperGroup.delete_group;
 import static com.zoffcc.applications.trifa.HelperGroup.group_conference_all_messages;
 import static com.zoffcc.applications.trifa.HelperGroup.group_identifier_short;
-import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_confid__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__dark_mode_pref;
 import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -126,7 +126,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
 
         this.group = fl;
 
-        long group_number = tox_group_by_confid__wrapper(fl.group_identifier);
+        long group_number = tox_group_by_groupid__wrapper(fl.group_identifier);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
@@ -386,7 +386,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             {
                 if (f2.group_identifier != null)
                 {
-                    final long group_num = tox_group_by_confid__wrapper(f2.group_identifier);
+                    final long group_num = tox_group_by_groupid__wrapper(f2.group_identifier);
                     tox_group_leave(group_num, "bye");
                     cache_confid_confnum.clear();
                     update_savedata_file_wrapper(); // after deleteing a conference

@@ -27,11 +27,13 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_confid__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_role;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_set_name;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class GroupInfoActivity extends AppCompatActivity
@@ -78,7 +80,7 @@ public class GroupInfoActivity extends AppCompatActivity
 
         try
         {
-            group_num = tox_group_by_confid__wrapper(group_id);
+            group_num = tox_group_by_groupid__wrapper(group_id);
         }
         catch (Exception e)
         {
@@ -146,6 +148,33 @@ public class GroupInfoActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
+        // TODO dirty hack, just write "conf title"
+
+        try
+        {
+            String my_new_name = group_myname_text.getText().toString();
+            if (my_new_name != null)
+            {
+                if (my_new_name.length() > 0)
+                {
+                    int res = tox_group_self_set_name(tox_group_by_groupid__wrapper(group_id),
+                                                      my_new_name);
+                    if (res == 1)
+                    {
+                        update_savedata_file_wrapper(); // after changing conference title
+                    }
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
         }
     }
 }

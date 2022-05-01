@@ -3208,6 +3208,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_group_self_get_peer_id(long group_number);
 
+    public static native int tox_group_self_set_name(long group_number, @NonNull String my_peer_name);
+
     public static native String tox_group_self_get_public_key(long group_number);
 
     public static native int tox_group_self_get_role(long group_number);

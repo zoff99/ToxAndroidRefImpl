@@ -184,7 +184,7 @@ public class HelperGroup
         }
     }
 
-    public static long tox_group_by_confid__wrapper(@NonNull String group_id_string)
+    public static long tox_group_by_groupid__wrapper(@NonNull String group_id_string)
     {
         ByteBuffer group_id_buffer = ByteBuffer.allocateDirect(GROUP_ID_LENGTH);
         byte[] data = HelperGeneric.hex_to_bytes(group_id_string.toUpperCase());
@@ -302,7 +302,7 @@ public class HelperGroup
     {
         try
         {
-            return tox_group_peer_get_name(tox_group_by_confid__wrapper(group_identifier),
+            return tox_group_peer_get_name(tox_group_by_groupid__wrapper(group_identifier),
                                            get_group_peernum_from_peer_pubkey(group_identifier, group_peer_pubkey));
         }
         catch (Exception e)
@@ -318,7 +318,7 @@ public class HelperGroup
     {
         try
         {
-            long group_num = tox_group_by_confid__wrapper(group_identifier);
+            long group_num = tox_group_by_groupid__wrapper(group_identifier);
             long num_peers = MainActivity.tox_group_peer_count(group_num);
 
             if (num_peers > 0)

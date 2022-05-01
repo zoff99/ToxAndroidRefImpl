@@ -64,7 +64,7 @@ import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_searc
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
-import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_confid__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
@@ -400,7 +400,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                final long conference_num = tox_group_by_confid__wrapper(group_id);
+                final long conference_num = tox_group_by_groupid__wrapper(group_id);
                 String group_topic = tox_group_get_name(conference_num);
                 if (group_topic == null)
                 {
@@ -459,7 +459,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         // Log.d(TAG, "set_peer_names_and_avatars:002");
 
-        final long conference_num = tox_group_by_confid__wrapper(group_id);
+        final long conference_num = tox_group_by_groupid__wrapper(group_id);
         long num_peers = tox_group_peer_count(conference_num);
 
         if (num_peers > 0)
@@ -743,7 +743,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                 if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
-                    int res = tox_group_send_message(tox_group_by_confid__wrapper(group_id), 0, msg);
+                    int res = tox_group_send_message(tox_group_by_groupid__wrapper(group_id), 0, msg);
                     Log.i(TAG, "tox_group_send_message:result=" + res + " m=" + m);
                     if (PREF__X_battery_saving_mode)
                     {
@@ -1017,7 +1017,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     // Log.i(TAG, "onActivityResult:001:conf_id=" + conf_id);
                                 }
 
-                                final long group_num = tox_group_by_confid__wrapper(group_id);
+                                final long group_num = tox_group_by_groupid__wrapper(group_id);
 
                                 Log.d(TAG, "onActivityResult:info:tox_group_invite_friend:group_num=" + group_num);
 
