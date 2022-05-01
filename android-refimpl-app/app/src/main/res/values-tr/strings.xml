@@ -379,4 +379,17 @@
     <string name="layout___group_id">Grup Kimliği</string>
     <string name="join_public_group_activity_help">Verilen grup kimliğine sahip Herkese Açık Gruba katılın.</string>
     <string name="layout___create_new_public_group">Yeni Herkese Açık Grup Oluştur</string>
+    <string name="join_public_group_joined">Herkese açık gruba katıldınız</string>
+    <string name="add_private_group_failed">Özel grup oluşturulamadı</string>
+    <string name="add_private_group_success">Özel bir grup oluşturdunuz</string>
+    <string name="layout___group_mypubjkey2">Ortak Anahtarım:</string>
+    <string name="layout___group_name2">Grup Adı:</string>
+    <string name="title_activity_groupinfo">Grup bilgisi</string>
+    <string name="join_public_group_failed">Herkese açık gruba katılma başarısız oldu</string>
+    <string name="add_public_group_failed">Herkese açık grup oluşturulamadı</string>
+    <string name="add_friend_success">Yeni bir arkadaş eklediniz</string>
+    <string name="layout___group_id2">Grup Kimliği:</string>
+    <string name="add_public_group_success">Herkese açık bir grup oluşturdunuz</string>
+    <string name="add_friend_failed">Arkadaş eklenemedi</string>
+    <string name="layout___group_myname2">Gruptaki adım:</string>
 </resources>
