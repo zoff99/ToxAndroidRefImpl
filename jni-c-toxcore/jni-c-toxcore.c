@@ -6337,6 +6337,63 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1leave(JNIEnv *env, j
 #endif
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1set_1name(JNIEnv *env, jobject thiz,
+        jlong group_number, jstring name)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Self_Name_Set error;
+    bool res = false;
+
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)name);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)name, getBytes, charsetName);
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    res = tox_group_self_set_name(tox_global,
+            (uint32_t)group_number,
+            (uint8_t *)pBytes, (size_t)plength,
+            &error);
+
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+#else
+    const char *my_peer_name_str = NULL;
+    my_peer_name_str = (*env)->GetStringUTFChars(env, name, NULL);
+
+    res = tox_group_self_set_name(tox_global,
+            (uint32_t)group_number,
+            (uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str),
+            &error);
+
+    (*env)->ReleaseStringUTFChars(env, name, my_peer_name_str);
+#endif
+
+    if(error != TOX_ERR_GROUP_SELF_NAME_SET_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong group_number)
