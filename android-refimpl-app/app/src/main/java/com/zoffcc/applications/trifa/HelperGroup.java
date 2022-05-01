@@ -534,6 +534,28 @@ public class HelperGroup
         }
     }
 
+    static void update_group_in_groupmessagelist(final String group_identifier)
+    {
+        try
+        {
+            if (group_message_list_activity != null)
+            {
+                if (group_identifier != null)
+                {
+                    if (group_message_list_activity.get_current_group_id().toLowerCase().equals(group_identifier.toLowerCase()))
+                    {
+                        group_message_list_activity.update_group_all_users();
+                    }
+                }
+            }
+        }
+        catch (Exception e1)
+        {
+            Log.i(TAG, "update_group_in_groupmessagelist:EE1:" + e1.getMessage());
+            e1.printStackTrace();
+        }
+    }
+
     static void add_system_message_to_group_chat(final String group_identifier, final String system_message)
     {
         GroupMessage m = new GroupMessage();

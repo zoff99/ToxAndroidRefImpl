@@ -791,7 +791,23 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     synchronized void update_group_all_users()
     {
-        // TODO: write me
+        try
+        {
+            set_peer_count_header();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            set_peer_names_and_avatars();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     synchronized void remove_group_all_users()
