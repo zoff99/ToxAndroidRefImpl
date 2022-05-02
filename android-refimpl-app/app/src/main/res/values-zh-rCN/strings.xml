@@ -401,4 +401,17 @@
     <string name="layout___group_id">群 ID</string>
     <string name="join_group_activity_join">加群</string>
     <string name="layout___create_new_public_group">创建新公共群</string>
+    <string name="title_activity_groupinfo">群组信息</string>
+    <string name="join_public_group_failed">未能加入该公开群</string>
+    <string name="join_public_group_joined">你已加入公开群</string>
+    <string name="add_public_group_failed">创建公开群失败</string>
+    <string name="add_private_group_failed">创建私密群失败</string>
+    <string name="add_private_group_success">你已创建了一个私密群</string>
+    <string name="add_friend_failed">添加好友失败</string>
+    <string name="add_friend_success">你已添加新好友</string>
+    <string name="add_public_group_success">你已创建了一个公开群</string>
+    <string name="layout___group_name2">群名称：</string>
+    <string name="layout___group_mypubjkey2">我的公钥：</string>
+    <string name="layout___group_id2">群 ID：</string>
+    <string name="layout___group_myname2">我在群组中的名称：</string>
 </resources>
