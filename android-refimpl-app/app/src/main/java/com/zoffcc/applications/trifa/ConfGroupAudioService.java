@@ -612,6 +612,7 @@ public class ConfGroupAudioService extends Service
 
             // Log.i(TAG, "toxav_groupchat_disable_av:D:gnum=" + tox_conference_by_confid__wrapper(conf_id));
             // Log.i(TAG, "toxav_groupchat_disable_av:D:gid=" + conf_id);
+            push_to_talk_active = false;
             toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
 
             try
@@ -659,6 +660,7 @@ public class ConfGroupAudioService extends Service
                     GoogleMaterial.Icon.gmd_pause).backgroundColor(Color.TRANSPARENT).sizeDp(50);
 
             toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
+            push_to_talk_active = true;
 
             try
             {
