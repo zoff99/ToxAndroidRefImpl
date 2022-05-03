@@ -45,6 +45,7 @@ import androidx.core.app.NotificationCompat;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
+import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk_active;
 import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
@@ -239,6 +240,7 @@ public class ConfGroupAudioService extends Service
                         {
                             Log.i(TAG, "startBluetoothSco");
                             manager.startBluetoothSco();
+                            Callstate.audio_device = 2;
                             // manager.setBluetoothScoOn(true);
                         }
                         else
@@ -263,6 +265,9 @@ public class ConfGroupAudioService extends Service
                     Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
                 }
 
+                /*
+                 * ------- now with always ON recording -------
+                 *
                 // HINT: stop audio recording, we do not need it in this mode -------------
                 try
                 {
@@ -281,6 +286,11 @@ public class ConfGroupAudioService extends Service
                     Log.i(TAG, "stop_audio_recording:EE01" + e.getMessage());
                 }
                 // HINT: stop audio recording, we do not need it in this mode -------------
+                 *
+                 * ------- now with always ON recording -------
+                 *
+                 */
+
                 try
                 {
                     Log.i(TAG, "GAThread:starting ...");
@@ -290,6 +300,8 @@ public class ConfGroupAudioService extends Service
                     running = true;
                     long d1 = 0;
                     long d2 = 0;
+
+                    push_to_talk_active = true;
 
                     while (running)
                     {
@@ -323,6 +335,7 @@ public class ConfGroupAudioService extends Service
 
                 Log.i(TAG, "GAThread:finished");
                 activity_state = 0;
+                push_to_talk_active = false;
 
                 // Log.i(TAG, "toxav_groupchat_disable_av:E:gnum=" + tox_conference_by_confid__wrapper(conf_id));
                 // Log.i(TAG, "toxav_groupchat_disable_av:E:gid=" + conf_id);
@@ -385,10 +398,10 @@ public class ConfGroupAudioService extends Service
         chronometer_base2 = SystemClock.elapsedRealtime();
 
         Drawable d_pause = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_pause).backgroundColor(
-            Color.TRANSPARENT).sizeDp(50);
+                Color.TRANSPARENT).sizeDp(50);
 
         Drawable d_stop = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_stop).backgroundColor(
-            Color.TRANSPARENT).sizeDp(50);
+                Color.TRANSPARENT).sizeDp(50);
 
         try
         {
@@ -595,7 +608,7 @@ public class ConfGroupAudioService extends Service
                                     false);
 
             Drawable d_play = new IconicsDrawable(context_gas_static).icon(
-                GoogleMaterial.Icon.gmd_play_arrow).backgroundColor(Color.TRANSPARENT).sizeDp(50);
+                    GoogleMaterial.Icon.gmd_play_arrow).backgroundColor(Color.TRANSPARENT).sizeDp(50);
 
             // Log.i(TAG, "toxav_groupchat_disable_av:D:gnum=" + tox_conference_by_confid__wrapper(conf_id));
             // Log.i(TAG, "toxav_groupchat_disable_av:D:gid=" + conf_id);
@@ -643,7 +656,7 @@ public class ConfGroupAudioService extends Service
             chronometer_base2 = SystemClock.elapsedRealtime();
 
             Drawable d_pause = new IconicsDrawable(context_gas_static).icon(
-                GoogleMaterial.Icon.gmd_pause).backgroundColor(Color.TRANSPARENT).sizeDp(50);
+                    GoogleMaterial.Icon.gmd_pause).backgroundColor(Color.TRANSPARENT).sizeDp(50);
 
             toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
 

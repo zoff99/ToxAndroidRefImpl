@@ -147,12 +147,12 @@ public class AudioRecording extends Thread
                 Log.i(TAG, "want_buf_size_in_bytes(1)=" + want_buf_size_in_bytes);
 
                 _recBuffer = ByteBuffer.allocateDirect(
-                    (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2)); // Max 120 ms @ 48 kHz
+                        (int) ((48000.0f / 1000.0f) * milliseconds_audio_samples_max * 2 * 2)); // Max 120 ms @ 48 kHz
                 set_JNI_audio_buffer(_recBuffer);
 
                 // for 60 ms --> 5760 bytes
                 NativeAudio.n_rec_buf_size_in_bytes =
-                    ((sampling_rate * channel_count * 2) / 1000) * PREF__X_audio_recording_frame_size;
+                        ((sampling_rate * channel_count * 2) / 1000) * PREF__X_audio_recording_frame_size;
 
                 Log.i(TAG, "NativeAudio.n_rec_buf_size_in_bytes=" + NativeAudio.n_rec_buf_size_in_bytes +
                            " PREF__X_audio_recording_frame_size=" + PREF__X_audio_recording_frame_size +
@@ -301,7 +301,7 @@ public class AudioRecording extends Thread
                             try
                             {
                                 debug_audio_writer_rec_s = new BufferedWriter(
-                                    new FileWriter("/sdcard/audio_rec_s.txt", true));
+                                        new FileWriter("/sdcard/audio_rec_s.txt", true));
                                 long ts = (save_timestamp - calling_activity_start_ms) * 1000;
                                 int value = 0;
                                 for (int xx = 0; xx < 160; xx++)
@@ -322,7 +322,7 @@ public class AudioRecording extends Thread
                             }
 
                             debug_audio_writer_rec_s = new BufferedWriter(
-                                new FileWriter("/sdcard/audio_rec_s_ts.txt", true));
+                                    new FileWriter("/sdcard/audio_rec_s_ts.txt", true));
                             debug_audio_writer_rec_s.write("" + save_timestamp + "\n");
 
                             if (debug_audio_writer_rec_s != null)
@@ -351,7 +351,7 @@ public class AudioRecording extends Thread
                             try
                             {
                                 debug_audio_writer_rec_d = new BufferedWriter(
-                                    new FileWriter("/sdcard/audio_rec_d.txt", true));
+                                        new FileWriter("/sdcard/audio_rec_d.txt", true));
                                 long ts = (save_timestamp - calling_activity_start_ms) * 1000;
                                 int value = 0;
                                 for (int xx = 0; xx < 160; xx++)
@@ -395,21 +395,25 @@ public class AudioRecording extends Thread
                                    _recBuffer.get(4) + " " + _recBuffer.get(5) + " ");
                     }
 
-                    //Log.i(TAG,
-                    //      "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX + " SMAPLINGRATE_TOX=" +
-                    //      SMAPLINGRATE_TOX);
+                    /*
+                    Log.i(TAG, "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX +
+                               " SMAPLINGRATE_TOX=" + SMAPLINGRATE_TOX + " Callstate.audio_group_active=" +
+                               Callstate.audio_group_active + " push_to_talk_active=" + push_to_talk_active +
+                               " ConferenceAudioActivity.conf_id=" + ConferenceAudioActivity.conf_id);
+                     */
 
                     if (Callstate.audio_group_active)
                     {
                         if (push_to_talk_active)
                         {
                             int audio_group_send_res = toxav_group_send_audio(
-                                tox_conference_by_confid__wrapper(ConferenceAudioActivity.conf_id),
-                                (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                                    tox_conference_by_confid__wrapper(ConferenceAudioActivity.conf_id),
+                                    (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
 
-                            //Log.i(TAG,
+                            // Log.i(TAG,
                             //      "audio_group_send_res__global_audio_group_send_res=" + audio_group_send_res + " " +
-                            //      global_audio_group_send_res);
+                            //      global_audio_group_send_res + " tox_conference_num=" +
+                            //      tox_conference_by_confid__wrapper(ConferenceAudioActivity.conf_id));
 
                             if (audio_group_send_res != global_audio_group_send_res)
                             {
@@ -457,8 +461,8 @@ public class AudioRecording extends Thread
                         //       "toxav_audio_send_frame:002:native:Callstate.friend_pubkey=" + Callstate.friend_pubkey +
                         //       " fnum=" + tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
                         audio_send_res = toxav_audio_send_frame(
-                            tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                            ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
 
                         // if (audio_send_res != 0)
                         // {
