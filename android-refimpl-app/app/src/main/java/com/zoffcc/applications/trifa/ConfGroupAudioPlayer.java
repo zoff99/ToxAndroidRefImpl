@@ -21,15 +21,19 @@ package com.zoffcc.applications.trifa;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import android.util.Log;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+
+import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 
 public class ConfGroupAudioPlayer extends AppCompatActivity
 {
@@ -74,6 +78,27 @@ public class ConfGroupAudioPlayer extends AppCompatActivity
             notification_channel_group_audio_play_service.setSound(null, null);
             notification_channel_group_audio_play_service.enableVibration(false);
             nmn3.createNotificationChannel(notification_channel_group_audio_play_service);
+        }
+
+        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
+        try
+        {
+            set_calling_audio_mode();
+            manager.setSpeakerphoneOn(true);
+            Callstate.audio_speaker = true;
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
+
+        try
+        {
+            setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
         }
 
         Log.i(TAG, "group_audio_service:start");

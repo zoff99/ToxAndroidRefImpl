@@ -42,6 +42,7 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import androidx.core.app.NotificationCompat;
 
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
@@ -49,6 +50,7 @@ import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk
 import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
+import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
@@ -340,6 +342,40 @@ public class ConfGroupAudioService extends Service
                 // Log.i(TAG, "toxav_groupchat_disable_av:E:gnum=" + tox_conference_by_confid__wrapper(conf_id));
                 // Log.i(TAG, "toxav_groupchat_disable_av:E:gid=" + conf_id);
                 toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
+
+
+                try
+                {
+                    destroy_buffers();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                // ------ shutdown audio device ------
+                // ------ shutdown audio device ------
+                // ------ shutdown audio device ------
+                AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                try
+                {
+                    if (dha._Detect())
+                    {
+                        if (isBluetoothConnected())
+                        {
+                            Log.i(TAG, "stopBluetoothSco:1");
+                            // manager.setBluetoothScoOn(false);
+                            manager.stopBluetoothSco();
+                        }
+                    }
+                }
+                catch (Exception ee)
+                {
+                    ee.printStackTrace();
+                }
+                // ------ shutdown audio device ------
+                // ------ shutdown audio device ------
+                // ------ shutdown audio device ------
             }
         };
 
@@ -531,8 +567,11 @@ public class ConfGroupAudioService extends Service
         }
 
         Callstate.audio_group_active = false;
+        Callstate.reset_values();
         ConferenceAudioActivity.conf_id = "-1";
         ConfGroupAudioService.conf_id = "-1";
+        ConferenceAudioActivity.conf_id_prev = "-1";
+        AudioRecording.global_audio_group_send_res = -999;
 
         try
         {
@@ -553,6 +592,8 @@ public class ConfGroupAudioService extends Service
         }
 
         ga_service = null;
+
+        reset_audio_mode();
 
         removeNotification();
     }
