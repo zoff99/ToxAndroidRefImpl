@@ -128,7 +128,7 @@
             android:label="@string/conference_audio_activity_name">
         </activity>
         <activity
-            android:name=".GroupAudioPlayer"
+            android:name=".ConfGroupAudioPlayer"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/conference_audio_activity_player_name">
         </activity>
@@ -297,7 +297,7 @@
         </service>
 
         <service
-            android:name=".GroupAudioService"
+            android:name=".ConfGroupAudioService"
             android:enabled="true"
             android:exported="false">
         </service>
@@ -308,7 +308,7 @@
             android:exported="false">
         </service>
 
-        <receiver android:name=".GroupAudioService$ButtonReceiver" android:enabled="true">
+        <receiver android:name=".ConfGroupAudioService$ButtonReceiver" android:enabled="true">
         </receiver>
 
         <receiver android:name=".CallAudioService$ButtonReceiver" android:enabled="true">

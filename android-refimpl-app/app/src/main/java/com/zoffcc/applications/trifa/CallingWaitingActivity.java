@@ -62,7 +62,7 @@ public class CallingWaitingActivity extends AppCompatActivity
 
         try
         {
-            GroupAudioService.stop_me();
+            ConfGroupAudioService.stop_me();
         }
         catch (Exception e)
         {

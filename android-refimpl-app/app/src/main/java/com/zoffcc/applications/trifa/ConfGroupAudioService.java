@@ -53,7 +53,7 @@ import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
-public class GroupAudioService extends Service
+public class ConfGroupAudioService extends Service
 {
     static final String TAG = "trifa.GAService";
     static String conf_id = "-1";
@@ -67,7 +67,7 @@ public class GroupAudioService extends Service
     static boolean running = false;
     static Thread GAThread = null;
     static NotificationManager nm3 = null;
-    static GroupAudioService ga_service = null;
+    static ConfGroupAudioService ga_service = null;
     static int activity_state = 0;
     static notification_and_builder noti_and_builder = null;
     static RemoteViews views = null;
@@ -206,7 +206,7 @@ public class GroupAudioService extends Service
                     e.printStackTrace();
                 }
 
-                ConferenceAudioActivity.conf_id = GroupAudioService.conf_id;
+                ConferenceAudioActivity.conf_id = ConfGroupAudioService.conf_id;
                 toxav_groupchat_enable_av(tox_conference_by_confid__wrapper(conf_id));
                 // ------------- START Audio playing -------------
                 // ------------- START Audio playing -------------
@@ -457,7 +457,7 @@ public class GroupAudioService extends Service
         NotificationCompat.Builder b;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
-            b = new NotificationCompat.Builder(this, GroupAudioPlayer.channelId);
+            b = new NotificationCompat.Builder(this, ConfGroupAudioPlayer.channelId);
         }
         else
         {
@@ -519,7 +519,7 @@ public class GroupAudioService extends Service
 
         Callstate.audio_group_active = false;
         ConferenceAudioActivity.conf_id = "-1";
-        GroupAudioService.conf_id = "-1";
+        ConfGroupAudioService.conf_id = "-1";
 
         try
         {

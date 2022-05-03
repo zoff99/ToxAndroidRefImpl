@@ -31,7 +31,7 @@ import android.util.Log;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-public class GroupAudioPlayer extends AppCompatActivity
+public class ConfGroupAudioPlayer extends AppCompatActivity
 {
     static final String TAG = "trifa.GAActy";
 
@@ -40,7 +40,7 @@ public class GroupAudioPlayer extends AppCompatActivity
     public static final String ACTION_NEXT = "action_next";
     public static final String ACTION_PREV = "action_previous";
 
-    static GroupAudioService group_audio_service = null;
+    static ConfGroupAudioService group_audio_service = null;
 
     static final int GROUP_AUDIO_STATE_PLAYING = 1;
     static int PlaybackState = GROUP_AUDIO_STATE_PLAYING;
@@ -79,7 +79,7 @@ public class GroupAudioPlayer extends AppCompatActivity
         Log.i(TAG, "group_audio_service:start");
         try
         {
-            Intent i = new Intent(this, GroupAudioService.class);
+            Intent i = new Intent(this, ConfGroupAudioService.class);
             i.putExtra("conf_id", conf_id);
             startService(i);
         }

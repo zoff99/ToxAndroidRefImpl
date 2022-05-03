@@ -138,7 +138,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_view_incl
 import static com.zoffcc.applications.trifa.CallingActivity.update_calling_friend_connection_status;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
-import static com.zoffcc.applications.trifa.GroupAudioService.do_update_group_title;
+import static com.zoffcc.applications.trifa.ConfGroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
@@ -1463,7 +1463,7 @@ public class MainActivity extends AppCompatActivity
                             // Exit
                             try
                             {
-                                GroupAudioService.stop_me();
+                                ConfGroupAudioService.stop_me();
                             }
                             catch (Exception e)
                             {
@@ -2080,7 +2080,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            GroupAudioService.stop_me();
+            ConfGroupAudioService.stop_me();
         }
         catch (Exception e)
         {
@@ -6272,9 +6272,9 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            if (GroupAudioService.running)
+            if (ConfGroupAudioService.running)
             {
-                if (conference_number == tox_conference_by_confid__wrapper(GroupAudioService.conf_id))
+                if (conference_number == tox_conference_by_confid__wrapper(ConfGroupAudioService.conf_id))
                 {
                     // update group title while in notification only
                     do_update_group_title();

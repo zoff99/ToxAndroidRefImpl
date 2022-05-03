@@ -135,7 +135,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         try
         {
-            GroupAudioService.stop_me();
+            ConfGroupAudioService.stop_me();
         }
         catch (Exception e)
         {
@@ -454,7 +454,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 {
                     try
                     {
-                        Intent intent = new Intent(group_audio_player_icon.getContext(), GroupAudioPlayer.class);
+                        Intent intent = new Intent(group_audio_player_icon.getContext(), ConfGroupAudioPlayer.class);
                         intent.putExtra("conf_id", conf_id);
                         startActivity(intent);
                     }
