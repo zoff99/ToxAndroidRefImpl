@@ -666,55 +666,66 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         String num_msgs = "*ERROR*";
         try
-
         {
             num_msgs = "" + orma.selectFromMessage().count();
         }
         catch (Exception e)
-
         {
             e.printStackTrace();
         }
 
         String num_confmsgs = "*ERROR*";
         try
-
         {
             num_confmsgs = "" + orma.selectFromConferenceMessage().count();
         }
         catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
+        String num_groupmsgs = "*ERROR*";
+        try
+        {
+            num_groupmsgs = "" + orma.selectFromGroupMessage().count();
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
         }
 
         String num_dbfriends = "*ERROR*";
         try
-
         {
             num_dbfriends = "" + orma.selectFromFriendList().count();
         }
         catch (Exception e)
-
         {
             e.printStackTrace();
         }
 
         String num_dbconfs = "*ERROR*";
         try
-
         {
             num_dbconfs = "" + orma.selectFromConferenceDB().count();
         }
         catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
+        String num_dbgroups = "*ERROR*";
+        try
+        {
+            num_dbgroups = "" + orma.selectFromGroupDB().count();
+        }
+        catch (Exception e)
         {
             e.printStackTrace();
         }
 
         String vfs_size = "*ERROR*";
         try
-
         {
             String dbFile = getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
             File database_dir = new File(new File(dbFile).getParent());
@@ -722,28 +733,25 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         }
         catch (Exception e)
-
         {
             e.printStackTrace();
         }
 
         String dbmain_size = "*ERROR*";
         try
-
         {
             String dbs_path = getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
             File database_dir = new File(new File(dbs_path).getParent());
             dbmain_size = files_and_sizes_in_dir(database_dir);
         }
         catch (Exception e)
-
         {
             e.printStackTrace();
         }
 
-        text_sqlstats.setText(
-                "Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs + "\nFriends: " +
-                num_dbfriends + "\nConferences: " + num_dbconfs + "\n\n" + vfs_size + "\n\n" + dbmain_size);
+        text_sqlstats.setText("Database:\n" + "Messages: " + num_msgs + "\nConference Messages: " + num_confmsgs +
+                              "\nGroup Messages: " + num_groupmsgs + "\nFriends: " + num_dbfriends + "\nConferences: " +
+                              num_dbconfs + "\nGroups: " + num_dbgroups + "\n\n" + vfs_size + "\n\n" + dbmain_size);
 
         maint_handler_s = maint_handler;
     }
