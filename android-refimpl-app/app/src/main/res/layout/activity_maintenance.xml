@@ -147,7 +147,7 @@
                 android:background="@drawable/rounded_blue_bg"
                 android:padding="5dp"
                 android:text="Database Stats:\nMesssages: 102"
-                android:textColor="@color/md_black_1000"
+                android:textColor="@color/text_on_blue_color"
                 android:textSize="16sp"/>
 
             <TextView

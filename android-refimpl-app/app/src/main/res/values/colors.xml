@@ -19,6 +19,7 @@
     <color name="friend_list_text_color">#8A000000</color>
     <color name="gray">#606060</color>
     <color name="icon_colors">#303F9F</color>
+    <color name="text_on_blue_color">#000000</color>
 
     <!--reds-->
     <color name="md_red_50">#FFEBEE</color>
