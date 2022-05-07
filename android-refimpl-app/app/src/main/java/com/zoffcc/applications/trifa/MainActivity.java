@@ -6812,12 +6812,14 @@ public class MainActivity extends AppCompatActivity
     {
         android_tox_callback_group_message_cb_method_wrapper(group_number, peer_id, a_TOX_MESSAGE_TYPE, message_orig,
                                                              length, false);
+        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
     }
 
     static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
     {
         android_tox_callback_group_message_cb_method_wrapper(group_number, peer_id, a_TOX_MESSAGE_TYPE, message_orig,
                                                              length, true);
+        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
     }
 
     static void android_tox_callback_group_privacy_state_cb_method(long group_number, final int a_TOX_GROUP_PRIVACY_STATE)
