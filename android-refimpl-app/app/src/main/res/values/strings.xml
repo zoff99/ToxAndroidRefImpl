@@ -22,6 +22,7 @@
     <string name="title_activity_conferenceinfo">Conferenceinfo</string>
     <string name="title_activity_groupinfo">Groupinfo</string>
     <string name="title_activity_conferencepeerinfo">Peerinfo</string>
+    <string name="title_activity_grouppeerinfo">Group Peerinfo</string>
     <string name="title_activity_aboutpage">About</string>
     <string name="title_activity_set_password">Set Password</string>
     <string name="title_activity_check_password">Enter Password</string>

@@ -53,14 +53,19 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.string_is_in_list;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
+import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_NGC_PUBKEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_TOKTOK_GROUPID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
@@ -125,6 +130,28 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
 
         String message__tox_peername = m.tox_group_peername;
         String message__tox_peerpubkey = m.tox_group_peer_pubkey;
+
+        boolean handle_special_name = false;
+
+        name_test_pk res = correct_pubkey(m);
+        if (res.changed)
+        {
+            try
+            {
+                message__tox_peername = res.tox_peername;
+                peer_name_text.setText(message__tox_peername);
+                message__text = res.text;
+                if (m.private_message == 1)
+                {
+                    message__text = "Private Message:\n" + res.text;
+                }
+                message__tox_peerpubkey = res.tox_peerpubkey;
+                handle_special_name = true;
+            }
+            catch (Exception e)
+            {
+            }
+        }
 
         swipeLayout.addSwipeListener(new SwipeLayout.SwipeListener()
         {
@@ -752,6 +779,53 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
     {
         name_test_pk ret = new name_test_pk();
         ret.changed = false;
+
+        if (m.group_identifier.equals(TOXIRC_TOKTOK_GROUPID))
+        {
+            if (m.tox_group_peer_pubkey.equals(TOXIRC_NGC_PUBKEY))
+            {
+                // toxirc messages will be displayed in a special way
+                if (m.text.length() > (3 + 1))
+                {
+                    if (m.text.startsWith("<"))
+                    {
+                        int start_pos = m.text.indexOf("<");
+                        int end_pos = m.text.indexOf("> ");
+
+                        if ((start_pos > -1) && (end_pos > -1) && (end_pos > start_pos))
+                        {
+                            try
+                            {
+                                String peer_name_corrected = m.text.substring(start_pos + 1, end_pos);
+
+                                ret.tox_peername = peer_name_corrected;
+
+                                if (string_is_in_list(peer_name_corrected, PREF__toxirc_muted_peers))
+                                {
+                                    ret.text = "** muted **";
+                                }
+                                else
+                                {
+                                    ret.text = m.text.substring(end_pos + 2);
+                                }
+
+                                String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
+                                        TrifaSetPatternActivity.StringToBytes2(
+                                                m.tox_group_peer_pubkey + "--" + peer_name_corrected)));
+
+                                new_fake_pubkey = new_fake_pubkey.substring(1, new_fake_pubkey.length() - 2);
+                                ret.tox_peerpubkey = new_fake_pubkey;
+                                ret.changed = true;
+                            }
+                            catch (Exception e)
+                            {
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return ret;
     }
 }

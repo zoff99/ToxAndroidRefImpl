@@ -182,6 +182,11 @@
             android:label="@string/title_activity_conferencepeerinfo">
         </activity>
         <activity
+            android:name=".GroupPeerInfoActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/title_activity_grouppeerinfo">
+        </activity>
+        <activity
             android:name=".ImageviewerActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
         </activity>

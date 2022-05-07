@@ -911,14 +911,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                                                     @Override
                                                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
                                                     {
-                                                        /*
                                                         Intent intent = new Intent(view.getContext(),
-                                                                                   ConferencePeerInfoActivity.class);
+                                                                                   GroupPeerInfoActivity.class);
                                                         intent.putExtra("peer_pubkey", peer_pubkey);
                                                         intent.putExtra("group_id", group_id);
-                                                        intent.putExtra("offline", offline);
                                                         view.getContext().startActivity(intent);
-                                                        */
                                                         return true;
                                                     }
                                                 });
