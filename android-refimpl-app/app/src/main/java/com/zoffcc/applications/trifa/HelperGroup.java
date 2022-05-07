@@ -525,6 +525,8 @@ public class HelperGroup
             CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
             cc.is_friend = COMBINED_IS_GROUP;
             cc.group_item = GroupDB.deep_copy(conf3);
+            // TODO: sometimes friend_list_fragment == NULL here!
+            //       because its not yet resumed yet
             MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
         }
         catch (Exception e1)
