@@ -36,11 +36,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anynewgroupview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class GroupMessageListFragment extends Fragment
@@ -93,17 +90,17 @@ public class GroupMessageListFragment extends Fragment
         {
             if (orma != null)
             {
-                    if ((group_search_messages_text == null) || (group_search_messages_text.length() == 0))
-                    {
-                        // TODO: sort by sent_timestamp ?
-                        data_values = orma.selectFromGroupMessage().
-                                group_identifierEq(current_group_id.toLowerCase()).
-                                orderBySent_timestampAsc().
-                                toList();
-                    }
-                    else
-                    {
-                        // TODO: sort by sent_timestamp ?
+                if ((group_search_messages_text == null) || (group_search_messages_text.length() == 0))
+                {
+                    // TODO: sort by sent_timestamp ?
+                    data_values = orma.selectFromGroupMessage().
+                            group_identifierEq(current_group_id.toLowerCase()).
+                            orderBySent_timestampAsc().
+                            toList();
+                }
+                else
+                {
+                    // TODO: sort by sent_timestamp ?
                         /*
                          searching for case-IN-sensitive non ascii chars is not working:
 
@@ -113,13 +110,12 @@ public class GroupMessageListFragment extends Fragment
                          The LIKE operator is case sensitive by default for unicode characters that are beyond
                          the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                          */
-                        data_values = orma.selectFromGroupMessage().
-                                group_identifierEq(current_group_id.toLowerCase()).
-                                orderBySent_timestampAsc().
-                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
-                                      "', text, '\\')").
-                                toList();
-                    }
+                    data_values = orma.selectFromGroupMessage().
+                            group_identifierEq(current_group_id.toLowerCase()).
+                            orderBySent_timestampAsc().
+                            where(" like('" + get_sqlite_search_string(group_search_messages_text) + "', text, '\\')").
+                            toList();
+                }
             }
         }
         catch (Exception e)
@@ -231,7 +227,7 @@ public class GroupMessageListFragment extends Fragment
         Log.i(TAG, "onResume");
         super.onResume();
 
-        global_showing_anynewgroupview = true;
+        global_showing_anygroupview = true;
         MainActivity.group_message_list_fragment = this;
     }
 
@@ -240,7 +236,7 @@ public class GroupMessageListFragment extends Fragment
     {
         super.onPause();
 
-        global_showing_anynewgroupview = false;
+        global_showing_anygroupview = false;
         MainActivity.group_message_list_fragment = null;
     }
 
