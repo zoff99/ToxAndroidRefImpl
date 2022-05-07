@@ -675,7 +675,7 @@ public class HelperGroup
         m.tox_group_peername = null;
         if (is_private_message)
         {
-            m.private_message = 0;
+            m.private_message = 1;
         }
         else
         {
