@@ -544,7 +544,8 @@ public class HelperGroup
             {
                 if (group_identifier != null)
                 {
-                    if (group_message_list_activity.get_current_group_id().toLowerCase().equals(group_identifier.toLowerCase()))
+                    if (group_message_list_activity.get_current_group_id().toLowerCase().equals(
+                            group_identifier.toLowerCase()))
                     {
                         group_message_list_activity.update_group_all_users();
                     }
@@ -716,6 +717,157 @@ public class HelperGroup
         {
             long new_msg_id = HelperGroup.insert_into_group_message_db(m, false);
             Log.i(TAG, "group_message_cb:new_msg_id=" + new_msg_id);
+        }
+
+        HelperFriend.add_all_friends_clear_wrapper(0);
+
+        if (do_notification)
+        {
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+        }
+    }
+
+    static GroupMessage get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey(String group_identifier, String sender_pubkey, long sent_timestamp, String message_id_tox, int n, boolean was_synced, final String message_text)
+    {
+        try
+        {
+
+            final int SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL = 30; // 30 sec
+
+            GroupMessage gm = orma.selectFromGroupMessage().
+                    group_identifierEq(group_identifier.toLowerCase()).
+                    tox_group_peer_pubkeyEq(sender_pubkey.toUpperCase()).
+                    sent_timestampGt(sent_timestamp - (SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL * 1000)).
+                    sent_timestampLt(sent_timestamp + (SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL * 1000)).
+                    textEq(message_text).
+                    limit(1).
+                    toList().
+                    get(0);
+
+            return gm;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    static void group_message_add_from_sync(final String group_identifier, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id)
+    {
+        Log.i(TAG, "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" +
+                   message);
+
+        int res = -1;
+        if (peer_number2 == -1)
+        {
+            res = -1;
+        }
+        else
+        {
+            long group_num_ = tox_group_by_groupid__wrapper(group_identifier);
+            final long my_peer_num = tox_group_self_get_peer_id(group_num_);
+            if (my_peer_num == peer_number2)
+            {
+                res = 1;
+            }
+            else
+            {
+                res = 0;
+            }
+        }
+
+        if (res == 1)
+        {
+            // HINT: do not add our own messages, they are already in the DB!
+            // Log.i(TAG, "conference_message_add_from_sync:own peer");
+            return;
+        }
+
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        GroupDB group_temp = null;
+
+        try
+        {
+            // TODO: cache me!!
+            group_temp = orma.selectFromGroupDB().
+                    group_identifierEq(group_identifier).get(0);
+        }
+        catch (Exception e)
+        {
+        }
+
+        if (group_temp == null)
+        {
+            Log.i(TAG, "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" +
+                       message+" we dont have the group anymore????");
+            return;
+        }
+
+        try
+        {
+            if (group_temp.notification_silent)
+            {
+                do_notification = false;
+            }
+        }
+        catch (Exception e)
+        {
+        }
+
+        if (group_message_list_activity != null)
+        {
+            // Log.i(TAG, "conference_message_add_from_sync:noti_and_badge:002conf:" +
+            //            conference_message_list_activity.get_current_conf_id() + ":" + conf_id);
+
+            if (group_message_list_activity.get_current_group_id().equals(group_identifier))
+            {
+                // Log.i(TAG, "noti_and_badge:003:");
+                // no notifcation and no badge update
+                do_notification = false;
+                do_badge_update = false;
+            }
+        }
+
+        GroupMessage m = new GroupMessage();
+        m.is_new = do_badge_update;
+        m.tox_group_peer_pubkey = peer_pubkey;
+        m.direction = 0; // msg received
+        m.TOX_MESSAGE_TYPE = 0;
+        m.read = false;
+        m.tox_group_peername = null;
+        m.group_identifier = group_identifier;
+        m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+        m.sent_timestamp = sent_timestamp_in_ms;
+        m.rcvd_timestamp = System.currentTimeMillis();
+        m.text = message;
+        m.message_id_tox = message_id;
+        m.was_synced = true;
+
+        try
+        {
+            m.tox_group_peername = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        if (group_message_list_activity != null)
+        {
+            if (group_message_list_activity.get_current_group_id().equals(group_identifier))
+            {
+                insert_into_group_message_db(m, true);
+            }
+            else
+            {
+                insert_into_group_message_db(m, false);
+            }
+        }
+        else
+        {
+            long new_msg_id = insert_into_group_message_db(m, false);
+            // Log.i(TAG, "conference_message_add_from_sync:new_msg_id=" + new_msg_id);
         }
 
         HelperFriend.add_all_friends_clear_wrapper(0);

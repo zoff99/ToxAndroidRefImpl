@@ -137,8 +137,8 @@ import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.toggle_osd_view_including_cam_preview;
 import static com.zoffcc.applications.trifa.CallingActivity.update_calling_friend_connection_status;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
-import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.ConfGroupAudioService.do_update_group_title;
+import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
@@ -146,6 +146,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_file
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
@@ -164,7 +165,10 @@ import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_w
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperGroup.add_system_message_to_group_chat;
 import static com.zoffcc.applications.trifa.HelperGroup.android_tox_callback_group_message_cb_method_wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey;
+import static com.zoffcc.applications.trifa.HelperGroup.group_message_add_from_sync;
 import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupnum__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_privacy_state;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_topic;
@@ -175,6 +179,7 @@ import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_not
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection_status_real;
 import static com.zoffcc.applications.trifa.HelperRelay.have_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_conference_own_relay;
+import static com.zoffcc.applications.trifa.HelperRelay.invite_to_group_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
 import static com.zoffcc.applications.trifa.HelperRelay.send_pushtoken_to_relay;
@@ -4505,8 +4510,8 @@ public class MainActivity extends AppCompatActivity
     static void android_tox_callback_friend_connection_status_cb_method(long friend_number, int a_TOX_CONNECTION)
     {
         FriendList f = main_get_friend(friend_number);
-        // Log.i(TAG, "friend_connection_status:friend:" + get_friend_name_from_pubkey(f.tox_public_key_string) +
-        //            " connection status:" + a_TOX_CONNECTION);
+        // Log.i(TAG, "friend_connection_status:pubkey=" + f.tox_public_key_string + " friend:" +
+        //           get_friend_name_from_pubkey(f.tox_public_key_string) + " connection status:" + a_TOX_CONNECTION);
 
         if (f != null)
         {
@@ -4543,6 +4548,7 @@ public class MainActivity extends AppCompatActivity
                             if (HelperRelay.is_own_relay(f.tox_public_key_string))
                             {
                                 HelperRelay.invite_to_all_conferences_own_relay(HelperRelay.get_own_relay_pubkey());
+                                HelperRelay.invite_to_all_groups_own_relay(HelperRelay.get_own_relay_pubkey());
                             }
                         }
 
@@ -5055,7 +5061,7 @@ public class MainActivity extends AppCompatActivity
                     String real_conference_id = real_sender_as_hex_string;
 
                     long conference_num = HelperConference.tox_conference_by_confid__wrapper(real_conference_id);
-                    // Log.i(TAG, "friend_sync_message_v2_cb:conference_num=" + conference_num);
+                    // Log.i(TAG, "friend_sync_message_v2_cb:1:conference_num=" + conference_num);
                     if (conference_num > -1)
                     {
                         String real_sender_peer_pubkey = wrapped_msg_text_as_string.substring(0, 64);
@@ -5118,12 +5124,54 @@ public class MainActivity extends AppCompatActivity
                     }
                     else
                     {
-                        // sync message from unkown original sender
-                        // still send "receipt" to our relay, or else it will send us this message forever
-                        Log.i(TAG, "friend_sync_message_v2_cb:send receipt for unknown message");
-                        send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
-                                                           (System.currentTimeMillis() / 1000));
+                        real_conference_id = real_conference_id.toLowerCase();
+                        long group_num = tox_group_by_groupid__wrapper(real_conference_id);
+                        if (group_num > -1)
+                        {
+                            // sync message is a group (NGC) message
+                            String real_sender_peer_pubkey = wrapped_msg_text_as_string.substring(0, 64);
+                            long real_text_length = (text_length - 64);
+                            String real_sender_text_ = wrapped_msg_text_as_string.substring(64);
 
+                            String real_sender_text = real_sender_text_;
+                            String real_send_message_id = "";
+
+                            long sync_msg_received_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
+
+                            // add text as conference message
+                            long sender_peer_num = HelperGroup.get_group_peernum_from_peer_pubkey(real_conference_id,
+                                                                                                  real_sender_peer_pubkey);
+
+                            GroupMessage gm = get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey(
+                                    real_conference_id, real_sender_peer_pubkey, sync_msg_received_timestamp,
+                                    real_send_message_id, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false, real_sender_text);
+
+                            if (gm != null)
+                            {
+                                Log.i(TAG, "friend_sync_message_v2_cb:potentially double message:1");
+                                // ok it's a "potentially" double message
+                                // just ignore it, but still send "receipt" to proxy so it won't send this message again
+                                send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
+                                                                   (System.currentTimeMillis() / 1000));
+                                return;
+                            }
+
+                            group_message_add_from_sync(real_conference_id, sender_peer_num, real_sender_peer_pubkey,
+                                                        TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
+                                                        sync_msg_received_timestamp, real_send_message_id);
+
+                            send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
+                                                               (System.currentTimeMillis() / 1000));
+                            return;
+                        }
+                        else
+                        {
+                            // sync message from unkown original sender
+                            // still send "receipt" to our relay, or else it will send us this message forever
+                            Log.i(TAG, "friend_sync_message_v2_cb:send receipt for unknown message");
+                            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
+                                                               (System.currentTimeMillis() / 1000));
+                        }
                         return;
                     }
                 }
@@ -5218,8 +5266,7 @@ public class MainActivity extends AppCompatActivity
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:007:*PING*");
         }
-        // Log.i(TAG, "tox_callback_friend_message_cb:msg=" + friend_message + " " + message_timestamp + " " +
-        //           long_date_time_format(message_timestamp * 1000));
+        // Log.i(TAG, "friend_message_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         HelperGeneric.receive_incoming_message(0, message_type, friend_number, friend_message, null, 0, null,
                                                msgV3hash_bin, message_timestamp);
@@ -5566,8 +5613,8 @@ public class MainActivity extends AppCompatActivity
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG,
-        //       "file_recv:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_KIND + ":" + file_size + ":" +
-        //       filename + ":" + filename_length);
+        //      "file_recv:" + get_friend_name_from_num(friend_number) + ":fn==" + file_number + ":" + a_TOX_FILE_KIND +
+        //      ":" + file_size + ":" + filename + ":" + filename_length);
 
         if (a_TOX_FILE_KIND == TOX_FILE_KIND_AVATAR.value)
         {
@@ -6087,7 +6134,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
-        // Log.i(TAG, "conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message);
+        // Log.i(TAG,"conference_message_cb:cf_num=" + conference_number + " pnum=" + peer_number + " msg=" + message_orig);
         int res = tox_conference_peer_number_is_ours(conference_number, peer_number);
 
         if (res == 1)
@@ -6861,6 +6908,10 @@ public class MainActivity extends AppCompatActivity
             update_group_in_db_privacy_state(group_identifier, new_privacy_state);
             update_group_in_friendlist(group_identifier);
             update_group_in_groupmessagelist(group_identifier);
+            if (have_own_relay())
+            {
+                invite_to_group_own_relay(new_group_num);
+            }
         }
     }
 
@@ -6910,6 +6961,10 @@ public class MainActivity extends AppCompatActivity
         update_savedata_file_wrapper();
         update_group_in_friendlist(group_identifier);
         update_group_in_groupmessagelist(group_identifier);
+        if (have_own_relay())
+        {
+            invite_to_group_own_relay(group_number);
+        }
     }
 
     static void android_tox_callback_group_topic_cb_method(long group_number, long peer_id, String topic, long topic_length)
@@ -7046,6 +7101,10 @@ public class MainActivity extends AppCompatActivity
                             add_system_message_to_group_chat(group_identifier,
                                                              "You created the Group (as Private [invite only] Group)");
                             set_group_active(group_identifier);
+                            if (have_own_relay())
+                            {
+                                invite_to_group_own_relay(new_group_num);
+                            }
                             try
                             {
                                 final GroupDB conf3 = orma.selectFromGroupDB().
@@ -7113,6 +7172,10 @@ public class MainActivity extends AppCompatActivity
                                                              "You created the Group (as Public Group)");
 
                             set_group_active(group_identifier);
+                            if (have_own_relay())
+                            {
+                                invite_to_group_own_relay(new_group_num);
+                            }
                             try
                             {
                                 final GroupDB conf3 = orma.selectFromGroupDB().

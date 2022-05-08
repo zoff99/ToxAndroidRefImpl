@@ -27,8 +27,10 @@ import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_lossless_packet;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
@@ -245,6 +247,39 @@ public class HelperRelay
     {
         return tox_conference_invite(tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()),
                                      conference_num);
+    }
+
+    static void invite_to_all_groups_own_relay(String relay_public_key_string)
+    {
+        try
+        {
+            List<GroupDB> c = orma.selectFromGroupDB().
+                    toList();
+
+            if (c != null)
+            {
+                if (c.size() > 0)
+                {
+                    for (int i = 0; i < c.size(); i++)
+                    {
+                        GroupDB conf = c.get(i);
+                        final long group_num = tox_group_by_groupid__wrapper(conf.group_identifier);
+                        int res = tox_group_invite_friend(group_num,
+                                                          tox_friend_by_public_key__wrapper(relay_public_key_string));
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static int invite_to_group_own_relay(long group_num)
+    {
+        return tox_group_invite_friend(group_num,
+                                       tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()));
     }
 
     static boolean is_any_relay(String friend_pubkey)
