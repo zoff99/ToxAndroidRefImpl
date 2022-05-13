@@ -35,6 +35,7 @@ import java.util.List;
 
 import androidx.appcompat.app.AlertDialog;
 
+import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffer;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -1191,5 +1192,70 @@ public class HelperMessage
                 main_handler_s.post(myRunnable);
             }
         }
+    }
+
+    static void sync_messagev2_answer(ByteBuffer raw_message_buf_wrapped, long friend_number, ByteBuffer msg_id_buffer, String real_sender_as_hex_string, String msg_id_as_hex_string_wrapped)
+    {
+        // we got an "msg receipt" from the relay
+        // Log.i(TAG, "friend_sync_message_v2_cb:TOX_FILE_KIND_MESSAGEV2_ANSWER");
+        final String message_id_hash_as_hex_string = msg_id_as_hex_string_wrapped;
+
+        try
+        {
+            // Log.i(TAG, "friend_sync_message_v2_cb:message_id_hash_as_hex_string=" + message_id_hash_as_hex_string +
+            //            " friendpubkey=" + real_sender_as_hex_string);
+
+            final List<Message> mlist = orma.selectFromMessage().
+                    msg_id_hashEq(message_id_hash_as_hex_string).
+                    tox_friendpubkeyEq(real_sender_as_hex_string).
+                    directionEq(1).
+                    readEq(false).
+                    toList();
+
+            if (mlist.size() > 0)
+            {
+                final Message m = mlist.get(0);
+
+                if (m != null)
+                {
+                    Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                long msg_wrapped_sec = MainActivity.tox_messagev2_get_ts_sec(raw_message_buf_wrapped);
+                                long msg_wrapped_ms = MainActivity.tox_messagev2_get_ts_ms(raw_message_buf_wrapped);
+                                m.raw_msgv2_bytes = "";
+                                m.rcvd_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
+                                m.read = true;
+                                update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
+                                m.resend_count = 2;
+                                update_message_in_db_resend_count(m);
+                                update_single_message(m, true);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
+                                                               (System.currentTimeMillis() / 1000));
+                        }
+                    };
+
+                    if (main_handler_s != null)
+                    {
+                        main_handler_s.post(myRunnable);
+                    }
+                    return;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+        }
+
+        send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer, (System.currentTimeMillis() / 1000));
     }
 }

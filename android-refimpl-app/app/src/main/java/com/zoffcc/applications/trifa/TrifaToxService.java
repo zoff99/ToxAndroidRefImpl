@@ -1458,55 +1458,7 @@ public class TrifaToxService extends Service
                         }
 
                         // ----------
-                        if (global_self_connection_status == TOX_CONNECTION_NONE.value)
-                        {
-                            if (HAVE_INTERNET_CONNECTIVITY)
-                            {
-                                if (global_self_last_went_offline_timestamp != -1)
-                                {
-                                    if (global_self_last_went_offline_timestamp +
-                                        TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS < System.currentTimeMillis())
-                                    {
-                                        Log.i(TAG, "offline and we have internet connectivity --> bootstrap again ...");
-                                        global_self_last_went_offline_timestamp = System.currentTimeMillis();
-
-                                        bootstrapping = true;
-                                        Log.i(TAG, "bootrapping:set to true[2]");
-                                        try
-                                        {
-                                            tox_notification_change(context_s, nmn2, 0, "sleep: " +
-                                                                                        (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
-                                                                                                1000) / 60) + "min (" +
-                                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP1 +
-                                                                                        "/" +
-                                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP2 +
-                                                                                        "/" +
-                                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP3 +
-                                                                                        ") " +
-                                                                                        long_date_time_format_or_empty(
-                                                                                                global_self_last_entered_battery_saving_timestamp)); // set notification to "bootstrapping"
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
-                                        }
-
-                                        try
-                                        {
-                                            TrifaToxService.write_debug_file("RUN__start__bootstrapping");
-                                            bootstrap_me();
-                                            TrifaToxService.write_debug_file(
-                                                    "RUN__finish__bootstrapping:" + tox_self_get_connection_status());
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
-                                            Log.i(TAG, "bootstrap_me:001:EE:" + e.getMessage());
-                                        }
-                                    }
-                                }
-                            }
-                        }
+                        check_if_need_bootstrap_again();
                     }
                     catch (InterruptedException e)
                     {
@@ -1524,25 +1476,6 @@ public class TrifaToxService extends Service
                         if (Callstate.audio_group_active)
                         {
                             tox_iteration_interval_ms = 5; // if we are in a group audio call iterate more often
-
-                            /*
-                            if (!tox_iterate_thread_high_prio)
-                            {
-                                try
-                                {
-                                    tox_iterate_thread_high_prio = true;
-                                    this.setName("tox_iterate()+");
-                                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-                                    // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-                                    android.os.Process.setThreadPriority(
-                                            android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
-                            }
-                            */
                         }
                         else
                         {
@@ -1554,24 +1487,12 @@ public class TrifaToxService extends Service
                                 {
                                     tox_iterate_thread_high_prio = true;
                                     this.setName("tox_iterate()+");
-                                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-                                    // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-                                    // android.os.Process.setThreadPriority(
-                                    //        android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
                                 }
                                 catch (Exception e)
                                 {
                                     e.printStackTrace();
                                 }
                             }
-
-                            /*
-                            long tox_iteration_interval_should_be = tox_iteration_interval();
-                            if (tox_iteration_interval_should_be < tox_iteration_interval_ms)
-                            {
-                                tox_iteration_interval_ms = tox_iteration_interval_should_be;
-                            }
-                            */
                         }
                     }
                     else
@@ -1596,101 +1517,15 @@ public class TrifaToxService extends Service
 
                     }
 
-                    // --- send pending 1-on-1 text messages here --------------
-                    // --- send pending 1-on-1 text messages here --------------
-                    // --- send pending 1-on-1 text messages here --------------
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
-                        if ((last_resend_pending_messages4_ms + (5 * 1000)) < System.currentTimeMillis())
-                        {
-                            last_resend_pending_messages4_ms = System.currentTimeMillis();
-                            resend_push_for_v3_messages();
-                        }
-
-                        if ((last_resend_pending_messages0_ms + (30 * 1000)) < System.currentTimeMillis())
-                        {
-                            last_resend_pending_messages0_ms = System.currentTimeMillis();
-                            resend_old_messages(null);
-                        }
-
-                        if ((last_resend_pending_messages1_ms + (30 * 1000)) < System.currentTimeMillis())
-                        {
-                            last_resend_pending_messages1_ms = System.currentTimeMillis();
-                            resend_v3_messages(null);
-                        }
-
-                        if ((last_resend_pending_messages2_ms + (30 * 1000)) < System.currentTimeMillis())
-                        {
-                            last_resend_pending_messages2_ms = System.currentTimeMillis();
-                            resend_v2_messages(false);
-                        }
-
-                        if ((last_resend_pending_messages3_ms + (120 * 1000)) < System.currentTimeMillis())
-                        {
-                            last_resend_pending_messages3_ms = System.currentTimeMillis();
-                            resend_v2_messages(true);
-                        }
+                        send_or_resend_pending_messages();
                     }
-                    // --- send pending 1-on-1 text messages here --------------
-                    // --- send pending 1-on-1 text messages here --------------
-                    // --- send pending 1-on-1 text messages here --------------
 
-
-                    // --- start queued outgoing FTs here --------------
-                    // --- start queued outgoing FTs here --------------
-                    // --- start queued outgoing FTs here --------------
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
-                        if ((last_start_queued_fts_ms + (4 * 1000)) < System.currentTimeMillis())
-                        {
-                            last_start_queued_fts_ms = System.currentTimeMillis();
-                            // Log.i(TAG, "start_queued_outgoing_FTs ============================================");
-
-                            try
-                            {
-                                List<Message> m_v1 = orma.selectFromMessage().
-                                        directionEq(1).
-                                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
-                                        ft_outgoing_queuedEq(true).
-                                        stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
-                                        orderBySent_timestampAsc().
-                                        toList();
-
-                                // Log.i(TAG, "start_queued_outgoing_FTs:000:" + m_v1);
-
-                                if ((m_v1 != null) && (m_v1.size() > 0))
-                                {
-                                    // Log.i(TAG, "start_queued_outgoing_FTs:001:" + m_v1.size());
-
-                                    Iterator<Message> ii = m_v1.iterator();
-                                    while (ii.hasNext())
-                                    {
-                                        Message m_resend_ft = ii.next();
-
-                                        if (is_friend_online_real(
-                                                tox_friend_by_public_key__wrapper(m_resend_ft.tox_friendpubkey)) != 0)
-                                        {
-                                            start_outgoing_ft(m_resend_ft);
-                                        }
-                                    }
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                            }
-                        }
+                        start_queued_filetransfers();
                     }
-                    // --- start queued outgoing FTs here --------------
-                    // --- start queued outgoing FTs here --------------
-                    // --- start queued outgoing FTs here --------------
-
-                    //**// if (s_time + 4000 < System.currentTimeMillis())
-                    //**// {
-                    //**//     tox_iteration_interval_ms = MainActivity.tox_iteration_interval();
-                    //**//     Log.i(TAG, "tox_iterate:--END--:took" +
-                    //**//                (long) (((float) (s_time - System.currentTimeMillis()) / 1000f)) +
-                    //**//                "s, new interval=" + tox_iteration_interval_ms + "ms");
-                    //**// }
                 }
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -1745,6 +1580,134 @@ public class TrifaToxService extends Service
         };
 
         ToxServiceThread.start();
+    }
+
+    private void send_or_resend_pending_messages()
+    {
+        if ((last_resend_pending_messages4_ms + (5 * 1000)) < System.currentTimeMillis())
+        {
+            last_resend_pending_messages4_ms = System.currentTimeMillis();
+            resend_push_for_v3_messages();
+        }
+
+        if ((last_resend_pending_messages0_ms + (30 * 1000)) < System.currentTimeMillis())
+        {
+            last_resend_pending_messages0_ms = System.currentTimeMillis();
+            resend_old_messages(null);
+        }
+
+        if ((last_resend_pending_messages1_ms + (30 * 1000)) < System.currentTimeMillis())
+        {
+            last_resend_pending_messages1_ms = System.currentTimeMillis();
+            resend_v3_messages(null);
+        }
+
+        if ((last_resend_pending_messages2_ms + (30 * 1000)) < System.currentTimeMillis())
+        {
+            last_resend_pending_messages2_ms = System.currentTimeMillis();
+            resend_v2_messages(false);
+        }
+
+        if ((last_resend_pending_messages3_ms + (120 * 1000)) < System.currentTimeMillis())
+        {
+            last_resend_pending_messages3_ms = System.currentTimeMillis();
+            resend_v2_messages(true);
+        }
+    }
+
+    private void start_queued_filetransfers()
+    {
+        if ((last_start_queued_fts_ms + (4 * 1000)) < System.currentTimeMillis())
+        {
+            last_start_queued_fts_ms = System.currentTimeMillis();
+            // Log.i(TAG, "start_queued_outgoing_FTs ============================================");
+
+            try
+            {
+                List<Message> m_v1 = orma.selectFromMessage().
+                        directionEq(1).
+                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                        ft_outgoing_queuedEq(true).
+                        stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
+                        orderBySent_timestampAsc().
+                        toList();
+
+                // Log.i(TAG, "start_queued_outgoing_FTs:000:" + m_v1);
+
+                if ((m_v1 != null) && (m_v1.size() > 0))
+                {
+                    // Log.i(TAG, "start_queued_outgoing_FTs:001:" + m_v1.size());
+
+                    Iterator<Message> ii = m_v1.iterator();
+                    while (ii.hasNext())
+                    {
+                        Message m_resend_ft = ii.next();
+
+                        if (is_friend_online_real(
+                                tox_friend_by_public_key__wrapper(m_resend_ft.tox_friendpubkey)) != 0)
+                        {
+                            start_outgoing_ft(m_resend_ft);
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+            }
+        }
+    }
+
+    private void check_if_need_bootstrap_again()
+    {
+        if (global_self_connection_status == TOX_CONNECTION_NONE.value)
+        {
+            if (HAVE_INTERNET_CONNECTIVITY)
+            {
+                if (global_self_last_went_offline_timestamp != -1)
+                {
+                    if (global_self_last_went_offline_timestamp +
+                        TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS < System.currentTimeMillis())
+                    {
+                        Log.i(TAG, "offline and we have internet connectivity --> bootstrap again ...");
+                        global_self_last_went_offline_timestamp = System.currentTimeMillis();
+
+                        bootstrapping = true;
+                        Log.i(TAG, "bootrapping:set to true[2]");
+                        try
+                        {
+                            tox_notification_change(context_s, nmn2, 0, "sleep: " +
+                                                                        (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
+                                                                                1000) / 60) + "min (" +
+                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP1 +
+                                                                        "/" +
+                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP2 +
+                                                                        "/" +
+                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP3 +
+                                                                        ") " +
+                                                                        long_date_time_format_or_empty(
+                                                                                global_self_last_entered_battery_saving_timestamp)); // set notification to "bootstrapping"
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        try
+                        {
+                            TrifaToxService.write_debug_file("RUN__start__bootstrapping");
+                            bootstrap_me();
+                            TrifaToxService.write_debug_file(
+                                    "RUN__finish__bootstrapping:" + tox_self_get_connection_status());
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "bootstrap_me:001:EE:" + e.getMessage());
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void start_me()
@@ -2248,6 +2211,9 @@ public class TrifaToxService extends Service
         Log.i(TAG, text);
     }
 
+    /*
+     * This is called by native methods to check/fix broken UTF-8 Strings
+     */
     static String safe_string(byte[] in)
     {
         // Log.i(TAG, "safe_string:in=" + in);

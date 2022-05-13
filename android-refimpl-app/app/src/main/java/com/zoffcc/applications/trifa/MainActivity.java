@@ -146,7 +146,6 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_file
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
-import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_num;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
@@ -5024,99 +5023,153 @@ public class MainActivity extends AppCompatActivity
 
         if (msgv2_type == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_SEND.value)
         {
-            long msg_wrapped_sec = tox_messagev2_get_ts_sec(raw_message_buf_wrapped);
-            long msg_wrapped_ms = tox_messagev2_get_ts_ms(raw_message_buf_wrapped);
-            // Log.i(TAG, "friend_sync_message_v2_cb:sec=" + msg_wrapped_sec + " ms=" + msg_wrapped_ms);
-            ByteBuffer msg_text_buffer_wrapped = ByteBuffer.allocateDirect((int) raw_data_length);
-            long text_length = tox_messagev2_get_message_text(raw_message_buf_wrapped, raw_data_length, 0, 0,
-                                                              msg_text_buffer_wrapped);
-            String wrapped_msg_text_as_string = "";
+            sync_messagev2_send(friend_number, raw_data, raw_data_length, raw_message_buf_wrapped, msg_id_buffer,
+                                real_sender_as_hex_string);
+        }
+        else if (msgv2_type == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+        {
+            HelperMessage.sync_messagev2_answer(raw_message_buf_wrapped, friend_number, msg_id_buffer, real_sender_as_hex_string,
+                                                msg_id_as_hex_string_wrapped);
+        }
+    }
 
-            try
-            {
-                wrapped_msg_text_as_string = new String(msg_text_buffer_wrapped.array(),
-                                                        msg_text_buffer_wrapped.arrayOffset(), (int) text_length,
-                                                        StandardCharsets.UTF_8);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
+    static void sync_messagev2_send(long friend_number, byte[] raw_data, long raw_data_length, ByteBuffer raw_message_buf_wrapped, ByteBuffer msg_id_buffer, String real_sender_as_hex_string)
+    {
+        long msg_wrapped_sec = tox_messagev2_get_ts_sec(raw_message_buf_wrapped);
+        long msg_wrapped_ms = tox_messagev2_get_ts_ms(raw_message_buf_wrapped);
+        // Log.i(TAG, "friend_sync_message_v2_cb:sec=" + msg_wrapped_sec + " ms=" + msg_wrapped_ms);
+        ByteBuffer msg_text_buffer_wrapped = ByteBuffer.allocateDirect((int) raw_data_length);
+        long text_length = tox_messagev2_get_message_text(raw_message_buf_wrapped, raw_data_length, 0, 0,
+                                                          msg_text_buffer_wrapped);
+        String wrapped_msg_text_as_string = "";
 
-            String msg_text_as_hex_string_wrapped = HelperGeneric.bytesToHex(msg_text_buffer_wrapped.array(),
-                                                                             msg_text_buffer_wrapped.arrayOffset(),
-                                                                             msg_text_buffer_wrapped.limit());
-            // Log.i(TAG, "friend_sync_message_v2_cb:len=" + text_length + " wrapped msg text str=" +
-            //            wrapped_msg_text_as_string);
-            // Log.i(TAG, "friend_sync_message_v2_cb:wrapped msg text hex=" + msg_text_as_hex_string_wrapped);
+        try
+        {
+            wrapped_msg_text_as_string = new String(msg_text_buffer_wrapped.array(),
+                                                    msg_text_buffer_wrapped.arrayOffset(), (int) text_length,
+                                                    StandardCharsets.UTF_8);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
 
-            try
+        String msg_text_as_hex_string_wrapped = HelperGeneric.bytesToHex(msg_text_buffer_wrapped.array(),
+                                                                         msg_text_buffer_wrapped.arrayOffset(),
+                                                                         msg_text_buffer_wrapped.limit());
+        // Log.i(TAG, "friend_sync_message_v2_cb:len=" + text_length + " wrapped msg text str=" +
+        //            wrapped_msg_text_as_string);
+        // Log.i(TAG, "friend_sync_message_v2_cb:wrapped msg text hex=" + msg_text_as_hex_string_wrapped);
+
+        try
+        {
+            if (tox_friend_by_public_key__wrapper(real_sender_as_hex_string) == -1)
             {
-                if (tox_friend_by_public_key__wrapper(real_sender_as_hex_string) == -1)
+                // pubkey does NOT belong to a friend. it is probably a conference id
+                // check it here
+
+                // Log.i(TAG, "friend_sync_message_v2_cb:LL:" + orma.selectFromConferenceDB().toList());
+                String real_conference_id = real_sender_as_hex_string;
+
+                long conference_num = HelperConference.tox_conference_by_confid__wrapper(real_conference_id);
+                // Log.i(TAG, "friend_sync_message_v2_cb:1:conference_num=" + conference_num);
+                if (conference_num > -1)
                 {
-                    // pubkey does NOT belong to a friend. it is probably a conference id
-                    // check it here
+                    String real_sender_peer_pubkey = wrapped_msg_text_as_string.substring(0, 64);
+                    long real_text_length = (text_length - 64 - 9);
+                    String real_sender_text_ = wrapped_msg_text_as_string.substring(64);
 
-                    // Log.i(TAG, "friend_sync_message_v2_cb:LL:" + orma.selectFromConferenceDB().toList());
-                    String real_conference_id = real_sender_as_hex_string;
+                    String real_sender_text = "";
+                    String real_send_message_id = "";
 
-                    long conference_num = HelperConference.tox_conference_by_confid__wrapper(real_conference_id);
-                    // Log.i(TAG, "friend_sync_message_v2_cb:1:conference_num=" + conference_num);
-                    if (conference_num > -1)
+                    // Log.i(TAG,
+                    //      "xxxxxxxxxxxxx2:" + real_sender_text_.length() + " " + real_sender_text_.substring(8, 9) +
+                    //      " " + real_sender_text_.substring(9) + " " + real_sender_text_.substring(0, 8));
+
+                    if ((real_sender_text_.length() > 8) && (real_sender_text_.startsWith(":", 8)))
                     {
+                        real_sender_text = real_sender_text_.substring(9);
+                        real_send_message_id = real_sender_text_.substring(0, 8).toLowerCase();
+                    }
+                    else
+                    {
+                        real_sender_text = real_sender_text_;
+                        real_send_message_id = "";
+                    }
+
+
+                    long sync_msg_received_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
+
+                    // add text as conference message
+                    long sender_peer_num = HelperConference.get_peernum_from_peer_pubkey(real_conference_id,
+                                                                                         real_sender_peer_pubkey);
+                    // Log.i(TAG, "friend_sync_message_v2_cb:sender_peer_num=" + sender_peer_num);
+
+                    // now check if this is "potentially" a double message, we can not be sure a 100%
+                    // since there is no uniqe key for each message
+                    ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
+                            real_conference_id, real_sender_peer_pubkey, sync_msg_received_timestamp,
+                            real_send_message_id, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false);
+
+                    if (cm != null)
+                    {
+                        if (cm.text.equals(real_sender_text))
+                        {
+                            Log.i(TAG, "friend_sync_message_v2_cb:potentially double message:1");
+                            // ok it's a "potentially" double message
+                            // just ignore it, but still send "receipt" to proxy so it won't send this message again
+                            send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
+                                                               (System.currentTimeMillis() / 1000));
+                            return;
+                        }
+                    }
+
+                    HelperGeneric.conference_message_add_from_sync(
+                            HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
+                            real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
+                            sync_msg_received_timestamp, real_send_message_id);
+
+                    send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
+                                                       (System.currentTimeMillis() / 1000));
+                    return;
+                }
+                else
+                {
+                    real_conference_id = real_conference_id.toLowerCase();
+                    long group_num = tox_group_by_groupid__wrapper(real_conference_id);
+                    if (group_num > -1)
+                    {
+                        // sync message is a group (NGC) message
                         String real_sender_peer_pubkey = wrapped_msg_text_as_string.substring(0, 64);
-                        long real_text_length = (text_length - 64 - 9);
+                        long real_text_length = (text_length - 64);
                         String real_sender_text_ = wrapped_msg_text_as_string.substring(64);
 
-                        String real_sender_text = "";
+                        String real_sender_text = real_sender_text_;
                         String real_send_message_id = "";
-
-                        // Log.i(TAG,
-                        //      "xxxxxxxxxxxxx2:" + real_sender_text_.length() + " " + real_sender_text_.substring(8, 9) +
-                        //      " " + real_sender_text_.substring(9) + " " + real_sender_text_.substring(0, 8));
-
-                        if ((real_sender_text_.length() > 8) && (real_sender_text_.startsWith(":", 8)))
-                        {
-                            real_sender_text = real_sender_text_.substring(9);
-                            real_send_message_id = real_sender_text_.substring(0, 8).toLowerCase();
-                        }
-                        else
-                        {
-                            real_sender_text = real_sender_text_;
-                            real_send_message_id = "";
-                        }
-
 
                         long sync_msg_received_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
 
                         // add text as conference message
-                        long sender_peer_num = HelperConference.get_peernum_from_peer_pubkey(real_conference_id,
-                                                                                             real_sender_peer_pubkey);
-                        // Log.i(TAG, "friend_sync_message_v2_cb:sender_peer_num=" + sender_peer_num);
+                        long sender_peer_num = HelperGroup.get_group_peernum_from_peer_pubkey(real_conference_id,
+                                                                                              real_sender_peer_pubkey);
 
-                        // now check if this is "potentially" a double message, we can not be sure a 100%
-                        // since there is no uniqe key for each message
-                        ConferenceMessage cm = get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey(
+                        GroupMessage gm = get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey(
                                 real_conference_id, real_sender_peer_pubkey, sync_msg_received_timestamp,
-                                real_send_message_id, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false);
+                                real_send_message_id, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false, real_sender_text);
 
-                        if (cm != null)
+                        if (gm != null)
                         {
-                            if (cm.text.equals(real_sender_text))
-                            {
-                                Log.i(TAG, "friend_sync_message_v2_cb:potentially double message:1");
-                                // ok it's a "potentially" double message
-                                // just ignore it, but still send "receipt" to proxy so it won't send this message again
-                                send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
-                                                                   (System.currentTimeMillis() / 1000));
-                                return;
-                            }
+                            Log.i(TAG, "friend_sync_message_v2_cb:potentially double message:1");
+                            // ok it's a "potentially" double message
+                            // just ignore it, but still send "receipt" to proxy so it won't send this message again
+                            send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
+                                                               (System.currentTimeMillis() / 1000));
+                            return;
                         }
 
-                        HelperGeneric.conference_message_add_from_sync(
-                                HelperConference.tox_conference_by_confid__wrapper(real_conference_id), sender_peer_num,
-                                real_sender_peer_pubkey, TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
-                                sync_msg_received_timestamp, real_send_message_id);
+                        group_message_add_from_sync(real_conference_id, sender_peer_num, real_sender_peer_pubkey,
+                                                    TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
+                                                    sync_msg_received_timestamp, real_send_message_id);
 
                         send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
                                                            (System.currentTimeMillis() / 1000));
@@ -5124,137 +5177,30 @@ public class MainActivity extends AppCompatActivity
                     }
                     else
                     {
-                        real_conference_id = real_conference_id.toLowerCase();
-                        long group_num = tox_group_by_groupid__wrapper(real_conference_id);
-                        if (group_num > -1)
-                        {
-                            // sync message is a group (NGC) message
-                            String real_sender_peer_pubkey = wrapped_msg_text_as_string.substring(0, 64);
-                            long real_text_length = (text_length - 64);
-                            String real_sender_text_ = wrapped_msg_text_as_string.substring(64);
-
-                            String real_sender_text = real_sender_text_;
-                            String real_send_message_id = "";
-
-                            long sync_msg_received_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
-
-                            // add text as conference message
-                            long sender_peer_num = HelperGroup.get_group_peernum_from_peer_pubkey(real_conference_id,
-                                                                                                  real_sender_peer_pubkey);
-
-                            GroupMessage gm = get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey(
-                                    real_conference_id, real_sender_peer_pubkey, sync_msg_received_timestamp,
-                                    real_send_message_id, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false, real_sender_text);
-
-                            if (gm != null)
-                            {
-                                Log.i(TAG, "friend_sync_message_v2_cb:potentially double message:1");
-                                // ok it's a "potentially" double message
-                                // just ignore it, but still send "receipt" to proxy so it won't send this message again
-                                send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
-                                                                   (System.currentTimeMillis() / 1000));
-                                return;
-                            }
-
-                            group_message_add_from_sync(real_conference_id, sender_peer_num, real_sender_peer_pubkey,
-                                                        TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
-                                                        sync_msg_received_timestamp, real_send_message_id);
-
-                            send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
-                                                               (System.currentTimeMillis() / 1000));
-                            return;
-                        }
-                        else
-                        {
-                            // sync message from unkown original sender
-                            // still send "receipt" to our relay, or else it will send us this message forever
-                            Log.i(TAG, "friend_sync_message_v2_cb:send receipt for unknown message");
-                            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
-                                                               (System.currentTimeMillis() / 1000));
-                        }
-                        return;
+                        // sync message from unkown original sender
+                        // still send "receipt" to our relay, or else it will send us this message forever
+                        Log.i(TAG, "friend_sync_message_v2_cb:send receipt for unknown message");
+                        send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
+                                                           (System.currentTimeMillis() / 1000));
                     }
-                }
-                else
-                {
-                    HelperGeneric.receive_incoming_message(2, 0,
-                                                           tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
-                                                           wrapped_msg_text_as_string, raw_data, raw_data_length,
-                                                           real_sender_as_hex_string, null, 0);
+                    return;
                 }
             }
-            catch (Exception e2)
+            else
             {
-                e2.printStackTrace();
+                HelperGeneric.receive_incoming_message(2, 0,
+                                                       tox_friend_by_public_key__wrapper(real_sender_as_hex_string),
+                                                       wrapped_msg_text_as_string, raw_data, raw_data_length,
+                                                       real_sender_as_hex_string, null, 0);
             }
-
-            // send message receipt v2 to own relay
-            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer, (System.currentTimeMillis() / 1000));
         }
-        else if (msgv2_type == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
+        catch (Exception e2)
         {
-            // we got an "msg receipt" from the relay
-            // Log.i(TAG, "friend_sync_message_v2_cb:TOX_FILE_KIND_MESSAGEV2_ANSWER");
-            final String message_id_hash_as_hex_string = msg_id_as_hex_string_wrapped;
-
-            try
-            {
-                // Log.i(TAG, "friend_sync_message_v2_cb:message_id_hash_as_hex_string=" + message_id_hash_as_hex_string +
-                //            " friendpubkey=" + real_sender_as_hex_string);
-
-                final List<Message> mlist = orma.selectFromMessage().
-                        msg_id_hashEq(message_id_hash_as_hex_string).
-                        tox_friendpubkeyEq(real_sender_as_hex_string).
-                        directionEq(1).
-                        readEq(false).
-                        toList();
-
-                if (mlist.size() > 0)
-                {
-                    final Message m = mlist.get(0);
-
-                    if (m != null)
-                    {
-                        Runnable myRunnable = new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                try
-                                {
-                                    long msg_wrapped_sec = tox_messagev2_get_ts_sec(raw_message_buf_wrapped);
-                                    long msg_wrapped_ms = tox_messagev2_get_ts_ms(raw_message_buf_wrapped);
-                                    m.raw_msgv2_bytes = "";
-                                    m.rcvd_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
-                                    m.read = true;
-                                    HelperMessage.update_message_in_db_read_rcvd_timestamp_rawmsgbytes(m);
-                                    m.resend_count = 2;
-                                    HelperMessage.update_message_in_db_resend_count(m);
-                                    HelperMessage.update_single_message(m, true);
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
-                                send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer,
-                                                                   (System.currentTimeMillis() / 1000));
-                            }
-                        };
-
-                        if (main_handler_s != null)
-                        {
-                            main_handler_s.post(myRunnable);
-                        }
-                        return;
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-            }
-
-            send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer, (System.currentTimeMillis() / 1000));
+            e2.printStackTrace();
         }
+
+        // send message receipt v2 to own relay
+        send_friend_msg_receipt_v2_wrapper(friend_number, 4, msg_id_buffer, (System.currentTimeMillis() / 1000));
     }
 
     // --- incoming message ---
