@@ -1468,7 +1468,7 @@ public class MainActivity extends AppCompatActivity
                             // Exit
                             try
                             {
-                                ConfGroupAudioService.stop_me();
+                                ConfGroupAudioService.stop_me(true);
                             }
                             catch (Exception e)
                             {
@@ -2085,7 +2085,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            ConfGroupAudioService.stop_me();
+            ConfGroupAudioService.stop_me(true);
         }
         catch (Exception e)
         {

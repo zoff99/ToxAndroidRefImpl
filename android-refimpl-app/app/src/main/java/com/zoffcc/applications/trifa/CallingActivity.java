@@ -250,7 +250,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            ConfGroupAudioService.stop_me();
+            ConfGroupAudioService.stop_me(false);
         }
         catch (Exception e)
         {

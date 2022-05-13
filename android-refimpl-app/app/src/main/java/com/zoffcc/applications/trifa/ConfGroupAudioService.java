@@ -551,7 +551,7 @@ public class ConfGroupAudioService extends Service
         }
     }
 
-    public static void stop_me()
+    public static void stop_me(boolean stop_full)
     {
         running = false;
         try
@@ -567,7 +567,10 @@ public class ConfGroupAudioService extends Service
         }
 
         Callstate.audio_group_active = false;
-        Callstate.reset_values();
+        if (stop_full)
+        {
+            Callstate.reset_values();
+        }
         ConferenceAudioActivity.conf_id = "-1";
         ConfGroupAudioService.conf_id = "-1";
         ConferenceAudioActivity.conf_id_prev = "-1";
@@ -593,7 +596,10 @@ public class ConfGroupAudioService extends Service
 
         ga_service = null;
 
-        reset_audio_mode();
+        if (stop_full)
+        {
+            reset_audio_mode();
+        }
 
         removeNotification();
     }
@@ -610,7 +616,7 @@ public class ConfGroupAudioService extends Service
                 if (intent.getAction().equals(ACTION_STOP))
                 {
                     global_gas_status = GAS_PAUSED;
-                    stop_me();
+                    stop_me(true);
                 }
                 else if (intent.getAction().equals(ACTION_PLAY))
                 {
