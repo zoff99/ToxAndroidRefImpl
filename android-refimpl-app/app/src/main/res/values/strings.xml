@@ -172,6 +172,8 @@
 
     <string name="pref_title_download_push_msg_app">Download Push Message App</string>
 
+    <string name="pref_title_custom_bootstrap_nodes">Use Custom Bootstrap nodes</string>
+
     <string name="pref_title_set_fps">set fps</string>
     <string name="pref_description_set_fps">try to set 15fps video framerate, this may crash on some phones</string>
 

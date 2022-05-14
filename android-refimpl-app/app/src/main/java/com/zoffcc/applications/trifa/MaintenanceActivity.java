@@ -835,7 +835,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                     BootstrapNodeEntryDB bn2 = new BootstrapNodeEntryDB();
                                     bn2.ip = nl_entry.getIpv4();
                                     bn2.port = nl_entry.getPort();
-                                    bn2.key_hex = nl_entry.getPublicKey();
+                                    bn2.key_hex = nl_entry.getPublicKey().toUpperCase();
                                     bn2.udp_node = true;
                                     bn2.num = num_udp;
                                     if ((bn2.ip != null) && (bn2.port > 0) && (bn2.key_hex != null))
@@ -863,7 +863,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                         BootstrapNodeEntryDB bn2 = new BootstrapNodeEntryDB();
                                         bn2.ip = nl_entry.getIpv4();
                                         bn2.port = nl_entry.getTcpPorts().get(k);
-                                        bn2.key_hex = nl_entry.getPublicKey();
+                                        bn2.key_hex = nl_entry.getPublicKey().toUpperCase();
                                         bn2.udp_node = false;
                                         bn2.num = num_tcp;
                                         if ((bn2.ip != null) && (bn2.port > 0) && (bn2.key_hex != null))

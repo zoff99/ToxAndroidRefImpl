@@ -27,9 +27,11 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.Process;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
@@ -59,6 +61,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_connection_status;
+import static com.zoffcc.applications.trifa.HelperGeneric.IPisValid;
 import static com.zoffcc.applications.trifa.HelperGeneric.battery_saving_can_sleep;
 import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
@@ -66,6 +69,8 @@ import static com.zoffcc.applications.trifa.HelperGeneric.get_combined_connectio
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_toxconnection_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.hex_to_bytes;
+import static com.zoffcc.applications.trifa.HelperGeneric.isIPPortValid;
+import static com.zoffcc.applications.trifa.HelperGeneric.is_valid_tox_public_key;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
@@ -138,6 +143,12 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_IP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_KEYHEX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_PORT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_UDP_IP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_UDP_KEYHEX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_UDP_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
@@ -1643,8 +1654,7 @@ public class TrifaToxService extends Service
                     {
                         Message m_resend_ft = ii.next();
 
-                        if (is_friend_online_real(
-                                tox_friend_by_public_key__wrapper(m_resend_ft.tox_friendpubkey)) != 0)
+                        if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_ft.tox_friendpubkey)) != 0)
                         {
                             start_outgoing_ft(m_resend_ft);
                         }
@@ -1665,8 +1675,8 @@ public class TrifaToxService extends Service
             {
                 if (global_self_last_went_offline_timestamp != -1)
                 {
-                    if (global_self_last_went_offline_timestamp +
-                        TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS < System.currentTimeMillis())
+                    if (global_self_last_went_offline_timestamp + TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS <
+                        System.currentTimeMillis())
                     {
                         Log.i(TAG, "offline and we have internet connectivity --> bootstrap again ...");
                         global_self_last_went_offline_timestamp = System.currentTimeMillis();
@@ -1678,12 +1688,9 @@ public class TrifaToxService extends Service
                             tox_notification_change(context_s, nmn2, 0, "sleep: " +
                                                                         (int) ((BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS /
                                                                                 1000) / 60) + "min (" +
-                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP1 +
-                                                                        "/" +
-                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP2 +
-                                                                        "/" +
-                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP3 +
-                                                                        ") " +
+                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP1 + "/" +
+                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP2 + "/" +
+                                                                        BATTERY_OPTIMIZATION_LAST_SLEEP3 + ") " +
                                                                         long_date_time_format_or_empty(
                                                                                 global_self_last_entered_battery_saving_timestamp)); // set notification to "bootstrapping"
                         }
@@ -1717,9 +1724,50 @@ public class TrifaToxService extends Service
         startForeground(HelperToxNotification.ONGOING_NOTIFICATION_ID, notification2);
     }
 
+    static void bootstap_from_custom_nodes()
+    {
+        try
+        {
+            final SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context_s);
+            final String bs_udp_ip = settings.getString(PREF_KEY_CUSTOM_BOOTSTRAP_UDP_IP, "");
+            final String bs_udp_port = settings.getString(PREF_KEY_CUSTOM_BOOTSTRAP_UDP_PORT, "");
+            final String bs_udp_keyhex = settings.getString(PREF_KEY_CUSTOM_BOOTSTRAP_UDP_KEYHEX, "");
+            final String bs_tcp_ip = settings.getString(PREF_KEY_CUSTOM_BOOTSTRAP_TCP_IP, "");
+            final String bs_tcp_port = settings.getString(PREF_KEY_CUSTOM_BOOTSTRAP_TCP_PORT, "");
+            final String bs_tcp_keyhex = settings.getString(PREF_KEY_CUSTOM_BOOTSTRAP_TCP_KEYHEX, "");
+
+            if ((bs_udp_ip.length() > 0) && (bs_udp_port.length() > 0) && (IPisValid(bs_udp_ip)) &&
+                (isIPPortValid(bs_udp_port)) && (is_valid_tox_public_key(bs_udp_keyhex)))
+            {
+                Log.i(TAG, "bootstap_from_custom_nodes:bootstrap_single:ip=" + bs_udp_ip + " port=" +
+                           Integer.parseInt(bs_udp_port) + " key=" + bs_udp_keyhex.toUpperCase());
+                int bootstrap_result = bootstrap_single_wrapper(bs_udp_ip, Integer.parseInt(bs_udp_port),
+                                                                bs_udp_keyhex.toUpperCase());
+                Log.i(TAG, "bootstap_from_custom_nodes:bootstrap_single:res=" + bootstrap_result);
+            }
+
+            if ((bs_tcp_ip.length() > 0) && (bs_tcp_port.length() > 0) && (IPisValid(bs_tcp_ip)) &&
+                (isIPPortValid(bs_tcp_port)) && (is_valid_tox_public_key(bs_tcp_keyhex)))
+            {
+                Log.i(TAG, "bootstap_from_custom_nodes:add_tcp_relay_single:ip=" + bs_tcp_ip + " port=" +
+                           Integer.parseInt(bs_tcp_port) + " key=" + bs_tcp_keyhex.toUpperCase());
+                int bootstrap_result = HelperGeneric.add_tcp_relay_single_wrapper(bs_tcp_ip,
+                                                                                  Integer.parseInt(bs_tcp_port),
+                                                                                  bs_tcp_keyhex.toUpperCase());
+                Log.i(TAG, "bootstap_from_custom_nodes:add_tcp_relay_single:res=" + bootstrap_result);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "bootstap_from_custom_nodes:EE01:" + e.getMessage());
+        }
+    }
+
     static void bootstrap_me()
     {
         Log.i(TAG, "bootstrap_me");
+
+        bootstap_from_custom_nodes();
 
         // ----- UDP ------
         get_udp_nodelist_from_db();
@@ -1749,10 +1797,12 @@ public class TrifaToxService extends Service
                 if (bootstrap_result == 0)
                 {
                     used++;
+                    // Log.i(TAG, "bootstrap_single:++:used=" + used);
                 }
 
-                if (used > USE_MAX_NUMBER_OF_BOOTSTRAP_NODES)
+                if (used >= USE_MAX_NUMBER_OF_BOOTSTRAP_NODES)
                 {
+                    Log.i(TAG, "bootstrap_single:break:used=" + used);
                     break;
                 }
             }
@@ -1795,10 +1845,12 @@ public class TrifaToxService extends Service
                         if (bootstrap_result == 0)
                         {
                             used++;
+                            // Log.i(TAG, "add_tcp_relay_single:++:used=" + used);
                         }
 
-                        if (used > USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS)
+                        if (used >= USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS)
                         {
+                            Log.i(TAG, "add_tcp_relay_single:break:used=" + used);
                             break;
                         }
                     }

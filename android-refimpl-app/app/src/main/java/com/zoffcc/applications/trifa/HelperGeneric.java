@@ -132,6 +132,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILETRANSFER_SIZE_MSGV2;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
@@ -3822,6 +3823,194 @@ public class HelperGeneric
         }
     }
 
+    /**
+     * Validate the given IPv4 or IPv6 address.
+     *
+     * @param address the IP address as a String.
+     * @return true if a valid address, false otherwise
+     */
+    public static boolean IPisValid(String address)
+    {
+        return isValidIPv4(address) || isValidIPv6(address);
+    }
+
+    /**
+     * Validate the given IPv4 or IPv6 address and netmask.
+     *
+     * @param address the IP address as a String.
+     * @return true if a valid address with netmask, false otherwise
+     */
+    public static boolean IPisValidWithNetMask(String address)
+    {
+        return isValidIPv4WithNetmask(address) || isValidIPv6WithNetmask(address);
+    }
+
+    /**
+     * Validate the given IPv4 address.
+     *
+     * @param address the IP address as a String.
+     * @return true if a valid IPv4 address, false otherwise
+     */
+    public static boolean isValidIPv4(String address)
+    {
+        if (address.length() == 0)
+        {
+            return false;
+        }
+
+        int octet;
+        int octets = 0;
+
+        String temp = address + ".";
+
+        int pos;
+        int start = 0;
+        while (start < temp.length() && (pos = temp.indexOf('.', start)) > start)
+        {
+            if (octets == 4)
+            {
+                return false;
+            }
+            try
+            {
+                octet = Integer.parseInt(temp.substring(start, pos));
+            }
+            catch (NumberFormatException ex)
+            {
+                return false;
+            }
+            if (octet < 0 || octet > 255)
+            {
+                return false;
+            }
+            start = pos + 1;
+            octets++;
+        }
+
+        return octets == 4;
+    }
+
+    public static boolean isValidIPv4WithNetmask(String address)
+    {
+        int index = address.indexOf("/");
+        String mask = address.substring(index + 1);
+
+        return (index > 0) && isValidIPv4(address.substring(0, index)) && (isValidIPv4(mask) || isMaskValue(mask, 32));
+    }
+
+    public static boolean isValidIPv6WithNetmask(String address)
+    {
+        int index = address.indexOf("/");
+        String mask = address.substring(index + 1);
+
+        return (index > 0) &&
+               (isValidIPv6(address.substring(0, index)) && (isValidIPv6(mask) || isMaskValue(mask, 128)));
+    }
+
+    public static boolean isIPPortValid(String port)
+    {
+        // HINT: valid number for IP ports: 1 - 65535
+        try
+        {
+            int port_int = Integer.parseInt(port);
+            if ((port_int > 0) && (port_int < 65535))
+            {
+                return true;
+            }
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+        return false;
+    }
+
+    private static boolean isMaskValue(String component, int size)
+    {
+        try
+        {
+            int value = Integer.parseInt(component);
+
+            return value >= 0 && value <= size;
+        }
+        catch (NumberFormatException e)
+        {
+            return false;
+        }
+    }
+
+    /**
+     * Validate the given IPv6 address.
+     *
+     * @param address the IP address as a String.
+     * @return true if a valid IPv4 address, false otherwise
+     */
+    public static boolean isValidIPv6(String address)
+    {
+        if (address.length() == 0)
+        {
+            return false;
+        }
+
+        int octet;
+        int octets = 0;
+
+        String temp = address + ":";
+        boolean doubleColonFound = false;
+        int pos;
+        int start = 0;
+        while (start < temp.length() && (pos = temp.indexOf(':', start)) >= start)
+        {
+            if (octets == 8)
+            {
+                return false;
+            }
+
+            if (start != pos)
+            {
+                String value = temp.substring(start, pos);
+
+                if (pos == (temp.length() - 1) && value.indexOf('.') > 0)
+                {
+                    if (!isValidIPv4(value))
+                    {
+                        return false;
+                    }
+
+                    octets++; // add an extra one as address covers 2 words.
+                }
+                else
+                {
+                    try
+                    {
+                        octet = Integer.parseInt(temp.substring(start, pos), 16);
+                    }
+                    catch (NumberFormatException ex)
+                    {
+                        return false;
+                    }
+                    if (octet < 0 || octet > 0xffff)
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                if (pos != 1 && pos != temp.length() - 1 && doubleColonFound)
+                {
+                    return false;
+                }
+                doubleColonFound = true;
+            }
+            start = pos + 1;
+            octets++;
+        }
+
+        return octets == 8 || doubleColonFound;
+    }
+
+
     public static String trim_to_utf8_length_bytes(String input_string, final int max_length_in_bytes)
     {
         try
@@ -3897,5 +4086,28 @@ public class HelperGeneric
             e.printStackTrace();
             Log.i(TAG, "display_toast:EE01:" + e.getMessage());
         }
+    }
+
+    static boolean is_valid_tox_public_key(final String pubkey)
+    {
+        if (pubkey == null)
+        {
+            // string is null
+            return false;
+        }
+
+        if (pubkey.length() != (TOX_PUBLIC_KEY_SIZE * 2))
+        {
+            // string length is not correct
+            return false;
+        }
+
+        if (!pubkey.toUpperCase().matches("^[A-Z0-9]+$"))
+        {
+            // string contains illegal characters
+            return false;
+        }
+
+        return true;
     }
 }

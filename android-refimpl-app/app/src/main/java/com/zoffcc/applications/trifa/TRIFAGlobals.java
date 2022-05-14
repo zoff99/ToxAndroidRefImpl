@@ -166,6 +166,13 @@ public class TRIFAGlobals
 
     static String PREF__DB_secrect_key__user_hash = "";
 
+    static String PREF_KEY_CUSTOM_BOOTSTRAP_UDP_IP = "custom_bootstrap_udp_ip";
+    static String PREF_KEY_CUSTOM_BOOTSTRAP_UDP_PORT = "custom_bootstrap_udp_port";
+    static String PREF_KEY_CUSTOM_BOOTSTRAP_UDP_KEYHEX = "custom_bootstrap_udp_keyhex";
+    static String PREF_KEY_CUSTOM_BOOTSTRAP_TCP_IP = "custom_bootstrap_tcp_ip";
+    static String PREF_KEY_CUSTOM_BOOTSTRAP_TCP_PORT = "custom_bootstrap_tcp_port";
+    static String PREF_KEY_CUSTOM_BOOTSTRAP_TCP_KEYHEX = "custom_bootstrap_tcp_keyhex";
+
     static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES = 250000L; // 250 kBytes // update FT and progress bars every XX bytes
     static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES = 15000L; // 15 kBytes
     static final long UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES = 250000L; // 250 kByzes, less than this in bytes is a small file
@@ -187,8 +194,8 @@ public class TRIFAGlobals
     static final int MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE = 256;
     static final int LEN_TRIFA_AUTOGEN_PASSWORD = 32;
 
-    static final int USE_MAX_NUMBER_OF_BOOTSTRAP_NODES = 10;
-    static final int USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS = 10;
+    static final int USE_MAX_NUMBER_OF_BOOTSTRAP_NODES = 8;
+    static final int USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS = 8;
 
     // ---- lookup cache ----
     // static Map<String, info.guardianproject.iocipher.RandomAccessFile> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.RandomAccessFile>();
