@@ -414,4 +414,5 @@
     <string name="layout___group_mypubjkey2">我的公钥：</string>
     <string name="layout___group_id2">群 ID：</string>
     <string name="layout___group_myname2">我在群组中的名称：</string>
+    <string name="title_activity_grouppeerinfo">对 Peerinfo 分组</string>
 </resources>
