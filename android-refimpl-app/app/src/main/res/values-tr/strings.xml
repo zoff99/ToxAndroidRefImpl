@@ -253,8 +253,8 @@
     <string name="layout___run_analyze_on_sql_database">SQL veri tabanında ANALYZE çalıştır</string>
     <string name="layout___reset_favorite_emoji_list">favori Emoji Listesini sıfırla</string>
     <string name="layout___delete_all_avatar_icons">tüm Avatar Simgelerini sil</string>
-    <string name="layout___update_bootstrapnodes_from_internet">Bootstrapnodes\'u internetten güncelle</string>
-    <string name="layout___reset_bootstrapnodes_to_default">Bootstrapnodes\'u öntanımlı değere sıfırla</string>
+    <string name="layout___update_bootstrapnodes_from_internet">önyükleme düğümlerini internetten güncelle</string>
+    <string name="layout___reset_bootstrapnodes_to_default">önyükleme düğümlerini öntanımlı değere sıfırla</string>
     <string name="layout___test_notification_sound">Bildirim sesini test et</string>
     <string name="layout___test_ringtone_sound">Zil sesini test et</string>
     <string name="layout___export_tox_savedata_unsecure">tox kayıt verilerini dışa aktar *güvenli değil*</string>
@@ -392,4 +392,6 @@
     <string name="add_public_group_success">Herkese açık bir grup oluşturdunuz</string>
     <string name="add_friend_failed">Arkadaş eklenemedi</string>
     <string name="layout___group_myname2">Gruptaki adım:</string>
+    <string name="pref_title_custom_bootstrap_nodes">Özel önyükleme düğümleri kullan</string>
+    <string name="title_activity_grouppeerinfo">Grup Eş Bilgisi</string>
 </resources>
