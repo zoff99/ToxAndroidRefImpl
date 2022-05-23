@@ -373,4 +373,34 @@
 \n
 \nVoulez-vous voir comment vous pouvez configurer la Notification Push maintenant \?</string>
     <string name="MainActivity_setup_push_tip_title">Configurer la notification push</string>
+    <string name="add_group_activity_name">Créer un groupe privé</string>
+    <string name="add_public_group_activity_name">Créer un groupe public</string>
+    <string name="join_public_activity_name">Rejoindre un groupe public</string>
+    <string name="group_message_list_activity_name">Groupe</string>
+    <string name="layout___group_name">Nom du groupe</string>
+    <string name="title_activity_groupinfo">Infos sur le groupe</string>
+    <string name="join_public_group_activity_help">Rejoindre un groupe public avec l\'ID de groupe donné.</string>
+    <string name="join_group_activity_join">Rejoindre le groupe</string>
+    <string name="join_public_group_failed">Échec de l’adhésion au groupe public</string>
+    <string name="join_public_group_joined">Vous avez rejoint le groupe public</string>
+    <string name="add_friend_failed">l\'ajout d\'un ami a échoué</string>
+    <string name="layout___group_id">ID du groupe</string>
+    <string name="layout___group_id2">ID du groupe :</string>
+    <string name="layout___group_name2">Nom du groupe :</string>
+    <string name="layout___group_mypubjkey2">Ma Pubkey :</string>
+    <string name="title_activity_grouppeerinfo">Infos sur les pairs du groupe</string>
+    <string name="pref_title_custom_bootstrap_nodes">Utiliser des nœuds Bootstrap personnalisés</string>
+    <string name="add_public_group_activity_help">Créer un nouveau groupe public avec un nom de groupe déterminé.</string>
+    <string name="add_public_group_failed">La création d\'un groupe public a échoué</string>
+    <string name="add_public_group_success">Vous avez créé un groupe public</string>
+    <string name="add_private_group_failed">La création d\'un groupe privé a échoué</string>
+    <string name="add_private_group_success">Vous avez créé un groupe privé</string>
+    <string name="add_friend_success">Vous avez ajouté un nouvel ami</string>
+    <string name="layout___group_myname2">mon nom dans le groupe :</string>
+    <string name="layout___create_new_public_group">Créer un nouveau groupe public</string>
+    <string name="layout___join_public_group">Rejoindre un groupe public</string>
+    <string name="add_group_activity_help">Créez un nouveau groupe privé (seulement sur invitation) avec un nom de groupe déterminé.</string>
+    <string name="add_group_activity_add">Créer un groupe</string>
+    <string name="layout___create_new_private_group">Créer un nouveau groupe privé</string>
+    <string name="layout___add_friend">Ajouter un ami</string>
 </resources>

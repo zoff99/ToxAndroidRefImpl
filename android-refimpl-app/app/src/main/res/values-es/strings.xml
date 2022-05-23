@@ -358,4 +358,34 @@
     <string name="MainActivity_setup_push_tip_text">No has instalado la App de Notificación Push y no has configurado la Notificación Push. TRIfA funcionará completamente sin la Notificación Push, pero necesita estar en línea constantemente para recibir Mensajes.Con la Notificación Push puedes ahorrar batería y ancho de banda de Internet.
 \n
 \n¿Quieres ver cómo puedes configurar la Notificación Push ahora\?</string>
+    <string name="add_public_group_activity_name">Crear grupo público</string>
+    <string name="join_public_activity_name">Unirse al grupo público</string>
+    <string name="title_activity_groupinfo">información del grupo</string>
+    <string name="add_group_activity_help">Cree un nuevo grupo privado (solo por invitación) con un nombre de grupo determinado.</string>
+    <string name="add_public_group_activity_help">Crear un nuevo Grupo Público con un Nombre de Grupo determinado.</string>
+    <string name="add_group_activity_add">Crear grupo</string>
+    <string name="join_group_activity_join">Unirse al grupo</string>
+    <string name="join_public_group_failed">Error al unirse al grupo público</string>
+    <string name="join_public_group_joined">Te has unido al Grupo Público</string>
+    <string name="add_public_group_failed">Error al crear un grupo público</string>
+    <string name="add_public_group_success">Has creado un Grupo Público</string>
+    <string name="add_friend_failed">Error al agregar Amigo</string>
+    <string name="add_friend_success">Has añadido un nuevo amigo</string>
+    <string name="layout___group_name">Nombre del grupo</string>
+    <string name="layout___group_id">ID del grupo</string>
+    <string name="layout___group_id2">ID del grupo:</string>
+    <string name="layout___group_name2">Nombre del grupo:</string>
+    <string name="layout___group_myname2">mi nombre en el grupo:</string>
+    <string name="layout___group_mypubjkey2">Mi Pubkey:</string>
+    <string name="layout___create_new_private_group">Crear nuevo grupo privado</string>
+    <string name="layout___create_new_public_group">Crear nuevo grupo público</string>
+    <string name="pref_title_custom_bootstrap_nodes">Usar nodos de Bootstrap personalizados</string>
+    <string name="join_public_group_activity_help">Unirse a un grupo público con el ID de grupo dado.</string>
+    <string name="layout___add_friend">Añadir amigo</string>
+    <string name="layout___join_public_group">Unirse a un grupo público</string>
+    <string name="title_activity_grouppeerinfo">Información de pares del grupo</string>
+    <string name="add_private_group_failed">Error al crear un grupo privado</string>
+    <string name="add_private_group_success">Has creado un Grupo Privado</string>
+    <string name="add_group_activity_name">Crear grupo privado</string>
+    <string name="group_message_list_activity_name">Grupo</string>
 </resources>
