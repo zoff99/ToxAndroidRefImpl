@@ -62,6 +62,7 @@ import androidx.appcompat.widget.Toolbar;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
@@ -743,17 +744,20 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                 if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
-                    int res = tox_group_send_message(tox_group_by_groupid__wrapper(group_id), 0, msg);
-                    Log.i(TAG, "tox_group_send_message:result=" + res + " m=" + m);
+                    long message_id = tox_group_send_message(tox_group_by_groupid__wrapper(group_id), 0, msg);
+                    Log.i(TAG, "tox_group_send_message:result=" + message_id + " m=" + m);
                     if (PREF__X_battery_saving_mode)
                     {
                         Log.i(TAG, "global_last_activity_for_battery_savings_ts:001:*PING*");
                     }
                     global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
 
-                    if (res > -1)
+                    if (message_id > -1)
                     {
                         // message was sent OK
+                        m.message_id_tox = fourbytes_of_long_to_hex(message_id);
+                        Log.i(TAG, "message_id_tox=" + m.message_id_tox + " message_id=" + message_id);
+                        // TODO: m.msg_id_hash = hex(peerpubkey + message_id)
                         insert_into_group_message_db(m, true);
                         ml_new_group_message.setText("");
                     }
@@ -765,6 +769,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         }
         catch (Exception e)
+
         {
             e.printStackTrace();
         }

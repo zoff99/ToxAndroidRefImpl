@@ -35,7 +35,7 @@ public class GroupMessage
 
     @Column(indexed = true, helpers = Column.Helpers.ALL, defaultExpr = "")
     @Nullable
-    String message_id_tox = ""; // Tox Group Message_ID
+    String message_id_tox = ""; // Tox Group Message_ID (4 bytes as hex string lowercase)
 
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     String group_identifier = "-1"; // f_key -> GroupDB.group_identifier
@@ -82,6 +82,10 @@ public class GroupMessage
     @Nullable
     boolean was_synced = false;
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String msg_id_hash = null; // 32byte hash, used for MessageV2 Messages! and otherwise NULL
+
     static GroupMessage deep_copy(GroupMessage in)
     {
         GroupMessage out = new GroupMessage();
@@ -100,6 +104,7 @@ public class GroupMessage
         out.text = in.text;
         out.tox_group_peername = in.tox_group_peername;
         out.was_synced = in.was_synced;
+        out.msg_id_hash = in.msg_id_hash;
 
         return out;
     }

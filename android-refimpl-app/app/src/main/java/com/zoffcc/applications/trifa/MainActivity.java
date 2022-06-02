@@ -3266,9 +3266,9 @@ public class MainActivity extends AppCompatActivity
      * @param a_TOX_MESSAGE_TYPE Message type (normal, action, ...).
      * @param message            A non-NULL pointer to the first element of a byte array
      *                           containing the message text.
-     * @return true on success.
+     * @return message_id on success. return < 0 on error.
      */
-    public static native int tox_group_send_message(long group_number, int a_TOX_MESSAGE_TYPE, @NonNull String message);
+    public static native long tox_group_send_message(long group_number, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
     /**
      * Send a text chat message to the specified peer in the specified group.
@@ -3284,7 +3284,7 @@ public class MainActivity extends AppCompatActivity
      * @param peer_id      The ID of the peer the message is intended for.
      * @param message      A non-NULL pointer to the first element of a byte array
      *                     containing the message text.
-     * @return true on success.
+     * @return message_id on success or < 0 on error
      */
     public static native int tox_group_send_private_message(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
@@ -5028,8 +5028,8 @@ public class MainActivity extends AppCompatActivity
         }
         else if (msgv2_type == ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_MESSAGEV2_ANSWER.value)
         {
-            HelperMessage.sync_messagev2_answer(raw_message_buf_wrapped, friend_number, msg_id_buffer, real_sender_as_hex_string,
-                                                msg_id_as_hex_string_wrapped);
+            HelperMessage.sync_messagev2_answer(raw_message_buf_wrapped, friend_number, msg_id_buffer,
+                                                real_sender_as_hex_string, msg_id_as_hex_string_wrapped);
         }
     }
 
@@ -6801,17 +6801,17 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native new Group methods --------
     // -------- called by native new Group methods --------
 
-    static void android_tox_callback_group_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
+    static void android_tox_callback_group_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length, long message_id)
     {
         android_tox_callback_group_message_cb_method_wrapper(group_number, peer_id, a_TOX_MESSAGE_TYPE, message_orig,
-                                                             length, false);
+                                                             length, message_id, false);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
     }
 
     static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
     {
         android_tox_callback_group_message_cb_method_wrapper(group_number, peer_id, a_TOX_MESSAGE_TYPE, message_orig,
-                                                             length, true);
+                                                             length, 0, true);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
     }
 

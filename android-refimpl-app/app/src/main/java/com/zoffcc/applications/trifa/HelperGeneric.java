@@ -1715,6 +1715,11 @@ public class HelperGeneric
         return res;
     }
 
+    public static String fourbytes_of_long_to_hex(final long in)
+    {
+        return String.format("%08x", in);
+    }
+
     public static String bytebuffer_to_hexstring(ByteBuffer in, boolean upper_case)
     {
         try

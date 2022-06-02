@@ -30,6 +30,7 @@ import androidx.annotation.NonNull;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
+import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
@@ -594,7 +595,7 @@ public class HelperGroup
         }
     }
 
-    static void android_tox_callback_group_message_cb_method_wrapper(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length, boolean is_private_message)
+    static void android_tox_callback_group_message_cb_method_wrapper(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length, long message_id, boolean is_private_message)
     {
         Log.i(TAG, "android_tox_callback_group_message_cb_method_wrapper:gn=" + group_number + " peerid=" + peer_id +
                    " message=" + message_orig + " is_private_message=" + is_private_message);
@@ -613,6 +614,11 @@ public class HelperGroup
         message_ = message_orig;
         message_id_ = "";
         // TODO: add message ID later --------
+
+        if (!is_private_message)
+        {
+            message_id_ = fourbytes_of_long_to_hex(message_id);
+        }
 
         boolean do_notification = true;
         boolean do_badge_update = true;
@@ -691,6 +697,7 @@ public class HelperGroup
         m.text = message_;
         m.message_id_tox = message_id_;
         m.was_synced = false;
+        Log.i(TAG, "message_id_tox=" + message_id_ + " message_id=" + message_id);
 
         try
         {
@@ -754,8 +761,8 @@ public class HelperGroup
 
     static void group_message_add_from_sync(final String group_identifier, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id)
     {
-        Log.i(TAG, "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" +
-                   message);
+        Log.i(TAG,
+              "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" + message);
 
         int res = -1;
         if (peer_number2 == -1)
@@ -800,7 +807,7 @@ public class HelperGroup
         if (group_temp == null)
         {
             Log.i(TAG, "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" +
-                       message+" we dont have the group anymore????");
+                       message + " we dont have the group anymore????");
             return;
         }
 
