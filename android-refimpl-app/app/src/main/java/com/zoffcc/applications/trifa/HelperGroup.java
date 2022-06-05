@@ -597,8 +597,8 @@ public class HelperGroup
 
     static void android_tox_callback_group_message_cb_method_wrapper(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length, long message_id, boolean is_private_message)
     {
-        Log.i(TAG, "android_tox_callback_group_message_cb_method_wrapper:gn=" + group_number + " peerid=" + peer_id +
-                   " message=" + message_orig + " is_private_message=" + is_private_message);
+        // Log.i(TAG, "android_tox_callback_group_message_cb_method_wrapper:gn=" + group_number + " peerid=" + peer_id +
+        //           " message=" + message_orig + " is_private_message=" + is_private_message);
 
         long res = tox_group_self_get_peer_id(group_number);
         if (res == peer_id)
@@ -697,7 +697,7 @@ public class HelperGroup
         m.text = message_;
         m.message_id_tox = message_id_;
         m.was_synced = false;
-        Log.i(TAG, "message_id_tox=" + message_id_ + " message_id=" + message_id);
+        // Log.i(TAG, "message_id_tox=" + message_id_ + " message_id=" + message_id);
 
         try
         {
@@ -738,12 +738,17 @@ public class HelperGroup
     {
         try
         {
+            if ((message_id_tox == null) || (message_id_tox.length() < 8))
+            {
+                return null;
+            }
 
             final int SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL = 30; // 30 sec
 
             GroupMessage gm = orma.selectFromGroupMessage().
                     group_identifierEq(group_identifier.toLowerCase()).
                     tox_group_peer_pubkeyEq(sender_pubkey.toUpperCase()).
+                    message_id_toxEq(message_id_tox.toLowerCase()).
                     sent_timestampGt(sent_timestamp - (SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL * 1000)).
                     sent_timestampLt(sent_timestamp + (SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL * 1000)).
                     textEq(message_text).
@@ -761,8 +766,8 @@ public class HelperGroup
 
     static void group_message_add_from_sync(final String group_identifier, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id)
     {
-        Log.i(TAG,
-              "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" + message);
+        // Log.i(TAG,
+        //       "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" + message);
 
         int res = -1;
         if (peer_number2 == -1)

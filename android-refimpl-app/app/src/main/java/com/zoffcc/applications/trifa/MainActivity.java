@@ -5086,6 +5086,8 @@ public class MainActivity extends AppCompatActivity
                     //      "xxxxxxxxxxxxx2:" + real_sender_text_.length() + " " + real_sender_text_.substring(8, 9) +
                     //      " " + real_sender_text_.substring(9) + " " + real_sender_text_.substring(0, 8));
 
+                    Log.i(TAG, "real_sender_text_=" + real_sender_text_);
+
                     if ((real_sender_text_.length() > 8) && (real_sender_text_.startsWith(":", 8)))
                     {
                         real_sender_text = real_sender_text_.substring(9);
@@ -5144,8 +5146,19 @@ public class MainActivity extends AppCompatActivity
                         long real_text_length = (text_length - 64);
                         String real_sender_text_ = wrapped_msg_text_as_string.substring(64);
 
-                        String real_sender_text = real_sender_text_;
+                        String real_sender_text = "";
                         String real_send_message_id = "";
+
+                        if ((real_sender_text_.length() > 8) && (real_sender_text_.startsWith(":", 8)))
+                        {
+                            real_sender_text = real_sender_text_.substring(9);
+                            real_send_message_id = real_sender_text_.substring(0, 8).toLowerCase();
+                        }
+                        else
+                        {
+                            real_sender_text = real_sender_text_;
+                            real_send_message_id = "";
+                        }
 
                         long sync_msg_received_timestamp = (msg_wrapped_sec * 1000) + msg_wrapped_ms;
 
@@ -5156,6 +5169,8 @@ public class MainActivity extends AppCompatActivity
                         GroupMessage gm = get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey(
                                 real_conference_id, real_sender_peer_pubkey, sync_msg_received_timestamp,
                                 real_send_message_id, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false, real_sender_text);
+
+                        // Log.i(TAG, "m.message_id_tox=" + real_send_message_id);
 
                         if (gm != null)
                         {
@@ -6915,7 +6930,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_group_topic_cb_method(long group_number, long peer_id, String topic, long topic_length)
     {
-        Log.i(TAG, "group_topic_cb: groupnum=" + group_number + " peer=" + peer_id + " topic=" + topic);
+        // Log.i(TAG, "group_topic_cb: groupnum=" + group_number + " peer=" + peer_id + " topic=" + topic);
         if (topic == null)
         {
             topic = "";

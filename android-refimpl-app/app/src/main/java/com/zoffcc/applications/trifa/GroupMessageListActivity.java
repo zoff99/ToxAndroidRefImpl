@@ -475,8 +475,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, peers[(int) i]);
                         String peer_name = tox_group_peer_get_name(conference_num, peers[(int) i]);
-                        Log.i(TAG,
-                              "groupnum=" + conference_num + " peernum=" + peers[(int) i] + " peer_name=" + peer_name);
+                        // Log.i(TAG,
+                        //      "groupnum=" + conference_num + " peernum=" + peers[(int) i] + " peer_name=" + peer_name);
                         String peer_name_temp =
                                 "" + peer_name + " :" + peers[(int) i] + ": " + peer_pubkey_temp.substring(0, 6);
 
@@ -504,8 +504,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, offline_peers[(int) i]);
                         String peer_name = tox_group_peer_get_name(conference_num, offline_peers[(int) i]);
-                        Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
-                                   peer_name);
+                        // Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
+                        //           peer_name);
                         String peer_name_temp = "" + peer_name + " :" + offline_peers[(int) i] + ": " +
                                                 peer_pubkey_temp.substring(0, 6);
 
@@ -756,7 +756,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         // message was sent OK
                         m.message_id_tox = fourbytes_of_long_to_hex(message_id);
-                        Log.i(TAG, "message_id_tox=" + m.message_id_tox + " message_id=" + message_id);
+                        // Log.i(TAG, "message_id_tox=" + m.message_id_tox + " message_id=" + message_id);
                         // TODO: m.msg_id_hash = hex(peerpubkey + message_id)
                         insert_into_group_message_db(m, true);
                         ml_new_group_message.setText("");
