@@ -75,11 +75,13 @@ jobs:
     - name: acls_maven_pkg
       run: |
            sudo chmod -R a+rx /root/work/artefacts/
-           sudo chmod a+r /root/work/artefacts/local_maven_trifa_jni*.zip
+           sudo chmod a+r /root/work//artefacts//local_maven_trifa_jni_.zip
+           ls -al /root/work//artefacts/
+           echo "exit 0 here"
 
     - name: upload apk
       uses: actions/upload-artifact@v2
       with:
         name: local_maven_trifa_jni_1.x.yy.zip
-        path: /root/work/artefacts/local_maven_trifa_jni*.zip
+        path: /root/work/artefacts/
 
