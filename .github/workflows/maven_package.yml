@@ -1,4 +1,4 @@
-name: Android CI
+name: Maven Package CI
 
 on: [push, pull_request]
 
