@@ -115,6 +115,7 @@ android {
         exclude 'META-INF/kotlin*'
         exclude 'META-INF/annotation-experimental_release.kotlin_module'
         exclude 'META-INF/app_release.kotlin_module'
+        exclude 'META-INF/app_debug.kotlin_module'
         exclude 'META-INF/com.yariksoffice*'
         exclude 'META-INF/core-ktx_release.kotlin_module'
         exclude 'META-INF/fragment_release.kotlin_module'
