@@ -137,6 +137,7 @@ android {
         exclude 'lib/armeabi/librsjni.so'
         exclude 'lib/armeabi/libsqlcipher.so'
         exclude 'lib/armeabi/libiocipher.so'
+        exclude 'lib/armeabi/libiocipher2.so'
         exclude 'lib/armeabi/libspeex.so'
         exclude 'lib/armeabi/libblasV8.so'
         exclude 'lib/armeabi/librsjni_androidx.so'
@@ -147,6 +148,7 @@ android {
         // exclude 'lib/arm64-v8a/librsjni.so'
         // exclude 'lib/arm64-v8a/libsqlcipher.so'
         // exclude 'lib/arm64-v8a/libiocipher.so'
+        // exclude 'lib/arm64-v8a/libiocipher2.so'
         // exclude 'lib/arm64-v8a/libspeex.so'
         // exclude 'lib/arm64-v8a/libblasV8.so'
         // exclude 'lib/arm64-v8a/librsjni_androidx.so'
@@ -158,6 +160,7 @@ android {
         exclude 'lib/mips64/librsjni.so'
         exclude 'lib/mips64/libsqlcipher.so'
         exclude 'lib/mips64/libiocipher.so'
+        exclude 'lib/mips64/libiocipher2.so'
         exclude 'lib/mips64/libspeex.so'
         exclude 'lib/mips64/libblasV8.so'
         exclude 'lib/mips64/librsjni_androidx.so'
@@ -168,6 +171,7 @@ android {
         exclude 'lib/mips/librsjni.so'
         exclude 'lib/mips/libsqlcipher.so'
         exclude 'lib/mips/libiocipher.so'
+        exclude 'lib/mips/libiocipher2.so'
         exclude 'lib/mips/libspeex.so'
         exclude 'lib/mips/libblasV8.so'
         exclude 'lib/mips/librsjni_androidx.so'
@@ -178,6 +182,7 @@ android {
         // exclude 'lib/x86/librsjni.so'
         // exclude 'lib/x86/libsqlcipher.so'
         // exclude 'lib/x86/libiocipher.so'
+        // exclude 'lib/x86/libiocipher2.so'
         // exclude 'lib/x86/libspeex.so'
         // exclude 'lib/x86/libblasV8.so'
         // exclude 'lib/x86/libnative-audio-jni.so'
@@ -188,6 +193,7 @@ android {
         // exclude 'lib/x86_64/librsjni.so'
         // exclude 'lib/x86_64/libsqlcipher.so'
         // exclude 'lib/x86_64/libiocipher.so'
+        // exclude 'lib/x86_64/libiocipher2.so'
         // exclude 'lib/x86_64/libspeex.so'
         // exclude 'lib/x86_64/libblasV8.so'
         // exclude 'lib/x86_64/librsjni_androidx.so'
@@ -312,7 +318,10 @@ dependencies {
     implementation('net.zetetic:android-database-sqlcipher:4.5.1@aar') {
         transitive = true
     }
-    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
+    //implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
+    //    transitive = true
+    //}
+    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.103') {
         transitive = true
     }
     //
