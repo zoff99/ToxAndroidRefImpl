@@ -310,6 +310,11 @@ cd $_s_/trifa_src/android-refimpl-app/ ; ls -hal ./jnilib/build/outputs/aar/trif
 # cp -av ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar $CIRCLE_ARTIFACTS/
 # ls -hal ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar || exit 1
 
+echo $CIRCLE_ARTIFACTS/
+ls -al $CIRCLE_ARTIFACTS/
+echo $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$latest_git_tag".zip
+ls -al $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$latest_git_tag".zip
+
 # --------- show generated aar file -----------
 
 
