@@ -1,6 +1,8 @@
 name: Maven Package CI
 
 on:
+  push:
+  pull_request:
   release:
     types: [published, edited]
   workflow_dispatch:
