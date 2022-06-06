@@ -38,7 +38,8 @@ jobs:
 
     - name: move_source
       run: |
-           sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/jni-c-toxcore /root/work/
+           sudo mkdir -p /root/work/jni-c-toxcore/
+           sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/jni-c-toxcore/* /root/work/jni-c-toxcore/
 
     - name: build_maven_deps
       run: |
@@ -49,12 +50,12 @@ jobs:
            sudo mkdir -p /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir
            pwd
            ls -al
-           sudo bash -c "export JAVA_OPTS='-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee';cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh"
+           sudo bash -c "cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh"
 
     - name: build_maven_pkg
       run: |
            pwd
-           sudo bash -c "export JAVA_OPTS='-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee';cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
+           sudo bash -c "cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
 
     - name: upload apk
       uses: actions/upload-artifact@v1
