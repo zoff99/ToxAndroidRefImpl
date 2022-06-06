@@ -76,12 +76,13 @@ jobs:
       run: |
            sudo chmod -R a+rx /root/work/artefacts/
            sudo chmod a+r /root/work//artefacts//local_maven_trifa_jni_.zip
-           ls -al /root/work//artefacts/
+           sudo ls -al /root/work/artefacts/
+           sudo cp -av /root/work/artefacts/*.zip /home/runner/work/
            echo "exit 0 here"
 
     - name: upload apk
       uses: actions/upload-artifact@v2
       with:
         name: local_maven_trifa_jni_1.x.yy.zip
-        path: /root/work/artefacts/
+        path: /home/runner/work/*.zip
 
