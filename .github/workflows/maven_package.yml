@@ -36,17 +36,25 @@ jobs:
            python \
            libncurses5
 
+    - name: move_source
+      run: |
+           sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/jni-c-toxcore /root/work/
+
     - name: build_maven_deps
       run: |
            sudo mkdir -p ~/work/deploy
-           sudo mkdir -p ~/.android/ ; sudo touch ~/.android/debug.keystore
+           sudo mkdir -p ~/.android/
+           sudo touch ~/.android/debug.keystore
+           sudo mkdir -p build_dir
+           sudo mkdir -p /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir
            pwd
-           sudo mkdir -p build_dir ; cd build_dir ; pwd ; ls -al ; sudo bash ../circle_scripts/deps.sh ""
+           ls -al
+           sudo bash -c "export JAVA_OPTS='-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee';cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh"
 
     - name: build_maven_pkg
       run: |
            pwd
-           cd build_dir ; sudo bash ../circle_scripts/trifa.sh '../'
+           sudo bash -c "export JAVA_OPTS='-XX:+IgnoreUnrecognizedVMOptions --add-modules java.se.ee';cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
 
     - name: upload apk
       uses: actions/upload-artifact@v1
