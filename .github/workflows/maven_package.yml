@@ -21,19 +21,19 @@ jobs:
 
     - name: pkgs
       run: |
-           sudo apt update &&
-           sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends
-           clang
-           cmake
-           libconfig-dev
-           libgtest-dev
-           ninja-build
-           pkg-config
-           zip grep file ca-certificates autotools-dev autoconf automake
-           git bc wget rsync cmake make pkg-config libtool
-           ssh gzip tar
-           coreutils
-           python
+           sudo apt update && \
+           sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+           clang \
+           cmake \
+           libconfig-dev \
+           libgtest-dev \
+           ninja-build \
+           pkg-config \
+           zip grep file ca-certificates autotools-dev autoconf automake \
+           git bc wget rsync cmake make pkg-config libtool \
+           ssh gzip tar \
+           coreutils \
+           python \
            libncurses5
 
     - name: build_maven_deps
