@@ -85,8 +85,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 80
-static const char global_version_string[] = "0.99.80";
+#define VERSION_PATCH 81
+static const char global_version_string[] = "0.99.81";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -273,8 +273,12 @@ jmethodID android_tox_callback_group_message_cb_method = NULL;
 jmethodID android_tox_callback_group_private_message_cb_method = NULL;
 jmethodID android_tox_callback_group_invite_cb_method = NULL;
 jmethodID android_tox_callback_group_peer_join_cb_method = NULL;
+jmethodID android_tox_callback_group_peer_exit_cb_method = NULL;
+jmethodID android_tox_callback_group_peer_name_cb_method = NULL;
 jmethodID android_tox_callback_group_join_fail_cb_method = NULL;
 jmethodID android_tox_callback_group_self_join_cb_method = NULL;
+jmethodID android_tox_callback_group_topic_cb_method = NULL;
+jmethodID android_tox_callback_group_privacy_state_cb_method = NULL;
 // -------- _newGroup-callbacks_ -----
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
@@ -353,7 +357,7 @@ static void group_audio_callback_func(void *tox, uint32_t groupnumber, uint32_t 
 
 // ------- new Group Callback forward defintions -------
 void group_message_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_Message_Type type,
-                      const uint8_t *message, size_t length, void *user_data);
+                      const uint8_t *message, size_t length, uint32_t message_id, void *user_data);
 
 void group_private_message_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_Message_Type type,
                       const uint8_t *message, size_t length, void *user_data);
@@ -363,9 +367,21 @@ void group_invite_cb(Tox *tox, uint32_t friend_number, const uint8_t *invite_dat
 
 void group_peer_join_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, void *user_data);
 
+void group_peer_exit_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_Group_Exit_Type exit_type,
+                        const uint8_t *name, size_t name_length, const uint8_t *part_message, size_t length, void *user_data);
+
+void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *name,
+                                    size_t length, void *user_data);
+
 void group_join_fail_cb(Tox *tox, uint32_t group_number, Tox_Group_Join_Fail fail_type, void *user_data);
 
 void group_self_join_cb(Tox *tox, uint32_t group_number, void *user_data);
+
+void group_topic_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *topic, size_t length,
+                        void *user_data);
+
+void group_privacy_state_cb(Tox *tox, uint32_t group_number, Tox_Group_Privacy_State privacy_state,
+                            void *user_data);
 // ------- new Group Callback forward defintions -------
 
 
@@ -1074,8 +1090,12 @@ void init_tox_callbacks()
     tox_callback_group_private_message(tox_global, group_private_message_cb);
     tox_callback_group_invite(tox_global, group_invite_cb);
     tox_callback_group_peer_join(tox_global, group_peer_join_cb);
+    tox_callback_group_peer_exit(tox_global, group_peer_exit_cb);
     tox_callback_group_join_fail(tox_global, group_join_fail_cb);
     tox_callback_group_self_join(tox_global, group_self_join_cb);
+    tox_callback_group_peer_name(tox_global, group_peer_name_cb);
+    tox_callback_group_topic(tox_global, group_topic_cb);
+    tox_callback_group_privacy_state(tox_global, group_privacy_state_cb);
 #endif
     // -------- newGroups _callbacks_ --------
 
@@ -2846,19 +2866,26 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 
     // -------- _newGroup callbacks_ --------
     android_tox_callback_group_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
-            "android_tox_callback_group_message_cb_method", "(JJILjava/lang/String;J)V");
+            "android_tox_callback_group_message_cb_method", "(JJILjava/lang/String;JJ)V");
     android_tox_callback_group_private_message_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_private_message_cb_method", "(JJILjava/lang/String;J)V");
     android_tox_callback_group_invite_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_invite_cb_method", "(J[BJLjava/lang/String;)V");
     android_tox_callback_group_peer_join_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_peer_join_cb_method", "(JJ)V");
+    android_tox_callback_group_peer_exit_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_peer_exit_cb_method", "(JJI)V");
+    android_tox_callback_group_peer_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_peer_name_cb_method", "(JJ)V");
     android_tox_callback_group_join_fail_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_join_fail_cb_method", "(JI)V");
     android_tox_callback_group_self_join_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_self_join_cb_method", "(J)V");
+    android_tox_callback_group_topic_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_topic_cb_method", "(JJLjava/lang/String;J)V");
+    android_tox_callback_group_privacy_state_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_privacy_state_cb_method", "(JI)V");
     // -------- _newGroup _callbacks_ --------
-
 
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
@@ -6317,6 +6344,63 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1leave(JNIEnv *env, j
 #endif
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1set_1name(JNIEnv *env, jobject thiz,
+        jlong group_number, jstring name)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Self_Name_Set error;
+    bool res = false;
+
+#ifdef JAVA_LINUX
+
+    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)name);
+    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+
+    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)name, getBytes, charsetName);
+    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    res = tox_group_self_set_name(tox_global,
+            (uint32_t)group_number,
+            (uint8_t *)pBytes, (size_t)plength,
+            &error);
+
+    (*env)->DeleteLocalRef(env, charsetName);
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+#else
+    const char *my_peer_name_str = NULL;
+    my_peer_name_str = (*env)->GetStringUTFChars(env, name, NULL);
+
+    res = tox_group_self_set_name(tox_global,
+            (uint32_t)group_number,
+            (uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str),
+            &error);
+
+    (*env)->ReleaseStringUTFChars(env, name, my_peer_name_str);
+#endif
+
+    if(error != TOX_ERR_GROUP_SELF_NAME_SET_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong group_number)
@@ -6354,7 +6438,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1public_1k
 }
 
 JNIEXPORT jlong JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_group_join(JNIEnv *env, jobject thiz,
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1join(JNIEnv *env, jobject thiz,
         jobject chat_id_buffer, jlong chat_id_length, jobject my_peer_name, jobject password)
 {
 #ifndef HAVE_TOX_NGC
@@ -6524,6 +6608,174 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1public_1k
 #endif
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1name(JNIEnv *env, jobject thiz,
+        jlong group_number, jlong peer_id)
+{
+#ifndef HAVE_TOX_NGC
+    return (jstring)NULL;
+#else
+
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    Tox_Err_Group_Peer_Query error;
+    size_t length = tox_group_peer_get_name_size(tox_global, (uint32_t)group_number, (uint32_t)peer_id, &error);
+
+    if(error != TOX_ERR_GROUP_PEER_QUERY_OK)
+    {
+        return (jstring)NULL;
+    }
+    else
+    {
+        char title[length + 1];
+        CLEAR(title);
+        bool res = tox_group_peer_get_name(tox_global, (uint32_t)group_number, (uint32_t)peer_id, (uint8_t *)title, &error);
+
+        if(res == false)
+        {
+            return (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+        }
+        else
+        {
+            jstring js1 = c_safe_string_from_java((char *)title, length);
+            return js1;
+        }
+    }
+#endif
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1name(JNIEnv *env, jobject thiz,
+        jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jstring)NULL;
+#else
+
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    Tox_Err_Group_State_Queries error;
+    size_t length = tox_group_get_name_size(tox_global, (uint32_t)group_number, &error);
+
+    if(error != TOX_ERR_GROUP_STATE_QUERIES_OK)
+    {
+        return (jstring)NULL;
+    }
+    else
+    {
+        char title[length + 1];
+        CLEAR(title);
+        bool res = tox_group_get_name(tox_global, (uint32_t)group_number, (uint8_t *)title, &error);
+
+        if(res == false)
+        {
+            return (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+        }
+        else
+        {
+            jstring js1 = c_safe_string_from_java((char *)title, length);
+            return js1;
+        }
+    }
+#endif
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1topic(JNIEnv *env, jobject thiz,
+        jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jstring)NULL;
+#else
+
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    Tox_Err_Group_State_Queries error;
+    size_t length = tox_group_get_topic_size(tox_global, (uint32_t)group_number, &error);
+
+    if(error != TOX_ERR_GROUP_STATE_QUERIES_OK)
+    {
+        return (jstring)NULL;
+    }
+    else
+    {
+        char title[length + 1];
+        CLEAR(title);
+        bool res = tox_group_get_topic(tox_global, (uint32_t)group_number, (uint8_t *)title, &error);
+
+        if(res == false)
+        {
+            return (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+        }
+        else
+        {
+            jstring js1 = c_safe_string_from_java((char *)title, length);
+            return js1;
+        }
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1connection_1status(JNIEnv *env, jobject thiz, jlong group_number,
+            jlong peer_id)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Peer_Query error;
+    uint32_t res = tox_group_peer_get_connection_status(tox_global, (uint32_t)group_number, (uint32_t)peer_id, &error);
+
+    if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1role(JNIEnv *env, jobject thiz, jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Self_Query error;
+    uint32_t res = tox_group_self_get_role(tox_global, (uint32_t)group_number, &error);
+
+    if (error != TOX_ERR_GROUP_SELF_QUERY_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1chat_1id(JNIEnv *env, jobject thiz,
         jlong group_number, jobject chat_id_buffer)
@@ -6644,11 +6896,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1number_1groups(
 #endif
 }
 
-
-
-void tox_group_get_peerlist(const Tox *tox, uint32_t group_number, uint32_t *peerlist, Tox_Err_Group_Peer_Query *error);
-
-
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peerlist(JNIEnv *env, jobject thiz, jlong group_number)
 {
@@ -6700,6 +6947,57 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peerlist(JNIEnv
     return result;
 }
 
+JNIEXPORT jlongArray JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1offline_1peerlist(JNIEnv *env, jobject thiz, jlong group_number)
+{
+    Tox_Err_Group_Peer_Query error;
+    size_t numpeers = tox_group_offline_peer_count(tox_global, (uint32_t)group_number, &error);
+    if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
+    {
+        return NULL;
+    }
+
+    size_t memsize = (numpeers * sizeof(uint32_t));
+    uint32_t *peer_list = malloc(memsize);
+    uint32_t *peer_list_iter = peer_list;
+    jlongArray result;
+    Tox_Err_Group_Peer_Query error2;
+    tox_group_get_offline_peerlist(tox_global, (uint32_t)group_number, peer_list, &error2);
+
+    if (error2 != TOX_ERR_GROUP_PEER_QUERY_OK)
+    {
+        if(peer_list)
+        {
+            free(peer_list);
+        }
+        return NULL;
+    }
+
+    result = (*env)->NewLongArray(env, numpeers);
+
+    if(result == NULL)
+    {
+        // TODO this would be bad!!
+    }
+
+    jlong buffer[numpeers];
+    size_t i = 0;
+
+    for(i=0; i<numpeers; i++)
+    {
+        buffer[i] = (long)peer_list_iter[i];
+    }
+
+    (*env)->SetLongArrayRegion(env, result, 0, numpeers, buffer);
+
+    if(peer_list)
+    {
+        free(peer_list);
+    }
+
+    return result;
+}
+
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1count(JNIEnv *env, jobject thiz, jlong group_number)
 {
@@ -6713,6 +7011,30 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1count(JNIEnv *
 
     Tox_Err_Group_Peer_Query error;
     size_t res = tox_group_peer_count(tox_global, (uint32_t)group_number, &error);
+    if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
+    {
+        return (jlong)-98;
+    }
+    else
+    {
+        return (jlong)res;
+    }
+#endif
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1offline_1peer_1count(JNIEnv *env, jobject thiz, jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jlong)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    Tox_Err_Group_Peer_Query error;
+    size_t res = tox_group_offline_peer_count(tox_global, (uint32_t)group_number, &error);
     if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
     {
         return (jlong)-98;
@@ -7015,17 +7337,17 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1invite_1accept(JNIEn
 #endif
 }
 
-JNIEXPORT jint JNICALL
+JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv *env, jobject thiz,
         jlong group_number, jint type, jobject message)
 {
 #ifndef HAVE_TOX_NGC
-    return (jint)-99;
+    return (jlong)-99;
 #else
 
     if(message == NULL)
     {
-        return (jint)-22;
+        return (jlong)-22;
     }
 
 #ifdef JAVA_LINUX
@@ -7040,9 +7362,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
     jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
+    uint32_t message_id;
     Tox_Err_Group_Send_Message error;
     bool res = tox_group_send_message(tox_global, (uint32_t)group_number, (int)type, (const uint8_t *)pBytes,
-                                           (size_t)plength, &error);
+                                           (size_t)plength, &message_id, &error);
     (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
     (*env)->DeleteLocalRef(env, stringJbytes);
 
@@ -7051,9 +7374,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
     const char *message_str = NULL;
     // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
+    uint32_t message_id;
     Tox_Err_Group_Send_Message error;
     bool res = tox_group_send_message(tox_global, (uint32_t)group_number, (int)type, (const uint8_t *)message_str,
-                                           (size_t)strlen(message_str), &error);
+                                           (size_t)strlen(message_str), &message_id, &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
 
 #endif
@@ -7063,38 +7387,38 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
         if(error == TOX_ERR_GROUP_SEND_MESSAGE_GROUP_NOT_FOUND)
         {
             dbg(9, "tox_group_send_message:ERROR:TOX_ERR_GROUP_SEND_MESSAGE_GROUP_NOT_FOUND");
-            return (jint)-1;
+            return (jlong)-1;
         }
         else if(error == TOX_ERR_GROUP_SEND_MESSAGE_TOO_LONG)
         {
             dbg(9, "tox_group_send_message:ERROR:TOX_ERR_GROUP_SEND_MESSAGE_TOO_LONG");
-            return (jint)-2;
+            return (jlong)-2;
         }
         else if(error == TOX_ERR_GROUP_SEND_MESSAGE_EMPTY)
         {
             dbg(9, "tox_group_send_message:ERROR:TOX_ERR_GROUP_SEND_MESSAGE_EMPTY");
-            return (jint)-3;
+            return (jlong)-3;
         }
         else if(error == TOX_ERR_GROUP_SEND_MESSAGE_BAD_TYPE)
         {
             dbg(9, "tox_group_send_message:ERROR:TOX_ERR_GROUP_SEND_MESSAGE_BAD_TYPE");
-            return (jint)-4;
+            return (jlong)-4;
         }
         else
         {
             dbg(9, "tox_group_send_message:ERROR:%d", (int)error);
-            return (jint)-99;
+            return (jlong)-99;
         }
     }
     else
     {
-        return (jint)res;
+        return (jlong)message_id;
     }
 #endif
 }
 
 void android_tox_callback_group_message_cb(uint32_t group_number, uint32_t peer_id, Tox_Message_Type type,
-        const uint8_t *message, size_t length)
+        const uint8_t *message, size_t length, uint32_t message_id)
 {
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
@@ -7102,14 +7426,14 @@ void android_tox_callback_group_message_cb(uint32_t group_number, uint32_t peer_
     (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_group_message_cb_method, (jlong)(unsigned long long)group_number,
                                      (jlong)(unsigned long long)peer_id,
-                                     (jint) type, js1, (jlong)(unsigned long long)length);
+                                     (jint) type, js1, (jlong)(unsigned long long)length, (jlong)(int64_t)message_id);
     (*jnienv2)->DeleteLocalRef(jnienv2, js1);
 }
 
 void group_message_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_Message_Type type,
-                      const uint8_t *message, size_t length, void *user_data)
+                      const uint8_t *message, size_t length, uint32_t message_id, void *user_data)
 {
-    android_tox_callback_group_message_cb(group_number, peer_id, type, message, length);
+    android_tox_callback_group_message_cb(group_number, peer_id, type, message, length, message_id);
 }
 
 void android_tox_callback_group_private_message_cb(uint32_t group_number, uint32_t peer_id, Tox_Message_Type type,
@@ -7177,6 +7501,44 @@ void group_peer_join_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, void 
     android_tox_callback_group_peer_join_cb(group_number, peer_id);
 }
 
+void android_tox_callback_group_peer_exit_cb(uint32_t group_number, uint32_t peer_id, Tox_Group_Exit_Type exit_type)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_peer_exit_cb_method,
+                                     (jlong)group_number,
+                                     (jlong)peer_id,
+                                     (jint)exit_type);
+}
+
+void group_peer_exit_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_Group_Exit_Type exit_type,
+                        const uint8_t *name, size_t name_length, const uint8_t *part_message, size_t length, void *user_data)
+
+{
+    android_tox_callback_group_peer_exit_cb(group_number, peer_id, exit_type);
+}
+
+void android_tox_callback_group_peer_name_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *name, size_t length)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+
+    // TODO: give back acutal name aswell
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_peer_name_cb_method,
+                                     (jlong)group_number,
+                                     (jlong)peer_id);
+}
+
+void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *name,
+                                    size_t length, void *user_data)
+
+{
+    android_tox_callback_group_peer_name_cb(group_number, peer_id, name, length);
+}
+
 void android_tox_callback_group_join_fail_cb(uint32_t group_number, Tox_Group_Join_Fail fail_type)
 {
     JNIEnv *jnienv2;
@@ -7207,6 +7569,44 @@ void group_self_join_cb(Tox *tox, uint32_t group_number, void *user_data)
 {
     android_tox_callback_group_self_join_cb(group_number);
 }
+
+void android_tox_callback_group_topic_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *topic, size_t length)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    jstring js1 = c_safe_string_from_java((char *)topic, length);
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_topic_cb_method,
+                                     (jlong)group_number,
+                                     (jlong)peer_id,
+                                     js1,
+                                     (jlong)length);
+    (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+}
+
+void group_topic_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *topic, size_t length,
+                        void *user_data)
+{
+    android_tox_callback_group_topic_cb(group_number, peer_id, topic, length);
+}
+
+void android_tox_callback_group_privacy_state_cb(uint32_t group_number, uint32_t privacy_state)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_privacy_state_cb_method,
+                                     (jlong)group_number,
+                                     (jint)privacy_state);
+}
+
+void group_privacy_state_cb(Tox *tox, uint32_t group_number, Tox_Group_Privacy_State privacy_state,
+                            void *user_data)
+{
+    android_tox_callback_group_privacy_state_cb(group_number, privacy_state);
+}
+
+
 
 // ------------------- new Groups -------------------
 // ------------------- new Groups -------------------
