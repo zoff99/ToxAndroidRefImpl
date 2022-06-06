@@ -42,7 +42,9 @@ jobs:
            sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/jni-c-toxcore/* /root/work/jni-c-toxcore/
            sudo mkdir -p /root/work/android-refimpl-app/
            sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/* /root/work/android-refimpl-app/
-
+           # sudo git clone https://github.com/zoff99/ToxAndroidRefImpl /root/work/trifa_master_src
+           # sudo mkdir -p /root/work/android-refimpl-app/app/
+           # sudo cp -av /root/work/trifa_master_src/android-refimpl-app/app/* /root/work/android-refimpl-app/app/
     - name: build_maven_deps
       run: |
            sudo mkdir -p ~/work/deploy
