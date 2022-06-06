@@ -72,6 +72,11 @@ jobs:
            pwd
            sudo bash -c "cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
 
+    - name: acls_maven_pkg
+      run: |
+           sudo chmod -R a+rx /root/work/artefacts/
+           sudo chmod a+r /root/work/artefacts/local_maven_trifa_jni*.zip
+
     - name: upload apk
       uses: actions/upload-artifact@v2
       with:
