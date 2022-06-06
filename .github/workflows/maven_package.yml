@@ -21,9 +21,8 @@ jobs:
 
     - name: pkgs
       run: |
-           apt update &&
-           export DEBIAN_FRONTEND=noninteractive &&
-           apt install -y --no-install-recommends
+           sudo apt update &&
+           sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends
            clang
            cmake
            libconfig-dev
