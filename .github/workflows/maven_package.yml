@@ -64,6 +64,6 @@ jobs:
     - name: upload apk
       uses: actions/upload-artifact@v1
       with:
-        name: trifa
-        path: /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk
+        name: local_maven_trifa_jni_1.x.yy.zip
+        path: /root/work/artefacts/local_maven_trifa_jni_*.zip
 

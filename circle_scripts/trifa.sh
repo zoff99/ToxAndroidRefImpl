@@ -287,24 +287,9 @@ cd $_s_/trifa_src/android-refimpl-app/ ; ./gradlew :jnilib:install --info
 cd $_s_/trifa_src/android-refimpl-app/
 ls -al ./gradlew
 
-if [[ "$current_git_tag""x"  =~ ^trifajni-.* ]] ; then
-    echo "############### ------------ ###################"
-    echo "############### ------------ ###################"
-    echo "trying to upload artefact to bintray ..."
-    echo "############### ------------ ###################"
-    echo "############### ------------ ###################"
-    ./gradlew :jnilib:bintrayUpload --info
-    echo "############### ------------ ###################"
-    echo "############### ------------ ###################"
-    echo "trying to upload artefact to bintray ... DONE"
-    echo "############### ------------ ###################"
-    echo "############### ------------ ###################"
-else
-    echo "not uploading artefact to bintray!! -> not maven branch"
-fi
-
 find ~/.m2/repository -type f -exec ls -al {} \;
 # --------- bintray artefact -------------
+
 # --------- show generated aar file -----------
 cd $_s_/trifa_src/android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/
 cd ~ ; find ./ -name '*.aar' | grep 'trifa-jni'
