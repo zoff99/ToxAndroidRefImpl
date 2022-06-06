@@ -38,15 +38,15 @@ jobs:
 
     - name: build_maven_deps
       run: |
-           mkdir -p ~/work/deploy
-           mkdir -p ~/.android/ ; touch ~/.android/debug.keystore
+           sudo mkdir -p ~/work/deploy
+           sudo mkdir -p ~/.android/ ; sudo touch ~/.android/debug.keystore
            pwd
-           mkdir -p build_dir ; cd build_dir ; pwd ; ls -al ; bash ../circle_scripts/deps.sh ""
+           sudo mkdir -p build_dir ; cd build_dir ; pwd ; ls -al ; sudo bash ../circle_scripts/deps.sh ""
 
     - name: build_maven_pkg
       run: |
            pwd
-           cd build_dir ; bash ../circle_scripts/trifa.sh '../'
+           cd build_dir ; sudo bash ../circle_scripts/trifa.sh '../'
 
     - name: upload apk
       uses: actions/upload-artifact@v1
