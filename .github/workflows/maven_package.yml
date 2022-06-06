@@ -1,6 +1,13 @@
 name: Maven Package CI
 
-on: [push, pull_request]
+on:
+  release:
+    types: [published, edited]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
 
 jobs:
   build:
@@ -8,7 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
     - name: set up JDK 1.8
       uses: actions/setup-java@v1
       with:
@@ -62,8 +71,8 @@ jobs:
            sudo bash -c "cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
 
     - name: upload apk
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: local_maven_trifa_jni_1.x.yy.zip
-        path: /root/work/artefacts/local_maven_trifa_jni_*.zip
+        path: /root/work/artefacts/local_maven_trifa_jni*.zip
 
