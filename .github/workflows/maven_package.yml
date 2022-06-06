@@ -40,6 +40,8 @@ jobs:
       run: |
            sudo mkdir -p /root/work/jni-c-toxcore/
            sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/jni-c-toxcore/* /root/work/jni-c-toxcore/
+           sudo mkdir -p /root/work/android-refimpl-app/
+           sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/* /root/work/android-refimpl-app/
 
     - name: build_maven_deps
       run: |
