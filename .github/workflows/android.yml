@@ -23,7 +23,7 @@ jobs:
       run: cd android-refimpl-app ; ./gradlew assembleRelease
 
     - name: upload apk
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v3
       with:
         name: trifa
         path: /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk
@@ -71,7 +71,7 @@ jobs:
           cd android-refimpl-app ; ./gradlew connectedAndroidTest || echo "NOERR"
 
     - name: upload screenshots
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: macscreen
         path: |
