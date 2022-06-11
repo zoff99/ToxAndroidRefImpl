@@ -71,7 +71,15 @@ jobs:
           screencapture -T 52 -x -t png /Users/runner/screen09.png &
           screencapture -T 53 -x -t png /Users/runner/screen10.png &
           screencapture -T 60 -x -t png /Users/runner/screen11.png &
-          screencapture -T 80 -x -t png /Users/runner/screen12.png &
+          screencapture -T 61 -x -t png /Users/runner/screen12.png &
+          screencapture -T 62 -x -t png /Users/runner/screen13.png &
+          screencapture -T 63 -x -t png /Users/runner/screen14.png &
+          screencapture -T 64 -x -t png /Users/runner/screen15.png &
+          screencapture -T 65 -x -t png /Users/runner/screen16.png &
+          screencapture -T 66 -x -t png /Users/runner/screen17.png &
+          screencapture -T 67 -x -t png /Users/runner/screen18.png &
+          screencapture -T 68 -x -t png /Users/runner/screen19.png &
+          screencapture -T 69 -x -t png /Users/runner/screen20.png &
           screencapture -T 240 -x -t png /Users/runner/screen99.png &
           cd android-refimpl-app ; ./gradlew connectedAndroidTest || echo "NOERR"
 
