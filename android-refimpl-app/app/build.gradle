@@ -367,10 +367,10 @@ dependencies {
         exclude group: 'com.android.support'
     }
     //
-    implementation('com.github.bumptech.glide:glide:4.13.1') {
+    implementation('com.github.bumptech.glide:glide:4.13.2') {
         exclude group: 'com.android.support'
     }
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.13.1'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
     //
     //
     //
