@@ -77,15 +77,15 @@
     <string name="pref_title_fps_half">снизить количество кадров в секунду</string>
     <string name="pref_description_fps_half">Снизить частоту кадров вдвое: 12 кадров в секунду вместо 25 кадров в секунду</string>
     <string name="pref_title_set_fps">установить количество кадров в секунду</string>
-    <string name="pref_description_set_fps">попробуйте выставить 15 кадров в секунду, но на некоторых телефонах это может привести к сбою</string>
+    <string name="pref_description_set_fps">попробуйте выставить 15 кадров в секунду. На некоторых телефонах это может привести к сбою</string>
     <string name="pref_title_display_name">Показать имя</string>
     <string name="pref_default_display_name">Джон Смит</string>
     <string name="pref_title_conference_show_system_messages">Системные сообщения</string>
     <string name="pref_description_conference_show_system_messages">показать системные сообщения в конференциях</string>
-    <string name="pref_title_local_discovery_enabled">Обнаружение локальной сети</string>
+    <string name="pref_title_local_discovery_enabled">Обнаружение в локальной сети</string>
     <string name="pref_description_local_discovery_enabled">использовать начальные узлы из локальной сети</string>
-    <string name="pref_title_U_keep_nospam">соханить NoSpam</string>
-    <string name="pref_description_U_keep_nospam">сохранить значение NoSpam. Это небезопасно, активируйте только если вы знаете, что делаете!</string>
+    <string name="pref_title_U_keep_nospam">сохранить NoSpam</string>
+    <string name="pref_description_U_keep_nospam">сохранить значение NoSpam. Это небезопасно! Активируйте только если вы знаете, что делаете!</string>
     <string name="pref_title_allow_screen_off_in_audio_call">Выключить экран</string>
     <string name="pref_description_allow_screen_off_in_audio_call">Если у вас возникли проблемы с отключением экрана при аудиозвонках, отключите эту функцию</string>
     <string name="pref_title_X_zoom_incoming_video">Масштаб окна видеозвонка</string>
@@ -214,7 +214,7 @@
     <string name="MainActivity_ok_take_me_there_button">Хорошо, примите меня туда</string>
     <string name="MainActivity_info_dialog_title">ИНФОРМАЦИЯ</string>
     <string name="MainActivity_add_to_batt_opt">Пожалуйста, добавьте TRIfA в список исключений экономии батареи!</string>
-    <string name="MainActivity_friend_is_typing">друг печатает ...</string>
+    <string name="MainActivity_friend_is_typing">друг печатает …</string>
     <string name="MainActivity_notification_new_message">новое сообщение</string>
     <string name="MainActivity_notification_new_message2">новое сообщение</string>
     <string name="MainActivity_button_ok">Хорошо</string>
@@ -228,8 +228,8 @@
     <string name="MainActivity_notification_new_message5">новое сообщение</string>
     <string name="Aboutpage_0">Журнал сбоев TRIfA</string>
     <string name="Aboutpage_2">отправить отчет о сбое по электронной почте</string>
-    <string name="Aboutpage_4">чтение информации о сбое ...</string>
-    <string name="Aboutpage_5a">TRIfA - Tox-клиент для Android</string>
+    <string name="Aboutpage_4">чтение информации о сбое …</string>
+    <string name="Aboutpage_5a">TRIfA — Tox-клиент для Android</string>
     <string name="Aboutpage_5b">Версия:</string>
     <string name="Aboutpage_6">Что такое Tox\?</string>
     <string name="Aboutpage_8">используемые библиотеки:</string>
@@ -239,12 +239,13 @@
     <string name="CallingActivity_23">Задержка видео:</string>
     <string name="ConferenceAudioActivity_10">Список пользователей</string>
     <string name="ConferenceAudioActivity_17">Нажми, чтобы говорить</string>
-    <string name="ConferenceAudioActivity_18">...</string>
+    <string name="ConferenceAudioActivity_18">говорение …</string>
     <string name="GroupActivityActive">Активный:</string>
     <string name="GroupActivityOffline">Не в сети:</string>
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">сканировать QR-код</string>
-    <string name="layout___enter_pass_longtext">Введите пароль \nНет опции восстановления!</string>
+    <string name="layout___enter_pass_longtext">Введите пароль
+\nНет опции восстановления!</string>
     <string name="layout___unlock">Разблокировать</string>
     <string name="layout___name">Имя</string>
     <string name="layout___push_to_talk">Нажмите, чтобы говорить</string>
@@ -254,19 +255,19 @@
     <string name="layout___alias">Псевдоним</string>
     <string name="layout___remove_friends_relay">удалить эстафету друзей</string>
     <string name="layout___friends_relay_pubkey">Эстафета друзей публичного ключа:</string>
-    <string name="layout___waiting_for_orbot">ожидание Orbot ...</string>
+    <string name="layout___waiting_for_orbot">ожидание Orbot …</string>
     <string name="layout___clear_glide_cache">очистить скользящий кэш</string>
     <string name="layout___set_app_language">установить язык приложения</string>
-    <string name="layout___run_vacuum_on_sql_database">запустить VACUUM в базе данных SQL</string>
-    <string name="layout___run_analyze_on_sql_database">запустить ANALYZE в базе данных SQL</string>
+    <string name="layout___run_vacuum_on_sql_database">запустить VACUUM по базе данных SQL</string>
+    <string name="layout___run_analyze_on_sql_database">запустить ANALYZE по базе данных SQL</string>
     <string name="layout___reset_favorite_emoji_list">сбросить список любимых эмодзи</string>
     <string name="layout___delete_all_avatar_icons">удалить все аватары</string>
     <string name="layout___update_bootstrapnodes_from_internet">обновить список начальных узлов из Интернета</string>
     <string name="layout___reset_bootstrapnodes_to_default">сбросить начальные узлы к настроенным по умолчанию</string>
     <string name="layout___test_notification_sound">проверить звуковое оповещение</string>
     <string name="layout___test_ringtone_sound">проверить звук звонка</string>
-    <string name="layout___export_tox_savedata_unsecure">экспортировать сохраненные данные Tox * не безопасно *</string>
-    <string name="layout___im_port_tox_savadata_unsecure">импорт сохранённых данных Tox * небезопасно *</string>
+    <string name="layout___export_tox_savedata_unsecure">экспортировать сохраненные данные Tox *небезопасно*</string>
+    <string name="layout___im_port_tox_savadata_unsecure">импорт сохранённых данных Tox *небезопасно*</string>
     <string name="layout___click_image_to_change_your_avatar">нажмите на изображение, чтобы изменить свой аватар</string>
     <string name="layout___remove_own_relay">удалить собственный релей</string>
     <string name="layout___relay_pubkey">Эстафета публичного ключа:</string>
@@ -275,11 +276,11 @@
     <string name="layout___copy_toxid">скопировать ToxID</string>
     <string name="layout___your_toxidenticon">Ваш значок-идентификатор Tox</string>
     <string name="layout___active_network_connections">активные сетевые подключения:</string>
-    <string name="layout___error_getting_active_network_connections">* ошибка получения активных сетевых подключений *</string>
+    <string name="layout___error_getting_active_network_connections">*ошибка получения активных сетевых подключений*</string>
     <string name="layout___set_password_or_skip">Установите пароль или пропустите.
 \n
-\nПри пропуске пароль
-\nбудет сгенерирован автоматически
+\nПри пропуске, пароль будет
+\nсгенерирован автоматически
 \nНет опции восстановления!</string>
     <string name="layout___password">Пароль</string>
     <string name="layout___password_again">Подтверждение пароля</string>
@@ -303,21 +304,21 @@
     <string name="pref_title_X_tox_set_do_not_sync_av">не синхронизировать аудио и видео</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">Кодировщик H264 должен использовать кадры внутреннего обновления</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">H264 внутреннее обновление</string>
-    <string name="pref_description_force_udp_only">принудительно использовать только UDP, при включении этой настройки некоторые контакты могут стать недоступными
+    <string name="pref_description_force_udp_only">принудительно использовать только UDP. При включении этой настройки некоторые контакты могут стать недоступными
 \nТребуется перезапуск!</string>
     <string name="pref_title_force_udp_only">принудительный режим UDP</string>
-    <string name="pref_description_mic_gain_factor">Установите более высокое усиление, если ваш микрофон записывает с низкой громкостью</string>
+    <string name="pref_description_mic_gain_factor">Увеличьте усиление, если ваш микрофон слишком тихий</string>
     <string name="pref_title_mic_gain_factor">Усиление микрофона</string>
     <string name="pref_description_global_font_size">Выбрать размер шрифта</string>
     <string name="pref_title_global_font_size">Размер шрифта</string>
     <string name="pref_description_video_cam_resolution">Какое разрешение использовать для видеозвонков</string>
     <string name="pref_title_video_cam_resolution">Разрешение камеры</string>
-    <string name="pref_description_auto_accept_video">автоматически принимать видео размером до 20 МБ</string>
+    <string name="pref_description_auto_accept_video">автоматически принимать видео размером до 40 МБ</string>
     <string name="pref_title_auto_accept_video">автоматически принимать видео</string>
     <string name="conference_audio_activity_player_name">Проигрыватель аудиоконференций</string>
     <string name="layout___migdb_do_not_close">НЕ закрывайте этот экран</string>
     <string name="layout___migdb_text">Перенос файлов базы данных</string>
-    <string name="messages_search_default_text">поиск ...</string>
+    <string name="messages_search_default_text">поиск …</string>
     <string name="MainActivity_new_noti_token_dialog_text">Получен новый токен уведомления. Использовать этот токен\?</string>
     <string name="MainActivity_new_noti_token_dialog_title">Токен</string>
     <string name="MainActivity_yes_button">да</string>
@@ -325,9 +326,57 @@
     <string name="pref_title_auto_accept_all_upto">автоматически принимать все файлы</string>
     <string name="title_activity_wrong_credentials">Неверные учетные данные</string>
     <string name="wrong_credentials_error">Неверные учетные данные</string>
-    <string name="layout___iobrowser_start">просматривать зашифрованное хранилище</string>
+    <string name="layout___iobrowser_start">просмотреть зашифрованное хранилище</string>
     <string name="pref_description_start_on_boot">запуск приложения после загрузки.
-\nGoogle больше не допускает этого, начиная с Android 10</string>
+\nНачиная с Android 10, Google отобрал эту возможность</string>
     <string name="pref_title_start_on_boot">запускать при загрузке</string>
     <string name="pref_title_window_security">запретить скриншоты</string>
+    <string name="pref_title_compact_friendlist">Сжать список друзей</string>
+    <string name="title_activity_groupinfo">Информация о группе</string>
+    <string name="pref_description_window_security">Включение этой настройки добавит флаг FLAG_SECURE всем активити.
+\nЭто не позволит сделать скриншот программы, записать её на видео и увидеть миниатюру с содержимым в списке последних программ</string>
+    <string name="add_public_group_activity_help">Создать открытую группу с указанным названием.</string>
+    <string name="join_public_group_activity_help">Присоединиться к открытой группе с указанным Group ID.</string>
+    <string name="join_public_group_failed">Не удалось присоединиться к открытой группе</string>
+    <string name="join_public_group_joined">Вы присоединились к открытой группе</string>
+    <string name="add_group_activity_add">Создать группу</string>
+    <string name="join_group_activity_join">Присоединиться к группе</string>
+    <string name="add_private_group_success">Вы создали частную группу</string>
+    <string name="add_friend_failed">не удалось добавить друга</string>
+    <string name="add_friend_success">Вы добавили нового друга</string>
+    <string name="add_private_group_failed">Не удалось создать частную группу</string>
+    <string name="layout___group_id2">Group ID:</string>
+    <string name="layout___group_name2">Название группы:</string>
+    <string name="layout___group_myname2">моё имя в группе:</string>
+    <string name="layout___group_id">Group ID</string>
+    <string name="layout___group_mypubjkey2">Мой публичный ключ:</string>
+    <string name="layout___join_public_group">Присоединиться к открытой группе</string>
+    <string name="pref_title_speakerphone_tweak">Исправление для громкоговорителя при звонках</string>
+    <string name="pref_description_speakerphone_tweak">Если приложение не переключается на громкоговоритель при аудиозвонках, попробуйте включить эту опцию.</string>
+    <string name="add_public_group_failed">Не удалось создать открытую группу</string>
+    <string name="add_public_group_success">Вы создали открытую группу</string>
+    <string name="layout___create_new_public_group">Создать новую открытую группу</string>
+    <string name="layout___conf_id">ID конференции:</string>
+    <string name="add_group_activity_name">Создать частную группу</string>
+    <string name="group_message_list_activity_name">Группа</string>
+    <string name="pref_title_use_incognito_keyboard2">клавиатура в режиме инкогнито</string>
+    <string name="pref_description_use_incognito_keyboard2">клавиатура не будет обучаться и обрабатывать вводимые слова</string>
+    <string name="pref_description_compact_friendlist">Сделать список друзей более компактным. Удобно, если у вас много друзей</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">поделиться файлами</string>
+    <string name="layout___capabilities">Возможности:</string>
+    <string name="layout___conf_title">Название:</string>
+    <string name="add_group_activity_help">Создать частную (доступную только по приглашению) группу с указанным названием.</string>
+    <string name="title_activity_conferenceinfo">Информация о конференции</string>
+    <string name="add_public_group_activity_name">Создать открытую группу</string>
+    <string name="join_public_activity_name">Присоединиться к открытой группе</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">добавляет возможность отправить файлы в TRIfA.</string>
+    <string name="pref_title_use_camera_x">Удаление фона</string>
+    <string name="pref_description_use_camera_x">!! Экспериментальная функция !!
+\nИспользовать CameraX и Remove background в видеозвонках
+\nЭта функция может не работать от слова совсем. Не полагайтесь на неё слишком сильно!</string>
+    <string name="layout___group_name">Название группы</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">экспортировать зашифрованные чаты *небезопасно*</string>
+    <string name="layout___add_friend">Добавить друга</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">экспортировать зашифрованные файлы *небезопасно*</string>
+    <string name="layout___create_new_private_group">Создать новую частную группу</string>
 </resources>
