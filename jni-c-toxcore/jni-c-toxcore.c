@@ -7412,20 +7412,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
     }
     else
     {
-#ifdef JAVA_LINUX
-        // HINT: workaround, java JNI for linux does not give jlong larger than (0xFFFFFFFFL/2) back correctly.
-        //       i could not find out why
-        if ((long)message_id > (long)(0xFFFFFFFFL/2))
-        {
-            return (jlong)(-((long)message_id - (0xFFFFFFFFL/2)));
-        }
-        else
-        {
-            return (jlong)message_id;
-        }
-#else
-        return (jlong)(unsigned long long)message_id;
-#endif
+        return (jlong)message_id;
     }
 #endif
 }
