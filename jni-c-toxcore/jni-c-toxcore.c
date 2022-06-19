@@ -7412,7 +7412,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
     }
     else
     {
-        return (jlong)message_id;
+        return (jlong)(unsigned long long)message_id;
     }
 #endif
 }
