@@ -7350,6 +7350,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
         return (jlong)-22;
     }
 
+    uint32_t message_id = -1;
+    bool res;
+    Tox_Err_Group_Send_Message error;
+
 #ifdef JAVA_LINUX
 
     const jclass stringClass = (*env)->GetObjectClass(env, (jstring)message);
@@ -7362,9 +7366,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
     jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
-    uint32_t message_id;
-    Tox_Err_Group_Send_Message error;
-    bool res = tox_group_send_message(tox_global, (uint32_t)group_number, (int)type, (const uint8_t *)pBytes,
+    res = tox_group_send_message(tox_global, (uint32_t)group_number, (int)type, (const uint8_t *)pBytes,
                                            (size_t)plength, &message_id, &error);
     (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
     (*env)->DeleteLocalRef(env, stringJbytes);
@@ -7374,9 +7376,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
     const char *message_str = NULL;
     // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
-    uint32_t message_id;
-    Tox_Err_Group_Send_Message error;
-    bool res = tox_group_send_message(tox_global, (uint32_t)group_number, (int)type, (const uint8_t *)message_str,
+    res = tox_group_send_message(tox_global, (uint32_t)group_number, (int)type, (const uint8_t *)message_str,
                                            (size_t)strlen(message_str), &message_id, &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
 
@@ -7412,7 +7412,20 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv
     }
     else
     {
+#ifdef JAVA_LINUX
+        // HINT: workaround, java JNI for linux does not give jlong larger than (0xFFFFFFFFL/2) back correctly.
+        //       i could not find out why
+        if ((long)message_id > (long)(0xFFFFFFFFL/2))
+        {
+            return (jlong)(-((long)message_id - (0xFFFFFFFFL/2)));
+        }
+        else
+        {
+            return (jlong)message_id;
+        }
+#else
         return (jlong)(unsigned long long)message_id;
+#endif
     }
 #endif
 }
