@@ -322,7 +322,7 @@ dependencies {
     //implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
     //    transitive = true
     //}
-    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.103') {
+    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.104') {
         transitive = true
     }
     //
