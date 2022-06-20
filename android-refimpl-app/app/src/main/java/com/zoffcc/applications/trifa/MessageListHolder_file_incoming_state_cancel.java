@@ -54,6 +54,8 @@ import java.net.URLConnection;
 import androidx.recyclerview.widget.RecyclerView;
 import info.guardianproject.iocipher.File;
 
+import static com.zoffcc.applications.trifa.HelperFiletransfer.check_if_incoming_file_was_exported;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.open_local_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
@@ -237,6 +239,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE_FT_NORMAL);
             }
 
+            String export_filename_with_path = check_if_incoming_file_was_exported(message2);
+
             boolean is_image = false;
             boolean is_video = false;
             try
@@ -355,6 +359,26 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             {
                 try
                 {
+                    if (export_filename_with_path == null)
+                    {
+                        ft_preview_image.setOnTouchListener(null);
+                    }
+                    else
+                    {
+                        ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                        {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event)
+                            {
+                                if (event.getAction() == MotionEvent.ACTION_UP)
+                                {
+                                    open_local_file(export_filename_with_path, v.getContext());
+                                }
+                                return true;
+                            }
+                        });
+                    }
+
                     final Drawable d4 = new IconicsDrawable(context).
                             icon(GoogleMaterial.Icon.gmd_ondemand_video).
                             backgroundColor(Color.TRANSPARENT).
@@ -388,7 +412,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 priority(Priority.LOW).
                                 into(ft_preview_image);
                     }
-                    ft_preview_image.setOnTouchListener(null);
                 }
                 catch (Exception e)
                 {
@@ -415,8 +438,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                         placeholder(R.drawable.round_loading_animation).
                         into(ft_preview_image);
 
+                Log.i(TAG, "open_incoming_file:001");
+
                 if (PREF__allow_open_encrypted_file_via_intent)
                 {
+                    Log.i(TAG, "open_incoming_file:002");
                     ft_preview_image.setOnTouchListener(new View.OnTouchListener()
                     {
                         @Override
@@ -469,12 +495,46 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 }
                 else
                 {
-                    ft_preview_image.setOnTouchListener(null);
+                    Log.i(TAG, "open_incoming_file:003");
+                    if (export_filename_with_path == null)
+                    {
+                        Log.i(TAG, "open_incoming_file:004");
+                        ft_preview_image.setOnTouchListener(null);
+                    }
+                    else
+                    {
+                        Log.i(TAG, "open_incoming_file:005");
+                        ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                        {
+                            @Override
+                            public boolean onTouch(View v, MotionEvent event)
+                            {
+                                if (event.getAction() == MotionEvent.ACTION_UP)
+                                {
+                                    Log.i(TAG, "open_incoming_file:006:" + export_filename_with_path);
+                                    open_local_file(export_filename_with_path, v.getContext());
+                                }
+                                return true;
+                            }
+                        });
+                    }
+
                 }
             }
 
             ft_export_button_container.setVisibility(View.VISIBLE);
             ft_export_button.setVisibility(View.VISIBLE);
+
+            if (export_filename_with_path == null)
+            {
+                Log.i(TAG, "ft_export_button.setImageResource:EXPORT");
+                ft_export_button.setImageResource(android.R.drawable.ic_menu_save);
+            }
+            else
+            {
+                Log.i(TAG, "ft_export_button.setImageResource:is exported");
+                ft_export_button.setImageResource(android.R.drawable.ic_menu_set_as);
+            }
 
             ft_export_button.setOnTouchListener(new View.OnTouchListener()
             {
@@ -596,7 +656,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         {
             e.printStackTrace();
         }
-
     }
 
     @Override

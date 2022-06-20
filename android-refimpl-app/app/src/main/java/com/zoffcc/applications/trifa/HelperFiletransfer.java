@@ -19,9 +19,12 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import com.zoffcc.applications.trifa.MessageListActivity.outgoing_file_wrapped;
 
@@ -33,7 +36,9 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
+import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_fileExt;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_message_accepted_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_queueing_from_id;
@@ -44,6 +49,7 @@ import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_all_upto;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_video;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_OUTGOING_WRAPPER_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
@@ -962,6 +968,51 @@ public class HelperFiletransfer
         catch (Exception e)
         {
             return null;
+        }
+    }
+
+    static String check_if_incoming_file_was_exported(final Message m)
+    {
+        Log.i(TAG, "check_if_incoming_file_was_exported");
+
+        try
+        {
+            final String export_filename = SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey + "/";
+            final FileDB file_ = orma.selectFromFileDB().idEq(m.filedb_id).get(0);
+            java.io.File f = new java.io.File(export_filename + file_.file_name);
+            if (f.exists() && (f.isFile()) && (f.canRead() && (f.length() > 0)))
+            {
+                Log.i(TAG, "check_if_incoming_file_was_exported:" + (export_filename + file_.file_name));
+                return export_filename + file_.file_name;
+            }
+            else
+            {
+                Log.i(TAG, "check_if_incoming_file_was_exported:null");
+                return null;
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "check_if_incoming_file_was_exported:EE:" + e.getMessage());
+            return null;
+        }
+    }
+
+    static void open_local_file(final String filename_fullpath, final Context context)
+    {
+        try
+        {
+            MimeTypeMap myMime = MimeTypeMap.getSingleton();
+            Intent newIntent = new Intent(Intent.ACTION_VIEW);
+            String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));
+            Uri file_uri = Uri.parse(filename_fullpath);
+            newIntent.setDataAndType(file_uri, mimeType);
+            context.startActivity(newIntent);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            display_toast("opening file failed", false, 0);
         }
     }
 }
