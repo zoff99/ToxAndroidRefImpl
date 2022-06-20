@@ -7726,7 +7726,7 @@ public class MainActivity extends AppCompatActivity
             {
                 progressDialog2.dismiss();
                 Context c = weakContext.get();
-                Toast.makeText(c, "File exported to:" + "\n" + fname + f.file_name, Toast.LENGTH_LONG).show();
+                Toast.makeText(c, "File exported to:" + "\n" + fname + f.file_name, Toast.LENGTH_SHORT).show();
             }
             catch (Exception e4)
             {
