@@ -973,8 +973,6 @@ public class HelperFiletransfer
 
     static String check_if_incoming_file_was_exported(final Message m)
     {
-        Log.i(TAG, "check_if_incoming_file_was_exported");
-
         try
         {
             final String export_filename = SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey + "/";
@@ -982,7 +980,6 @@ public class HelperFiletransfer
             java.io.File f = new java.io.File(export_filename + file_.file_name);
             if (f.exists() && (f.isFile()) && (f.canRead() && (f.length() > 0)))
             {
-                Log.i(TAG, "check_if_incoming_file_was_exported:" + (export_filename + file_.file_name));
                 return export_filename + file_.file_name;
             }
             else

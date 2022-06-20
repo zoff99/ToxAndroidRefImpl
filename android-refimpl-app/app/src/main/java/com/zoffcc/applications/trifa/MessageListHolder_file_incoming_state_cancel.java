@@ -439,11 +439,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                         placeholder(R.drawable.round_loading_animation).
                         into(ft_preview_image);
 
-                Log.i(TAG, "open_incoming_file:001");
-
                 if (PREF__allow_open_encrypted_file_via_intent)
                 {
-                    Log.i(TAG, "open_incoming_file:002");
                     ft_preview_image.setOnTouchListener(new View.OnTouchListener()
                     {
                         @Override
@@ -496,15 +493,12 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 }
                 else
                 {
-                    Log.i(TAG, "open_incoming_file:003");
                     if (export_filename_with_path == null)
                     {
-                        Log.i(TAG, "open_incoming_file:004");
                         ft_preview_image.setOnTouchListener(null);
                     }
                     else
                     {
-                        Log.i(TAG, "open_incoming_file:005");
                         ft_preview_image.setOnTouchListener(new View.OnTouchListener()
                         {
                             @Override
@@ -512,7 +506,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                             {
                                 if (event.getAction() == MotionEvent.ACTION_UP)
                                 {
-                                    Log.i(TAG, "open_incoming_file:006:" + export_filename_with_path);
                                     open_local_file(export_filename_with_path, v.getContext());
                                 }
                                 return true;
@@ -528,12 +521,10 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
             if (export_filename_with_path == null)
             {
-                Log.i(TAG, "ft_export_button.setImageResource:EXPORT");
                 ft_export_button.setImageResource(android.R.drawable.ic_menu_save);
             }
             else
             {
-                Log.i(TAG, "ft_export_button.setImageResource:is exported");
                 ft_export_button.setImageResource(android.R.drawable.ic_menu_set_as);
             }
 
