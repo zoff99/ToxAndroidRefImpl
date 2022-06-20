@@ -34,6 +34,7 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -553,6 +554,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                         @Override
                                         public void onClick(DialogInterface dialog, int which)
                                         {
+                                            final int view_position_in_adapter = getAbsoluteAdapterPosition();
+                                            final RecyclerView.Adapter<? extends RecyclerView.ViewHolder> adapter = getBindingAdapter();
+
+                                            getBindingAdapter().notifyItemChanged(1);
+
                                             try
                                             {
                                                 final String export_filename =
@@ -585,7 +591,10 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                                 new MainActivity.save_selected_message_custom_asynchtask(v.getContext(),
                                                                                                          progressDialog2,
                                                                                                          file_,
-                                                                                                         export_filename).execute();
+                                                                                                         export_filename,
+                                                                                                         adapter,
+                                                                                                         view_position_in_adapter,
+                                                                                                         v).execute();
                                             }
                                             catch (Exception e)
                                             {

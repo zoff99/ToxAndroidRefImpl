@@ -112,6 +112,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.renderscript.Allocation;
 import androidx.renderscript.Element;
 import androidx.renderscript.RenderScript;
@@ -7680,13 +7681,19 @@ public class MainActivity extends AppCompatActivity
         private final String export_directory = "";
         private final FileDB f;
         private final String fname;
+        private final View v;
+        private final RecyclerView.Adapter<? extends RecyclerView.ViewHolder> a;
+        private final int pos;
 
-        save_selected_message_custom_asynchtask(Context c, ProgressDialog progressDialog2, FileDB file_, String export_filename)
+        save_selected_message_custom_asynchtask(Context c, ProgressDialog progressDialog2, FileDB file_, String export_filename, RecyclerView.Adapter<? extends RecyclerView.ViewHolder> a, int pos_in_adaper, View v)
         {
             this.weakContext = new WeakReference<>(c);
             this.progressDialog2 = progressDialog2;
             this.f = file_;
             this.fname = export_filename;
+            this.v = v;
+            this.a = a;
+            this.pos = pos_in_adaper;
         }
 
         @Override
@@ -7706,6 +7713,15 @@ public class MainActivity extends AppCompatActivity
         @Override
         protected void onPostExecute(String result)
         {
+            try
+            {
+                a.notifyItemChanged(pos);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
             try
             {
                 progressDialog2.dismiss();
