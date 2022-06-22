@@ -240,4 +240,53 @@
 \nΌταν επιλέγετε να παραλείψετε ένα
 \nκωδικός πρόσβασης θα δημιουργηθεί αυτόματα
 \nΔεν υπάρχει επιλογή ανάκτησης!</string>
+    <string name="group_message_list_activity_name">Ομάδα</string>
+    <string name="pref_title_custom_bootstrap_nodes">Χρησιμοποιήστε προσαρμοσμένους κόμβους bootstrap</string>
+    <string name="pref_description_use_camera_x">!! Πειραματικό !!
+\nΧρησιμοποιήστε το CameraΧ και αφαιρέστε το φόντο σε βιντεοκλήσεις
+\nΑυτό μπορεί να μην λειτουργήσει πλήρως, παρακαλώ να είστε προσεκτικοί και να μην εξαρτηθείτε σε αυτή την λειτουργία πάντα!</string>
+    <string name="MainActivity_setup_push_tip_text">Δεν έχετε εγκαταστήσει και ρυθμίσει την εφαρμογή ειδοποιήσεων Push. Το TΡΙfΑ θα λειτουργήσει πλήρως χωρίς ειδοποίηση ώθησης, αλλά πρέπει να είναι συνεχώς σε απευθείας σύνδεση για να λαμβάνετε μηνύματα. Με την προώθηση ειδοποίησης μπορείτε να βελτιώσετε την χρηση μπαταρίας και το internet bandwidth.
+\n
+\nΘέλετε να δείτε πώς μπορείτε να ρυθμίσετε την ειδοποίηση ώθησης τώρα;</string>
+    <string name="layout___group_mypubjkey2">Το pubkey μου:</string>
+    <string name="title_activity_conferenceinfo">Πληροφορίες διάσκεψης</string>
+    <string name="add_group_activity_name">Δημιουργία ιδιωτικής ομάδας</string>
+    <string name="add_public_group_activity_name">Δημιουργία δημόσιας ομάδας</string>
+    <string name="join_public_activity_name">Συμμετοχή σε δημόσια ομάδα</string>
+    <string name="layout___conf_title">Τίτλος:</string>
+    <string name="title_activity_groupinfo">Πληροφορίες ομάδας</string>
+    <string name="pref_description_use_incognito_keyboard2">Ενεργοποιήστε το για να ενημερώσετε το πληκτρολόγιο ώστε να μην μαθαίνει από τις καταχωρημένες σας λέξεις</string>
+    <string name="pref_title_download_push_msg_app">Λήψη εφαρμογής μηνυμάτων ώθησης</string>
+    <string name="pref_title_use_camera_x">Αφαίρεση φόντου</string>
+    <string name="add_group_activity_help">Δημιουργήστε μια νέα ιδιωτική (μόνο με πρόσκληση) ομάδα με ένα δεδομένο όνομα ομάδας.</string>
+    <string name="add_private_group_failed">Η δημιουργία ιδιωτικής ομάδας απέτυχε</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Αφαίρεση εικόνας προφίλ</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Θέλετε να καταργήσετε την εικόνα του προφίλ σας;</string>
+    <string name="layout___create_new_private_group">Δημιουργήστε νέα ιδιωτική ομάδα</string>
+    <string name="layout___create_new_public_group">Δημιουργήστε νέα δημόσια ομάδα</string>
+    <string name="title_activity_grouppeerinfo">Πληροφορίες ατόμου ομάδας</string>
+    <string name="pref_title_use_incognito_keyboard2">Ανωνυμία πληκτρολογίου</string>
+    <string name="add_public_group_activity_help">Δημιουργήστε μια νέα δημόσια ομάδα με ένα δεδομένο όνομα ομάδας.</string>
+    <string name="join_public_group_activity_help">Εγγραφείτε σε μια δημόσια ομάδα με το δεδομένο αναγνωριστικό ομάδας.</string>
+    <string name="add_group_activity_add">Δημιουργία ομάδας</string>
+    <string name="join_group_activity_join">Συμμετοχή σε ομάδα</string>
+    <string name="join_public_group_joined">Έχετε συμμετάσχει στη δημόσια ομάδα</string>
+    <string name="join_public_group_failed">Η συμμετοχή στη δημόσια ομάδα απέτυχε</string>
+    <string name="add_public_group_failed">Η δημιουργία δημόσιας ομάδας απέτυχε</string>
+    <string name="add_public_group_success">Δημιουργήσατε μια δημόσια ομάδα</string>
+    <string name="add_private_group_success">Δημιουργήσατε μια ιδιωτική ομάδα</string>
+    <string name="add_friend_failed">Η προσθήκη φίλου απέτυχε</string>
+    <string name="add_friend_success">Έχετε προσθέσει έναν νέο φίλο</string>
+    <string name="layout___group_name">Όνομα ομάδας</string>
+    <string name="layout___group_id">Αναγνωριστικό ομάδας</string>
+    <string name="layout___conf_id">Αναγνωριστικό διάσκεψης:</string>
+    <string name="layout___group_id2">Αναγνωριστικό ομάδας:</string>
+    <string name="layout___group_name2">Όνομα ομάδας:</string>
+    <string name="layout___group_myname2">Το όνομά μου στην ομάδα:</string>
+    <string name="layout___add_friend">Προσθήκη φίλου</string>
+    <string name="layout___join_public_group">Εγγραφείτε σε μια δημόσια ομάδα</string>
+    <string name="pref_title_speakerphone_tweak">Διόρθωση μεγαφώνου για κλήσεις</string>
+    <string name="pref_description_speakerphone_tweak">Εάν η εφαρμογή δεν μεταβεί στο ηχείο σε μια κλήση, τότε προσπαθήστε να ενεργοποιήσετε αυτή την διόρθωση.</string>
+    <string name="MainActivity_setup_push_tip_title">Ρύθμιση Ειδοποιήσεων Push</string>
+    <string name="layout___capabilities">Δυνατότητες:</string>
 </resources>
