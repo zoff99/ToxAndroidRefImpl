@@ -480,7 +480,7 @@ public class HelperGroup
         }
     }
 
-    static void group_conference_all_messages(final String group_identifier)
+    static void delete_group_all_messages(final String group_identifier)
     {
         Thread t = new Thread()
         {

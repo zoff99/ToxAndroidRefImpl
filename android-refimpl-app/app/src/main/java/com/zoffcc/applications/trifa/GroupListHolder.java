@@ -41,11 +41,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.delete_group;
-import static com.zoffcc.applications.trifa.HelperGroup.group_conference_all_messages;
+import static com.zoffcc.applications.trifa.HelperGroup.delete_group_all_messages;
 import static com.zoffcc.applications.trifa.HelperGroup.group_identifier_short;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__dark_mode_pref;
-import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_leave;
@@ -184,8 +183,8 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             }
             String peer_num_text_color_text = "<font color=\"" + peer_num_text_color + "\">";
             String peer_num_text_color_text_end = "</font>";
-            peer_num_text_color_text="";
-            peer_num_text_color_text_end="";
+            peer_num_text_color_text = "";
+            peer_num_text_color_text_end = "";
 
             statusText.setText(Html.fromHtml("#" + fl.tox_group_number + " "
                                              //
@@ -388,12 +387,11 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                 {
                     final long group_num = tox_group_by_groupid__wrapper(f2.group_identifier);
                     tox_group_leave(group_num, "bye");
-                    cache_confid_confnum.clear();
                     update_savedata_file_wrapper(); // after deleteing a conference
                 }
 
                 Log.i(TAG, "onMenuItemClick:info:33");
-                group_conference_all_messages(f2.group_identifier);
+                delete_group_all_messages(f2.group_identifier);
                 delete_group(f2.group_identifier);
                 Log.i(TAG, "onMenuItemClick:info:34");
 
