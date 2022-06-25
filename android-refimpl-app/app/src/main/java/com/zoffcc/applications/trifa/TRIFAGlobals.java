@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.zoffcc.applications.trifa.ToxVars.MAX_FILE_DATA_SIZE;
+
 public class TRIFAGlobals
 {
     static String global_my_toxid = "";
@@ -173,9 +175,10 @@ public class TRIFAGlobals
     static String PREF_KEY_CUSTOM_BOOTSTRAP_TCP_PORT = "custom_bootstrap_tcp_port";
     static String PREF_KEY_CUSTOM_BOOTSTRAP_TCP_KEYHEX = "custom_bootstrap_tcp_keyhex";
 
-    static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES = 250000L; // 250 kBytes // update FT and progress bars every XX bytes
-    static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES = 15000L; // 15 kBytes
-    static final long UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES = 250000L; // 250 kByzes, less than this in bytes is a small file
+    static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES =
+            120L * MAX_FILE_DATA_SIZE; // update FT and progress bars every XX bytes
+    static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES = 8L * MAX_FILE_DATA_SIZE;
+    static final long UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES = 250000L; // less than this in bytes is a small file
 
     static final int FILE_PICK_METHOD = 2;
     static final String TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY = "-1";

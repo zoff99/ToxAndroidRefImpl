@@ -36,6 +36,11 @@ public class ToxVars
     public static final int TOX_NOSPAM_SIZE = sizeof_uint32_t;
     public static final int TOX_ADDRESS_SIZE = TOX_PUBLIC_KEY_SIZE + TOX_NOSPAM_SIZE + sizeof_uint16_t;
     public static final int TOX_MAX_MESSAGE_LENGTH = 1372;
+    public static final int CRYPTO_MAC_SIZE = 16;
+    public static final int CRYPTO_DATA_PACKET_MIN_SIZE = (1 + 2 + 4 + 4) + CRYPTO_MAC_SIZE;
+    public static final int MAX_CRYPTO_PACKET_SIZE = 1400;
+    public static final int MAX_CRYPTO_DATA_SIZE = (MAX_CRYPTO_PACKET_SIZE - CRYPTO_DATA_PACKET_MIN_SIZE);
+    public static final int MAX_FILE_DATA_SIZE = (MAX_CRYPTO_DATA_SIZE - 2); // == 1371 bytes!
     public static final int TOX_HASH_LENGTH = 32;
     public static final int TOX_FILE_ID_LENGTH = 32;
     public static final int TOX_MAX_FILENAME_LENGTH = 255;
