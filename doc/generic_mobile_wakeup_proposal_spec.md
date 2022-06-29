@@ -129,6 +129,6 @@
 ## Sanity checks on Push URL
 
 * check that URL starts with "https://"
-* allow URL to be empty, to indicate "removal" or Push URL
+* allow URL to be empty, to indicate "removal" of Push URL
 * show a Dialog to qTox user with information what this is used for and clearly show the URL within the Dialog
 
