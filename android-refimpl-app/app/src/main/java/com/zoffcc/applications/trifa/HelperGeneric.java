@@ -2464,10 +2464,10 @@ public class HelperGeneric
             ByteBuffer msg_id_buffer = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
             // use msg V2 API Call
             // long t_sec = (System.currentTimeMillis() / 1000);
-            long res = MainActivity.tox_util_friend_send_message_v2(friendnum_to_use, a_TOX_MESSAGE_TYPE,
-                                                                    timestamp_unixtime_seconds, message,
-                                                                    message.length(), raw_message_buf,
-                                                                    raw_message_length_buf, msg_id_buffer);
+            long res = MainActivity.tox_util_friend_send_message_v2_wrapper(friendnum_to_use, a_TOX_MESSAGE_TYPE,
+                                                                            timestamp_unixtime_seconds, message,
+                                                                            message.length(), raw_message_buf,
+                                                                            raw_message_length_buf, msg_id_buffer);
             if (PREF__X_battery_saving_mode)
             {
                 Log.i(TAG, "global_last_activity_for_battery_savings_ts:002:*PING*");

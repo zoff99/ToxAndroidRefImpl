@@ -37,6 +37,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytesToHex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperMessage.get_message_in_db_sent_push_is_read;
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_sent_push_set;
@@ -61,6 +62,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.write_debug_file2;
 
 public class HelperFriend
 {
@@ -1123,6 +1125,23 @@ public class HelperFriend
 
     static void send_friend_msg_receipt_v2_wrapper(final long friend_number, final int msg_type, final ByteBuffer msg_id_buffer, long t_sec_receipt)
     {
+        StackTraceElement[] s = Thread.currentThread().getStackTrace();
+
+        //Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:1:fn=" + friend_number + " msg_type=" + msg_type + " line:" +
+        //           s[1].getLineNumber() + " file:" + s[1].getFileName() + " method:" + s[1].getMethodName());
+        //Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:2:fn=" + friend_number + " msg_type=" + msg_type + " line:" +
+        //           s[3].getLineNumber() + " file:" + s[3].getFileName() + " method:" + s[3].getMethodName());
+        Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:2a:fn=" + friend_number + " msg_type=" + msg_type + " line:" +
+                   s[4].getLineNumber() + " file:" + s[4].getFileName() + " method:" + s[4].getMethodName());
+        Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:2b:msg_id=" +
+                   bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit()));
+
+        write_debug_file2(
+                "send_friend_msg_receipt_v2_wrapper:2a:fn=" + friend_number + " msg_type=" + msg_type + " line:" +
+                s[4].getLineNumber() + " file:" + s[4].getFileName() + " method:" + s[4].getMethodName());
+        write_debug_file2("send_friend_msg_receipt_v2_wrapper:2b:msg_id=" +
+                          bytesToHex(msg_id_buffer.array(), msg_id_buffer.arrayOffset(), msg_id_buffer.limit()));
+
         // (msg_type == 1) msgV2 direct message
         // (msg_type == 2) msgV2 relay message
         // (msg_type == 3) msgV2 group confirm msg received message
@@ -1130,7 +1149,7 @@ public class HelperFriend
         if (msg_type == 1)
         {
             // send message receipt v2
-            MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
+            MainActivity.tox_util_friend_send_msg_receipt_v2_wrapper(friend_number, t_sec_receipt, msg_id_buffer);
 
             try
             {
@@ -1140,7 +1159,7 @@ public class HelperFriend
                 if (relay_for_friend != null)
                 {
                     // if friend has a relay, send the "msg receipt" also to the relay. just to be sure.
-                    MainActivity.tox_util_friend_send_msg_receipt_v2(
+                    MainActivity.tox_util_friend_send_msg_receipt_v2_wrapper(
                             tox_friend_by_public_key__wrapper(relay_for_friend), t_sec_receipt, msg_id_buffer);
                 }
             }
@@ -1166,17 +1185,17 @@ public class HelperFriend
                         {
                             try
                             {
-                                String msg_id_as_hex_string = HelperGeneric.bytesToHex(msg_id_buffer.array(),
-                                                                                       msg_id_buffer.arrayOffset(),
-                                                                                       msg_id_buffer.limit());
+                                String msg_id_as_hex_string = bytesToHex(msg_id_buffer.array(),
+                                                                         msg_id_buffer.arrayOffset(),
+                                                                         msg_id_buffer.limit());
                                 // Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:send delayed -> now msgid=" +
                                 //           msg_id_as_hex_string);
 
                                 try
                                 {
-                                    int res = MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number,
-                                                                                               t_sec_receipt,
-                                                                                               msg_id_buffer);
+                                    int res = MainActivity.tox_util_friend_send_msg_receipt_v2_wrapper(friend_number,
+                                                                                                       t_sec_receipt,
+                                                                                                       msg_id_buffer);
 
                                     // Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:ACK:1:res=" + res + " f=" +
                                     //           get_friend_name_from_num(friend_number));
@@ -1189,7 +1208,7 @@ public class HelperFriend
                                         if (relay_for_friend != null)
                                         {
                                             // if friend has a relay, send the "msg receipt" also to the relay. just to be sure.
-                                            int res_relay = MainActivity.tox_util_friend_send_msg_receipt_v2(
+                                            int res_relay = MainActivity.tox_util_friend_send_msg_receipt_v2_wrapper(
                                                     tox_friend_by_public_key__wrapper(relay_for_friend), t_sec_receipt,
                                                     msg_id_buffer);
 
@@ -1228,12 +1247,12 @@ public class HelperFriend
         else if (msg_type == 3)
         {
             // send message receipt v2
-            MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
+            MainActivity.tox_util_friend_send_msg_receipt_v2_wrapper(friend_number, t_sec_receipt, msg_id_buffer);
         }
         else if (msg_type == 4)
         {
             // send message receipt v2 for unknown message
-            MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
+            MainActivity.tox_util_friend_send_msg_receipt_v2_wrapper(friend_number, t_sec_receipt, msg_id_buffer);
         }
     }
 

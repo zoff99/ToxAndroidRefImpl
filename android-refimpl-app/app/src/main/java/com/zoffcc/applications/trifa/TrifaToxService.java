@@ -90,6 +90,7 @@ import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notificati
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change_wrapper;
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_setup;
 import static com.zoffcc.applications.trifa.MainActivity.DEBUG_BATTERY_OPTIMIZATION_LOGGING;
+import static com.zoffcc.applications.trifa.MainActivity.DEBUG_FILE_LOGGING;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__force_udp_only;
@@ -764,6 +765,30 @@ public class TrifaToxService extends Service
                 {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    static void write_debug_file2(String filename)
+    {
+        if (DEBUG_FILE_LOGGING)
+        {
+            try
+            {
+                Log.d("FILEDEBUG", "" + filename);
+
+                File dir = new File(SD_CARD_FILES_DEBUG_DIR);
+                dir.mkdirs();
+                String filename2 = long_date_time_format(System.currentTimeMillis()) + "_" + filename;
+                File file = new File(dir, filename2);
+
+                FileOutputStream f = new FileOutputStream(file);
+                f.write(1);
+                f.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
             }
         }
     }
