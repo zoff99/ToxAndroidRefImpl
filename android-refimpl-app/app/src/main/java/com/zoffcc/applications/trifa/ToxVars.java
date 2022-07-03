@@ -71,6 +71,7 @@ public class ToxVars
         boolean msgv2 = false;
         boolean toxav_h264 = false;
         boolean msgv3 = false;
+        boolean ftv2 = false;
         boolean next_implementation = false;
     }
 
@@ -79,6 +80,7 @@ public class ToxVars
     public static long TOX_CAPABILITY_MSGV2 = 1 << 1;
     public static long TOX_CAPABILITY_TOXAV_H264 = 1 << 2;
     public static long TOX_CAPABILITY_MSGV3 = 1 << 3;
+    public static long TOX_CAPABILITY_FTV2 = 1 << 4;
     public static long TOX_CAPABILITY_NEXT_IMPLEMENTATION = (1L << 63L);
 
     public static TOX_CAPABILITY_DECODE_RESULT TOX_CAPABILITY_DECODE(long capabilites_encoded)
@@ -103,6 +105,11 @@ public class ToxVars
         if ((capabilites_encoded & TOX_CAPABILITY_MSGV3) != 0)
         {
             res.msgv3 = true;
+        }
+
+        if ((capabilites_encoded & TOX_CAPABILITY_FTV2) != 0)
+        {
+            res.ftv2 = true;
         }
 
         if ((capabilites_encoded & TOX_CAPABILITY_NEXT_IMPLEMENTATION) != 0)
@@ -140,6 +147,11 @@ public class ToxVars
         if (in.msgv3)
         {
             res = res + " MSGV3 ";
+        }
+
+        if (in.ftv2)
+        {
+            res = res + " FTV2 ";
         }
 
         if (in.next_implementation)
@@ -985,7 +997,7 @@ public class ToxVars
          * has no avatar.
          */
         TOX_FILE_KIND_AVATAR(1), TOX_FILE_KIND_MESSAGEV2_SEND(2), TOX_FILE_KIND_MESSAGEV2_ANSWER(
-            3), TOX_FILE_KIND_MESSAGEV2_ALTER(4), TOX_FILE_KIND_MESSAGEV2_SYNC(5);
+            3), TOX_FILE_KIND_MESSAGEV2_ALTER(4), TOX_FILE_KIND_MESSAGEV2_SYNC(5), TOX_FILE_KIND_FTV2(16);
 
         public int value;
 
@@ -1019,6 +1031,10 @@ public class ToxVars
             else if (value == TOX_FILE_KIND_MESSAGEV2_SYNC.value)
             {
                 return "TOX_FILE_KIND_MESSAGEV2_SYNC";
+            }
+            else if (value == TOX_FILE_KIND_FTV2.value)
+            {
+                return "TOX_FILE_KIND_FTV2";
             }
             return "UNKNOWN";
         }

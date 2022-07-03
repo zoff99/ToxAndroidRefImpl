@@ -23,6 +23,8 @@ import com.github.gfx.android.orma.annotation.Column;
 import com.github.gfx.android.orma.annotation.PrimaryKey;
 import com.github.gfx.android.orma.annotation.Table;
 
+import androidx.annotation.Nullable;
+
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
@@ -75,6 +77,10 @@ public class Filetransfer
     @Column(indexed = true, defaultExpr = "false")
     boolean storage_frame_work = false;
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String tox_file_id_hex = "";
+
     static Filetransfer deep_copy(Filetransfer in)
     {
         Filetransfer out = new Filetransfer();
@@ -92,6 +98,7 @@ public class Filetransfer
         out.current_position = in.current_position;
         out.message_id = in.message_id;
         out.storage_frame_work = in.storage_frame_work;
+        out.tox_file_id_hex = in.tox_file_id_hex;
         return out;
     }
 
@@ -101,6 +108,6 @@ public class Filetransfer
         return "id=" + id + ", kind=" + kind + ", state=" + state + ", direction=" + direction + ", path_name=" +
                path_name + ", file_name=" + file_name + ", filesize=" + filesize + ", current_position=" +
                current_position + ", message_id=" + message_id + ", tox_public_key_string=" + tox_public_key_string +
-               ", storage_frame_work=" + storage_frame_work;
+               ", storage_frame_work=" + storage_frame_work + ", tox_file_id_hex=" + tox_file_id_hex;
     }
 }

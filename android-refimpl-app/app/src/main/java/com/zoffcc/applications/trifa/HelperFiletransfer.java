@@ -54,6 +54,7 @@ import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_OUTGOING_
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_send;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_capabilities;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB;
@@ -63,6 +64,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fis_saf;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
@@ -635,6 +637,7 @@ public class HelperFiletransfer
                 fos_open(f.fos_open).
                 filesize(f.filesize).
                 current_position(f.current_position).
+                tox_file_id_hex(f.tox_file_id_hex).
                 execute();
     }
 
@@ -814,17 +817,42 @@ public class HelperFiletransfer
             // ------ DEBUG ------
 
             ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
-            byte[] sha256_buf = TrifaSetPatternActivity.sha256(
-                    TrifaSetPatternActivity.StringToBytes2("" + ft.path_name + ":" + ft.file_name + ":" + ft.filesize));
 
-            // Log.i(TAG, "TOX_FILE_ID_LENGTH=" + TOX_FILE_ID_LENGTH + " sha_byte=" + sha256_buf.length);
+            //if (TOX_CAPABILITY_DECODE(
+            //        tox_friend_get_capabilities(tox_friend_by_public_key__wrapper(m.tox_friendpubkey))).ftv2)
+            //{
+            MainActivity.tox_messagev3_get_new_message_id(file_id_buffer);
+            //}
+            //else
+            //{
+            //    byte[] sha256_buf = TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(
+            //            "" + ft.path_name + ":" + ft.file_name + ":" + ft.filesize));
+            //    file_id_buffer.put(sha256_buf);
+            //}
 
-            file_id_buffer.put(sha256_buf);
+            final String file_id_buffer_hex = HelperGeneric.bytesToHex(file_id_buffer.array(),
+                                                                       file_id_buffer.arrayOffset(),
+                                                                       file_id_buffer.limit()).toUpperCase();
+            Log.i(TAG, "TOX_FILE_ID_LENGTH=" + TOX_FILE_ID_LENGTH + " file_id_buffer_hex=" + file_id_buffer_hex);
+            ft.tox_file_id_hex = file_id_buffer_hex;
 
             // actually start sending the file to friend
-            long file_number = tox_file_send(tox_friend_by_public_key__wrapper(m.tox_friendpubkey),
-                                             ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA.value, ft.filesize,
-                                             file_id_buffer, ft.file_name, ft.file_name.length());
+            long file_number = -1;
+            if (TOX_CAPABILITY_DECODE(
+                    tox_friend_get_capabilities(tox_friend_by_public_key__wrapper(m.tox_friendpubkey))).ftv2)
+            {
+                file_number = tox_file_send(tox_friend_by_public_key__wrapper(m.tox_friendpubkey),
+                                            ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2.value, ft.filesize, file_id_buffer,
+                                            ft.file_name, ft.file_name.length());
+                ft.kind = ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2.value;
+            }
+            else
+            {
+                file_number = tox_file_send(tox_friend_by_public_key__wrapper(m.tox_friendpubkey),
+                                            ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA.value, ft.filesize, file_id_buffer,
+                                            ft.file_name, ft.file_name.length());
+                ft.kind = ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA.value;
+            }
             // TODO: handle errors from tox_file_send() here -------
 
             if (file_number < 0)
