@@ -51,6 +51,7 @@ import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelis
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.HelperConference.new_or_updated_conference;
 import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences_inactive;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.set_all_filetransfers_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
@@ -871,6 +872,7 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "set_all_conferences_inactive:004");
                     set_all_friends_offline();
                     set_all_conferences_inactive();
+                    set_all_filetransfers_inactive();
                     MainActivity.init_tox_callbacks();
                     HelperGeneric.update_savedata_file_wrapper();
                 }

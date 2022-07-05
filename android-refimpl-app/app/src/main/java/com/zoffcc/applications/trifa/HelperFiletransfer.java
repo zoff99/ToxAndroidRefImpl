@@ -34,6 +34,7 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Random;
 
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
@@ -70,6 +71,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperFiletransfer
@@ -499,6 +501,85 @@ public class HelperFiletransfer
         }
     }
 
+    static void cancel_filetransfer_f(final Filetransfer f)
+    {
+        try
+        {
+            if (f == null)
+            {
+                return;
+            }
+
+            long ft_id = f.id;
+            long msg_id = HelperMessage.get_message_id_from_filetransfer_id(ft_id);
+
+            if (f.direction == TRIFA_FT_DIRECTION_INCOMING.value)
+            {
+                if ((f.kind == TOX_FILE_KIND_DATA.value) || (f.kind == TOX_FILE_KIND_FTV2.value))
+                {
+                    delete_filetransfer_tmpfile(ft_id);
+                    HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    remove_vfs_ft_from_cache(f);
+                    set_filetransfer_for_message_from_filetransfer_id(ft_id, -1);
+                    delete_filetransfers_from_id(ft_id);
+                    try
+                    {
+                        if (f.id != -1)
+                        {
+                            HelperMessage.update_single_message_from_messge_id(msg_id, true);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+                else // avatar FT
+                {
+                    set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_CANCEL.value);
+                    HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    remove_vfs_ft_from_cache(f);
+                    delete_filetransfer_tmpfile(ft_id);
+                    delete_filetransfers_from_id(ft_id);
+                }
+            }
+            else // outgoing FT
+            {
+                if ((f.kind == TOX_FILE_KIND_DATA.value) || (f.kind == TOX_FILE_KIND_FTV2.value))
+                {
+                    HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    remove_ft_from_cache(f);
+                    set_filetransfer_for_message_from_filetransfer_id(ft_id, -1);
+                    delete_filetransfers_from_id(ft_id);
+                    try
+                    {
+                        if (f.id != -1)
+                        {
+                            HelperMessage.update_single_message_from_messge_id(msg_id, true);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+                else // avatar FT
+                {
+                    set_filetransfer_state_from_id(ft_id, TOX_FILE_CONTROL_CANCEL.value);
+                    if (msg_id > -1)
+                    {
+                        HelperMessage.set_message_state_from_id(msg_id, TOX_FILE_CONTROL_CANCEL.value);
+                    }
+                    remove_ft_from_cache(f);
+                    delete_filetransfer_tmpfile(ft_id);
+                    delete_filetransfers_from_id(ft_id);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     static void cancel_filetransfer(long friend_number, long file_number)
     {
         // Log.i(TAG, "FTFTFT:cancel_filetransfer");
@@ -515,7 +596,7 @@ public class HelperFiletransfer
 
             if (f.direction == TRIFA_FT_DIRECTION_INCOMING.value)
             {
-                if (f.kind == TOX_FILE_KIND_DATA.value)
+                if ((f.kind == TOX_FILE_KIND_DATA.value) || (f.kind == TOX_FILE_KIND_FTV2.value))
                 {
                     long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
@@ -560,7 +641,7 @@ public class HelperFiletransfer
             }
             else // outgoing FT
             {
-                if (f.kind == TOX_FILE_KIND_DATA.value)
+                if ((f.kind == TOX_FILE_KIND_DATA.value) || (f.kind == TOX_FILE_KIND_FTV2.value))
                 {
                     long ft_id = get_filetransfer_id_from_friendnum_and_filenum(friend_number, file_number);
                     long msg_id = HelperMessage.get_message_id_from_filetransfer_id_and_friendnum(ft_id, friend_number);
@@ -609,6 +690,30 @@ public class HelperFiletransfer
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    static void set_all_filetransfers_inactive()
+    {
+        try
+        {
+            List<Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).toList();
+            for (Filetransfer f : fts_active)
+            {
+                // Log.i(TAG, "set_all_filetransfers_inactive:cancel:id=" + f.tox_file_id_hex + " filename=" + f.file_name);
+                cancel_filetransfer_f(f);
+            }
+
+            orma.updateFiletransfer().
+                    file_number(-1).
+                    state(TOX_FILE_CONTROL_CANCEL.value).
+                    execute();
+            Log.i(TAG, "set_all_filetransfers_inactive");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "set_all_filetransfers_inactive:EE:" + e.getMessage());
         }
     }
 
