@@ -300,7 +300,6 @@ public class MainActivity extends AppCompatActivity
     final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
-    final static boolean DEBUG_FILE_LOGGING = false;  // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -3116,20 +3115,7 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_util_friend_send_msg_receipt_v2(long friend_number, long ts_sec, ByteBuffer msgid_buffer);
 
-    public static int tox_util_friend_send_msg_receipt_v2_wrapper(long friend_number, long ts_sec, ByteBuffer msgid_buffer)
-    {
-        Log.i(TAG, "tox_util_friend_send_msg_receipt_v2:fn=" + friend_number);
-        return tox_util_friend_send_msg_receipt_v2(friend_number, ts_sec, msgid_buffer);
-    }
-
     public static native long tox_util_friend_send_message_v2(long friend_number, int type, long ts_sec, String message, long length, ByteBuffer raw_message_back_buffer, ByteBuffer raw_message_back_buffer_length, ByteBuffer msgid_back_buffer);
-
-    public static long tox_util_friend_send_message_v2_wrapper(long friend_number, int type, long ts_sec, String message, long length, ByteBuffer raw_message_back_buffer, ByteBuffer raw_message_back_buffer_length, ByteBuffer msgid_back_buffer)
-    {
-        Log.i(TAG, "tox_util_friend_send_message_v2:fn=" + friend_number + " type=" + type + " msg=" + message);
-        return tox_util_friend_send_message_v2(friend_number, type, ts_sec, message, length, raw_message_back_buffer,
-                                               raw_message_back_buffer_length, msgid_back_buffer);
-    }
 
     public static native int tox_util_friend_resend_message_v2(long friend_number, ByteBuffer raw_message_buffer, long raw_msg_len);
     // --------------- Message V2 -------------
