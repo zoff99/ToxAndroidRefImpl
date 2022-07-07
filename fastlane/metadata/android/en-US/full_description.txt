@@ -14,6 +14,9 @@ Tox has no central servers that can be raided, shut down, or forced to turn over
 Tox is free software. That's free as in freedom, as well as in price. This means Tox is yours — to use, modify, and share — because Tox is developed by and for the users.<br><br>
 
 <b>More Information:</b><br>
-* <a href="https://tox.zoff.cc">about Tox</a><br>
-* <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
-* <a href="https://matrix.to/#/#toktok:libera.chat">Join Tox IRC Channel</a><br>
+* about Tox: https://tox.zoff.cc
+<br>
+* Join discussion on Matrix: https://matrix.to/#/#trifa:matrix.org
+<br>
+* Join Tox IRC Channel: https://matrix.to/#/#toktok:libera.chat
+<br>
