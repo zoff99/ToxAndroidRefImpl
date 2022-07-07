@@ -99,6 +99,7 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__speakerphone_tweak;
+import static com.zoffcc.applications.trifa.MainActivity.VFS_CUSTOM_WRITE_CACHE;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -846,6 +847,7 @@ public class HelperGeneric
                 info.guardianproject.iocipher.File dst_dir = new info.guardianproject.iocipher.File(
                         dst_path_name + "/");
                 dst_dir.mkdirs();
+                // Log.i(TAG, "move_tmp_file_to_real_file:ft.len=" + f1.length());
                 f1.renameTo(f2);
             }
             else
@@ -2110,6 +2112,18 @@ public class HelperGeneric
 
     static void write_chunk_to_VFS_file(String file_name_with_path, long position, long file_chunk_length, final byte[] data)
     {
+        if (VFS_CUSTOM_WRITE_CACHE)
+        {
+            write_chunk_to_VFS_file__with_custom_write_cache(file_name_with_path, position, file_chunk_length, data);
+        }
+        else
+        {
+            write_chunk_to_VFS_file__no_extra_write_cache(file_name_with_path, position, file_chunk_length, data);
+        }
+    }
+
+    static void write_chunk_to_VFS_file__no_extra_write_cache(String file_name_with_path, long position, long file_chunk_length, final byte[] data)
+    {
         try
         {
             final ByteBuffer data_bb = ByteBuffer.wrap(data);
@@ -2143,7 +2157,7 @@ public class HelperGeneric
         }
     }
 
-    static void Xwrite_chunk_to_VFS_file(String file_name_with_path, final long position, long file_chunk_length, final byte[] data)
+    static void write_chunk_to_VFS_file__with_custom_write_cache(String file_name_with_path, final long position, long file_chunk_length, final byte[] data)
     {
         try
         {

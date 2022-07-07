@@ -30,7 +30,7 @@ public class BufferedOutputStreamCustom extends info.guardianproject.iocipher.Fi
     protected byte[] buf;
     protected int count;
     protected long cur_pos;
-    final protected int PAGE_SIZE = 8192 * 4; // in bytes (should be a multiple of 8192)
+    final protected int PAGE_SIZE = 8192 * 10; // in bytes (must be a multiple of 8192)
 
     public BufferedOutputStreamCustom(String path) throws FileNotFoundException
     {
@@ -48,7 +48,7 @@ public class BufferedOutputStreamCustom extends info.guardianproject.iocipher.Fi
     {
         if (count > 0)
         {
-            // Log.i("BufOutStream", "buf=" + buf + " count=" + count);
+            // Log.i("BufOutStream:flush", "buf=" + buf + " count=" + count);
             super.write(buf, 0, count);
             count = 0;
         }
@@ -70,7 +70,7 @@ public class BufferedOutputStreamCustom extends info.guardianproject.iocipher.Fi
      * @param len the number of bytes to write.
      * @throws IOException if an I/O error occurs.
      */
-    public synchronized void write(byte b[], int off, int len) throws IOException
+    public synchronized void write(byte[] b, int off, int len) throws IOException
     {
         // Log.i("BufOutStream:write", "buf=" + buf + " off=" + off + " len=" + len + " count=" + count);
 

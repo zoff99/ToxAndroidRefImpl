@@ -803,6 +803,22 @@ public class HelperFiletransfer
         //t.start();
     }
 
+    static void flush_and_close_vfs_ft_from_cache(Filetransfer f)
+    {
+        try
+        {
+            BufferedOutputStreamCustom fos = cache_ft_fos.get(f.path_name + "/" + f.file_name);
+            if (fos != null)
+            {
+                fos.flush();
+                fos.close();
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+    }
+
     static void remove_vfs_ft_from_cache(Filetransfer f)
     {
         try
@@ -813,7 +829,7 @@ public class HelperFiletransfer
                 fos.close();
             }
         }
-        catch (Exception e2)
+        catch (Exception ignored)
         {
         }
         // Log.i(TAG, "remove_vfs_ft_from_cache:f:" + f.path_name + "/" + f.file_name);

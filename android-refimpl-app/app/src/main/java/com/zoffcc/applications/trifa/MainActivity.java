@@ -143,6 +143,7 @@ import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.flush_and_close_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
@@ -305,6 +306,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
+    final static boolean VFS_CUSTOM_WRITE_CACHE = true; // set "true" for release builds
     public final static boolean DEBUG_BSN_ON_PROFILE = false; // set "false" for release builds
     // --------- global config ---------
     // --------- global config ---------
@@ -6159,7 +6161,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // Log.i(TAG, "file_recv_chunk:file fully received");
-
+                flush_and_close_vfs_ft_from_cache(f);
                 HelperGeneric.move_tmp_file_to_real_file(f.path_name, f.file_name,
                                                          VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string +
                                                          "/", f.file_name);

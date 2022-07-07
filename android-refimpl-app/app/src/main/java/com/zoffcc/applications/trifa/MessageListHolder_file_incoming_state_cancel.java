@@ -254,7 +254,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             }
             catch (Exception e)
             {
-                e.printStackTrace();
+                // e.printStackTrace();
             }
 
             if (!is_image)
@@ -269,7 +269,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
             }
 
