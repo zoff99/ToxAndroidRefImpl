@@ -6234,6 +6234,7 @@ public class MainActivity extends AppCompatActivity
             }
             catch (Exception e2)
             {
+                remove_vfs_ft_from_cache(f);
                 e2.printStackTrace();
             }
         }
