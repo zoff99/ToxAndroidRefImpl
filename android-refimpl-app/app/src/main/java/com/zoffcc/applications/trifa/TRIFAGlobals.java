@@ -176,7 +176,7 @@ public class TRIFAGlobals
     static String PREF_KEY_CUSTOM_BOOTSTRAP_TCP_KEYHEX = "custom_bootstrap_tcp_keyhex";
 
     static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES =
-            120L * MAX_FILE_DATA_SIZE; // update FT and progress bars every XX bytes
+            300L * MAX_FILE_DATA_SIZE; // update FT and progress bars every XX bytes
     static final long UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES = 8L * MAX_FILE_DATA_SIZE;
     static final long UPDATE_MESSAGE_PROGRESS_SMALL_FILE_IS_LESS_THAN_BYTES = 250000L; // less than this in bytes is a small file
 
@@ -218,6 +218,9 @@ public class TRIFAGlobals
 
     static long LAST_ONLINE_TIMSTAMP_ONLINE_NOW = Long.MAX_VALUE - 1;
     static long LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE = -1;
+
+    static long global_last_activity_outgoung_ft_ts = -1;
+    static long global_last_activity_incoming_ft_ts = -1;
 
     static long ONE_HOUR_IN_MS = 3600 * 1000;
     static int MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS = 30 * 1000;

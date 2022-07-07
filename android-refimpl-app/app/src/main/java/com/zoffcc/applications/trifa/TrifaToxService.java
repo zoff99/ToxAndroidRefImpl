@@ -157,6 +157,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTS
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_incoming_ft_ts;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_outgoung_ft_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_name;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_status_message;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
@@ -1510,9 +1512,28 @@ public class TrifaToxService extends Service
                     }
                     else
                     {
-                        // tox_iteration_interval_ms = Math.max(100, MainActivity.tox_iteration_interval());
-                        tox_iteration_interval_ms = tox_iteration_interval();
-                        // Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
+                        if (global_last_activity_outgoung_ft_ts > -1)
+                        {
+                            if ((global_last_activity_outgoung_ft_ts + 200) > System.currentTimeMillis())
+                            {
+                                // iterate faster if outgoing filetransfers are active
+                                tox_iteration_interval_ms = 5;
+                            }
+                        }
+                        else if (global_last_activity_incoming_ft_ts > -1)
+                        {
+                            if ((global_last_activity_incoming_ft_ts + 200) > System.currentTimeMillis())
+                            {
+                                // iterate faster if incoming filetransfers are active
+                                tox_iteration_interval_ms = 5;
+                            }
+                        }
+                        else
+                        {
+                            // tox_iteration_interval_ms = Math.max(100, MainActivity.tox_iteration_interval());
+                            tox_iteration_interval_ms = tox_iteration_interval();
+                            // Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
+                        }
 
                         if (tox_iterate_thread_high_prio)
                         {
