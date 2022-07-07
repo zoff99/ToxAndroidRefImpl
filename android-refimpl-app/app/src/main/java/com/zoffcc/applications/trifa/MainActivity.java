@@ -5535,7 +5535,7 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     if (ft.id != -1)
                                     {
-                                        HelperMessage.update_single_message_from_ftid(ft.id, false);
+                                        HelperMessage.update_single_message_from_ftid(ft.id, true);
                                     }
                                 }
                                 catch (Exception e)
@@ -5558,7 +5558,7 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     if (ft.id != -1)
                                     {
-                                        HelperMessage.update_single_message_from_ftid(ft.id, false);
+                                        HelperMessage.update_single_message_from_ftid(ft.id, true);
                                     }
                                 }
                                 catch (Exception e)
@@ -5682,7 +5682,7 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     if (ft.id != -1)
                                     {
-                                        HelperMessage.update_single_message_from_ftid(ft.id, false);
+                                        HelperMessage.update_single_message_from_ftid(ft.id, true);
                                     }
                                 }
                                 catch (Exception e)
@@ -5705,7 +5705,7 @@ public class MainActivity extends AppCompatActivity
                                 {
                                     if (ft.id != -1)
                                     {
-                                        HelperMessage.update_single_message_from_ftid(ft.id, false);
+                                        HelperMessage.update_single_message_from_ftid(ft.id, true);
                                     }
                                 }
                                 catch (Exception e)
@@ -6273,7 +6273,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (f.id != -1)
                                 {
-                                    HelperMessage.update_single_message_from_ftid(f.id, false);
+                                    HelperMessage.update_single_message_from_ftid(f.id, true);
                                 }
                             }
                             catch (Exception e)
@@ -6297,7 +6297,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (f.id != -1)
                                 {
-                                    HelperMessage.update_single_message_from_ftid(f.id, false);
+                                    HelperMessage.update_single_message_from_ftid(f.id, true);
                                 }
                             }
                             catch (Exception e)
