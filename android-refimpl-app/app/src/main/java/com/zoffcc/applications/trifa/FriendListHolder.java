@@ -561,6 +561,85 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
     }
 
+
+    public void friend_toggle_notification_silent()
+    {
+        if (!this.friendlist.notification_silent)
+        {
+            this.friendlist.notification_silent = true;
+            orma.updateFriendList().tox_public_key_stringEq(this.friendlist.tox_public_key_string).
+                    notification_silent(this.friendlist.notification_silent).execute();
+
+            final Drawable d_notification = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_notifications_off).
+                    color(context.getResources().
+                            getColor(R.color.icon_colors)).
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
+            f_notification.setImageDrawable(d_notification);
+
+            try
+            {
+                if (friend_list_fragment != null)
+                {
+                    // TODO: dirty hack, make better
+                    final boolean sorted_reload = true;
+                    if (!sorted_reload)
+                    {
+                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                        cc.is_friend = COMBINED_IS_FRIEND;
+                        cc.friend_item = this.friendlist;
+                        friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    }
+                    else
+                    {
+                        friend_list_fragment.add_all_friends_clear(0);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+            this.friendlist.notification_silent = false;
+            orma.updateFriendList().tox_public_key_stringEq(this.friendlist.tox_public_key_string).
+                    notification_silent(this.friendlist.notification_silent).execute();
+
+            final Drawable d_notification = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_notifications_active).
+                    color(context.getResources().
+                            getColor(R.color.icon_colors)).
+                    alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
+            f_notification.setImageDrawable(d_notification);
+
+            try
+            {
+                if (friend_list_fragment != null)
+                {
+                    // TODO: dirty hack, make better
+                    final boolean sorted_reload = true;
+                    if (!sorted_reload)
+                    {
+                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                        cc.is_friend = COMBINED_IS_FRIEND;
+                        cc.friend_item = this.friendlist;
+                        friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    }
+                    else
+                    {
+                        friend_list_fragment.add_all_friends_clear(0);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
     @Override
     public void onClick(View v)
     {
@@ -569,81 +648,22 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         {
             if (v.equals(f_notification))
             {
-                if (!this.friendlist.notification_silent)
+                AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                builder.setTitle(v.getContext().getString(R.string.FriendListHolder_toggle_notification_silent_title));
+                builder.setMessage(v.getContext().getString(R.string.FriendListHolder_toggle_notification_silent_message));
+
+                builder.setNegativeButton(v.getContext().getString(R.string.MainActivity_no_button), null);
+                builder.setPositiveButton(v.getContext().getString(R.string.MainActivity_yes_button), new DialogInterface.OnClickListener()
                 {
-                    this.friendlist.notification_silent = true;
-                    orma.updateFriendList().tox_public_key_stringEq(this.friendlist.tox_public_key_string).
-                            notification_silent(this.friendlist.notification_silent).execute();
-
-                    final Drawable d_notification = new IconicsDrawable(context).
-                            icon(GoogleMaterial.Icon.gmd_notifications_off).
-                            color(context.getResources().
-                                    getColor(R.color.icon_colors)).
-                            alpha(FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED).sizeDp(
-                            FL_NOTIFICATION_ICON_SIZE_DP_NOT_SELECTED);
-                    f_notification.setImageDrawable(d_notification);
-
-                    try
+                    @Override
+                    public void onClick(DialogInterface dialog, int which)
                     {
-                        if (friend_list_fragment != null)
-                        {
-                            // TODO: dirty hack, make better
-                            final boolean sorted_reload = true;
-                            if (!sorted_reload)
-                            {
-                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                                cc.is_friend = COMBINED_IS_FRIEND;
-                                cc.friend_item = this.friendlist;
-                                friend_list_fragment.modify_friend(cc, cc.is_friend);
-                            }
-                            else
-                            {
-                                friend_list_fragment.add_all_friends_clear(0);
-                            }
-                        }
+                        friend_toggle_notification_silent();
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-                else
-                {
-                    this.friendlist.notification_silent = false;
-                    orma.updateFriendList().tox_public_key_stringEq(this.friendlist.tox_public_key_string).
-                            notification_silent(this.friendlist.notification_silent).execute();
+                });
 
-                    final Drawable d_notification = new IconicsDrawable(context).
-                            icon(GoogleMaterial.Icon.gmd_notifications_active).
-                            color(context.getResources().
-                                    getColor(R.color.icon_colors)).
-                            alpha(FL_NOTIFICATION_ICON_ALPHA_SELECTED).sizeDp(FL_NOTIFICATION_ICON_SIZE_DP_SELECTED);
-                    f_notification.setImageDrawable(d_notification);
-
-                    try
-                    {
-                        if (friend_list_fragment != null)
-                        {
-                            // TODO: dirty hack, make better
-                            final boolean sorted_reload = true;
-                            if (!sorted_reload)
-                            {
-                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                                cc.is_friend = COMBINED_IS_FRIEND;
-                                cc.friend_item = this.friendlist;
-                                friend_list_fragment.modify_friend(cc, cc.is_friend);
-                            }
-                            else
-                            {
-                                friend_list_fragment.add_all_friends_clear(0);
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
+                AlertDialog dialog = builder.create();
+                dialog.show();
             }
             else
             {
@@ -656,7 +676,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             Log.i(TAG, "onClick:EE:" + e.getMessage());
         }
     }
-
 
     public void show_confirm_dialog(final View view, final FriendList f2)
     {
