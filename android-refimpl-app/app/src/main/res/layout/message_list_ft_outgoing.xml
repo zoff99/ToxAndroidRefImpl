@@ -84,7 +84,7 @@
                         app:progress_max="100"
                         app:progress_reached_bar_height="15dp"
                         app:progress_reached_color="@color/md_green_800"
-                        app:progress_text_color="@color/md_black_1000"
+                        app:progress_text_color="@color/md_always_black_1000"
                         app:progress_text_offset="5dp"
                         app:progress_text_size="12sp"
                         app:progress_text_visibility="visible"

@@ -301,6 +301,7 @@
     <color name="md_grey_800">#424242</color>
     <color name="md_grey_900">#212121</color>
     <color name="md_black_1000">#000000</color>
+    <color name="md_always_black_1000">#000000</color>
     <color name="md_white_1000">#ffffff</color>
 
     <!--blue grey-->
