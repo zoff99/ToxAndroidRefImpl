@@ -1438,6 +1438,7 @@ public class MessageListActivity extends AppCompatActivity
             m.text = ofw.filename_wrapped + "\n" + ofw.file_size_wrapped + " bytes";
             m.storage_frame_work = false;
             m.sent_push = 0;
+            m.is_new = false; // no notification for outgoing filetransfers
 
             long new_msg_id = insert_into_message_db(m, update_message_view);
             m.id = new_msg_id;
@@ -1507,6 +1508,7 @@ public class MessageListActivity extends AppCompatActivity
             m.sent_timestamp = System.currentTimeMillis();
             m.text = filename + "\n" + file_size + " bytes";
             m.storage_frame_work = true;
+            m.is_new = false; // no notification for outgoing filetransfers
 
             long new_msg_id = insert_into_message_db(m, update_message_view);
             m.id = new_msg_id;
