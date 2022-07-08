@@ -85,8 +85,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 81
-static const char global_version_string[] = "0.99.81";
+#define VERSION_PATCH 82
+static const char global_version_string[] = "0.99.82";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -4568,42 +4568,42 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv *e
     {
         if(error == TOX_ERR_FILE_SEND_CHUNK_NULL)
         {
-            dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_NULL");
+            dbg(0, "tox_file_send_chunk:TOX_ERR_FILE_SEND_CHUNK_NULL");
             return (jint)-1;
         }
         else if(error == TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_FOUND)
         {
-            dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_FOUND");
+            dbg(0, "tox_file_send_chunk:TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_FOUND");
             return (jint)-2;
         }
         else if(error == TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_CONNECTED)
         {
-            dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_CONNECTED");
+            dbg(0, "tox_file_send_chunk:TOX_ERR_FILE_SEND_CHUNK_FRIEND_NOT_CONNECTED");
             return (jint)-3;
         }
         else if(error == TOX_ERR_FILE_SEND_CHUNK_NOT_FOUND)
         {
-            dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_NOT_FOUND");
+            dbg(0, "tox_file_send_chunk:TOX_ERR_FILE_SEND_CHUNK_NOT_FOUND");
             return (jint)-4;
         }
         else if(error == TOX_ERR_FILE_SEND_CHUNK_NOT_TRANSFERRING)
         {
-            dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_NOT_TRANSFERRING");
+            dbg(0, "tox_file_send_chunk:TOX_ERR_FILE_SEND_CHUNK_NOT_TRANSFERRING");
             return (jint)-5;
         }
         else if(error == TOX_ERR_FILE_SEND_CHUNK_INVALID_LENGTH)
         {
-            dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_INVALID_LENGTH");
+            dbg(0, "tox_file_send_chunk:TOX_ERR_FILE_SEND_CHUNK_INVALID_LENGTH");
             return (jint)-6;
         }
         else if(error == TOX_ERR_FILE_SEND_CHUNK_SENDQ)
         {
-            dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_SENDQ");
+            dbg(0, "tox_file_send_chunk:TOX_ERR_FILE_SEND_CHUNK_SENDQ");
             return (jint)-7;
         }
         else if(error == TOX_ERR_FILE_SEND_CHUNK_WRONG_POSITION)
         {
-            dbg(0, "tox_file_send:TOX_ERR_FILE_SEND_CHUNK_WRONG_POSITION");
+            dbg(0, "tox_file_send_chunk:TOX_ERR_FILE_SEND_CHUNK_WRONG_POSITION");
             return (jint)-8;
         }
         else
