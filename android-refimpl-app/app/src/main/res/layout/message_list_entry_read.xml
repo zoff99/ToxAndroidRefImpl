@@ -186,7 +186,7 @@
                     android:layout_marginTop="5dp"
                     android:layout_marginBottom="5dp"
                     android:layout_weight="1"
-                    android:background="@drawable/rounded_date_bg"
+                    android:background="@color/message_text_date_string_color"
                     android:paddingStart="@dimen/padding_small"
                     android:paddingLeft="@dimen/padding_small"
                     android:paddingTop="2dp"

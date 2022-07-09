@@ -278,7 +278,7 @@
             android:paddingRight="@dimen/padding_small"
             android:paddingBottom="2dp"
             android:text="2017-05-14"
-            android:textColor="#FFFFFF"
+            android:textColor="@color/message_text_date_string_color"
             android:textSize="@dimen/text_small" />
 
         <ImageView

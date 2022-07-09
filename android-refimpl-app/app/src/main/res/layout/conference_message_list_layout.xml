@@ -40,7 +40,7 @@
         android:paddingRight="6dp"
         android:paddingTop="3dp"
         android:text="March 1, 2015"
-        android:textColor="@color/md_white_1000"
+        android:textColor="@color/scroll_date_header_color"
         android:textSize="14sp"
         android:visibility="invisible"/>
 
