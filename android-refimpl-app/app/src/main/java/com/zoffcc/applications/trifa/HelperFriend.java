@@ -1125,7 +1125,7 @@ public class HelperFriend
     {
         // (msg_type == 1) msgV2 direct message
         // (msg_type == 2) msgV2 relay message
-        // (msg_type == 3) msgV2 group confirm msg received message
+        // (msg_type == 3) msgV2 "conference" and "group" confirm msg received message
         // (msg_type == 4) msgV2 confirm unknown received message
         if (msg_type == 1)
         {
@@ -1228,6 +1228,14 @@ public class HelperFriend
         else if (msg_type == 3)
         {
             // send message receipt v2
+            /*
+            String msg_id_as_hex_string_wrapped = HelperGeneric.bytesToHex(msg_id_buffer.array(),
+                                                                           msg_id_buffer.arrayOffset(),
+                                                                           msg_id_buffer.limit());
+
+            Log.i(TAG, "send_friend_msg_receipt_v2_wrapper:(msg_type == 3):" + get_friend_name_from_num(friend_number) +
+                       " buffer=" + msg_id_as_hex_string_wrapped);
+             */
             MainActivity.tox_util_friend_send_msg_receipt_v2(friend_number, t_sec_receipt, msg_id_buffer);
         }
         else if (msg_type == 4)

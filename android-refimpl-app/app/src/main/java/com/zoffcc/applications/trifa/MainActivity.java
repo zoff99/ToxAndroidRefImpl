@@ -5190,7 +5190,7 @@ public class MainActivity extends AppCompatActivity
 
                         if (gm != null)
                         {
-                            Log.i(TAG, "friend_sync_message_v2_cb:potentially double message:1");
+                            Log.i(TAG, "friend_sync_message_v2_cb:potentially double message:2");
                             // ok it's a "potentially" double message
                             // just ignore it, but still send "receipt" to proxy so it won't send this message again
                             send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
