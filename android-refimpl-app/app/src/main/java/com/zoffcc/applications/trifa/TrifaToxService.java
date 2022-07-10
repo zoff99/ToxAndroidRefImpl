@@ -940,6 +940,19 @@ public class TrifaToxService extends Service
                 }
                 // ----- convert old NULL's into 0 -----
 
+                // ----- convert old NULL's into 0 -----
+                try
+                {
+                    orma.getConnection().execSQL(
+                            "update Message set filetransfer_kind='0' where filetransfer_kind is NULL");
+                    Log.i(TAG, "onCreate:filetransfer_kind");
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onCreate:filetransfer_kind:EE01");
+                }
+                // ----- convert old NULL's into 0 -----
+
                 // TODO --------
                 String my_tox_id_local = get_my_toxid();
                 global_my_toxid = my_tox_id_local;
@@ -1684,7 +1697,7 @@ public class TrifaToxService extends Service
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ignored)
             {
             }
         }

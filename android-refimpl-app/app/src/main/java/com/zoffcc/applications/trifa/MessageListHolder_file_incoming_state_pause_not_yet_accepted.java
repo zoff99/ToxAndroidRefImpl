@@ -22,6 +22,8 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -49,6 +51,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.set_message_accepted_f
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -68,6 +71,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
     TextView date_time;
     TextView message_text_date_string;
     ViewGroup message_text_date;
+    ViewGroup rounded_bg_container;
 
     public MessageListHolder_file_incoming_state_pause_not_yet_accepted(View itemView, Context c)
     {
@@ -83,6 +87,7 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
+        rounded_bg_container = (ViewGroup) itemView.findViewById(R.id.ft_incoming_rounded_bg);
         textView = (TextView) itemView.findViewById(R.id.m_text);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         date_time = (TextView) itemView.findViewById(R.id.date_time);
@@ -112,6 +117,37 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
         }
 
         final Message message = m;
+
+        int drawable_id = R.drawable.rounded_orange_bg_with_border;
+        try
+        {
+            if (m.filetransfer_kind == TOX_FILE_KIND_FTV2.value)
+            {
+                drawable_id = R.drawable.rounded_orange_bg;
+            }
+
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN)
+            {
+                rounded_bg_container.setBackgroundDrawable(ContextCompat.getDrawable(context, drawable_id));
+            }
+            else
+            {
+                rounded_bg_container.setBackground(ContextCompat.getDrawable(context, drawable_id));
+            }
+        }
+        catch (Exception e)
+        {
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN)
+            {
+                rounded_bg_container.setBackgroundDrawable(ContextCompat.getDrawable(context, drawable_id));
+            }
+            else
+            {
+                rounded_bg_container.setBackground(ContextCompat.getDrawable(context, drawable_id));
+            }
+        }
 
         // --------- message date header (show only if different from previous message) ---------
         // --------- message date header (show only if different from previous message) ---------

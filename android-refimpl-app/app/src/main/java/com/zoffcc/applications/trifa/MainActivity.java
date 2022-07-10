@@ -267,6 +267,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
@@ -5869,6 +5870,7 @@ public class MainActivity extends AppCompatActivity
             m.sent_timestamp = m.rcvd_timestamp;
             m.text = filename_corrected + "\n" + file_size + " bytes";
             m.sent_push = 0;
+            m.filetransfer_kind = TOX_FILE_KIND_FTV2.value;
             long new_msg_id = -1;
 
             if (message_list_activity != null)
@@ -6015,6 +6017,7 @@ public class MainActivity extends AppCompatActivity
             m.sent_timestamp = m.rcvd_timestamp;
             m.text = filename_corrected + "\n" + file_size + " bytes";
             m.sent_push = 0;
+            m.filetransfer_kind = TOX_FILE_KIND_DATA.value;
             long new_msg_id = -1;
 
             if (message_list_activity != null)

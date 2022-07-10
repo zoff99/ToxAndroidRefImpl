@@ -25,6 +25,7 @@
 
 
             <LinearLayout
+                android:id="@+id/ft_outgoing_rounded_bg"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="20dp"
@@ -32,6 +33,7 @@
                 android:layout_weight="6"
                 android:background="@drawable/rounded_blue_bg"
                 android:minHeight="0dp"
+
                 android:orientation="vertical">
 
 

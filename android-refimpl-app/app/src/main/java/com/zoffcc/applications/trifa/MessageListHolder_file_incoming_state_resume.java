@@ -36,6 +36,7 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
@@ -51,6 +52,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE_FT_SMALL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_file_incoming_state_resume extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -70,6 +72,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
     TextView date_time;
     TextView message_text_date_string;
     ViewGroup message_text_date;
+    ViewGroup rounded_bg_container;
 
     public MessageListHolder_file_incoming_state_resume(View itemView, Context c)
     {
@@ -85,6 +88,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
+        rounded_bg_container = (ViewGroup) itemView.findViewById(R.id.ft_incoming_rounded_bg);
         textView = (TextView) itemView.findViewById(R.id.m_text);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
         date_time = (TextView) itemView.findViewById(R.id.date_time);
@@ -114,6 +118,37 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
         }
 
         final Message message = m;
+
+        int drawable_id = R.drawable.rounded_orange_bg_with_border;
+        try
+        {
+            if (m.filetransfer_kind == TOX_FILE_KIND_FTV2.value)
+            {
+                drawable_id = R.drawable.rounded_orange_bg;
+            }
+
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN)
+            {
+                rounded_bg_container.setBackgroundDrawable(ContextCompat.getDrawable(context, drawable_id));
+            }
+            else
+            {
+                rounded_bg_container.setBackground(ContextCompat.getDrawable(context, drawable_id));
+            }
+        }
+        catch (Exception e)
+        {
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN)
+            {
+                rounded_bg_container.setBackgroundDrawable(ContextCompat.getDrawable(context, drawable_id));
+            }
+            else
+            {
+                rounded_bg_container.setBackground(ContextCompat.getDrawable(context, drawable_id));
+            }
+        }
 
         // --------- message date header (show only if different from previous message) ---------
         // --------- message date header (show only if different from previous message) ---------

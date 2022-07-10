@@ -27,6 +27,8 @@ import androidx.annotation.Nullable;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 
 @Table
 public class Message
@@ -128,6 +130,10 @@ public class Message
     @Nullable
     int sent_push = 0;
 
+    @Column(helpers = Column.Helpers.ALL, defaultExpr = "0")
+    @Nullable
+    int filetransfer_kind = TOX_FILE_KIND_DATA.value;
+
     static Message deep_copy(Message in)
     {
         Message out = new Message();
@@ -160,6 +166,7 @@ public class Message
         out.msg_at_relay = in.msg_at_relay;
         out.msg_idv3_hash = in.msg_idv3_hash;
         out.sent_push = in.sent_push;
+        out.filetransfer_kind = in.filetransfer_kind;
 
         return out;
     }
@@ -175,6 +182,6 @@ public class Message
                ", is_new=" + is_new + ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version +
                ", resend_count=" + resend_count + ", raw_msgv2_bytes=" + "xxxxxx" + ", storage_frame_work=" +
                storage_frame_work + ", ft_outgoing_queued=" + ft_outgoing_queued + ", msg_at_relay=" + msg_at_relay +
-               ", sent_push=" + sent_push;
+               ", sent_push=" + sent_push + ", filetransfer_kind=" + filetransfer_kind;
     }
 }

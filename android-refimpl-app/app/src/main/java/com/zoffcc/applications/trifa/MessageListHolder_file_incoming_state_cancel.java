@@ -34,7 +34,6 @@ import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Adapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -52,6 +51,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import info.guardianproject.iocipher.File;
 
@@ -69,6 +69,7 @@ import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE_FT_NORMAL;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -91,6 +92,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
     TextView date_time;
     ViewGroup layout_message_container;
+    ViewGroup rounded_bg_container;
     boolean is_selected = false;
     TextView message_text_date_string;
     ViewGroup message_text_date;
@@ -109,6 +111,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_buttons_container = (ViewGroup) itemView.findViewById(R.id.ft_buttons_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
+        rounded_bg_container = (ViewGroup) itemView.findViewById(R.id.ft_incoming_rounded_bg);
         textView = (EmojiTextViewLinks) itemView.findViewById(R.id.m_text);
         imageView = (ImageView) itemView.findViewById(R.id.m_icon);
         img_avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.img_avatar);
@@ -133,6 +136,37 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         }
 
         message_ = m;
+
+        int drawable_id = R.drawable.rounded_orange_bg_with_border;
+        try
+        {
+            if (m.filetransfer_kind == TOX_FILE_KIND_FTV2.value)
+            {
+                drawable_id = R.drawable.rounded_orange_bg;
+            }
+
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN)
+            {
+                rounded_bg_container.setBackgroundDrawable(ContextCompat.getDrawable(context, drawable_id));
+            }
+            else
+            {
+                rounded_bg_container.setBackground(ContextCompat.getDrawable(context, drawable_id));
+            }
+        }
+        catch (Exception e)
+        {
+            final int sdk = android.os.Build.VERSION.SDK_INT;
+            if (sdk < android.os.Build.VERSION_CODES.JELLY_BEAN)
+            {
+                rounded_bg_container.setBackgroundDrawable(ContextCompat.getDrawable(context, drawable_id));
+            }
+            else
+            {
+                rounded_bg_container.setBackground(ContextCompat.getDrawable(context, drawable_id));
+            }
+        }
 
         is_selected = false;
         if (selected_messages.isEmpty())

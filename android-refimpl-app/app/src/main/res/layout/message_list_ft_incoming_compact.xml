@@ -44,6 +44,7 @@
 
 
             <LinearLayout
+                android:id="@+id/ft_incoming_rounded_bg"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="0dp"
