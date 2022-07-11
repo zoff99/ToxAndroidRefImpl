@@ -416,4 +416,6 @@
     <string name="layout___group_myname2">我在群组中的名称：</string>
     <string name="title_activity_grouppeerinfo">对 Peerinfo 分组</string>
     <string name="pref_title_custom_bootstrap_nodes">使用自定义引导节点</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">切换通知</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">你要为此好友切换“通知静音”吗？</string>
 </resources>
