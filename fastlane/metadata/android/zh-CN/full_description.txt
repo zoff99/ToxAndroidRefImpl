@@ -14,6 +14,9 @@ Tox 没有中心化服务器可供搜查，关闭，或强制接管数据 — �
 Tox 是自由软件。自由且免费。这意味着 Tox 属于您 — 使用，修改，分发 — 因为 Tox 来自用户，为了用户。<br><br>
 
 <b>更多信息：</b><br>
-* <a href="https://tox.zoff.cc">关于 Tox</a><br>
-* <a href="https://matrix.to/#/#trifa:matrix.org">在 Matrix 上加入讨论</a><br>
-* <a href="https://matrix.to/#/#toktok:libera.chat">加入 Tox IRC 频道</a><br>
+*关于 Tox: https://tox.zoff.cc
+<br>
+*加入 Matrix 上的讨论: https://matrix.to/#/#trifa:matrix.org
+<br>
+*加入 Tox IRC 频道: https://matrix.to/#/#toktok:libera.chat
+<br>

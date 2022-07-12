@@ -14,6 +14,9 @@ Tox'un baskın yapılabilecek, kapatılabilecek veya verileri vermeye zorlanabil
 Tox, ücretsiz olmasının yanı sıra özgür bir yazılımdır. Bu, Tox'un — kullanmak, değiştirmek ve paylaşmak üzere — sizin olduğu anlamına gelir çünkü Tox kullanıcılar tarafından ve kullanıcılar için geliştirilir.<br><br>
 
 <b>Daha Fazla Bilgi:</b><br>
-* <a href="https://tox.zoff.cc">Tox hakkında</a><br>
-* <a href="https://matrix.to/#/#trifa:matrix.org">Matrix üzerinde tartışmaya katılın</a><br>
-* <a href="https://matrix.to/#/#toktok:libera.chat">Tox IRC kanalına katılın</a><br>
+* Tox hakkında: https://tox.zoff.cc
+<br>
+* Matrix üzerinde tartışmaya katılın: https://matrix.to/#/#trifa:matrix.org
+<br>
+* Tox IRC kanalına katılın: https://matrix.to/#/#toktok:libera.chat
+<br>
