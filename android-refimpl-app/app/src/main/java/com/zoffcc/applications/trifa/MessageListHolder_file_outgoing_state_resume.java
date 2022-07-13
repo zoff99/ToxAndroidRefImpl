@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -44,6 +45,7 @@ import com.mikepenz.iconics.IconicsDrawable;
 
 import java.net.URLConnection;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
@@ -307,29 +309,25 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
             {
                 if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    try
-                    {
-                        // cancel FT
-                        Log.i(TAG, "button_cancel:OnTouch:001");
-                        tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
-                                         get_filetransfer_filenum_from_id(message.filetransfer_id),
-                                         TOX_FILE_CONTROL_CANCEL.value);
-                        set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
-                        set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setTitle(
+                            v.getContext().getString(R.string.MessageListHolder_file_outgoing_cancel_ft_title));
+                    builder.setMessage(
+                            v.getContext().getString(R.string.MessageListHolder_file_outgoing_cancel_ft_message));
 
-                        // TODO: cleanup duplicated outgoing files from provider here ************
-                        remove_ft_from_cache(message);
+                    builder.setNegativeButton(v.getContext().getString(R.string.MainActivity_no_button), null);
+                    builder.setPositiveButton(v.getContext().getString(R.string.MainActivity_yes_button),
+                                              new DialogInterface.OnClickListener()
+                                              {
+                                                  @Override
+                                                  public void onClick(DialogInterface dialog, int which)
+                                                  {
+                                                      cancel_outgoing_filetransfer(message);
+                                                  }
+                                              });
 
-                        button_ok.setVisibility(View.GONE);
-                        button_cancel.setVisibility(View.GONE);
-                        ft_progressbar.setVisibility(View.GONE);
-
-                        // update message view
-                        update_single_message_from_messge_id(message.id, true);
-                    }
-                    catch (Exception e)
-                    {
-                    }
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
                 else
                 {
@@ -446,6 +444,33 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
         }
 
 
+    }
+
+    private void cancel_outgoing_filetransfer(final Message message)
+    {
+        try
+        {
+            // cancel FT
+            Log.i(TAG, "button_cancel:OnTouch:001");
+            tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
+                             get_filetransfer_filenum_from_id(message.filetransfer_id),
+                             TOX_FILE_CONTROL_CANCEL.value);
+            set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
+            set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+
+            // TODO: cleanup duplicated outgoing files from provider here ************
+            remove_ft_from_cache(message);
+
+            button_ok.setVisibility(View.GONE);
+            button_cancel.setVisibility(View.GONE);
+            ft_progressbar.setVisibility(View.GONE);
+
+            // update message view
+            update_single_message_from_messge_id(message.id, true);
+        }
+        catch (Exception e)
+        {
+        }
     }
 
     @Override

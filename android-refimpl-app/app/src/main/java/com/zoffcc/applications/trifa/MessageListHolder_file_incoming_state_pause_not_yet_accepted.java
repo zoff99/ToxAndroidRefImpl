@@ -20,11 +20,9 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-
-import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,16 +36,20 @@ import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_accepted_from_id;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_state_from_id;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_message_accepted_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
-import static com.zoffcc.applications.trifa.HelperGeneric.set_message_accepted_from_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
@@ -253,29 +255,25 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
             {
                 if (event.getAction() == MotionEvent.ACTION_DOWN)
                 {
-                    try
-                    {
-                        // cancel FT
-                        Log.i(TAG, "button_cancel:OnTouch:001");
-                        // values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
-                        tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
-                                         get_filetransfer_filenum_from_id(message.filetransfer_id),
-                                         TOX_FILE_CONTROL_CANCEL.value);
-                        set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
-                        set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setTitle(
+                            v.getContext().getString(R.string.MessageListHolder_file_incoming_cancel_ft_title));
+                    builder.setMessage(
+                            v.getContext().getString(R.string.MessageListHolder_file_incoming_cancel_ft_message));
 
-                        remove_vfs_ft_from_cache(message);
+                    builder.setNegativeButton(v.getContext().getString(R.string.MainActivity_no_button), null);
+                    builder.setPositiveButton(v.getContext().getString(R.string.MainActivity_yes_button),
+                                              new DialogInterface.OnClickListener()
+                                              {
+                                                  @Override
+                                                  public void onClick(DialogInterface dialog, int which)
+                                                  {
+                                                      cancel_incoming_filetransfer(message);
+                                                  }
+                                              });
 
-                        button_ok.setVisibility(View.GONE);
-                        button_cancel.setVisibility(View.GONE);
-                        ft_progressbar.setVisibility(View.GONE);
-
-                        // update message view
-                        update_single_message_from_messge_id(message.id, true);
-                    }
-                    catch (Exception e)
-                    {
-                    }
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
                 else
                 {
@@ -332,6 +330,32 @@ public class MessageListHolder_file_incoming_state_pause_not_yet_accepted extend
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private void cancel_incoming_filetransfer(final Message message)
+    {
+        try
+        {
+            // cancel FT
+            Log.i(TAG, "button_cancel:OnTouch:001");
+            // values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
+            tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
+                             get_filetransfer_filenum_from_id(message.filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
+            set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
+            set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
+
+            remove_vfs_ft_from_cache(message);
+
+            button_ok.setVisibility(View.GONE);
+            button_cancel.setVisibility(View.GONE);
+            ft_progressbar.setVisibility(View.GONE);
+
+            // update message view
+            update_single_message_from_messge_id(message.id, true);
+        }
+        catch (Exception e)
+        {
         }
     }
 

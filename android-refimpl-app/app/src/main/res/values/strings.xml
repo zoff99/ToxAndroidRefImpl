@@ -343,6 +343,10 @@
     <string name="add_friend_success">You have added a new Friend</string>
     <string name="FriendListHolder_toggle_notification_silent_title">toggle Notification</string>
     <string name="FriendListHolder_toggle_notification_silent_message">Do you want to toggle Notification Silence for this Friend?</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">cancel Filetransfer</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">Do you want to cancel this Filetransfer?</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">cancel Filetransfer</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">Do you want to cancel this Filetransfer?</string>
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
