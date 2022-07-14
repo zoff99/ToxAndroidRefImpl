@@ -13,7 +13,7 @@ buildscript {
         classpath "com.gradle:build-scan-plugin:1.13.4"
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.4'
 
-        classpath 'com.android.tools.build:gradle:4.0.2'
+        classpath 'com.android.tools.build:gradle:7.2.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.0"
 
         // used to generate a POM file
