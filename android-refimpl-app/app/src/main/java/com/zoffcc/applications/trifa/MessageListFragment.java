@@ -29,6 +29,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.List;
 
 import androidx.fragment.app.Fragment;
@@ -58,6 +60,7 @@ public class MessageListFragment extends Fragment
     boolean is_data_loaded = true;
     static boolean show_only_files = false;
     static String search_messages_text = null;
+    FloatingActionButton unread_messages_notice_button = null;
 
     @SuppressLint("WrongThread")
     @Override
@@ -66,6 +69,8 @@ public class MessageListFragment extends Fragment
         Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
 
+        unread_messages_notice_button = view.findViewById(R.id.unread_messages_notice_button);
+        unread_messages_notice_button.setVisibility(View.INVISIBLE);
 
         mla = (MessageListActivity) (getActivity());
         if (mla != null)
@@ -206,7 +211,7 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:at bottom");
                         is_at_bottom = true;
-                        view.findViewById(R.id.unread_messages_notice_button).setVisibility(view.INVISIBLE);
+                        unread_messages_notice_button.setVisibility(View.INVISIBLE);
                     }
                 }
                 else
@@ -215,7 +220,7 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:NOT at bottom");
                         is_at_bottom = false;
-                        view.findViewById(R.id.unread_messages_notice_button).setVisibility(view.VISIBLE);
+                        unread_messages_notice_button.setVisibility(View.VISIBLE);
                     }
                 }
             }

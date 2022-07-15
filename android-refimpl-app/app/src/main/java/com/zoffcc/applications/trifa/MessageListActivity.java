@@ -2144,4 +2144,26 @@ public class MessageListActivity extends AppCompatActivity
         intent.putExtra("friendnum", tox_friend_by_public_key__wrapper(friend_pubkey));
         c.startActivity(intent);
     }
+
+    public void scroll_to_bottom(View v)
+    {
+        try
+        {
+            MainActivity.message_list_fragment.listingsView.scrollToPosition(
+                    MainActivity.message_list_fragment.adapter.getItemCount() - 1);
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        MainActivity.message_list_fragment.is_at_bottom = true;
+
+        try
+        {
+            MainActivity.message_list_fragment.unread_messages_notice_button.setVisibility(View.INVISIBLE);
+        }
+        catch (Exception ignored)
+        {
+        }
+    }
 }
