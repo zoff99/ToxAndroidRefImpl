@@ -77,6 +77,9 @@ public class TRIFAGlobals
 
     public static final int MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION = 4;
 
+    public static final int FAB_SCROLL_TO_BOTTOM_FADEOUT_MS = 350;
+    public static final int FAB_SCROLL_TO_BOTTOM_FADEIN_MS = 200;
+
     public static final long UINT32_MAX_JAVA = 4294967295L; // 0xffffffff == UINT32_MAX
 
     // ----------

@@ -14,6 +14,8 @@
     <color name="fast_scroller_color">#3F51B5</color>
     <color name="message_text_date_string_color">#FFFFFF</color>
     <color name="scroll_date_header_color">#FFFFFF</color>
+    <color name="message_list_scroll_to_bottom_fab_bg_normal">#9E9E9E</color>
+    <color name="message_list_scroll_to_bottom_fab_bg_new_message">#FF4081</color>
 
     <!-- google's material design colours from
     http://www.google.com/design/spec/style/color.html#color-ui-color-palette -->

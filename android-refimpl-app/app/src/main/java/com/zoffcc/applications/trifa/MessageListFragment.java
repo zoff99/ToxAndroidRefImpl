@@ -27,10 +27,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.List;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -38,7 +42,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -58,6 +65,7 @@ public class MessageListFragment extends Fragment
     boolean is_data_loaded = true;
     static boolean show_only_files = false;
     static String search_messages_text = null;
+    FloatingActionButton unread_messages_notice_button = null;
 
     @SuppressLint("WrongThread")
     @Override
@@ -65,6 +73,13 @@ public class MessageListFragment extends Fragment
     {
         Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
+
+        unread_messages_notice_button = view.findViewById(R.id.unread_messages_notice_button);
+        unread_messages_notice_button.setAnimation(null);
+        unread_messages_notice_button.setVisibility(View.INVISIBLE);
+        unread_messages_notice_button.setSupportBackgroundTintList(
+                (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
+
 
 
         mla = (MessageListActivity) (getActivity());
@@ -206,6 +221,14 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:at bottom");
                         is_at_bottom = true;
+                        final AlphaAnimation anim_fade_out = new AlphaAnimation(1, 0);
+                        anim_fade_out.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
+                        anim_fade_out.setStartOffset(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
+                        anim_fade_out.setFillAfter(false);
+                        unread_messages_notice_button.setAnimation(anim_fade_out);
+                        unread_messages_notice_button.setVisibility(View.INVISIBLE);
+                        unread_messages_notice_button.setSupportBackgroundTintList(
+                                (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
                     }
                 }
                 else
@@ -214,6 +237,12 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:NOT at bottom");
                         is_at_bottom = false;
+                        final AlphaAnimation anim_fade_in = new AlphaAnimation(0, 1);
+                        anim_fade_in.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
+                        anim_fade_in.setStartOffset(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
+                        anim_fade_in.setFillAfter(false);
+                        unread_messages_notice_button.setAnimation(anim_fade_in);
+                        unread_messages_notice_button.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -423,6 +452,12 @@ public class MessageListFragment extends Fragment
                     if (is_at_bottom)
                     {
                         listingsView.scrollToPosition(adapter.getItemCount() - 1);
+                    }
+                    else
+                    {
+                        // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
+                        unread_messages_notice_button.setSupportBackgroundTintList(
+                                (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
                     }
                 }
                 catch (Exception e)
