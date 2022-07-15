@@ -206,6 +206,7 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:at bottom");
                         is_at_bottom = true;
+                        view.findViewById(R.id.unread_messages_notice_button).setVisibility(view.INVISIBLE);
                     }
                 }
                 else
@@ -214,6 +215,7 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:NOT at bottom");
                         is_at_bottom = false;
+                        view.findViewById(R.id.unread_messages_notice_button).setVisibility(view.VISIBLE);
                     }
                 }
             }

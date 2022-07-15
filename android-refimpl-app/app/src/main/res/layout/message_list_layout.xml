@@ -2,6 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/chat_background_1"
@@ -43,5 +44,21 @@
         android:textColor="@color/scroll_date_header_color"
         android:textSize="14sp"
         android:visibility="invisible"/>
+
+    <Button
+        android:id="@+id/unread_messages_notice_button"
+        style="@android:style/Widget.DeviceDefault.Button"
+        android:layout_width="193dp"
+        android:layout_height="37dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="30dp"
+        android:background="@color/design_default_color_error"
+        android:text="@string/layout___unread_messages"
+        android:textColor="#DDDDDD"
+        android:textSize="15sp"
+        android:visibility="invisible"
+        android:onClick="scroll_to_bottom_by_unread_btn"
+        />
 
 </RelativeLayout>

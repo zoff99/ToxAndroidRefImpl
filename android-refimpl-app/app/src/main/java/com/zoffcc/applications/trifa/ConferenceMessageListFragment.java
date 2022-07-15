@@ -71,6 +71,7 @@ public class ConferenceMessageListFragment extends Fragment
         // default is: at bottom
         is_at_bottom = true;
 
+
         try
         {
             // reset "new" flags for messages -------
@@ -214,6 +215,7 @@ public class ConferenceMessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:at bottom");
                         is_at_bottom = true;
+                        view.findViewById(R.id.unread_messages_notice_button).setVisibility(view.INVISIBLE);
                     }
                 }
                 else
@@ -222,6 +224,7 @@ public class ConferenceMessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:NOT at bottom");
                         is_at_bottom = false;
+                        view.findViewById(R.id.unread_messages_notice_button).setVisibility(view.VISIBLE);
                     }
                 }
             }
