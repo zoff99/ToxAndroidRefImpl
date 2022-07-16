@@ -27,10 +27,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
 import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.l4digital.fastscroll.FastScroller;
 
 import java.util.List;
 
@@ -41,11 +41,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -59,6 +58,7 @@ public class MessageListFragment extends Fragment
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     MessagelistAdapter adapter = null;
     static boolean is_at_bottom = true;
+    static boolean faded_in = false;
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
     MessageListActivity mla = null;
@@ -81,7 +81,6 @@ public class MessageListFragment extends Fragment
                 (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
 
 
-
         mla = (MessageListActivity) (getActivity());
         if (mla != null)
         {
@@ -91,6 +90,7 @@ public class MessageListFragment extends Fragment
 
         // default is: at bottom
         is_at_bottom = true;
+        faded_in = false;
 
         try
         {
@@ -188,6 +188,34 @@ public class MessageListFragment extends Fragment
         listingsView.setItemAnimator(new DefaultItemAnimator());
         listingsView.setHasFixedSize(false);
 
+        listingsView.setFastScrollListener(new FastScroller.FastScrollListener()
+        {
+            @Override
+            public void onFastScrollStart(FastScroller fastScroller)
+            {
+                if (!is_at_bottom)
+                {
+                    if (faded_in)
+                    {
+                        do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
+                                            false);
+                    }
+                }
+            }
+
+            @Override
+            public void onFastScrollStop(FastScroller fastScroller)
+            {
+                if (!is_at_bottom)
+                {
+                    if (!faded_in)
+                    {
+                        do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, true);
+                    }
+                }
+            }
+        });
+
         RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener()
         {
             @Override
@@ -197,10 +225,25 @@ public class MessageListFragment extends Fragment
 
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING)
                 {
+                    if (!is_at_bottom)
+                    {
+                        if (faded_in)
+                        {
+                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
+                                                false);
+                        }
+                    }
                     conversationDateHeader.show();
                 }
                 else if (newState == RecyclerView.SCROLL_STATE_IDLE)
                 {
+                    if (!is_at_bottom)
+                    {
+                        if (!faded_in)
+                        {
+                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, true);
+                        }
+                    }
                     conversationDateHeader.hide();
                 }
             }
@@ -221,14 +264,10 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:at bottom");
                         is_at_bottom = true;
-                        final AlphaAnimation anim_fade_out = new AlphaAnimation(1, 0);
-                        anim_fade_out.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
-                        anim_fade_out.setStartOffset(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
-                        anim_fade_out.setFillAfter(false);
-                        unread_messages_notice_button.setAnimation(anim_fade_out);
-                        unread_messages_notice_button.setVisibility(View.INVISIBLE);
+                        do_fade_anim_on_fab(unread_messages_notice_button, false);
                         unread_messages_notice_button.setSupportBackgroundTintList(
-                                (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
+                                (ContextCompat.getColorStateList(context_s,
+                                                                 R.color.message_list_scroll_to_bottom_fab_bg_normal)));
                     }
                 }
                 else
@@ -237,11 +276,7 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:NOT at bottom");
                         is_at_bottom = false;
-                        final AlphaAnimation anim_fade_in = new AlphaAnimation(0, 1);
-                        anim_fade_in.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
-                        anim_fade_in.setStartOffset(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
-                        anim_fade_in.setFillAfter(false);
-                        unread_messages_notice_button.setAnimation(anim_fade_in);
+                        do_fade_anim_on_fab(unread_messages_notice_button, true);
                         unread_messages_notice_button.setVisibility(View.VISIBLE);
                     }
                 }
@@ -457,7 +492,8 @@ public class MessageListFragment extends Fragment
                     {
                         // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
                         unread_messages_notice_button.setSupportBackgroundTintList(
-                                (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                                (ContextCompat.getColorStateList(context_s,
+                                                                 R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
                     }
                 }
                 catch (Exception e)

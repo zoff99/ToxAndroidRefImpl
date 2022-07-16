@@ -19,6 +19,8 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.app.Notification;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -40,6 +42,7 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.AlphaAnimation;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
 import android.widget.RemoteViews;
@@ -48,6 +51,7 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.target.NotificationTarget;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
@@ -103,7 +107,10 @@ import static com.zoffcc.applications.trifa.MainActivity.VFS_CUSTOM_WRITE_CACHE;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
+import static com.zoffcc.applications.trifa.MessageListFragment.faded_in;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_V2_MSG_SENT_OK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
@@ -4128,5 +4135,57 @@ public class HelperGeneric
         }
 
         return true;
+    }
+
+    public static void do_fade_anim_on_fab(final FloatingActionButton fab, boolean fade_in)
+    {
+        if (fade_in)
+        {
+            faded_in = true;
+            ObjectAnimator scaleUpX = ObjectAnimator.ofFloat(fab, "scaleX", 0.0f, 1f);
+            ObjectAnimator scaleUpY = ObjectAnimator.ofFloat(fab, "scaleY", 0.0f, 1f);
+            scaleUpX.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
+            scaleUpY.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
+
+            AnimatorSet scaleUp = new AnimatorSet();
+            scaleUp.play(scaleUpX).with(scaleUpY);
+
+            scaleUp.start();
+        }
+        else
+        {
+            faded_in = false;
+            ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(fab, "scaleX", 1f, 0.0f);
+            ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(fab, "scaleY", 1f, 0.0f);
+            scaleDownX.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
+            scaleDownY.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
+
+            AnimatorSet scaleDown = new AnimatorSet();
+            scaleDown.play(scaleDownX).with(scaleDownY);
+
+            scaleDown.start();
+        }
+
+    }
+
+    public static void set_fade_anim_on_fab(final FloatingActionButton fab, boolean fade_in)
+    {
+        int fade_ms = FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
+        int start = 1;
+        int end = 0;
+
+        if (fade_in)
+        {
+            fade_ms = FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
+            start = 0;
+            end = 1;
+        }
+
+        final AlphaAnimation anim_fade_out = new AlphaAnimation(start, end);
+        anim_fade_out.setDuration(fade_ms);
+        anim_fade_out.setStartOffset(fade_ms);
+        anim_fade_out.setFillAfter(false);
+
+        fab.setAnimation(anim_fade_out);
     }
 }

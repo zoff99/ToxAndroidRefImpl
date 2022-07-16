@@ -358,11 +358,11 @@ dependencies {
     implementation('com.github.angads25:filepicker:1.1.1') {
         exclude group: 'com.android.support'
     }
-    //
-    implementation('com.github.zoff99:pkgs_l4digitalFastscroll:1.1.2') {
+
+    implementation('io.github.l4digital:fastscroll:2.1.0') {
         exclude group: 'com.android.support'
     }
-    //
+
     implementation('com.vanniktech:emoji-google:0.7.0') {
         exclude group: 'com.android.support'
     }

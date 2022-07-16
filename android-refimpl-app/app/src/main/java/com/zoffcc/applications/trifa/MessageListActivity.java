@@ -44,7 +44,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.AlphaAnimation;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -86,6 +85,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
@@ -108,7 +108,6 @@ import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.MessageListFragment.show_only_files;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
@@ -2163,21 +2162,9 @@ public class MessageListActivity extends AppCompatActivity
 
         try
         {
-            final AlphaAnimation anim_fade_out = new AlphaAnimation(1, 0);
-            anim_fade_out.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
-            anim_fade_out.setStartOffset(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
-            anim_fade_out.setFillAfter(false);
-            MainActivity.message_list_fragment.unread_messages_notice_button.setAnimation(anim_fade_out);
+            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, false);
             MainActivity.message_list_fragment.unread_messages_notice_button.setSupportBackgroundTintList(
                     (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
-        }
-        catch (Exception ignored)
-        {
-        }
-
-        try
-        {
-            MainActivity.message_list_fragment.unread_messages_notice_button.setVisibility(View.INVISIBLE);
         }
         catch (Exception ignored)
         {

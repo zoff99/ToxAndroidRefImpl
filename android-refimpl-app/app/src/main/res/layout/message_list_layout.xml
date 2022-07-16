@@ -17,7 +17,9 @@
         android:divider="@null"
         android:dividerHeight="2dp"
         app:bubbleColor="@color/fast_scroller_color"
+        app:bubbleSize="normal"
         app:bubbleTextColor="#ffffff"
+        app:bubbleTextSize="20sp"
         app:handleColor="@color/fast_scroller_color"
         app:hideScrollbar="true"
         app:showTrack="false"
@@ -50,11 +52,11 @@
         android:layout_alignParentBottom="true"
         android:layout_marginRight="30dp"
         android:layout_marginBottom="30dp"
-        app:backgroundTint="@color/message_list_scroll_to_bottom_fab_bg_normal"
         android:onClick="scroll_to_bottom"
-        app:fabSize="mini"
         android:textSize="15sp"
         android:visibility="invisible"
+        app:backgroundTint="@color/message_list_scroll_to_bottom_fab_bg_normal"
+        app:fabSize="mini"
         app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
 
 </RelativeLayout>
