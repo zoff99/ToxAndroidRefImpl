@@ -418,4 +418,8 @@
     <string name="pref_title_custom_bootstrap_nodes">使用自定义引导节点</string>
     <string name="FriendListHolder_toggle_notification_silent_title">切换通知</string>
     <string name="FriendListHolder_toggle_notification_silent_message">你要为此好友切换“通知静音”吗？</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">取消文件传输</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">你想取消此文件传输吗？</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">取消文件传输</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">你想取消此文件传输吗？</string>
 </resources>
