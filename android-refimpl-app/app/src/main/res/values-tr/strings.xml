@@ -396,4 +396,8 @@
     <string name="title_activity_grouppeerinfo">Grup Eş Bilgisi</string>
     <string name="FriendListHolder_toggle_notification_silent_title">Bildirimi değiştir</string>
     <string name="FriendListHolder_toggle_notification_silent_message">Bu arkadaş için bildirim sessizliğini değiştirmek istiyor musunuz\?</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">Dosya aktarımını iptal et</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">Bu dosya aktarımını iptal etmek istiyor musunuz\?</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">Bu dosya aktarımını iptal etmek istiyor musunuz\?</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">Dosya aktarımını iptal et</string>
 </resources>
