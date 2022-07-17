@@ -189,6 +189,9 @@
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">share files</string>
     <string name="pref_description_allow_file_sharing_to_trifa_via_intent">share files to TRIfA via share Intent.</string>
 
+    <string name="pref_title_allow_open_encrypted_file_via_intent">open files from encrypted storage</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">open files directly from encrypted storage via Intent. This can be potentially dangerous, because other malicious apps could open other files in TRIfA\'s encrypted storage.</string>
+
     <string name="pref_title_allow_screen_off_in_audio_call">Turn screen off</string>
     <string name="pref_description_allow_screen_off_in_audio_call">If you experience troubles with screen turning off in an Audiocall, set this to off</string>
 

@@ -36,10 +36,12 @@ import java.io.OutputStream;
 import info.guardianproject.iocipher.File;
 import info.guardianproject.iocipher.FileInputStream;
 
+import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
+
 public class IOCipherContentProvider extends AbstractFileProvider
 {
     public static final String TAG = "IOCipherContentProvider";
-    public static final Uri FILES_URI = Uri.parse("content://com.zoffcc.applications.trifa/");
+    public static final Uri FILES_URI = Uri.parse("content://com.zoffcc.applications.trifa.ext1_fileprovider/");
     private static final int PIPE_BLOCKSIZE = 8192;
     private MimeTypeMap mimeTypeMap;
 
@@ -53,6 +55,11 @@ public class IOCipherContentProvider extends AbstractFileProvider
     @Override
     public long getDataLength(Uri uri)
     {
+        if (!PREF__allow_open_encrypted_file_via_intent)
+        {
+            return 0;
+        }
+
         String path = uri.getPath();
         long filesize = new File(path).length();
         if ((filesize < 1) || (filesize > (Long.MAX_VALUE - 2)))
@@ -67,6 +74,11 @@ public class IOCipherContentProvider extends AbstractFileProvider
     @Override
     public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException
     {
+        if (!PREF__allow_open_encrypted_file_via_intent)
+        {
+            throw new FileNotFoundException("No Access");
+        }
+
         ParcelFileDescriptor[] pipe = null;
         InputStream in = null;
 
@@ -81,7 +93,7 @@ public class IOCipherContentProvider extends AbstractFileProvider
         }
         catch (IOException e)
         {
-            Log.e(TAG, "Error opening pipe", e);
+            // Log.e(TAG, "Error opening pipe", e);
             throw new FileNotFoundException("Could not open pipe for: " + uri.toString());
         }
 
@@ -120,6 +132,27 @@ public class IOCipherContentProvider extends AbstractFileProvider
             catch (IOException e)
             {
                 Log.e(TAG, "File transfer failed:", e);
+                try
+                {
+                    in.close();
+                }
+                catch (Exception ignored)
+                {
+                }
+                try
+                {
+                    out.flush();
+                }
+                catch (Exception ignored)
+                {
+                }
+                try
+                {
+                    out.close();
+                }
+                catch (Exception ignored)
+                {
+                }
             }
         }
     }

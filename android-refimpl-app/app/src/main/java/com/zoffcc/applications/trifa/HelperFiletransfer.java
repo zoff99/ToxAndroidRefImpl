@@ -19,10 +19,12 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
@@ -36,6 +38,8 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
+
+import androidx.core.content.FileProvider;
 
 import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -1138,7 +1142,7 @@ public class HelperFiletransfer
             }
             else
             {
-                Log.i(TAG, "check_if_incoming_file_was_exported:null");
+                // Log.i(TAG, "check_if_incoming_file_was_exported:null");
                 return null;
             }
         }
@@ -1153,12 +1157,29 @@ public class HelperFiletransfer
     {
         try
         {
-            MimeTypeMap myMime = MimeTypeMap.getSingleton();
-            Intent newIntent = new Intent(Intent.ACTION_VIEW);
-            String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));
-            Uri file_uri = Uri.parse(filename_fullpath);
-            newIntent.setDataAndType(file_uri, mimeType);
-            context.startActivity(newIntent);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                Uri file_uri = FileProvider.getUriForFile(context, "com.zoffcc.applications.trifa.std_fileprovider",
+                                                          new java.io.File(filename_fullpath));
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));
+                Intent newIntent = new Intent(Intent.ACTION_VIEW);
+                newIntent.setDataAndType(file_uri, mimeType);
+                newIntent.setClipData(ClipData.newRawUri("", file_uri));
+                newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                // Log.i(TAG, "open_local_file:23:intent=" + newIntent);
+                context.startActivity(newIntent);
+            }
+            else
+            {
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                Intent newIntent = new Intent(Intent.ACTION_VIEW);
+                String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));
+                Uri file_uri = Uri.parse(filename_fullpath);
+                newIntent.setDataAndType(file_uri, mimeType);
+                // Log.i(TAG, "open_local_file:lt23:intent=" + newIntent);
+                context.startActivity(newIntent);
+            }
         }
         catch (Exception e)
         {

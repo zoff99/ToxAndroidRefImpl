@@ -341,10 +341,20 @@
         </receiver>
 
         <provider
-            android:name=".IOCipherContentProvider"
-            android:authorities="com.zoffcc.applications.trifa"
+            android:name=".StdContentProvider"
+            android:authorities="com.zoffcc.applications.trifa.std_fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/stdfilepaths" />
+        </provider>
+
+        <provider
+            android:name=".IOCipherContentProvider"
+            android:authorities="com.zoffcc.applications.trifa.ext1_fileprovider"
+            android:grantUriPermissions="true"
+            android:exported="true">
         </provider>
 
     </application>

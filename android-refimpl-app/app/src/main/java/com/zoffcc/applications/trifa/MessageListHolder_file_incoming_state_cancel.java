@@ -38,6 +38,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -394,26 +395,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             {
                 try
                 {
-                    if (export_filename_with_path == null)
-                    {
-                        ft_preview_image.setOnTouchListener(null);
-                    }
-                    else
-                    {
-                        ft_preview_image.setOnTouchListener(new View.OnTouchListener()
-                        {
-                            @Override
-                            public boolean onTouch(View v, MotionEvent event)
-                            {
-                                if (event.getAction() == MotionEvent.ACTION_UP)
-                                {
-                                    open_local_file(export_filename_with_path, v.getContext());
-                                }
-                                return true;
-                            }
-                        });
-                    }
-
                     final Drawable d4 = new IconicsDrawable(context).
                             icon(GoogleMaterial.Icon.gmd_ondemand_video).
                             backgroundColor(Color.TRANSPARENT).
@@ -447,13 +428,15 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 priority(Priority.LOW).
                                 into(ft_preview_image);
                     }
+
+                    try_to_open_file(message2, export_filename_with_path);
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
             }
-            else // ---- not an image ----
+            else // ---- not an image or a video ----
             {
                 final Drawable d3 = new IconicsDrawable(this.context).
                         icon(GoogleMaterial.Icon.gmd_attachment).
@@ -473,81 +456,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                         placeholder(R.drawable.round_loading_animation).
                         into(ft_preview_image);
 
-                if (PREF__allow_open_encrypted_file_via_intent)
-                {
-                    ft_preview_image.setOnTouchListener(new View.OnTouchListener()
-                    {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event)
-                        {
-                            if (event.getAction() == MotionEvent.ACTION_UP)
-                            {
-                                try
-                                {
-                                    final Uri uri = Uri.parse(
-                                            IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
-
-                                    // Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
-                                    //            message2.filename_fullpath);
-
-                                    File file = new File(message2.filename_fullpath);
-                                    String filename_without_path = file.getName();
-
-                                    new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
-                                            setTitle(filename_without_path).
-                                            setNeutralButton("View", new DialogInterface.OnClickListener()
-                                            {
-                                                @Override
-                                                public void onClick(DialogInterface dialog, int which)
-                                                {
-                                                    try
-                                                    {
-                                                        Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
-                                                        v.getContext().startActivity(sendIntent);
-                                                    }
-                                                    catch (ActivityNotFoundException e)
-                                                    {
-                                                        Log.e(TAG, "No relevant Activity found", e);
-                                                    }
-                                                }
-                                            }).show();
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                    Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
-                                }
-                            }
-                            else
-                            {
-                            }
-                            return true;
-                        }
-                    });
-                }
-                else
-                {
-                    if (export_filename_with_path == null)
-                    {
-                        ft_preview_image.setOnTouchListener(null);
-                    }
-                    else
-                    {
-                        ft_preview_image.setOnTouchListener(new View.OnTouchListener()
-                        {
-                            @Override
-                            public boolean onTouch(View v, MotionEvent event)
-                            {
-                                if (event.getAction() == MotionEvent.ACTION_UP)
-                                {
-                                    open_local_file(export_filename_with_path, v.getContext());
-                                }
-                                return true;
-                            }
-                        });
-                    }
-
-                }
+                try_to_open_file(message2, export_filename_with_path);
             }
 
             ft_export_button_container.setVisibility(View.VISIBLE);
@@ -689,6 +598,86 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    public void try_to_open_file(Message message2, String export_filename_with_path)
+    {
+        if ((PREF__allow_open_encrypted_file_via_intent) && (export_filename_with_path == null))
+        {
+            ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+            {
+                @Override
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    if (event.getAction() == MotionEvent.ACTION_UP)
+                    {
+                        try
+                        {
+                            final Uri uri = Uri.parse(
+                                    IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
+
+                            //Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
+                            //           message2.filename_fullpath);
+
+                            File file = new File(message2.filename_fullpath);
+                            String filename_without_path = file.getName();
+
+                            new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
+                                    setTitle(filename_without_path).
+                                    setNeutralButton("View", new DialogInterface.OnClickListener()
+                                    {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which)
+                                        {
+                                            try
+                                            {
+                                                Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
+                                                v.getContext().startActivity(sendIntent);
+                                            }
+                                            catch (ActivityNotFoundException e)
+                                            {
+                                                Toast.makeText(context, "Can not handle this file",
+                                                               Toast.LENGTH_LONG).show();
+                                                // Log.e(TAG, "No relevant Activity found", e);
+                                            }
+                                        }
+                                    }).show();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
+                        }
+                    }
+                    else
+                    {
+                    }
+                    return true;
+                }
+            });
+        }
+        else
+        {
+            if (export_filename_with_path == null)
+            {
+                ft_preview_image.setOnTouchListener(null);
+            }
+            else
+            {
+                ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                {
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event)
+                    {
+                        if (event.getAction() == MotionEvent.ACTION_UP)
+                        {
+                            open_local_file(export_filename_with_path, v.getContext());
+                        }
+                        return true;
+                    }
+                });
+            }
         }
     }
 
