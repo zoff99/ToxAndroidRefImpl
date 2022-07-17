@@ -1187,4 +1187,39 @@ public class HelperFiletransfer
             display_toast("opening file failed", false, 0);
         }
     }
+
+    static void open_local_outgoing_file(final String filename_fullpath, final Context context)
+    {
+        try
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+            {
+                Uri file_uri = FileProvider.getUriForFile(context, "com.zoffcc.applications.trifa.ext2_provider",
+                                                          new java.io.File(filename_fullpath));
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));
+                Intent newIntent = new Intent(Intent.ACTION_VIEW);
+                newIntent.setDataAndType(file_uri, mimeType);
+                newIntent.setClipData(ClipData.newRawUri("", file_uri));
+                newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                // Log.i(TAG, "open_local_outgoing_file:23:intent=" + newIntent);
+                context.startActivity(newIntent);
+            }
+            else
+            {
+                MimeTypeMap myMime = MimeTypeMap.getSingleton();
+                Intent newIntent = new Intent(Intent.ACTION_VIEW);
+                String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));
+                Uri file_uri = Uri.parse(filename_fullpath);
+                newIntent.setDataAndType(file_uri, mimeType);
+                // Log.i(TAG, "open_local_outgoing_file:lt23:intent=" + newIntent);
+                context.startActivity(newIntent);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            display_toast("opening outgoing file failed", false, 0);
+        }
+    }
 }

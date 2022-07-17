@@ -4088,6 +4088,11 @@ public class HelperGeneric
 
     static void display_toast(final String toast_text, final boolean length_long, final int delay_ms)
     {
+        display_toast_with_context(context_s, toast_text, length_long, delay_ms);
+    }
+
+    static void display_toast_with_context(final Context c, final String toast_text, final boolean length_long, final int delay_ms)
+    {
         try
         {
             int toast_length = Toast.LENGTH_SHORT;
@@ -4099,18 +4104,48 @@ public class HelperGeneric
 
             if (delay_ms == 0)
             {
-                Toast.makeText(context_s, toast_text, toast_length).show();
+                Toast.makeText(c, toast_text, toast_length).show();
             }
             else
             {
                 final int toast_length2 = toast_length;
-                new Handler().postDelayed(() -> Toast.makeText(context_s, toast_text, toast_length2).show(), delay_ms);
+                new Handler().postDelayed(() -> Toast.makeText(c, toast_text, toast_length2).show(), delay_ms);
             }
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "display_toast:EE01:" + e.getMessage());
+            Log.i(TAG, "display_toast_with_context:EE01:" + e.getMessage());
+        }
+    }
+
+    static void display_toast_with_context_custom_duration(final Context c, final String toast_text, final int custom_duration_ms, final int delay_ms)
+    {
+        try
+        {
+            new Handler().postDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    final Toast toast = Toast.makeText(c, toast_text, Toast.LENGTH_SHORT);
+                    toast.show();
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            toast.cancel();
+                        }
+                    }, custom_duration_ms);
+                }
+            }, delay_ms);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "display_toast_with_context_custom_duration:EE01:" + e.getMessage());
         }
     }
 

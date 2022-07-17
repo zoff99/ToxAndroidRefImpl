@@ -19,23 +19,20 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.content.ActivityNotFoundException;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.MimeTypeMap;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -50,11 +47,10 @@ import com.mikepenz.iconics.IconicsDrawable;
 import java.net.URLConnection;
 
 import androidx.core.content.ContextCompat;
-import androidx.core.content.FileProvider;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
 
-import static android.webkit.MimeTypeMap.getFileExtensionFromUrl;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.open_local_outgoing_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
@@ -119,6 +115,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     public void bindMessageList(Message m)
     {
         // Log.i(TAG, "bindMessageList");
@@ -232,7 +229,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
 
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
 
-        if (message.filedb_id == -1) // tranfser was canceled somewhere
+        if (message.filedb_id == -1) // transfer was canceled somewhere
         {
 
             textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
@@ -402,69 +399,13 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                     {
                         if (event.getAction() == MotionEvent.ACTION_UP)
                         {
-                            if (message.storage_frame_work)
+                            if (!message.storage_frame_work)
                             {
-                                try
-                                {
-                                    Uri file_uri = Uri.parse(message.filename_fullpath);
-                                    Intent newIntent = new Intent(Intent.ACTION_VIEW, file_uri);
-                                    if (Build.VERSION.SDK_INT > 23)
-                                    {
-                                        newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                    }
-
-                                    try
-                                    {
-                                        context.startActivity(newIntent);
-                                    }
-                                    catch (ActivityNotFoundException e)
-                                    {
-                                        Toast.makeText(context, "Can not handle this file", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
+                                open_local_outgoing_file(message.filename_fullpath, v.getContext());
                             }
                             else
                             {
-                                try
-                                {
-                                    MimeTypeMap myMime = MimeTypeMap.getSingleton();
-                                    Intent newIntent = new Intent(Intent.ACTION_VIEW);
-                                    String mimeType = myMime.getMimeTypeFromExtension(
-                                            getFileExtensionFromUrl(message.filename_fullpath));
-
-                                    Uri file_uri = null;
-                                    if (Build.VERSION.SDK_INT > 23)
-                                    {
-                                        file_uri = FileProvider.getUriForFile(context,
-                                                                              BuildConfig.APPLICATION_ID + ".provider",
-                                                                              new java.io.File(
-                                                                                      message.filename_fullpath));
-                                        newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                                    }
-                                    else
-                                    {
-                                        file_uri = Uri.fromFile(new java.io.File(message.filename_fullpath));
-                                    }
-
-                                    newIntent.setDataAndType(file_uri, mimeType);
-                                    newIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                                    try
-                                    {
-                                        context.startActivity(newIntent);
-                                    }
-                                    catch (ActivityNotFoundException e)
-                                    {
-                                        Toast.makeText(context, "Can not handle this file", Toast.LENGTH_LONG).show();
-                                    }
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
+                                // TODO: write open outgoing local file with Storage Framework (which is wonky at best)
                             }
                         }
                         return true;

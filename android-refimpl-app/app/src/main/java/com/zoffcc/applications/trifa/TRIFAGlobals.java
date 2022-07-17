@@ -110,6 +110,8 @@ public class TRIFAGlobals
     final static long AVATAR_INCOMING_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
     final static long AVATAR_SELF_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
 
+    final static int FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK = 800 * 1024 * 1024; // above this size we need Storage Framework for outgoing FTs
+
     static boolean orbot_is_really_running = false;
 
     final static int HIGHER_GLOBAL_VIDEO_BITRATE = 2500;

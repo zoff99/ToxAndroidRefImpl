@@ -158,6 +158,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_cap
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
+import static com.zoffcc.applications.trifa.HelperGeneric.display_toast_with_context_custom_duration;
 import static com.zoffcc.applications.trifa.HelperGeneric.draw_main_top_icon;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffer;
@@ -8069,7 +8070,7 @@ public class MainActivity extends AppCompatActivity
             {
                 progressDialog2.dismiss();
                 Context c = weakContext.get();
-                Toast.makeText(c, "File exported to:" + "\n" + fname + f.file_name, Toast.LENGTH_SHORT).show();
+                display_toast_with_context_custom_duration(c, "File exported to:" + "\n" + fname + f.file_name, 200, 0);
             }
             catch (Exception e4)
             {

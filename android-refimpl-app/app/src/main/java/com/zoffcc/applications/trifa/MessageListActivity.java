@@ -108,6 +108,7 @@ import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.MessageListFragment.show_only_files;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
@@ -1388,7 +1389,7 @@ public class MessageListActivity extends AppCompatActivity
         }
 
 
-        if (file_size < 300 * 1024 * 1024) // less than 300 MByte filesize
+        if (file_size < FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK) // less than xxx Bytes filesize
         {
             outgoing_file_wrapped ofw = copy_outgoing_file_to_sdcard_dir(filepath, filename, file_size);
 
