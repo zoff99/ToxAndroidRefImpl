@@ -400,4 +400,6 @@
     <string name="MessageListHolder_file_outgoing_cancel_ft_message">Bu dosya aktarımını iptal etmek istiyor musunuz\?</string>
     <string name="MessageListHolder_file_incoming_cancel_ft_message">Bu dosya aktarımını iptal etmek istiyor musunuz\?</string>
     <string name="MessageListHolder_file_outgoing_cancel_ft_title">Dosya aktarımını iptal et</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">dosyaları şifreli depolama alanından aç</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">Intent aracılığıyla doğrudan şifrelenen depolama alanından dosya aç. Bu tehlikeli olabilir çünkü diğer kötü amaçlı uygulamalar TRIfA\'nın şifrelenen depolama alanındaki diğer dosyaları açabilir.</string>
 </resources>
