@@ -422,4 +422,6 @@
     <string name="MessageListHolder_file_incoming_cancel_ft_message">你想取消此文件传输吗？</string>
     <string name="MessageListHolder_file_outgoing_cancel_ft_title">取消文件传输</string>
     <string name="MessageListHolder_file_outgoing_cancel_ft_message">你想取消此文件传输吗？</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">从加密存储打开文件</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">通过 Intent 直接从加密存储中打开文件。 这可能具有潜在危险，因为其他恶意应用程序可能会打开 TRIfA 加密存储中的其他文件。</string>
 </resources>
