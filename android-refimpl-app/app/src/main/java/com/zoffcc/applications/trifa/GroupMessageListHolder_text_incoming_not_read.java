@@ -66,6 +66,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_NGC_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_TOKTOK_GROUPID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXIRC_TOKTOK_IRC_USER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
@@ -780,52 +781,112 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         name_test_pk ret = new name_test_pk();
         ret.changed = false;
 
-        if (m.group_identifier.equals(TOXIRC_TOKTOK_GROUPID))
+        try
         {
-            if (m.tox_group_peer_pubkey.equals(TOXIRC_NGC_PUBKEY))
+            if (m.group_identifier.equals(TOXIRC_TOKTOK_GROUPID))
             {
-                // toxirc messages will be displayed in a special way
-                if (m.text.length() > (3 + 1))
+                try
                 {
-                    if (m.text.startsWith("<"))
+                    if (m.tox_group_peer_pubkey.equals(TOXIRC_NGC_PUBKEY))
                     {
-                        int start_pos = m.text.indexOf("<");
-                        int end_pos = m.text.indexOf("> ");
-
-                        if ((start_pos > -1) && (end_pos > -1) && (end_pos > start_pos))
+                        // toxirc messages will be displayed in a special way
+                        if (m.text.length() > (3 + 1))
                         {
-                            try
+                            if (m.text.startsWith("<"))
                             {
-                                String peer_name_corrected = m.text.substring(start_pos + 1, end_pos);
+                                int start_pos = m.text.indexOf("<");
+                                int end_pos = m.text.indexOf("> ");
 
-                                ret.tox_peername = peer_name_corrected;
-
-                                if (string_is_in_list(peer_name_corrected, PREF__toxirc_muted_peers))
+                                if ((start_pos > -1) && (end_pos > -1) && (end_pos > start_pos))
                                 {
-                                    ret.text = "** muted **";
-                                }
-                                else
-                                {
-                                    ret.text = m.text.substring(end_pos + 2);
-                                }
+                                    try
+                                    {
+                                        String peer_name_corrected = m.text.substring(start_pos + 1, end_pos);
 
-                                String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
-                                        TrifaSetPatternActivity.StringToBytes2(
-                                                m.tox_group_peer_pubkey + "--" + peer_name_corrected)));
+                                        ret.tox_peername = peer_name_corrected;
 
-                                new_fake_pubkey = new_fake_pubkey.substring(1, new_fake_pubkey.length() - 2);
-                                ret.tox_peerpubkey = new_fake_pubkey;
-                                ret.changed = true;
-                            }
-                            catch (Exception e)
-                            {
+                                        if (string_is_in_list(peer_name_corrected, PREF__toxirc_muted_peers))
+                                        {
+                                            ret.text = "** muted **";
+                                        }
+                                        else
+                                        {
+                                            ret.text = m.text.substring(end_pos + 2);
+                                        }
+
+                                        String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
+                                                TrifaSetPatternActivity.StringToBytes2(
+                                                        m.tox_group_peer_pubkey + "--" + peer_name_corrected)));
+
+                                        new_fake_pubkey = new_fake_pubkey.substring(1, new_fake_pubkey.length() - 2);
+                                        ret.tox_peerpubkey = new_fake_pubkey;
+                                        ret.changed = true;
+                                    }
+                                    catch (Exception e)
+                                    {
+                                    }
+                                }
                             }
                         }
                     }
                 }
+                catch (Exception ignored)
+                {
+                }
+
+                try
+                {
+                    if (ret.tox_peerpubkey.equals(TOXIRC_TOKTOK_IRC_USER_PUBKEY) && ret.changed)
+                    {
+                        // toktok irc messages will be displayed in a special way
+                        if (ret.text.length() > (3 + 1))
+                        {
+                            if (ret.text.startsWith("<"))
+                            {
+                                int start_pos = ret.text.indexOf("<");
+                                int end_pos = ret.text.indexOf("> ");
+
+                                if ((start_pos > -1) && (end_pos > -1) && (end_pos > start_pos))
+                                {
+                                    try
+                                    {
+                                        String peer_name_corrected = ret.text.substring(start_pos + 1, end_pos);
+
+                                        ret.tox_peername = peer_name_corrected;
+
+                                        if (string_is_in_list(peer_name_corrected, PREF__toxirc_muted_peers))
+                                        {
+                                            ret.text = "** muted **";
+                                        }
+                                        else
+                                        {
+                                            ret.text = ret.text.substring(end_pos + 2);
+                                        }
+
+                                        String new_fake_pubkey = bytesToHex(TrifaSetPatternActivity.sha256(
+                                                TrifaSetPatternActivity.StringToBytes2(
+                                                        ret.tox_peerpubkey + "--" + peer_name_corrected)));
+
+                                        new_fake_pubkey = new_fake_pubkey.substring(1, new_fake_pubkey.length() - 2);
+                                        ret.tox_peerpubkey = new_fake_pubkey;
+                                        ret.changed = true;
+                                    }
+                                    catch (Exception e)
+                                    {
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ignored)
+                {
+                }
             }
         }
-
+        catch (Exception ignored)
+        {
+        }
         return ret;
     }
 }
