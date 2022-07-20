@@ -4174,53 +4174,64 @@ public class HelperGeneric
 
     public static void do_fade_anim_on_fab(final FloatingActionButton fab, boolean fade_in)
     {
-        if (fade_in)
+        try
         {
-            faded_in = true;
-            ObjectAnimator scaleUpX = ObjectAnimator.ofFloat(fab, "scaleX", 0.0f, 1f);
-            ObjectAnimator scaleUpY = ObjectAnimator.ofFloat(fab, "scaleY", 0.0f, 1f);
-            scaleUpX.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
-            scaleUpY.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
+            if (fade_in)
+            {
+                faded_in = true;
+                ObjectAnimator scaleUpX = ObjectAnimator.ofFloat(fab, "scaleX", 0.0f, 1f);
+                ObjectAnimator scaleUpY = ObjectAnimator.ofFloat(fab, "scaleY", 0.0f, 1f);
+                scaleUpX.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
+                scaleUpY.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
 
-            AnimatorSet scaleUp = new AnimatorSet();
-            scaleUp.play(scaleUpX).with(scaleUpY);
+                AnimatorSet scaleUp = new AnimatorSet();
+                scaleUp.play(scaleUpX).with(scaleUpY);
 
-            scaleUp.start();
+                scaleUp.start();
+            }
+            else
+            {
+                faded_in = false;
+                ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(fab, "scaleX", 1f, 0.0f);
+                ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(fab, "scaleY", 1f, 0.0f);
+                scaleDownX.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
+                scaleDownY.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
+
+                AnimatorSet scaleDown = new AnimatorSet();
+                scaleDown.play(scaleDownX).with(scaleDownY);
+
+                scaleDown.start();
+            }
         }
-        else
+        catch (Exception ignored)
         {
-            faded_in = false;
-            ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(fab, "scaleX", 1f, 0.0f);
-            ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(fab, "scaleY", 1f, 0.0f);
-            scaleDownX.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
-            scaleDownY.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);
-
-            AnimatorSet scaleDown = new AnimatorSet();
-            scaleDown.play(scaleDownX).with(scaleDownY);
-
-            scaleDown.start();
         }
-
     }
 
     public static void set_fade_anim_on_fab(final FloatingActionButton fab, boolean fade_in)
     {
-        int fade_ms = FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
-        int start = 1;
-        int end = 0;
-
-        if (fade_in)
+        try
         {
-            fade_ms = FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
-            start = 0;
-            end = 1;
+            int fade_ms = FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
+            int start = 1;
+            int end = 0;
+
+            if (fade_in)
+            {
+                fade_ms = FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
+                start = 0;
+                end = 1;
+            }
+
+            final AlphaAnimation anim_fade_out = new AlphaAnimation(start, end);
+            anim_fade_out.setDuration(fade_ms);
+            anim_fade_out.setStartOffset(fade_ms);
+            anim_fade_out.setFillAfter(false);
+
+            fab.setAnimation(anim_fade_out);
         }
-
-        final AlphaAnimation anim_fade_out = new AlphaAnimation(start, end);
-        anim_fade_out.setDuration(fade_ms);
-        anim_fade_out.setStartOffset(fade_ms);
-        anim_fade_out.setFillAfter(false);
-
-        fab.setAnimation(anim_fade_out);
+        catch (Exception ignored)
+        {
+        }
     }
 }
