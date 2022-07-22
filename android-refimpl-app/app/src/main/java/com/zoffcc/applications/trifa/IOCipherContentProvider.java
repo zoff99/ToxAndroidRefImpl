@@ -42,7 +42,7 @@ public class IOCipherContentProvider extends AbstractFileProvider
 {
     public static final String TAG = "IOCipherContentProvider";
     public static final Uri FILES_URI = Uri.parse("content://com.zoffcc.applications.trifa.ext1_fileprovider/");
-    private static final int PIPE_BLOCKSIZE = 8192;
+    private static final int PIPE_BLOCKSIZE = 8192; // do not change this. its the blocksize of IOCipher.
     private MimeTypeMap mimeTypeMap;
 
     @Override
@@ -57,6 +57,7 @@ public class IOCipherContentProvider extends AbstractFileProvider
     {
         if (!PREF__allow_open_encrypted_file_via_intent)
         {
+            // Log.i(TAG, "getDataLength:ret:001:allow_open_encrypted_file_via_intent");
             return 0;
         }
 
@@ -76,6 +77,7 @@ public class IOCipherContentProvider extends AbstractFileProvider
     {
         if (!PREF__allow_open_encrypted_file_via_intent)
         {
+            // Log.i(TAG, "openFile:err:002:allow_open_encrypted_file_via_intent");
             throw new FileNotFoundException("No Access");
         }
 
@@ -86,14 +88,21 @@ public class IOCipherContentProvider extends AbstractFileProvider
         {
             pipe = ParcelFileDescriptor.createPipe();
             String path = uri.getPath();
-            // Log.i(TAG, "streaming " + path + " tid=" + Thread.currentThread().getId());
+            // Log.i(TAG, "openFile:streaming " + path + " mode=" + mode + "tid = " + Thread.currentThread().getId());
+
+            long filesize = new File(path).length();
+            if ((filesize < 1) || (filesize > (Long.MAX_VALUE - 2)))
+            {
+                filesize = AssetFileDescriptor.UNKNOWN_LENGTH;
+            }
+            // Log.i(TAG, "openFile:getDataLength:ret=" + filesize);
 
             in = new FileInputStream(new File(path));
             new PipeFeederThread(in, new AutoCloseOutputStream(pipe[1])).start();
         }
         catch (IOException e)
         {
-            // Log.e(TAG, "Error opening pipe", e);
+            Log.e(TAG, "Error opening pipe", e);
             throw new FileNotFoundException("Could not open pipe for: " + uri.toString());
         }
 
@@ -119,9 +128,10 @@ public class IOCipherContentProvider extends AbstractFileProvider
 
             try
             {
-                while ((len = in.read(buf)) > 0)
+                while ((len = in.read(buf)) >= 0)
                 {
-                    // Log.i(TAG, "write_data:" + len + " tid=" + Thread.currentThread().getId());
+                    // Log.i(TAG, "write_data:" + len + " buf.length=" + buf.length + " buf=" + buf + " tid=" +
+                    //            Thread.currentThread().getId());
                     out.write(buf, 0, len);
                 }
 
@@ -131,7 +141,7 @@ public class IOCipherContentProvider extends AbstractFileProvider
             }
             catch (IOException e)
             {
-                Log.e(TAG, "File transfer failed:", e);
+                // Log.e(TAG, "File transfer failed:", e);
                 try
                 {
                     in.close();
