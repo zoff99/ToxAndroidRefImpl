@@ -8070,7 +8070,7 @@ public class MainActivity extends AppCompatActivity
             {
                 progressDialog2.dismiss();
                 Context c = weakContext.get();
-                display_toast_with_context_custom_duration(c, "File exported to:" + "\n" + fname + f.file_name, 200, 0);
+                display_toast_with_context_custom_duration(c, "File exported to:" + "\n" + fname + f.file_name, 400, 0);
             }
             catch (Exception e4)
             {
