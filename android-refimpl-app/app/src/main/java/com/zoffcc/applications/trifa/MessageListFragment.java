@@ -197,8 +197,14 @@ public class MessageListFragment extends Fragment
                 {
                     if (faded_in)
                     {
-                        do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
-                                            false);
+                        try
+                        {
+                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
+                                                false);
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
             }
@@ -210,7 +216,13 @@ public class MessageListFragment extends Fragment
                 {
                     if (!faded_in)
                     {
-                        do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, true);
+                        try
+                        {
+                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, true);
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
             }
@@ -229,8 +241,14 @@ public class MessageListFragment extends Fragment
                     {
                         if (faded_in)
                         {
-                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
-                                                false);
+                            try
+                            {
+                                do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
+                                                    false);
+                            }
+                            catch (Exception ignored)
+                            {
+                            }
                         }
                     }
                     conversationDateHeader.show();
@@ -241,7 +259,15 @@ public class MessageListFragment extends Fragment
                     {
                         if (!faded_in)
                         {
-                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, true);
+                            try
+                            {
+                                do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
+                                                    true);
+                            }
+                            catch (Exception ignored)
+                            {
+
+                            }
                         }
                     }
                     conversationDateHeader.hide();
@@ -264,10 +290,16 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:at bottom");
                         is_at_bottom = true;
-                        do_fade_anim_on_fab(unread_messages_notice_button, false);
-                        unread_messages_notice_button.setSupportBackgroundTintList(
-                                (ContextCompat.getColorStateList(context_s,
-                                                                 R.color.message_list_scroll_to_bottom_fab_bg_normal)));
+                        try
+                        {
+                            do_fade_anim_on_fab(unread_messages_notice_button, false);
+                            unread_messages_notice_button.setSupportBackgroundTintList(
+                                    (ContextCompat.getColorStateList(context_s,
+                                                                     R.color.message_list_scroll_to_bottom_fab_bg_normal)));
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
                 else
@@ -276,8 +308,14 @@ public class MessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:NOT at bottom");
                         is_at_bottom = false;
-                        do_fade_anim_on_fab(unread_messages_notice_button, true);
-                        unread_messages_notice_button.setVisibility(View.VISIBLE);
+                        try
+                        {
+                            do_fade_anim_on_fab(unread_messages_notice_button, true);
+                            unread_messages_notice_button.setVisibility(View.VISIBLE);
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
             }
@@ -490,10 +528,16 @@ public class MessageListFragment extends Fragment
                     }
                     else
                     {
-                        // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
-                        unread_messages_notice_button.setSupportBackgroundTintList(
-                                (ContextCompat.getColorStateList(context_s,
-                                                                 R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                        try
+                        {
+                            // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
+                            unread_messages_notice_button.setSupportBackgroundTintList(
+                                    (ContextCompat.getColorStateList(context_s,
+                                                                     R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
                 catch (Exception e)
