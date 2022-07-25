@@ -58,6 +58,7 @@ import info.guardianproject.iocipher.File;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_if_incoming_file_was_exported;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.open_local_file;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.share_local_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
@@ -88,6 +89,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     ViewGroup ft_buttons_container;
     ImageButton ft_preview_image;
     ImageButton ft_export_button;
+    ImageButton ft_share_button;
     EmojiTextViewLinks textView;
     ImageView imageView;
     de.hdodenhof.circleimageview.CircleImageView img_avatar;
@@ -122,6 +124,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
         ft_export_button_container = (ViewGroup) itemView.findViewById(R.id.ft_export_button_container);
         ft_export_button = (ImageButton) itemView.findViewById(R.id.ft_export_button);
+        ft_share_button = (ImageButton) itemView.findViewById(R.id.ft_share_button);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -266,6 +269,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             ft_preview_image.setVisibility(View.GONE);
             ft_export_button_container.setVisibility(View.GONE);
             ft_export_button.setVisibility(View.GONE);
+            ft_share_button.setVisibility(View.GONE);
         }
         else
         {
@@ -461,6 +465,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
             ft_export_button_container.setVisibility(View.VISIBLE);
             ft_export_button.setVisibility(View.VISIBLE);
+            ft_share_button.setVisibility(View.GONE);
 
             if (export_filename_with_path == null)
             {
@@ -469,6 +474,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             else
             {
                 ft_export_button.setImageResource(android.R.drawable.ic_menu_set_as);
+                ft_share_button.setVisibility(View.VISIBLE);
             }
 
             ft_export_button.setOnTouchListener(new View.OnTouchListener()
@@ -551,6 +557,25 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 }
             });
 
+            ft_share_button.setOnTouchListener(new View.OnTouchListener()
+            {
+                @Override
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    if (event.getAction() == MotionEvent.ACTION_UP)
+                    {
+                        try
+                        {
+                            try_to_share_file(message2, export_filename_with_path, v.getContext());
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
+                    }
+                    return true;
+                }
+            });
+
             ft_preview_container.setVisibility(View.VISIBLE);
             ft_preview_image.setVisibility(View.VISIBLE);
         }
@@ -601,6 +626,14 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         }
     }
 
+    public void try_to_share_file(Message message2, String export_filename_with_path, final Context c)
+    {
+        if (export_filename_with_path != null)
+        {
+            share_local_file(export_filename_with_path, c);
+        }
+    }
+
     public void try_to_open_file(Message message2, String export_filename_with_path)
     {
         if ((PREF__allow_open_encrypted_file_via_intent) && (export_filename_with_path == null))
@@ -614,8 +647,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     {
                         try
                         {
-                            final Uri uri = Uri.parse(
-                                    IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
+                            final Uri uri = Uri.parse(IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
 
                             //Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
                             //           message2.filename_fullpath);

@@ -1,5 +1,6 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:padding="@dimen/message_entry_padding">
@@ -234,11 +235,31 @@
                     android:layout_marginBottom="1dp"
                     android:layout_weight="1"
                     android:background="@android:color/transparent"
+                    android:contentDescription="export"
                     android:elevation="4dp"
                     android:padding="0dp"
                     android:scaleType="fitCenter"
                     android:src="@android:drawable/ic_menu_save"
-                    android:visibility="visible" />
+                    android:visibility="visible"
+                    tools:ignore="HardcodedText" />
+
+                <ImageButton
+                    android:id="@+id/ft_share_button"
+                    android:layout_width="40dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="share"
+                    android:elevation="4dp"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
+                    android:src="@android:drawable/ic_menu_share"
+                    android:visibility="visible"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
 
             <TextView

@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
@@ -1153,6 +1154,33 @@ public class HelperFiletransfer
         }
     }
 
+    static void share_local_file(final String filename_fullpath, final Context context)
+    {
+        Uri file_uri = FileProvider.getUriForFile(context, "com.zoffcc.applications.trifa.std_fileprovider",
+                                                  new java.io.File(filename_fullpath));
+
+        Intent intent = new Intent(Intent.ACTION_SEND, file_uri);
+        intent.putExtra(Intent.EXTRA_STREAM, file_uri);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        MimeTypeMap myMime = MimeTypeMap.getSingleton();
+        String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));
+        if (mimeType == null)
+        {
+            mimeType = "application/octet-stream";
+        }
+        // Log.i(TAG, "share_local_file:mime type: " + mimeType);
+        intent.setDataAndType(file_uri, mimeType);
+        try
+        {
+            context.startActivity(Intent.createChooser(intent, "Share"));
+        }
+        catch (ActivityNotFoundException e)
+        {
+            Log.e(TAG, "share_local_file:No relevant Activity found", e);
+        }
+    }
+
     static void open_local_file(final String filename_fullpath, final Context context)
     {
         try
@@ -1166,6 +1194,7 @@ public class HelperFiletransfer
                 Intent newIntent = new Intent(Intent.ACTION_VIEW);
                 newIntent.setDataAndType(file_uri, mimeType);
                 newIntent.setClipData(ClipData.newRawUri("", file_uri));
+                newIntent.putExtra(Intent.EXTRA_STREAM, file_uri);
                 newIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                 // Log.i(TAG, "open_local_file:23:intent=" + newIntent);
                 context.startActivity(newIntent);
