@@ -240,7 +240,7 @@
                     android:padding="0dp"
                     android:scaleType="fitCenter"
                     android:src="@android:drawable/ic_menu_save"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     tools:ignore="HardcodedText" />
 
                 <ImageButton
@@ -258,7 +258,7 @@
                     android:padding="0dp"
                     android:scaleType="fitCenter"
                     android:src="@android:drawable/ic_menu_share"
-                    android:visibility="visible"
+                    android:visibility="gone"
                     tools:ignore="HardcodedText" />
             </LinearLayout>
 
