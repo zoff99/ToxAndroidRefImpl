@@ -379,4 +379,25 @@
     <string name="layout___add_friend">Добавить друга</string>
     <string name="layout___export_tox_encrypted_files_unsecure">экспортировать зашифрованные файлы *небезопасно*</string>
     <string name="layout___create_new_private_group">Создать новую частную группу</string>
+    <string name="pref_title_download_push_msg_app">Скачать Tox Push Message App</string>
+    <string name="pref_title_use_push_service">Использовать PUSH сервис</string>
+    <string name="pref_description_use_push_service">Внимание: Это задействует Google FCM или Unified Push, чтоб сохранить заряд батареи и интернет трафик.
+\nЭто приложение установит HTTPS соединение к некоторым PUSH серверам напрямую (не через Tox).
+\nАктивируйте, если Вы понимаете, что это такое.
+\nЭта функция требует установки приложения Tox Push Message App.</string>
+    <string name="title_activity_grouppeerinfo">Информация о пирах группы</string>
+    <string name="pref_description_compact_chatlist">Отображать сообщения чата более компактно</string>
+    <string name="layout___remove_friends_pushurl">удалить дружественную PUSH ссылку</string>
+    <string name="pref_title_compact_chatlist">Компактный список чатов</string>
+    <string name="MainActivity_setup_push_tip_title">Настроить PUSH уведомления</string>
+    <string name="MainActivity_setup_push_tip_text">Вы не установили приложение Push Notification App и не настроили Push уведомления. TRIfA будет работать без PUSH уведомлений, но Вы должны быть постоянно онлайн для получения входящих сообщений. PUSH уведомления сохраняют заряд батареи и интернет трафик.
+\n
+\nХотите посмотреть, как настроить PUSH уведомления сейчас\?</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Удалить картинку профиля</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Вы хотите удалить картинку своего профиля\?</string>
+    <string name="layout___remove_own_pushurl">удалить Push URL</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">Открыть файл с зашифрованного хранилища</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">Открыть файл прямо с шифрованного хранилища через Интернет. Это может быть потенциально опасно, вредоносное приложение может открыть другие файлы внутри хранилища TRIfA.</string>
+    <string name="layout___own_pushurl">PUSH ссылка:</string>
+    <string name="layout___friends_pushurl">Дружественная PUSH ссылка:</string>
 </resources>
