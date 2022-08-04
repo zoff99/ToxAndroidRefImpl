@@ -1,2 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="add_group_activity_name">व्यक्तीगत समूह तयार करा</string>
+    <string name="add_public_group_activity_name">सार्वजनिक समूह तयार करा</string>
+    <string name="message_list_activity_name">गप्पागोष्टी</string>
+    <string name="conference_message_list_activity_name">मजकूर सम्मेलन</string>
+    <string name="group_message_list_activity_name">समूह</string>
+    <string name="conference_audio_activity_player_name">ऑडिओ कॉन्फरन्स प्लेयर</string>
+    <string name="set_password_message_empty">खूणेचा शब्द रिकामा आहे</string>
+    <string name="set_password_message_password_invalid">खूणेचा शब्द खूप छोटा आहे</string>
+    <string name="title_activity_calling">कॉल</string>
+    <string name="title_activity_profile">प्रोफाइल</string>
+    <string name="title_activity_settings">सेटिंग्ज</string>
+    <string name="title_activity_crash">अपघात</string>
+    <string name="title_activity_friendinfo">मित्राची माहिती</string>
+    <string name="title_activity_conferenceinfo">संमेलनाची माहिती</string>
+    <string name="title_activity_aboutpage">बद्दल</string>
+    <string name="title_activity_conferencepeerinfo">पीरइन्फो</string>
+    <string name="title_activity_grouppeerinfo">Group Peerinfo</string>
+    <string name="title_activity_set_password">खुणेचा शब्द सेट करा</string>
+    <string name="title_activity_share">TRIfA सह उघडा</string>
+    <string name="title_activity_maintenance">देखभाल</string>
+    <string name="pref_title_auto_accept_image">आपोआप प्रतिमा स्वीकारा</string>
+    <string name="pref_description_auto_accept_image">12 मेगाबाइट आकारापर्यंत प्रतिमा आणि फोटो स्वयं स्वीकारा</string>
+    <string name="pref_title_auto_accept_video">व्हिडिओ स्वयंचलितपणे स्वीकारा</string>
+    <string name="pref_title_auto_accept_all_upto">सर्व फाइल्स स्वयंचलितपणे स्वीकारा</string>
+    <string name="join_public_activity_name">सार्वजनिक समूहात सामील व्हा</string>
+    <string name="add_friend_activity_name">मित्र जोडा</string>
+    <string name="conference_audio_activity_name">श्राव्य/ध्वनि सम्मेलन</string>
+    <string name="set_password_message_password_dont_match">खूणेचा शब्द जुळत नाही</string>
+    <string name="title_activity_groupinfo">समूहाची माहिती</string>
+    <string name="pref_header_general">सर्वसाधारण</string>
+    <string name="settings_toolbar_title">समायोजन</string>
+    <string name="pref_description_auto_accept_video">40 मेगाबाइट आकारापर्यंतचे व्हिडिओ स्वयंचलितपणे स्वीकारा</string>
+    <string name="title_activity_check_password">खूणेचा शब्द प्रविष्ट करा</string>
+    <string name="pref_description_auto_accept_all_upto">200 मेगाबाइट आकाराच्या सर्व फाइल्स स्वयंचलितपणे स्वीकारा</string>
+</resources>
