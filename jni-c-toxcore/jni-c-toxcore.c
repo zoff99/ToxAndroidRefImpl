@@ -3805,6 +3805,11 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1friend_1send_1message(JNIEnv *env, jobject thiz,
         jlong friend_number, jint type, jobject message, jobject hash_buffer, jlong timestamp)
 {
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
     uint8_t *hash_buffer_c = NULL;
     long capacity_hash = 0;
     hash_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, hash_buffer);
@@ -3957,6 +3962,12 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEnv *env, jobject thiz,
         jlong friend_number, jint type, jobject message)
 {
+
+    if(tox_global == NULL)
+    {
+        return (jlong)-99;
+    }
+
 
 #ifdef JAVA_LINUX
 
@@ -7693,6 +7704,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1uv_1reversed(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px)
 {
+    if(tox_av_global == NULL)
+    {
+        return (jint)-99;
+    }
+
     TOXAV_ERR_SEND_FRAME error;
     video_buffer_2_y_size = (int)(frame_width_px * frame_height_px);
     video_buffer_2_u_size = (int)(video_buffer_2_y_size / 4);
@@ -7750,6 +7766,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px)
 {
+    if(tox_av_global == NULL)
+    {
+        return (jint)-99;
+    }
+
     TOXAV_ERR_SEND_FRAME error;
     video_buffer_2_y_size = (int)(frame_width_px * frame_height_px);
     video_buffer_2_u_size = (int)(video_buffer_2_y_size / 4);
@@ -7789,6 +7810,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1age(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px, jint age_ms)
 {
+    if(tox_av_global == NULL)
+    {
+        return (jint)-99;
+    }
+
     TOXAV_ERR_SEND_FRAME error;
     video_buffer_2_y_size = (int)(frame_width_px * frame_height_px);
     video_buffer_2_u_size = (int)(video_buffer_2_y_size / 4);
@@ -7827,6 +7853,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264_1age(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len, jint age_ms)
 {
+    if(tox_av_global == NULL)
+    {
+        return (jint)-99;
+    }
+
     TOXAV_ERR_SEND_FRAME error;
     bool res = toxav_video_send_frame_h264_age(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
                                            (uint16_t)frame_height_px,
@@ -7860,6 +7891,10 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len)
 {
+    if(tox_av_global == NULL)
+    {
+        return (jint)-99;
+    }
 
     TOXAV_ERR_SEND_FRAME error;
     bool res = toxav_video_send_frame_h264(tox_av_global, (uint32_t)friend_number, (uint16_t)frame_width_px,
