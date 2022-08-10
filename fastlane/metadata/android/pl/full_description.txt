@@ -1,0 +1,22 @@
+<b>TRIfA – Nowy rodzaj komunikatorów internetowych</b><br>
+
+Niezależnie od tego, czy są to korporacje, czy rządy, cyfrowy nadzór jest dziś powszechny.<br>
+Tox to łatwe w użyciu oprogramowanie, które łączy Cię z przyjaciółmi i rodziną bez konieczności podsłuchiwania innych osób.<br>
+Podczas gdy inne znane usługi wymagają płacenia za funkcje, Tox jest całkowicie darmowy i jest dostępny bez reklam — na zawsze.<br><br>
+
+<b>Zaszyfrowane:</b><br>
+Wszystko, co robisz z Tox, jest szyfrowane przy użyciu bibliotek typu open source. Jedynymi osobami, które mogą zobaczyć Twoje rozmowy, są osoby, z którymi rozmawiasz.<br><br>
+
+<b>Dystrybuowane:</b><br>
+Tox nie ma centralnych serwerów, które można by przeszukać, zamknąć lub zmusić do przekazania danych — sieć składa się z użytkowników. Pożegnaj się z awariami serwera!<br><br>
+
+<b>Bezpłatne:</b><br>
+Tox to darmowe oprogramowanie. To za darmo jak w wolności, a także w cenie. Oznacza to, że Tox należy do Ciebie — do używania, modyfikowania i udostępniania — ponieważ Tox jest opracowywany przez i dla użytkowników.<br><br>
+
+<b>Więcej informacji:</b><br>
+* O Tox: https://tox.zoff.cc
+<br>
+* Dołącz do dyskusji na temat Matrix: https://matrix.to/#/#trifa:matrix.org
+<br>
+* Dołącz do kanału IRC Tox: https://matrix.to/#/#toktok:libera.chat
+<br>
