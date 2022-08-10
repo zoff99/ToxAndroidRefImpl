@@ -14,6 +14,6 @@ Tox عبارة عن برنامج سهل الاستخدام يوصلك بالأص
 Tox هو برنامج مجاني. هو حر كما في الحرية، وكذلك في السعر. وهذا يعني أن Tox لك — للاستخدام والتعديل والمشاركة — لأن Tox تم تطويره من قبل المستخدمين ولأجلهم.<br><br>
 
 <b>مزيد من المعلومات:</b><br>
-* <a href="https://tox.zoff.cc">about Tox</a><br>
-* <a href="https://matrix.to/#/#trifa:matrix.org">Join discussion on Matrix</a><br>
-* <a href="https://matrix.to/#/#toktok:libera.chat">Join Tox IRC Channel</a><br>
+* معرفة المزيد: https://tox.zoff.cc
+* الانضمام إلى المناقشة على ماتريكس: https://matrix.to/#/#trifa:matrix.org
+* انضم إلى قناة الدردشة لدينا: https://matrix.to/#/#toktok:libera.chat
