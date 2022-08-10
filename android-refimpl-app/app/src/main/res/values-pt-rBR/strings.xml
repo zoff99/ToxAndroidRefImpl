@@ -289,4 +289,5 @@
     <string name="add_group_activity_name">Criar Grupo Privado</string>
     <string name="group_message_list_activity_name">Grupo</string>
     <string name="layout___group_name">Nome do Grupo</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">abrir arquivos do armazenamento criptografado</string>
 </resources>
