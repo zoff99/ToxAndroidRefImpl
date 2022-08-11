@@ -14,6 +14,6 @@ Tox neturi centrinių serverių, kurie gali būti užpulti, nulaužti, arba priv
 Tox yra laisva ir nemokama programinė įranga. Tai reiškia, kad Tox galite laisvai: naudoti, keisti ir dalintis, nes Tox yra kuriamas vartotojų ir skirtas vartotojams.<br><br>
 
 <b>Daugiau informacijos:</b><br>
-* <a href="https://tox.zoff.cc">Apie Tox</a><br>
-* <a href="https://matrix.to/#/#trifa:matrix.org">Prisijunkite prie diskusijos per Matrix</a><br>
-* <a href="https://matrix.to/#/#toktok:libera.chat">Prisijunkite prie Tox IRC kanalo</a><br>
+* Apie Tox: https://tox.zoff.cc
+* Prisijunkite prie diskusijos per Matrix: https://matrix.to/#/#trifa:matrix.org
+* Prisijunkite prie Tox IRC kanalo: https://matrix.to/#/#toktok:libera.chat

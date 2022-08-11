@@ -14,6 +14,6 @@ O Tox não tem servidores centrais que possam ser invadidos, desligados ou forç
 O Tox é um programa livre e grátis. Livre como em liberdade e grátis no preço. Isso significa que o Tox é seu – para usar, modificar e compartilhar –, porque o Tox foi desenvolvido por e para os usuários.<br><br>
 
 <b>Mais informações:</b><br>
-*<a href="https://tox.zoff.cc">sobre o Tox</a><br>
-*<a href="https://matrix.to/#/#trifa:matrix.org"> Participe da discussão no Matrix</a><br>
-*<a href="https://matrix.to/#/#toktok:libera.chat"> Junte-se ao canal de chat do Tox</a><br>
+* Sobre o Tox: https://tox.zoff.cc
+* Participe da discussão no Matrix: https://matrix.to/#/#trifa:matrix.org
+* Junte-se ao canal de chat do Tox: https://matrix.to/#/#toktok:libera.chat

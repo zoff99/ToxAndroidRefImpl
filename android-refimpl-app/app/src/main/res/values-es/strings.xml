@@ -388,4 +388,12 @@
     <string name="add_private_group_success">Has creado un Grupo Privado</string>
     <string name="add_group_activity_name">Crear grupo privado</string>
     <string name="group_message_list_activity_name">Grupo</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">habilitar/deshabilitar notificaciones</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">¿Desea habilitar/deshabilitar el silencio de notificaciones para este amigo\?</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">cancelar la transferencia de archivos</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">¿Desea cancelar esta transferencia de archivos\?</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">cancelar la transferencia de archivos</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">¿Desea cancelar esta transferencia de archivos\?</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">abre archivos directamente desde el almacenamiento cifrado a través de Intent. Esto puede ser potencialmente peligroso, porque otras aplicaciones maliciosas podrían abrir otros archivos en el almacenamiento cifrado de TRIfA.</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">abrir archivos desde un almacenamiento encriptado</string>
 </resources>

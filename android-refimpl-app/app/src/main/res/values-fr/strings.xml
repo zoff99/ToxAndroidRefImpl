@@ -403,4 +403,12 @@
     <string name="add_group_activity_add">Créer un groupe</string>
     <string name="layout___create_new_private_group">Créer un nouveau groupe privé</string>
     <string name="layout___add_friend">Ajouter un ami</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">activer/désactiver notifications</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">Voulez-vous activer/désactiver le silence des notifications pour cet ami \?</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">annuler le transfert de fichiers</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">Voulez-vous annuler ce transfert de fichiers \?</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">ouvrir des fichiers à partir d\'un stockage crypté</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">ouvre des fichiers directement à partir d’un stockage crypté via Intent. Cela peut être potentiellement dangereux, car d’autres applications malveillantes pourraient ouvrir d’autres fichiers dans le stockage crypté de TRIfA.</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">annuler le transfert de fichiers</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">Voulez-vous annuler ce transfert de fichiers \?</string>
 </resources>

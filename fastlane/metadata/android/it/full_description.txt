@@ -14,6 +14,6 @@ Tox non ha server centrali che possono essere razziati, arrestati o costretti a 
 Tox è un software libero.È libero come in libertà, oltre che gratuito nel prezzo. Ciò significa che Tox è tuo — da usare, modificare e condividere — perché Tox è sviluppato da e per gli utenti.<br><br>
 
 <b>Ulteriori informazioni:</b><br>
-* <a href="https://tox.zoff.cc">su Tox</a><br>
-* <a href="https://matrix.to/#/#trifa:matrix.org">Partecipa alla discussione su Matrix</a><br>
-* <a href="https://matrix.to/#/#toktok:libera.chat">Entra nel canale IRC Tox</a><br>
+* Su Tox: https://tox.zoff.cc
+* Partecipa alla discussione su Matrix: https://matrix.to/#/#trifa:matrix.org
+* Entra nel canale IRC Tox: https://matrix.to/#/#toktok:libera.chat
