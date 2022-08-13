@@ -58,6 +58,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
+import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.set_all_friends_offline;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
@@ -140,6 +141,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LA
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP3;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_INIT_NAME;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_INIT_STATUSMSG;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
@@ -1067,6 +1070,17 @@ public class TrifaToxService extends Service
                         Log.i(TAG, "need_add_bots:start");
                         add_friend_real(ECHOBOT_TOXID);
                         set_g_opts("ADD_BOTS_ON_STARTUP_done", "true");
+
+                        FriendList f_echobot = main_get_friend(ECHOBOT_TOXID.substring(0, 32 * 2).toUpperCase());
+                        if (f_echobot != null)
+                        {
+                            f_echobot.status_message = ECHOBOT_INIT_STATUSMSG;
+                            f_echobot.name = ECHOBOT_INIT_NAME;
+                            HelperFriend.update_friend_in_db_name(f_echobot);
+                            HelperFriend.update_friend_in_db_status_message(f_echobot);
+                            HelperFriend.update_single_friend_in_friendlist_view(f_echobot);
+                        }
+
                         Log.i(TAG, "need_add_bots=true (INSERT)");
                     }
                 }
