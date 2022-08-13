@@ -771,11 +771,6 @@ public class HelperFriend
 
     synchronized static void insert_into_friendlist_db(final FriendList f)
     {
-        //        Thread t = new Thread()
-        //        {
-        //            @Override
-        //            public void run()
-        //            {
         try
         {
             if (orma.selectFromFriendList().tox_public_key_stringEq(f.tox_public_key_string).count() == 0)
@@ -796,10 +791,6 @@ public class HelperFriend
             e.printStackTrace();
             Log.i(TAG, "friend added to DB:EE:" + e.getMessage());
         }
-
-        //            }
-        //        };
-        //        t.start();
     }
 
     static void delete_friend_all_files(final long friendnum)
