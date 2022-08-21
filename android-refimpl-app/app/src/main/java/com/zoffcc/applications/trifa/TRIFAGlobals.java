@@ -88,10 +88,12 @@ public class TRIFAGlobals
     final static String ECHOBOT_TOXID = "76518406F6A9F2217E8DC487CC783C25CC16A15EB36FF32E335A235342C48A39218F515C39A6";
     final static String ECHOBOT_INIT_NAME = "Echobot";
     final static String ECHOBOT_INIT_STATUSMSG = "A tiny bot to test Tox audio and video.";
+    //
     final static String TOXIRC_TOKTOK_CONFID = "836eaf5f6af15a9608feb231e48112f074b7625c054446163a4d8311a5abbb19";
     final static String TOXIRC_PUBKEY = "A922A51E1C91205B9F7992E2273107D47C72E8AE909C61C28A77A4A2A115431B";
-    final static String TOXIRC_TOKTOK_GROUPID = "388a30ab8395878658edbe722f1ec35e78a1cda3ab0500b613e82e34b2847cdd";
-    final static String TOXIRC_NGC_PUBKEY = "36D94C37C9FA61181434720B6C46BE34FA379400F063D7892DB0C676D98FA15C";
+    //
+    final static String TOXIRC_TOKTOK_GROUPID = "fcd19cef34d5fcc970562c849808c370fb6c54fbc1a1c74d9691582ed597dd61";
+    final static String TOXIRC_NGC_PUBKEY = "7C6F258261CB4BB3A1ADD7756728558926E8BD794E340FC1DED13343726FDB75";
     final static String TOXIRC_TOKTOK_IRC_USER_PUBKEY = "05D78D2393A4DFB689912C567341EC5B1B2E1591B1FE14B46CBD31899F6F5";
     // ----------
 
@@ -113,7 +115,8 @@ public class TRIFAGlobals
     final static long AVATAR_INCOMING_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
     final static long AVATAR_SELF_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
 
-    final static int FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK = 800 * 1024 * 1024; // above this size we need Storage Framework for outgoing FTs
+    final static int FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK =
+            800 * 1024 * 1024; // above this size we need Storage Framework for outgoing FTs
 
     static boolean orbot_is_really_running = false;
 
