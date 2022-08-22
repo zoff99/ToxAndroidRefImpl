@@ -16,7 +16,7 @@
     <string name="title_activity_conferenceinfo">संमेलनाची माहिती</string>
     <string name="title_activity_aboutpage">बद्दल</string>
     <string name="title_activity_conferencepeerinfo">पीरइन्फो</string>
-    <string name="title_activity_grouppeerinfo">Group Peerinfo</string>
+    <string name="title_activity_grouppeerinfo">ग्रुप पीरइन्फो</string>
     <string name="title_activity_set_password">खुणेचा शब्द सेट करा</string>
     <string name="title_activity_share">TRIfA सह उघडा</string>
     <string name="title_activity_maintenance">देखभाल</string>
@@ -34,4 +34,13 @@
     <string name="pref_description_auto_accept_video">40 मेगाबाइट आकारापर्यंतचे व्हिडिओ स्वयंचलितपणे स्वीकारा</string>
     <string name="title_activity_check_password">खूणेचा शब्द प्रविष्ट करा</string>
     <string name="pref_description_auto_accept_all_upto">200 मेगाबाइट आकाराच्या सर्व फाइल्स स्वयंचलितपणे स्वीकारा</string>
+    <string name="pref_title_higher_audio_quality">ध्वनी गुणवत्ता</string>
+    <string name="pref_title_global_font_size">अक्षराचा आकार</string>
+    <string name="pref_description_global_font_size">अक्षराचा आकार निवडा</string>
+    <string name="pref_title_higher_video_quality">व्हिडिओची गुणवत्ता</string>
+    <string name="pref_description_higher_video_quality">उत्तम व्हिडिओ गुणवत्ता वापरा.
+\nबदल पुन्हा सुरू करणे आवश्यक आहे!</string>
+    <string name="pref_title_orbot_enabled">Tor Proxy सक्षम करा</string>
+    <string name="pref_description_orbot_enabled">हे वापरण्यासाठी तुम्हाला Orbot इन्स्टॉल करावे लागेल.
+\nबदल पुन्हा सुरू करणे आवश्यक आहे!</string>
 </resources>
