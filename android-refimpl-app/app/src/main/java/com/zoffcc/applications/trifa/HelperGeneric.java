@@ -3488,7 +3488,14 @@ public class HelperGeneric
                 //
                 // after importing the file. just stop the app hard
                 // tox_service_fg.stop_me(true);
-                MainActivity.exit();
+                // MainActivity.exit();
+                try
+                {
+                    System.exit(0);
+                }
+                catch (Exception ignored)
+                {
+                }
                 return;
             }
         });

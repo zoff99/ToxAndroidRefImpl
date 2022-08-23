@@ -362,7 +362,14 @@ public class TrifaToxService extends Service
                         tox_notification_cancel(static_context);
                         Log.i(TAG, "stop_me:015");
 
-                        MainActivity.exit();
+                        // MainActivity.exit();
+                        try
+                        {
+                            System.exit(0);
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
 
                         Log.i(TAG, "stop_me:089");
                     }
@@ -376,6 +383,7 @@ public class TrifaToxService extends Service
                 try
                 {
                     stopSelf();
+                    System.exit(0);
                 }
                 catch (Exception e2)
                 {
