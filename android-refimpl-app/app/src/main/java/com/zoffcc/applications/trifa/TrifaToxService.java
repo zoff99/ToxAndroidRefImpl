@@ -383,11 +383,18 @@ public class TrifaToxService extends Service
                 try
                 {
                     stopSelf();
-                    System.exit(0);
                 }
                 catch (Exception e2)
                 {
                     e2.printStackTrace();
+                }
+
+                try
+                {
+                    System.exit(0);
+                }
+                catch (Exception ignored)
+                {
                 }
             }
         }
