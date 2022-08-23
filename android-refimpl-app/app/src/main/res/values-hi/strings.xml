@@ -371,7 +371,7 @@
     <string name="pref_description_force_udp_only">यह केवल यूडीपी मोड को बाध्य करेगा, कुछ संपर्क इस सेटिंग के चालू होने पर पहुंच योग्य नहीं हो सकते हैं
 \n परिवर्तन को पुनरारंभ करने की आवश्यकता है!</string>
     <string name="pref_description_use_incognito_keyboard2">कीबोर्ड को यह बताने के लिए चालू करें कि आपके दर्ज किए गए शब्दों से न सीखें</string>
-    <string name="pref_title_h264_encoder_use_intra_refresh">H264 इंट्रा रिफ्रेश-(H264 intra refresh)</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 अंतः आंतर पुनश्चर्या</string>
     <string name="pref_description_compact_friendlist">यदि आपके पास मित्रों की एक बड़ी सूची है, तो मित्र सूची को और अधिक संक्षिप्त बनाएं</string>
     <string name="pref_title_compact_chatlist">संक्षिप्त चैट सूची</string>
     <string name="pref_description_compact_chatlist">यह चैट संदेश को अधिक कॉम्पैक्ट सेविंग स्पेस में प्रदर्शित करता है</string>
