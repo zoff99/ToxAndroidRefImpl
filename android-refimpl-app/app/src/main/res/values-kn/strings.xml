@@ -1,14 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="add_friend_activity_name">ನಿನ್ನ ಗೆಳೆಯನನ್ನು ಸೇರಿಸು</string>
     <string name="message_list_activity_name">ಮಾತಾಡು</string>
     <string name="conference_message_list_activity_name">ಪದ ಮಿಲನ</string>
     <string name="conference_audio_activity_name">ದನಿ ಮಿಲನ</string>
     <string name="conference_audio_activity_player_name">ದನಿ ಮಿಲನ ಚಲನೆ</string>
-
     <string name="set_password_message_empty">ಪಾಸ್-ವರ್ಡ್ ಶೂನ್ಯ</string>
     <string name="set_password_message_password_invalid">ಪಾಸ್-ವರ್ಡ್ ತೀರ ಚಿಕ್ಕದು</string>
     <string name="set_password_message_password_dont_match">ಪಾಸ್-ವರ್ಡ್  ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತಿಲ್ಲ</string>
-
     <string name="title_activity_calling">ಕರೆ</string>
     <string name="title_activity_profile">ಜಾತಕ</string>
     <string name="title_activity_settings">ಸಂಯೋಜನೆ</string>
@@ -20,33 +19,24 @@
     <string name="title_activity_check_password">Enter ಪಾಸ್-ವರ್ಡ್</string>
     <string name="title_activity_share">open with TRIfA</string>
     <string name="title_activity_maintenance">ನಿರ್ವಹಣೆ</string>
-
-
     <string-array name="spinner_own_status_array">
         <item>ಆನ್‌ಲೈನ್</item>
         <item>ದೂರವಿರುವೆ</item>
         <item>ಕೆಲಸದಲ್ಲಿ ನಿರತನಾಗಿರುವೆ</item>
     </string-array>
-
     <string name="settings_toolbar_title">Settings</string>
-
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <string name="pref_header_general">ಸಾಮಾನ್ಯ</string>
-
     <string name="pref_title_auto_accept_image">ಚಿತ್ರಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸ್ವೀಕರಿಸು</string>
-    <string name="pref_description_auto_accept_image">3 MByte ಗಾತ್ರದ ಚಿತ್ರಗಳು ಮತ್ತು ಫೋಟೋಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸು</string>
-
+    <string name="pref_description_auto_accept_image">3 MegaByte ಗಾತ್ರದ ಚಿತ್ರಗಳು ಮತ್ತು ಫೋಟೋಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸು</string>
     <string name="pref_title_auto_accept_video">ವೀಡಿಯೊಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ </string>
-    <string name="pref_description_auto_accept_video">10 MByte ಗಾತ್ರದ ವೀಡಿಯೊಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ</string>
-
+    <string name="pref_description_auto_accept_video">10 MegaByte ಗಾತ್ರದ ವೀಡಿಯೊಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ</string>
     <string name="pref_title_video_uv_reversed"> ವೀಡಿಯೊದಲ್ಲಿ ರಿವರ್ಸ್ ಯುವಿ  </string>
     <string name="pref_description_video_uv_reversed">ಕ್ಯಾಮೆರಾ ವೀಡಿಯೊದಲ್ಲಿ ಯುವಿ  ಕ್ರಮವನ್ನು ಹಿಮ್ಮುಖಗೊಳಿಸಿ</string>
-
     <string name="pref_title_software_echo_cancel">ಪ್ರತಿಧ್ವನಿ ರದ್ದತಿ</string>
     <string name="pref_description_software_echo_cancel">ಸಾಫ್ಟ್‌ವೇರ್ ಎಕೋ ರದ್ದತಿ ಬಳಸಿ</string>
-
     <string name="pref_title_higher_video_quality">ವೀಡಿಯೊ ಗುಣಮಟ್ಟ</string>
     <string name="pref_description_higher_video_quality">ಉತ್ತಮ ವೀಡಿಯೊ ಗುಣಮಟ್ಟವನ್ನು ಬಳಸಿ. Change n ಬದಲಾವಣೆಗೆ RESTART ಅಗತ್ಯವಿದೆ!</string>
     <string-array name="pref_higher_video_quality_titles">
@@ -59,7 +49,6 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-
     <string name="pref_title_video_cam_resolution">ಕ್ಯಾಮೆರಾ ರೆಸಲ್ಯೂಶನ್</string>
     <string name="pref_description_video_cam_resolution">ವೀಡಿಯೊ ಕರೆ ಮಾಡಲು ಯಾವ ರೆಸಲ್ಯೂಶನ್ ಬಳಸಬೇಕು</string>
     <string-array name="pref_video_cam_resolution_titles">
@@ -72,7 +61,6 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-
     <string name="pref_title_global_font_size">ಅಕ್ಷರ ಗಾತ್ರ</string>
     <string name="pref_description_global_font_size">Select ಅಕ್ಷರ ಗಾತ್ರ ಆಯ್ಕೆ ಮಾಡಿ</string>
     <string-array name="pref_global_font_size_titles">
@@ -87,7 +75,6 @@
         <item>2</item>
         <item>3</item>
     </string-array>
-
     <string name="pref_title_camera_get_preview_format">ಕ್ಯಾಮೆರಾ ಪೂರ್ವ-ವೀಕ್ಷಣೆ ಸ್ವರೂಪ</string>
     <string name="pref_description_camera_get_preview_format">ಕ್ಯಾಮೆರಾ ಪೂರ್ವವೀಕ್ಷಣೆ ಸ್ವರೂಪ ಕೆಲವು ಫೋನ್‌ಗಳಲ್ಲಿ ತಪ್ಪಾದ ಸ್ವರೂಪದಲ್ಲಿದೆ ಎಂದು ತೋರುತ್ತದೆ</string>
     <string-array name="pref_camera_get_preview_format_titles">
@@ -98,10 +85,8 @@
         <item>YV12</item>
         <item>NV21</item>
     </string-array>
-
     <string name="pref_title_mic_gain_factor">ಮೈಕ್ ಗೇನ್</string>
     <string name="pref_description_mic_gain_factor">ನಿಮ್ಮ ಮೈಕ್ರೊಫೋನ್ ಕಡಿಮೆ ಪರಿಮಾಣದೊಂದಿಗೆ ರೆಕಾರ್ಡ್ ಮಾಡಿದರೆ ಹೆಚ್ಚಿನ ಲಾಭವನ್ನು ಹೊಂದಿಸಿ</string>
-
     <string name="pref_title_higher_audio_quality">Audio Quality</string>
     <string name="pref_description_higher_audio_quality">Use better Audio quality.\nChange needs RESTART!</string>
     <string-array name="pref_higher_audio_quality_titles">
@@ -114,50 +99,34 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-
     <string name="pref_title_udp_enabled">enable UDP</string>
     <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
-
     <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
     <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
-
     <string name="pref_title_fps_half">lower fps</string>
     <string name="pref_description_fps_half">Video Framerate 1/2 : so 12fps instead of 25fps</string>
-
     <string name="pref_title_set_fps">set fps</string>
     <string name="pref_description_set_fps">try to set 15fps video framerate, this may crash on some phones</string>
-
     <string name="pref_title_conference_show_system_messages">System Messages</string>
     <string name="pref_description_conference_show_system_messages">show System Messages in Conferences</string>
-
     <string name="pref_title_local_discovery_enabled">LAN discovery</string>
     <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
-
     <string name="pref_title_U_keep_nospam">keep NoSpam</string>
     <string name="pref_description_U_keep_nospam">keep NoSpam value. This is not safe, only activate if you know what you are doing!</string>
-
     <string name="pref_title_allow_screen_off_in_audio_call">Turn screen off</string>
     <string name="pref_description_allow_screen_off_in_audio_call">If you experience troubles with screen turning off in an Audiocall, set this to off</string>
-
     <string name="pref_title_X_zoom_incoming_video">Zoom Videocall Window</string>
     <string name="pref_description_X_zoom_incoming_video">allow to pinch-zoom the Videocall Window. This is not working fully!</string>
-
     <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
     <string name="pref_description_X_use_native_audio_play">!! Expermimental !!\nUse Native Audio to Play Sound</string>
-
     <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
     <string name="pref_description_X_battery_saving_mode">!! Expermimental !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
-
     <string name="pref_title_X_misc_button_enabled">Misc. Button</string>
     <string name="pref_description_X_misc_button_enabled">!! Expermimental !!\nadd a Button on Calling Screen to send a fixed Message</string>
-
     <string name="pref_title_X_eac_delay_ms">AEC delay</string>
     <string name="pref_description_X_eac_delay_ms">!! Expermimental !!\nAEC delay in ms</string>
-
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
-
-    <string name="pref_header_data_sync">Data &#038; sync</string>
-
+    <string name="pref_header_data_sync">Data &amp; sync</string>
     <string name="pref_title_sync_frequency">Sync frequency</string>
     <string-array name="pref_sync_frequency_titles">
         <item>15 minutes</item>
@@ -175,8 +144,6 @@
         <item>360</item>
         <item>-1</item>
     </string-array>
-
-
     <string name="pref_title_min_audio_samplingrate_out">Audio Samplingrate</string>
     <string name="pref_description_min_audio_samplingrate_out">Default setting is 48000 Hz</string>
     <string-array name="pref_min_audio_samplingrate_out_titles">
@@ -191,8 +158,6 @@
         <item>16000</item>
         <item>48000</item>
     </string-array>
-
-
     <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
     <string name="pref_description_X_audio_recording_frame_size">Default setting is 40 ms</string>
     <string-array name="X_audio_recording_frame_size_titles">
@@ -207,7 +172,6 @@
         <item>40</item>
         <item>20</item>
     </string-array>
-
     <string name="pref_title_X_battery_saving_timeout">Offline Time in Batterysavings mode</string>
     <string name="pref_description_X_battery_saving_timeout">Default setting is 15 minutes</string>
     <string-array name="X_battery_saving_timeout_titles">
@@ -228,30 +192,22 @@
         <item>60</item>
         <item>120</item>
     </string-array>
-
     <string-array name="list_preference_entries">
         <item>Entry 1</item>
         <item>Entry 2</item>
         <item>Entry 3</item>
     </string-array>
-
     <string-array name="list_preference_entry_values">
         <item>1</item>
         <item>2</item>
         <item>3</item>
     </string-array>
-
     <string-array name="multi_select_list_preference_default_value"/>
-
     <string name="pref_title_system_sync_settings">System sync settings</string>
-
     <string name="pref_header_notifications">Notifications</string>
-
     <string name="pref_title_new_message_notifications">New message notifications</string>
-
     <string name="pref_title_ringtone">Ringtone</string>
     <string name="pref_ringtone_silent">ಮೌನ</string>
-
     <string name="pref_title_vibrate">  ಕಂಪಿಸು</string>
     <string name="pref_title_sound">ಸದ್ದು</string>
     <string name="add_friend_activity_help">Paste friend\'s Tox ID in the text box above or tap the
@@ -261,8 +217,6 @@
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
-
-
     <!-- Java Source texts -->
     <!-- Java Source texts -->
     <!-- Java Source texts -->
@@ -291,7 +245,6 @@
     <string name="MainActivity_notification_new_message3">ಹೊಸ ಸಂದೇಶ</string>
     <string name="MainActivity_notification_new_message4">ಹೊಸ ಸಂದೇಶ</string>
     <string name="MainActivity_notification_new_message5">ಹೊಸ ಸಂದೇಶ</string>
-
     <string name="Aboutpage_0">TRIfA Crashlog</string>
     <string name="Aboutpage_2">send Crash report via Email</string>
     <string name="Aboutpage_4">reading crash info ...</string>
@@ -299,13 +252,10 @@
     <string name="Aboutpage_5b">Version:</string>
     <string name="Aboutpage_6">What is Tox?</string>
     <string name="Aboutpage_8">used libraries:</string>
-
     <string name="AddFriendActivity_3">incorrect ToxID</string>
     <string name="AddFriendActivity_4">No ToxID</string>
-
     <string name="CallingActivity_0">Video Delay:</string>
     <string name="CallingActivity_23">Video Delay:</string>
-
     <string name="ConferenceAudioActivity_10">Userlist</string>
     <string name="ConferenceAudioActivity_17">Push to Talk</string>
     <string name="ConferenceAudioActivity_18">talking ...</string>
@@ -314,8 +264,6 @@
     <!-- Java Source texts -->
     <!-- Java Source texts -->
     <!-- Java Source texts -->
-
-
     <!-- Layout texts -->
     <!-- Layout texts -->
     <!-- Layout texts -->
@@ -371,5 +319,109 @@
     <!-- Layout texts -->
     <!-- Layout texts -->
     <!-- Layout texts -->
-
+    <string name="pref_title_X_tox_set_do_not_sync_av">AV ಅನ್ನು ಸಿಂಕ್ ಮಾಡಬೇಡಿ</string>
+    <string name="pref_title_toxirc_muted_peers_01">ಟಾಕ್ಸಿರ್ಕ್ ಬ್ರಿಡ್ಜ್ ಮ್ಯೂಟ್ ಮಾಡಿದ ಬಳಕೆದಾರರು</string>
+    <string name="title_activity_conferenceinfo">ಕಾನ್ಫರೆನ್ಸ್ ಮಾಹಿತಿ</string>
+    <string name="pref_description_toxirc_muted_peers_02">ಮ್ಯೂಟ್ ಮಾಡಿದ ಬಳಕೆದಾರ 1 (ಬಳಸದಿದ್ದರೆ ಖಾಲಿ ಬಿಡಿ)</string>
+    <string name="add_public_group_activity_name">ಸಾರ್ವಜನಿಕ ಗುಂಪನ್ನು ರಚಿಸಿ</string>
+    <string name="join_public_activity_name">ಸಾರ್ವಜನಿಕ ಗುಂಪಿಗೆ ಸೇರಿಕೊಳ್ಳಿ</string>
+    <string name="pref_title_start_on_boot">ಬೂಟ್ ನಲ್ಲಿ ಪ್ರಾರಂಭಿಸಿ</string>
+    <string name="messages_search_default_text">ಹುಡುಕಿ Kannada ...</string>
+    <string name="layout___group_id">ಗುಂಪು ID</string>
+    <string name="layout___friends_pushurl">ಸ್ನೇಹಿತರ ಪುಶ್ URL:</string>
+    <string name="pref_description_window_security">ಈ ಸೆಟ್ಟಿಂಗ್ ಅನ್ನು ಸಕ್ರಿಯಗೊಳಿಸುವುದರಿಂದ ಚಟುವಟಿಕೆಗಳಿಗೆ FLAG_SECURE ಸೇರಿಸುತ್ತದೆ.
+\nಇದು ಸ್ಕ್ರೀನ್ ಶಾಟ್ ಗಳು ಮತ್ತು ಪರದೆ ರೆಕಾರ್ಡಿಂಗ್ ಮತ್ತು ಇತ್ತೀಚಿನ ಮುನ್ನೋಟದಲ್ಲಿ ವಿಷಯವನ್ನು ತೋರಿಸುವುದನ್ನು ತಡೆಯುತ್ತದೆ</string>
+    <string name="pref_title_window_security">ಸ್ಕ್ರೀನ್ ಶಾಟ್ ಗಳನ್ನು ತಡೆಗಟ್ಟಿ</string>
+    <string name="pref_title_download_push_msg_app">ಪುಶ್ ಮೆಸೇಜ್ ಅಪ್ಲಿಕೇಶನ್ ಡೌನ್ ಲೋಡ್ ಮಾಡಿ</string>
+    <string name="title_activity_groupinfo">ಗುಂಪು ಮಾಹಿತಿ</string>
+    <string name="pref_title_use_incognito_keyboard2">ಅಜ್ಞಾತ ಕೀಲಿಮಣೆ</string>
+    <string name="pref_description_compact_friendlist">ನೀವು ಸ್ನೇಹಿತರ ದೊಡ್ಡ ಪಟ್ಟಿಯನ್ನು ಹೊಂದಿದ್ದರೆ, ಸ್ನೇಹಿತರ ಪಟ್ಟಿಯನ್ನು ಹೆಚ್ಚು ಕಾಂಪ್ಯಾಕ್ಟ್ ಮಾಡಿ</string>
+    <string name="pref_title_compact_chatlist">ಕಾಂಪ್ಯಾಕ್ಟ್ ಚಾಟ್ ಲಿಸ್ಟ್</string>
+    <string name="add_public_group_activity_help">ನೀಡಿರುವ ಗುಂಪಿನ ಹೆಸರಿನೊಂದಿಗೆ ಹೊಸ ಸಾರ್ವಜನಿಕ ಗುಂಪನ್ನು ರಚಿಸಿ.</string>
+    <string name="join_public_group_activity_help">ನೀಡಿರುವ ಗುಂಪು ID ಯೊಂದಿಗೆ ಸಾರ್ವಜನಿಕ ಗುಂಪಿಗೆ ಸೇರಿಕೊಳ್ಳಿ.</string>
+    <string name="join_group_activity_join">ಗುಂಪು ಸೇರಿ</string>
+    <string name="add_private_group_failed">ಖಾಸಗಿ ಗುಂಪನ್ನು ರಚಿಸುವುದು ವಿಫಲವಾಗಿದೆ</string>
+    <string name="add_private_group_success">ನೀವು ಖಾಸಗಿ ಗುಂಪನ್ನು ರಚಿಸಿದ್ದೀರಿ</string>
+    <string name="add_friend_success">ನೀವು ಹೊಸ ಸ್ನೇಹಿತರನ್ನು ಸೇರಿಸಿದ್ದೀರಿ</string>
+    <string name="add_friend_failed">ಸ್ನೇಹಿತನನ್ನು ಸೇರಿಸಲು ವಿಫಲವಾಗಿದೆ</string>
+    <string name="MainActivity_new_noti_token_dialog_title">ಟೋಕನ್</string>
+    <string name="MainActivity_yes_button">ಹೌದು</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">ಪ್ರೊಫೈಲ್ ಚಿತ್ರವನ್ನು ತೆಗೆದುಹಾಕಿ</string>
+    <string name="layout___group_id2">ಗುಂಪು ID:</string>
+    <string name="layout___group_name2">ಸಮೂಹ ಹೆಸರು:</string>
+    <string name="layout___iobrowser_start">ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಸಂಗ್ರಹಣೆಯನ್ನು ಬ್ರೌಸ್ ಮಾಡಿ</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಫೈಲ್‌ಗಳನ್ನು ರಫ್ತು ಮಾಡಿ *ಅಸುರಕ್ಷಿತ*</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಫೈಲ್‌ಗಳನ್ನು ರಫ್ತು ಮಾಡಿ *ಅಸುರಕ್ಷಿತ*</string>
+    <string name="layout___create_new_public_group">ಹೊಸ ಸಾರ್ವಜನಿಕ ಸಮೂಹ ರಚಿಸಿ</string>
+    <string name="layout___join_public_group">ಸಾರ್ವಜನಿಕ ಗುಂಪಿಗೆ ಸೇರಿಕೊಳ್ಳಿ</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">ಅಧಿಸೂಚನೆಯನ್ನು ಟಾಗಲ್ ಮಾಡಿ</string>
+    <string name="pref_description_use_incognito_keyboard2">ನೀವು ನಮೂದಿಸಿದ ಪದಗಳಿಂದ ಕಲಿಯಬೇಡಿ ಎಂದು ಕೀಲಿಮಣೆಗೆ ಹೇಳಲು ಆನ್ ಮಾಡಿ</string>
+    <string name="pref_title_use_push_service">ಪುಶ್ ಸೇವೆಯನ್ನು ಬಳಸಿ</string>
+    <string name="pref_title_compact_friendlist">ಕಾಂಪ್ಯಾಕ್ಟ್ ಫ್ರೆಂಡ್ ಲಿಸ್ಟ್</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಸಂಗ್ರಹಣೆಯಿಂದ ಫೈಲ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ</string>
+    <string name="pref_description_use_push_service">ಎಚ್ಚರಿಕೆ: ಬ್ಯಾಟರಿ ಮತ್ತು ಬ್ಯಾಂಡ್ವಿಡ್ತ್ ಅನ್ನು ಉಳಿಸಲು ಇದು ಗೂಗಲ್ ಎಫ್ಸಿಎಂ ಅಥವಾ ಯುನಿಫೈಡ್ ಪುಶ್ ಅನ್ನು ಬಳಸುತ್ತದೆ.
+\nಅಪ್ಲಿಕೇಶನ್ HTTPS: ಕೆಲವು PUSH ಸರ್ವರ್ ಗಳಿಗೆ ನೇರವಾಗಿ (Tox ಮೂಲಕ ಅಲ್ಲ) ಸಂಪರ್ಕಗಳನ್ನು ಮಾಡುತ್ತದೆ.
+\nನೀವು ಅದನ್ನು ಒಪ್ಪಿಕೊಂಡರೆ ಮಾತ್ರ ಇದನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಿ.
+\nಈ ವೈಶಿಷ್ಟ್ಯಕ್ಕೆ ಟಾಕ್ಸ್ ಪುಶ್ ಮೆಸೇಜ್ ಅಪ್ಲಿಕೇಶನ್ ಅನ್ನು ಇನ್ಸ್ಟಾಲ್ ಮಾಡುವ ಅಗತ್ಯವಿದೆ.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">ಫೈಲ್ ಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">ಇಂಟೆಂಟ್ ಮೂಲಕ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಸಂಗ್ರಹಣೆಯಿಂದ ನೇರವಾಗಿ ಫೈಲ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ. ಇದು ಅಪಾಯಕಾರಿಯಾಗಬಹುದು, ಏಕೆಂದರೆ ಇತರ ದುರುದ್ದೇಶಪೂರಿತ ಅಪ್ಲಿಕೇಶನ್‌ಗಳು TRIfA ನ ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಸಂಗ್ರಹಣೆಯಲ್ಲಿ ಇತರ ಫೈಲ್‌ಗಳನ್ನು ತೆರೆಯಬಹುದು.</string>
+    <string name="pref_description_X_audio_play_buffer_custom">!! ಪ್ರಯೋಗಾತ್ಮಕ !!
+\nಆಡಿಯೋ ಪ್ಲೇ ಬಫರ್ ಅನ್ನು ಬೈಟ್ ಗಳಲ್ಲಿ, ಕಸ್ಟಮ್ ಸೆಟ್ಟಿಂಗ್ ಅನ್ನು ನಿಷ್ಕ್ರಿಯಗೊಳಿಸಲು 0 ಗೆ ಹೊಂದಿಸಿ</string>
+    <string name="pref_description_use_camera_x">!! ಪ್ರಯೋಗಾತ್ಮಕ !!
+\nಕ್ಯಾಮರಾX ಬಳಸಿ ಮತ್ತು ವೀಡಿಯೊ ಕರೆಗಳಲ್ಲಿ ಹಿನ್ನೆಲೆಯನ್ನು ತೆಗೆದುಹಾಕಿ
+\nಇದು ಇನ್ನೂ ಸಂಪೂರ್ಣವಾಗಿ ಕೆಲಸ ಮಾಡದಿರಬಹುದು, ದಯವಿಟ್ಟು ಜಾಗರೂಕರಾಗಿರಿ ಮತ್ತು ಯಾವಾಗಲೂ ಕೆಲಸ ಮಾಡಲು ಇದರ ಮೇಲೆ ಅವಲಂಬಿತರಾಗಬೇಡಿ!</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">ನೀವು ಈ ಸ್ನೇಹಿತನಿಗೆ ಅಧಿಸೂಚನೆ ಮೌನವನ್ನು ಟಾಗಲ್ ಮಾಡಲು ಬಯಸುವಿರಾ\?</string>
+    <string name="layout___remove_own_pushurl">ಪುಶ್ URL ಅನ್ನು ತೆಗೆದುಹಾಕಿ</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">ನಿಮ್ಮ ಪ್ರೊಫೈಲ್ ಚಿತ್ರವನ್ನು ನೀವು ತೆಗೆದುಹಾಕಲು ಬಯಸುವಿರಾ\?</string>
+    <string name="layout___capabilities">ಸಾಮರ್ಥ್ಯಗಳು:</string>
+    <string name="layout___group_myname2">ಗುಂಪಿನಲ್ಲಿ ನನ್ನ ಹೆಸರು:</string>
+    <string name="layout___group_mypubjkey2">ನನ್ನ ಪಬ್ಕಿ:</string>
+    <string name="layout___own_pushurl">ಪುಶ್ URL:</string>
+    <string name="title_activity_grouppeerinfo">ಗುಂಪು ಪೀರಿನ್ಫೋ</string>
+    <string name="pref_title_auto_accept_all_upto">ಎಲ್ಲಾ ಫೈಲ್‌ಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ</string>
+    <string name="pref_description_auto_accept_all_upto">200 MegaByte ಗಾತ್ರದವರೆಗಿನ ಎಲ್ಲಾ ಫೈಲ್ ಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸು</string>
+    <string name="pref_title_force_udp_only">ಬಲ UDP ಮೋಡ್</string>
+    <string name="pref_description_force_udp_only">ಇದು ಕೇವಲ UDP ಮೋಡ್ ಅನ್ನು ಒತ್ತಾಯಿಸುತ್ತದೆ, ಈ ಸೆಟ್ಟಿಂಗ್ ಆನ್ ಆಗಿರುವುದರಿಂದ ಕೆಲವು ಸಂಪರ್ಕಗಳನ್ನು ತಲುಪಲು ಸಾಧ್ಯವಾಗದಿರಬಹುದು
+\nಬದಲಾವಣೆಗೆ ಮರುಪ್ರಾರಂಭದ ಅಗತ್ಯವಿದೆ!</string>
+    <string name="pref_description_start_on_boot">ಬೂಟ್ ಮಾಡಿದ ನಂತರ ಅಪ್ಲಿಕೇಶನ್ ಅನ್ನು ಪ್ರಾರಂಭಿಸಿ.
+\nಆಂಡ್ರಾಯ್ಡ್ 10 ನಿಂದ ಪ್ರಾರಂಭಿಸಿ ಗೂಗಲ್ ಇನ್ನು ಮುಂದೆ ಇದನ್ನು ಅನುಮತಿಸುವುದಿಲ್ಲ</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 ಇಂಟ್ರಾ ರಿಫ್ರೆಶ್</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">H264 ಎನ್ ಕೋಡರ್ ಇಂಟ್ರಾ ರಿಫ್ರೆಶ್ ಫ್ರೇಮ್ ಗಳನ್ನು ಬಳಸಬೇಕು</string>
+    <string name="pref_title_custom_bootstrap_nodes">ಕಸ್ಟಮ್ ಬೂಟ್ ಸ್ಟ್ರಾಪ್ ನೋಡ್ ಗಳನ್ನು ಬಳಸಿ</string>
+    <string name="pref_description_speakerphone_tweak">ಕರೆಯಲ್ಲಿ ಅಪ್ಲಿಕೇಶನ್ ಸ್ಪೀಕರ್ ಗೆ ಬದಲಾಗದಿದ್ದರೆ, ಈ ಫಿಕ್ಸ್ ಅನ್ನು ಸಕ್ರಿಯಗೊಳಿಸಲು ಪ್ರಯತ್ನಿಸಿ.</string>
+    <string name="join_public_group_joined">ನೀವು ಸಾರ್ವಜನಿಕ ಗುಂಪಿಗೆ ಸೇರಿದ್ದೀರಿ</string>
+    <string name="add_public_group_failed">ಸಾರ್ವಜನಿಕ ಗುಂಪನ್ನು ರಚಿಸುವುದು ವಿಫಲವಾಗಿದೆ</string>
+    <string name="layout___conf_id">ಕಾನ್ಫರೆನ್ಸ್ ID:</string>
+    <string name="add_public_group_success">ನೀವು ಸಾರ್ವಜನಿಕ ಗುಂಪನ್ನು ರಚಿಸಿದ್ದೀರಿ</string>
+    <string name="layout___conf_title">ಶೀರ್ಷಿಕೆ:</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">ನೀವು ಈ ಫೈಲ್ ವರ್ಗಾವಣೆಯನ್ನು ರದ್ದುಗೊಳಿಸಲು ಬಯಸುವಿರಾ\?</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">ಫೈಲ್ ವರ್ಗಾವಣೆ ರದ್ದುಗೊಳಿಸಿ</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">ನೀವು ಈ ಫೈಲ್ ವರ್ಗಾವಣೆಯನ್ನು ರದ್ದುಗೊಳಿಸಲು ಬಯಸುವಿರಾ\?</string>
+    <string name="layout___remove_friends_pushurl">ಸ್ನೇಹಿತರ ಪುಶ್ URL ಅನ್ನು ತೆಗೆದುಹಾಕಿ</string>
+    <string name="pref_title_speakerphone_tweak">ಕರೆಗಳಿಗೆ ಸ್ಪೀಕರ್ ಫಿಕ್ಸ್ ಮಾಡಿ</string>
+    <string name="add_group_activity_name">ಖಾಸಗಿ ಸಮೂಹ ರಚಿಸಿ</string>
+    <string name="group_message_list_activity_name">ಗುಂಪು</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">ಹಂಚಿಕೆ ಉದ್ದೇಶದ ಮೂಲಕ TRIfA ಗೆ ಫೈಲ್‌ಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ.</string>
+    <string name="add_group_activity_help">ನೀಡಿರುವ ಗುಂಪಿನ ಹೆಸರಿನೊಂದಿಗೆ ಹೊಸ ಖಾಸಗಿ (ಆಹ್ವಾನ ಮಾತ್ರ) ಗುಂಪನ್ನು ರಚಿಸಿ.</string>
+    <string name="add_group_activity_add">ಗುಂಪು ರಚಿಸಿ</string>
+    <string name="MainActivity_setup_push_tip_title">ಪುಶ್ ಅಧಿಸೂಚನೆಯನ್ನು ಸೆಟಪ್ ಮಾಡಿ</string>
+    <string name="MainActivity_setup_push_tip_text">ನೀವು ಪುಶ್ ನೋಟಿಫಿಕೇಶನ್ ಅಪ್ಲಿಕೇಶನ್ ಅನ್ನು ಇನ್ ಸ್ಟಾಲ್ ಮಾಡಿಲ್ಲ ಮತ್ತು ಪುಶ್ ನೋಟಿಫಿಕೇಶನ್ ಅನ್ನು ಸೆಟಪ್ ಮಾಡಿಲ್ಲ. TRIfA ಸಂಪೂರ್ಣವಾಗಿ ಪುಶ್ ನೋಟಿಫಿಕೇಶನ್ ಇಲ್ಲದೆ ಕೆಲಸ ಮಾಡುತ್ತದೆ, ಆದರೆ ಸಂದೇಶಗಳನ್ನು ಸ್ವೀಕರಿಸಲು ಅದು ನಿರಂತರವಾಗಿ ಆನ್ ಲೈನ್ ನಲ್ಲಿರಬೇಕು.ಪುಶ್ ಅಧಿಸೂಚನೆಯೊಂದಿಗೆ ನೀವು ಬ್ಯಾಟರಿ ಮತ್ತು ಇಂಟರ್ನೆಟ್ ಬ್ಯಾಂಡ್ ವಿಡ್ತ್ ಅನ್ನು ಉಳಿಸಬಹುದು.
+\n
+\nಪುಶ್ ಅಧಿಸೂಚನೆಯನ್ನು ನೀವು ಈಗ ಹೇಗೆ ಹೊಂದಿಸಬಹುದು ಎಂದು ನೋಡಲು ಬಯಸುವಿರಾ\?</string>
+    <string name="layout___group_name">ಸಮೂಹ ಹೆಸರು</string>
+    <string name="layout___migdb_text">ಡೇಟಾಬೇಸ್ ಫೈಲ್‌ಗಳನ್ನು ಸ್ಥಳಾಂತರಿಸಲಾಗುತ್ತಿದೆ</string>
+    <string name="layout___migdb_do_not_close">ಈ ಪರದೆಯನ್ನು ಮುಚ್ಚಬೇಡ</string>
+    <string name="title_activity_wrong_credentials">ತಪ್ಪು ರುಜುವಾತುಗಳು</string>
+    <string name="wrong_credentials_error">ತಪ್ಪು ರುಜುವಾತುಗಳು</string>
+    <string name="layout___add_friend">ಗೆಳೆಯನನ್ನು ಸೇರಿಸು</string>
+    <string name="layout___create_new_private_group">ಹೊಸ ಖಾಸಗಿ ಸಮೂಹವನ್ನು ರಚಿಸಿ</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!! ಪ್ರಯೋಗಾತ್ಮಕ !!
+\nವೀಡಿಯೊ ಅಥವಾ ಆಡಿಯೋವನ್ನು ಸಿಂಕ್ ಮಾಡಬೇಡಿ. ನಿಮಗೆ ವೀಡಿಯೊಕಾಲ್ ಸಮಸ್ಯೆಗಳಿದ್ದರೆ, ಕೊನೆಯ ಪ್ರಯತ್ನವಾಗಿ ಈ ಸೆಟ್ಟಿಂಗ್ ಅನ್ನು ಬಳಸಿ.</string>
+    <string name="pref_title_use_camera_x">ಹಿನ್ನೆಲೆ ತೆಗೆದುಹಾಕಿ</string>
+    <string name="pref_title_X_audio_play_buffer_custom">ಆಡಿಯೋ ಪ್ಲೇ ಬಫರ್</string>
+    <string name="pref_description_toxirc_muted_peers_01">ಮ್ಯೂಟ್ ಮಾಡಿದ ಬಳಕೆದಾರ 1 (ಬಳಸದಿದ್ದರೆ ಖಾಲಿ ಬಿಡಿ)</string>
+    <string name="pref_description_toxirc_muted_peers_03">ಮ್ಯೂಟ್ ಮಾಡಿದ ಬಳಕೆದಾರ 1 (ಬಳಸದಿದ್ದರೆ ಖಾಲಿ ಬಿಡಿ)</string>
+    <string name="join_public_group_failed">ಸಾರ್ವಜನಿಕ ಗುಂಪಿಗೆ ಸೇರುವುದು ವಿಫಲವಾಗಿದೆ</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">ಫೈಲ್ ವರ್ಗಾವಣೆ ರದ್ದುಗೊಳಿಸಿ</string>
+    <string name="MainActivity_new_noti_token_dialog_text">ಹೊಸ ಅಧಿಸೂಚನೆ ಟೋಕನ್ ಸ್ವೀಕರಿಸಲಾಗಿದೆ. ಈ ಟೋಕನ್ ಬಳಸುವುದೇ\?</string>
 </resources>
