@@ -199,8 +199,8 @@ public class MessageListFragment extends Fragment
                     {
                         try
                         {
-                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
-                                                false);
+                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, false,
+                                                this.getClass().getName());
                         }
                         catch (Exception ignored)
                         {
@@ -218,7 +218,8 @@ public class MessageListFragment extends Fragment
                     {
                         try
                         {
-                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, true);
+                            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, true,
+                                                this.getClass().getName());
                         }
                         catch (Exception ignored)
                         {
@@ -244,7 +245,7 @@ public class MessageListFragment extends Fragment
                             try
                             {
                                 do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
-                                                    false);
+                                                    false, this.getClass().getName());
                             }
                             catch (Exception ignored)
                             {
@@ -262,7 +263,7 @@ public class MessageListFragment extends Fragment
                             try
                             {
                                 do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button,
-                                                    true);
+                                                    true, this.getClass().getName());
                             }
                             catch (Exception ignored)
                             {
@@ -292,7 +293,7 @@ public class MessageListFragment extends Fragment
                         is_at_bottom = true;
                         try
                         {
-                            do_fade_anim_on_fab(unread_messages_notice_button, false);
+                            do_fade_anim_on_fab(unread_messages_notice_button, false, this.getClass().getName());
                             unread_messages_notice_button.setSupportBackgroundTintList(
                                     (ContextCompat.getColorStateList(context_s,
                                                                      R.color.message_list_scroll_to_bottom_fab_bg_normal)));
@@ -310,7 +311,7 @@ public class MessageListFragment extends Fragment
                         is_at_bottom = false;
                         try
                         {
-                            do_fade_anim_on_fab(unread_messages_notice_button, true);
+                            do_fade_anim_on_fab(unread_messages_notice_button, true, this.getClass().getName());
                             unread_messages_notice_button.setVisibility(View.VISIBLE);
                         }
                         catch (Exception ignored)
@@ -391,6 +392,7 @@ public class MessageListFragment extends Fragment
         }
 
         is_data_loaded = false;
+
         MainActivity.message_list_fragment = this;
         // Log.i(TAG, "onResume:099");
     }

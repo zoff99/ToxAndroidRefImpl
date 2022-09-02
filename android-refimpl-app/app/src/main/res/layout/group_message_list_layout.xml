@@ -44,4 +44,19 @@
         android:textSize="14sp"
         android:visibility="invisible" />
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/unread_messages_notice_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginRight="30dp"
+        android:layout_marginBottom="30dp"
+        android:onClick="scroll_to_bottom"
+        android:textSize="15sp"
+        android:visibility="invisible"
+        app:backgroundTint="@color/message_list_scroll_to_bottom_fab_bg_normal"
+        app:fabSize="mini"
+        app:srcCompat="@drawable/ic_baseline_keyboard_arrow_down_24" />
+
 </RelativeLayout>
