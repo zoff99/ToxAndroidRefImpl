@@ -124,6 +124,8 @@ public class CheckPasswordActivity extends AppCompatActivity
             {
                 try_password_hash = TrifaSetPatternActivity.bytesToString(
                         TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(pass)));
+
+                // HINT: used_password = base64encode_as_string(sha256hash(encode_UTF8string_to_bytes(user_entered_password)))
             }
             catch (Exception e)
             {
