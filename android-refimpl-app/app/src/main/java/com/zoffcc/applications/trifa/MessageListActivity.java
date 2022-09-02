@@ -2163,7 +2163,8 @@ public class MessageListActivity extends AppCompatActivity
 
         try
         {
-            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, false);
+            do_fade_anim_on_fab(MainActivity.message_list_fragment.unread_messages_notice_button, false,
+                                this.getClass().getName());
             MainActivity.message_list_fragment.unread_messages_notice_button.setSupportBackgroundTintList(
                     (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
         }

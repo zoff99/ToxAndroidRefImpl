@@ -59,6 +59,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.ConferenceMessageListFragment.conf_search_messages_text;
@@ -67,11 +68,13 @@ import static com.zoffcc.applications.trifa.HelperConference.is_conference_activ
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
@@ -1292,6 +1295,31 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    public void scroll_to_bottom(View v)
+    {
+        try
+        {
+            MainActivity.conference_message_list_fragment.listingsView.scrollToPosition(
+                    MainActivity.conference_message_list_fragment.adapter.getItemCount() - 1);
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        MessageListFragment.is_at_bottom = true;
+
+        try
+        {
+            do_fade_anim_on_fab(MainActivity.conference_message_list_fragment.unread_messages_notice_button, false,
+                                this.getClass().getName());
+            MainActivity.conference_message_list_fragment.unread_messages_notice_button.setSupportBackgroundTintList(
+                    (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
+        }
+        catch (Exception ignored)
+        {
         }
     }
 }

@@ -107,7 +107,6 @@ import static com.zoffcc.applications.trifa.MainActivity.VFS_CUSTOM_WRITE_CACHE;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
-import static com.zoffcc.applications.trifa.MessageListFragment.faded_in;
 import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
@@ -4179,13 +4178,33 @@ public class HelperGeneric
         return true;
     }
 
-    public static void do_fade_anim_on_fab(final FloatingActionButton fab, boolean fade_in)
+    public static void do_fade_anim_on_fab(final FloatingActionButton fab, boolean fade_in, final String caller_class_name)
     {
         try
         {
+            // Log.i(TAG, "caller_class_name:" + caller_class_name);
+            // com.zoffcc.applications.trifa.MessageListFragment
+            // com.zoffcc.applications.trifa.MessageListActivity
+            // com.zoffcc.applications.trifa.ConferenceMessageListFragment
+            // com.zoffcc.applications.trifa.ConferenceMessageListActivity
+            // com.zoffcc.applications.trifa.GroupMessageListFragment
+            // com.zoffcc.applications.trifa.GroupMessageListActivity
+
             if (fade_in)
             {
-                faded_in = true;
+                if (caller_class_name.contains("rifa.ConferenceMessage"))
+                {
+                    ConferenceMessageListFragment.faded_in = true;
+                }
+                else if (caller_class_name.contains("rifa.GroupMessage"))
+                {
+                    GroupMessageListFragment.faded_in = true;
+                }
+                else
+                {
+                    MessageListFragment.faded_in = true;
+                }
+
                 ObjectAnimator scaleUpX = ObjectAnimator.ofFloat(fab, "scaleX", 0.0f, 1f);
                 ObjectAnimator scaleUpY = ObjectAnimator.ofFloat(fab, "scaleY", 0.0f, 1f);
                 scaleUpX.setDuration(FAB_SCROLL_TO_BOTTOM_FADEOUT_MS);
@@ -4198,7 +4217,19 @@ public class HelperGeneric
             }
             else
             {
-                faded_in = false;
+                if (caller_class_name.contains("rifa.ConferenceMessage"))
+                {
+                    ConferenceMessageListFragment.faded_in = false;
+                }
+                else if (caller_class_name.contains("rifa.GroupMessage"))
+                {
+                    GroupMessageListFragment.faded_in = false;
+                }
+                else
+                {
+                    MessageListFragment.faded_in = false;
+                }
+
                 ObjectAnimator scaleDownX = ObjectAnimator.ofFloat(fab, "scaleX", 1f, 0.0f);
                 ObjectAnimator scaleDownY = ObjectAnimator.ofFloat(fab, "scaleY", 1f, 0.0f);
                 scaleDownX.setDuration(FAB_SCROLL_TO_BOTTOM_FADEIN_MS);

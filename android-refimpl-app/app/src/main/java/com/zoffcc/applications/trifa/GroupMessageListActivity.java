@@ -58,10 +58,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
@@ -71,6 +73,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
@@ -91,7 +94,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
@@ -730,7 +732,8 @@ public class GroupMessageListActivity extends AppCompatActivity
             {
                 GroupMessage m = new GroupMessage();
                 m.is_new = false; // own messages are always "not new"
-                m.tox_group_peer_pubkey = tox_group_self_get_public_key(tox_group_by_groupid__wrapper(group_id)).toUpperCase();
+                m.tox_group_peer_pubkey = tox_group_self_get_public_key(
+                        tox_group_by_groupid__wrapper(group_id)).toUpperCase();
                 m.direction = 1; // msg sent
                 m.TOX_MESSAGE_TYPE = 0;
                 m.read = true; // !!!! there is not "read status" with conferences in Tox !!!!
@@ -1044,6 +1047,31 @@ public class GroupMessageListActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
+        }
+    }
+
+    public void scroll_to_bottom(View v)
+    {
+        try
+        {
+            MainActivity.group_message_list_fragment.listingsView.scrollToPosition(
+                    MainActivity.group_message_list_fragment.adapter.getItemCount() - 1);
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        MessageListFragment.is_at_bottom = true;
+
+        try
+        {
+            do_fade_anim_on_fab(MainActivity.group_message_list_fragment.unread_messages_notice_button, false,
+                                this.getClass().getName());
+            MainActivity.group_message_list_fragment.unread_messages_notice_button.setSupportBackgroundTintList(
+                    (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
+        }
+        catch (Exception ignored)
+        {
         }
     }
 }

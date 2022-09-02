@@ -28,14 +28,20 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.l4digital.fastscroll.FastScroller;
+
 import java.util.List;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -48,9 +54,12 @@ public class GroupMessageListFragment extends Fragment
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     GroupMessagelistAdapter adapter = null;
     static boolean is_at_bottom = true;
+    static boolean faded_in = false;
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
+    boolean is_data_loaded = true;
     static String group_search_messages_text = null;
+    FloatingActionButton unread_messages_notice_button = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -58,6 +67,11 @@ public class GroupMessageListFragment extends Fragment
         // Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.group_message_list_layout, container, false);
 
+        unread_messages_notice_button = view.findViewById(R.id.unread_messages_notice_button);
+        unread_messages_notice_button.setAnimation(null);
+        unread_messages_notice_button.setVisibility(View.INVISIBLE);
+        unread_messages_notice_button.setSupportBackgroundTintList(
+                (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
 
         GroupMessageListActivity mla = (GroupMessageListActivity) (getActivity());
         if (mla != null)
@@ -68,6 +82,7 @@ public class GroupMessageListFragment extends Fragment
 
         // default is: at bottom
         is_at_bottom = true;
+        faded_in = false;
 
         try
         {
@@ -141,6 +156,47 @@ public class GroupMessageListFragment extends Fragment
         listingsView.setItemAnimator(new DefaultItemAnimator());
         listingsView.setHasFixedSize(false);
 
+        listingsView.setFastScrollListener(new FastScroller.FastScrollListener()
+        {
+            @Override
+            public void onFastScrollStart(FastScroller fastScroller)
+            {
+                if (!is_at_bottom)
+                {
+                    if (faded_in)
+                    {
+                        try
+                        {
+                            do_fade_anim_on_fab(MainActivity.group_message_list_fragment.unread_messages_notice_button,
+                                                false, this.getClass().getName());
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onFastScrollStop(FastScroller fastScroller)
+            {
+                if (!is_at_bottom)
+                {
+                    if (!faded_in)
+                    {
+                        try
+                        {
+                            do_fade_anim_on_fab(MainActivity.group_message_list_fragment.unread_messages_notice_button,
+                                                true, this.getClass().getName());
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
+                    }
+                }
+            }
+        });
+
         RecyclerView.OnScrollListener mScrollListener = new RecyclerView.OnScrollListener()
         {
             @Override
@@ -150,10 +206,41 @@ public class GroupMessageListFragment extends Fragment
 
                 if (newState == RecyclerView.SCROLL_STATE_DRAGGING)
                 {
+                    if (!is_at_bottom)
+                    {
+                        if (faded_in)
+                        {
+                            try
+                            {
+                                do_fade_anim_on_fab(
+                                        MainActivity.group_message_list_fragment.unread_messages_notice_button, false,
+                                        this.getClass().getName());
+                            }
+                            catch (Exception ignored)
+                            {
+                            }
+                        }
+                    }
                     conversationDateHeader.show();
                 }
                 else if (newState == RecyclerView.SCROLL_STATE_IDLE)
                 {
+                    if (!is_at_bottom)
+                    {
+                        if (!faded_in)
+                        {
+                            try
+                            {
+                                do_fade_anim_on_fab(
+                                        MainActivity.group_message_list_fragment.unread_messages_notice_button, true,
+                                        this.getClass().getName());
+                            }
+                            catch (Exception ignored)
+                            {
+
+                            }
+                        }
+                    }
                     conversationDateHeader.hide();
                 }
             }
@@ -174,6 +261,16 @@ public class GroupMessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:at bottom");
                         is_at_bottom = true;
+                        try
+                        {
+                            do_fade_anim_on_fab(unread_messages_notice_button, false, this.getClass().getName());
+                            unread_messages_notice_button.setSupportBackgroundTintList(
+                                    (ContextCompat.getColorStateList(context_s,
+                                                                     R.color.message_list_scroll_to_bottom_fab_bg_normal)));
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
                 else
@@ -182,6 +279,14 @@ public class GroupMessageListFragment extends Fragment
                     {
                         // Log.i(TAG, "onScrolled:NOT at bottom");
                         is_at_bottom = false;
+                        try
+                        {
+                            do_fade_anim_on_fab(unread_messages_notice_button, true, this.getClass().getName());
+                            unread_messages_notice_button.setVisibility(View.VISIBLE);
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
             }
@@ -196,7 +301,9 @@ public class GroupMessageListFragment extends Fragment
         // a = new MessagelistArrayAdapter(context, data_values);
         // setListAdapter(a);
 
-        MainActivity.group_message_list_fragment = this;
+        // MainActivity.group_message_list_fragment = this;
+
+        is_data_loaded = true;
 
         return view;
     }
@@ -224,10 +331,38 @@ public class GroupMessageListFragment extends Fragment
     @Override
     public void onResume()
     {
+        global_showing_anygroupview = true;
+
         Log.i(TAG, "onResume");
         super.onResume();
 
-        global_showing_anygroupview = true;
+        if (!is_data_loaded)
+        {
+            try
+            {
+                // reset "new" flags for messages -------
+                if (orma != null)
+                {
+                    orma.updateGroupMessage().
+                            group_identifierEq(current_group_id.toLowerCase()).
+                            is_new(false).execute();
+                    Log.i(TAG, "loading data:002");
+                }
+                // reset "new" flags for messages -------
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            update_all_messages(true);
+
+            // default is: at bottom
+            is_at_bottom = true;
+        }
+
+        is_data_loaded = false;
+
         MainActivity.group_message_list_fragment = this;
     }
 
@@ -277,6 +412,19 @@ public class GroupMessageListFragment extends Fragment
                     if (is_at_bottom)
                     {
                         listingsView.scrollToPosition(adapter.getItemCount() - 1);
+                    }
+                    else
+                    {
+                        try
+                        {
+                            // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
+                            unread_messages_notice_button.setSupportBackgroundTintList(
+                                    (ContextCompat.getColorStateList(context_s,
+                                                                     R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
                 catch (Exception e)
