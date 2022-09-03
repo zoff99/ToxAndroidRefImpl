@@ -32,6 +32,7 @@ import android.widget.TextView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.l4digital.fastscroll.FastScroller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import androidx.core.content.ContextCompat;
@@ -43,6 +44,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
@@ -58,11 +60,12 @@ public class MessageListFragment extends Fragment
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     MessagelistAdapter adapter = null;
     static boolean is_at_bottom = true;
+    static int current_page_offset = -1;
     static boolean faded_in = false;
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
     MessageListActivity mla = null;
-    boolean is_data_loaded = true;
+    boolean is_data_loaded = false;
     static boolean show_only_files = false;
     static String search_messages_text = null;
     FloatingActionButton unread_messages_notice_button = null;
@@ -109,37 +112,51 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
         }
 
-        // Log.i(TAG, "loaded_messages:start");
         try
         {
             if (orma != null)
             {
-                // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
-                // -------------------------------------------------
-                // HINT: here ordering of messages is applied !!
-                // -------------------------------------------------
-                if (show_only_files)
+                data_values = new ArrayList<Message>();
+                data_values.clear();
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        if (2 == 1 + 4)
+        {
+            // Log.i(TAG, "loaded_messages:start");
+            try
+            {
+                if (orma != null)
                 {
-                    data_values = orma.selectFromMessage().tox_friendpubkeyEq(
-                            tox_friend_get_public_key__wrapper(current_friendnum)).
-                            and().
-                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
-                            orderBySent_timestampAsc().
-                            orderBySent_timestamp_msAsc().
-                            toList();
-                }
-                else
-                {
-                    if ((search_messages_text == null) || (search_messages_text.length() == 0))
+                    // Log.i(TAG, "current_friendpublic_key=" + tox_friend_get_public_key__wrapper(current_friendnum));
+                    // -------------------------------------------------
+                    // HINT: here ordering of messages is applied !!
+                    // -------------------------------------------------
+                    if (show_only_files)
                     {
                         data_values = orma.selectFromMessage().tox_friendpubkeyEq(
                                 tox_friend_get_public_key__wrapper(current_friendnum)).
+                                and().
+                                TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                                 orderBySent_timestampAsc().
                                 orderBySent_timestamp_msAsc().
                                 toList();
                     }
                     else
                     {
+                        if ((search_messages_text == null) || (search_messages_text.length() == 0))
+                        {
+                            data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                                    tox_friend_get_public_key__wrapper(current_friendnum)).
+                                    orderBySent_timestampAsc().
+                                    orderBySent_timestamp_msAsc().
+                                    toList();
+                        }
+                        else
+                        {
                         /*
                          searching for case-IN-sensitive non ascii chars is not working:
 
@@ -149,23 +166,25 @@ public class MessageListFragment extends Fragment
                          The LIKE operator is case sensitive by default for unicode characters that are beyond
                          the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                          */
-                        data_values = orma.selectFromMessage().tox_friendpubkeyEq(
-                                tox_friend_get_public_key__wrapper(current_friendnum)).
-                                orderBySent_timestampAsc().
-                                orderBySent_timestamp_msAsc().
-                                where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
-                                toList();
+                            data_values = orma.selectFromMessage().tox_friendpubkeyEq(
+                                    tox_friend_get_public_key__wrapper(current_friendnum)).
+                                    orderBySent_timestampAsc().
+                                    orderBySent_timestamp_msAsc().
+                                    where(" like('" + get_sqlite_search_string(search_messages_text) +
+                                          "', text, '\\')").
+                                    toList();
+                        }
                     }
+                    // Log.i(TAG, "loading data:001");
+                    // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
+                    // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
                 }
-                // Log.i(TAG, "loading data:001");
-                // Log.i(TAG, "current_friendpublic_key:data_values=" + data_values);
-                // Log.i(TAG, "current_friendpublic_key:data_values size=" + data_values.size());
             }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            // data_values is NULL here!!
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                // data_values is NULL here!!
+            }
         }
         // Log.i(TAG, "loaded_messages:ready");
 
@@ -333,7 +352,7 @@ public class MessageListFragment extends Fragment
 
         // MainActivity.message_list_fragment = this;
 
-        is_data_loaded = true;
+        is_data_loaded = false;
 
         return view;
     }
@@ -385,13 +404,13 @@ public class MessageListFragment extends Fragment
                 e.printStackTrace();
             }
 
-            update_all_messages(true);
+            update_all_messages(true, PREF__messageview_paging);
 
             // default is: at bottom
             is_at_bottom = true;
         }
 
-        is_data_loaded = false;
+        is_data_loaded = true;
 
         MainActivity.message_list_fragment = this;
         // Log.i(TAG, "onResume:099");
@@ -407,7 +426,12 @@ public class MessageListFragment extends Fragment
         MainActivity.message_list_fragment = null;
     }
 
-    void update_all_messages(boolean always)
+    void reset_paging()
+    {
+        current_page_offset = -1; // reset paging when we change friend that is shown
+    }
+
+    void update_all_messages(boolean always, boolean paging)
     {
         Log.i(TAG, "update_all_messages");
 

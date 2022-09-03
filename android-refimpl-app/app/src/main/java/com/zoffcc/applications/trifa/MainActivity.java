@@ -487,6 +487,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__show_friendnumber_on_friendlist = false;
     static int PREF__dark_mode_pref = 0;
     static boolean PREF__enable_ngc_features = false;
+    static boolean PREF__messageview_paging = true;
 
     static String versionName = "";
     static int versionCode = -1;

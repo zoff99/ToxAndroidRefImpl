@@ -34,6 +34,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_NEWER_HASH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 
 public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
@@ -66,6 +69,18 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
 
         switch (viewType)
         {
+            case Message_model.PAGING:
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
+                                                                            false);
+                }
+                return new ConferenceMessageListHolder_paging(view, this.context);
             case Message_model.TEXT_INCOMING_NOT_READ:
                 if (PREF__compact_chatlist)
                 {
@@ -127,7 +142,16 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
 
         {
             // TEXT -------------
-            if (my_msg.direction == 0)
+            if ((my_msg.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) && (
+
+                    ((my_msg.message_id_tox.equals(MESSAGE_PAGING_SHOW_OLDER_HASH)) ||
+                     (my_msg.message_id_tox.equals(MESSAGE_PAGING_SHOW_NEWER_HASH)))
+
+            ))
+            {
+                return Message_model.PAGING;
+            }
+            else if (my_msg.direction == 0)
             {
                 // msg to me
                 if (my_msg.read)
@@ -178,6 +202,9 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
 
             switch (getItemViewType(position))
             {
+                case Message_model.PAGING:
+                    ((ConferenceMessageListHolder_paging) holder).bindMessageList(m2);
+                    break;
                 case Message_model.TEXT_INCOMING_NOT_READ:
                     ((ConferenceMessageListHolder_text_incoming_not_read) holder).bindMessageList(m2);
                     break;
