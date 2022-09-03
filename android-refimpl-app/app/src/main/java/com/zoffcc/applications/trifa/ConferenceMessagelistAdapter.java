@@ -69,17 +69,13 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
 
         switch (viewType)
         {
-            case Message_model.PAGING:
-                if (PREF__compact_chatlist)
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact,
-                                                                            parent, false);
-                }
-                else
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
-                                                                            false);
-                }
+            case Message_model.PAGING_NEWER:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_paging_newer, parent,
+                                                                        false);
+                return new ConferenceMessageListHolder_paging(view, this.context);
+            case Message_model.PAGING_OLDER:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_paging_older, parent,
+                                                                        false);
                 return new ConferenceMessageListHolder_paging(view, this.context);
             case Message_model.TEXT_INCOMING_NOT_READ:
                 if (PREF__compact_chatlist)
@@ -149,7 +145,14 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
 
             ))
             {
-                return Message_model.PAGING;
+                if (my_msg.message_id_tox.equals(MESSAGE_PAGING_SHOW_OLDER_HASH))
+                {
+                    return Message_model.PAGING_OLDER;
+                }
+                else
+                {
+                    return Message_model.PAGING_NEWER;
+                }
             }
             else if (my_msg.direction == 0)
             {
@@ -202,7 +205,10 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
 
             switch (getItemViewType(position))
             {
-                case Message_model.PAGING:
+                case Message_model.PAGING_NEWER:
+                    ((ConferenceMessageListHolder_paging) holder).bindMessageList(m2);
+                    break;
+                case Message_model.PAGING_OLDER:
                     ((ConferenceMessageListHolder_paging) holder).bindMessageList(m2);
                     break;
                 case Message_model.TEXT_INCOMING_NOT_READ:

@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -394,6 +395,7 @@ public class ConferenceMessageListFragment extends Fragment
         super.onAttach(activity);
     }
 
+    @SuppressLint("WrongThread")
     @Override
     public void onResume()
     {
@@ -533,7 +535,7 @@ public class ConferenceMessageListFragment extends Fragment
 
         try
         {
-            if ((always) || (data_values != null))
+            if (always)
             {
                 if (data_values != null)
                 {
@@ -544,7 +546,7 @@ public class ConferenceMessageListFragment extends Fragment
                 boolean older_messages = false;
                 List<ConferenceMessage> ml = null;
 
-                if (paging)
+                if ((paging) && ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0)))
                 {
                     later_messages = true;
                     older_messages = true;
@@ -598,7 +600,6 @@ public class ConferenceMessageListFragment extends Fragment
                             offset(offset).
                             limit(rowcount).
                             toList();
-
                 }
                 else
                 {
@@ -644,7 +645,7 @@ public class ConferenceMessageListFragment extends Fragment
                         m_older.is_new = false;
                         m_older.direction = 0;
                         m_older.message_id_tox = MESSAGE_PAGING_SHOW_OLDER_HASH;
-                        m_older.text = "^^^ older Messages ^^^";
+                        m_older.text = "older Messages";
                         add_message(m_older, false);
                     }
 
@@ -674,7 +675,7 @@ public class ConferenceMessageListFragment extends Fragment
                         m_later.is_new = false;
                         m_later.direction = 0;
                         m_later.message_id_tox = MESSAGE_PAGING_SHOW_NEWER_HASH;
-                        m_later.text = "vvv newer Messages vvv";
+                        m_later.text = "newer Messages";
                         add_message(m_later, true);
                     }
                 }
