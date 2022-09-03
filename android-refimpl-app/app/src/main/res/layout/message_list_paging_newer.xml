@@ -1,0 +1,87 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@null"
+    android:padding="4dp">
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/message_entry_padding">
+
+        <LinearLayout
+            android:id="@+id/layout_message_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="0dp">
+
+            <LinearLayout
+                android:id="@+id/m_container"
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_marginLeft="0dp"
+                android:layout_marginRight="0dp"
+                android:layout_weight="6"
+                android:background="@drawable/rounded_orange_bg"
+                android:minHeight="0dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/dummy2"
+                    android:layout_width="6dp"
+                    android:layout_height="wrap_content"
+                    android:text="" />
+
+                <ImageView
+                    android:id="@+id/icon_left"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
+                    android:visibility="visible"
+                    app:srcCompat="@drawable/ic_baseline_arrow_circle_down_24" />
+
+                <com.luseen.autolinklibrary.EmojiTextViewLinks
+                    android:id="@+id/m_text"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
+                    android:minHeight="40dp"
+                    android:paddingBottom="0dp"
+                    android:text="__________"
+                    android:textAlignment="center"
+                    android:textColor="#8A000000"
+                    android:textColorLink="@color/textblock_link_color_for_orange"
+                    android:textSize="20sp"
+                    app:emojiSize="@dimen/emoji_size_in_textview" />
+
+                <ImageView
+                    android:id="@+id/icon_right"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
+                    android:visibility="visible"
+                    app:srcCompat="@drawable/ic_baseline_arrow_circle_down_24" />
+
+                <TextView
+                    android:id="@+id/dummy"
+                    android:layout_width="6dp"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    android:visibility="visible" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </RelativeLayout>
+</LinearLayout>
+
+
+

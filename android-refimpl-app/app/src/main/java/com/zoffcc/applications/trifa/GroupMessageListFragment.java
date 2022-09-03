@@ -41,6 +41,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
@@ -355,7 +356,7 @@ public class GroupMessageListFragment extends Fragment
                 e.printStackTrace();
             }
 
-            update_all_messages(true);
+            update_all_messages(true, PREF__messageview_paging);
 
             // default is: at bottom
             is_at_bottom = true;
@@ -440,7 +441,7 @@ public class GroupMessageListFragment extends Fragment
         }
     }
 
-    void update_all_messages(boolean always)
+    void update_all_messages(boolean always, boolean paging)
     {
         Log.i(TAG, "update_all_messages");
 

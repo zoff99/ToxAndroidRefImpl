@@ -70,6 +70,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
@@ -285,7 +286,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         group_search_messages_text = null;
-                        MainActivity.group_message_list_fragment.update_all_messages(true);
+                        MainActivity.group_message_list_fragment.update_all_messages(true, PREF__messageview_paging);
                     }
                     catch (Exception e2)
                     {
@@ -298,7 +299,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         group_search_messages_text = query;
-                        MainActivity.group_message_list_fragment.update_all_messages(true);
+                        MainActivity.group_message_list_fragment.update_all_messages(true, PREF__messageview_paging);
                     }
                     catch (Exception e2)
                     {
@@ -320,7 +321,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         group_search_messages_text = null;
-                        MainActivity.group_message_list_fragment.update_all_messages(true);
+                        MainActivity.group_message_list_fragment.update_all_messages(true, PREF__messageview_paging);
                     }
                     catch (Exception e2)
                     {
@@ -333,7 +334,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         group_search_messages_text = query;
-                        MainActivity.group_message_list_fragment.update_all_messages(true);
+                        MainActivity.group_message_list_fragment.update_all_messages(true, PREF__messageview_paging);
                     }
                     catch (Exception e2)
                     {

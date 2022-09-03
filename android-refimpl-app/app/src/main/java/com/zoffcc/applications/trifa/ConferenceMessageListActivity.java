@@ -71,6 +71,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
@@ -288,7 +289,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         conf_search_messages_text = null;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                        MainActivity.conference_message_list_fragment.update_all_messages(true,
+                                                                                          PREF__messageview_paging);
                     }
                     catch (Exception e2)
                     {
@@ -301,7 +303,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         conf_search_messages_text = query;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                        MainActivity.conference_message_list_fragment.update_all_messages(true,
+                                                                                          PREF__messageview_paging);
                     }
                     catch (Exception e2)
                     {
@@ -323,7 +326,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         conf_search_messages_text = null;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                        MainActivity.conference_message_list_fragment.update_all_messages(true,
+                                                                                          PREF__messageview_paging);
                     }
                     catch (Exception e2)
                     {
@@ -336,7 +340,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         conf_search_messages_text = query;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true);
+                        MainActivity.conference_message_list_fragment.update_all_messages(true,
+                                                                                          PREF__messageview_paging);
                     }
                     catch (Exception e2)
                     {
