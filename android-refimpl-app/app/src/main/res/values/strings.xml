@@ -413,6 +413,7 @@
     <string name="GroupActivityOffline">Offline:</string>
 
     <string name="messages_search_default_text">search ...</string>
+    <string name="incoming_filetransfer_size_too_large">Incoming filesize too large. Only files up to 2 GBytes can be received.</string>
     <!-- Java Source texts -->
     <!-- Java Source texts -->
     <!-- Java Source texts -->

@@ -81,6 +81,10 @@ public class TRIFAGlobals
     public static final int FAB_SCROLL_TO_BOTTOM_FADEIN_MS = 200;
 
     public static final long UINT32_MAX_JAVA = 4294967295L; // 0xffffffff == UINT32_MAX
+    /*
+     // HINT: java does NOT have an unsigned 64 bit number!
+    public static final long UINT64_MAX_JAVA = 0xffffffffffffffffL; // 0xffffffffffffffff == UINT64_MAX
+     */
 
     // ----------
     // https://toxme.io/u/echobot

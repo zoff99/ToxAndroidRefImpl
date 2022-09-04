@@ -5755,6 +5755,22 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
     {
+        // HINT: IOCipher can only handle files up to 2GBytes in size
+        if (file_size >= ((UINT32_MAX_JAVA / 2L) - 1L))
+        {
+            try
+            {
+                tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            display_toast(context_s.getString(R.string.incoming_filetransfer_size_too_large), false, 800);
+            return;
+        }
+
         if (PREF__X_battery_saving_mode)
         {
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:010:*PING*");
