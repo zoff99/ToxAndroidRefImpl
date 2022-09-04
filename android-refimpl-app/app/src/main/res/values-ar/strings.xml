@@ -32,7 +32,8 @@
     <string name="pref_title_software_echo_cancel">إلغاء الصدى</string>
     <string name="pref_description_software_echo_cancel">استخدم إلغاء صدى البرنامج</string>
     <string name="pref_title_higher_video_quality">جودة الفيديو</string>
-    <string name="pref_description_higher_video_quality">استخدام جودة فيديو أفضل. \nالتغيير يحتاج إلى RESTART!</string>
+    <string name="pref_description_higher_video_quality">استخدام جودة فيديو أفضل.
+\nالتغيير يحتاج إلى RESTART!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>نطاق ترددي منخفض \n(250 كيلو بايت /ثانية)</item>
         <item>عرض النطاق العادي \n(2500 كيلو بايت /ثانية)</item>
@@ -54,7 +55,8 @@
         <item>NV21</item>
     </string-array>
     <string name="pref_title_higher_audio_quality">جودة الصوت</string>
-    <string name="pref_description_higher_audio_quality">استخدام جودة صوت أفضل. \nالتغيير يحتاج إلى RESTART!</string>
+    <string name="pref_description_higher_audio_quality">استخدام جودة صوت أفضل.
+\nالتغيير يحتاج إلى RESTART!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>منخفض \n(6 كيلو بايت /ثانية)</item>
         <item>عادي \n(32 كيلو بايت /ثانية)</item>
@@ -66,9 +68,12 @@
         <item>2</item>
     </string-array>
     <string name="pref_title_udp_enabled">تمكين UDP</string>
-    <string name="pref_description_udp_enabled">بالنسبة لمعظم الأجهزة المحمولة ، سيتسبب UDP في حركة مرور على الإنترنت أكثر بكثير. \nالتغيير يحتاج إلى RESTART! \nإعداد الإعداد الافتراضي متوقف</string>
+    <string name="pref_description_udp_enabled">بالنسبة لمعظم الأجهزة المحمولة ، سيتسبب UDP في حركة مرور على الإنترنت أكثر بكثير.
+\nالتغيير يحتاج إلى RESTART!
+\nإعداد الإعداد الافتراضي متوقف</string>
     <string name="pref_title_orbot_enabled">تمكين Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">تحتاج إلى تثبيت Orbot لاستخدام هذا. \nالتغيير يحتاج إلى RESTART!</string>
+    <string name="pref_description_orbot_enabled">تحتاج إلى تثبيت Orbot لاستخدام هذا.
+\nالتغيير يحتاج إلى RESTART!</string>
     <string name="pref_title_fps_half">إطارات في الثانية أقل</string>
     <string name="pref_description_fps_half">Video Framerate 1/2: حتى 12 إطارًا في الثانية بدلاً من 25 إطارًا في الثانية</string>
     <string name="pref_title_set_fps">تعيين إطارا في الثانية</string>
@@ -86,13 +91,18 @@
     <string name="pref_title_X_zoom_incoming_video">تكبير نافذة محادثة فيديو</string>
     <string name="pref_description_X_zoom_incoming_video">السماح بتكبير /تصغير نافذة مكالمة الفيديو. هذا لا يعمل بشكل كامل!</string>
     <string name="pref_title_X_use_native_audio_play">نظام الصوت الأصلي</string>
-    <string name="pref_description_X_use_native_audio_play">!! تجريبي !! \nاستخدم الصوت الأصلي لتشغيل الصوت</string>
+    <string name="pref_description_X_use_native_audio_play">!! تجريبي !!
+\nاستخدم الصوت الأصلي لتشغيل الصوت</string>
     <string name="pref_title_X_battery_saving_mode">وضع توفير البطارية</string>
-    <string name="pref_description_X_battery_saving_mode">!! تجريبي !! \nسيوفر هذا قدرًا أكبر قليلاً من طاقة البطارية ، لكن الرسالة ستستغرق وقتًا أطول في الإرسال والاستقبال. \nربما هناك بعض التأثيرات السيئة الأخرى أيضًا!</string>
+    <string name="pref_description_X_battery_saving_mode">!! تجريبي !!
+\nسيوفر هذا قدرًا أكبر قليلاً من طاقة البطارية ، لكن الرسالة ستستغرق وقتًا أطول في الإرسال والاستقبال.
+\nربما هناك بعض التأثيرات السيئة الأخرى أيضًا!</string>
     <string name="pref_title_X_misc_button_enabled">متفرقات. زر</string>
-    <string name="pref_description_X_misc_button_enabled">!! تجريبي !! \nإضافة زر على شاشة الاتصال لإرسال رسالة ثابتة</string>
+    <string name="pref_description_X_misc_button_enabled">!! تجريبي !!
+\nإضافة زر على شاشة الاتصال لإرسال رسالة ثابتة</string>
     <string name="pref_title_X_eac_delay_ms">تأخير AEC</string>
-    <string name="pref_description_X_eac_delay_ms">!! تجريبي !! \nتأخير AEC بالميلي ثانية</string>
+    <string name="pref_description_X_eac_delay_ms">!! تجريبي !!
+\nتأخير AEC بالميلي ثانية</string>
     <string name="pref_title_add_friends_to_messages">أضف أصدقاء إلى الرسائل</string>
     <string-array name="pref_example_list_titles">
         <item>دائما</item>
@@ -234,7 +244,8 @@
     <string name="GroupActivityOffline">غير متصل على الانترنت:</string>
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">مسح رمز الاستجابة السريعة</string>
-    <string name="layout___enter_pass_longtext">أدخل كلمة المرور \nلا يوجد خيار استرداد!</string>
+    <string name="layout___enter_pass_longtext">أدخل كلمة المرور
+\nلا يوجد خيار استرداد!</string>
     <string name="layout___unlock">الغاء القفل</string>
     <string name="layout___name">اسم</string>
     <string name="layout___push_to_talk">اضغط للتحدث</string>
@@ -266,7 +277,11 @@
     <string name="layout___your_toxidenticon">ToxIdenticon الخاص بك</string>
     <string name="layout___active_network_connections">اتصالات الشبكة النشطة:</string>
     <string name="layout___error_getting_active_network_connections">* خطأ في الحصول على اتصالات شبكة نشطة *</string>
-    <string name="layout___set_password_or_skip">تعيين كلمة المرور أو التخطي. \n\nعند تحديد تخطي \nسيتم إنشاء كلمة المرور تلقائيًا \nلا يوجد خيار استرداد!</string>
+    <string name="layout___set_password_or_skip">تعيين كلمة المرور أو التخطي.
+\n
+\nعند تحديد تخطي
+\nسيتم إنشاء كلمة المرور تلقائيًا
+\nلا يوجد خيار استرداد!</string>
     <string name="layout___password">كلمه السر</string>
     <string name="layout___password_again">أدخل كلمة السر مرة أخرى</string>
     <string name="layout___set_password">ضبط كلمة السر</string>
@@ -319,4 +334,74 @@
     <string name="pref_title_compact_chatlist">قائمة الدردشة المضغوطة</string>
     <string name="pref_description_compact_friendlist">اجعل قائمة الأصدقاء أكثر إحكاما ، إذا كانت لديك قائمة كبيرة من الأصدقاء</string>
     <string name="pref_title_compact_friendlist">قائمة الأصدقاء المضغوطة</string>
+    <string name="layout___export_tox_encrypted_files_unsecure"></string>
+    <string name="FriendListHolder_toggle_notification_silent_title"></string>
+    <string name="FriendListHolder_toggle_notification_silent_message"></string>
+    <string name="ProfileActivity_delete_avatar_dialog_text"></string>
+    <string name="layout___group_id2"></string>
+    <string name="layout___own_pushurl"></string>
+    <string name="add_public_group_activity_name"></string>
+    <string name="pref_title_window_security"></string>
+    <string name="pref_title_download_push_msg_app"></string>
+    <string name="title_activity_groupinfo"></string>
+    <string name="pref_description_use_push_service"></string>
+    <string name="pref_description_use_camera_x"></string>
+    <string name="add_public_group_success"></string>
+    <string name="add_private_group_success"></string>
+    <string name="ProfileActivity_delete_avatar_dialog_title"></string>
+    <string name="layout___remove_own_pushurl"></string>
+    <string name="layout___create_new_private_group"></string>
+    <string name="title_activity_grouppeerinfo"></string>
+    <string name="pref_description_window_security"></string>
+    <string name="pref_title_use_camera_x"></string>
+    <string name="join_public_group_activity_help"></string>
+    <string name="join_group_activity_join"></string>
+    <string name="join_public_group_joined"></string>
+    <string name="join_public_group_failed"></string>
+    <string name="layout___group_id"></string>
+    <string name="layout___export_tox_encrypted_chats_unsecure"></string>
+    <string name="join_public_activity_name"></string>
+    <string name="MainActivity_setup_push_tip_text"></string>
+    <string name="layout___group_myname2"></string>
+    <string name="layout___capabilities"></string>
+    <string name="layout___join_public_group"></string>
+    <string name="pref_description_toxirc_muted_peers_02"></string>
+    <string name="layout___add_friend"></string>
+    <string name="pref_title_use_incognito_keyboard2"></string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent"></string>
+    <string name="pref_description_toxirc_muted_peers_03"></string>
+    <string name="layout___create_new_public_group"></string>
+    <string name="pref_title_use_push_service"></string>
+    <string name="pref_description_use_incognito_keyboard2"></string>
+    <string name="pref_description_toxirc_muted_peers_01"></string>
+    <string name="pref_title_toxirc_muted_peers_01"></string>
+    <string name="app_name" translatable="false"></string>
+    <string name="layout___group_mypubjkey2"></string>
+    <string name="pref_title_custom_bootstrap_nodes"></string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent"></string>
+    <string name="add_private_group_failed"></string>
+    <string name="layout___conf_title"></string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent"></string>
+    <string name="layout___friends_pushurl"></string>
+    <string name="layout___conf_id"></string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent"></string>
+    <string name="title_activity_conferenceinfo"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message"></string>
+    <string name="layout___group_name"></string>
+    <string name="pref_title_speakerphone_tweak"></string>
+    <string name="pref_description_speakerphone_tweak"></string>
+    <string name="add_group_activity_name"></string>
+    <string name="group_message_list_activity_name"></string>
+    <string name="MainActivity_setup_push_tip_title"></string>
+    <string name="add_group_activity_help"></string>
+    <string name="add_public_group_activity_help"></string>
+    <string name="add_group_activity_add"></string>
+    <string name="add_public_group_failed"></string>
+    <string name="add_friend_failed"></string>
+    <string name="add_friend_success"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message"></string>
+    <string name="layout___remove_friends_pushurl"></string>
+    <string name="layout___group_name2"></string>
 </resources>
