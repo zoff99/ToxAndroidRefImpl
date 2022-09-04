@@ -297,4 +297,5 @@
     <string name="MessageListHolder_file_outgoing_cancel_ft_title">cancelar a transferência de arquivos</string>
     <string name="MessageListHolder_file_outgoing_cancel_ft_message">Deseja cancelar esta transferência de arquivos\?</string>
     <string name="pref_description_allow_open_encrypted_file_via_intent">abre arquivos diretamente do armazenamento criptografado via Intent. Isso pode ser potencialmente perigoso, porque outros aplicativos maliciosos podem abrir outros arquivos no armazenamento criptografado do TRIfA.</string>
+    <string name="app_name" translatable="false"></string>
 </resources>
