@@ -400,4 +400,16 @@
     <string name="pref_description_allow_open_encrypted_file_via_intent">Открыть файл прямо с шифрованного хранилища через Интернет. Это может быть потенциально опасно, вредоносное приложение может открыть другие файлы внутри хранилища TRIfA.</string>
     <string name="layout___own_pushurl">PUSH ссылка:</string>
     <string name="layout___friends_pushurl">Дружественная PUSH ссылка:</string>
+    <string name="app_name" translatable="false"></string>
+    <string name="FriendListHolder_toggle_notification_silent_title"></string>
+    <string name="pref_title_custom_bootstrap_nodes"></string>
+    <string name="pref_description_toxirc_muted_peers_01"></string>
+    <string name="FriendListHolder_toggle_notification_silent_message"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title"></string>
+    <string name="pref_title_toxirc_muted_peers_01"></string>
+    <string name="pref_description_toxirc_muted_peers_02"></string>
+    <string name="pref_description_toxirc_muted_peers_03"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title"></string>
 </resources>
