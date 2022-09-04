@@ -411,4 +411,5 @@
     <string name="pref_description_allow_open_encrypted_file_via_intent">ouvre des fichiers directement à partir d’un stockage crypté via Intent. Cela peut être potentiellement dangereux, car d’autres applications malveillantes pourraient ouvrir d’autres fichiers dans le stockage crypté de TRIfA.</string>
     <string name="MessageListHolder_file_incoming_cancel_ft_title">annuler le transfert de fichiers</string>
     <string name="MessageListHolder_file_incoming_cancel_ft_message">Voulez-vous annuler ce transfert de fichiers \?</string>
+    <string name="app_name" translatable="false"></string>
 </resources>
