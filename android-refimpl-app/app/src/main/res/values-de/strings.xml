@@ -36,7 +36,8 @@
     <string name="pref_title_software_echo_cancel">Echounterdrückung</string>
     <string name="pref_description_software_echo_cancel">Verwenden Sie die Software Echounterdrückung</string>
     <string name="pref_title_higher_video_quality">Videoqualität</string>
-    <string name="pref_description_higher_video_quality">Verwenden Sie eine bessere Videoqualität. \nÄndern muss neu gestartet werden!</string>
+    <string name="pref_description_higher_video_quality">Verwenden Sie eine bessere Videoqualität.
+\nÄndern muss neu gestartet werden!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>niedrige Bandbreite \n(250 kb /s)</item>
         <item>normale Bandbreite \n(2500 kb /s)</item>
@@ -58,7 +59,8 @@
         <item>NV21</item>
     </string-array>
     <string name="pref_title_higher_audio_quality">Audio Qualität</string>
-    <string name="pref_description_higher_audio_quality">Verwenden Sie eine bessere Audioqualität. \nÄndern muss neu gestartet werden!</string>
+    <string name="pref_description_higher_audio_quality">Verwenden Sie eine bessere Audioqualität.
+\nÄndern muss neu gestartet werden!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>niedrig \n(6 kb /s)</item>
         <item>normal \n(32 kb /s)</item>
@@ -70,9 +72,12 @@
         <item>2</item>
     </string-array>
     <string name="pref_title_udp_enabled">UDP aktivieren</string>
-    <string name="pref_description_udp_enabled">Bei den meisten Mobilgeräten verursacht UDP viel mehr Internetverkehr. \nÄnderung muss neu gestartet werden! \nDie Standardeinstellung ist AUS</string>
+    <string name="pref_description_udp_enabled">Bei den meisten Mobilgeräten verursacht UDP viel mehr Internetverkehr.
+\nÄnderung muss neu gestartet werden!
+\nDie Standardeinstellung ist AUS</string>
     <string name="pref_title_orbot_enabled">Aktivieren Sie Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">Sie müssen Orbot installieren, um dies nutzen zu können. \nDer Neustart muss geändert werden!</string>
+    <string name="pref_description_orbot_enabled">Sie müssen Orbot installieren, um dies nutzen zu können.
+\nDer Neustart muss geändert werden!</string>
     <string name="pref_title_fps_half">niedrigere fps</string>
     <string name="pref_description_fps_half">Video Framerate 1/2: also 12fps statt 25fps</string>
     <string name="pref_title_set_fps">setze fps</string>
@@ -88,13 +93,18 @@
     <string name="pref_title_X_zoom_incoming_video">Zoom-Videoanruffenster</string>
     <string name="pref_description_X_zoom_incoming_video">Ermöglichen Sie das Zoomen des Videoanruffensters. Dies funktioniert nicht vollständig!</string>
     <string name="pref_title_X_use_native_audio_play">Natives Audiosystem</string>
-    <string name="pref_description_X_use_native_audio_play">!! Experimentell !! \nVerwenden Sie Native Audio, um Sound abzuspielen</string>
+    <string name="pref_description_X_use_native_audio_play">!! Experimentell !!
+\nVerwenden Sie Native Audio, um Sound abzuspielen</string>
     <string name="pref_title_X_battery_saving_mode">Batteriesparmodus</string>
-    <string name="pref_description_X_battery_saving_mode">!! Experimentell !! \nDies spart etwas mehr Batterie, aber das Senden und Empfangen von Nachrichten dauert länger. \nWahrscheinlich auch einige andere schlechte Effekte!</string>
+    <string name="pref_description_X_battery_saving_mode">!! Experimentell !!
+\nDies spart etwas mehr Batterie, aber das Senden und Empfangen von Nachrichten dauert länger.
+\nWahrscheinlich auch einige andere schlechte Effekte!</string>
     <string name="pref_title_X_misc_button_enabled">Sonstiges Taste</string>
-    <string name="pref_description_X_misc_button_enabled">!! Experimentell !! \nDie Schaltfläche auf dem Anrufbildschirm hinzufügen, um eine feste Nachricht zu senden</string>
+    <string name="pref_description_X_misc_button_enabled">!! Experimentell !!
+\nDie Schaltfläche auf dem Anrufbildschirm hinzufügen, um eine feste Nachricht zu senden</string>
     <string name="pref_title_X_eac_delay_ms">AEC Verzögerung</string>
-    <string name="pref_description_X_eac_delay_ms">!! Experimentelle !! \nAEC Verzögerung in ms</string>
+    <string name="pref_description_X_eac_delay_ms">!! Experimentelle !!
+\nAEC Verzögerung in ms</string>
     <string name="pref_title_add_friends_to_messages">Fügen Sie Nachrichten zu Freunden hinzu</string>
     <string name="pref_header_data_sync">Daten &amp; Synchronisation</string>
     <string name="pref_title_sync_frequency">Synchronisations-Häufigkeit</string>
@@ -213,7 +223,7 @@
     <string name="Aboutpage_4">Absturzinformationen lesen ...</string>
     <string name="Aboutpage_5a">TRIfA ein Tox Client für Android</string>
     <string name="Aboutpage_5b">Version:</string>
-    <string name="Aboutpage_6">Was ist Tox?</string>
+    <string name="Aboutpage_6">Was ist Tox\?</string>
     <string name="Aboutpage_8">gebrauchte Bibliotheken:</string>
     <string name="AddFriendActivity_3">falsche ToxID</string>
     <string name="AddFriendActivity_4">Keine ToxID</string>
@@ -226,7 +236,8 @@
     <string name="GroupActivityOffline">Offline:</string>
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">QR-Code scannen</string>
-    <string name="layout___enter_pass_longtext">Passwort eingeben \nEs gibt KEINE Wiederherstellungsoption!</string>
+    <string name="layout___enter_pass_longtext">Passwort eingeben
+\nEs gibt KEINE Wiederherstellungsoption!</string>
     <string name="layout___unlock">Freischalten</string>
     <string name="layout___name">Name</string>
     <string name="layout___push_to_talk">Drücken, um zu sprechen</string>
@@ -258,7 +269,11 @@
     <string name="layout___your_toxidenticon">Ihr ToxIdenticon</string>
     <string name="layout___active_network_connections">aktive Netzwerkverbindungen:</string>
     <string name="layout___error_getting_active_network_connections">* Fehler beim Abrufen aktiver Netzwerkverbindungen *</string>
-    <string name="layout___set_password_or_skip">Passwort festlegen oder überspringen. \n \nWenn Sie ein \nKennwort überspringen, wird es automatisch generiert \nEs gibt KEINE Wiederherstellungsoption!</string>
+    <string name="layout___set_password_or_skip">Passwort festlegen oder überspringen.
+\n
+\nWenn Sie ein
+\nKennwort überspringen, wird es automatisch generiert
+\nEs gibt KEINE Wiederherstellungsoption!</string>
     <string name="layout___password">Passwort</string>
     <string name="layout___password_again">Passwort erneut</string>
     <string name="layout___set_password">Passwort festlegen</string>
@@ -350,4 +365,43 @@
     <string name="MainActivity_setup_push_tip_text">Du hast die Push-Benachrichtigungs-App nicht installiert und die Push-Benachrichtigung nicht eingerichtet. TRIfA funktioniert auch ohne Push-Benachrichtigung, aber es muss ständig online sein, um Nachrichten zu empfangen. Mit Push-Benachrichtigung kannst du Akku und Internetbandbreite sparen.
 \n
 \nMöchtest du sehen, wie du die Push-Benachrichtigung jetzt einrichten kannst\?</string>
+    <string name="FriendListHolder_toggle_notification_silent_title"></string>
+    <string name="FriendListHolder_toggle_notification_silent_message"></string>
+    <string name="group_message_list_activity_name"></string>
+    <string name="title_activity_groupinfo"></string>
+    <string name="join_public_group_joined"></string>
+    <string name="add_public_group_failed"></string>
+    <string name="add_public_group_success"></string>
+    <string name="add_friend_failed"></string>
+    <string name="add_friend_success"></string>
+    <string name="layout___group_name"></string>
+    <string name="pref_title_custom_bootstrap_nodes"></string>
+    <string name="join_public_activity_name"></string>
+    <string name="layout___join_public_group"></string>
+    <string name="layout___create_new_public_group"></string>
+    <string name="add_group_activity_name"></string>
+    <string name="add_private_group_success"></string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent"></string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent"></string>
+    <string name="add_private_group_failed"></string>
+    <string name="layout___create_new_private_group"></string>
+    <string name="app_name" translatable="false"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message"></string>
+    <string name="add_public_group_activity_name"></string>
+    <string name="layout___group_id2"></string>
+    <string name="add_public_group_activity_help"></string>
+    <string name="layout___add_friend"></string>
+    <string name="join_public_group_failed"></string>
+    <string name="join_group_activity_join"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message"></string>
+    <string name="title_activity_grouppeerinfo"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title"></string>
+    <string name="add_group_activity_help"></string>
+    <string name="layout___group_id"></string>
+    <string name="add_group_activity_add"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title"></string>
+    <string name="join_public_group_activity_help"></string>
+    <string name="layout___group_name2"></string>
+    <string name="layout___group_myname2"></string>
+    <string name="layout___group_mypubjkey2"></string>
 </resources>
