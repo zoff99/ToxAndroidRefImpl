@@ -36,7 +36,8 @@
     <string name="pref_title_software_echo_cancel">Echo Cancellation</string>
     <string name="pref_description_software_echo_cancel">Använd mjukvaror Echo Cancellation</string>
     <string name="pref_title_higher_video_quality">Videokvalitét</string>
-    <string name="pref_description_higher_video_quality">Använd bättre videokvalitet. \nÄndra behov ÅTERSTART!</string>
+    <string name="pref_description_higher_video_quality">Använd bättre videokvalitet.
+\nÄndra behov ÅTERSTART!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>låg bandbredd \n(250 kb /s)</item>
         <item>normal bandbredd \n(2500 kb /s)</item>
@@ -58,7 +59,8 @@
         <item>NV21</item>
     </string-array>
     <string name="pref_title_higher_audio_quality">Ljudkvalité</string>
-    <string name="pref_description_higher_audio_quality">Använd bättre ljudkvalitet. \nÄndra behov ÅTERSTART!</string>
+    <string name="pref_description_higher_audio_quality">Använd bättre ljudkvalitet.
+\nÄndra behov ÅTERSTART!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>låg \n(6 kb /s)</item>
         <item>normal \n(32 kb /s)</item>
@@ -70,9 +72,12 @@
         <item>2</item>
     </string-array>
     <string name="pref_title_udp_enabled">aktivera UDP</string>
-    <string name="pref_description_udp_enabled">för de flesta mobila enheter kommer UDP att orsaka mycket mer internettrafik. \nÄndra behov ÅTERSTART! \nFelinställningen är AV</string>
+    <string name="pref_description_udp_enabled">för de flesta mobila enheter kommer UDP att orsaka mycket mer internettrafik.
+\nÄndra behov ÅTERSTART!
+\nFelinställningen är AV</string>
     <string name="pref_title_orbot_enabled">aktivera Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">Du måste installera Orbot för att kunna använda detta. \nÄndra behov ÅTERSTART!</string>
+    <string name="pref_description_orbot_enabled">Du måste installera Orbot för att kunna använda detta.
+\nÄndra behov ÅTERSTART!</string>
     <string name="pref_title_fps_half">lägre fps</string>
     <string name="pref_description_fps_half">Video Framerate 1/2: så 12fps istället för 25fps</string>
     <string name="pref_title_set_fps">ställa in fps</string>
@@ -88,13 +93,17 @@
     <string name="pref_title_X_zoom_incoming_video">Zoom Videocall-fönster</string>
     <string name="pref_description_X_zoom_incoming_video">låt att knipa in zoomfönstret Videocall. Detta fungerar inte helt!</string>
     <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
-    <string name="pref_description_X_use_native_audio_play">!! Experimentell !! \nAnvänd Native Audio för att spela ljud</string>
+    <string name="pref_description_X_use_native_audio_play">!! Experimentell !!
+\nAnvänd Native Audio för att spela ljud</string>
     <string name="pref_title_X_battery_saving_mode">Batterisparläge</string>
-    <string name="pref_description_X_battery_saving_mode">!! Experimentellt !! \nDetta sparar lite mer batteri, men meddelandet tar längre tid att skicka och ta emot. \n Troligtvis några andra dåliga effekter också!</string>
+    <string name="pref_description_X_battery_saving_mode">!! Experimentellt !!
+\nDetta sparar lite mer batteri, men meddelandet tar längre tid att skicka och ta emot.
+\n Troligtvis några andra dåliga effekter också!</string>
     <string name="pref_title_X_misc_button_enabled">Övrigt. Knapp</string>
-    <string name="pref_description_X_misc_button_enabled">!! Expermimental !! \lägg till en knapp på samtalskärmen för att skicka ett fast meddelande</string>
+    <string name="pref_description_X_misc_button_enabled">!! Expermimental !! ägg till en knapp på samtalskärmen för att skicka ett fast meddelande</string>
     <string name="pref_title_X_eac_delay_ms">AEC försening</string>
-    <string name="pref_description_X_eac_delay_ms">!! Experimentell !! \nAEC-försening i ms</string>
+    <string name="pref_description_X_eac_delay_ms">!! Experimentell !!
+\nAEC-försening i ms</string>
     <string name="pref_title_add_friends_to_messages">Lägg till vänner i meddelanden</string>
     <string name="pref_header_data_sync">Data</string>
     <string name="pref_title_sync_frequency">Synkroniseringsfrekvens</string>
@@ -213,7 +222,7 @@
     <string name="Aboutpage_4">läser kraschinfo ...</string>
     <string name="Aboutpage_5a">TRIfA en Tox-klient för Android</string>
     <string name="Aboutpage_5b">Version:</string>
-    <string name="Aboutpage_6">Vad är Tox?</string>
+    <string name="Aboutpage_6">Vad är Tox\?</string>
     <string name="Aboutpage_8">begagnade bibliotek:</string>
     <string name="AddFriendActivity_3">felaktig ToxID</string>
     <string name="AddFriendActivity_4">Ingen ToxID</string>
@@ -226,7 +235,8 @@
     <string name="GroupActivityOffline">Off-line:</string>
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">skanna QR kod</string>
-    <string name="layout___enter_pass_longtext">Ange lösenord \nDet finns inget återställningsalternativ!</string>
+    <string name="layout___enter_pass_longtext">Ange lösenord
+\nDet finns inget återställningsalternativ!</string>
     <string name="layout___unlock">Låsa upp</string>
     <string name="layout___name">namn</string>
     <string name="layout___push_to_talk">Tryck för att prata</string>
@@ -258,7 +268,11 @@
     <string name="layout___your_toxidenticon">Din ToxIdenticon</string>
     <string name="layout___active_network_connections">aktiva nätverksanslutningar:</string>
     <string name="layout___error_getting_active_network_connections">* fel vid aktiva nätverksanslutningar *</string>
-    <string name="layout___set_password_or_skip">Ställ in lösenord eller hoppa över. \n \nNär du väljer att hoppa över ett \npassord kommer att autogenereras \nDet finns inget återställningsalternativ!</string>
+    <string name="layout___set_password_or_skip">Ställ in lösenord eller hoppa över.
+\n
+\nNär du väljer att hoppa över ett
+\npassord kommer att autogenereras
+\nDet finns inget återställningsalternativ!</string>
     <string name="layout___password">Lösenord</string>
     <string name="layout___password_again">Lösenord igen</string>
     <string name="layout___set_password">Välj lösenord</string>
@@ -276,4 +290,105 @@
     <!-- Generated by Automatic String Resource Translation -->
     <!--          https://asrt.gluege.boerde.de             -->
     <string name="pref_title_video_cam_resolution">Kamera upplösning</string>
+    <string name="app_name" translatable="false"></string>
+    <string name="FriendListHolder_toggle_notification_silent_title"></string>
+    <string name="FriendListHolder_toggle_notification_silent_message"></string>
+    <string name="layout___conf_id"></string>
+    <string name="title_activity_wrong_credentials"></string>
+    <string name="wrong_credentials_error"></string>
+    <string name="layout___add_friend"></string>
+    <string name="layout___join_public_group"></string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent"></string>
+    <string name="pref_description_toxirc_muted_peers_01"></string>
+    <string name="title_activity_groupinfo"></string>
+    <string name="pref_description_auto_accept_all_upto"></string>
+    <string name="pref_description_window_security"></string>
+    <string name="pref_title_compact_friendlist"></string>
+    <string name="pref_description_compact_friendlist"></string>
+    <string name="pref_title_compact_chatlist"></string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent"></string>
+    <string name="pref_description_X_audio_play_buffer_custom"></string>
+    <string name="join_group_activity_join"></string>
+    <string name="add_friend_success"></string>
+    <string name="layout___group_id"></string>
+    <string name="layout___group_mypubjkey2"></string>
+    <string name="layout___capabilities"></string>
+    <string name="layout___iobrowser_start"></string>
+    <string name="layout___export_tox_encrypted_files_unsecure"></string>
+    <string name="layout___create_new_private_group"></string>
+    <string name="pref_title_window_security"></string>
+    <string name="pref_title_custom_bootstrap_nodes"></string>
+    <string name="title_activity_grouppeerinfo"></string>
+    <string name="add_public_group_success"></string>
+    <string name="layout___migdb_do_not_close"></string>
+    <string name="layout___create_new_public_group"></string>
+    <string name="MainActivity_new_noti_token_dialog_text"></string>
+    <string name="MainActivity_new_noti_token_dialog_title"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title"></string>
+    <string name="pref_title_use_incognito_keyboard2"></string>
+    <string name="layout___group_id2"></string>
+    <string name="pref_description_compact_chatlist"></string>
+    <string name="join_public_group_joined"></string>
+    <string name="layout___group_name2"></string>
+    <string name="layout___group_myname2"></string>
+    <string name="join_public_group_activity_help"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message"></string>
+    <string name="conference_audio_activity_player_name"></string>
+    <string name="pref_title_toxirc_muted_peers_01"></string>
+    <string name="pref_title_X_tox_set_do_not_sync_av"></string>
+    <string name="join_public_activity_name"></string>
+    <string name="pref_description_use_camera_x"></string>
+    <string name="title_activity_conferenceinfo"></string>
+    <string name="pref_title_X_audio_play_buffer_custom"></string>
+    <string name="pref_description_mic_gain_factor"></string>
+    <string name="layout___remove_own_pushurl"></string>
+    <string name="add_public_group_activity_name"></string>
+    <string name="layout___conf_title"></string>
+    <string name="group_message_list_activity_name"></string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent"></string>
+    <string name="pref_title_force_udp_only"></string>
+    <string name="pref_description_toxirc_muted_peers_03"></string>
+    <string name="add_group_activity_help"></string>
+    <string name="add_public_group_failed"></string>
+    <string name="layout___migdb_text"></string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent"></string>
+    <string name="add_group_activity_add"></string>
+    <string name="pref_title_mic_gain_factor"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title"></string>
+    <string name="layout___remove_friends_pushurl"></string>
+    <string name="pref_description_X_tox_set_do_not_sync_av"></string>
+    <string name="add_public_group_activity_help"></string>
+    <string name="pref_title_start_on_boot"></string>
+    <string name="pref_title_global_font_size"></string>
+    <string name="messages_search_default_text"></string>
+    <string name="add_private_group_success"></string>
+    <string name="add_friend_failed"></string>
+    <string name="pref_title_use_camera_x"></string>
+    <string name="pref_description_toxirc_muted_peers_02"></string>
+    <string name="pref_description_global_font_size"></string>
+    <string name="layout___friends_pushurl"></string>
+    <string name="add_private_group_failed"></string>
+    <string name="join_public_group_failed"></string>
+    <string name="pref_description_use_push_service"></string>
+    <string name="pref_title_speakerphone_tweak"></string>
+    <string name="MainActivity_setup_push_tip_title"></string>
+    <string name="MainActivity_setup_push_tip_text"></string>
+    <string name="add_group_activity_name"></string>
+    <string name="pref_title_auto_accept_all_upto"></string>
+    <string name="pref_description_video_cam_resolution"></string>
+    <string name="pref_description_force_udp_only"></string>
+    <string name="pref_title_h264_encoder_use_intra_refresh"></string>
+    <string name="pref_description_h264_encoder_use_intra_refresh"></string>
+    <string name="pref_description_start_on_boot"></string>
+    <string name="pref_description_use_incognito_keyboard2"></string>
+    <string name="pref_title_use_push_service"></string>
+    <string name="pref_title_download_push_msg_app"></string>
+    <string name="pref_description_speakerphone_tweak"></string>
+    <string name="ProfileActivity_delete_avatar_dialog_title"></string>
+    <string name="ProfileActivity_delete_avatar_dialog_text"></string>
+    <string name="layout___group_name"></string>
+    <string name="MainActivity_yes_button"></string>
+    <string name="layout___export_tox_encrypted_chats_unsecure"></string>
+    <string name="layout___own_pushurl"></string>
 </resources>
