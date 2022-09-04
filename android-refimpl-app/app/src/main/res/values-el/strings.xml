@@ -289,4 +289,13 @@
     <string name="pref_description_speakerphone_tweak">Εάν η εφαρμογή δεν μεταβεί στο ηχείο σε μια κλήση, τότε προσπαθήστε να ενεργοποιήσετε αυτή την διόρθωση.</string>
     <string name="MainActivity_setup_push_tip_title">Ρύθμιση Ειδοποιήσεων Push</string>
     <string name="layout___capabilities">Δυνατότητες:</string>
+    <string name="FriendListHolder_toggle_notification_silent_title"></string>
+    <string name="FriendListHolder_toggle_notification_silent_message"></string>
+    <string name="app_name" translatable="false"></string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title"></string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title"></string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message"></string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message"></string>
 </resources>
