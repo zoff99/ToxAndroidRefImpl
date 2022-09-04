@@ -32,7 +32,8 @@
     <string name="pref_title_software_echo_cancel">गूंज रद्दीकरण</string>
     <string name="pref_description_software_echo_cancel">सॉफ्टवेयर इको कैंसिलेशन का उपयोग करें</string>
     <string name="pref_title_higher_video_quality">वीडियो की गुणवत्ता</string>
-    <string name="pref_description_higher_video_quality">बेहतर वीडियो गुणवत्ता का उपयोग करें। \nपरिवर्तन की आवश्यकता है!</string>
+    <string name="pref_description_higher_video_quality">बेहतर वीडियो गुणवत्ता का उपयोग करें।
+\nपरिवर्तन की आवश्यकता है!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>कम बैंडविड्थ \n(250 kb /s)</item>
         <item>सामान्य बैंडविड्थ \n(2500 kb /s)</item>
@@ -54,7 +55,8 @@
         <item>NV21</item>
     </string-array>
     <string name="pref_title_higher_audio_quality">ध्वनि गुणवत्ता</string>
-    <string name="pref_description_higher_audio_quality">बेहतर ऑडियो गुणवत्ता का उपयोग करें। \nपरिवर्तन की आवश्यकता है!</string>
+    <string name="pref_description_higher_audio_quality">बेहतर ऑडियो गुणवत्ता का उपयोग करें।
+\nपरिवर्तन की आवश्यकता है!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>कम \n(6 kb /s)</item>
         <item>सामान्य \n(32 kb /s)</item>
@@ -66,9 +68,12 @@
         <item>2</item>
     </string-array>
     <string name="pref_title_udp_enabled">यूडीपी सक्षम करें</string>
-    <string name="pref_description_udp_enabled">अधिकांश मोबाइल उपकरणों के लिए UDP अधिक इंटरनेट ट्रैफ़िक का कारण बनेगी। \nपरिवर्तन की आवश्यकता RESTART! \nDefault सेटिंग है</string>
+    <string name="pref_description_udp_enabled">अधिकांश मोबाइल उपकरणों के लिए UDP अधिक इंटरनेट ट्रैफ़िक का कारण बनेगी।
+\nपरिवर्तन की आवश्यकता RESTART!
+\nDefault सेटिंग है</string>
     <string name="pref_title_orbot_enabled">टोर प्रॉक्सी को सक्षम करें</string>
-    <string name="pref_description_orbot_enabled">इसका उपयोग करने के लिए आपको Orbot इंस्टॉल करना होगा। \nपरिवर्तन की आवश्यकता है RESTART!</string>
+    <string name="pref_description_orbot_enabled">इसका उपयोग करने के लिए आपको Orbot इंस्टॉल करना होगा।
+\nपरिवर्तन की आवश्यकता है RESTART!</string>
     <string name="pref_title_fps_half">कम एफपीएस</string>
     <string name="pref_description_fps_half">वीडियो Framerate 1/2: तो 25fps के बजाय 12fps</string>
     <string name="pref_title_set_fps">एफपीएस सेट करें</string>
@@ -89,11 +94,15 @@
     <string name="pref_description_X_use_native_audio_play">!! प्रायोगिक !!
 \nध्वनि सुनने के लिए मूल ऑडियो का उपयोग करें</string>
     <string name="pref_title_X_battery_saving_mode">बैटरी बचत प्रणाली</string>
-    <string name="pref_description_X_battery_saving_mode">!! प्रायोगिक !! \nthis थोड़ी अधिक बैटरी बचाएगा, लेकिन संदेश भेजने और प्राप्त करने में अधिक समय लगेगा। \nकुछ अन्य बुरे प्रभाव भी!</string>
+    <string name="pref_description_X_battery_saving_mode">!! प्रायोगिक !!
+\nthis थोड़ी अधिक बैटरी बचाएगा, लेकिन संदेश भेजने और प्राप्त करने में अधिक समय लगेगा।
+\nकुछ अन्य बुरे प्रभाव भी!</string>
     <string name="pref_title_X_misc_button_enabled">विविध। बटन</string>
-    <string name="pref_description_X_misc_button_enabled">!! प्रायोगिक !! \nएक निश्चित संदेश भेजने के लिए कॉलिंग स्क्रीन पर एक बटन</string>
+    <string name="pref_description_X_misc_button_enabled">!! प्रायोगिक !!
+\nएक निश्चित संदेश भेजने के लिए कॉलिंग स्क्रीन पर एक बटन</string>
     <string name="pref_title_X_eac_delay_ms">एईसी देरी</string>
-    <string name="pref_description_X_eac_delay_ms">!! प्रायोगिक !! \nएमएस में देरी</string>
+    <string name="pref_description_X_eac_delay_ms">!! प्रायोगिक !!
+\nएमएस में देरी</string>
     <string name="pref_title_add_friends_to_messages">मित्रों को संदेशों में जोड़ें</string>
     <string-array name="pref_example_list_titles">
         <item>हमेशा</item>
@@ -222,7 +231,7 @@
     <string name="Aboutpage_4">क्रैश की जानकारी पढ़ने ...</string>
     <string name="Aboutpage_5a">TRIfA Android के लिए एक विषाक्त ग्राहक</string>
     <string name="Aboutpage_5b">संस्करण:</string>
-    <string name="Aboutpage_6">टॉक्स क्या है?</string>
+    <string name="Aboutpage_6">टॉक्स क्या है\?</string>
     <string name="Aboutpage_8">प्रयुक्त पुस्तकालय:</string>
     <string name="AddFriendActivity_3">गलत ToxID</string>
     <string name="AddFriendActivity_4">कोई टॉक्सिड नहीं</string>
@@ -235,7 +244,8 @@
     <string name="GroupActivityOffline">ऑफ़लाइन:</string>
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">क्यू आर कोड स्कैन करें</string>
-    <string name="layout___enter_pass_longtext">पासवर्ड दर्ज करें \nकोई पुनर्प्राप्ति विकल्प नहीं है!</string>
+    <string name="layout___enter_pass_longtext">पासवर्ड दर्ज करें
+\nकोई पुनर्प्राप्ति विकल्प नहीं है!</string>
     <string name="layout___unlock">अनलॉक</string>
     <string name="layout___name">नाम</string>
     <string name="layout___push_to_talk">बात करने के लिए धक्का</string>
@@ -267,7 +277,11 @@
     <string name="layout___your_toxidenticon">आपका टोक्सीडेंटिकॉन</string>
     <string name="layout___active_network_connections">सक्रिय नेटवर्क कनेक्शन:</string>
     <string name="layout___error_getting_active_network_connections">* सक्रिय नेटवर्क कनेक्शन प्राप्त करने में त्रुटि *</string>
-    <string name="layout___set_password_or_skip">पासवर्ड सेट करें या छोड़ दें। \n\nजब आप एक \nपासवर्ड को छोड़ना चुनते हैं तो स्वतः पूर्ण हो जाएगा \nकोई रिकवरी विकल्प नहीं है!</string>
+    <string name="layout___set_password_or_skip">पासवर्ड सेट करें या छोड़ दें।
+\n
+\nजब आप एक
+\nपासवर्ड को छोड़ना चुनते हैं तो स्वतः पूर्ण हो जाएगा
+\nकोई रिकवरी विकल्प नहीं है!</string>
     <string name="layout___password">कुंजिका</string>
     <string name="layout___password_again">कूटशब्द दुबारा भरें</string>
     <string name="layout___set_password">पासवर्ड सेट करें</string>
@@ -397,4 +411,5 @@
     <string name="title_activity_wrong_credentials">गलत प्रामाणिकताएं</string>
     <string name="layout___create_new_private_group">नया निजी समूह बनाएं</string>
     <string name="layout___remove_own_pushurl">Push URL हटाए</string>
+    <string name="app_name" translatable="false"></string>
 </resources>
