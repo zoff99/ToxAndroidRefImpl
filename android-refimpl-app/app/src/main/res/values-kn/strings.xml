@@ -7,7 +7,7 @@
     <string name="conference_audio_activity_player_name">ದನಿ ಮಿಲನ ಚಲನೆ</string>
     <string name="set_password_message_empty">ಪಾಸ್-ವರ್ಡ್ ಶೂನ್ಯ</string>
     <string name="set_password_message_password_invalid">ಪಾಸ್-ವರ್ಡ್ ತೀರ ಚಿಕ್ಕದು</string>
-    <string name="set_password_message_password_dont_match">ಪಾಸ್-ವರ್ಡ್  ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತಿಲ್ಲ</string>
+    <string name="set_password_message_password_dont_match">ಪಾಸ್-ವರ್ಡ್ ಹೊಂದಾಣಿಕೆಯಾಗುತ್ತಿಲ್ಲ</string>
     <string name="title_activity_calling">ಕರೆ</string>
     <string name="title_activity_profile">ಜಾತಕ</string>
     <string name="title_activity_settings">ಸಂಯೋಜನೆ</string>
@@ -31,10 +31,10 @@
     <string name="pref_header_general">ಸಾಮಾನ್ಯ</string>
     <string name="pref_title_auto_accept_image">ಚಿತ್ರಗಳನ್ನು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಸ್ವೀಕರಿಸು</string>
     <string name="pref_description_auto_accept_image">3 MegaByte ಗಾತ್ರದ ಚಿತ್ರಗಳು ಮತ್ತು ಫೋಟೋಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸು</string>
-    <string name="pref_title_auto_accept_video">ವೀಡಿಯೊಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ </string>
+    <string name="pref_title_auto_accept_video">ವೀಡಿಯೊಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ</string>
     <string name="pref_description_auto_accept_video">10 MegaByte ಗಾತ್ರದ ವೀಡಿಯೊಗಳನ್ನು ಸ್ವಯಂ ಸ್ವೀಕರಿಸಿ</string>
-    <string name="pref_title_video_uv_reversed"> ವೀಡಿಯೊದಲ್ಲಿ ರಿವರ್ಸ್ ಯುವಿ  </string>
-    <string name="pref_description_video_uv_reversed">ಕ್ಯಾಮೆರಾ ವೀಡಿಯೊದಲ್ಲಿ ಯುವಿ  ಕ್ರಮವನ್ನು ಹಿಮ್ಮುಖಗೊಳಿಸಿ</string>
+    <string name="pref_title_video_uv_reversed">ವೀಡಿಯೊದಲ್ಲಿ ರಿವರ್ಸ್ ಯುವಿ</string>
+    <string name="pref_description_video_uv_reversed">ಕ್ಯಾಮೆರಾ ವೀಡಿಯೊದಲ್ಲಿ ಯುವಿ ಕ್ರಮವನ್ನು ಹಿಮ್ಮುಖಗೊಳಿಸಿ</string>
     <string name="pref_title_software_echo_cancel">ಪ್ರತಿಧ್ವನಿ ರದ್ದತಿ</string>
     <string name="pref_description_software_echo_cancel">ಸಾಫ್ಟ್‌ವೇರ್ ಎಕೋ ರದ್ದತಿ ಬಳಸಿ</string>
     <string name="pref_title_higher_video_quality">ವೀಡಿಯೊ ಗುಣಮಟ್ಟ</string>
@@ -88,7 +88,8 @@
     <string name="pref_title_mic_gain_factor">ಮೈಕ್ ಗೇನ್</string>
     <string name="pref_description_mic_gain_factor">ನಿಮ್ಮ ಮೈಕ್ರೊಫೋನ್ ಕಡಿಮೆ ಪರಿಮಾಣದೊಂದಿಗೆ ರೆಕಾರ್ಡ್ ಮಾಡಿದರೆ ಹೆಚ್ಚಿನ ಲಾಭವನ್ನು ಹೊಂದಿಸಿ</string>
     <string name="pref_title_higher_audio_quality">Audio Quality</string>
-    <string name="pref_description_higher_audio_quality">Use better Audio quality.\nChange needs RESTART!</string>
+    <string name="pref_description_higher_audio_quality">Use better Audio quality.
+\nChange needs RESTART!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>low\n(6 kb/s)</item>
         <item>normal\n(32 kb/s)</item>
@@ -100,9 +101,12 @@
         <item>2</item>
     </string-array>
     <string name="pref_title_udp_enabled">enable UDP</string>
-    <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
+    <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.
+\nChange needs RESTART!
+\nDefault setting is OFF</string>
     <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
+    <string name="pref_description_orbot_enabled">You need to install Orbot to use this.
+\nChange needs RESTART!</string>
     <string name="pref_title_fps_half">lower fps</string>
     <string name="pref_description_fps_half">Video Framerate 1/2 : so 12fps instead of 25fps</string>
     <string name="pref_title_set_fps">set fps</string>
@@ -118,13 +122,18 @@
     <string name="pref_title_X_zoom_incoming_video">Zoom Videocall Window</string>
     <string name="pref_description_X_zoom_incoming_video">allow to pinch-zoom the Videocall Window. This is not working fully!</string>
     <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
-    <string name="pref_description_X_use_native_audio_play">!! Expermimental !!\nUse Native Audio to Play Sound</string>
+    <string name="pref_description_X_use_native_audio_play">!! Expermimental !!
+\nUse Native Audio to Play Sound</string>
     <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
-    <string name="pref_description_X_battery_saving_mode">!! Expermimental !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
+    <string name="pref_description_X_battery_saving_mode">!! Expermimental !!
+\nthis will save a bit more battery, but message will take longer to send and receive.
+\nProbably some other bad effects too!</string>
     <string name="pref_title_X_misc_button_enabled">Misc. Button</string>
-    <string name="pref_description_X_misc_button_enabled">!! Expermimental !!\nadd a Button on Calling Screen to send a fixed Message</string>
+    <string name="pref_description_X_misc_button_enabled">!! Expermimental !!
+\nadd a Button on Calling Screen to send a fixed Message</string>
     <string name="pref_title_X_eac_delay_ms">AEC delay</string>
-    <string name="pref_description_X_eac_delay_ms">!! Expermimental !!\nAEC delay in ms</string>
+    <string name="pref_description_X_eac_delay_ms">!! Expermimental !!
+\nAEC delay in ms</string>
     <string name="pref_title_add_friends_to_messages">Add friends to messages</string>
     <string name="pref_header_data_sync">Data &amp; sync</string>
     <string name="pref_title_sync_frequency">Sync frequency</string>
@@ -208,10 +217,9 @@
     <string name="pref_title_new_message_notifications">New message notifications</string>
     <string name="pref_title_ringtone">Ringtone</string>
     <string name="pref_ringtone_silent">ಮೌನ</string>
-    <string name="pref_title_vibrate">  ಕಂಪಿಸು</string>
+    <string name="pref_title_vibrate">ಕಂಪಿಸು</string>
     <string name="pref_title_sound">ಸದ್ದು</string>
-    <string name="add_friend_activity_help">Paste friend\'s Tox ID in the text box above or tap the
-    QR code button to scan friend\'s code with a camera.</string>
+    <string name="add_friend_activity_help">Paste friend\'s Tox ID in the text box above or tap the QR code button to scan friend\'s code with a camera.</string>
     <string name="add_friend_activity_add">Add Friend</string>
     <string name="cancel">Cancel</string>
     <!-- Strings related to Settings -->
@@ -234,11 +242,11 @@
     <string name="MainActivity_info_dialog_title">ಮಾಹಿತಿ</string>
     <string name="MainActivity_add_to_batt_opt">Please add TRIfA to the exception list for Batteryoptimization!</string>
     <string name="MainActivity_friend_is_typing">ಗೆಳೆಯ ಟೈಪಿಸುತ್ತಿದ್ದಾನೆ..</string>
-    <string name="MainActivity_notification_new_message">ಹೊಸ  ಸಂದೇಶ</string>
+    <string name="MainActivity_notification_new_message">ಹೊಸ ಸಂದೇಶ</string>
     <string name="MainActivity_notification_new_message2">ಹೊಸ ಸಂದೇಶ</string>
     <string name="MainActivity_button_ok">ಸರಿ</string>
     <string name="MainActivity_error_starting_email_app">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಶುರುವಾಗುವಾಗ ತಪ್ಪಿದೆ</string>
-    <string name="MainActivity_no_email_app_found">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಸಿಗಲಿಲ್ಲ </string>
+    <string name="MainActivity_no_email_app_found">ಇಮೇಲ್ ಅಪ್ಲಿಕೇಶನ್ ಸಿಗಲಿಲ್ಲ</string>
     <string name="MainActivity_toast_msg_deleted">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ</string>
     <string name="MainActivity_toast_msg_exported">ಸಂದೇಶಗಳನ್ನು ರಫ್ತು ಮಾಡಲಾಗಿದೆ</string>
     <string name="MainActivity_toast_msgs_deleted">ಸಂದೇಶಗಳನ್ನು ಅಳಿಸಲಾಗಿದೆ</string>
@@ -250,7 +258,7 @@
     <string name="Aboutpage_4">reading crash info ...</string>
     <string name="Aboutpage_5a">TRIfA a Tox Client for Android</string>
     <string name="Aboutpage_5b">Version:</string>
-    <string name="Aboutpage_6">What is Tox?</string>
+    <string name="Aboutpage_6">What is Tox\?</string>
     <string name="Aboutpage_8">used libraries:</string>
     <string name="AddFriendActivity_3">incorrect ToxID</string>
     <string name="AddFriendActivity_4">No ToxID</string>
@@ -269,7 +277,8 @@
     <!-- Layout texts -->
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">scan QR Code</string>
-    <string name="layout___enter_pass_longtext">Enter Password\nThere is NO recovery option!</string>
+    <string name="layout___enter_pass_longtext">Enter Password
+\nThere is NO recovery option!</string>
     <string name="layout___unlock">Unlock</string>
     <string name="layout___name">Name</string>
     <string name="layout___push_to_talk">Push to talk</string>
@@ -301,7 +310,11 @@
     <string name="layout___your_toxidenticon">Your ToxIdenticon</string>
     <string name="layout___active_network_connections">active Network Connections:</string>
     <string name="layout___error_getting_active_network_connections">*error getting active network connections*</string>
-    <string name="layout___set_password_or_skip">Set Password or skip.\n\nWhen you select to skip a\npassword will be autogenerated\nThere is NO recovery option!</string>
+    <string name="layout___set_password_or_skip">Set Password or skip.
+\n
+\nWhen you select to skip a
+\npassword will be autogenerated
+\nThere is NO recovery option!</string>
     <string name="layout___password">Password</string>
     <string name="layout___password_again">Password again</string>
     <string name="layout___set_password">Set Password</string>
@@ -424,4 +437,6 @@
     <string name="join_public_group_failed">ಸಾರ್ವಜನಿಕ ಗುಂಪಿಗೆ ಸೇರುವುದು ವಿಫಲವಾಗಿದೆ</string>
     <string name="MessageListHolder_file_incoming_cancel_ft_title">ಫೈಲ್ ವರ್ಗಾವಣೆ ರದ್ದುಗೊಳಿಸಿ</string>
     <string name="MainActivity_new_noti_token_dialog_text">ಹೊಸ ಅಧಿಸೂಚನೆ ಟೋಕನ್ ಸ್ವೀಕರಿಸಲಾಗಿದೆ. ಈ ಟೋಕನ್ ಬಳಸುವುದೇ\?</string>
+    <string name="app_name" translatable="false"></string>
+    <string name="pref_description_compact_chatlist"></string>
 </resources>
