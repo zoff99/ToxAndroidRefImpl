@@ -32,7 +32,8 @@
     <string name="pref_title_software_echo_cancel">Cancelación del eco</string>
     <string name="pref_description_software_echo_cancel">Usar cancelación de eco de software</string>
     <string name="pref_title_higher_video_quality">Calidad de video</string>
-    <string name="pref_description_higher_video_quality">Utilice una mejor calidad de video. \n¡Cambiar necesita reiniciar!</string>
+    <string name="pref_description_higher_video_quality">Utilice una mejor calidad de video.
+\n¡Cambiar necesita reiniciar!</string>
     <string-array name="pref_higher_video_quality_titles">
         <item>bajo ancho de banda \n(250 kb /s)</item>
         <item>ancho de banda normal \n(2500 kb /s)</item>
@@ -54,7 +55,8 @@
         <item>NV21</item>
     </string-array>
     <string name="pref_title_higher_audio_quality">Calidad de audio</string>
-    <string name="pref_description_higher_audio_quality">Utilice una mejor calidad de audio. \n¡El cambio necesita reiniciar!</string>
+    <string name="pref_description_higher_audio_quality">Utilice una mejor calidad de audio.
+\n¡El cambio necesita reiniciar!</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>bajo \n(6 kb /s)</item>
         <item>normal \n(32 kb /s)</item>
@@ -66,9 +68,12 @@
         <item>2</item>
     </string-array>
     <string name="pref_title_udp_enabled">habilitar UDP</string>
-    <string name="pref_description_udp_enabled">para la mayoría de los dispositivos móviles UDP provocará mucho más tráfico de Internet. \n¡El cambio necesita REINICIAR! \nLa configuración predeterminada está DESACTIVADA</string>
+    <string name="pref_description_udp_enabled">para la mayoría de los dispositivos móviles UDP provocará mucho más tráfico de Internet.
+\n¡El cambio necesita REINICIAR!
+\nLa configuración predeterminada está DESACTIVADA</string>
     <string name="pref_title_orbot_enabled">habilitar Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">Necesitas instalar Orbot para usar esto. \n¡El cambio necesita REINICIAR!</string>
+    <string name="pref_description_orbot_enabled">Necesitas instalar Orbot para usar esto.
+\n¡El cambio necesita REINICIAR!</string>
     <string name="pref_title_fps_half">fps inferiores</string>
     <string name="pref_description_fps_half">Video Framerate 1/2: 12 fps en lugar de 25 fps</string>
     <string name="pref_title_set_fps">establecer fps</string>
@@ -86,13 +91,18 @@
     <string name="pref_title_X_zoom_incoming_video">Zoom Ventana de videollamada</string>
     <string name="pref_description_X_zoom_incoming_video">permitir pellizcar-hacer zoom en la ventana de videollamada. ¡Esto no está funcionando completamente!</string>
     <string name="pref_title_X_use_native_audio_play">Sistema de audio nativo</string>
-    <string name="pref_description_X_use_native_audio_play">!! Experimental !! \nUtilice audio nativo para reproducir sonido</string>
+    <string name="pref_description_X_use_native_audio_play">!! Experimental !!
+\nUtilice audio nativo para reproducir sonido</string>
     <string name="pref_title_X_battery_saving_mode">Modo de ahorro de batería</string>
-    <string name="pref_description_X_battery_saving_mode">!! ¡Experimental! \nesto ahorrará un poco más de batería, pero el mensaje tardará más en enviarse y recibir. \n ¡Probablemente también otros efectos negativos!</string>
+    <string name="pref_description_X_battery_saving_mode">!! ¡Experimental!
+\nesto ahorrará un poco más de batería, pero el mensaje tardará más en enviarse y recibir.
+\n ¡Probablemente también otros efectos negativos!</string>
     <string name="pref_title_X_misc_button_enabled">Misceláneos Botón</string>
-    <string name="pref_description_X_misc_button_enabled">!! Experimental !! \nadd un botón en la pantalla de llamadas para enviar un mensaje fijo</string>
+    <string name="pref_description_X_misc_button_enabled">!! Experimental !!
+\nadd un botón en la pantalla de llamadas para enviar un mensaje fijo</string>
     <string name="pref_title_X_eac_delay_ms">Retraso AEC</string>
-    <string name="pref_description_X_eac_delay_ms">!! Experimental !! \nAEC retraso en ms</string>
+    <string name="pref_description_X_eac_delay_ms">!! Experimental !!
+\nAEC retraso en ms</string>
     <string name="pref_title_add_friends_to_messages">Agregar amigos a los mensajes</string>
     <string-array name="pref_example_list_titles">
         <item>Siempre</item>
@@ -221,7 +231,7 @@
     <string name="Aboutpage_4">leyendo información sobre el bloqueo ...</string>
     <string name="Aboutpage_5a">TRIfA un cliente Tox para Android</string>
     <string name="Aboutpage_5b">Versión:</string>
-    <string name="Aboutpage_6">¿Qué es la toxina?</string>
+    <string name="Aboutpage_6">¿Qué es la toxina\?</string>
     <string name="Aboutpage_8">bibliotecas usadas:</string>
     <string name="AddFriendActivity_3">ToxID incorrecto</string>
     <string name="AddFriendActivity_4">Sin ToxID</string>
@@ -234,7 +244,8 @@
     <string name="GroupActivityOffline">Desconectado:</string>
     <string name="layout___toxid">ToxID</string>
     <string name="layout___scan_qr_code">escanear código QR</string>
-    <string name="layout___enter_pass_longtext">Ingrese la contraseña \n¡No hay opción de recuperación!</string>
+    <string name="layout___enter_pass_longtext">Ingrese la contraseña
+\n¡No hay opción de recuperación!</string>
     <string name="layout___unlock">desbloquear</string>
     <string name="layout___name">Nombre</string>
     <string name="layout___push_to_talk">Empuja para hablar</string>
@@ -266,7 +277,11 @@
     <string name="layout___your_toxidenticon">Tu ToxIdenticon</string>
     <string name="layout___active_network_connections">Conexiones de red activas:</string>
     <string name="layout___error_getting_active_network_connections">* error al obtener conexiones de red activas *</string>
-    <string name="layout___set_password_or_skip">Establecer contraseña u omitir. \n \nCuando seleccione omitir una \ncontraseña se generará automáticamente \n¡No hay opción de recuperación!</string>
+    <string name="layout___set_password_or_skip">Establecer contraseña u omitir.
+\n
+\nCuando seleccione omitir una
+\ncontraseña se generará automáticamente
+\n¡No hay opción de recuperación!</string>
     <string name="layout___password">Contraseña</string>
     <string name="layout___password_again">Contraseña de nuevo</string>
     <string name="layout___set_password">Configurar la clave</string>
@@ -396,4 +411,5 @@
     <string name="MessageListHolder_file_outgoing_cancel_ft_message">¿Desea cancelar esta transferencia de archivos\?</string>
     <string name="pref_description_allow_open_encrypted_file_via_intent">abre archivos directamente desde el almacenamiento cifrado a través de Intent. Esto puede ser potencialmente peligroso, porque otras aplicaciones maliciosas podrían abrir otros archivos en el almacenamiento cifrado de TRIfA.</string>
     <string name="pref_title_allow_open_encrypted_file_via_intent">abrir archivos desde un almacenamiento encriptado</string>
+    <string name="app_name" translatable="false"></string>
 </resources>
