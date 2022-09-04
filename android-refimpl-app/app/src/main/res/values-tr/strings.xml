@@ -93,7 +93,8 @@
     <string name="pref_title_X_zoom_incoming_video">Görüntülü Arama Penceresini Yakınlaştır</string>
     <string name="pref_description_X_zoom_incoming_video">Video Arama Penceresini sıkıştırarak yakınlaştırmaya izin ver. Bu tam olarak çalışmıyor!</string>
     <string name="pref_title_X_use_native_audio_play">Yerel Ses Sistemi</string>
-    <string name="pref_description_X_use_native_audio_play">!! Deneysel !! \nSes Çalmak için Yerel Sesi Kullanın</string>
+    <string name="pref_description_X_use_native_audio_play">!! Deneysel !!
+\nSes Çalmak için Yerel Sesi Kullanın</string>
     <string name="pref_title_X_battery_saving_mode">Pil Tasarruf Modu</string>
     <string name="pref_description_X_battery_saving_mode">!! Deneysel !!
 \nBu daha fazla pil tasarrufu sağlayacaktır, ancak mesajın gönderilmesi ve alınması daha uzun sürecektir.
@@ -222,7 +223,7 @@
     <string name="Aboutpage_4">çökme bilgisi okunuyor ...</string>
     <string name="Aboutpage_5a">TRIfA Android için bir Tox İstemcisi</string>
     <string name="Aboutpage_5b">Sürüm:</string>
-    <string name="Aboutpage_6">Tox nedir?</string>
+    <string name="Aboutpage_6">Tox nedir\?</string>
     <string name="Aboutpage_8">kullanılan kütüphaneler:</string>
     <string name="AddFriendActivity_3">yanlış ToxID</string>
     <string name="AddFriendActivity_4">ToxID yok</string>
@@ -402,4 +403,5 @@
     <string name="MessageListHolder_file_outgoing_cancel_ft_title">Dosya aktarımını iptal et</string>
     <string name="pref_title_allow_open_encrypted_file_via_intent">dosyaları şifreli depolama alanından aç</string>
     <string name="pref_description_allow_open_encrypted_file_via_intent">Intent aracılığıyla doğrudan şifrelenen depolama alanından dosya aç. Bu tehlikeli olabilir çünkü diğer kötü amaçlı uygulamalar TRIfA\'nın şifrelenen depolama alanındaki diğer dosyaları açabilir.</string>
+    <string name="app_name" translatable="false"></string>
 </resources>
