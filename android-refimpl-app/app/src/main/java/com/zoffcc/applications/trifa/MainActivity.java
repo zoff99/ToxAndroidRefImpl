@@ -488,6 +488,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__dark_mode_pref = 0;
     static boolean PREF__enable_ngc_features = false;
     static boolean PREF__messageview_paging = true;
+    static boolean PREF__allow_push_server_ntfy = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -1203,6 +1204,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__compact_chatlist = true;
+        }
+
+        try
+        {
+            PREF__allow_push_server_ntfy = settings.getBoolean("allow_push_server_ntfy", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__allow_push_server_ntfy = false;
         }
 
         try
@@ -2668,6 +2679,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__compact_chatlist = true;
+        }
+
+        try
+        {
+            PREF__allow_push_server_ntfy = settings.getBoolean("allow_push_server_ntfy", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__allow_push_server_ntfy = false;
         }
 
         try

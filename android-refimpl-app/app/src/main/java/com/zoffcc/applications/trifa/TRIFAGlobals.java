@@ -49,6 +49,7 @@ public class TRIFAGlobals
     final static String NOTIFICATION_FCM_PUSH_URL_PREFIX = "https://tox.zoff.xyz/toxfcm/fcm.php?id=";
     final static String NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD = "https://toxcon2020.zoff.cc/toxfcm/fcm.php?id=";
     final static String NOTIFICATION_UP_PUSH_URL_PREFIX = "https://gotify1.unifiedpush.org/UP?token=";
+    final static String NOTIFICATION_NTFY_PUSH_URL_PREFIX = "https://ntfy.sh/";
 
     final static String TOX_PUSH_MSG_APP_WEBDOWNLOAD = "https://github.com/zoff99/tox_push_msg_app/releases/latest/download/play.pushmsg.apk";
     final static String TOX_PUSH_MSG_APP_PLAYSTORE = "https://play.google.com/store/apps/details?id=com.zoffcc.applications.pushmsg";
