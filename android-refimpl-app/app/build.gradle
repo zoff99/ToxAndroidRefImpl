@@ -310,7 +310,7 @@ dependencies {
     implementation('com.mikepenz:material-design-iconic-typeface:2.2.0.5@aar') {
         exclude group: 'com.android.support'
     }
-    implementation('com.google.zxing:core:3.4.1') {
+    implementation('com.google.zxing:core:3.5.0') {
         exclude group: 'com.android.support'
     }
     //
@@ -359,7 +359,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-    implementation('io.github.l4digital:fastscroll:2.1.0') {
+    implementation('io.github.l4digital:fastscroll:3.0.0-beta.3') {
         exclude group: 'com.android.support'
     }
 
