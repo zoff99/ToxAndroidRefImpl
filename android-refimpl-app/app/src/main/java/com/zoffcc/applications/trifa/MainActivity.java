@@ -1216,6 +1216,17 @@ public class MainActivity extends AppCompatActivity
             PREF__allow_push_server_ntfy = false;
         }
 
+
+        try
+        {
+            PREF__enable_ngc_features = settings.getBoolean("enable_ngc_features", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__enable_ngc_features = false;
+        }
+
         try
         {
             PREF__use_push_service = settings.getBoolean("use_push_service", true);
@@ -2689,6 +2700,16 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__allow_push_server_ntfy = false;
+        }
+
+        try
+        {
+            PREF__enable_ngc_features = settings.getBoolean("enable_ngc_features", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__enable_ngc_features = false;
         }
 
         try
