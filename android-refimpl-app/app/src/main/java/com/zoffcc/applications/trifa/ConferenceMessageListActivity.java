@@ -289,7 +289,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         conf_search_messages_text = null;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true,
+                        MainActivity.conference_message_list_fragment.update_all_messages(false,
                                                                                           PREF__messageview_paging);
                     }
                     catch (Exception e2)
@@ -303,7 +303,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         conf_search_messages_text = query;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true,
+                        MainActivity.conference_message_list_fragment.update_all_messages(false,
                                                                                           PREF__messageview_paging);
                     }
                     catch (Exception e2)
@@ -326,7 +326,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages
                         conf_search_messages_text = null;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true,
+                        MainActivity.conference_message_list_fragment.update_all_messages(false,
                                                                                           PREF__messageview_paging);
                     }
                     catch (Exception e2)
@@ -340,7 +340,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                     {
                         // all messages and search string
                         conf_search_messages_text = query;
-                        MainActivity.conference_message_list_fragment.update_all_messages(true,
+                        MainActivity.conference_message_list_fragment.update_all_messages(false,
                                                                                           PREF__messageview_paging);
                     }
                     catch (Exception e2)

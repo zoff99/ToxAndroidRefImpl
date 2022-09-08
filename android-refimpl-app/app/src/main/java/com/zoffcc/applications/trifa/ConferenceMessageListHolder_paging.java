@@ -150,13 +150,14 @@ public class ConferenceMessageListHolder_paging extends RecyclerView.ViewHolder 
                     ConferenceMessageListFragment.current_page_offset =
                             ConferenceMessageListFragment.current_page_offset - MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
                 }
+                MainActivity.conference_message_list_fragment.update_all_messages(true, PREF__messageview_paging);
             }
             else
             {
                 ConferenceMessageListFragment.current_page_offset =
                         ConferenceMessageListFragment.current_page_offset + MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
+                MainActivity.conference_message_list_fragment.update_all_messages(false, PREF__messageview_paging);
             }
-            MainActivity.conference_message_list_fragment.update_all_messages(true, PREF__messageview_paging);
         }
         catch (Exception ignored)
         {

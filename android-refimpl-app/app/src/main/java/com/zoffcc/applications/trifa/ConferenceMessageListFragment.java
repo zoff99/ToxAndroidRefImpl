@@ -423,7 +423,7 @@ public class ConferenceMessageListFragment extends Fragment
                 e.printStackTrace();
             }
 
-            update_all_messages(true, PREF__messageview_paging);
+            update_all_messages(false, PREF__messageview_paging);
 
             // default is: at bottom
             is_at_bottom = true;
@@ -467,7 +467,7 @@ public class ConferenceMessageListFragment extends Fragment
         }
     }
 
-    synchronized void add_message(final ConferenceMessage m, final boolean dummy)
+    synchronized void add_message(final ConferenceMessage m, final boolean is_real_new_message, final boolean stay_at_top)
     {
         Runnable myRunnable = new Runnable()
         {
@@ -477,6 +477,13 @@ public class ConferenceMessageListFragment extends Fragment
                 try
                 {
                     adapter.add_item(m);
+
+                    if (stay_at_top)
+                    {
+                        is_at_bottom = false;
+                        listingsView.scrollToPosition(0);
+                    }
+
                     if (is_at_bottom)
                     {
                         listingsView.scrollToPosition(adapter.getItemCount() - 1);
@@ -485,10 +492,13 @@ public class ConferenceMessageListFragment extends Fragment
                     {
                         try
                         {
-                            // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
-                            unread_messages_notice_button.setSupportBackgroundTintList(
-                                    (ContextCompat.getColorStateList(context_s,
-                                                                     R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                            if (is_real_new_message)
+                            {
+                                // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
+                                unread_messages_notice_button.setSupportBackgroundTintList(
+                                        (ContextCompat.getColorStateList(context_s,
+                                                                         R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                            }
                         }
                         catch (Exception ignored)
                         {
@@ -513,7 +523,7 @@ public class ConferenceMessageListFragment extends Fragment
         current_page_offset = -1; // reset paging when we change friend that is shown
     }
 
-    void update_all_messages(boolean always, boolean paging)
+    void update_all_messages(final boolean stay_at_top, final boolean paging)
     {
         Log.i(TAG, "update_all_messages");
 
@@ -535,87 +545,85 @@ public class ConferenceMessageListFragment extends Fragment
 
         try
         {
-            if (always)
+            if (data_values != null)
             {
-                if (data_values != null)
+                data_values.clear();
+            }
+
+            boolean later_messages = false;
+            boolean older_messages = false;
+            List<ConferenceMessage> ml = null;
+
+            if ((paging) && ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0)))
+            {
+                later_messages = true;
+                older_messages = true;
+
+                int count_messages = orma.selectFromConferenceMessage().
+                        conference_identifierEq(current_conf_id).
+                        tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                        orderBySent_timestampAsc().
+                        count();
+
+                int offset = 0;
+                int rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
+
+                if (current_page_offset == -1) // HINT: page at the bottom (latest messages shown)
                 {
-                    data_values.clear();
-                }
-
-                boolean later_messages = false;
-                boolean older_messages = false;
-                List<ConferenceMessage> ml = null;
-
-                if ((paging) && ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0)))
-                {
-                    later_messages = true;
-                    older_messages = true;
-
-                    int count_messages = orma.selectFromConferenceMessage().
-                            conference_identifierEq(current_conf_id).
-                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                            orderBySent_timestampAsc().
-                            count();
-
-                    int offset = 0;
-                    int rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
-
-                    if (current_page_offset == -1) // HINT: page at the bottom (latest messages shown)
+                    later_messages = false;
+                    offset = count_messages - MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
+                    if (offset < 0)
                     {
-                        later_messages = false;
-                        offset = count_messages - MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
-                        if (offset < 0)
-                        {
-                            offset = 0;
-                        }
-                        current_page_offset = offset;
-                        // HINT: we need MESSAGE_PAGING_LAST_PAGE_MARGIN in case new messages arrived
-                        //       since "count_messages" was calculated above
-                        rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE + MESSAGE_PAGING_LAST_PAGE_MARGIN;
+                        offset = 0;
                     }
-                    else
-                    {
-                        if ((count_messages - current_page_offset) < MESSAGE_PAGING_NUM_MSGS_PER_PAGE)
-                        {
-                            current_page_offset = count_messages - MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
-                            rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE + MESSAGE_PAGING_LAST_PAGE_MARGIN;
-                        }
-                        offset = current_page_offset;
-                    }
-
-                    if ((count_messages - offset) <= MESSAGE_PAGING_NUM_MSGS_PER_PAGE)
-                    {
-                        later_messages = false;
-                    }
-
-                    if (offset < 1)
-                    {
-                        older_messages = false;
-                    }
-
-                    ml = orma.selectFromConferenceMessage().
-                            conference_identifierEq(current_conf_id).
-                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                            orderBySent_timestampAsc().
-                            offset(offset).
-                            limit(rowcount).
-                            toList();
+                    current_page_offset = offset;
+                    // HINT: we need MESSAGE_PAGING_LAST_PAGE_MARGIN in case new messages arrived
+                    //       since "count_messages" was calculated above
+                    rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE + MESSAGE_PAGING_LAST_PAGE_MARGIN;
                 }
                 else
                 {
-                    if ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0))
+                    if ((count_messages - current_page_offset) < MESSAGE_PAGING_NUM_MSGS_PER_PAGE)
                     {
-                        ml = orma.selectFromConferenceMessage().
-                                conference_identifierEq(current_conf_id).
-                                and().
-                                tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                                orderBySent_timestampAsc().
-                                toList();
-
-                        // adapter.add_list_clear();
+                        current_page_offset = count_messages - MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
+                        rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE + MESSAGE_PAGING_LAST_PAGE_MARGIN;
                     }
-                    else
-                    {
+                    offset = current_page_offset;
+                }
+
+                if ((count_messages - offset) <= MESSAGE_PAGING_NUM_MSGS_PER_PAGE)
+                {
+                    later_messages = false;
+                }
+
+                if (offset < 1)
+                {
+                    older_messages = false;
+                }
+
+                ml = orma.selectFromConferenceMessage().
+                        conference_identifierEq(current_conf_id).
+                        tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                        orderBySent_timestampAsc().
+                        offset(offset).
+                        limit(rowcount).
+                        toList();
+            }
+            else
+            {
+                if ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0))
+                {
+                    ml = orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).
+                            and().
+                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                            orderBySent_timestampAsc().
+                            toList();
+
+                    // adapter.add_list_clear();
+                }
+                else
+                {
                     /*
                      searching for case-IN-sensitive non ascii chars is not working:
 
@@ -625,63 +633,59 @@ public class ConferenceMessageListFragment extends Fragment
                      The LIKE operator is case sensitive by default for unicode characters that are beyond
                      the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                      */
-                        ml = orma.selectFromConferenceMessage().
-                                conference_identifierEq(current_conf_id).
-                                and().
-                                tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                                orderBySent_timestampAsc().
-                                where(" like('" + get_sqlite_search_string(conf_search_messages_text) +
-                                      "', text, '\\')").
-                                toList();
-                    }
+                    ml = orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).
+                            and().
+                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                            orderBySent_timestampAsc().
+                            where(" like('" + get_sqlite_search_string(conf_search_messages_text) + "', text, '\\')").
+                            toList();
+                }
+            }
+
+            if (ml != null)
+            {
+                if (older_messages)
+                {
+                    ConferenceMessage m_older = new ConferenceMessage();
+                    m_older.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+                    m_older.is_new = false;
+                    m_older.direction = 0;
+                    m_older.message_id_tox = MESSAGE_PAGING_SHOW_OLDER_HASH;
+                    m_older.text = "older Messages";
+                    add_message(m_older, false, stay_at_top);
                 }
 
-                if (ml != null)
+                for (ConferenceMessage message : ml)
                 {
-                    if (older_messages)
+                    if (message == ml.get(ml.size() - 1))
                     {
-                        ConferenceMessage m_older = new ConferenceMessage();
-                        m_older.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
-                        m_older.is_new = false;
-                        m_older.direction = 0;
-                        m_older.message_id_tox = MESSAGE_PAGING_SHOW_OLDER_HASH;
-                        m_older.text = "older Messages";
-                        add_message(m_older, false);
+                        add_message(message, false, stay_at_top);
                     }
-
-                    for (ConferenceMessage message : ml)
+                    else
                     {
-                        if (message == ml.get(ml.size() - 1))
+                        if (later_messages)
                         {
-                            add_message(message, true);
+                            add_message(message, false, stay_at_top);
                         }
                         else
                         {
-                            if (later_messages)
-                            {
-                                add_message(message, false);
-                            }
-                            else
-                            {
-                                add_message(message, true);
-                            }
+                            add_message(message, false, stay_at_top);
                         }
-                    }
-
-                    if (later_messages)
-                    {
-                        ConferenceMessage m_later = new ConferenceMessage();
-                        m_later.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
-                        m_later.is_new = false;
-                        m_later.direction = 0;
-                        m_later.message_id_tox = MESSAGE_PAGING_SHOW_NEWER_HASH;
-                        m_later.text = "newer Messages";
-                        add_message(m_later, true);
                     }
                 }
 
+                if (later_messages)
+                {
+                    ConferenceMessage m_later = new ConferenceMessage();
+                    m_later.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+                    m_later.is_new = false;
+                    m_later.direction = 0;
+                    m_later.message_id_tox = MESSAGE_PAGING_SHOW_NEWER_HASH;
+                    m_later.text = "newer Messages";
+                    add_message(m_later, false, stay_at_top);
+                }
             }
-
         }
         catch (Exception e)
         {

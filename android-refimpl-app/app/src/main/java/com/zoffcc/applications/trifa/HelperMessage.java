@@ -252,7 +252,7 @@ public class HelperMessage
                                                     System.currentTimeMillis()))
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
-                                        MainActivity.conference_message_list_fragment.add_message(m,true);
+                                        MainActivity.conference_message_list_fragment.add_message(m, true, false);
                                     }
                                 }
                             }
