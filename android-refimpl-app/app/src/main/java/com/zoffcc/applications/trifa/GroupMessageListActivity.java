@@ -1062,7 +1062,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
         }
 
-        MessageListFragment.is_at_bottom = true;
+        GroupMessageListFragment.is_at_bottom = true;
 
         try
         {

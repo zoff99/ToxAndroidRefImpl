@@ -1314,7 +1314,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         {
         }
 
-        MessageListFragment.is_at_bottom = true;
+        ConferenceMessageListFragment.is_at_bottom = true;
 
         try
         {
