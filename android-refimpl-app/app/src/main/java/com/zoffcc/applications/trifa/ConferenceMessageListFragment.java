@@ -414,7 +414,7 @@ public class ConferenceMessageListFragment extends Fragment
                     orma.updateConferenceMessage().
                             conference_identifierEq(current_conf_id).
                             is_new(false).execute();
-                    Log.i(TAG, "loading data:002");
+                    // Log.i(TAG, "loading data:002");
                 }
                 // reset "new" flags for messages -------
             }

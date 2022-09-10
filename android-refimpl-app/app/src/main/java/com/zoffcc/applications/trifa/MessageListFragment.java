@@ -386,31 +386,29 @@ public class MessageListFragment extends Fragment
         Log.i(TAG, "onResume");
         super.onResume();
 
-        if (!is_data_loaded)
+        try
         {
-            try
+            // reset "new" flags for messages -------
+            if (orma != null)
             {
-                // reset "new" flags for messages -------
-                if (orma != null)
-                {
-                    orma.updateMessage().tox_friendpubkeyEq(
-                            tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
-                    Log.i(TAG, "loading data:002");
-                }
-                // reset "new" flags for messages -------
+                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(
+                        false).execute();
+                // Log.i(TAG, "loading data:002");
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            update_all_messages(true, PREF__messageview_paging);
-
-            // default is: at bottom
-            is_at_bottom = true;
+            // reset "new" flags for messages -------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
 
-        is_data_loaded = true;
+        update_all_messages(true, PREF__messageview_paging);
+
+        if (!is_data_loaded)
+        {
+            is_at_bottom = true;
+            is_data_loaded = true;
+        }
 
         MainActivity.message_list_fragment = this;
         // Log.i(TAG, "onResume:099");
@@ -431,7 +429,7 @@ public class MessageListFragment extends Fragment
         current_page_offset = -1; // reset paging when we change friend that is shown
     }
 
-    void update_all_messages(boolean always, boolean paging)
+    void update_all_messages(final boolean from_resume_fragment, final boolean paging)
     {
         Log.i(TAG, "update_all_messages");
 
@@ -449,40 +447,36 @@ public class MessageListFragment extends Fragment
 
         try
         {
-            if ((always) || (data_values != null))
-            {
-                Log.i(TAG, "data_values:005a");
-                if (data_values != null)
-                {
-                    data_values.clear();
-                }
-                Log.i(TAG, "data_values:005b");
 
-                // -------------------------------------------------
-                // HINT: this one does not respect ordering?!
-                // -------------------------------------------------
-                if (show_only_files)
+            final int number_of_items_old = data_values.size();
+            data_values.clear();
+            // Log.i(TAG, "data_values:005b");
+
+            // -------------------------------------------------
+            // HINT: this one does not respect ordering?!
+            // -------------------------------------------------
+            if (show_only_files)
+            {
+                adapter.add_list_clear(orma.selectFromMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        and().
+                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                        orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
+                        toList());
+            }
+            else
+            {
+                if ((search_messages_text == null) || (search_messages_text.length() == 0))
                 {
                     adapter.add_list_clear(orma.selectFromMessage().
                             tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                            and().
-                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                             orderBySent_timestampAsc().
                             orderBySent_timestamp_msAsc().
                             toList());
                 }
                 else
                 {
-                    if ((search_messages_text == null) || (search_messages_text.length() == 0))
-                    {
-                        adapter.add_list_clear(orma.selectFromMessage().
-                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                                orderBySent_timestampAsc().
-                                orderBySent_timestamp_msAsc().
-                                toList());
-                    }
-                    else
-                    {
                         /*
                          searching for case-IN-sensitive non ascii chars is not working:
 
@@ -492,17 +486,56 @@ public class MessageListFragment extends Fragment
                          The LIKE operator is case sensitive by default for unicode characters that are beyond
                          the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                          */
-                        adapter.add_list_clear(orma.selectFromMessage().
-                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                                orderBySent_timestampAsc().
-                                orderBySent_timestamp_msAsc().
-                                where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
-                                toList());
+                    adapter.add_list_clear(orma.selectFromMessage().
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                            toList());
+                }
+            }
+            // Log.i(TAG, "data_values:005c");
+
+            try
+            {
+                if (from_resume_fragment)
+                {
+                    if ((number_of_items_old > 0) && (data_values.size() > number_of_items_old))
+                    {
+                        if (is_at_bottom)
+                        {
+                            is_at_bottom = false;
+                        }
+
+                        if (!faded_in)
+                        {
+                            try
+                            {
+                                do_fade_anim_on_fab(unread_messages_notice_button, true, this.getClass().getName());
+                                unread_messages_notice_button.setVisibility(View.VISIBLE);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+
+                        try
+                        {
+                            // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
+                            unread_messages_notice_button.setSupportBackgroundTintList(
+                                    (ContextCompat.getColorStateList(context_s,
+                                                                     R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
                     }
                 }
-                Log.i(TAG, "data_values:005c");
             }
-            Log.i(TAG, "data_values:005d");
+            catch (Exception ignored)
+            {
+            }
         }
         catch (Exception e)
         {

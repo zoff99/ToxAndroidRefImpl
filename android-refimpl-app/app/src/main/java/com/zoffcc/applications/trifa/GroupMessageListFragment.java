@@ -347,7 +347,7 @@ public class GroupMessageListFragment extends Fragment
                     orma.updateGroupMessage().
                             group_identifierEq(current_group_id.toLowerCase()).
                             is_new(false).execute();
-                    Log.i(TAG, "loading data:002");
+                    // Log.i(TAG, "loading data:002");
                 }
                 // reset "new" flags for messages -------
             }
@@ -465,12 +465,12 @@ public class GroupMessageListFragment extends Fragment
         {
             if ((always) || (data_values != null))
             {
-                Log.i(TAG, "data_values:005a");
+                // Log.i(TAG, "data_values:005a");
                 if (data_values != null)
                 {
                     data_values.clear();
                 }
-                Log.i(TAG, "data_values:005b");
+                // Log.i(TAG, "data_values:005b");
 
                 // -------------------------------------------------
                 // HINT: this one does not respect ordering?!
@@ -499,9 +499,9 @@ public class GroupMessageListFragment extends Fragment
                             where(" like('" + get_sqlite_search_string(group_search_messages_text) + "', text, '\\')").
                             toList());
                 }
-                Log.i(TAG, "data_values:005c");
+                // Log.i(TAG, "data_values:005c");
             }
-            Log.i(TAG, "data_values:005d");
+            // Log.i(TAG, "data_values:005d");
         }
         catch (Exception e)
         {
