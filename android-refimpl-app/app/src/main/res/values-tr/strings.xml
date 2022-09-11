@@ -402,4 +402,10 @@
     <string name="MessageListHolder_file_outgoing_cancel_ft_title">Dosya aktarımını iptal et</string>
     <string name="pref_title_allow_open_encrypted_file_via_intent">dosyaları şifreli depolama alanından aç</string>
     <string name="pref_description_allow_open_encrypted_file_via_intent">Intent aracılığıyla doğrudan şifrelenen depolama alanından dosya aç. Bu tehlikeli olabilir çünkü diğer kötü amaçlı uygulamalar TRIfA\'nın şifrelenen depolama alanındaki diğer dosyaları açabilir.</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC - Yeni Grup Sohbetleri</string>
+    <string name="pref_title_allow_push_server_ntfy">ntfy.sh Sunucusuna İzin Ver</string>
+    <string name="pref_description_allow_push_server_ntfy">UYARI: Anlık bildirimler için ntfy.sh sunucusuna izin verin. Bu, bir arkadaşınız anlık bildirim belirtecinizle abone olursa, anlık bildirimler aldığınızda zaman damgalarının üst verilerini sızdırabilir. ntfy.sh parola ve kimlik doğrulamasına sahip DEĞİLDİR. Uyarıldınız.</string>
+    <string name="pref_description_enable_ngc_features">!! Deneysel!
+\nBu çalışmıyor, ETKİNLEŞTİRMEYİN!!!</string>
+    <string name="incoming_filetransfer_size_too_large">Gelen dosya boyutu çok büyük. Yalnızca 2 GByte\'a kadar olan dosyalar alınabilir.</string>
 </resources>
