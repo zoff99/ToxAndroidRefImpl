@@ -297,36 +297,6 @@ public class HelperConference
         }
     }
 
-    static long insert_into_conference_message_db_system_message(final ConferenceMessage m, final boolean update_conference_view_flag)
-    {
-        long row_id = orma.insertIntoConferenceMessage(m);
-
-        try
-        {
-            Cursor cursor = orma.getConnection().rawQuery(
-                    "SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            //Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_conference_view_flag)
-            {
-                if (MainActivity.PREF__conference_show_system_messages)
-                {
-                    HelperMessage.add_single_conference_message_from_messge_id(msg_id, true);
-                }
-            }
-
-            return msg_id;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return -1;
-        }
-    }
-
     static long insert_into_conference_message_db(final ConferenceMessage m, final boolean update_conference_view_flag)
     {
         long row_id = orma.insertIntoConferenceMessage(m);
