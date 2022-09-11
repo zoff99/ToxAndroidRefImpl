@@ -424,4 +424,6 @@
     <string name="MessageListHolder_file_outgoing_cancel_ft_message">你想取消此文件传输吗？</string>
     <string name="pref_title_allow_open_encrypted_file_via_intent">从加密存储打开文件</string>
     <string name="pref_description_allow_open_encrypted_file_via_intent">通过 Intent 直接从加密存储中打开文件。 这可能具有潜在危险，因为其他恶意应用程序可能会打开 TRIfA 加密存储中的其他文件。</string>
+    <string name="pref_title_allow_push_server_ntfy">允许 nfty.sh 服务器</string>
+    <string name="pref_description_allow_push_server_ntfy">警告：允许 ntfy.sh 服务器进行推送通知，如果朋友使用你的推送令牌订阅，可能会在你收到推送通知时泄露你的时间戳元数据。警告：ntfy.sh 没有密码和身份验证。</string>
 </resources>
