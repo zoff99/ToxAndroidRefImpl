@@ -41,9 +41,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -108,15 +110,28 @@ public class GroupMessageListFragment extends Fragment
             {
                 if ((group_search_messages_text == null) || (group_search_messages_text.length() == 0))
                 {
-                    // TODO: sort by sent_timestamp ?
-                    data_values = orma.selectFromGroupMessage().
-                            group_identifierEq(current_group_id.toLowerCase()).
-                            orderBySent_timestampAsc().
-                            toList();
+
+                    if (PREF__conference_show_system_messages)
+                    {
+                        data_values = orma.selectFromGroupMessage().
+                                group_identifierEq(current_group_id.toLowerCase()).
+                                orderBySent_timestampAsc().
+                                toList();
+                    }
+                    else
+                    {
+                        data_values = orma.selectFromGroupMessage().
+                                group_identifierEq(current_group_id.toLowerCase()).
+                                tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                                orderBySent_timestampAsc().
+                                toList();
+                    }
                 }
                 else
                 {
-                    // TODO: sort by sent_timestamp ?
+                    if (PREF__conference_show_system_messages)
+                    {
+
                         /*
                          searching for case-IN-sensitive non ascii chars is not working:
 
@@ -126,11 +141,32 @@ public class GroupMessageListFragment extends Fragment
                          The LIKE operator is case sensitive by default for unicode characters that are beyond
                          the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                          */
-                    data_values = orma.selectFromGroupMessage().
-                            group_identifierEq(current_group_id.toLowerCase()).
-                            orderBySent_timestampAsc().
-                            where(" like('" + get_sqlite_search_string(group_search_messages_text) + "', text, '\\')").
-                            toList();
+                        data_values = orma.selectFromGroupMessage().
+                                group_identifierEq(current_group_id.toLowerCase()).
+                                orderBySent_timestampAsc().
+                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
+                                      "', text, '\\')").
+                                toList();
+                    }
+                    else
+                    {
+                        /*
+                         searching for case-IN-sensitive non ascii chars is not working:
+
+                         https://sqlite.org/lang_expr.html#like
+
+                         Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                         The LIKE operator is case sensitive by default for unicode characters that are beyond
+                         the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                         */
+                        data_values = orma.selectFromGroupMessage().
+                                group_identifierEq(current_group_id.toLowerCase()).
+                                tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                                orderBySent_timestampAsc().
+                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
+                                      "', text, '\\')").
+                                toList();
+                    }
                 }
             }
         }
