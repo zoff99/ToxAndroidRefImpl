@@ -43,12 +43,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__message_paging_num_msgs_per_page;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LAST_PAGE_MARGIN;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_NEWER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
@@ -566,12 +566,12 @@ public class ConferenceMessageListFragment extends Fragment
                         count();
 
                 int offset = 0;
-                int rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
+                int rowcount = PREF__message_paging_num_msgs_per_page;
 
                 if (current_page_offset == -1) // HINT: page at the bottom (latest messages shown)
                 {
                     later_messages = false;
-                    offset = count_messages - MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
+                    offset = count_messages - PREF__message_paging_num_msgs_per_page;
                     if (offset < 0)
                     {
                         offset = 0;
@@ -579,19 +579,19 @@ public class ConferenceMessageListFragment extends Fragment
                     current_page_offset = offset;
                     // HINT: we need MESSAGE_PAGING_LAST_PAGE_MARGIN in case new messages arrived
                     //       since "count_messages" was calculated above
-                    rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE + MESSAGE_PAGING_LAST_PAGE_MARGIN;
+                    rowcount = PREF__message_paging_num_msgs_per_page + MESSAGE_PAGING_LAST_PAGE_MARGIN;
                 }
                 else
                 {
-                    if ((count_messages - current_page_offset) < MESSAGE_PAGING_NUM_MSGS_PER_PAGE)
+                    if ((count_messages - current_page_offset) < PREF__message_paging_num_msgs_per_page)
                     {
-                        current_page_offset = count_messages - MESSAGE_PAGING_NUM_MSGS_PER_PAGE;
-                        rowcount = MESSAGE_PAGING_NUM_MSGS_PER_PAGE + MESSAGE_PAGING_LAST_PAGE_MARGIN;
+                        current_page_offset = count_messages - PREF__message_paging_num_msgs_per_page;
+                        rowcount = PREF__message_paging_num_msgs_per_page + MESSAGE_PAGING_LAST_PAGE_MARGIN;
                     }
                     offset = current_page_offset;
                 }
 
-                if ((count_messages - offset) <= MESSAGE_PAGING_NUM_MSGS_PER_PAGE)
+                if ((count_messages - offset) <= PREF__message_paging_num_msgs_per_page)
                 {
                     later_messages = false;
                 }

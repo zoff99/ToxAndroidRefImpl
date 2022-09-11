@@ -56,6 +56,15 @@
             android:summary="@string/pref_description_window_security"
             android:title="@string/pref_title_window_security" />
 
+        <EditTextPreference
+            android:defaultValue="50"
+            android:inputType="number"
+            android:key="message_paging_num_msgs_per_page"
+            android:maxLength="3"
+            android:numeric="integer"
+            android:summary="@string/pref_description_message_paging_num_msgs_per_page"
+            android:title="@string/pref_title_message_paging_num_msgs_per_page" />
+
         <SwitchPreference
             android:defaultValue="true"
             android:key="auto_accept_image"

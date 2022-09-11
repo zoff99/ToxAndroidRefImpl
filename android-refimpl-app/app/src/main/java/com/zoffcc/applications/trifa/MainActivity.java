@@ -487,8 +487,9 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__show_friendnumber_on_friendlist = false;
     static int PREF__dark_mode_pref = 0;
     static boolean PREF__enable_ngc_features = false;
-    static boolean PREF__messageview_paging = true;
     static boolean PREF__allow_push_server_ntfy = false;
+    static boolean PREF__messageview_paging = true;
+    static int PREF__message_paging_num_msgs_per_page = 50;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2319,6 +2320,34 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             PREF__X_eac_delay_ms = 80;
+            e.printStackTrace();
+        }
+
+        try
+        {
+            int temp = Integer.parseInt(settings.getString("message_paging_num_msgs_per_page", "50"));
+
+            // HINT: sanity check pref value
+            if ((temp < 0) || (temp > 999))
+            {
+                temp = 50;
+            }
+
+            PREF__message_paging_num_msgs_per_page = temp;
+
+            if (PREF__message_paging_num_msgs_per_page == 0)
+            {
+                PREF__messageview_paging = false;
+            }
+            else
+            {
+                PREF__messageview_paging = true;
+            }
+        }
+        catch (Exception e)
+        {
+            PREF__message_paging_num_msgs_per_page = 50;
+            PREF__messageview_paging = true;
             e.printStackTrace();
         }
 

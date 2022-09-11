@@ -161,6 +161,9 @@
     <string name="pref_title_window_security">prevent Screenshots</string>
     <string name="pref_description_window_security">Enabling this setting adds FLAG_SECURE to Activities.\nIt prevents screenshots and screen recording and showing content in recents preview</string>
 
+    <string name="pref_title_message_paging_num_msgs_per_page">Message Paging</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Set the number of messages to show per page. 0 means no paging</string>
+
     <string name="pref_title_compact_friendlist">Compact Friendlist</string>
     <string name="pref_description_compact_friendlist">Make the Friendlist more compact, if you have a large list of Friends</string>
 
