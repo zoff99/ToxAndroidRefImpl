@@ -1053,6 +1053,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         is_relayEq(false).
                         orderByTox_public_key_stringAsc().
                         toList();
+                // Log.i(TAG, "export_friends:" + fl.size());
                 for (FriendList f : fl)
                 {
                     String dirpath = export_dir_string + "/" + f.tox_public_key_string + "_" +
@@ -1063,8 +1064,13 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     List<Message> ml = orma.selectFromMessage().
                             tox_friendpubkeyEq(f.tox_public_key_string).
                             toList();
+                    // Log.i(TAG, "export_messages_count:" + ml.size() + " friend=" + f.tox_public_key_string);
+                    long counter = 0;
                     for (Message m : ml)
                     {
+                        counter++;
+                        // Log.i(TAG, "export_message:" + m.text + " friend=" + f.tox_public_key_string);
+
                         long ts = 0;
                         String msg_type_state = "";
                         if (m.direction == 0)
@@ -1086,8 +1092,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                 msg_type_state = "OU";
                             }
                         }
-                        String msg_path =
-                                dirpath + "/" + long_date_time_format_for_filename(ts) + "_" + msg_type_state + ".txt";
+                        String msg_path = dirpath + "/" + long_date_time_format_for_filename(ts) + "_" +
+                                          String.format("%03d", counter) + "_" + msg_type_state + ".txt";
                         // Log.i(TAG, "friend:xxx:F:M:" + msg_path);
 
                         try
@@ -1106,8 +1112,10 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         kindEq(TOX_CONFERENCE_TYPE_TEXT.value).
                         orderByConference_identifierAsc().
                         toList();
+                long counter = 0;
                 for (ConferenceDB conf : cl)
                 {
+                    counter++;
                     String dirpath = export_dir_string + "/" + conf.conference_identifier + "_" +
                                      filter_out_specials_from_filepath_stricter(conf.name);
                     // Log.i(TAG, "friend:xxx:C:" + dirpath);
@@ -1138,10 +1146,10 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                 msg_type_state = "OU";
                             }
                         }
-                        String msg_path =
-                                dirpath + "/" + long_date_time_format_for_filename(ts) + "_" + msg_type_state + "_" +
-                                cm.tox_peerpubkey + "_" + filter_out_specials_from_filepath_stricter(cm.tox_peername) +
-                                ".txt";
+                        String msg_path = dirpath + "/" + long_date_time_format_for_filename(ts) + "_" +
+                                          String.format("%03d", counter) + "_" + msg_type_state + "_" +
+                                          cm.tox_peerpubkey + "_" +
+                                          filter_out_specials_from_filepath_stricter(cm.tox_peername) + ".txt";
                         // Log.i(TAG, "friend:xxx:C:M:" + msg_path);
 
                         try
@@ -1162,6 +1170,15 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         dbs_path, PREF__DB_secrect_key, null, net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE);
 
                 final String sql_export_filename = export_dir_string + "/" + "export.sqlite";
+
+                try
+                {
+                    new File(sql_export_filename).delete();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
 
                 touch(new File(sql_export_filename));
                 String sql = "ATTACH DATABASE '" + sql_export_filename + "' AS export KEY '';";

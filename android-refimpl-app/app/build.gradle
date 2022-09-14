@@ -316,7 +316,11 @@ dependencies {
     //
     implementation("com.daimajia.swipelayout:library:1.2.0@aar")
     //
-    implementation('net.zetetic:android-database-sqlcipher:4.5.1@aar') {
+    implementation('net.zetetic:android-database-sqlcipher:4.5.2@aar') {
+        transitive = true
+    }
+    //noinspection KtxExtensionAvailable
+    implementation('androidx.sqlite:sqlite:2.2.0') {
         transitive = true
     }
     //implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
