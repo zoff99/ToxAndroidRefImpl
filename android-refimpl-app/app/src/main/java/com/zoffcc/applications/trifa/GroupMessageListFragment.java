@@ -501,25 +501,33 @@ public class GroupMessageListFragment extends Fragment
         {
             if ((always) || (data_values != null))
             {
-                // Log.i(TAG, "data_values:005a");
                 if (data_values != null)
                 {
                     data_values.clear();
                 }
-                // Log.i(TAG, "data_values:005b");
 
-                // -------------------------------------------------
-                // HINT: this one does not respect ordering?!
-                // -------------------------------------------------
                 if ((group_search_messages_text == null) || (group_search_messages_text.length() == 0))
                 {
-                    adapter.add_list_clear(orma.selectFromGroupMessage().
-                            group_identifierEq(current_group_id.toLowerCase()).
-                            orderBySent_timestampAsc().
-                            toList());
+                    if (PREF__conference_show_system_messages)
+                    {
+                        adapter.add_list_clear(orma.selectFromGroupMessage().
+                                group_identifierEq(current_group_id.toLowerCase()).
+                                orderBySent_timestampAsc().
+                                toList());
+                    }
+                    else
+                    {
+                        adapter.add_list_clear(orma.selectFromGroupMessage().
+                                group_identifierEq(current_group_id.toLowerCase()).
+                                tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                                orderBySent_timestampAsc().
+                                toList());
+                    }
                 }
                 else
                 {
+                    if (PREF__conference_show_system_messages)
+                    {
                     /*
                      searching for case-IN-sensitive non ascii chars is not working:
 
@@ -529,15 +537,34 @@ public class GroupMessageListFragment extends Fragment
                      The LIKE operator is case sensitive by default for unicode characters that are beyond
                      the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                      */
-                    adapter.add_list_clear(orma.selectFromGroupMessage().
-                            group_identifierEq(current_group_id.toLowerCase()).
-                            orderBySent_timestampAsc().
-                            where(" like('" + get_sqlite_search_string(group_search_messages_text) + "', text, '\\')").
-                            toList());
+                        adapter.add_list_clear(orma.selectFromGroupMessage().
+                                group_identifierEq(current_group_id.toLowerCase()).
+                                orderBySent_timestampAsc().
+                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
+                                      "', text, '\\')").
+                                toList());
+                    }
+                    else
+                    {
+                           /*
+                     searching for case-IN-sensitive non ascii chars is not working:
+
+                     https://sqlite.org/lang_expr.html#like
+
+                     Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                     The LIKE operator is case sensitive by default for unicode characters that are beyond
+                     the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                     */
+                        adapter.add_list_clear(orma.selectFromGroupMessage().
+                                group_identifierEq(current_group_id.toLowerCase()).
+                                tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                                orderBySent_timestampAsc().
+                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
+                                      "', text, '\\')").
+                                toList());
+                    }
                 }
-                // Log.i(TAG, "data_values:005c");
             }
-            // Log.i(TAG, "data_values:005d");
         }
         catch (Exception e)
         {

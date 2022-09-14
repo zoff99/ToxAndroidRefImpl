@@ -32,6 +32,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
@@ -244,7 +245,15 @@ public class HelperGroup
 
             if (update_group_view_flag)
             {
-                add_single_group_message_from_messge_id(msg_id, true);
+                if ((PREF__conference_show_system_messages == false) &&
+                    (m.tox_group_peer_pubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)))
+                {
+                    // HINT: dont show system message because of user PREF
+                }
+                else
+                {
+                    add_single_group_message_from_messge_id(msg_id, true);
+                }
             }
 
             return msg_id;
