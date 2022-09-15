@@ -4640,6 +4640,44 @@ public class MainActivity extends AppCompatActivity
             {
                 if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
                 {
+                    // TODO: check when we have actual FTs that are stale
+                    // ******** friend just came online ********
+                    // check for stale filetransfers
+                    try
+                    {
+                        // Log.i(TAG, "check_for_stale_ft:001:friend=" + f);
+                        List<Filetransfer> fts_active = orma.selectFromFiletransfer().
+                                file_numberNotEq(-1).
+                                kindEq(TOX_FILE_KIND_DATA.value).
+                                tox_public_key_stringEq(f.tox_public_key_string).
+                                toList();
+                        for (Filetransfer ft : fts_active)
+                        {
+                            // Log.i(TAG, "check_for_stale_ft:002:ft=" + ft);
+
+                            ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
+                            tox_file_get_file_id(friend_number, ft.file_number, file_id_buffer);
+                            MainActivity.tox_messagev3_get_new_message_id(file_id_buffer);
+                            final String file_id_buffer_hex = HelperGeneric.bytesToHex(file_id_buffer.array(),
+                                                                                       file_id_buffer.arrayOffset(),
+                                                                                       file_id_buffer.limit()).toUpperCase();
+                            //Log.i(TAG, "check_for_stale_ft:003:ft_hex_from_db=" + ft.tox_file_id_hex +
+                            //           " file_id_buffer_hex=" + file_id_buffer_hex);
+
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // e.printStackTrace();
+                        // Log.i(TAG, "check_for_stale_ft:088:EE:" + e.getMessage());
+                    }
+                }
+            }
+
+            if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)
+            {
+                if (f.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
+                {
                     // ******** friend just came online ********
                     if (have_own_relay())
                     {
