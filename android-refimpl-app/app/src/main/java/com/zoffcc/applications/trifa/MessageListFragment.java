@@ -44,10 +44,15 @@ import androidx.recyclerview.widget.RecyclerView;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__message_paging_num_msgs_per_page;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LAST_PAGE_MARGIN;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_NEWER_HASH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -76,6 +81,8 @@ public class MessageListFragment extends Fragment
     {
         Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
+
+        reset_paging();
 
         unread_messages_notice_button = view.findViewById(R.id.unread_messages_notice_button);
         unread_messages_notice_button.setAnimation(null);
@@ -385,30 +392,31 @@ public class MessageListFragment extends Fragment
 
         Log.i(TAG, "onResume");
         super.onResume();
-
-        try
-        {
-            // reset "new" flags for messages -------
-            if (orma != null)
-            {
-                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(
-                        false).execute();
-                // Log.i(TAG, "loading data:002");
-            }
-            // reset "new" flags for messages -------
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        update_all_messages(true, PREF__messageview_paging);
-
         if (!is_data_loaded)
         {
+            try
+            {
+                // reset "new" flags for messages -------
+                if (orma != null)
+                {
+                    orma.updateMessage().tox_friendpubkeyEq(
+                            tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
+                    // Log.i(TAG, "loading data:002");
+                }
+                // reset "new" flags for messages -------
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            update_all_messages(true, false, PREF__messageview_paging);
+
+            // default is: at bottom
             is_at_bottom = true;
-            is_data_loaded = true;
         }
+
+        is_data_loaded = true;
 
         MainActivity.message_list_fragment = this;
         // Log.i(TAG, "onResume:099");
@@ -429,7 +437,7 @@ public class MessageListFragment extends Fragment
         current_page_offset = -1; // reset paging when we change friend that is shown
     }
 
-    void update_all_messages(final boolean from_resume_fragment, final boolean paging)
+    void update_all_messages(final boolean from_resume_fragment, final boolean stay_at_top, final boolean paging)
     {
         Log.i(TAG, "update_all_messages");
 
@@ -447,36 +455,119 @@ public class MessageListFragment extends Fragment
 
         try
         {
-
             final int number_of_items_old = data_values.size();
             data_values.clear();
-            // Log.i(TAG, "data_values:005b");
 
-            // -------------------------------------------------
-            // HINT: this one does not respect ordering?!
-            // -------------------------------------------------
-            if (show_only_files)
+            boolean later_messages = false;
+            boolean older_messages = false;
+            List<Message> ml = null;
+
+            if ((paging) && ((search_messages_text == null) || (search_messages_text.length() == 0)))
             {
-                adapter.add_list_clear(orma.selectFromMessage().
-                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                        and().
-                        TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
-                        orderBySent_timestampAsc().
-                        orderBySent_timestamp_msAsc().
-                        toList());
-            }
-            else
-            {
-                if ((search_messages_text == null) || (search_messages_text.length() == 0))
+                later_messages = true;
+                older_messages = true;
+                int count_messages = 0;
+
+                if (show_only_files)
                 {
-                    adapter.add_list_clear(orma.selectFromMessage().
+                    count_messages = orma.selectFromMessage().
                             tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                             orderBySent_timestampAsc().
                             orderBySent_timestamp_msAsc().
-                            toList());
+                            count();
                 }
                 else
                 {
+                    count_messages = orma.selectFromMessage().
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            count();
+                }
+
+                int offset = 0;
+                int rowcount = PREF__message_paging_num_msgs_per_page;
+
+                if (current_page_offset == -1) // HINT: page at the bottom (latest messages shown)
+                {
+                    later_messages = false;
+                    offset = count_messages - PREF__message_paging_num_msgs_per_page;
+                    if (offset < 0)
+                    {
+                        offset = 0;
+                    }
+                    current_page_offset = offset;
+                    // HINT: we need MESSAGE_PAGING_LAST_PAGE_MARGIN in case new messages arrived
+                    //       since "count_messages" was calculated above
+                    rowcount = PREF__message_paging_num_msgs_per_page + MESSAGE_PAGING_LAST_PAGE_MARGIN;
+                }
+                else
+                {
+                    if ((count_messages - current_page_offset) < PREF__message_paging_num_msgs_per_page)
+                    {
+                        current_page_offset = count_messages - PREF__message_paging_num_msgs_per_page;
+                        rowcount = PREF__message_paging_num_msgs_per_page + MESSAGE_PAGING_LAST_PAGE_MARGIN;
+                    }
+                    offset = current_page_offset;
+                }
+
+                if ((count_messages - offset) <= PREF__message_paging_num_msgs_per_page)
+                {
+                    later_messages = false;
+                }
+
+                if (offset < 1)
+                {
+                    older_messages = false;
+                }
+
+                if (show_only_files)
+                {
+                    ml = orma.selectFromMessage().
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            offset(offset).
+                            limit(rowcount).
+                            toList();
+                }
+                else
+                {
+                    ml = orma.selectFromMessage().
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            offset(offset).
+                            limit(rowcount).
+                            toList();
+                }
+            }
+            else
+            {
+                if (show_only_files)
+                {
+                    ml = orma.selectFromMessage().
+                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                            and().
+                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                            orderBySent_timestampAsc().
+                            orderBySent_timestamp_msAsc().
+                            toList();
+                }
+                else
+                {
+                    if ((search_messages_text == null) || (search_messages_text.length() == 0))
+                    {
+                        ml = orma.selectFromMessage().
+                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                toList();
+                    }
+                    else
+                    {
                         /*
                          searching for case-IN-sensitive non ascii chars is not working:
 
@@ -486,15 +577,59 @@ public class MessageListFragment extends Fragment
                          The LIKE operator is case sensitive by default for unicode characters that are beyond
                          the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
                          */
-                    adapter.add_list_clear(orma.selectFromMessage().
-                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                            orderBySent_timestampAsc().
-                            orderBySent_timestamp_msAsc().
-                            where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
-                            toList());
+                        ml = orma.selectFromMessage().
+                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                                orderBySent_timestampAsc().
+                                orderBySent_timestamp_msAsc().
+                                where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                                toList();
+                    }
                 }
             }
-            // Log.i(TAG, "data_values:005c");
+
+            if (ml != null)
+            {
+                if (older_messages)
+                {
+                    Message m_older = new Message();
+                    m_older.tox_friendpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+                    m_older.is_new = false;
+                    m_older.direction = 0;
+                    m_older.msg_idv3_hash = MESSAGE_PAGING_SHOW_OLDER_HASH;
+                    m_older.text = "older Messages";
+                    add_message(m_older, false, stay_at_top);
+                }
+
+                for (Message message : ml)
+                {
+                    if (message == ml.get(ml.size() - 1))
+                    {
+                        add_message(message, false, stay_at_top);
+                    }
+                    else
+                    {
+                        if (later_messages)
+                        {
+                            add_message(message, false, stay_at_top);
+                        }
+                        else
+                        {
+                            add_message(message, false, stay_at_top);
+                        }
+                    }
+                }
+
+                if (later_messages)
+                {
+                    Message m_later = new Message();
+                    m_later.tox_friendpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+                    m_later.is_new = false;
+                    m_later.direction = 0;
+                    m_later.msg_idv3_hash = MESSAGE_PAGING_SHOW_NEWER_HASH;
+                    m_later.text = "newer Messages";
+                    add_message(m_later, false, stay_at_top);
+                }
+            }
 
             try
             {
@@ -569,7 +704,7 @@ public class MessageListFragment extends Fragment
         }
     }
 
-    synchronized void add_message(final Message m)
+    synchronized void add_message(final Message m, final boolean is_real_new_message, final boolean stay_at_top)
     {
         // Log.i(TAG, "add_message:001");
         Runnable myRunnable = new Runnable()
@@ -581,6 +716,13 @@ public class MessageListFragment extends Fragment
                 {
                     // Log.i(TAG, "add_message:002");
                     adapter.add_item(m);
+
+                    if (stay_at_top)
+                    {
+                        is_at_bottom = false;
+                        listingsView.scrollToPosition(0);
+                    }
+
                     if (is_at_bottom)
                     {
                         listingsView.scrollToPosition(adapter.getItemCount() - 1);
@@ -589,10 +731,13 @@ public class MessageListFragment extends Fragment
                     {
                         try
                         {
-                            // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
-                            unread_messages_notice_button.setSupportBackgroundTintList(
-                                    (ContextCompat.getColorStateList(context_s,
-                                                                     R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                            if (is_real_new_message)
+                            {
+                                // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
+                                unread_messages_notice_button.setSupportBackgroundTintList(
+                                        (ContextCompat.getColorStateList(context_s,
+                                                                         R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                            }
                         }
                         catch (Exception ignored)
                         {

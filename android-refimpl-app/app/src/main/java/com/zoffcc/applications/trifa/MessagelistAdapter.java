@@ -34,7 +34,10 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_NEWER_HASH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_PAUSE;
 
@@ -72,6 +75,14 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
         switch (viewType)
         {
+            case Message_model.PAGING_NEWER:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_paging_newer, parent,
+                                                                        false);
+                return new MessageListHolder_paging(view, this.context);
+            case Message_model.PAGING_OLDER:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_paging_older, parent,
+                                                                        false);
+                return new MessageListHolder_paging(view, this.context);
             case Message_model.TEXT_INCOMING_NOT_READ:
                 if (PREF__compact_chatlist)
                 {
@@ -260,7 +271,23 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         else
         {
             // TEXT -------------
-            if (my_msg.direction == 0)
+            if ((my_msg.tox_friendpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) && (
+
+                    ((my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_OLDER_HASH)) ||
+                     (my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_NEWER_HASH)))
+
+            ))
+            {
+                if (my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_OLDER_HASH))
+                {
+                    return Message_model.PAGING_OLDER;
+                }
+                else
+                {
+                    return Message_model.PAGING_NEWER;
+                }
+            }
+            else if (my_msg.direction == 0)
             {
                 // msg to me
                 if (my_msg.read)
@@ -321,6 +348,12 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
             switch (getItemViewType(position))
             {
+                case Message_model.PAGING_NEWER:
+                    ((MessageListHolder_paging) holder).bindMessageList(m2);
+                    break;
+                case Message_model.PAGING_OLDER:
+                    ((MessageListHolder_paging) holder).bindMessageList(m2);
+                    break;
                 case Message_model.TEXT_INCOMING_NOT_READ:
                     ((MessageListHolder_text_incoming_not_read) holder).bindMessageList(m2);
                     break;

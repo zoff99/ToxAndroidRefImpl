@@ -330,7 +330,7 @@ public class HelperMessage
                                     if (MainActivity.message_list_fragment != null)
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
-                                        MainActivity.message_list_fragment.add_message(m);
+                                        MainActivity.message_list_fragment.add_message(m, true, false);
                                     }
                                 }
                             }
