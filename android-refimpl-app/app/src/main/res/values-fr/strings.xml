@@ -411,4 +411,10 @@
     <string name="pref_description_allow_open_encrypted_file_via_intent">ouvre des fichiers directement à partir d’un stockage crypté via Intent. Cela peut être potentiellement dangereux, car d’autres applications malveillantes pourraient ouvrir d’autres fichiers dans le stockage crypté de TRIfA.</string>
     <string name="MessageListHolder_file_incoming_cancel_ft_title">annuler le transfert de fichiers</string>
     <string name="MessageListHolder_file_incoming_cancel_ft_message">Voulez-vous annuler ce transfert de fichiers \?</string>
+    <string name="pref_title_allow_push_server_ntfy">Autoriser le serveur ntfy.sh</string>
+    <string name="incoming_filetransfer_size_too_large">Taille du fichier entrant trop grande. Seuls les fichiers jusqu\'à 2 Go peuvent être reçus.</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC - Nouveaux groupes de discussion</string>
+    <string name="pref_description_allow_push_server_ntfy">AVERTISSEMENT : si vous autorisez le serveur ntfy.sh pour les notifications push, cela peut entraîner une fuite de vos métadonnées d\'horodatage lorsque vous recevez des notifications push, si un ami s\'abonne avec votre jeton push. Le ntfy.sh n\'a AUCUN mot de passe et AUCUNE authentification. Vous avez été prévenu.</string>
+    <string name="pref_description_enable_ngc_features">! ! Expérimental ! !
+\nCela ne fonctionne PAS, NE PAS activer ! !</string>
 </resources>
