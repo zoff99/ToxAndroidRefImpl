@@ -392,31 +392,30 @@ public class MessageListFragment extends Fragment
 
         Log.i(TAG, "onResume");
         super.onResume();
-        if (!is_data_loaded)
+
+        try
         {
-            try
+            // reset "new" flags for messages -------
+            if (orma != null)
             {
-                // reset "new" flags for messages -------
-                if (orma != null)
-                {
-                    orma.updateMessage().tox_friendpubkeyEq(
-                            tox_friend_get_public_key__wrapper(current_friendnum)).is_new(false).execute();
-                    // Log.i(TAG, "loading data:002");
-                }
-                // reset "new" flags for messages -------
+                orma.updateMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).is_new(
+                        false).execute();
+                // Log.i(TAG, "loading data:002");
             }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            update_all_messages(true, false, PREF__messageview_paging);
-
-            // default is: at bottom
-            is_at_bottom = true;
+            // reset "new" flags for messages -------
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
 
-        is_data_loaded = true;
+        update_all_messages(true, false, PREF__messageview_paging);
+
+        if (!is_data_loaded)
+        {
+            is_at_bottom = true;
+            is_data_loaded = true;
+        }
 
         MainActivity.message_list_fragment = this;
         // Log.i(TAG, "onResume:099");
@@ -486,6 +485,9 @@ public class MessageListFragment extends Fragment
                             count();
                 }
 
+                Log.i(TAG, "CCC:001:" + count_messages + " " + current_page_offset + " " + is_at_bottom + " " +
+                           is_data_loaded);
+
                 int offset = 0;
                 int rowcount = PREF__message_paging_num_msgs_per_page;
 
@@ -501,16 +503,28 @@ public class MessageListFragment extends Fragment
                     // HINT: we need MESSAGE_PAGING_LAST_PAGE_MARGIN in case new messages arrived
                     //       since "count_messages" was calculated above
                     rowcount = PREF__message_paging_num_msgs_per_page + MESSAGE_PAGING_LAST_PAGE_MARGIN;
+
+                    Log.i(TAG, "CCC:002:" + rowcount + " " + current_page_offset + " " + is_at_bottom + " " +
+                               is_data_loaded);
                 }
                 else
                 {
+                    Log.i(TAG, "CCC:003a:" + (count_messages - current_page_offset) + " " + PREF__message_paging_num_msgs_per_page);
                     if ((count_messages - current_page_offset) < PREF__message_paging_num_msgs_per_page)
                     {
                         current_page_offset = count_messages - PREF__message_paging_num_msgs_per_page;
                         rowcount = PREF__message_paging_num_msgs_per_page + MESSAGE_PAGING_LAST_PAGE_MARGIN;
+
+                        Log.i(TAG, "CCC:003b:" + current_page_offset + " " + rowcount);
+
                     }
                     offset = current_page_offset;
+
+                    Log.i(TAG, "CCC:003c:" + rowcount + " " + current_page_offset + " " + is_at_bottom + " " +
+                               is_data_loaded);
                 }
+
+                Log.i(TAG, "CCC:004:" + count_messages + " " + offset + " " + PREF__message_paging_num_msgs_per_page);
 
                 if ((count_messages - offset) <= PREF__message_paging_num_msgs_per_page)
                 {
@@ -714,7 +728,7 @@ public class MessageListFragment extends Fragment
             {
                 try
                 {
-                    // Log.i(TAG, "add_message:002");
+                    Log.i(TAG, "add_message:002");
                     adapter.add_item(m);
 
                     if (stay_at_top)
