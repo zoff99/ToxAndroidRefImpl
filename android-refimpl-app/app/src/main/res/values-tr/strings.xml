@@ -408,4 +408,6 @@
     <string name="pref_description_enable_ngc_features">!! Deneysel!
 \nBu çalışmıyor, ETKİNLEŞTİRMEYİN!!!</string>
     <string name="incoming_filetransfer_size_too_large">Gelen dosya boyutu çok büyük. Yalnızca 2 GByte\'a kadar olan dosyalar alınabilir.</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Mesaj Sayfalama</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Sayfa başına gösterilecek mesaj sayısını ayarlayın. 0, sayfalama yok anlamına gelir</string>
 </resources>
