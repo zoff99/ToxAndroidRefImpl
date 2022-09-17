@@ -5767,8 +5767,8 @@ public class MainActivity extends AppCompatActivity
                     }
 
                     // transfer finished -----------
-                    ByteBuffer avatar_chunk = ByteBuffer.allocateDirect(1);
-                    int res = tox_file_send_chunk(friend_number, file_number, position, avatar_chunk, 0);
+                    ByteBuffer dummy_chunk = ByteBuffer.allocateDirect(1);
+                    int res = tox_file_send_chunk(friend_number, file_number, position, dummy_chunk, 0);
                     // Log.i(TAG, "file_chunk_request:res(2)=" + res);
                     // remove FT from DB
                     HelperFiletransfer.delete_filetransfers_from_friendnum_and_filenum(friend_number, file_number);
@@ -7607,7 +7607,21 @@ public class MainActivity extends AppCompatActivity
                         {
                             try
                             {
-                                // TODO: cleanup duplicated outgoing files from provider here ************
+                                // cleanup duplicated outgoing files from provider here ************
+                                if (m_to_delete.storage_frame_work == false)
+                                {
+                                    if (m_to_delete.filename_fullpath.startsWith(SD_CARD_FILES_OUTGOING_WRAPPER_DIR))
+                                    {
+                                        // HINT: real file (no storage framework) and correct directory, delete the file now
+                                        try
+                                        {
+                                            new File(m_to_delete.filename_fullpath).delete();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+                                    }
+                                }
                                 // FileDB file_ = orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
                                 orma.deleteFromFileDB().idEq(m_to_delete.filedb_id).execute();
                             }
@@ -7618,7 +7632,6 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                     }
-
                     // ---------- delete fileDB if this message is an outgoing file ----------
 
                     // ---------- delete fileDB and VFS file if this message is an incoming file ----------
