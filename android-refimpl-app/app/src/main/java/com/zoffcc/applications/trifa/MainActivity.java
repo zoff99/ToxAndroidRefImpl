@@ -2348,6 +2348,15 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+        // HINT: disable paging for now!!!!!!!!!!!!
+        // HINT: disable paging for now!!!!!!!!!!!!
+        // HINT: disable paging for now!!!!!!!!!!!!
+        PREF__message_paging_num_msgs_per_page = 0;
+        PREF__messageview_paging = false;
+        // HINT: disable paging for now!!!!!!!!!!!!
+        // HINT: disable paging for now!!!!!!!!!!!!
+        // HINT: disable paging for now!!!!!!!!!!!!
+
         try
         {
             PREF__X_audio_play_buffer_custom = Integer.parseInt(settings.getString("X_audio_play_buffer_custom", "0"));

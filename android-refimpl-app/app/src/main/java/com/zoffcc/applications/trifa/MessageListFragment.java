@@ -86,7 +86,16 @@ public class MessageListFragment extends Fragment
 
         reset_paging();
 
-        messages_count_old = get_messages_count_full();
+        if (PREF__messageview_paging)
+        {
+            try
+            {
+                messages_count_old = get_messages_count_full();
+            }
+            catch (Exception e)
+            {
+            }
+        }
 
         unread_messages_notice_button = view.findViewById(R.id.unread_messages_notice_button);
         unread_messages_notice_button.setAnimation(null);
@@ -430,7 +439,10 @@ public class MessageListFragment extends Fragment
     {
         try
         {
-            messages_count_old = get_messages_count_full();
+            if (PREF__messageview_paging)
+            {
+                messages_count_old = get_messages_count_full();
+            }
         }
         catch (Exception e)
         {
@@ -577,7 +589,10 @@ public class MessageListFragment extends Fragment
 
                 if (from_resume_fragment)
                 {
-                    count_messages_full = get_messages_count_full();
+                    if (PREF__messageview_paging)
+                    {
+                        count_messages_full = get_messages_count_full();
+                    }
                 }
             }
             else
