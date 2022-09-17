@@ -396,4 +396,10 @@
     <string name="MessageListHolder_file_outgoing_cancel_ft_message">¿Desea cancelar esta transferencia de archivos\?</string>
     <string name="pref_description_allow_open_encrypted_file_via_intent">abre archivos directamente desde el almacenamiento cifrado a través de Intent. Esto puede ser potencialmente peligroso, porque otras aplicaciones maliciosas podrían abrir otros archivos en el almacenamiento cifrado de TRIfA.</string>
     <string name="pref_title_allow_open_encrypted_file_via_intent">abrir archivos desde un almacenamiento encriptado</string>
+    <string name="pref_title_allow_push_server_ntfy">Permitir servidor ntfy.sh</string>
+    <string name="pref_description_allow_push_server_ntfy">ADVERTENCIA: si permitires que el servidor ntfy.sh reciba las notificaciones push, esto puede filtrar tus metadatos de marcas de tiempo cuando recibas las notificaciones push, caso un amigo se suscribe con tu token de empuje. El ntfy.sh NO tiene contraseñas NI autenticación. Has sido advertido.</string>
+    <string name="incoming_filetransfer_size_too_large">El tamaño de los archivos entrantes es demasiado grande. Sólo se pueden recibir archivos de hasta 2 GBytes.</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC - Nuevos chats de grupo</string>
+    <string name="pref_description_enable_ngc_features">¡¡!! ¡¡Experimental !!
+\n¡¡Esto NO está funcionando, NO lo actives !!</string>
 </resources>
