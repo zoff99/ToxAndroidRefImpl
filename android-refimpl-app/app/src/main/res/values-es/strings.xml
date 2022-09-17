@@ -402,4 +402,6 @@
     <string name="pref_title_allow_enable_ngc_features">NGC - Nuevos chats de grupo</string>
     <string name="pref_description_enable_ngc_features">¡¡!! ¡¡Experimental !!
 \n¡¡Esto NO está funcionando, NO lo actives !!</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Define el número de mensajes que se mostrarán por página. 0 significa que no hay paginación</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Paginación de Mensajes</string>
 </resources>
