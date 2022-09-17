@@ -558,6 +558,15 @@ public class ProfileActivity extends AppCompatActivity
                                                    VFS_PREFIX + VFS_OWN_AVATAR_DIR,
                                                    VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION);
 
+                        try
+                        {
+                            file.delete();
+                        }
+                        catch (Exception e)
+                        {
+
+                        }
+
                         set_g_opts("VFS_OWN_AVATAR_FNAME",
                                    VFS_PREFIX + VFS_OWN_AVATAR_DIR + "/" + VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION);
 
@@ -570,7 +579,6 @@ public class ProfileActivity extends AppCompatActivity
                                                         VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION, true, false, null);
 
                         send_avatar_to_all_friends();
-
                     }
                 }
                 catch (Exception e)
