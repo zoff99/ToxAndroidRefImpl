@@ -66,6 +66,8 @@ public class MessageListFragment extends Fragment
     MessagelistAdapter adapter = null;
     static boolean is_at_bottom = true;
     static int current_page_offset = -1;
+    static int messages_count_old = 0;
+    static int count_messages_full = 0;
     static boolean faded_in = false;
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
@@ -83,6 +85,8 @@ public class MessageListFragment extends Fragment
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
 
         reset_paging();
+
+        messages_count_old = get_messages_count_full();
 
         unread_messages_notice_button = view.findViewById(R.id.unread_messages_notice_button);
         unread_messages_notice_button.setAnimation(null);
@@ -424,6 +428,14 @@ public class MessageListFragment extends Fragment
     @Override
     public void onPause()
     {
+        try
+        {
+            messages_count_old = get_messages_count_full();
+        }
+        catch (Exception e)
+        {
+        }
+
         Log.i(TAG, "onPause");
         super.onPause();
 
@@ -454,7 +466,9 @@ public class MessageListFragment extends Fragment
 
         try
         {
-            final int number_of_items_old = data_values.size();
+            int number_of_items_old = data_values.size();
+            int count_messages = 0;
+            Log.i(TAG, "CCC:000:" + number_of_items_old);
             data_values.clear();
 
             boolean later_messages = false;
@@ -463,9 +477,11 @@ public class MessageListFragment extends Fragment
 
             if ((paging) && ((search_messages_text == null) || (search_messages_text.length() == 0)))
             {
+                number_of_items_old = messages_count_old;
+                Log.i(TAG, "CCC:000b:" + number_of_items_old);
+
                 later_messages = true;
                 older_messages = true;
-                int count_messages = 0;
 
                 if (show_only_files)
                 {
@@ -509,7 +525,8 @@ public class MessageListFragment extends Fragment
                 }
                 else
                 {
-                    Log.i(TAG, "CCC:003a:" + (count_messages - current_page_offset) + " " + PREF__message_paging_num_msgs_per_page);
+                    Log.i(TAG, "CCC:003a:" + (count_messages - current_page_offset) + " " +
+                               PREF__message_paging_num_msgs_per_page);
                     if ((count_messages - current_page_offset) < PREF__message_paging_num_msgs_per_page)
                     {
                         current_page_offset = count_messages - PREF__message_paging_num_msgs_per_page;
@@ -557,49 +574,23 @@ public class MessageListFragment extends Fragment
                             limit(rowcount).
                             toList();
                 }
+
+                if (from_resume_fragment)
+                {
+                    count_messages_full = get_messages_count_full();
+                }
             }
             else
             {
-                if (show_only_files)
+                ml = get_messages();
+                count_messages = ml.size();
+                if (from_resume_fragment)
                 {
-                    ml = orma.selectFromMessage().
-                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                            and().
-                            TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
-                            orderBySent_timestampAsc().
-                            orderBySent_timestamp_msAsc().
-                            toList();
-                }
-                else
-                {
-                    if ((search_messages_text == null) || (search_messages_text.length() == 0))
-                    {
-                        ml = orma.selectFromMessage().
-                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                                orderBySent_timestampAsc().
-                                orderBySent_timestamp_msAsc().
-                                toList();
-                    }
-                    else
-                    {
-                        /*
-                         searching for case-IN-sensitive non ascii chars is not working:
-
-                         https://sqlite.org/lang_expr.html#like
-
-                         Important Note: SQLite only understands upper/lower case for ASCII characters by default.
-                         The LIKE operator is case sensitive by default for unicode characters that are beyond
-                         the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
-                         */
-                        ml = orma.selectFromMessage().
-                                tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                                orderBySent_timestampAsc().
-                                orderBySent_timestamp_msAsc().
-                                where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
-                                toList();
-                    }
+                    count_messages_full = count_messages;
                 }
             }
+
+            Log.i(TAG, "CCC:009:" + count_messages_full + " " + count_messages + " " + number_of_items_old);
 
             if (ml != null)
             {
@@ -647,37 +638,48 @@ public class MessageListFragment extends Fragment
 
             try
             {
+                Log.i(TAG, "CCC:A:001:" + from_resume_fragment);
                 if (from_resume_fragment)
                 {
-                    if ((number_of_items_old > 0) && (data_values.size() > number_of_items_old))
+                    Log.i(TAG, "CCC:A:002:" + number_of_items_old + " " + count_messages_full);
+                    if ((number_of_items_old > 0) && (count_messages_full > number_of_items_old))
                     {
+                        Log.i(TAG, "CCC:A:003");
                         if (is_at_bottom)
                         {
+                            Log.i(TAG, "CCC:A:004");
                             is_at_bottom = false;
                         }
 
+                        Log.i(TAG, "CCC:A:005");
                         if (!faded_in)
                         {
+                            Log.i(TAG, "CCC:A:006");
                             try
                             {
                                 do_fade_anim_on_fab(unread_messages_notice_button, true, this.getClass().getName());
                                 unread_messages_notice_button.setVisibility(View.VISIBLE);
+                                Log.i(TAG, "CCC:A:007");
                             }
                             catch (Exception e)
                             {
                                 e.printStackTrace();
+                                Log.i(TAG, "CCC:A:008");
                             }
                         }
 
                         try
                         {
+                            Log.i(TAG, "CCC:A:009");
                             // set color of FAB to "red"-ish color, to indicate that there are also new messages/FTs
                             unread_messages_notice_button.setSupportBackgroundTintList(
                                     (ContextCompat.getColorStateList(context_s,
                                                                      R.color.message_list_scroll_to_bottom_fab_bg_new_message)));
+                            Log.i(TAG, "CCC:A:010");
                         }
                         catch (Exception ignored)
                         {
+                            Log.i(TAG, "CCC:A:011");
                         }
                     }
                 }
@@ -692,6 +694,96 @@ public class MessageListFragment extends Fragment
             Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
 
+    }
+
+    private List<Message> get_messages()
+    {
+        List<Message> ml;
+        if (show_only_files)
+        {
+            ml = orma.selectFromMessage().
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                    and().
+                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                    orderBySent_timestampAsc().
+                    orderBySent_timestamp_msAsc().
+                    toList();
+        }
+        else
+        {
+            if ((search_messages_text == null) || (search_messages_text.length() == 0))
+            {
+                ml = orma.selectFromMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
+                        toList();
+            }
+            else
+            {
+                /*
+                 searching for case-IN-sensitive non ascii chars is not working:
+
+                 https://sqlite.org/lang_expr.html#like
+
+                 Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                 The LIKE operator is case sensitive by default for unicode characters that are beyond
+                 the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                 */
+                ml = orma.selectFromMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
+                        where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                        toList();
+            }
+        }
+        return ml;
+    }
+
+    private int get_messages_count_full()
+    {
+        int c = 0;
+        if (show_only_files)
+        {
+            c = orma.selectFromMessage().
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                    and().
+                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                    orderBySent_timestampAsc().
+                    orderBySent_timestamp_msAsc().
+                    count();
+        }
+        else
+        {
+            if ((search_messages_text == null) || (search_messages_text.length() == 0))
+            {
+                c = orma.selectFromMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
+                        count();
+            }
+            else
+            {
+                /*
+                 searching for case-IN-sensitive non ascii chars is not working:
+
+                 https://sqlite.org/lang_expr.html#like
+
+                 Important Note: SQLite only understands upper/lower case for ASCII characters by default.
+                 The LIKE operator is case sensitive by default for unicode characters that are beyond
+                 the ASCII range. For example, the expression 'a' LIKE 'A' is TRUE but 'æ' LIKE 'Æ' is FALSE
+                 */
+                c = orma.selectFromMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
+                        where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                        count();
+            }
+        }
+        return c;
     }
 
     synchronized void modify_message(final Message m)
