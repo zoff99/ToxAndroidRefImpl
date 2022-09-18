@@ -350,4 +350,20 @@
     <string name="MainActivity_setup_push_tip_text">Du hast die Push-Benachrichtigungs-App nicht installiert und die Push-Benachrichtigung nicht eingerichtet. TRIfA funktioniert auch ohne Push-Benachrichtigung, aber es muss ständig online sein, um Nachrichten zu empfangen. Mit Push-Benachrichtigung kannst du Akku und Internetbandbreite sparen.
 \n
 \nMöchtest du sehen, wie du die Push-Benachrichtigung jetzt einrichten kannst\?</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Legen Sie die Anzahl der Nachrichten fest, die pro Seite angezeigt werden sollen. 0 bedeutet kein Paging</string>
+    <string name="join_group_activity_join">Gruppe beitreten</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Nachrichten-Paging</string>
+    <string name="pref_title_allow_push_server_ntfy">ntfy.sh Server zulassen</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">Öffnen von Dateien aus verschlüsseltem Speicher</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC - Neue Gruppenchats</string>
+    <string name="pref_description_enable_ngc_features">!! Experimentell !!
+\nDas funktioniert NICHT, NICHT aktivieren !!</string>
+    <string name="join_public_activity_name">Öffentliche Gruppe beitreten</string>
+    <string name="group_message_list_activity_name">Gruppe</string>
+    <string name="title_activity_groupinfo">Gruppeninfo</string>
+    <string name="pref_title_custom_bootstrap_nodes">Benutzerdefinierte Bootstrap-Knoten verwenden</string>
+    <string name="add_group_activity_name">Private Gruppe erstellen</string>
+    <string name="add_public_group_activity_name">Öffentliche Gruppe erstellen</string>
+    <string name="title_activity_grouppeerinfo">Gruppen-Peerinfo</string>
+    <string name="add_group_activity_add">Gruppe erstellen</string>
 </resources>

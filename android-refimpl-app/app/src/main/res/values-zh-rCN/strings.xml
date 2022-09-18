@@ -430,4 +430,6 @@
     <string name="pref_description_enable_ngc_features">!! 实验性 !! 
 \n这不起作用，请勿激活！！</string>
     <string name="incoming_filetransfer_size_too_large">传入的文件太大。 只能接收最大 2 GBytes 的文件。</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">每页消息数</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">设置每页显示的消息数。0 表示不分页</string>
 </resources>
