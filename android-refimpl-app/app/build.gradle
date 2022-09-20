@@ -113,6 +113,7 @@ android {
         exclude 'kotlin/*'
         exclude 'kotlin'
         exclude 'META-INF/kotlin*'
+        exclude 'META-INF/*.kotlin_module'
         exclude 'META-INF/annotation-experimental_release.kotlin_module'
         exclude 'META-INF/app_release.kotlin_module'
         exclude 'META-INF/app_debug.kotlin_module'
@@ -133,6 +134,7 @@ android {
         exclude 'META-INF/services/kotlinx.coroutines.internal.MainDispatcherFactory'
         exclude 'META-INF/slidingpanelayout_release.kotlin_module'
         exclude 'META-INF/window_release.kotlin_module'
+        exclude 'META-INF/fastscroll_release.kotlin_module'
         //
         exclude 'lib/armeabi/libRSSupport.so'
         exclude 'lib/armeabi/librsjni.so'
