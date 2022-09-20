@@ -303,4 +303,6 @@
     <string name="pref_description_enable_ngc_features">!! Experimental !!
 \nIsso NÃO está funcionando, NÃO ative !!</string>
     <string name="incoming_filetransfer_size_too_large">O arquivo a ser recebido é muito grande. Somente arquivos de até 2 GBytes podem ser recebidos.</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Paginação de Mensagens</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Define o número de mensagens a serem exibidas por página. 0 significa sem paginação</string>
 </resources>

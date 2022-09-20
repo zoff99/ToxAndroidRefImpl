@@ -417,4 +417,6 @@
     <string name="pref_description_allow_push_server_ntfy">AVERTISSEMENT : si vous autorisez le serveur ntfy.sh pour les notifications push, cela peut entraîner une fuite de vos métadonnées d\'horodatage lorsque vous recevez des notifications push, si un ami s\'abonne avec votre jeton push. Le ntfy.sh n\'a AUCUN mot de passe et AUCUNE authentification. Vous avez été prévenu.</string>
     <string name="pref_description_enable_ngc_features">! ! Expérimental ! !
 \nCela ne fonctionne PAS, NE PAS activer ! !</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Pagination des messages</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Défine le nombre de messages à afficher par page. 0 signifie pas de pagination</string>
 </resources>
