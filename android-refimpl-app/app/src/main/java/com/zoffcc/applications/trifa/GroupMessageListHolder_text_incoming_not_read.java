@@ -59,6 +59,7 @@ import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
@@ -225,7 +226,23 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         // Log.i(TAG, "is_system_message=" + is_system_message + " message__tox_peerpubkey=" + message__tox_peerpubkey);
 
         is_selected = false;
-        layout_message_container.setBackgroundColor(Color.TRANSPARENT);
+        if (selected_group_messages.isEmpty())
+        {
+            is_selected = false;
+        }
+        else
+        {
+            is_selected = selected_group_messages.contains(m.id);
+        }
+
+        if (is_selected)
+        {
+            layout_message_container.setBackgroundColor(Color.GRAY);
+        }
+        else
+        {
+            layout_message_container.setBackgroundColor(Color.TRANSPARENT);
+        }
 
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
@@ -751,7 +768,7 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         @Override
         public void onClick(final View v)
         {
-            // is_selected = GroupMessageListActivity.onClick_message_helper(v, is_selected, message_);
+            is_selected = GroupMessageListActivity.onClick_message_helper(v, is_selected, message_);
         }
     };
 
@@ -760,11 +777,10 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         @Override
         public boolean onLongClick(final View v)
         {
-            //GroupMessageListActivity.long_click_message_return res = GroupMessageListActivity.onLongClick_message_helper(
-            //        context, v, is_selected, message_);
-            //is_selected = res.is_selected;
-            //return res.ret_value;
-            return false;
+            GroupMessageListActivity.long_click_message_return res = GroupMessageListActivity.onLongClick_message_helper(
+                    context, v, is_selected, message_);
+            is_selected = res.is_selected;
+            return res.ret_value;
         }
     };
 

@@ -72,7 +72,7 @@ public class GroupMessageListHolder_error extends RecyclerView.ViewHolder
         @Override
         public void onClick(final View v)
         {
-            // is_selected = GroupMessageListActivity.onClick_message_helper(v, is_selected, message_);
+            is_selected = GroupMessageListActivity.onClick_message_helper(v, is_selected, message_);
         }
     };
 
@@ -81,10 +81,10 @@ public class GroupMessageListHolder_error extends RecyclerView.ViewHolder
         @Override
         public boolean onLongClick(final View v)
         {
-            // GroupMessageListActivity.long_click_message_return res = GroupMessageListActivity.onLongClick_message_helper(context, v, is_selected, message_);
-            // is_selected = res.is_selected;
-            // return res.ret_value;
-            return false;
+            GroupMessageListActivity.long_click_message_return res = GroupMessageListActivity.onLongClick_message_helper(
+                    context, v, is_selected, message_);
+            is_selected = res.is_selected;
+            return res.ret_value;
         }
     };
 }

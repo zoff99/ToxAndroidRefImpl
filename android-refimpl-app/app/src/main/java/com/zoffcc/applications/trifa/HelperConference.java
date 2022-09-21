@@ -105,9 +105,69 @@ public class HelperConference
         }
     }
 
+    static void copy_selected_group_messages(Context c)
+    {
+        try
+        {
+            if (!MainActivity.selected_group_messages.isEmpty())
+            {
+                // sort ascending (lowest ID on top)
+                Collections.sort(MainActivity.selected_group_messages, new Comparator<Long>()
+                {
+                    public int compare(Long o1, Long o2)
+                    {
+                        return o1.compareTo(o2);
+                    }
+                });
+                StringBuilder copy_text = new StringBuilder();
+                boolean first = true;
+                Iterator i = MainActivity.selected_group_messages.iterator();
+
+                while (i.hasNext())
+                {
+                    try
+                    {
+                        if (first)
+                        {
+                            first = false;
+                            copy_text = new StringBuilder(
+                                    "" + orma.selectFromGroupMessage().idEq((Long) i.next()).get(0).text);
+                        }
+                        else
+                        {
+                            copy_text.append("\n").append(
+                                    orma.selectFromGroupMessage().idEq((Long) i.next()).get(0).text);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+
+                MainActivity.clipboard.setPrimaryClip(ClipData.newPlainText("", copy_text.toString()));
+                Toast.makeText(c, "copied to Clipboard", Toast.LENGTH_SHORT).show();
+                MainActivity.selected_group_messages.clear();
+
+                try
+                {
+                    // need to redraw all items again here, to remove the selections
+                    MainActivity.group_message_list_fragment.adapter.redraw_all_items();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
+    }
+
     static void delete_selected_conference_messages(Context c, final boolean update_conf_message_list, final String dialog_text)
     {
-        // TODO: write me!
         ProgressDialog progressDialog2 = null;
 
         try
@@ -115,6 +175,22 @@ public class HelperConference
             new MainActivity.delete_selected_conference_messages_asynchtask(c, progressDialog2,
                                                                             update_conf_message_list,
                                                                             dialog_text).execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "delete_selected_conference_messages:EE2:" + e.getMessage());
+        }
+    }
+
+    static void delete_selected_group_messages(Context c, final boolean update_group_message_list, final String dialog_text)
+    {
+        ProgressDialog progressDialog2 = null;
+
+        try
+        {
+            new MainActivity.delete_selected_group_messages_asynchtask(c, progressDialog2, update_group_message_list,
+                                                                       dialog_text).execute();
         }
         catch (Exception e)
         {

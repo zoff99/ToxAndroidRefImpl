@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -780,10 +781,127 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
     }
 
+    static boolean onClick_message_helper(final View v, boolean is_selected, final GroupMessage message_)
+    {
+        try
+        {
+            if (is_selected)
+            {
+                v.setBackgroundColor(Color.TRANSPARENT);
+                is_selected = false;
+                selected_group_messages.remove(message_.id);
+                if (selected_group_messages.size() == 1)
+                {
+                    amode_info_menu_item.setVisible(true);
+                }
+                else
+                {
+                    amode_info_menu_item.setVisible(false);
+                }
+
+                if (selected_group_messages.isEmpty())
+                {
+                    // last item was de-selected
+                    amode.finish();
+                }
+                else
+                {
+                    if (amode != null)
+                    {
+                        amode.setTitle("" + selected_group_messages.size() + " selected");
+                    }
+                }
+            }
+            else
+            {
+                if (!selected_group_messages.isEmpty())
+                {
+                    v.setBackgroundColor(Color.GRAY);
+                    is_selected = true;
+                    selected_group_messages.add(message_.id);
+
+                    if (selected_group_messages.size() == 1)
+                    {
+                        amode_info_menu_item.setVisible(true);
+                    }
+                    else
+                    {
+                        amode_info_menu_item.setVisible(false);
+                    }
+
+                    if (amode != null)
+                    {
+                        amode.setTitle("" + selected_group_messages.size() + " selected");
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        return is_selected;
+    }
+
     static class long_click_message_return
     {
         boolean is_selected;
         boolean ret_value;
+    }
+
+    static GroupMessageListActivity.long_click_message_return onLongClick_message_helper(Context context, final View v, boolean is_selected, final GroupMessage message_)
+    {
+        GroupMessageListActivity.long_click_message_return ret = new GroupMessageListActivity.long_click_message_return();
+
+        try
+        {
+            if (is_selected)
+            {
+                ret.is_selected = true;
+            }
+            else
+            {
+                if (selected_group_messages.isEmpty())
+                {
+                    try
+                    {
+                        amode = MainActivity.group_message_list_activity.startSupportActionMode(
+                                new ToolbarActionMode(context));
+                        amode_info_menu_item = amode.getMenu().findItem(R.id.action_info);
+                        v.setBackgroundColor(Color.GRAY);
+                        ret.is_selected = true;
+                        selected_group_messages.add(message_.id);
+
+                        if (selected_group_messages.size() == 1)
+                        {
+                            amode_info_menu_item.setVisible(true);
+                        }
+                        else
+                        {
+                            amode_info_menu_item.setVisible(false);
+                        }
+
+                        if (amode != null)
+                        {
+                            amode.setTitle("" + selected_group_messages.size() + " selected");
+                        }
+                        ret.ret_value = true;
+                        return ret;
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        ret.ret_value = true;
+        return ret;
     }
 
     @Override

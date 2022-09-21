@@ -8098,6 +8098,159 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static class delete_selected_group_messages_asynchtask extends AsyncTask<Void, Void, String>
+    {
+        ProgressDialog progressDialog2;
+        private WeakReference<Context> weakContext;
+        boolean update_group_message_list = false;
+        String dialog_text = "";
+
+        delete_selected_group_messages_asynchtask(Context c, ProgressDialog progressDialog2, boolean update_group_message_list, String dialog_text)
+        {
+            this.weakContext = new WeakReference<>(c);
+            this.progressDialog2 = progressDialog2;
+            this.update_group_message_list = update_group_message_list;
+            this.dialog_text = dialog_text;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids)
+        {
+            // sort ascending (lowest ID on top)
+            Collections.sort(selected_group_messages, new Comparator<Long>()
+            {
+                public int compare(Long o1, Long o2)
+                {
+                    return o1.compareTo(o2);
+                }
+            });
+            Iterator i = selected_group_messages.iterator();
+
+            while (i.hasNext())
+            {
+                try
+                {
+                    long mid = (Long) i.next();
+                    final GroupMessage m_to_delete = orma.selectFromGroupMessage().idEq(mid).get(0);
+
+                    // ---------- delete the message itself ----------
+                    try
+                    {
+                        long message_id_to_delete = m_to_delete.id;
+
+                        try
+                        {
+                            if (update_group_message_list)
+                            {
+                                Runnable myRunnable = new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            MainActivity.group_message_list_fragment.adapter.remove_item(m_to_delete);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                };
+
+                                if (main_handler_s != null)
+                                {
+                                    main_handler_s.post(myRunnable);
+                                }
+                            }
+
+                            // let message delete animation finish (maybe use yet another asynctask here?) ------------
+                            try
+                            {
+                                if (update_group_message_list)
+                                {
+                                    Thread.sleep(50);
+                                }
+                            }
+                            catch (Exception sleep_ex)
+                            {
+                                sleep_ex.printStackTrace();
+                            }
+
+                            // let message delete animation finish (maybe use yet another asynctask here?) ------------
+                            orma.deleteFromConferenceMessage().idEq(message_id_to_delete).execute();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "delete_selected_group_messages_asynchtask:EE1:" + e.getMessage());
+                        }
+                    }
+                    catch (Exception e2)
+                    {
+                        e2.printStackTrace();
+                        Log.i(TAG, "delete_selected_group_messages_asynchtask:EE2:" + e2.getMessage());
+                    }
+
+                    // ---------- delete the message itself ----------
+                }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                    Log.i(TAG, "delete_selected_group_messages_asynchtask:EE3:" + e2.getMessage());
+                }
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            selected_group_messages.clear();
+
+            try
+            {
+                progressDialog2.dismiss();
+                Context c = weakContext.get();
+                Toast.makeText(c, R.string.MainActivity_toast_msgs_deleted, Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e4)
+            {
+                e4.printStackTrace();
+                Log.i(TAG, "delete_selected_group_messages_asynchtask:EE3:" + e4.getMessage());
+            }
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+            super.onPreExecute();
+
+            if (this.progressDialog2 == null)
+            {
+                try
+                {
+                    Context c = weakContext.get();
+                    progressDialog2 = ProgressDialog.show(c, "", dialog_text);
+                    progressDialog2.setCanceledOnTouchOutside(false);
+                    progressDialog2.setOnCancelListener(new DialogInterface.OnCancelListener()
+                    {
+                        @Override
+                        public void onCancel(DialogInterface dialog)
+                        {
+                        }
+                    });
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                    Log.i(TAG, "onPreExecute:start:EE:" + e.getMessage());
+                }
+            }
+        }
+    }
+
     static class send_message_result
     {
         long msg_num;

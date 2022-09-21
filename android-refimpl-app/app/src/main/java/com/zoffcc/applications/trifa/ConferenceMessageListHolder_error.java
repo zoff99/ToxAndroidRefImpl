@@ -21,7 +21,6 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Context;
 import android.graphics.Color;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,7 +28,9 @@ import android.view.ViewGroup;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import androidx.recyclerview.widget.RecyclerView;
+
+import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 
 public class ConferenceMessageListHolder_error extends RecyclerView.ViewHolder
 {
@@ -58,13 +59,13 @@ public class ConferenceMessageListHolder_error extends RecyclerView.ViewHolder
         message_ = m;
 
         is_selected = false;
-        if (selected_messages.isEmpty())
+        if (selected_conference_messages.isEmpty())
         {
             is_selected = false;
         }
         else
         {
-            is_selected = selected_messages.contains(m.id);
+            is_selected = selected_conference_messages.contains(m.id);
         }
 
         if (is_selected)
@@ -94,7 +95,8 @@ public class ConferenceMessageListHolder_error extends RecyclerView.ViewHolder
         @Override
         public boolean onLongClick(final View v)
         {
-            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(context, v, is_selected, message_);
+            ConferenceMessageListActivity.long_click_message_return res = ConferenceMessageListActivity.onLongClick_message_helper(
+                    context, v, is_selected, message_);
             is_selected = res.is_selected;
             return res.ret_value;
         }

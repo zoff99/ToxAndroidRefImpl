@@ -63,7 +63,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_ONLY_EMOJI_SIZE;
@@ -219,13 +219,13 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         // Log.i(TAG, "is_system_message=" + is_system_message + " message__tox_peerpubkey=" + message__tox_peerpubkey);
 
         is_selected = false;
-        if (selected_messages.isEmpty())
+        if (selected_conference_messages.isEmpty())
         {
             is_selected = false;
         }
         else
         {
-            is_selected = selected_messages.contains(m.id);
+            is_selected = selected_conference_messages.contains(m.id);
         }
 
         if (is_selected)
@@ -248,6 +248,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
                 layout_message_container.performClick();
             }
         });
+
         textView.setOnLongClickListener(new View.OnLongClickListener()
         {
             @Override

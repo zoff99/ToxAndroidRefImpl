@@ -29,13 +29,17 @@ import androidx.appcompat.view.ActionMode;
 import androidx.core.view.MenuItemCompat;
 
 import static com.zoffcc.applications.trifa.HelperConference.copy_selected_conference_messages;
+import static com.zoffcc.applications.trifa.HelperConference.copy_selected_group_messages;
 import static com.zoffcc.applications.trifa.HelperConference.delete_selected_conference_messages;
+import static com.zoffcc.applications.trifa.HelperConference.delete_selected_group_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.copy_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.delete_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.save_selected_messages;
 import static com.zoffcc.applications.trifa.HelperMessage.show_select_conference_message_info;
+import static com.zoffcc.applications.trifa.HelperMessage.show_select_group_message_info;
 import static com.zoffcc.applications.trifa.HelperMessage.show_select_message_info;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
@@ -96,14 +100,22 @@ public class ToolbarActionMode implements ActionMode.Callback
                 // Toast.makeText(context, "You selected Delete menu.", Toast.LENGTH_SHORT).show(); // Show toast
                 if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
                 {
-                    // normal chat view
-                    delete_selected_messages(context, true, false, "deleting Messages ...");
+
+                    if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
+                    {
+                        // normal chat view
+                        delete_selected_messages(context, true, false, "deleting Messages ...");
+                    }
+                    else
+                    {
+                        // group chat view
+                        delete_selected_group_messages(context, true, "deleting Messages ...");
+                    }
                 }
                 else
                 {
                     // conference view
                     delete_selected_conference_messages(context, true, "deleting Messages ...");
-                    // TODO: write me
                 }
                 mode.finish(); // Finish action mode
                 break;
@@ -113,8 +125,16 @@ public class ToolbarActionMode implements ActionMode.Callback
                 // Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show(); // Show toast
                 if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
                 {
-                    // normal chat view
-                    copy_selected_messages(context);
+                    if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
+                    {
+                        // normal chat view
+                        copy_selected_messages(context);
+                    }
+                    else
+                    {
+                        // group chat view
+                        copy_selected_group_messages(context);
+                    }
                 }
                 else
                 {
@@ -136,8 +156,16 @@ public class ToolbarActionMode implements ActionMode.Callback
 
                 if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
                 {
-                    // normal chat view
-                    show_select_message_info(context);
+                    if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
+                    {
+                        // normal chat view
+                        show_select_message_info(context);
+                    }
+                    else
+                    {
+                        // group chat view
+                        show_select_group_message_info(context);
+                    }
                 }
                 else
                 {
@@ -159,6 +187,8 @@ public class ToolbarActionMode implements ActionMode.Callback
             {
                 selected_conference_messages.clear();
 
+                selected_group_messages.clear();
+
                 selected_messages.clear();
                 selected_messages_incoming_file.clear();
                 selected_messages_text_only.clear();
@@ -169,6 +199,19 @@ public class ToolbarActionMode implements ActionMode.Callback
                     {
                         // need to redraw all items again here, to remove the selections
                         MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    if (MainActivity.group_message_list_fragment != null)
+                    {
+                        // need to redraw all items again here, to remove the selections
+                        MainActivity.group_message_list_fragment.adapter.redraw_all_items();
                     }
                 }
                 catch (Exception e)
@@ -190,11 +233,43 @@ public class ToolbarActionMode implements ActionMode.Callback
                 }
             }
 
-            if (amode != null)
+            try
             {
-                amode = null;
-                amode_save_menu_item = null;
-                amode_info_menu_item = null;
+                if (amode != null)
+                {
+                    amode = null;
+                    amode_save_menu_item = null;
+                    amode_info_menu_item = null;
+                }
+            }
+            catch (Exception ignored)
+            {
+            }
+
+            try
+            {
+                if (GroupMessageListActivity.amode != null)
+                {
+                    GroupMessageListActivity.amode = null;
+                    GroupMessageListActivity.amode_save_menu_item = null;
+                    GroupMessageListActivity.amode_info_menu_item = null;
+                }
+            }
+            catch (Exception ignored)
+            {
+            }
+
+            try
+            {
+                if (ConferenceMessageListActivity.amode != null)
+                {
+                    ConferenceMessageListActivity.amode = null;
+                    ConferenceMessageListActivity.amode_save_menu_item = null;
+                    ConferenceMessageListActivity.amode_info_menu_item = null;
+                }
+            }
+            catch (Exception ignored)
+            {
             }
         }
         catch (Exception e)

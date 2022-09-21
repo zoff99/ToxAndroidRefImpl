@@ -126,6 +126,7 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
                 layout_message_container.performClick();
             }
         });
+
         textView.setOnLongClickListener(new View.OnLongClickListener()
         {
             @Override
