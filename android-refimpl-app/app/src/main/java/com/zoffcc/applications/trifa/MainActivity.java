@@ -5077,6 +5077,8 @@ public class MainActivity extends AppCompatActivity
         //            " friend request message:" + friend_request_message);
         String friend_public_key__ = friend_public_key.substring(0, TOX_PUBLIC_KEY_SIZE * 2);
         HelperFriend.add_friend_to_system(friend_public_key__.toUpperCase(), false, null);
+
+        display_toast(context_s.getString(R.string.invite_friend_success), false, 300);
     }
 
     static void android_tox_callback_friend_message_v2_cb_method(long friend_number, String friend_message, long length, long ts_sec, long ts_ms, byte[] raw_message, long raw_message_length)
@@ -6548,6 +6550,8 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "conference_invite_cb:toxav_groupchat_disable_av result=" + result);
         }
 
+        display_toast(context_s.getString(R.string.invite_join_conference_success), false, 300);
+
         cache_confid_confnum.clear();
 
         Log.i(TAG, "conference_invite_cb:tox_conference_join res=" + conference_num);
@@ -7060,6 +7064,8 @@ public class MainActivity extends AppCompatActivity
 
         if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
         {
+            display_toast(context_s.getString(R.string.invite_join_group_success), false, 300);
+
             // TODO: get real group_identifier and privacy_state, get it via API call
             String group_identifier = bytes_to_hex(Arrays.copyOfRange(invite_data, 0, GROUP_ID_LENGTH));
             HelperGroup.add_group_wrapper(friend_number, new_group_num, group_identifier, 0);
