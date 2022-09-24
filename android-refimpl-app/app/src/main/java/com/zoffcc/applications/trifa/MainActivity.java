@@ -185,6 +185,7 @@ import static com.zoffcc.applications.trifa.HelperRelay.invite_to_conference_own
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_group_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
+import static com.zoffcc.applications.trifa.HelperRelay.send_all_friend_pubkeys_to_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.send_pushtoken_to_relay;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -4704,6 +4705,7 @@ public class MainActivity extends AppCompatActivity
                             {
                                 HelperRelay.invite_to_all_conferences_own_relay(HelperRelay.get_own_relay_pubkey());
                                 HelperRelay.invite_to_all_groups_own_relay(HelperRelay.get_own_relay_pubkey());
+                                HelperRelay.send_all_friend_pubkeys_to_relay(HelperRelay.get_own_relay_pubkey());
                             }
                         }
 
