@@ -185,7 +185,6 @@ import static com.zoffcc.applications.trifa.HelperRelay.invite_to_conference_own
 import static com.zoffcc.applications.trifa.HelperRelay.invite_to_group_own_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
-import static com.zoffcc.applications.trifa.HelperRelay.send_all_friend_pubkeys_to_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.send_pushtoken_to_relay;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
@@ -3357,6 +3356,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native String tox_group_peer_get_public_key(long group_number, long peer_id);
 
+    public static native long tox_group_peer_by_public_key(long group_number, @NonNull String peer_public_key_string);
+
     public static native String tox_group_peer_get_name(long group_number, long peer_id);
 
     public static native String tox_group_get_name(long group_number);
@@ -3403,9 +3404,28 @@ public class MainActivity extends AppCompatActivity
      * @param peer_id      The ID of the peer the message is intended for.
      * @param message      A non-NULL pointer to the first element of a byte array
      *                     containing the message text.
-     * @return message_id on success or < 0 on error
+     * @return 0 on success. return < 0 on error.
      */
     public static native int tox_group_send_private_message(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, @NonNull String message);
+
+    /**
+     * Send a text chat message to the specified peer in the specified group.
+     * <p>
+     * This function creates a group private message packet and pushes it into the send
+     * queue.
+     * <p>
+     * The message length may not exceed TOX_MAX_MESSAGE_LENGTH. Larger messages
+     * must be split by the client and sent as separate messages. Other clients can
+     * then reassemble the fragments. Messages may not be empty.
+     *
+     * @param group_number The group number of the group the message is intended for.
+     * @param peer_public_key_string   A memory region of at least TOX_PUBLIC_KEY_SIZE bytes of the peer the
+     *                     message is intended for. If this parameter is NULL, this function will return false.
+     * @param message      A non-NULL pointer to the first element of a byte array
+     *                     containing the message text.
+     * @return 0 on success. return < 0 on error.
+     */
+    public static native int tox_group_send_private_message_by_peerpubkey(long group_number, @NonNull String peer_public_key_string, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
     /**
      * Accept an invite to a group chat that the client previously received from a friend. The invite

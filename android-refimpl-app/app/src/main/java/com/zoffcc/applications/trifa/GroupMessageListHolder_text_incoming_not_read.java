@@ -133,6 +133,18 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         String message__tox_peername = m.tox_group_peername;
         String message__tox_peerpubkey = m.tox_group_peer_pubkey;
 
+        /*
+        try
+        {
+            message__text = message__text + "\npeerid=" +
+                            tox_group_peer_by_public_key(tox_group_by_groupid__wrapper(m.group_identifier),
+                                                         m.tox_group_peer_pubkey);
+        }
+        catch (Exception e)
+        {
+        }
+        */
+
         boolean handle_special_name = false;
 
         name_test_pk res = correct_pubkey(m);

@@ -45,6 +45,7 @@ import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_searc
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGES_TIMEDELTA_NO_TIMESTAMP_MS;
@@ -89,6 +90,59 @@ public class GroupMessageListHolder_text_outgoing_read extends RecyclerView.View
     public void bindMessageList(GroupMessage m)
     {
         message_ = m;
+
+        String message__text = m.text;
+
+        if (m.private_message == 1)
+        {
+            try
+            {
+                if ((m.sent_privately_to_tox_group_peer_pubkey == null) ||
+                    (m.sent_privately_to_tox_group_peer_pubkey.length() < 10))
+                {
+                    message__text = "Private Message to " + "*unknown*" + ":\n" + m.text;
+                }
+                else
+                {
+                    String display_peer_name = "*unknown*";
+
+                    try
+                    {
+                        String peer_name_pubkey_part = m.sent_privately_to_tox_group_peer_pubkey.substring(
+                                (m.sent_privately_to_tox_group_peer_pubkey.length() - 6),
+                                m.sent_privately_to_tox_group_peer_pubkey.length());
+
+
+                        String peer_name_name_part = tox_group_peer_get_name__wrapper(m.group_identifier,
+                                                                                      m.sent_privately_to_tox_group_peer_pubkey);
+
+                        if (peer_name_name_part == null)
+                        {
+                            peer_name_name_part = display_peer_name;
+                        }
+                        else
+                        {
+                            if (peer_name_name_part.equals("-1"))
+                            {
+                                peer_name_name_part = display_peer_name;
+                            }
+                        }
+
+                        display_peer_name = peer_name_name_part + " / " + peer_name_pubkey_part;
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    message__text = "Private Message to " + display_peer_name + ":\n" + m.text;
+                }
+            }
+            catch (Exception e)
+            {
+                message__text = "Private Message to " + "*unknown*" + ":\n" + m.text;
+            }
+        }
 
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
 
@@ -137,7 +191,7 @@ public class GroupMessageListHolder_text_outgoing_read extends RecyclerView.View
         textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
                                  AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
 
-        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
+        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(message__text))
         {
             // text consits only of emojis -> increase size
             textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_ONLY_EMOJI_SIZE[PREF__global_font_size]));
@@ -149,11 +203,11 @@ public class GroupMessageListHolder_text_outgoing_read extends RecyclerView.View
 
         if ((group_search_messages_text == null) || (group_search_messages_text.length() == 0))
         {
-            textView.setAutoLinkText(m.text);
+            textView.setAutoLinkText(message__text);
         }
         else
         {
-            textView.setAutoLinkTextHighlight(m.text, group_search_messages_text);
+            textView.setAutoLinkTextHighlight(message__text, group_search_messages_text);
         }
 
         date_time.setText(long_date_time_format(m.sent_timestamp));

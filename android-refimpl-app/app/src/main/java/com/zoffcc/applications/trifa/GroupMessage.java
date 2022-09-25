@@ -86,6 +86,10 @@ public class GroupMessage
     @Nullable
     String msg_id_hash = null; // 32byte hash
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String sent_privately_to_tox_group_peer_pubkey = null;
+
     static GroupMessage deep_copy(GroupMessage in)
     {
         GroupMessage out = new GroupMessage();
@@ -105,6 +109,7 @@ public class GroupMessage
         out.tox_group_peername = in.tox_group_peername;
         out.was_synced = in.was_synced;
         out.msg_id_hash = in.msg_id_hash;
+        out.sent_privately_to_tox_group_peer_pubkey = in.sent_privately_to_tox_group_peer_pubkey;
 
         return out;
     }
