@@ -3336,6 +3336,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_group_self_get_role(long group_number);
 
+    public static native int tox_group_peer_get_role(long group_number, long peer_id);
+
     public static native int tox_group_get_chat_id(long group_number, @NonNull ByteBuffer chat_id_buffer);
 
     public static native long tox_group_get_number_groups();
