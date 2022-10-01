@@ -369,18 +369,21 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
+    // HINT: can't update because of:
+    // https://github.com/vanniktech/Emoji/pull/465
+    // minSdk 21, targetSdk 29 & update all of the dependencies
     implementation('com.vanniktech:emoji-google:0.7.0') {
         exclude group: 'com.android.support'
     }
     //
-    implementation('com.github.bumptech.glide:glide:4.13.2') {
+    implementation('com.github.bumptech.glide:glide:4.14.1') {
         exclude group: 'com.android.support'
     }
-    annotationProcessor 'com.github.bumptech.glide:compiler:4.13.2'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.14.1'
     //
     //
     //
-    implementation 'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.85'
+    implementation 'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.86'
     //
     //
     //
