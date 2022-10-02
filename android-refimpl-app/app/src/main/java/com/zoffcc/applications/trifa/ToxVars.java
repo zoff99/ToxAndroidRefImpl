@@ -1734,6 +1734,27 @@ public class ToxVars
             }
             return "UNKNOWN";
         }
+
+        public static String value_char(int value)
+        {
+            if (value == TOX_GROUP_ROLE_FOUNDER.value)
+            {
+                return "F";
+            }
+            else if (value == TOX_GROUP_ROLE_MODERATOR.value)
+            {
+                return "M";
+            }
+            else if (value == TOX_GROUP_ROLE_USER.value)
+            {
+                return "u";
+            }
+            else if (value == TOX_GROUP_ROLE_OBSERVER.value)
+            {
+                return "_";
+            }
+            return "x";
+        }
     }
 
     // ---------- TOX -------------

@@ -54,6 +54,8 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
+import java.util.Map;
+
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
@@ -66,6 +68,7 @@ import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_searc
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
+import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
@@ -88,6 +91,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -480,10 +484,24 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, peers[(int) i]);
                         String peer_name = tox_group_peer_get_name(conference_num, peers[(int) i]);
+
+                        int peerrole = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value;
+                        try
+                        {
+                            peerrole = tox_group_peer_get_role(conference_num,
+                                                               get_group_peernum_from_peer_pubkey(group_id,
+                                                                                                  peer_pubkey_temp));
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
                         // Log.i(TAG,
                         //      "groupnum=" + conference_num + " peernum=" + peers[(int) i] + " peer_name=" + peer_name);
                         String peer_name_temp =
-                                "" + peer_name + " :" + peers[(int) i] + ": " + peer_pubkey_temp.substring(0, 6);
+                                ToxVars.Tox_Group_Role.value_char(peerrole) + " " + peer_name + " :" + peers[(int) i] +
+                                ": " + peer_pubkey_temp.substring(0, 6);
 
                         add_group_user(peer_pubkey_temp, i, peer_name_temp,
                                        tox_group_peer_get_connection_status(conference_num, peers[(int) i]));
