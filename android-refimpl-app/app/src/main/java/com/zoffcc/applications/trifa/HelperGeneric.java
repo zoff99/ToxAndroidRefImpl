@@ -4101,21 +4101,84 @@ public class HelperGeneric
     {
         try
         {
-            int toast_length = Toast.LENGTH_SHORT;
+            int toast_length_ = Toast.LENGTH_SHORT;
 
             if (length_long)
             {
-                toast_length = Toast.LENGTH_LONG;
+                toast_length_ = Toast.LENGTH_LONG;
             }
+
+            final int toast_length = toast_length_;
 
             if (delay_ms == 0)
             {
-                Toast.makeText(c, toast_text, toast_length).show();
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Toast.makeText(c, toast_text, toast_length).show();
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
             }
             else
             {
-                final int toast_length2 = toast_length;
-                new Handler().postDelayed(() -> Toast.makeText(c, toast_text, toast_length2).show(), delay_ms);
+                try
+                {
+                    Thread t = new Thread()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                sleep(delay_ms);
+                            }
+                            catch (Exception e2)
+                            {
+                                e2.printStackTrace();
+                            }
+
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        Toast.makeText(c, toast_text, toast_length).show();
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+
+                            if (main_handler_s != null)
+                            {
+                                main_handler_s.post(myRunnable);
+                            }
+                        }
+                    };
+                    t.start();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         }
         catch (Exception e)
