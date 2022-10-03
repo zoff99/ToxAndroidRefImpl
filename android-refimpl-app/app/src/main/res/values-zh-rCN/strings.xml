@@ -432,4 +432,7 @@
     <string name="incoming_filetransfer_size_too_large">传入的文件太大。 只能接收最大 2 GBytes 的文件。</string>
     <string name="pref_title_message_paging_num_msgs_per_page">每页消息数</string>
     <string name="pref_description_message_paging_num_msgs_per_page">设置每页显示的消息数。0 表示不分页</string>
+    <string name="invite_join_conference_success">你已应邀加入会议群</string>
+    <string name="invite_friend_success">你收到了好友请求</string>
+    <string name="invite_join_group_success">你已应邀进群</string>
 </resources>
