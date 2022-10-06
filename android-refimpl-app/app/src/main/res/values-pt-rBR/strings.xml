@@ -305,4 +305,7 @@
     <string name="incoming_filetransfer_size_too_large">O arquivo a ser recebido é muito grande. Somente arquivos de até 2 GBytes podem ser recebidos.</string>
     <string name="pref_title_message_paging_num_msgs_per_page">Paginação de Mensagens</string>
     <string name="pref_description_message_paging_num_msgs_per_page">Define o número de mensagens a serem exibidas por página. 0 significa sem paginação</string>
+    <string name="invite_friend_success">Você recebeu um Pedido de Amizade</string>
+    <string name="invite_join_conference_success">Você foi convidado para um Grupo de Conferência</string>
+    <string name="invite_join_group_success">Você foi convidado para um Grupo</string>
 </resources>
