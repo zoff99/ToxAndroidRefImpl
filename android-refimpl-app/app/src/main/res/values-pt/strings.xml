@@ -253,4 +253,16 @@
     <string name="layout___capabilities">Capacidades:</string>
     <string name="pref_title_speakerphone_tweak">Correção do alto-falante para chamadas</string>
     <string name="pref_description_speakerphone_tweak">Se a app não mudar para o alto-falante numa chamada, então tente ativar essa correção.</string>
+    <string name="pref_title_custom_bootstrap_nodes">Usar nós Bootstrap Personalizados</string>
+    <string name="add_group_activity_name">Criar Grupo Privado</string>
+    <string name="title_activity_grouppeerinfo">Informação de Par do Grupo</string>
+    <string name="group_message_list_activity_name">Grupo</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">abrir arquivos do armazenamento criptografado</string>
+    <string name="join_public_activity_name">Entrar em Grupo Público</string>
+    <string name="pref_title_allow_push_server_ntfy">Permitir Servidor ntfy.sh</string>
+    <string name="add_public_group_activity_name">Criar Grupo Público</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Paginação de Mensagem</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Definir o número de mensagem para mostrar por página. 0 significa sem paginação</string>
+    <string name="title_activity_groupinfo">Informação do grupo</string>
+    <string name="pref_description_allow_push_server_ntfy">AVISO: Permitir servidor ntfy.sh para notificações push, isso pode vazar seus metadados de carimbo de tempo quando você recebe notificações push, se um(a) amigo(a) inscreve você com token push. ntfy.ah NÃO tem senhas e NÃO tem autenticação. você foi avisado.</string>
 </resources>
