@@ -199,7 +199,7 @@
             android:layout_height="2dp"
             android:layout_gravity="center_vertical"
             android:layout_weight="100"
-            android:background="@color/md_grey_300" />
+            android:background="@color/md_grey_300_seperator" />
 
         <TextView
             android:layout_width="20dp"
