@@ -61,7 +61,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_conference_peer_info);
+        setContentView(R.layout.activity_group_peer_info);
 
         Intent intent = getIntent();
         peer_pubkey = intent.getStringExtra("peer_pubkey");

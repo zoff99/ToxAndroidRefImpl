@@ -109,6 +109,64 @@
                 android:layout_width="match_parent"
                 android:layout_height="20dp" />
 
+            <TextView
+                android:id="@+id/group_peerrole_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:fontFamily="monospace"
+                android:gravity="center_horizontal"
+                android:text="\?\? Unknown Group Role \?\?"
+                android:textIsSelectable="false"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
+            <TextView
+                android:id="@+id/dumm_99"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_weight="800"
+                android:fontFamily="monospace"
+                android:paddingLeft="4dp"
+                android:paddingBottom="15dp"
+                android:text="[DEBUG] send private message:"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:typeface="monospace" />
+
+            <EditText
+                android:id="@+id/group_send_private_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:hint="Private Message"
+                android:imeOptions="flagNoPersonalizedLearning"
+                android:inputType="text"
+                android:textSize="16sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text=""
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
         </LinearLayout>
     </ScrollView>
 
