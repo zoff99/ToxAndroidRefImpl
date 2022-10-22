@@ -250,4 +250,10 @@
     <string name="pref_description_use_camera_x">!! Eksperimentinis !!
 \nVaizdo skambučiuose naudokite „CameraX“ ir pašalinkite foną
 \nTai gali neveikti iki galo, būkite atsargūs ir nepasikliaukite, jog tai suveiks visada!</string>
+    <string name="join_public_activity_name">Prisijungti prie viešos grupės</string>
+    <string name="add_public_group_activity_name">Sukurti viešą grupę</string>
+    <string name="title_activity_groupinfo">Grupės informacija</string>
+    <string name="pref_title_use_incognito_keyboard2">inkognito klaviatūra</string>
+    <string name="add_group_activity_name">Sukurti privačią grupę</string>
+    <string name="group_message_list_activity_name">Grupė</string>
 </resources>
