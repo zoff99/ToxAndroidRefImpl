@@ -17,3 +17,4 @@ Tox yra laisva ir nemokama programinė įranga. Tai reiškia, kad Tox galite lai
 * Apie Tox: https://tox.zoff.cc
 * Prisijunkite prie diskusijos per Matrix: https://matrix.to/#/#trifa:matrix.org
 * Prisijunkite prie Tox IRC kanalo: https://matrix.to/#/#toktok:libera.chat
+<br>
