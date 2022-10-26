@@ -419,4 +419,7 @@
 \nCela ne fonctionne PAS, NE PAS activer ! !</string>
     <string name="pref_title_message_paging_num_msgs_per_page">Pagination des messages</string>
     <string name="pref_description_message_paging_num_msgs_per_page">Défine le nombre de messages à afficher par page. 0 signifie pas de pagination</string>
+    <string name="invite_friend_success">Vous avez reçu une demande d\'amitié</string>
+    <string name="invite_join_conference_success">Vous avez été invité à un groupe de conférence</string>
+    <string name="invite_join_group_success">Vous avez été invité à un groupe</string>
 </resources>
