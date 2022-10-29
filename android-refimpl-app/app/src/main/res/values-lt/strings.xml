@@ -22,7 +22,7 @@
     <string name="pref_description_local_discovery_enabled">Naudotis mazgus vietiniame LAN, kad prijungti bootstrap</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">H264 enkoderis turėtų naudoti intra atnaujinimo kadrus</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">H264 intra atnaujinimas</string>
-    <string name="pref_title_video_uv_reversed">Invertuoti vaizdo UV</string>
+    <string name="pref_title_video_uv_reversed">Apversti vaizdo įrašo UV</string>
     <string name="layout___export">Eksportuoti</string>
     <string name="layout___copy">Kopijuoti</string>
     <string name="layout___online">Prisijungės /-usi</string>
@@ -216,7 +216,7 @@
     <string name="pref_title_toxirc_muted_peers_01">Toxirc Bridge nutildyti vartotojai</string>
     <string name="pref_description_compact_chatlist">Pateikite susirašinėjimus kompaktiškiau taupydami vietą</string>
     <string name="pref_title_compact_chatlist">Suglaudinti susirašinėjimų sąrašą</string>
-    <string name="pref_description_compact_friendlist">Padarykite draugų sąrašą kompaktiškesnį, jei turite didelį jų sąrašą</string>
+    <string name="pref_description_compact_friendlist">Padaryti draugų sąrašą kompaktiškesnį, jei turite didelį jų sąrašą</string>
     <string name="pref_title_compact_friendlist">Suglaudinti draugų sąrašą</string>
     <string name="pref_description_window_security">Įgalinus šį nustatymą, prie veiklų bus pridėta FLAG_SECURE.
 \nTai apsaugos nuo ekrano nuotraukų darymo, ekrano vaizdo įrašinėjimo bei turinio rodymo \"Naujausieji\" peržiūroje</string>
@@ -256,4 +256,56 @@
     <string name="pref_title_use_incognito_keyboard2">inkognito klaviatūra</string>
     <string name="add_group_activity_name">Sukurti privačią grupę</string>
     <string name="group_message_list_activity_name">Grupė</string>
+    <string name="invite_friend_success">Gavote prašymą draugauti</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">Ar norite atšaukti šį failų perdavimą\?</string>
+    <string name="incoming_filetransfer_size_too_large">Gaunamų failų dydis per didelis. Galima priimti tik iki 2 GB dydžio failus.</string>
+    <string name="layout___group_name">Grupės pavadinimas</string>
+    <string name="layout___group_id">Grupės ID</string>
+    <string name="layout___group_id2">Grupės ID:</string>
+    <string name="layout___group_name2">Grupės pavadinimas:</string>
+    <string name="layout___group_mypubjkey2">Mano viešasis raktas:</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">Perjungti pranešimą</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">Ar norite perjungti šio draugo pranešimų garsą\?</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Žinučių kiekis puslapyje</string>
+    <string name="pref_title_allow_push_server_ntfy">Leisti ntfy.sh serverį</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC – nauji grupiniai pokalbiai</string>
+    <string name="pref_description_enable_ngc_features">!! Eksperimentinis !!
+\nTai neveikia, NEAKTYVUOKITE !!!</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Nustatyti žinučių, kurios bus rodomos viename puslapyje, skaičių. 0 reiškia, kad puslapiai nebus rodomi</string>
+    <string name="pref_description_allow_push_server_ntfy">ĮSPĖJIMAS: leidimas ntfy.sh serveriui gauti tiesioginius pranešimus, gali nutekėti jūsų laiko žymų metaduomenys, kai gaunate tiesioginius pranešimus, jei draugas užsiprenumeruoja su jūsų tiesioginiu prieigos raktu. ntfy.sh neturi slaptažodžių ir jame NĖRA autentifikavimo. jūs buvote įspėti.</string>
+    <string name="join_public_group_joined">Jūs prisijungėte prie viešos grupės</string>
+    <string name="add_public_group_failed">Nepavyko sukurti viešos grupės</string>
+    <string name="add_group_activity_add">Sukurti grupę</string>
+    <string name="join_group_activity_join">Prisijungti prie grupės</string>
+    <string name="join_public_group_failed">Nepavyko prisijungti prie viešos grupės</string>
+    <string name="MainActivity_setup_push_tip_text">Neįdiegėte tiesioginių pranešimų programėlės ir nesukonfigūravote tiesioginių pranešimų. TRIfA veiks visiškai be tiesioginių pranešimo, tačiau turės būti nuolat prisijungusi, kad gautų pranešimus. Naudodami tiesioginį pranešimą galite taupyti akumuliatoriaus naudojimą ir interneto pralaidumą.
+\n
+\nAr norite sužinoti, kaip galite nustatyti tiesioginius pranešimus\?</string>
+    <string name="layout___create_new_private_group">Sukurti naują privačią grupę</string>
+    <string name="layout___create_new_public_group">Sukurti naują viešą grupę</string>
+    <string name="layout___join_public_group">Prisijungti prie viešos grupės</string>
+    <string name="add_public_group_success">Sukūrėte viešą grupę</string>
+    <string name="add_private_group_failed">Nepavyko sukurti privačios grupės</string>
+    <string name="add_private_group_success">Sukūrėte privačią grupę</string>
+    <string name="layout___group_myname2">mano vardas grupėje:</string>
+    <string name="pref_title_custom_bootstrap_nodes">Naudoti pasirinktinius įkrovos mazgus</string>
+    <string name="layout___add_friend">Pridėti draugą</string>
+    <string name="add_friend_success">Pridėjote naują draugą</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">Ar norite atšaukti šį failų perdavimą\?</string>
+    <string name="add_friend_failed">pridėti draugo nepavyko</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">atšaukti failų perdavimą</string>
+    <string name="title_activity_grouppeerinfo">Grupės bendro informacija</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">atidaryti failus tiesiai iš užšifruotos saugyklos naudodami „Intent“. Tai gali būti pavojinga, nes kitos kenkėjiškos programos gali atidaryti kitus failus šifruotoje TRIfA saugykloje.</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">atšaukti failų perdavimą</string>
+    <string name="MainActivity_setup_push_tip_title">Nustatyti tiesioginį pranešimą</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Pašalinti profilio nuotrauką</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Ar norite pašalinti savo profilio nuotrauką\?</string>
+    <string name="add_group_activity_help">Sukurti naują privačią (tik su pakvietimu) grupę su nurodytu grupės pavadinimu.</string>
+    <string name="join_public_group_activity_help">Prisijungti prie viešos grupės su nurodytu grupės ID.</string>
+    <string name="add_public_group_activity_help">Sukurti naują viešą grupę su nurodytu grupės pavadinimu.</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">atidaryti failus iš užšifruotos saugyklos</string>
+    <string name="invite_join_group_success">Buvote pakviestas į grupę</string>
+    <string name="invite_join_conference_success">Jūs buvote pakviesti į konferencijų grupę</string>
+    <string name="pref_description_use_incognito_keyboard2">įjungti, kad nurodytumėte klaviatūrai nesimokyti iš įvestų žodžių</string>
+    <string name="layout___capabilities">Galimybės:</string>
 </resources>
