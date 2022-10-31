@@ -56,6 +56,8 @@ import com.mikepenz.iconics.IconicsDrawable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.text.PrecomputedTextCompat;
+import androidx.core.widget.TextViewCompat;
 import androidx.documentfile.provider.DocumentFile;
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -86,6 +88,9 @@ import static com.zoffcc.applications.trifa.HelperRelay.remove_own_relay_in_db;
 import static com.zoffcc.applications.trifa.Identicon.IDENTICON_ROWS;
 import static com.zoffcc.applications.trifa.MainActivity.clipboard;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_get_all_tcp_relays;
+import static com.zoffcc.applications.trifa.MainActivity.tox_get_all_udp_connections;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabilities;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
@@ -122,9 +127,11 @@ public class ProfileActivity extends AppCompatActivity
     ImageView my_identicon_imageview = null;
     TextView mytox_network_connections = null;
     static final int MEDIAPICK_ID_002 = 8003;
+    static Thread netconn_thread = null;
 
     static Handler profile_handler_s = null;
     Identicon.Identicon_data id_data = null;
+    private boolean stop_me_netconn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -152,7 +159,6 @@ public class ProfileActivity extends AppCompatActivity
         copy_toxid_button = findViewById(R.id.copy_toxid_button);
 
         mytox_network_connections = findViewById(R.id.mytox_network_connections);
-        mytox_network_connections.setText(get_network_connections());
 
         my_toxcapabilities_textview.setText(
                 TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(tox_self_get_capabilities())));
@@ -344,8 +350,6 @@ public class ProfileActivity extends AppCompatActivity
         mynick_edittext.setText(global_my_name);
         mystatus_message_edittext.setText(global_my_status_message);
 
-        update_toxid_display();
-
         profile_icon_edit.setOnClickListener(v -> {
             // select new avatar image
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -412,21 +416,116 @@ public class ProfileActivity extends AppCompatActivity
             {
             }
         });
-
-        try
-        {
-            String fname = get_vfs_image_filename_own_avatar();
-            if (fname != null)
-            {
-                put_vfs_image_on_imageview_real(this, profile_icon, d1, fname, true, false, null);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
         profile_handler_s = profile_handler;
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        mytox_network_connections.setText("\n\n" + "   " + "loading ...");
+
+        netconn_thread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(3 * 1000);
+                    while (!stop_me_netconn)
+                    {
+                        try
+                        {
+                            final String net_conn_text =
+                                    "\nCurrently conntected TCP Relays:\n(If you are using a Proxy this will show the connections after the Proxy!)\n\n" +
+                                    tox_get_all_tcp_relays() + "\nCurrent UDP connections:\n\n" +
+                                    tox_get_all_udp_connections() + "\n\nOLD:\n" + get_network_connections();
+
+                            Log.i(TAG, "profile_netconn_thread:running ...");
+
+                            PrecomputedTextCompat.Params tvcp = TextViewCompat.getTextMetricsParams(
+                                    mytox_network_connections);
+                            PrecomputedTextCompat pText = PrecomputedTextCompat.create(net_conn_text, tvcp);
+
+                            Runnable myRunnable = new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    try
+                                    {
+                                        TextViewCompat.setPrecomputedText(mytox_network_connections, pText);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+                                }
+                            };
+
+                            if (main_handler_s != null)
+                            {
+                                main_handler_s.post(myRunnable);
+                            }
+
+                            Thread.sleep(10 * 1000);
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
+                    }
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+        };
+        stop_me_netconn = false;
+        netconn_thread.start();
+
+        final Thread t1 = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(50);
+                    android.os.Message msg2 = new android.os.Message();
+                    Bundle b2 = new Bundle();
+                    msg2.what = 3;
+                    msg2.setData(b2);
+                    profile_handler_s.sendMessage(msg2);
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+        };
+        t1.start();
+
+        final Thread t2 = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    Thread.sleep(50);
+                    android.os.Message msg2 = new android.os.Message();
+                    Bundle b2 = new Bundle();
+                    msg2.what = 1;
+                    msg2.setData(b2);
+                    profile_handler_s.sendMessage(msg2);
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+        };
+        t2.start();
     }
 
     @Override
@@ -740,7 +839,6 @@ public class ProfileActivity extends AppCompatActivity
     {
         super.onPause();
         // TODO dirty hack, just write "name" and message all the time, and send to "tox core"
-
         try
         {
             global_my_name = mynick_edittext.getText().toString().substring(0, Math.min(
@@ -755,6 +853,27 @@ public class ProfileActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        try
+        {
+            netconn_thread.interrupt();
+            stop_me_netconn = true;
+            Log.i(TAG, "profile_netconn_thread:stopping ...");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        try
+        {
+            netconn_thread.join(100);
+            Log.i(TAG, "profile_netconn_thread:stopped");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        netconn_thread = null;
     }
 
     Bitmap encodeAsBitmap(String str) throws WriterException
@@ -799,6 +918,25 @@ public class ProfileActivity extends AppCompatActivity
                 if (id == 1)
                 {
                     update_toxid_display();
+                }
+                else if (id == 3)
+                {
+                    try
+                    {
+                        String fname = get_vfs_image_filename_own_avatar();
+                        if (fname != null)
+                        {
+                            final Drawable d1 = new IconicsDrawable(getApplicationContext()).icon(
+                                    GoogleMaterial.Icon.gmd_face).color(
+                                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(200);
+                            put_vfs_image_on_imageview_real(getApplicationContext(), profile_icon, d1, fname, true,
+                                                            false, null);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                 }
             }
             catch (Exception e)

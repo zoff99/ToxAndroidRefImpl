@@ -3096,6 +3096,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native String get_my_toxid();
 
+    public static native String tox_get_all_tcp_relays();
+
+    public static native String tox_get_all_udp_connections();
+
     // *UNUSED* public static native void bootstrap();
 
     public static native int add_tcp_relay_single(String ip, String key_hex, long port);
@@ -3420,11 +3424,11 @@ public class MainActivity extends AppCompatActivity
      * must be split by the client and sent as separate messages. Other clients can
      * then reassemble the fragments. Messages may not be empty.
      *
-     * @param group_number The group number of the group the message is intended for.
-     * @param peer_public_key_string   A memory region of at least TOX_PUBLIC_KEY_SIZE bytes of the peer the
-     *                     message is intended for. If this parameter is NULL, this function will return false.
-     * @param message      A non-NULL pointer to the first element of a byte array
-     *                     containing the message text.
+     * @param group_number           The group number of the group the message is intended for.
+     * @param peer_public_key_string A memory region of at least TOX_PUBLIC_KEY_SIZE bytes of the peer the
+     *                               message is intended for. If this parameter is NULL, this function will return false.
+     * @param message                A non-NULL pointer to the first element of a byte array
+     *                               containing the message text.
      * @return 0 on success. return < 0 on error.
      */
     public static native int tox_group_send_private_message_by_peerpubkey(long group_number, @NonNull String peer_public_key_string, int a_TOX_MESSAGE_TYPE, @NonNull String message);
@@ -7108,7 +7112,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_group_peer_join_cb_method(long group_number, long peer_id)
     {
-        Log.i(TAG, "group_peer_join_cb:group_number=" + group_number + " peer_id=" + peer_id);
+        // Log.i(TAG, "group_peer_join_cb:group_number=" + group_number + " peer_id=" + peer_id);
 
         final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
         update_group_in_friendlist(temp_group_identifier);
@@ -7118,8 +7122,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a_Tox_Group_Exit_Type)
     {
-        Log.i(TAG, "group_peer_exit_cb:group_number=" + group_number + " peer_id=" + peer_id + " exit_type=" +
-                   a_Tox_Group_Exit_Type);
+        // Log.i(TAG, "group_peer_exit_cb:group_number=" + group_number + " peer_id=" + peer_id + " exit_type=" +
+        //           a_Tox_Group_Exit_Type);
 
         final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
         update_group_in_friendlist(temp_group_identifier);
