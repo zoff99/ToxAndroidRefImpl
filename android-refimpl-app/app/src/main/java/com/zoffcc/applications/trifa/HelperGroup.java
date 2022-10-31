@@ -541,8 +541,8 @@ public class HelperGroup
         }
         catch (Exception e1)
         {
-            Log.i(TAG, "update_group_in_friendlist:EE1:" + e1.getMessage());
-            e1.printStackTrace();
+            // Log.i(TAG, "update_group_in_friendlist:EE1:" + e1.getMessage());
+            // e1.printStackTrace();
         }
     }
 
