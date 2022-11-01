@@ -435,4 +435,5 @@
     <string name="invite_join_conference_success">你已应邀加入会议群</string>
     <string name="invite_friend_success">你收到了好友请求</string>
     <string name="invite_join_group_success">你已应邀进群</string>
+    <string name="layout___load_network_connections">加载网络连接</string>
 </resources>

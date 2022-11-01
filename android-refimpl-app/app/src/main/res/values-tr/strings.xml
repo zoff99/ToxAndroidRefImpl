@@ -413,4 +413,5 @@
     <string name="invite_friend_success">Bir arkadaşlık isteği aldınız</string>
     <string name="invite_join_group_success">Bir gruba davet edildiniz</string>
     <string name="invite_join_conference_success">Bir konferans grubuna davet edildiniz</string>
+    <string name="layout___load_network_connections">ağ bağlantılarını yükle</string>
 </resources>
