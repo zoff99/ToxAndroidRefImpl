@@ -475,6 +475,7 @@
     <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA *UNSECURE*</string>
     <string name="layout___click_image_to_change_your_avatar">click Image to change your Avatar</string>
     <string name="layout___remove_own_relay">remove own Relay</string>
+    <string name="layout___load_network_connections">load network connections</string>
     <string name="layout___relay_pubkey">Relay Pubkey:</string>
     <string name="layout___remove_own_pushurl">remove Push URL</string>
     <string name="layout___own_pushurl">Push URL:</string>

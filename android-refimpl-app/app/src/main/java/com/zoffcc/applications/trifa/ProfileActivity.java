@@ -120,6 +120,7 @@ public class ProfileActivity extends AppCompatActivity
     Button copy_toxid_button = null;
     Button remove_own_relay_button = null;
     Button remove_own_pushurl_button = null;
+    Button load_network_connections_button = null;
     TextView my_relay_toxid_textview = null;
     TextView my_relay_toxid_text = null;
     TextView my_pushurl_textview = null;
@@ -127,7 +128,6 @@ public class ProfileActivity extends AppCompatActivity
     ImageView my_identicon_imageview = null;
     TextView mytox_network_connections = null;
     static final int MEDIAPICK_ID_002 = 8003;
-    static Thread netconn_thread = null;
 
     static Handler profile_handler_s = null;
     Identicon.Identicon_data id_data = null;
@@ -159,9 +159,65 @@ public class ProfileActivity extends AppCompatActivity
         copy_toxid_button = findViewById(R.id.copy_toxid_button);
 
         mytox_network_connections = findViewById(R.id.mytox_network_connections);
+        load_network_connections_button = findViewById(R.id.load_network_connections_button);
 
         my_toxcapabilities_textview.setText(
                 TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(tox_self_get_capabilities())));
+
+        load_network_connections_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    final Thread t4 = new Thread()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                final String net_conn_text =
+                                        "THIS feature is BETA, and does show all connections yet!!\n\nCurrently conntected TCP Relays:\n(If you are using a Proxy this will show the connections after the Proxy!)\n\n" +
+                                        tox_get_all_tcp_relays() + "\nCurrent UDP connections:\n\n" +
+                                        tox_get_all_udp_connections() + "\n\nOLD:\n" + get_network_connections();
+                                PrecomputedTextCompat.Params tvcp = TextViewCompat.getTextMetricsParams(
+                                        mytox_network_connections);
+                                PrecomputedTextCompat pText = PrecomputedTextCompat.create(net_conn_text, tvcp);
+                                Runnable myRunnable = new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            TextViewCompat.setPrecomputedText(mytox_network_connections, pText);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                };
+                                if (main_handler_s != null)
+                                {
+                                    main_handler_s.post(myRunnable);
+                                }
+                            }
+                            catch (Exception ignored)
+                            {
+                            }
+                        }
+                    };
+                    t4.start();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
 
         new_nospam_button.setOnClickListener(new View.OnClickListener()
         {
@@ -424,66 +480,7 @@ public class ProfileActivity extends AppCompatActivity
     {
         super.onResume();
 
-        mytox_network_connections.setText("\n\n" + "   " + "loading ...");
-
-        netconn_thread = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                try
-                {
-                    Thread.sleep(3 * 1000);
-                    while (!stop_me_netconn)
-                    {
-                        try
-                        {
-                            final String net_conn_text =
-                                    "\nCurrently conntected TCP Relays:\n(If you are using a Proxy this will show the connections after the Proxy!)\n\n" +
-                                    tox_get_all_tcp_relays() + "\nCurrent UDP connections:\n\n" +
-                                    tox_get_all_udp_connections() + "\n\nOLD:\n" + get_network_connections();
-
-                            Log.i(TAG, "profile_netconn_thread:running ...");
-
-                            PrecomputedTextCompat.Params tvcp = TextViewCompat.getTextMetricsParams(
-                                    mytox_network_connections);
-                            PrecomputedTextCompat pText = PrecomputedTextCompat.create(net_conn_text, tvcp);
-
-                            Runnable myRunnable = new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    try
-                                    {
-                                        TextViewCompat.setPrecomputedText(mytox_network_connections, pText);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            };
-
-                            if (main_handler_s != null)
-                            {
-                                main_handler_s.post(myRunnable);
-                            }
-
-                            Thread.sleep(10 * 1000);
-                        }
-                        catch (Exception ignored)
-                        {
-                        }
-                    }
-                }
-                catch (Exception ignored)
-                {
-                }
-            }
-        };
-        stop_me_netconn = false;
-        netconn_thread.start();
+        mytox_network_connections.setText("");
 
         final Thread t1 = new Thread()
         {
@@ -853,27 +850,6 @@ public class ProfileActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
-
-        try
-        {
-            netconn_thread.interrupt();
-            stop_me_netconn = true;
-            Log.i(TAG, "profile_netconn_thread:stopping ...");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        try
-        {
-            netconn_thread.join(100);
-            Log.i(TAG, "profile_netconn_thread:stopped");
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        netconn_thread = null;
     }
 
     Bitmap encodeAsBitmap(String str) throws WriterException
