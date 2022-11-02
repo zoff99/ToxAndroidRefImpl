@@ -65,6 +65,20 @@
                 android:textColor="@color/md_black_1000"
                 android:textSize="20sp"/>
 
+            <TextView
+                android:id="@+id/warning_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="15dp"
+                android:layout_marginRight="15dp"
+                android:layout_marginTop="25dp"
+                android:gravity="center_vertical"
+                android:paddingBottom="15dp"
+                android:paddingTop="12dp"
+                android:text="@string/join_public_group_activity_warning"
+                android:textColor="@color/md_black_1000"
+                android:textSize="25sp"/>
+
         </LinearLayout>
 
     </ScrollView>
