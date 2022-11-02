@@ -483,7 +483,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__hide_setup_push_tip = false;
     static boolean PREF__show_friendnumber_on_friendlist = false;
     static int PREF__dark_mode_pref = 0;
-    static boolean PREF__enable_ngc_features = false;
+    static boolean PREF__enable_ngc_features = true;
     static boolean PREF__allow_push_server_ntfy = false;
     static boolean PREF__messageview_paging = true;
     static int PREF__message_paging_num_msgs_per_page = 50;
@@ -1217,12 +1217,12 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__enable_ngc_features = settings.getBoolean("enable_ngc_features", false);
+            PREF__enable_ngc_features = settings.getBoolean("enable_ngc_features", true);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__enable_ngc_features = false;
+            PREF__enable_ngc_features = true;
         }
 
         try
@@ -2739,12 +2739,12 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            PREF__enable_ngc_features = settings.getBoolean("enable_ngc_features", false);
+            PREF__enable_ngc_features = settings.getBoolean("enable_ngc_features", true);
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__enable_ngc_features = false;
+            PREF__enable_ngc_features = true;
         }
 
         try

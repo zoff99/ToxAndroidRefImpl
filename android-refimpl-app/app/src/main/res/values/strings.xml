@@ -226,7 +226,7 @@
     <string name="pref_description_use_camera_x">!! Experimental !!\nUse CameraX and Remove background in Video Calls\nThis might not work fully yet, please be careful and do not depend on this to work always!</string>
 
     <string name="pref_title_allow_enable_ngc_features">NGC - New Group Chats</string>
-    <string name="pref_description_enable_ngc_features">!! Experimental !!\nThis is NOT working, DO NOT activate !!</string>
+    <string name="pref_description_enable_ngc_features">!! Experimental !!\nThis is NOT fully working!!</string>
 
     <string name="pref_title_X_audio_play_buffer_custom">Audio play buffer</string>
     <string name="pref_description_X_audio_play_buffer_custom">!! Experimental !!\nAudio play buffer in bytes, set to "0" to disable custom setting</string>

@@ -278,7 +278,7 @@
             android:title="@string/pref_title_use_camera_x" />
 
         <SwitchPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="enable_ngc_features"
             android:summary="@string/pref_description_enable_ngc_features"
             android:title="@string/pref_title_allow_enable_ngc_features" />
