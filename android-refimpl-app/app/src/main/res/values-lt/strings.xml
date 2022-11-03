@@ -308,4 +308,5 @@
     <string name="invite_join_conference_success">Jūs buvote pakviesti į konferencijų grupę</string>
     <string name="pref_description_use_incognito_keyboard2">įjungti, kad nurodytumėte klaviatūrai nesimokyti iš įvestų žodžių</string>
     <string name="layout___capabilities">Galimybės:</string>
+    <string name="layout___load_network_connections">įkelti tinklo ryšius</string>
 </resources>
