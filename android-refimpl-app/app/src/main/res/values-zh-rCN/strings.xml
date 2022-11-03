@@ -427,8 +427,8 @@
     <string name="pref_title_allow_push_server_ntfy">允许 nfty.sh 服务器</string>
     <string name="pref_description_allow_push_server_ntfy">警告：允许 ntfy.sh 服务器进行推送通知，如果朋友使用你的推送令牌订阅，可能会在你收到推送通知时泄露你的时间戳元数据。警告：ntfy.sh 没有密码和身份验证。</string>
     <string name="pref_title_allow_enable_ngc_features">NGC - 新群聊</string>
-    <string name="pref_description_enable_ngc_features">!! 实验性 !! 
-\n这不起作用，请勿激活！！</string>
+    <string name="pref_description_enable_ngc_features">!! 实验性 !!
+\n不完全正常工作！！</string>
     <string name="incoming_filetransfer_size_too_large">传入的文件太大。 只能接收最大 2 GBytes 的文件。</string>
     <string name="pref_title_message_paging_num_msgs_per_page">每页消息数</string>
     <string name="pref_description_message_paging_num_msgs_per_page">设置每页显示的消息数。0 表示不分页</string>
@@ -436,4 +436,6 @@
     <string name="invite_friend_success">你收到了好友请求</string>
     <string name="invite_join_group_success">你已应邀进群</string>
     <string name="layout___load_network_connections">加载网络连接</string>
+    <string name="join_public_group_activity_warning">警告：
+\n尚无法通过群 ID 加入公共群！！</string>
 </resources>
