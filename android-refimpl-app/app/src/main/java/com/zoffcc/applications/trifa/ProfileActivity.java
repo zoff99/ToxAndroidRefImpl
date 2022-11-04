@@ -179,7 +179,7 @@ public class ProfileActivity extends AppCompatActivity
                             try
                             {
                                 final String net_conn_text =
-                                        "THIS feature is BETA, and does show all connections yet!!\n\nCurrently conntected TCP Relays:\n(If you are using a Proxy this will show the connections after the Proxy!)\n\n" +
+                                        "THIS feature is BETA, and does not show all connections yet!!\n\nCurrently conntected TCP Relays:\n(If you are using a Proxy this will show the connections after the Proxy!)\n\n" +
                                         tox_get_all_tcp_relays() + "\nCurrent UDP connections:\n\n" +
                                         tox_get_all_udp_connections() + "\n\nOLD:\n" + get_network_connections();
                                 PrecomputedTextCompat.Params tvcp = TextViewCompat.getTextMetricsParams(
