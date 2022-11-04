@@ -358,4 +358,11 @@
 \nVuoi vedere come puoi impostare la notifica push ora\?</string>
     <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Condividi file a TRIfa attraverso l\'intento di condivisione</string>
     <string name="pref_description_speakerphone_tweak">Se l\'app non cambia altoparlante in chiamata, allora attiva questa fix</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Paging dei messaggi</string>
+    <string name="add_public_group_activity_name">Crea gruppo pubblico</string>
+    <string name="join_public_activity_name">Entra nel gruppo pubblico</string>
+    <string name="group_message_list_activity_name">Gruppo</string>
+    <string name="title_activity_groupinfo">Info gruppo</string>
+    <string name="title_activity_grouppeerinfo">Peerinfo Gruppo</string>
+    <string name="add_group_activity_name">Crea gruppo privato</string>
 </resources>
