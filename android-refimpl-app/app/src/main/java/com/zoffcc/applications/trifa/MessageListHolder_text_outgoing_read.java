@@ -319,6 +319,8 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
+
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     @Override

@@ -580,6 +580,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         }
 
         HelperGeneric.fill_friend_avatar_icon(m, context, img_avatar);
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     public void try_to_share_file(Message message2, String export_filename_with_path, final Context c)

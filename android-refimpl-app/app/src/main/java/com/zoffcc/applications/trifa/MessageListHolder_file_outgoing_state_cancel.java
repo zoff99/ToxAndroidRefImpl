@@ -420,6 +420,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         }
 
         HelperGeneric.fill_own_avatar_icon(context, img_avatar);
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     @Override

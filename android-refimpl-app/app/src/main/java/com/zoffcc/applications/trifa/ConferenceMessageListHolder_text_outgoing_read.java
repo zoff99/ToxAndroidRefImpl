@@ -213,47 +213,7 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
             }
         });
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
-                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        img_avatar.setImageDrawable(d_lock);
-
-        try
-        {
-            if (VFS_ENCRYPT)
-            {
-                String fname = get_vfs_image_filename_own_avatar();
-
-                info.guardianproject.iocipher.File f1 = null;
-                try
-                {
-                    f1 = new info.guardianproject.iocipher.File(fname);
-                }
-                catch (Exception e)
-                {
-                    // e.printStackTrace();
-                }
-
-                if ((f1 != null) && (fname != null))
-                {
-                    if (f1.length() > 0)
-                    {
-                        final RequestOptions glide_options = new RequestOptions().fitCenter();
-                        // GLIDE:own-avatar
-                        GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(img_avatar);
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        HelperGeneric.fill_own_avatar_icon(context, img_avatar);
 
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
@@ -311,6 +271,8 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
+
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     @Override

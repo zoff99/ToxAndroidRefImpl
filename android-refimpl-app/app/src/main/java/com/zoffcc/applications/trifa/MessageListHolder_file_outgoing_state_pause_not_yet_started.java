@@ -440,6 +440,8 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_started extends
                     placeholder(R.drawable.round_loading_animation).
                     into(ft_preview_image);
         }
+
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     private void cancel_outgoing_filetransfer(final Message message)

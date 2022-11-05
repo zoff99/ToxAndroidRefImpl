@@ -261,6 +261,7 @@ public class MessageListHolder_file_incoming_state_pause_has_accepted extends Re
         // ft_progressbar.setIndeterminate(false);
 
         HelperGeneric.fill_friend_avatar_icon(m, context, img_avatar);
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     private void cancel_incoming_filetransfer(final Message message)

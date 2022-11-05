@@ -253,6 +253,7 @@ public class MessageListHolder_file_outgoing_state_pause_has_accepted extends Re
         });
 
         HelperGeneric.fill_own_avatar_icon(context, img_avatar);
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     private void cancel_outgoing_filetransfer(final Message message)

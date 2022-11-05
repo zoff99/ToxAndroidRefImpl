@@ -652,6 +652,8 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
+
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     @Override

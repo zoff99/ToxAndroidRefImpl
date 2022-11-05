@@ -42,6 +42,7 @@ import android.os.Handler;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.webkit.MimeTypeMap;
 import android.widget.ImageView;
@@ -107,6 +108,8 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__speakerphone_tweak;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_CUSTOM_WRITE_CACHE;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
@@ -117,6 +120,8 @@ import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_AVATAR_HEIGHT_COMPACT_LAYOUT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_AVATAR_HEIGHT_NORMAL_LAYOUT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_V2_MSG_SENT_OK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
@@ -4435,5 +4440,19 @@ public class HelperGeneric
         {
             e.printStackTrace();
         }
+    }
+
+    public static void set_avatar_img_height_in_chat(CircleImageView v)
+    {
+        ViewGroup.LayoutParams p = v.getLayoutParams();
+        if (PREF__compact_chatlist)
+        {
+            p.height = (int) dp2px(MESSAGE_AVATAR_HEIGHT_COMPACT_LAYOUT[PREF__global_font_size]);
+        }
+        else
+        {
+            p.height = (int) dp2px(MESSAGE_AVATAR_HEIGHT_NORMAL_LAYOUT[PREF__global_font_size]);
+        }
+        v.setLayoutParams(p);
     }
 }

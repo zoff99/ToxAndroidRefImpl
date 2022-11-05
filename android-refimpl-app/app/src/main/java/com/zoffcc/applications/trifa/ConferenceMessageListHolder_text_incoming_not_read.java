@@ -707,6 +707,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
             // --------- timestamp (show only if different from previous message) ---------
         }
 
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     @Override

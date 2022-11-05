@@ -404,6 +404,8 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
         // b = Color.blue(color);
         // Log.i(TAG, "bindMessageList2: " + a + " " + r + " " + g + " " + b);
         // ***************
+
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     @Override

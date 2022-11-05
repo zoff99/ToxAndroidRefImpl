@@ -263,9 +263,7 @@ public class GroupMessageListHolder_text_outgoing_read extends RecyclerView.View
             }
         });
 
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
-                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        img_avatar.setImageDrawable(d_lock);
+        HelperGeneric.fill_own_avatar_icon(context, img_avatar);
 
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
@@ -323,6 +321,8 @@ public class GroupMessageListHolder_text_outgoing_read extends RecyclerView.View
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
+
+        HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 
     @Override
