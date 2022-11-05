@@ -205,50 +205,9 @@ public class MessageListHolder_file_outgoing_state_pause_not_yet_accepted extend
         button_ok.setVisibility(View.GONE);
         button_cancel.setVisibility(View.VISIBLE);
 
-
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        img_avatar.setImageDrawable(d_lock);
-
-        try
-        {
-            if (VFS_ENCRYPT)
-            {
-                String fname = get_vfs_image_filename_own_avatar();
-
-                info.guardianproject.iocipher.File f1 = null;
-                try
-                {
-                    f1 = new info.guardianproject.iocipher.File(fname);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                if ((f1 != null) && (fname != null))
-                {
-                    if (f1.length() > 0)
-                    {
-                        final RequestOptions glide_options = new RequestOptions().fitCenter();
-                        GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(img_avatar);
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
+        HelperGeneric.fill_own_avatar_icon(context, img_avatar);
 
         textView.setAutoLinkText("" + message.text + "\n\nWaiting for Friend to accept ...");
-
 
         boolean is_image = false;
         try

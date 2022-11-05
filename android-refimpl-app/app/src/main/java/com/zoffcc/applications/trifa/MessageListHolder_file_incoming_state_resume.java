@@ -31,9 +31,6 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.bumptech.glide.request.RequestOptions;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -49,7 +46,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from_id;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.tox_file_control;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE_FT_SMALL;
@@ -266,57 +262,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
             }
         });
 
-
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
-                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        img_avatar.setImageDrawable(d_lock);
-
-        try
-        {
-            if (VFS_ENCRYPT)
-            {
-                FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).get(0);
-
-                info.guardianproject.iocipher.File f1 = null;
-                try
-                {
-                    f1 = new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                if ((f1 != null) && (fl.avatar_pathname != null))
-                {
-                    // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
-
-                    if (f1.length() > 0)
-                    {
-                        // byte[] byteArray = new byte[(int) f1.length()];
-                        // fis.read(byteArray, 0, (int) f1.length());
-                        // fis.close();
-
-                        final RequestOptions glide_options = new RequestOptions().fitCenter();
-                        GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                        fl.avatar_update_timestamp)).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(img_avatar);
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
+        HelperGeneric.fill_friend_avatar_icon(m, context, img_avatar);
     }
 
     private void cancel_incoming_filetransfer(final Message message)
@@ -327,8 +273,7 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
             Log.i(TAG, "button_cancel:OnTouch:001");
             // values.get(position).state = TOX_FILE_CONTROL_CANCEL.value;
             tox_file_control(tox_friend_by_public_key__wrapper(message.tox_friendpubkey),
-                             get_filetransfer_filenum_from_id(message.filetransfer_id),
-                             TOX_FILE_CONTROL_CANCEL.value);
+                             get_filetransfer_filenum_from_id(message.filetransfer_id), TOX_FILE_CONTROL_CANCEL.value);
             set_filetransfer_state_from_id(message.filetransfer_id, TOX_FILE_CONTROL_CANCEL.value);
             set_message_state_from_id(message.id, TOX_FILE_CONTROL_CANCEL.value);
 

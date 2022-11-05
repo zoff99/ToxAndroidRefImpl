@@ -330,56 +330,7 @@ public class MessageListHolder_text_incoming_not_read extends RecyclerView.ViewH
             }
         });
 
-
-        final Drawable d_lock = new IconicsDrawable(context).icon(FontAwesome.Icon.faw_lock).color(
-                context.getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
-        img_avatar.setImageDrawable(d_lock);
-
-        try
-        {
-            if (VFS_ENCRYPT)
-            {
-                FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).get(0);
-
-                info.guardianproject.iocipher.File f1 = null;
-                try
-                {
-                    f1 = new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                if ((f1 != null) && (fl.avatar_pathname != null))
-                {
-                    // info.guardianproject.iocipher.FileInputStream fis = new info.guardianproject.iocipher.FileInputStream(f1);
-
-                    if (f1.length() > 0)
-                    {
-                        // byte[] byteArray = new byte[(int) f1.length()];
-                        // fis.read(byteArray, 0, (int) f1.length());
-                        // fis.close();
-
-                        final RequestOptions glide_options = new RequestOptions().fitCenter();
-                        GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                        fl.avatar_update_timestamp)).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(img_avatar);
-                    }
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        HelperGeneric.fill_friend_avatar_icon(m, context, img_avatar);
 
         // --------- timestamp (show only if different from previous message) ---------
         // --------- timestamp (show only if different from previous message) ---------
