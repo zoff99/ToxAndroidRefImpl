@@ -86,7 +86,6 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
-import com.vanniktech.emoji.google.GoogleEmojiProvider;
 import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
@@ -610,8 +609,8 @@ public class MainActivity extends AppCompatActivity
 
         Log.i(TAG, "M:STARTUP:EmojiManager install");
         // EmojiManager.install(new IosEmojiProvider());
-        EmojiManager.install(new GoogleEmojiProvider());
-        // EmojiManager.install(new EmojiOneProvider());
+        EmojiManager.install(new com.vanniktech.emoji.google.GoogleEmojiProvider());
+        // EmojiManager.install(new com.vanniktech.emoji.twitter.TwitterEmojiProvider());
 
 
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
