@@ -92,12 +92,17 @@ public class MessageListFragment extends Fragment
             }
         }
 
-        unread_messages_notice_button = view.findViewById(R.id.unread_messages_notice_button);
-        unread_messages_notice_button.setAnimation(null);
-        unread_messages_notice_button.setVisibility(View.INVISIBLE);
-        unread_messages_notice_button.setSupportBackgroundTintList(
-                (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
-
+        try
+        {
+            unread_messages_notice_button = view.findViewById(R.id.unread_messages_notice_button);
+            unread_messages_notice_button.setAnimation(null);
+            unread_messages_notice_button.setVisibility(View.INVISIBLE);
+            unread_messages_notice_button.setSupportBackgroundTintList(
+                    (ContextCompat.getColorStateList(context_s, R.color.message_list_scroll_to_bottom_fab_bg_normal)));
+        }
+        catch (Exception e)
+        {
+        }
 
         mla = (MessageListActivity) (getActivity());
         if (mla != null)
