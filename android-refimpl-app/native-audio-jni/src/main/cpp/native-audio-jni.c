@@ -65,11 +65,17 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
+#define WEBRTC_AEC 1
 
 bool filteraudio_used = false;
 #ifdef WEBRTC_AEC
-// webrtc lib for software AEC
-#include "webrtc/echo_control_mobile.h"
+// webrtc lib for software AEC and NS
+#include "webrtc6/webrtc/modules/audio_processing/ns/noise_suppression_x.h"
+#include "webrtc6/webrtc/modules/audio_processing/aecm/echo_control_mobile.h"
+
+int16_t *pcm_buf_resampled;
+int16_t *pcm_buf_out_resampled;
+
 #endif
 
 /*---------------------------------------------------------------------------*/
@@ -134,9 +140,12 @@ int player_state_current = _STOPPED;
 pthread_mutex_t play_buffer_queued_count_mutex;
 int play_buffer_queued_count_mutex_valid = 0;
 
+const int samples_per_frame_for_48000_40ms = 1920;
+
 // --------- AEC ---------
 #ifdef WEBRTC_AEC
 void *webrtc_aecmInst = NULL;
+NsxHandle *nsxInst = NULL;
 #endif
 // --------- AEC ---------
 
@@ -200,11 +209,10 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopREC(JNIEnv *en
 
 float audio_vu(const int16_t *pcm_data, uint32_t sample_count);
 
-void start_filter_audio(uint32_t in_samplerate);
+int32_t upsample_16000_to_48000_basic(int16_t *in, int16_t *out, int32_t sample_count);
 
-void stop_filter_audio();
+int32_t downsample_48000_to_16000_basic(int16_t *in, int16_t *out, int32_t sample_count);
 
-void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms);
 // ----- function defs ------
 
 
@@ -348,7 +356,32 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 //                                     audio_rec_buffer_size[rec_buf_pointer_start] /
 //                                     2));
 
-                // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "filter_audio:AEC:res=%d", res_filter);
+#ifdef WEBRTC_AEC
+                if (audio_rec_buffer_size[rec_buf_pointer_start] ==
+                    (samples_per_frame_for_48000_40ms * 2))
+                {
+                    //__android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                    //                    "bqRecorderCallback:2222222:audio_rec_buffer_size[in bytes]=%ld",
+                    //                    audio_rec_buffer_size[rec_buf_pointer_start]);
+                    const int num_samples_record = audio_rec_buffer_size[rec_buf_pointer_start] / 2;
+                    const int split_factor = 4 * 3;
+                    const int sample_count_split = (num_samples_record / split_factor);
+                    for (int x = 0; x < split_factor; x++)
+                    {
+                        short const *const tmp1[] = {
+                                (int16_t *) audio_rec_buffer[rec_buf_pointer_start] +
+                                (x * sample_count_split), 0};
+                        short *const tmp2[] = {
+                                pcm_buf_out_resampled + (x * sample_count_split), 0};
+                        WebRtcNsx_Process(nsxInst,
+                                          tmp1,
+                                          1,
+                                          tmp2);
+                    }
+                    memcpy(audio_rec_buffer[rec_buf_pointer_start], pcm_buf_out_resampled,
+                           num_samples_record * 2);
+                }
+#endif
             }
 
             // TODO: make this better? faster?
@@ -800,17 +833,33 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
 
     if ((channels == 1) && (sampleRate == 48000))
     {
-        // filteraudio
-        filteraudio_used = true;
 #ifdef WEBRTC_AEC
         // webrtc
-        WebRtcAecm_Create(&webrtc_aecmInst);
-        WebRtcAecm_Init(webrtc_aecmInst, sampleRate);
+
+        pcm_buf_resampled = calloc(1, sizeof(int16_t) * samples_per_frame_for_48000_40ms);
+        pcm_buf_out_resampled = calloc(1, sizeof(int16_t) * samples_per_frame_for_48000_40ms);
+        nsxInst = WebRtcNsx_Create();
+        int res1 = WebRtcNsx_Init(nsxInst, sampleRate); // only at 16kHz MONO
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "WebRtcNsx_Init:res=%d",
+                            res1);
+        int res3 = WebRtcNsx_set_policy(nsxInst, 2);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "WebRtcNsx_set_policy:res=%d",
+                            res3);
+
+        webrtc_aecmInst = WebRtcAecm_Create();
+        int32_t res2 = WebRtcAecm_Init(webrtc_aecmInst, sampleRate / 3); // only at 16kHz MONO
         AecmConfig config;
         config.echoMode = AecmTrue;
-        config.cngMode = 3;
+        config.cngMode = 2;
         WebRtcAecm_set_config(webrtc_aecmInst, config);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "WebRtcAecm_Init:res=%d sampleRate=%d",
+                            res2, sampleRate);
+
 #endif
+        filteraudio_used = true;
     }
     else
     {
@@ -1125,6 +1174,9 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
             {
                 //pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
                 //                  (unsigned int) (nextSize / 2));
+                //**// WebRtcAecm_BufferFarend();
+#ifdef WEBRTC_AEC
+#endif
             }
 
             pthread_mutex_lock(&play_buffer_queued_count_mutex);
@@ -1420,11 +1472,16 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
     {
         // filteraudio
         filteraudio_used = false;
-        stop_filter_audio();
         // webrtc
 #ifdef WEBRTC_AEC
         WebRtcAecm_Free(webrtc_aecmInst);
         webrtc_aecmInst = NULL;
+        WebRtcNsx_Free(nsxInst);
+        nsxInst = NULL;
+        free(pcm_buf_resampled);
+        pcm_buf_resampled = NULL;
+        free(pcm_buf_out_resampled);
+        pcm_buf_out_resampled = NULL;
 #endif
     }
 
@@ -1544,17 +1601,46 @@ jfloat Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1vu_1out(JNIEnv 
     return (jfloat) audio_out_vu_value;
 }
 
-void start_filter_audio(uint32_t in_samplerate)
+int32_t upsample_16000_to_48000_basic(int16_t *in, int16_t *out, int32_t sample_count)
 {
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "filter_audio: prepare. samplerate=%d",
-                        (int) in_samplerate);
+    if (sample_count < 1)
+    {
+        return -1;
+    }
+
+    int16_t tmp1;
+    int16_t tmp2;
+    int16_t v1;
+    for (int i = 0; i < sample_count; i++)
+    {
+        tmp1 = *(in);
+        tmp2 = *(in + 1);
+        v1 = (int16_t) (((float) (tmp2 - tmp1)) / 3.0f);
+        *out = tmp1;
+        out++;
+        *out = tmp1 + v1;
+        out++;
+        *out = tmp1 + v1 + v1;
+        out++;
+        in++;
+    }
+
+    return 0;
 }
 
-void stop_filter_audio()
+int32_t downsample_48000_to_16000_basic(int16_t *in, int16_t *out, int32_t sample_count)
 {
-}
+    if (sample_count < 3)
+    {
+        return -1;
+    }
 
-void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms)
-{
+    for (int i = 0; i < (sample_count / 3); i++)
+    {
+        *out = *in;
+        out++;
+        in = in + 3;
+    }
+
+    return 0;
 }

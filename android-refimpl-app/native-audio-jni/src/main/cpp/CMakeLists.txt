@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.4.1)
 
-add_subdirectory(filter_audio)
-add_subdirectory(webrtc)
+add_subdirectory(webrtc6)
+include_directories(./webrtc6)
 
 set(CMAKE_C_FLAGS1 "${CMAKE_C_FLAGS} -Wall \
 -Wextra \
@@ -35,7 +35,7 @@ set(CMAKE_C_FLAGS1 "${CMAKE_C_FLAGS} -Wall \
 -Werror \
 ")
 
-set(CMAKE_C_FLAGS2 "${CMAKE_C_FLAGS} -Wall")
+set(CMAKE_C_FLAGS2 "${CMAKE_C_FLAGS} -Wall -Iwebrtc6/webrtc")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS1} -std=c99 -fPIC")
 
@@ -46,8 +46,6 @@ add_library(native-audio-jni SHARED
 # Include libraries needed for native-audio-jni lib
 target_link_libraries(native-audio-jni
         android
-        filter_audio
+        aec2
         log
         OpenSLES)
-
-# webrtc
