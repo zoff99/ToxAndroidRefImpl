@@ -65,7 +65,7 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
-#define WEBRTC_AEC 1
+// #define WEBRTC_AEC 1
 
 bool filteraudio_used = false;
 #ifdef WEBRTC_AEC
@@ -75,8 +75,8 @@ bool filteraudio_used = false;
 
 int16_t *pcm_buf_resampled;
 int16_t *pcm_buf_out_resampled;
-
 #endif
+
 
 /*---------------------------------------------------------------------------*/
 /* Android AudioPlayer and AudioRecorder configuration                       */
