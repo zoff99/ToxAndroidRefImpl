@@ -200,6 +200,9 @@ public class NativeAudio
     public static native float get_vu_in();
 
     public static native float get_vu_out();
+
+    public static native void set_aec_active(int active);
+
     // ---------------------
 
     public static native void createBufferQueueAudioPlayer(int sampleRate, int channels, int num_bufs, int eac_delay_ms);

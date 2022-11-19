@@ -128,6 +128,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
@@ -3505,15 +3506,6 @@ public class MainActivity extends AppCompatActivity
 
     // audio_buffer2 is for incoming audio (group and call)
     public static native void set_JNI_audio_buffer2(ByteBuffer audio_buffer2);
-
-    // for AEC (libfilteraudio)
-    public static native void restart_filteraudio(long sampling_rate);
-
-    // for AEC (libfilteraudio)
-    public static native void set_audio_frame_duration_ms(int audio_frame_duration_ms);
-
-    // for AEC (libfilteraudio)
-    public static native void set_filteraudio_active(int filteraudio_active);
     // ----------- TRIfA internal -----------
 
     /**
@@ -3572,11 +3564,11 @@ public class MainActivity extends AppCompatActivity
 
                         if (PREF__use_software_aec)
                         {
-                            set_filteraudio_active(1);
+                            set_aec_active(1);
                         }
                         else
                         {
-                            set_filteraudio_active(0);
+                            set_aec_active(0);
                         }
 
                         if (f_video_enabled == 0)

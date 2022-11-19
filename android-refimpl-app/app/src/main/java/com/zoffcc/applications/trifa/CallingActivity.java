@@ -89,6 +89,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.set_audio_delay;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
@@ -117,7 +118,6 @@ import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
-import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_set_onion_active;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_answer;
@@ -2350,7 +2350,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     Log.i(TAG, "onSensorChanged:--> EAR");
 
-                    set_filteraudio_active(0);
+                    set_aec_active(0);
 
                     Callstate.audio_speaker = false;
 
@@ -2437,11 +2437,11 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     Log.i(TAG, "onSensorChanged:--> speaker");
                     if (PREF__use_software_aec)
                     {
-                        set_filteraudio_active(1);
+                        set_aec_active(1);
                     }
                     else
                     {
-                        set_filteraudio_active(0);
+                        set_aec_active(0);
                     }
 
                     Callstate.audio_speaker = true;

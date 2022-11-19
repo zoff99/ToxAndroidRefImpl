@@ -46,6 +46,7 @@ import java.util.List;
 
 import info.guardianproject.iocipher.VirtualFileSystem;
 
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_tcprelay_nodelist_from_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.get_udp_nodelist_from_db;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
@@ -111,7 +112,6 @@ import static com.zoffcc.applications.trifa.MainActivity.receiver1;
 import static com.zoffcc.applications.trifa.MainActivity.receiver2;
 import static com.zoffcc.applications.trifa.MainActivity.receiver3;
 import static com.zoffcc.applications.trifa.MainActivity.receiver4;
-import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_chatlist_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_id;
@@ -245,7 +245,7 @@ public class TrifaToxService extends Service
                     public void run()
                     {
                         Log.i(TAG, "stop_me:005:tox_thread_starting_up=" + tox_thread_starting_up);
-                        set_filteraudio_active(0);
+                        set_aec_active(0);
                         long i = 0;
                         while (is_tox_started)
                         {

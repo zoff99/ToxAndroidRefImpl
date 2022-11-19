@@ -74,6 +74,7 @@ import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 
 import static android.widget.Toast.LENGTH_LONG;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
@@ -105,7 +106,6 @@ import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
-import static com.zoffcc.applications.trifa.MainActivity.set_filteraudio_active;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_typing;
 import static com.zoffcc.applications.trifa.MessageListFragment.search_messages_text;
 import static com.zoffcc.applications.trifa.MessageListFragment.show_only_files;
@@ -1629,11 +1629,11 @@ public class MessageListActivity extends AppCompatActivity
                         Log.i(TAG, "CALL:start:(2.1):show activity");
                         if (PREF__use_software_aec)
                         {
-                            set_filteraudio_active(1);
+                            set_aec_active(1);
                         }
                         else
                         {
-                            set_filteraudio_active(0);
+                            set_aec_active(0);
                         }
 
                         Callstate.state = 1;
