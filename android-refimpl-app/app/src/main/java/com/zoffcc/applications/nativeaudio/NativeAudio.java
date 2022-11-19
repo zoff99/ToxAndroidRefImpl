@@ -42,7 +42,7 @@ public class NativeAudio
     public static int n_buf_iterate_ms = 40; // fixed ms interval for audio play (call and groups)
     public static int[] n_bytes_in_buffer = new int[n_audio_in_buffer_max_count];
     public static int sampling_rate = 48000;
-    public static int channel_count = 2;
+    public static int channel_count = 1;
 
     public static final int n_rec_audio_in_buffer_max_count = 3; // BAD: !!! always keep in sync with native-audio-jni.c `int num_rec_bufs = 2;` !!!
     public static ByteBuffer[] n_rec_audio_buffer = new ByteBuffer[n_rec_audio_in_buffer_max_count];
@@ -202,6 +202,8 @@ public class NativeAudio
     public static native float get_vu_out();
 
     public static native void set_aec_active(int active);
+
+    public static native int get_aec_active();
 
     // ---------------------
 

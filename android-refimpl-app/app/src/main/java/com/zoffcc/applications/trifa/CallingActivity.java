@@ -53,6 +53,7 @@ import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -87,6 +88,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffer
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.set_audio_delay;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.get_aec_active;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
@@ -153,6 +155,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     ImageButton decline_button = null;
     static ImageButton camera_toggle_button = null;
     static ImageButton mute_button = null;
+    static Button video_box_aec_button = null;
+    static View video_box_aec = null;
     ImageButton misc_button = null;
     TextView misc_button_pad = null;
     static View calling_friend_online_status = null;
@@ -297,6 +301,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         decline_button = (ImageButton) findViewById(R.id.decline_button);
         camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
         mute_button = (ImageButton) findViewById(R.id.mute_button);
+        video_box_aec_button = findViewById(R.id.video_box_aec_button);
+        video_box_aec = findViewById(R.id.video_box_aec);
         audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
         misc_button = (ImageButton) findViewById(R.id.misc_button);
         misc_button_pad = (TextView) findViewById(R.id.misc_button_pad);
@@ -793,6 +799,49 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         set_audio_play_volume();
 
         quality_slider.setPosition(PREF__video_call_quality);
+
+        try
+        {
+            video_box_aec_button.setText("AEC: " + get_aec_active());
+        }
+        catch (Exception e)
+        {
+        }
+        video_box_aec_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        video_box_aec_button.setText("AEC: " + get_aec_active());
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        set_aec_active(1 - get_aec_active());
+                        video_box_aec_button.setText("AEC: " + get_aec_active());
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                }
+                return true;
+            }
+        });
+
 
         // Detect when slider position changes
         quality_slider.setOnDiscreteSliderChangeListener(new DiscreteSlider.OnDiscreteSliderChangeListener()
@@ -2722,6 +2771,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                         CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.VISIBLE);
                         CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.VISIBLE);
+                        CallingActivity.video_box_aec.setVisibility(View.VISIBLE);
                     }
                     catch (Exception e)
                     {
@@ -2754,6 +2804,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                             CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
+                            CallingActivity.video_box_aec.setVisibility(View.VISIBLE);
+
                         }
                         else
                         {
@@ -2762,6 +2814,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             CallingActivity.box_right_volumeslider_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
+                            CallingActivity.video_box_aec.setVisibility(View.INVISIBLE);
+
                         }
                     }
                     catch (Exception e)

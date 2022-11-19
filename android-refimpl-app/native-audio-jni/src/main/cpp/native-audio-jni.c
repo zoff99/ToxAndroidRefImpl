@@ -212,11 +212,9 @@ float audio_vu(const int16_t *pcm_data, uint32_t sample_count);
 
 void set_aec_active(int active);
 
-#if 0
 static int32_t upsample_16000_to_48000_basic(int16_t *in, int16_t *out, int32_t sample_count);
 
 static int32_t downsample_48000_to_16000_basic(int16_t *in, int16_t *out, int32_t sample_count);
-#endif
 
 // ----- function defs ------
 
@@ -361,27 +359,58 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                     if (audio_rec_buffer_size[rec_buf_pointer_start] ==
                         (samples_per_frame_for_48000_40ms * 2))
                     {
-                        //__android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        //                    "bqRecorderCallback:2222222:audio_rec_buffer_size[in bytes]=%ld",
-                        //                    audio_rec_buffer_size[rec_buf_pointer_start]);
                         const int num_samples_record =
                                 audio_rec_buffer_size[rec_buf_pointer_start] / 2;
-                        const int split_factor = 4 * 3;
+
+                        int16_t *pcm_buf_rec = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
+                        int16_t *pcm_buf_record_resampled = (int16_t *) calloc(1,
+                                                                               sizeof(int16_t) *
+                                                                               (num_samples_record /
+                                                                                3));
+                        int16_t *pcm_buf_fltrd_resampled = (int16_t *) calloc(1,
+                                                                              sizeof(int16_t) *
+                                                                              (num_samples_record /
+                                                                               3));
+                        // downsample to 16khz
+                        downsample_48000_to_16000_basic(pcm_buf_rec, pcm_buf_record_resampled,
+                                                        num_samples_record);
+
+                        const int split_factor = 4;
                         const int sample_count_split = (num_samples_record / split_factor);
+                        const int sample_count_split_downsampled = sample_count_split / 3;
+                        printf("WebRtcAecm_Process:samples=%d split_factor=%d sample_count_split=%d sample_count_split_downsampled=%d\n",
+                               (int32_t) num_samples_record, split_factor, sample_count_split,
+                               sample_count_split_downsampled);
                         for (int x = 0; x < split_factor; x++)
                         {
                             short const *const tmp1[] = {
-                                    (int16_t *) audio_rec_buffer[rec_buf_pointer_start] +
-                                    (x * sample_count_split), 0};
+                                    pcm_buf_record_resampled + (x * sample_count_split_downsampled),
+                                    0};
                             short *const tmp2[] = {
-                                    pcm_buf_out_resampled + (x * sample_count_split), 0};
+                                    pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
+                                    0};
                             WebRtcNsx_Process(nsxInst,
                                               tmp1,
                                               1,
                                               tmp2);
+
+                            int32_t res = WebRtcAecm_Process(
+                                    webrtc_aecmInst,
+                                    pcm_buf_record_resampled + (x * sample_count_split_downsampled),
+                                    pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
+                                    pcm_buf_out_resampled + (x * sample_count_split_downsampled),
+                                    (sample_count_split / 3),
+                                    200
+                            );
+                            printf("WebRtcAecm_Process:res=%d\n", res);
                         }
-                        memcpy(audio_rec_buffer[rec_buf_pointer_start], pcm_buf_out_resampled,
-                               num_samples_record * 2);
+
+                        // upsample back to 48khz
+                        upsample_16000_to_48000_basic(pcm_buf_out_resampled,
+                                                      pcm_buf_rec,
+                                                      num_samples_record / 3);
+                        free(pcm_buf_record_resampled);
+                        free(pcm_buf_fltrd_resampled);
                     }
                 }
 #endif
@@ -1522,9 +1551,14 @@ float audio_vu(const int16_t *pcm_data, uint32_t sample_count)
     return vu;
 }
 
-void set_aec_active(int active)
+void Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1aec_1active(JNIEnv *env, jclass clazz, jint active)
 {
     aec_active = active;
+}
+
+jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1aec_1active(JNIEnv *env, jclass clazz)
+{
+    return aec_active;
 }
 
 jfloat Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1vu_1in(JNIEnv *env, jclass clazz)
@@ -1537,7 +1571,6 @@ jfloat Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1vu_1out(JNIEnv 
     return (jfloat) audio_out_vu_value;
 }
 
-#if 0
 static int32_t upsample_16000_to_48000_basic(int16_t *in, int16_t *out, int32_t sample_count)
 {
     if (sample_count < 1)
@@ -1583,4 +1616,3 @@ static int32_t downsample_48000_to_16000_basic(int16_t *in, int16_t *out, int32_
 
     return 0;
 }
-#endif
