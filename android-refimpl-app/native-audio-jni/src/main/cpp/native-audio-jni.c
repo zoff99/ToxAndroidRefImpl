@@ -1611,16 +1611,18 @@ int32_t upsample_16000_to_48000_basic(int16_t *in, int16_t *out, int32_t sample_
     int16_t tmp1;
     int16_t tmp2;
     int16_t v1;
+    int16_t v2;
     for (int i = 0; i < sample_count; i++)
     {
         tmp1 = *(in);
         tmp2 = *(in + 1);
-        v1 = (int16_t) (((float) (tmp2 - tmp1)) / 3.0f);
+        v1 = (int16_t) ((float) (tmp2 - tmp1) / 3.0f);
+        v2 = (int16_t) (((float) (tmp2 - tmp1) * 2.0f) / 3.0f);
         *out = tmp1;
         out++;
         *out = tmp1 + v1;
         out++;
-        *out = tmp1 + v1 + v1;
+        *out = tmp1 + v2;
         out++;
         in++;
     }
@@ -1637,7 +1639,7 @@ int32_t downsample_48000_to_16000_basic(int16_t *in, int16_t *out, int32_t sampl
 
     for (int i = 0; i < (sample_count / 3); i++)
     {
-        *out = *in;
+        *out = *(in + 0);
         out++;
         in = in + 3;
     }
