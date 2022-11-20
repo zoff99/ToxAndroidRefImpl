@@ -401,10 +401,13 @@
     <string name="incoming_filetransfer_size_too_large">El tamaño de los archivos entrantes es demasiado grande. Sólo se pueden recibir archivos de hasta 2 GBytes.</string>
     <string name="pref_title_allow_enable_ngc_features">NGC - Nuevos chats de grupo</string>
     <string name="pref_description_enable_ngc_features">¡¡!! ¡¡Experimental !!
-\n¡¡Esto NO está funcionando, NO lo actives !!</string>
+\n¡¡Esto NO está funcionando completamente !!</string>
     <string name="pref_description_message_paging_num_msgs_per_page">Define el número de mensajes que se mostrarán por página. 0 significa que no hay paginación</string>
     <string name="pref_title_message_paging_num_msgs_per_page">Paginación de Mensajes</string>
     <string name="invite_friend_success">Has recibido una solicitud de amistad</string>
     <string name="invite_join_group_success">Has sido invitado a un grupo</string>
     <string name="invite_join_conference_success">Has sido invitado a un Grupo de Conferencia</string>
+    <string name="join_public_group_activity_warning">Advertencia:
+\n¡¡El ingreso a un Grupo Público a través del ID de Grupo no está funcionando todavía!!</string>
+    <string name="layout___load_network_connections">cargar las conexiones de red</string>
 </resources>
