@@ -241,6 +241,8 @@ public class AudioReceiver extends Thread
         {
             NativeAudio.n_audio_buffer[i] = ByteBuffer.allocateDirect(NativeAudio.n_buf_size_in_bytes);
             NativeAudio.n_bytes_in_buffer[i] = 0;
+            Log.i(TAG, "audio_play:read:init:n_audio_buffer:bufnum=" + i + " size in bytes=" +
+                       NativeAudio.n_buf_size_in_bytes);
             NativeAudio.set_JNI_audio_buffer(NativeAudio.n_audio_buffer[i], NativeAudio.n_buf_size_in_bytes, i);
         }
 
