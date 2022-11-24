@@ -3603,6 +3603,7 @@ public class MainActivity extends AppCompatActivity
                         VIDEO_FRAME_RATE_INCOMING = 0;
                         last_video_frame_received = -1;
                         MainActivity.set_av_call_status(Callstate.state);
+                        HelperGeneric.clear_audio_play_buffers();
                         Intent intent = new Intent(context_s.getApplicationContext(), CallingActivity.class);
                         Callstate.friend_pubkey = HelperFriend.tox_friend_get_public_key__wrapper(fn);
                         Callstate.friend_alias_name = get_friend_name_from_pubkey(Callstate.friend_pubkey);
@@ -4061,7 +4062,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_audio_receive_frame_pts_cb_method(long friend_number, long sample_count, int channels, long sampling_rate, long pts)
     {
-/*
+        /*
         if (pts != 0)
         {
             long ts1 = System.currentTimeMillis();
@@ -4089,7 +4090,7 @@ public class MainActivity extends AppCompatActivity
             global_last_audio_pts = pts;
             global_last_audio_ts = ts1;
         }
-*/
+        */
 
         android_toxav_callback_audio_receive_frame_cb_method(friend_number, sample_count, channels, sampling_rate);
     }
@@ -4245,6 +4246,11 @@ public class MainActivity extends AppCompatActivity
                                                                           Math.min(incoming_bytes,
                                                                                    NativeAudio.n_buf_size_in_bytes -
                                                                                    NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]));
+
+                    //Log.i(TAG,
+                    //      "audio_play:play_buffers:003:n_audio_in_buffer_max_count=" + n_audio_in_buffer_max_count +
+                    //      " n_cur_buf=" + NativeAudio.n_cur_buf + " n_bytes_in_buffer=" +
+                    //      NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf]);
 
                     if (remain_bytes > 0)
                     {

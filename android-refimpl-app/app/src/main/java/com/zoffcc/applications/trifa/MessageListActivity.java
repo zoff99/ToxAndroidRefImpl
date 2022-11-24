@@ -99,6 +99,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_pagin
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
+import static com.zoffcc.applications.trifa.HelperGeneric.clear_audio_play_buffers;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -1648,7 +1649,7 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.my_audio_enabled = 1;
                         Callstate.my_video_enabled = 1;
                         MainActivity.set_av_call_status(Callstate.state);
-
+                        clear_audio_play_buffers();
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_alias_name = get_friend_name_from_pubkey(Callstate.friend_pubkey);
 

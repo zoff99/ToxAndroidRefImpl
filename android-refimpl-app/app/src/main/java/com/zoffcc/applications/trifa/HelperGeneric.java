@@ -57,6 +57,7 @@ import com.bumptech.glide.request.target.NotificationTarget;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
@@ -86,6 +87,8 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.audio_buffer;
+import static com.zoffcc.applications.nativeaudio.AudioProcessing.audio_rec_buffer;
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
@@ -113,6 +116,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__speakerphone_tweak;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_CUSTOM_WRITE_CACHE;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_option_set;
@@ -4454,5 +4458,60 @@ public class HelperGeneric
             p.height = (int) dp2px(MESSAGE_AVATAR_HEIGHT_NORMAL_LAYOUT[PREF__global_font_size]);
         }
         v.setLayoutParams(p);
+    }
+
+    public static void clear_audio_play_buffers()
+    {
+        try
+        {
+            audio_buffer.clear();
+            byte[] b1 = new byte[audio_buffer.limit()];
+            audio_buffer.put(b1);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "clear audio play buffers:001:EE01" + e.getMessage());
+        }
+
+        try
+        {
+            audio_rec_buffer.clear();
+            byte[] b2 = new byte[audio_rec_buffer.limit()];
+            audio_rec_buffer.put(b2);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "clear audio play buffers:002:EE02" + e.getMessage());
+        }
+
+        try
+        {
+            audio_buffer_2.clear();
+            byte[] b2 = new byte[audio_buffer_2.limit()];
+            audio_buffer_2.put(b2);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "clear audio play buffers:003:EE03" + e.getMessage());
+        }
+
+        try
+        {
+            for (int i = 0; i < NativeAudio.n_audio_in_buffer_max_count; i++)
+            {
+                NativeAudio.n_audio_buffer[i].clear();
+                Log.i(TAG, "clear audio play buffers:008:limit=" + NativeAudio.n_audio_buffer[i].limit());
+                byte[] b3 = new byte[NativeAudio.n_audio_buffer[i].limit()];
+                NativeAudio.n_audio_buffer[i].put(b3);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "clear audio play buffers:008:EE08" + e.getMessage());
+        }
     }
 }
