@@ -2486,7 +2486,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     Log.i(TAG, "onSensorChanged:--> speaker");
                     if (PREF__use_software_aec)
                     {
-                        set_aec_active(1);
+                        set_aec_active(0); // --ACTIVE--
                     }
                     else
                     {
