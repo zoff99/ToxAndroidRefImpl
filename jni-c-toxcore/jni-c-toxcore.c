@@ -2580,6 +2580,11 @@ void android_toxav_callback_call_cb(uint32_t friend_number, bool audio_enabled, 
 
 void toxav_call_cb_(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool video_enabled, void *user_data)
 {
+    // clear jni incoming audio buffer
+    if (audio_buffer_pcm_2 != NULL)
+    {
+        memset((void *)audio_buffer_pcm_2, 0,(size_t)audio_buffer_pcm_2_size);
+    }
     android_toxav_callback_call_cb(friend_number, audio_enabled, video_enabled);
 }
 // ------------- AV ------------
@@ -8000,6 +8005,11 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong audio_bit_rate, jlong video_bit_rate)
 {
+    // clear jni incoming audio buffer
+    if (audio_buffer_pcm_2 != NULL)
+    {
+        memset((void *)audio_buffer_pcm_2, 0,(size_t)audio_buffer_pcm_2_size);
+    }
     TOXAV_ERR_CALL error;
     bool res = toxav_call(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate, (uint32_t)video_bit_rate,
                           &error);
