@@ -9,7 +9,7 @@
     <string name="set_password_message_password_dont_match">Las contraseñas no coinciden</string>
     <string name="title_activity_calling">Llamada</string>
     <string name="title_activity_profile">Perfil</string>
-    <string name="title_activity_settings">Configuraciones</string>
+    <string name="title_activity_settings">Ajustes</string>
     <string name="title_activity_crash">Choque</string>
     <string name="title_activity_friendinfo">Información de amigo</string>
     <string name="title_activity_conferencepeerinfo">Informaciones sobre el par</string>
@@ -232,7 +232,7 @@
     <string name="ConferenceAudioActivity_18">hablando ...</string>
     <string name="GroupActivityActive">Activo:</string>
     <string name="GroupActivityOffline">Desconectado:</string>
-    <string name="layout___toxid">ToxID</string>
+    <string name="layout___toxid">Identificación de Tox</string>
     <string name="layout___scan_qr_code">escanear código QR</string>
     <string name="layout___enter_pass_longtext">Ingrese la contraseña \n¡No hay opción de recuperación!</string>
     <string name="layout___unlock">desbloquear</string>

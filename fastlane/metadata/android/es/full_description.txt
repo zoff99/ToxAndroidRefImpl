@@ -1,19 +1,22 @@
-<b>TRIfA: un nuevo tipo de mensajería instantánea </b><br>
+<b>TRIfA: Un Nuevo Tipo de Mensajería Instantánea</b><br>
 
-Ya sean corporaciones o gobiernos, la vigilancia digital hoy en día está muy extendida.<br>
+Ya se trate de corporaciones o gobiernos, la vigilancia digital hoy en día está muy extendida.<br>
 Tox es un software fácil de usar que lo conecta con amigos y familiares sin que nadie más lo escuche.<br>
-Mientras que otros servicios de renombre requieren que pague por las funciones, Tox es completamente gratuito y viene sin publicidad – para siempre.<br><br>
+Mientras que otros servicios de renombre requieren que pague por las funciones, Tox es completamente gratuito y viene sin publicidad, para siempre.<br><br>
 
-<b>Encriptado:</b><br>
-Todo lo que hace con Tox se cifra mediante bibliotecas de código abierto. Las únicas personas que pueden ver sus conversaciones son las personas con las que está hablando. <br><br>
+<b>Cifrado:</b><br>
+Todo lo que hace con Tox está encriptado usando bibliotecas de código abierto. Las únicas personas que pueden ver tus conversaciones son las personas con las que estás hablando.<br><br>
 
 <b>Distribuido:</b><br>
-Tox no tiene servidores centrales que puedan ser atacados, apagados o forzados a entregar datos; la red está formada por sus usuarios. ¡Diga adiós a las interrupciones del servidor!<br><br>
+Tox no tiene servidores centrales que puedan ser asaltados, cerrados o forzados a entregar datos: la red está formada por sus usuarios. ¡Diga adiós a las interrupciones del servidor!<br><br>
 
-<b> Gratis:</b><br>
-Tox es un software gratuito. Es libre como en libertad y gratis cuanto al precio. Esto significa que Tox es suyo, para usar, modificar y compartir, porque Tox está desarrollado por y para los usuarios.<br><br>
+<b>Gratis:</b><br>
+Tox es software libre. Eso es gratis como en libertad, así como en precio. Esto significa que Tox es suyo, para usar, modificar y compartir, porque Tox está desarrollado por y para los usuarios.<br><br>
 
-<b> Más informaciones: </b><br>
+<b>Más información:</b><br>
 * Acerca de Tox: https://tox.zoff.cc
+<br>
 * Únase a la discusión en Matrix: https://matrix.to/#/#trifa:matrix.org
-* Únase al canal Tox IRC: https://matrix.to/#/#toktok:libera.chat
+<br>
+* Únase al canal Tox del IRC: https://matrix.to/#/#toktok:libera.chat
+<br>
