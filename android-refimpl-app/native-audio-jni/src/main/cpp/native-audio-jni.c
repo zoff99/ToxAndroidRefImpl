@@ -131,6 +131,8 @@ JavaVM *cachedJVM = NULL;
 static const int audio_play_buffers_in_queue_max = 10;
 uint8_t *audio_play_buffer[10];
 static const uint8_t empty_buffer[20000];
+int empty_play_buffer_size =
+        1920 * 2; // to be changed later, we dont know the incoming audio setup yet
 long audio_play_buffer_size[10];
 int audio_play_buffers_in_queue = 0;
 int audio_play_buffers_curbuf_index = 0;
@@ -268,7 +270,8 @@ int android_find_class_global(char *name, jclass *ret)
 void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:A003:STATE = %d", (int)rec_state);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:A003:STATE = %d",
+                        (int) rec_state);
 #endif
     if (rec_state != _RECORDING)
     {
@@ -294,7 +297,9 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
         // enque the next buffer
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:A005:Enqueue -> %d, nextSize=%d", rec_buf_pointer_next, (int)nextSize);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "bqRecorderCallback:A005:Enqueue -> %d, nextSize=%d",
+                            rec_buf_pointer_next, (int) nextSize);
 #endif
 
         SLAndroidSimpleBufferQueueState state;
@@ -510,26 +515,28 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
     if (state5.count < 2)
     {
         (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                        (SLuint32) nextSize);
+                                        (SLuint32) empty_play_buffer_size);
         (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                        (SLuint32) nextSize);
+                                        (SLuint32) empty_play_buffer_size);
         (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                        (SLuint32) nextSize);
+                                        (SLuint32) empty_play_buffer_size);
         (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                        (SLuint32) nextSize);
+                                        (SLuint32) empty_play_buffer_size);
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "bqPlayerCallback:x:Enqueue:empty_buffer");
+                            "bqPlayerCallback:x:Enqueue:empty_buffer %p %d", (void *) empty_buffer,
+                            empty_play_buffer_size);
 #endif
     }
 
     if (audio_play_buffers_in_queue < 1)
     {
         (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                        (SLuint32) nextSize);
+                                        (SLuint32) empty_play_buffer_size);
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "bqPlayerCallback:1:Enqueue:empty_buffer");
+                            "bqPlayerCallback:1:Enqueue:empty_buffer %p %d", (void *) empty_buffer,
+                            empty_play_buffer_size);
 #endif
     }
     else
@@ -542,7 +549,7 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                                                   (audio_play_buffers_in_queue - 1)];
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "bqPlayerCallback:idx:%d %d", a, use_buffer_index);
+                            "bqPlayerCallback:idx:%d", use_buffer_index);
 #endif
 
         nextBuffer = (int8_t *) audio_play_buffer[use_buffer_index];
@@ -562,10 +569,11 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         if (result != SL_RESULT_SUCCESS)
         {
             (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                            (SLuint32) nextSize);
+                                            (SLuint32) empty_play_buffer_size);
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
             __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                "bqPlayerCallback:2:Enqueue:empty_buffer");
+                                "bqPlayerCallback:2:Enqueue:empty_buffer %p %d",
+                                (void *) empty_buffer, empty_play_buffer_size);
 #endif
         }
         else
@@ -576,7 +584,8 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "bqPlayerCallback:1:audio_play_buffers_in_queue=%d",(int)audio_play_buffers_in_queue);
+                        "bqPlayerCallback:1:audio_play_buffers_in_queue=%d",
+                        (int) audio_play_buffers_in_queue);
 #endif
 
     if (audio_play_buffers_in_queue < 0)
@@ -586,7 +595,8 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "bqPlayerCallback:2:audio_play_buffers_in_queue=%d",(int)audio_play_buffers_in_queue);
+                        "bqPlayerCallback:2:audio_play_buffers_in_queue=%d",
+                        (int) audio_play_buffers_in_queue);
 #endif
 
     pthread_mutex_unlock(&play_buffer_queued_count_mutex);
@@ -1128,6 +1138,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 
     nextBuffer = (int8_t *) audio_play_buffer[bufnum];
     nextSize = audio_play_buffer_size[bufnum];
+    empty_play_buffer_size = nextSize;
 
     SLAndroidSimpleBufferQueueState state;
     (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
@@ -1167,10 +1178,10 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         pthread_mutex_unlock(&play_buffer_queued_count_mutex);
 
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
-        SLAndroidSimpleBufferQueueState state;
-        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state);
+        SLAndroidSimpleBufferQueueState state67;
+        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state67);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "bqPlayerCallback:real_buffer_count:2=%d guess=%d", state.count,
+                            "bqPlayerCallback:real_buffer_count:2=%d guess=%d", state67.count,
                             audio_play_buffers_in_queue);
 #endif
 
@@ -1182,14 +1193,15 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         if (player_state_current != _PLAYING)
         {
             (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                            (SLuint32) nextSize);
+                                            (SLuint32) empty_play_buffer_size);
             (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                            (SLuint32) nextSize);
+                                            (SLuint32) empty_play_buffer_size);
             (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                            (SLuint32) nextSize);
+                                            (SLuint32) empty_play_buffer_size);
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
             __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                "PlayPCM16:2:Enqueue:empty_buffer");
+                                "PlayPCM16:2:Enqueue:empty_buffer %p %d", (void *) empty_buffer,
+                                empty_play_buffer_size);
 #endif
 
             SLAndroidSimpleBufferQueueState state2;
@@ -1237,10 +1249,11 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     if ((int) state9.count < 2)
     {
         (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                        (SLuint32) nextSize);
+                                        (SLuint32) empty_play_buffer_size);
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "PlayPCM16:9:Enqueue:empty_buffer");
+                            "PlayPCM16:9:Enqueue:empty_buffer %p %d", (void *) empty_buffer,
+                            empty_play_buffer_size);
 #endif
     }
 
