@@ -400,6 +400,7 @@ jstring c_safe_string_from_java(const char *instr, size_t len);
 
 void videocall_audio_alloc_peer_buffer();
 void videocall_audio_free_peer_buffer();
+void videocall_audio_clear_peer_buffer();
 uint32_t videocall_audio_get_samples_in_buffer();
 uint32_t videocall_audio_any_have_sample_count_in_buffer_count(uint32_t sample_count);
 void videocall_audio_add_buffer(const int16_t *pcm, uint32_t num_samples);
@@ -2580,6 +2581,15 @@ void android_toxav_callback_call_cb(uint32_t friend_number, bool audio_enabled, 
 
 void toxav_call_cb_(ToxAV *av, uint32_t friend_number, bool audio_enabled, bool video_enabled, void *user_data)
 {
+    // clear jni incoming audio buffer
+    if (audio_buffer_pcm_2 != NULL)
+    {
+        memset((void *)audio_buffer_pcm_2, 0,(size_t)audio_buffer_pcm_2_size);
+    }
+    pthread_mutex_lock(&group_audio___mutex);
+    videocall_audio_clear_peer_buffer();
+    pthread_mutex_unlock(&group_audio___mutex);
+
     android_toxav_callback_call_cb(friend_number, audio_enabled, video_enabled);
 }
 // ------------- AV ------------
@@ -8000,6 +8010,15 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong audio_bit_rate, jlong video_bit_rate)
 {
+    // clear jni incoming audio buffer
+    if (audio_buffer_pcm_2 != NULL)
+    {
+        memset((void *)audio_buffer_pcm_2, 0,(size_t)audio_buffer_pcm_2_size);
+    }
+    pthread_mutex_lock(&group_audio___mutex);
+    videocall_audio_clear_peer_buffer();
+    pthread_mutex_unlock(&group_audio___mutex);
+
     TOXAV_ERR_CALL error;
     bool res = toxav_call(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate, (uint32_t)video_bit_rate,
                           &error);
@@ -8389,17 +8408,34 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
 void videocall_audio_alloc_peer_buffer()
 {
-        uint32_t num_peers = 1;
-        global___audio_group_ret_buf = (int16_t *)calloc(1, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
-        global___audio_group_temp_buf = (int16_t *)calloc(1, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+    uint32_t num_peers = 1;
+    global___audio_group_ret_buf = (int16_t *)calloc(1, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+    global___audio_group_temp_buf = (int16_t *)calloc(1, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
 
-        global_group_audio_peerbuffers_buffer =
-                    (int16_t *)calloc(1, (size_t)(num_peers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2));
+    global_group_audio_peerbuffers_buffer =
+                (int16_t *)calloc(1, (size_t)(num_peers * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2));
 
-        global_group_audio_peerbuffers_buffer_start_pos = (size_t *)calloc(1, (size_t)(num_peers * sizeof(size_t)));
-        global_group_audio_peerbuffers_buffer_end_pos = (size_t *)calloc(1, (size_t)(num_peers * sizeof(size_t)));
-        global_group_audio_peerbuffers = num_peers;
+    global_group_audio_peerbuffers_buffer_start_pos = (size_t *)calloc(1, (size_t)(num_peers * sizeof(size_t)));
+    global_group_audio_peerbuffers_buffer_end_pos = (size_t *)calloc(1, (size_t)(num_peers * sizeof(size_t)));
+    global_group_audio_peerbuffers = num_peers;
 }
+
+void videocall_audio_clear_peer_buffer()
+{
+    if (global___audio_group_ret_buf)
+    {
+        memset(global___audio_group_ret_buf, 0, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+    }
+    if (global___audio_group_temp_buf)
+    {
+        memset(global___audio_group_temp_buf, 0, GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+    }
+    if (global_group_audio_peerbuffers_buffer)
+    {
+        memset(global_group_audio_peerbuffers_buffer, 0, 1 * GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * 2);
+    }
+}
+
 
 void videocall_audio_free_peer_buffer()
 {
