@@ -35,7 +35,7 @@ public class NativeAudio
 {
     private static final String TAG = "trifa.NativeAudio";
 
-    public static final int n_audio_in_buffer_max_count = 10; // NORM= 5;
+    public static final int n_audio_in_buffer_max_count = 10; // BAD: !!! always keep in sync with native-audio-jni.c `static const int audio_play_buffers_in_queue_max = 10;` !!!
     public static ByteBuffer[] n_audio_buffer = new ByteBuffer[n_audio_in_buffer_max_count];
     public static int n_cur_buf = 0;
     public static int n_buf_size_in_bytes = 0;
@@ -44,7 +44,7 @@ public class NativeAudio
     public static int sampling_rate = 48000;
     public static int channel_count = 1;
 
-    public static final int n_rec_audio_in_buffer_max_count = 3; // BAD: !!! always keep in sync with native-audio-jni.c `int num_rec_bufs = 2;` !!!
+    public static final int n_rec_audio_in_buffer_max_count = 3; // BAD: !!! always keep in sync with native-audio-jni.c `int num_rec_bufs = 3;` !!!
     public static ByteBuffer[] n_rec_audio_buffer = new ByteBuffer[n_rec_audio_in_buffer_max_count];
     public static int n_rec_cur_buf = 0;
     public static int n_rec_buf_size_in_bytes = 0;

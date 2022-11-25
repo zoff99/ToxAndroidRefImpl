@@ -65,7 +65,24 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
+/*
+ *
+ *
+ * #########################################
+ *
+ *
+ */
+static const char *LOGTAG = "trifa.nativeaudio";
+// #define DEBUG_NATIVE_AUDIO_DEEP 1 // define to activate full debug logging
 #define WEBRTC_AEC 1
+// #define WEBRTC_DEBUGGING 1
+/*
+ *
+ *
+ * #########################################
+ *
+ *
+ */
 
 bool filteraudio_used = false;
 #ifdef WEBRTC_AEC
@@ -123,17 +140,14 @@ int aec_active = 0;
 #endif
 #define SL_ANDROID_PERFORMANCE_POWER_SAVING ((SLuint32) 0x00000003)
 
-static const char *LOGTAG = "trifa.nativeaudio";
-// #define DEBUG_NATIVE_AUDIO_DEEP 1 // define to activate full debug logging
-
 // -----------------------------
 JavaVM *cachedJVM = NULL;
-static const int audio_play_buffers_in_queue_max = 10;
-uint8_t *audio_play_buffer[10];
+static const int audio_play_buffers_in_queue_max = 10; // BAD: !!! always keep in sync with NavitAudio.java `public static final int n_audio_in_buffer_max_count = 10;` !!!
+uint8_t *audio_play_buffer[10]; // always set to array depth of `audio_play_buffers_in_queue_max` !!!
 static const uint8_t empty_buffer[20000];
+long audio_play_buffer_size[10]; // always set to array depth of `audio_play_buffers_in_queue_max` !!!
 int empty_play_buffer_size =
         1920 * 2; // to be changed later, we dont know the incoming audio setup yet
-long audio_play_buffer_size[10];
 int audio_play_buffers_in_queue = 0;
 int audio_play_buffers_curbuf_index = 0;
 #define _STOPPED 0
@@ -154,11 +168,11 @@ NsxHandle *nsxInst = NULL;
 #endif
 // --------- AEC ---------
 
-uint8_t *audio_rec_buffer[20];
-long audio_rec_buffer_size[20];
+int num_rec_bufs = 3; // BAD: !!! always keep in sync with NavitAudio.java `public static final int n_rec_audio_in_buffer_max_count = 3;` !!!
+uint8_t *audio_rec_buffer[20]; // always set to array depth of at least `num_rec_bufs` !!!
+long audio_rec_buffer_size[20]; // always set to array depth of at least `num_rec_bufs` !!!
 int rec_buf_pointer_start = 0;
 int rec_buf_pointer_next = 0;
-int num_rec_bufs = 3; // BAD: !!! always keep in sync with NavitAudio.java `public static final int n_rec_audio_in_buffer_max_count = 2;` !!!
 #define _RECORDING 3
 int rec_state = _STOPPED;
 #define RECORD_BUFFERS_BETWEEN_REC_AND_PROCESS 2
@@ -381,13 +395,14 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                         // downsample to 16khz
                         downsample_48000_to_16000_basic(pcm_buf_rec, pcm_buf_record_resampled,
                                                         num_samples_record);
-
                         const int split_factor = 4;
                         const int sample_count_split = (num_samples_record / split_factor);
                         const int sample_count_split_downsampled = sample_count_split / 3;
+#ifdef WEBRTC_DEBUGGING
                         printf("WebRtcAecm_Process:samples=%d split_factor=%d sample_count_split=%d sample_count_split_downsampled=%d\n",
                                (int32_t) num_samples_record, split_factor, sample_count_split,
                                sample_count_split_downsampled);
+#endif
                         for (int x = 0; x < split_factor; x++)
                         {
                             short const *const tmp1[] = {
@@ -400,18 +415,20 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                                               tmp1,
                                               1,
                                               tmp2);
-
                             int32_t res = WebRtcAecm_Process(
                                     webrtc_aecmInst,
                                     pcm_buf_record_resampled + (x * sample_count_split_downsampled),
                                     pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
                                     pcm_buf_out_resampled + (x * sample_count_split_downsampled),
-                                    (sample_count_split / 3),
+                                    sample_count_split_downsampled,
                                     200
                             );
+                            // suppress unused var
+                            (void) res;
+#ifdef WEBRTC_DEBUGGING
                             printf("WebRtcAecm_Process:res=%d\n", res);
+#endif
                         }
-
                         // upsample back to 48khz
                         upsample_16000_to_48000_basic(pcm_buf_out_resampled,
                                                       pcm_buf_rec,
@@ -1130,14 +1147,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         audio_out_vu_value = 0.0f;
         return -1;
     }
-
-    // Leaving BufferQueue::Enqueue (SL_RESULT_PARAMETER_INVALID)
-
-    int nextSize = 0;
-    int8_t *nextBuffer = NULL;
-
-    nextBuffer = (int8_t *) audio_play_buffer[bufnum];
-    nextSize = audio_play_buffer_size[bufnum];
+    int8_t *nextBuffer = (int8_t *) audio_play_buffer[bufnum];
+    int nextSize = audio_play_buffer_size[bufnum];
     empty_play_buffer_size = nextSize;
 
     SLAndroidSimpleBufferQueueState state;
@@ -1150,24 +1161,56 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
             audio_out_vu_value = 0.0f;
             return -2;
         }
-
         if (player_state_current == _PLAYING)
         {
             audio_out_vu_value = audio_vu((int16_t *) nextBuffer, (uint32_t) (nextSize / 2));
         }
-
-        // enque the buffer
         playing_state = _PLAYING;
 
         if (filteraudio_used)
         {
             //pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
             //                  (unsigned int) (nextSize / 2));
-            //**// WebRtcAecm_BufferFarend();
 #ifdef WEBRTC_AEC
             if (aec_active == 1)
             {
+                if (audio_play_buffer_size[bufnum] ==
+                    (samples_per_frame_for_48000_40ms * 2))
+                {
+                    const int num_samples_play =
+                            audio_play_buffer_size[bufnum] / 2;
+                    int16_t *pcm_buf_play = (int16_t *) audio_play_buffer[bufnum];
+                    int16_t *pcm_buf_play_resampled = (int16_t *) calloc(1,
+                                                                         sizeof(int16_t) *
+                                                                         (num_samples_play /
+                                                                          3));
+                    // downsample to 16khz
+                    downsample_48000_to_16000_basic(pcm_buf_play, pcm_buf_play_resampled,
+                                                    num_samples_play);
 
+                    const int split_factor = 4;
+                    const int sample_count_split = (num_samples_play / split_factor);
+                    const int sample_count_split_downsampled = sample_count_split / 3;
+#ifdef WEBRTC_DEBUGGING
+                    printf("WebRtcAecm_BufferFarend:samples=%d split_factor=%d sample_count_split=%d sample_count_split_downsampled=%d\n",
+                           (int32_t) num_samples_play, split_factor, sample_count_split,
+                           sample_count_split_downsampled);
+#endif
+                    for (int x = 0; x < split_factor; x++)
+                    {
+                        int32_t res = WebRtcAecm_BufferFarend(
+                                webrtc_aecmInst,
+                                (int16_t *) pcm_buf_play_resampled +
+                                (x * sample_count_split_downsampled),
+                                sample_count_split_downsampled);
+                        // suppress unused var
+                        (void) res;
+#ifdef WEBRTC_DEBUGGING
+                        printf("WebRtcAecm_BufferFarend:res=%d\n", res);
+#endif
+                    }
+                    free(pcm_buf_play_resampled);
+                }
             }
 #endif
         }
@@ -1245,7 +1288,6 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 
     SLAndroidSimpleBufferQueueState state9;
     (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state9);
-
     if ((int) state9.count < 2)
     {
         (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
@@ -1627,7 +1669,11 @@ void
 Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1aec_1active(JNIEnv *env, jclass clazz,
                                                                       jint active)
 {
-    aec_active = active;
+    if (filteraudio_used == 1)
+    {
+        aec_active = (int) active;
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_aec_active:aec_active=%d", aec_active);
+    }
 }
 
 jint
