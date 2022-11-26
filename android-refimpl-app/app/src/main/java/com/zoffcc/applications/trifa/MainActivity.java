@@ -129,6 +129,7 @@ import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib
 import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_audio_aec_delay;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
@@ -3604,6 +3605,13 @@ public class MainActivity extends AppCompatActivity
                         last_video_frame_received = -1;
                         MainActivity.set_av_call_status(Callstate.state);
                         HelperGeneric.clear_audio_play_buffers();
+                        try
+                        {
+                            set_audio_aec_delay(PREF__X_eac_delay_ms);
+                        }
+                        catch(Exception e)
+                        {
+                        }
                         Intent intent = new Intent(context_s.getApplicationContext(), CallingActivity.class);
                         Callstate.friend_pubkey = HelperFriend.tox_friend_get_public_key__wrapper(fn);
                         Callstate.friend_alias_name = get_friend_name_from_pubkey(Callstate.friend_pubkey);

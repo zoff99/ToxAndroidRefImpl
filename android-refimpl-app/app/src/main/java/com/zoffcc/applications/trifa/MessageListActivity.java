@@ -75,6 +75,7 @@ import androidx.documentfile.provider.DocumentFile;
 
 import static android.widget.Toast.LENGTH_LONG;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_audio_aec_delay;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.CallingActivity.update_top_text_line;
@@ -95,6 +96,7 @@ import static com.zoffcc.applications.trifa.HelperMessage.insert_into_message_db
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.CallingActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.CallingWaitingActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_eac_delay_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
@@ -1650,6 +1652,13 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.my_video_enabled = 1;
                         MainActivity.set_av_call_status(Callstate.state);
                         clear_audio_play_buffers();
+                        try
+                        {
+                            set_audio_aec_delay(PREF__X_eac_delay_ms);
+                        }
+                        catch (Exception e)
+                        {
+                        }
                         Intent intent = new Intent(context_s, CallingActivity.class);
                         Callstate.friend_alias_name = get_friend_name_from_pubkey(Callstate.friend_pubkey);
 

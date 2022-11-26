@@ -95,6 +95,7 @@ int16_t *pcm_buf_out_resampled;
 #endif
 
 int aec_active = 0;
+int audio_aec_delay = 80;
 
 /*---------------------------------------------------------------------------*/
 /* Android AudioPlayer and AudioRecorder configuration                       */
@@ -319,7 +320,6 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         SLAndroidSimpleBufferQueueState state;
         (*bq)->GetState(bq, &state);
 
-#if 1
         if (state.count < 1)
         {
             SLresult result;
@@ -349,8 +349,6 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
 
         }
-#endif
-
 
         SLresult result = (*bq)->Enqueue(bq, nextBuffer, (SLuint32) nextSize);
         if (result != SL_RESULT_SUCCESS)
@@ -421,7 +419,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                                     pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
                                     pcm_buf_out_resampled + (x * sample_count_split_downsampled),
                                     sample_count_split_downsampled,
-                                    200
+                                    audio_aec_delay
                             );
                             // suppress unused var
                             (void) res;
@@ -1680,6 +1678,23 @@ jint
 Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1aec_1active(JNIEnv *env, jclass clazz)
 {
     return aec_active;
+}
+
+void
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1audio_1aec_1delay(JNIEnv *env,
+                                                                            jclass clazz,
+                                                                            jint delay)
+{
+    audio_aec_delay = (int) delay;
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_audio_aec_delay:audio_aec_delay=%d",
+                        audio_aec_delay);
+}
+
+jint
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1audio_1aec_1delay(JNIEnv *env,
+                                                                            jclass clazz)
+{
+    return audio_aec_delay;
 }
 
 jfloat Java_com_zoffcc_applications_nativeaudio_NativeAudio_get_1vu_1in(JNIEnv *env, jclass clazz)
