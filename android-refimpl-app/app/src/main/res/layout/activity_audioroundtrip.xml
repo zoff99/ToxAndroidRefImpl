@@ -15,11 +15,21 @@
         android:text="" />
 
     <TextView
+        android:id="@+id/info_text_001"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:gravity="center"
+        android:text="Do the Test in a quiet room,\nand do not make any sound.\nWait for the beep sounds,\nthen read the latency value.\n\nAfter the test please exit TRIfA and restart it."
+        android:textSize="13sp"
+        tools:ignore="HardcodedText" />
+
+    <TextView
         android:id="@+id/roundtrip_info_textview"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:gravity="center"
         android:text="device audio info"
         android:textSize="13sp"
@@ -28,9 +38,9 @@
     <TextView
         android:id="@+id/roundtrip_time_textview"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_weight="3"
+        android:layout_weight="2"
         android:gravity="center"
         android:text="press Start to start the Audio delay Test"
         android:textSize="20sp"
@@ -39,10 +49,9 @@
     <Button
         android:id="@+id/roundtrip_start_button"
         android:layout_width="wrap_content"
-        android:layout_height="0dp"
+        android:layout_height="60dp"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_margin="20dp"
-        android:layout_weight="1"
+        android:layout_margin="10dp"
         android:gravity="center"
         android:text="Start"
         android:textAllCaps="false"
@@ -53,7 +62,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center_vertical|center_horizontal"
-        android:layout_weight="1"
+        android:layout_weight="2"
         android:text="" />
 
 </LinearLayout>
