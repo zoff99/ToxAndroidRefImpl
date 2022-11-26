@@ -119,7 +119,7 @@ public class HelperGroup
             catch (Exception e3)
             {
                 Log.i(TAG, "new_or_updated_group:EE3:" + e3.getMessage());
-                e3.printStackTrace();
+                // e3.printStackTrace();
             }
 
             return;

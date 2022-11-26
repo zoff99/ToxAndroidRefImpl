@@ -1,0 +1,48 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/calling_activity_top_viewgroup"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context="com.zoffcc.applications.trifa.CallingActivity">
+
+    <TextView
+        android:id="@+id/dummy1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_weight="1"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/roundtrip_time_textview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_weight="3"
+        android:gravity="center"
+        android:text="press Start to start the Audio delay Test"
+        android:textSize="20sp"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/roundtrip_start_button"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_margin="20dp"
+        android:layout_weight="1"
+        android:gravity="center"
+        android:text="Start"
+        android:textAllCaps="false"
+        tools:ignore="HardcodedText" />
+
+    <TextView
+        android:id="@+id/dummy2"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_weight="1"
+        android:text="" />
+
+</LinearLayout>

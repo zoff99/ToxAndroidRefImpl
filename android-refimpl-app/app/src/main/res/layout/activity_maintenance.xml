@@ -136,6 +136,16 @@
                 android:text="@string/layout___iobrowser_start"
                 android:textSize="14sp"/>
 
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/button_audio_roundtrip_test_start"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:text="@string/layout___audio_roundtrip_test_start"
+                android:textSize="14sp"/>
+
             <TextView
                 android:id="@+id/text_sqlstats"
                 android:layout_width="match_parent"

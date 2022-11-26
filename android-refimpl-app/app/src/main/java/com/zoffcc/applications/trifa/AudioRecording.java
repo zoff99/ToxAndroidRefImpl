@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.os.AsyncTask;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.AudioProcessing;
@@ -37,12 +38,16 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engin
 import static com.zoffcc.applications.nativeaudio.NativeAudio.semaphore_audioprocessing_02;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
+import static com.zoffcc.applications.trifa.AudioRoundtripActivity.LatencyTestActive;
+import static com.zoffcc.applications.trifa.AudioRoundtripActivity.measured_audio_latency;
+import static com.zoffcc.applications.trifa.AudioRoundtripActivity.measured_audio_latency_set;
 import static com.zoffcc.applications.trifa.CallingActivity.calling_activity_start_ms;
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk_active;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group_audio_send_icon;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.AEC_DEBUG_DUMP;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
@@ -455,7 +460,7 @@ public class AudioRecording extends Thread
                             }
                         }
                     }
-                    else
+                    else if (Callstate.audio_call)
                     {
                         // Log.i(TAG,
                         //       "toxav_audio_send_frame:002:native:Callstate.friend_pubkey=" + Callstate.friend_pubkey +
@@ -470,6 +475,34 @@ public class AudioRecording extends Thread
                         //               ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
                         // }
 
+                    }
+                    else if (LatencyTestActive)
+                    {
+                        //  --------------- we are testing audio Latency ---------------
+                        float cur_recording_level = NativeAudio.get_vu_in();
+
+                        NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                        final String hex_string_bytes = bytesToHex(NativeAudio.n_rec_audio_buffer[bufnum_].array(),
+                                                                   NativeAudio.n_rec_audio_buffer[bufnum_].arrayOffset(),
+                                                                   NativeAudio.n_rec_audio_buffer[bufnum_].limit());
+
+                        if (cur_recording_level > -2)
+                        {
+                            long ms_latency = SystemClock.uptimeMillis() - AudioRoundtripActivity.d1;
+                            if ((ms_latency > 30) && (!measured_audio_latency_set))
+                            {
+                                Log.i(TAG, "LatencyTestThread:--recording--:level=" + cur_recording_level +
+                                           " latency in ms=" + ms_latency + " bufnum=" + bufnum_ + " data=" +
+                                           hex_string_bytes);
+                                measured_audio_latency = ms_latency;
+                                measured_audio_latency_set = true;
+                            }
+                        }
+                        //  --------------- we are testing audio Latency ---------------
+                    }
+                    else
+                    {
+                        // HINT: should never come here!
                     }
 
                     if (DEBUG_MIC_DATA_LOGGING)

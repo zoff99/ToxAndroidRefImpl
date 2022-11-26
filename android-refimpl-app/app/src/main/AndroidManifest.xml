@@ -276,6 +276,14 @@
             android:name=".IOBrowser" >
         </activity>
 
+        <activity
+            android:name=".AudioRoundtripActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden">
+        </activity>
+
         <receiver
             android:name=".ConnectionManager"
             android:label="NetworkConnection">

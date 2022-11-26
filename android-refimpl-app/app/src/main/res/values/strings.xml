@@ -470,6 +470,7 @@
     <string name="layout___test_notification_sound">test Notification sound</string>
     <string name="layout___test_ringtone_sound">test Ringtone sound</string>
     <string name="layout___iobrowser_start">browse encrypted Storage</string>
+    <string name="layout___audio_roundtrip_test_start">Audio Latency Test</string>
     <string name="layout___export_tox_savedata_unsecure">export tox savedata *unsecure*</string>
     <string name="layout___export_tox_encrypted_files_unsecure">export encrypted files *unsecure*</string>
     <string name="layout___export_tox_encrypted_chats_unsecure">export encrypted chats *unsecure*</string>
