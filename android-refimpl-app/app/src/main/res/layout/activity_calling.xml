@@ -263,9 +263,9 @@
                 android:id="@+id/video_box_aec"
                 android:layout_width="110dp"
                 android:layout_height="50dp"
-                android:layout_gravity="center|right"
+                android:layout_gravity="center|left"
                 android:layout_marginTop="150dp"
-                android:layout_marginRight="145dp"
+                android:layout_marginLeft="10dp"
                 android:background="@null"
                 android:elevation="2dp">
 
