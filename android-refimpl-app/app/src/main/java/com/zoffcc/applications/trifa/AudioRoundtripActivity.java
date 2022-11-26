@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -55,6 +56,7 @@ public class AudioRoundtripActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.ARoundtrActy";
     private TextView roundtrip_time_textview;
+    private TextView roundtrip_info_textview;
     private Button roundtrip_start_button;
     private boolean test_running = false;
     private Thread LatencyTestThread = null;
@@ -69,7 +71,44 @@ public class AudioRoundtripActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_audioroundtrip);
         roundtrip_time_textview = findViewById(R.id.roundtrip_time_textview);
+        roundtrip_info_textview = findViewById(R.id.roundtrip_info_textview);
         roundtrip_start_button = findViewById(R.id.roundtrip_start_button);
+
+        try
+        {
+            PackageManager pm = getPackageManager();
+            boolean claimsFeature = pm.hasSystemFeature(PackageManager.FEATURE_AUDIO_LOW_LATENCY);
+            Log.i(TAG, "FEATURE_AUDIO_LOW_LATENCY=" + claimsFeature);
+            roundtrip_info_textview.setText("has FEATURE_AUDIO_LOW_LATENCY");
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        try
+        {
+            PackageManager pm = getPackageManager();
+            boolean claimsFeature = pm.hasSystemFeature(PackageManager.FEATURE_AUDIO_PRO);
+            Log.i(TAG, "FEATURE_AUDIO_PRO=" + claimsFeature);
+            roundtrip_info_textview.setText(roundtrip_info_textview.getText() + "\nhas FEATURE_AUDIO_PRO");
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        try
+        {
+            AudioManager am = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            String sampleRate = am.getProperty(AudioManager.PROPERTY_OUTPUT_SAMPLE_RATE);
+            String framesPerBuffer = am.getProperty(AudioManager.PROPERTY_OUTPUT_FRAMES_PER_BUFFER);
+            Log.i(TAG, "AUDIO_LOW_LATENCY:sampleRate=" + sampleRate + " framesPerBuffer=" + framesPerBuffer);
+            roundtrip_info_textview.setText(
+                    roundtrip_info_textview.getText() + "\nAUDIO_LOW_LATENCY values:\nsampleRate=" + sampleRate +
+                    " framesPerBuffer=" + framesPerBuffer);
+        }
+        catch (Exception ignored)
+        {
+        }
     }
 
     @Override

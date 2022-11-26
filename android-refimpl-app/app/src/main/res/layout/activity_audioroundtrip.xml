@@ -15,6 +15,17 @@
         android:text="" />
 
     <TextView
+        android:id="@+id/roundtrip_info_textview"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_weight="2"
+        android:gravity="center"
+        android:text="device audio info"
+        android:textSize="13sp"
+        tools:ignore="HardcodedText" />
+
+    <TextView
         android:id="@+id/roundtrip_time_textview"
         android:layout_width="match_parent"
         android:layout_height="0dp"
