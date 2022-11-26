@@ -460,22 +460,6 @@ public class AudioRecording extends Thread
                             }
                         }
                     }
-                    else if (Callstate.audio_call)
-                    {
-                        // Log.i(TAG,
-                        //       "toxav_audio_send_frame:002:native:Callstate.friend_pubkey=" + Callstate.friend_pubkey +
-                        //       " fnum=" + tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
-                        audio_send_res = toxav_audio_send_frame(
-                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
-
-                        // if (audio_send_res != 0)
-                        // {
-                        //   Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" +
-                        //               ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
-                        // }
-
-                    }
                     else if (LatencyTestActive)
                     {
                         //  --------------- we are testing audio Latency ---------------
@@ -500,9 +484,21 @@ public class AudioRecording extends Thread
                         }
                         //  --------------- we are testing audio Latency ---------------
                     }
-                    else
+                    else // audio or video call
                     {
-                        // HINT: should never come here!
+                        // Log.i(TAG,
+                        //       "toxav_audio_send_frame:002:native:Callstate.friend_pubkey=" + Callstate.friend_pubkey +
+                        //       " fnum=" + tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
+                        audio_send_res = toxav_audio_send_frame(
+                                tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
+
+                        // if (audio_send_res != 0)
+                        // {
+                        //   Log.i(TAG, "send_audio_frame_to_toxcore_from_native:res=" + audio_send_res + ":" +
+                        //               ToxVars.TOXAV_ERR_SEND_FRAME.value_str(audio_send_res));
+                        // }
+
                     }
 
                     if (DEBUG_MIC_DATA_LOGGING)
