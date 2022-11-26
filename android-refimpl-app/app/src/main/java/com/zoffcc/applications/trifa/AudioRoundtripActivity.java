@@ -79,7 +79,10 @@ public class AudioRoundtripActivity extends AppCompatActivity
             PackageManager pm = getPackageManager();
             boolean claimsFeature = pm.hasSystemFeature(PackageManager.FEATURE_AUDIO_LOW_LATENCY);
             Log.i(TAG, "FEATURE_AUDIO_LOW_LATENCY=" + claimsFeature);
-            roundtrip_info_textview.setText("has FEATURE_AUDIO_LOW_LATENCY");
+            if (claimsFeature)
+            {
+                roundtrip_info_textview.setText("has FEATURE_AUDIO_LOW_LATENCY");
+            }
         }
         catch (Exception ignored)
         {
@@ -90,7 +93,10 @@ public class AudioRoundtripActivity extends AppCompatActivity
             PackageManager pm = getPackageManager();
             boolean claimsFeature = pm.hasSystemFeature(PackageManager.FEATURE_AUDIO_PRO);
             Log.i(TAG, "FEATURE_AUDIO_PRO=" + claimsFeature);
-            roundtrip_info_textview.setText(roundtrip_info_textview.getText() + "\nhas FEATURE_AUDIO_PRO");
+            if (claimsFeature)
+            {
+                roundtrip_info_textview.setText(roundtrip_info_textview.getText() + "\nhas FEATURE_AUDIO_PRO");
+            }
         }
         catch (Exception ignored)
         {
