@@ -52,14 +52,11 @@ import com.mikepenz.materialdrawer.holder.StringHolder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
-import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
@@ -72,7 +69,6 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_volume_percent;
-import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.conference_audio_activity;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
@@ -580,16 +576,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         try
         {
-            CallingActivity.ap = new AudioProcessing();
-            init_buffers(10, 1, SAMPLE_RATE_FIXED, 1, SAMPLE_RATE_FIXED);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
             if (!AudioRecording.stopped)
             {
                 AudioRecording.close();
@@ -802,15 +788,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 AudioReceiver.close();
                 audio_receiver_thread.join();
             }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            destroy_buffers();
         }
         catch (Exception e)
         {
@@ -1516,15 +1493,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 AudioReceiver.close();
                 audio_receiver_thread.join();
             }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            destroy_buffers();
         }
         catch (Exception e)
         {

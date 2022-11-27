@@ -64,7 +64,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.speech.levelmeter.BarLevelDrawable;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.zoffcc.applications.nativeaudio.AudioProcessing;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -74,6 +73,7 @@ import java.nio.channels.FileChannel;
 import java.util.concurrent.Executors;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.camera.core.CameraSelector;
 import androidx.camera.core.ImageAnalysis;
@@ -84,10 +84,6 @@ import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
 import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.set_audio_delay;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_aec_active;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
@@ -116,7 +112,6 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__video_call_qualit
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_cam_resolution;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_play_delay_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
-import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
@@ -188,7 +183,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private Sensor proximity_sensor = null;
     private Sensor accelerometer_sensor = null;
     static int device_orientation = 0;
-    static AudioProcessing ap = null;
     public static String channelId = "";
     static NotificationChannel notification_channel_call_audio_play_service = null;
     static NotificationManager nmn3 = null;
@@ -557,24 +551,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                         if (PREF__video_play_delay_ms > 490)
                         {
-                            if (native_aec_lib_ready)
-                            {
-                                set_audio_delay(490);
-                            }
                         }
                         else if (PREF__video_play_delay_ms < 0)
                         {
-                            if (native_aec_lib_ready)
-                            {
-                                set_audio_delay(0);
-                            }
                         }
                         else
                         {
-                            if (native_aec_lib_ready)
-                            {
-                                set_audio_delay(PREF__video_play_delay_ms);
-                            }
                         }
                     }
                     catch (Exception ee)
@@ -1112,6 +1094,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         camera_toggle_button.setOnTouchListener(new View.OnTouchListener()
         {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
@@ -1165,6 +1148,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         final Thread toggle_thread = new Thread()
                         {
+                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
                             @Override
                             public void run()
                             {
@@ -1636,16 +1620,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            ap = new AudioProcessing();
-            init_buffers(10, 1, SAMPLE_RATE_FIXED, 1, SAMPLE_RATE_FIXED);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
             if (!AudioRecording.stopped)
             {
                 AudioRecording.close();
@@ -1767,6 +1741,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Log.i(TAG, "onResume:99");
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     void toggle_camera()
     {
         if (PREF__use_camera_x)
@@ -1930,15 +1905,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 AudioReceiver.close();
                 audio_receiver_thread.join();
             }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            destroy_buffers();
         }
         catch (Exception e)
         {

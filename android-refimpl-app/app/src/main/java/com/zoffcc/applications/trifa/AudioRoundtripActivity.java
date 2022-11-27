@@ -35,9 +35,6 @@ import java.nio.ByteBuffer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
@@ -46,7 +43,6 @@ import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
-import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_read_length;
 import static com.zoffcc.applications.trifa.MainActivity.audio_out_buffer_mult;
@@ -256,13 +252,6 @@ public class AudioRoundtripActivity extends AppCompatActivity
                 audio_buffer_2_read_length[0] = 0;
                 int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
                 Log.i(TAG, "LatencyTestThread:audio_buffer_play size=" + AudioReceiver.buffer_size);
-                if (native_aec_lib_ready)
-                {
-                    destroy_buffers();
-                    Log.i(TAG, "LatencyTestThread:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" +
-                               sampling_rate_);
-                    init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
-                }
                 sampling_rate_ = sampling_rate;
                 channels_ = channels;
 
@@ -327,13 +316,6 @@ public class AudioRoundtripActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
 
-                if (native_aec_lib_ready)
-                {
-                    destroy_buffers();
-                    Log.i(TAG, "LatencyTestThread:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" +
-                               sampling_rate_);
-                    init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
-                }
                 if (audio_engine_starting)
                 {
                     // native audio engine is down. lets wait for it to get up ...

@@ -87,9 +87,6 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.audio_buffer;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.audio_rec_buffer;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.global_sps_pps_nal_unit_bytes;
@@ -1598,16 +1595,8 @@ public class HelperGeneric
                                 CallingActivity.ca.right_top_text_1b.setText(
                                         "I:" + Callstate.codec_to_str(Callstate.video_in_codec) + ":" +
                                         Callstate.video_in_bitrate);
-                                if (native_aec_lib_ready)
-                                {
-                                    CallingActivity.ca.right_top_text_2.setText(
-                                            "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay + "e");
-                                }
-                                else
-                                {
-                                    CallingActivity.ca.right_top_text_2.setText(
-                                            "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
-                                }
+                                CallingActivity.ca.right_top_text_2.setText(
+                                        "AO:" + Callstate.audio_bitrate + " " + Callstate.play_delay);
                             }
                             catch (Exception e)
                             {
@@ -4462,30 +4451,6 @@ public class HelperGeneric
 
     public static void clear_audio_play_buffers()
     {
-        try
-        {
-            audio_buffer.clear();
-            byte[] b1 = new byte[audio_buffer.limit()];
-            audio_buffer.put(b1);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "clear audio play buffers:001:EE01" + e.getMessage());
-        }
-
-        try
-        {
-            audio_rec_buffer.clear();
-            byte[] b2 = new byte[audio_rec_buffer.limit()];
-            audio_rec_buffer.put(b2);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "clear audio play buffers:002:EE02" + e.getMessage());
-        }
-
         try
         {
             audio_buffer_2.clear();

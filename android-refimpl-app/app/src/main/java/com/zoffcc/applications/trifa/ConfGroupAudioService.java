@@ -37,13 +37,10 @@ import android.widget.RemoteViews;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import androidx.core.app.NotificationCompat;
 
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk_active;
@@ -51,7 +48,6 @@ import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConn
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
-import static com.zoffcc.applications.trifa.MainActivity.SAMPLE_RATE_FIXED;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
@@ -147,15 +143,6 @@ public class ConfGroupAudioService extends Service
                 // ------------- START Audio playing -------------
                 // ------------- START Audio playing -------------
                 Callstate.audio_group_active = true;
-                try
-                {
-                    CallingActivity.ap = new AudioProcessing();
-                    init_buffers(10, 1, SAMPLE_RATE_FIXED, 1, SAMPLE_RATE_FIXED);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
 
                 try
                 {
@@ -342,16 +329,6 @@ public class ConfGroupAudioService extends Service
                 // Log.i(TAG, "toxav_groupchat_disable_av:E:gnum=" + tox_conference_by_confid__wrapper(conf_id));
                 // Log.i(TAG, "toxav_groupchat_disable_av:E:gid=" + conf_id);
                 toxav_groupchat_disable_av(tox_conference_by_confid__wrapper(conf_id));
-
-
-                try
-                {
-                    destroy_buffers();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
 
                 // ------ shutdown audio device ------
                 // ------ shutdown audio device ------

@@ -87,7 +87,6 @@ import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.yariksoffice.lingver.Lingver;
-import com.zoffcc.applications.nativeaudio.AudioProcessing;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.File;
@@ -123,10 +122,6 @@ import info.guardianproject.netcipher.proxy.StatusCallback;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.destroy_buffers;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.init_buffers;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.native_aec_lib_ready;
-import static com.zoffcc.applications.nativeaudio.AudioProcessing.play_buffer;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_audio_aec_delay;
@@ -3609,7 +3604,7 @@ public class MainActivity extends AppCompatActivity
                         {
                             set_audio_aec_delay(PREF__X_eac_delay_ms);
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                         }
                         Intent intent = new Intent(context_s.getApplicationContext(), CallingActivity.class);
@@ -4176,13 +4171,6 @@ public class MainActivity extends AppCompatActivity
 
             // always write to buffer[0] in the pipeline !! -----------
             Log.i(TAG, "audio_play:audio_buffer_play size=" + AudioReceiver.buffer_size);
-
-            if (native_aec_lib_ready)
-            {
-                destroy_buffers();
-                Log.i(TAG, "audio_play:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" + sampling_rate_);
-                init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
-            }
         }
 
         // Log.i(TAG, "audio_play:NativeAudio Play:001a:" + NativeAudio.channel_count + " " + channels_);
@@ -4384,15 +4372,6 @@ public class MainActivity extends AppCompatActivity
 
             // always write to buffer[0] in the pipeline !! -----------
             Log.i(TAG, "group_audio_receive_frame:audio_buffer_play size=" + AudioReceiver.buffer_size);
-
-            if (native_aec_lib_ready)
-            {
-                destroy_buffers();
-                Log.i(TAG, "group_audio_receive_frame:restart_aec:1:channels_=" + channels_ + " sampling_rate_=" +
-                           sampling_rate_);
-                init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
-            }
-
         }
 
         if (sampling_rate_ != sampling_rate)
@@ -4441,32 +4420,10 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "group_audio_receive_frame:NativeAudio restart Engine");
                     // TODO: locking? or something like that
                     NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
-
-                    if (native_aec_lib_ready)
-                    {
-                        destroy_buffers();
-                        int frame_size_ = (int) ((sample_count * 1000) / sampling_rate);
-                        // Log.i(TAG,
-                        //       "group_audio_receive_frame:restart_aec:2:channels_=" + channels_ + " sampling_rate_=" +
-                        //       sampling_rate_);
-                        init_buffers(frame_size_, channels_, (int) sampling_rate_, 1, SAMPLE_RATE_FIXED);
-                    }
-
                 }
 
                 audio_buffer_2.position(0);
                 int incoming_bytes = (int) ((sample_count * channels) * 2);
-
-                // -------------- apply AudioProcessing: AEC -----------------------
-                if (native_aec_lib_ready)
-                {
-                    AudioProcessing.audio_buffer.position(0);
-                    audio_buffer_2.position(0);
-                    AudioProcessing.audio_buffer.put(audio_buffer_2);
-                    play_buffer();
-                    audio_buffer_2.position(0);
-                }
-                // -------------- apply AudioProcessing: AEC -----------------------
 
                 if (NativeAudio.n_bytes_in_buffer[NativeAudio.n_cur_buf] < NativeAudio.n_buf_size_in_bytes)
                 {
