@@ -522,9 +522,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     try
                     {
                         PREF__video_play_delay_ms = progress_value * 5;
-                        //toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                        //                 ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
-                        //                 PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
+                        try
+                        {
+                            toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                             ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
+                                             -PREF__video_play_delay_ms);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                            Log.i(TAG, "TOXAV_DECODER_VIDEO_ADD_DELAY_MS:EE:" + e.getMessage());
+                        }
 
                         try
                         {
@@ -1331,22 +1339,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         catch (Exception e)
         {
             e.printStackTrace();
-        }
-    }
-
-    public static void set_av_latency()
-    {
-        try
-        {
-            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value,
-                                       TRIFAGlobals.VIDEO_DECODER_BUFFER_DELAY);
-            Log.i(TAG, "decoder buffer set to ms=" + TRIFAGlobals.VIDEO_DECODER_BUFFER_DELAY + ":res=" + res);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "TOXAV_DECODER_VIDEO_BUFFER_MS:EE:" + e.getMessage());
         }
     }
 
@@ -2872,9 +2864,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 try
                 {
-                    //toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                    //                 ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
-                    //                 PREF__video_play_delay_ms + DECODER_VIDEO_ADD_DELAY_MS);
+                    try
+                    {
+                        toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                                         ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
+                                         -PREF__video_play_delay_ms);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                        Log.i(TAG, "TOXAV_DECODER_VIDEO_ADD_DELAY_MS:EE:" + e.getMessage());
+                    }
 
                     try
                     {
@@ -2962,7 +2962,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static void on_call_started_actions()
     {
         set_min_and_max_video_bitrate();
-        set_av_latency();
         set_video_delay_ms();
         set_audio_play_volume();
         stop_ringtone();
