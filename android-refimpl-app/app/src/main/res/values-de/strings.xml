@@ -357,7 +357,7 @@
     <string name="pref_title_allow_open_encrypted_file_via_intent">Öffnen von Dateien aus verschlüsseltem Speicher</string>
     <string name="pref_title_allow_enable_ngc_features">NGC - Neue Gruppenchats</string>
     <string name="pref_description_enable_ngc_features">!! Experimentell !!
-\nDas funktioniert NICHT, NICHT aktivieren !!</string>
+\nDies funktioniert NICHT vollständig!!</string>
     <string name="join_public_activity_name">Öffentliche Gruppe beitreten</string>
     <string name="group_message_list_activity_name">Gruppe</string>
     <string name="title_activity_groupinfo">Gruppeninfo</string>
@@ -366,4 +366,27 @@
     <string name="add_public_group_activity_name">Öffentliche Gruppe erstellen</string>
     <string name="title_activity_grouppeerinfo">Gruppen-Peerinfo</string>
     <string name="add_group_activity_add">Gruppe erstellen</string>
+    <string name="add_private_group_success">Sie haben eine private Gruppe erstellt</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">Möchten Sie diese Dateiübertragung abbrechen\?</string>
+    <string name="pref_description_allow_push_server_ntfy">WARNUNG: Lassen Sie den ntfy.sh-Server für Push-Benachrichtigungen zu, dies kann Ihre Metadaten von Zeitstempeln verlieren, wenn Sie Push-Benachrichtigungen erhalten, wenn ein Freund sich mit Ihrem Push-Token anmeldet. ntfy.sh hat KEINE Passwörter und KEINE Authentifizierung. du wurdest gewarnt.</string>
+    <string name="add_public_group_activity_help">Erstellen Sie eine neue öffentliche Gruppe mit einem bestimmten Gruppennamen.</string>
+    <string name="join_public_group_activity_warning">Warnung:
+\nDer Beitritt zu einer öffentlichen Gruppe über die Gruppen-ID funktioniert noch nicht!!</string>
+    <string name="join_public_group_failed">Der Beitritt zur öffentlichen Gruppe ist fehlgeschlagen</string>
+    <string name="add_public_group_success">Sie haben eine öffentliche Gruppe erstellt</string>
+    <string name="invite_friend_success">Sie haben eine Freundschaftsanfrage erhalten</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">Möchten Sie die Benachrichtigungsstummschaltung für diesen Freund umschalten\?</string>
+    <string name="invite_join_group_success">Sie wurden zu einer Gruppe eingeladen</string>
+    <string name="invite_join_conference_success">Sie wurden zu einer Konferenzgruppe eingeladen</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">Möchten Sie diese Dateiübertragung abbrechen\?</string>
+    <string name="join_public_group_joined">Sie sind der öffentlichen Gruppe beigetreten</string>
+    <string name="add_friend_failed">Das Hinzufügen eines Freundes ist fehlgeschlagen</string>
+    <string name="add_friend_success">Sie haben einen neuen Freund hinzugefügt</string>
+    <string name="add_public_group_failed">Fehler beim Erstellen einer öffentlichen Gruppe</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">Dateiübertragung abbrechen</string>
+    <string name="add_private_group_failed">Erstellen einer privaten Gruppe fehlgeschlagen</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">Dateiübertragung abbrechen</string>
+    <string name="add_group_activity_help">Erstellen Sie eine neue private Gruppe (nur auf Einladung) mit einem bestimmten Gruppennamen.</string>
+    <string name="join_public_group_activity_help">Tritt einer öffentlichen Gruppe mit der angegebenen Gruppen-ID bei.</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">Benachrichtigung umschalten</string>
 </resources>

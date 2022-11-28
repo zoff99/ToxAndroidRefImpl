@@ -365,4 +365,7 @@
     <string name="title_activity_groupinfo">Info gruppo</string>
     <string name="title_activity_grouppeerinfo">Peerinfo Gruppo</string>
     <string name="add_group_activity_name">Crea gruppo privato</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">aprire i file dalla memoria crittografata</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC - Nuove chat di gruppo</string>
+    <string name="pref_title_custom_bootstrap_nodes">Utilizzare nodi Bootstrap personalizzati</string>
 </resources>
