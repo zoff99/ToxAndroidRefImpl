@@ -9,7 +9,7 @@
     <string name="set_password_message_password_dont_match">Las contraseñas no coinciden</string>
     <string name="title_activity_calling">Llamada</string>
     <string name="title_activity_profile">Perfil</string>
-    <string name="title_activity_settings">Configuración</string>
+    <string name="title_activity_settings">Ajustes</string>
     <string name="title_activity_crash">Choque</string>
     <string name="title_activity_friendinfo">Información de amigo</string>
     <string name="title_activity_conferencepeerinfo">Informaciones sobre el par</string>
