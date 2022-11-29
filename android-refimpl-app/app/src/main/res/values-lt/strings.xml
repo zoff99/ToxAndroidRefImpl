@@ -311,4 +311,5 @@
     <string name="layout___load_network_connections">įkelti tinklo ryšius</string>
     <string name="join_public_group_activity_warning">Įspėjimas:
 \nprisijungimas prie viešos grupės per grupės ID dar neveikia!!</string>
+    <string name="layout___audio_roundtrip_test_start">Garso delsos testas</string>
 </resources>

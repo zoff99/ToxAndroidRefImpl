@@ -416,4 +416,5 @@
     <string name="layout___load_network_connections">ağ bağlantılarını yükle</string>
     <string name="join_public_group_activity_warning">Uyarı:
 \nGrup kimliği aracılığıyla bir Genel Gruba katılmak henüz çalışmıyor!!</string>
+    <string name="layout___audio_roundtrip_test_start">Ses Gecikme Testi</string>
 </resources>

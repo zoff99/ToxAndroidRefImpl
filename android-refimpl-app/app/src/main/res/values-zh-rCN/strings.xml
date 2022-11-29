@@ -438,4 +438,5 @@
     <string name="layout___load_network_connections">加载网络连接</string>
     <string name="join_public_group_activity_warning">警告：
 \n尚无法通过群 ID 加入公共群！！</string>
+    <string name="layout___audio_roundtrip_test_start">音频延迟测试</string>
 </resources>

@@ -9,7 +9,7 @@
     <string name="set_password_message_password_dont_match">Las contraseñas no coinciden</string>
     <string name="title_activity_calling">Llamada</string>
     <string name="title_activity_profile">Perfil</string>
-    <string name="title_activity_settings">Ajustes</string>
+    <string name="title_activity_settings">Configuración</string>
     <string name="title_activity_crash">Choque</string>
     <string name="title_activity_friendinfo">Información de amigo</string>
     <string name="title_activity_conferencepeerinfo">Informaciones sobre el par</string>
@@ -23,7 +23,7 @@
         <item>Lejos</item>
         <item>Ocupado</item>
     </string-array>
-    <string name="settings_toolbar_title">Configuraciones</string>
+    <string name="settings_toolbar_title">Ajustes</string>
     <string name="pref_header_general">General</string>
     <string name="pref_title_auto_accept_image">imagen de aceptación automática</string>
     <string name="pref_description_auto_accept_image">aceptar automáticamente imágenes y fotos de hasta 12 MB de tamaño</string>
@@ -410,4 +410,5 @@
     <string name="join_public_group_activity_warning">Advertencia:
 \n¡¡El ingreso a un Grupo Público a través del ID de Grupo no está funcionando todavía!!</string>
     <string name="layout___load_network_connections">cargar las conexiones de red</string>
+    <string name="layout___audio_roundtrip_test_start">Prueba de la latencia del audio</string>
 </resources>
