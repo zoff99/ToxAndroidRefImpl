@@ -3557,37 +3557,6 @@ public class HelperGeneric
         return bitmap;
     }
 
-    public static void reset_audio_mode()
-    {
-        try
-        {
-            MainActivity.audio_manager_s.setMode(AudioManager.MODE_NORMAL);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void set_calling_audio_mode()
-    {
-        try
-        {
-            if (PREF__speakerphone_tweak)
-            {
-                MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_CALL);
-            }
-            else
-            {
-                MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     static boolean battery_saving_can_sleep()
     {
         if ((last_log_battery_savings_criteria_ts + 60000) < System.currentTimeMillis())
@@ -4477,6 +4446,37 @@ public class HelperGeneric
         {
             e.printStackTrace();
             Log.i(TAG, "clear audio play buffers:008:EE08" + e.getMessage());
+        }
+    }
+
+    public static void reset_audio_mode()
+    {
+        try
+        {
+            MainActivity.audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void set_calling_audio_mode()
+    {
+        try
+        {
+            if (PREF__speakerphone_tweak)
+            {
+                MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_CALL);
+            }
+            else
+            {
+                MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

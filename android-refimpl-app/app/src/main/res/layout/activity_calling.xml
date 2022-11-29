@@ -258,6 +258,29 @@
                 </LinearLayout>
             </FrameLayout>
 
+            <FrameLayout
+                android:id="@+id/video_speaker_aec"
+                android:layout_width="110dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center|left"
+                android:layout_marginTop="90dp"
+                android:layout_marginLeft="10dp"
+                android:background="@null"
+                android:elevation="2dp">
+
+                <Button
+                    android:id="@+id/video_box_speaker_button"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:background="#300000FF"
+                    android:elevation="8dp"
+                    android:gravity="center"
+                    android:text="- Speaker -"
+                    android:textColor="#4046BD46"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </FrameLayout>
 
             <FrameLayout
                 android:id="@+id/video_box_aec"

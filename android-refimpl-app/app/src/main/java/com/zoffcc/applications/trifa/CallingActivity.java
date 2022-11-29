@@ -150,6 +150,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     ImageButton decline_button = null;
     static ImageButton camera_toggle_button = null;
     static ImageButton mute_button = null;
+    static Button video_box_speaker_button = null;
+    static boolean video_speaker_state = true;
     static Button video_box_aec_button = null;
     static View video_box_aec = null;
     ImageButton misc_button = null;
@@ -296,6 +298,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         camera_toggle_button = (ImageButton) findViewById(R.id.camera_toggle_button);
         mute_button = (ImageButton) findViewById(R.id.mute_button);
         video_box_aec_button = findViewById(R.id.video_box_aec_button);
+        video_box_speaker_button = findViewById(R.id.video_box_speaker_button);
         video_box_aec = findViewById(R.id.video_box_aec);
         audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
         misc_button = (ImageButton) findViewById(R.id.misc_button);
@@ -789,6 +792,77 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         set_audio_play_volume();
 
         quality_slider.setPosition(PREF__video_call_quality);
+
+
+        try
+        {
+            video_box_speaker_button.setText("Speaker: ON");
+            video_speaker_state = true;
+        }
+        catch (Exception e)
+        {
+        }
+        video_box_speaker_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                {
+                    AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    try
+                    {
+                        if (video_speaker_state == false)
+                        {
+                            video_box_speaker_button.setText("Speaker: OFF");
+                        }
+                        else
+                        {
+                            video_box_speaker_button.setText("Speaker: ON");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                    try
+                    {
+                        if (video_speaker_state == false)
+                        {
+                            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                            manager.setWiredHeadsetOn(false);
+                            manager.setBluetoothScoOn(false);
+                            manager.setSpeakerphoneOn(true);
+                            video_box_speaker_button.setText("Speaker: ON");
+                            video_speaker_state = true;
+                        }
+                        else
+                        {
+                            // manager.setMode(AudioManager.MODE_IN_CALL);
+                            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                            manager.setWiredHeadsetOn(false);
+                            manager.setBluetoothScoOn(false);
+                            manager.setSpeakerphoneOn(false);
+                            video_box_speaker_button.setText("Speaker: OFF");
+                            video_speaker_state = false;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                else
+                {
+                }
+                return true;
+            }
+        });
+
 
         try
         {
@@ -1939,6 +2013,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     }
 
     // ---------------
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onStart()
     {
