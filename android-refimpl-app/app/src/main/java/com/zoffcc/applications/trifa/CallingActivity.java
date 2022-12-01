@@ -98,6 +98,8 @@ import static com.zoffcc.applications.trifa.HelperGeneric.format_timeduration_fr
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_ear;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_loudspeaker;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_bitrates;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
@@ -340,24 +342,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         callactivity_handler_s = callactivity_handler;
 
         // set volume control -------------
-        //**//setVolumeControlStream(AudioManager.STREAM_MUSIC);
         System.out.println("AVCS:MUSIC:0");
-
-        AudioManager manager = (AudioManager) this.getSystemService(Context.AUDIO_SERVICE);
-        try
-        {
-            //**//manager.setMode(AudioManager.MODE_NORMAL);
-            set_calling_audio_mode();
-            manager.setSpeakerphoneOn(true);
-            Callstate.audio_speaker = true;
-        }
-        catch (Exception ee)
-        {
-            ee.printStackTrace();
-        }
-
-        reset_audio_mode();
-
         try
         {
             setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
@@ -793,15 +778,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         quality_slider.setPosition(PREF__video_call_quality);
 
-
         try
         {
             video_box_speaker_button.setText("Speaker: ON");
             video_speaker_state = true;
+            AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+            set_audio_to_loudspeaker(manager);
         }
-        catch (Exception e)
+        catch (Exception ignored)
         {
         }
+
         video_box_speaker_button.setOnTouchListener(new View.OnTouchListener()
         {
             @Override
@@ -809,7 +796,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (event.getAction() != MotionEvent.ACTION_UP)
                 {
-                    AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                     try
                     {
                         if (video_speaker_state == false)
@@ -833,20 +819,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         if (video_speaker_state == false)
                         {
-                            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-                            manager.setWiredHeadsetOn(false);
-                            manager.setBluetoothScoOn(false);
-                            manager.setSpeakerphoneOn(true);
+                            set_audio_to_ear(manager);
                             video_box_speaker_button.setText("Speaker: ON");
                             video_speaker_state = true;
                         }
                         else
                         {
-                            // manager.setMode(AudioManager.MODE_IN_CALL);
-                            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-                            manager.setWiredHeadsetOn(false);
-                            manager.setBluetoothScoOn(false);
-                            manager.setSpeakerphoneOn(false);
+                            set_audio_to_loudspeaker(manager);
                             video_box_speaker_button.setText("Speaker: OFF");
                             video_speaker_state = false;
                         }
@@ -1643,6 +1622,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         audio_device_icon.setVisibility(View.VISIBLE);
         try
         {
+            // AAAAAAAAAAAAUDIO:1111111
             if (dh._Detect())
             {
                 if (isBluetoothConnected())
@@ -2424,7 +2404,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
         {
             // Log.i(TAG, "onSensorChanged:value=" + event.values[0] + " max=" + proximity_sensor.getMaximumRange());
-
             if (event.values[0] < proximity_sensor.getMaximumRange())
             {
                 // close to ear
@@ -2432,82 +2411,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     Log.i(TAG, "onSensorChanged:--> EAR");
 
-                    set_aec_active(0);
-
-                    Callstate.audio_speaker = false;
-
-                    //audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL,
-                    //                                  AudioManager.AUDIOFOCUS_GAIN);
-                    //**// requestAudioFocus();
-
-                    try
-                    {
-                        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                        //////+++++++/////audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
-                        // audioManager.setMode(AudioManager.MODE_IN_CALL);
-                        // audioManager.setMode(AudioManager.MODE_NORMAL);
-                        // audio_manager_s.setMode(AudioManager.MODE_NORMAL);
-                        Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_IN_COMMUNICATION)");
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "onSensorChanged:EE1:" + e.getMessage());
-                    }
-
                     try
                     {
                         if (!dh._Detect())
                         {
-                            AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                            audioManager.setSpeakerphoneOn(false);
-
-                            //                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                            //                            {
-                            //                                Log.i(TAG, "onSensorChanged:isStreamMute(STREAM_MUSIC)=" +
-                            //                                           audio_manager_s.isStreamMute(AudioManager.STREAM_MUSIC));
-                            //                                Log.i(TAG, "onSensorChanged:isStreamMute(STREAM_VOICE_CALL)=" +
-                            //                                           audio_manager_s.isStreamMute(AudioManager.STREAM_VOICE_CALL));
-                            //                            }
-                            Log.i(TAG, "onSensorChanged:setSpeakerphoneOn(false)");
-                        }
-
-                        try
-                        {
+                            set_aec_active(0);
+                            AudioManager manager = (AudioManager) context_s.getSystemService(Context.AUDIO_SERVICE);
+                            set_audio_to_ear(manager);
+                            Log.i(TAG, "onSensorChanged:--> EAR:set_audio_to_ear()");
                             turnOffScreen();
-                            Log.i(TAG, "onSensorChanged:turnOffScreen()");
-                        }
-                        catch (Exception e2)
-                        {
-                            e2.printStackTrace();
-                            Log.i(TAG, "onSensorChanged:EE2:" + e2.getMessage());
+                            Log.i(TAG, "onSensorChanged:--> EAR:turnOffScreen()");
+                            Callstate.audio_speaker = false;
                         }
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
-                        Callstate.audio_speaker = true;
-                        Log.i(TAG, "onSensorChanged:audio_speaker = true");
-                    }
-
-                    try
-                    {
-                        // set volume control -------------
-                        // setVolumeControlStream(AudioManager.STREAM_VOICE_CALL);
-                        // HINT: this seems to be correct now? at least the on devices I tested on
-                        //**//setVolumeControlStream(AudioManager.STREAM_MUSIC);
-
-                        //                        Class audioSystemClass = Class.forName("android.media.AudioManager");
-                        //                        Method setForceUse = audioSystemClass.getMethod("forceVolumeControlStream", int.class);
-                        //                        setForceUse.invoke(audio_manager_s, AudioManager.STREAM_MUSIC);
-
-                        System.out.println("AVCS:VOICE:1");
-                        // set volume control -------------
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "onSensorChanged:EE3:" + e.getMessage());
                     }
                 }
             }
@@ -2517,72 +2435,29 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 if (Callstate.audio_speaker == false)
                 {
                     Log.i(TAG, "onSensorChanged:--> speaker");
-                    if (PREF__use_software_aec)
-                    {
-                        set_aec_active(0); // --ACTIVE--
-                    }
-                    else
-                    {
-                        set_aec_active(0);
-                    }
-
-                    Callstate.audio_speaker = true;
-
-                    // audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_MUSIC,
-                    //                                  AudioManager.AUDIOFOCUS_GAIN);
-                    //**// requestAudioFocus();
-
-                    try
-                    {
-                        //////+++++++/////audio_manager_s.setMode(AudioManager.MODE_NORMAL);
-                        // audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
-                        Log.i(TAG, "onSensorChanged:setMode(AudioManager.MODE_NORMAL)");
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "onSensorChanged:EE4:" + e.getMessage());
-                    }
 
                     try
                     {
                         if (!dh._Detect())
                         {
-                            audio_manager_s.setSpeakerphoneOn(true);
-                            Log.i(TAG, "onSensorChanged:setSpeakerphoneOn(true)");
-                        }
-
-                        try
-                        {
+                            if (PREF__use_software_aec)
+                            {
+                                set_aec_active(0); // --ACTIVE--
+                            }
+                            else
+                            {
+                                set_aec_active(0);
+                            }
+                            AudioManager manager = (AudioManager) context_s.getSystemService(Context.AUDIO_SERVICE);
+                            set_audio_to_loudspeaker(manager);
                             turnOnScreen();
-                            Log.i(TAG, "onSensorChanged:turnOnScreen()");
-                        }
-                        catch (Exception e2)
-                        {
-                            e2.printStackTrace();
-                            Log.i(TAG, "onSensorChanged:EE5:" + e2.getMessage());
+                            Log.i(TAG, "onSensorChanged:--> speaker:turnOnScreen()");
+                            Callstate.audio_speaker = true;
                         }
                     }
                     catch (Exception e)
                     {
-                        e.printStackTrace();
-                        Callstate.audio_speaker = false;
-                        Log.i(TAG, "onSensorChanged:audio_speaker = false");
-                        Log.i(TAG, "onSensorChanged:EE6:" + e.getMessage());
                     }
-
-                    //                    try
-                    //                    {
-                    //                        // set volume control -------------
-                    //                        setVolumeControlStream(AudioManager.STREAM_MUSIC);
-                    //                        System.out.println("AVCS:VOICE:2");
-                    //                        // set volume control -------------
-                    //                    }
-                    //                    catch (Exception e)
-                    //                    {
-                    //                        e.printStackTrace();
-                    //                        Log.i(TAG, "onSensorChanged:EE7:" + e.getMessage());
-                    //                    }
                 }
             }
         }

@@ -211,7 +211,6 @@ public class AudioRoundtripActivity extends AppCompatActivity
                 AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                 try
                 {
-                    //**//manager.setMode(AudioManager.MODE_NORMAL);
                     set_calling_audio_mode();
                     manager.setSpeakerphoneOn(true);
                     Callstate.audio_speaker = true;
@@ -478,7 +477,6 @@ public class AudioRoundtripActivity extends AppCompatActivity
         AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         try
         {
-            //**//manager.setMode(AudioManager.MODE_NORMAL);
             set_calling_audio_mode();
             manager.setSpeakerphoneOn(false);
         }

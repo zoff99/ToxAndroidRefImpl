@@ -4465,14 +4465,38 @@ public class HelperGeneric
     {
         try
         {
-            if (PREF__speakerphone_tweak)
-            {
-                MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_CALL);
-            }
-            else
-            {
-                MainActivity.audio_manager_s.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            }
+            AudioManager manager = (AudioManager) context_s.getSystemService(Context.AUDIO_SERVICE);
+            set_audio_to_loudspeaker(manager);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void set_audio_to_loudspeaker(AudioManager manager)
+    {
+        try
+        {
+            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            manager.setWiredHeadsetOn(false);
+            manager.setBluetoothScoOn(false);
+            manager.setSpeakerphoneOn(false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    public static void set_audio_to_ear(AudioManager manager)
+    {
+        try
+        {
+            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            manager.setWiredHeadsetOn(false);
+            manager.setBluetoothScoOn(false);
+            manager.setSpeakerphoneOn(true);
         }
         catch (Exception e)
         {

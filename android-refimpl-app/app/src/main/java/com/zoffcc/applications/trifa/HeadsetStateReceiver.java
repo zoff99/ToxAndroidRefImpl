@@ -30,6 +30,7 @@ class HeadsetStateReceiver extends BroadcastReceiver
             if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1) ||
                 (ConfGroupAudioService.activity_state == 1) || (CallAudioService.activity_state == 1))
             {
+                // AAAAAAAAAAAAUDIO:1111111
                 if (intent.getAction().equals("android.intent.action.HEADSET_PLUG"))
                 {
                     // Log.i(TAG, "onReceive:" + intent + ":" + intent.getIntExtra("state", 0) + ":" + intent.getStringExtra("name") + ":" + intent.getIntExtra("microphone", 0));
