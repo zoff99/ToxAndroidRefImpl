@@ -143,10 +143,10 @@ int audio_aec_delay = 80;
 
 // -----------------------------
 JavaVM *cachedJVM = NULL;
-static const int audio_play_buffers_in_queue_max = 10; // BAD: !!! always keep in sync with NavitAudio.java `public static final int n_audio_in_buffer_max_count = 10;` !!!
-uint8_t *audio_play_buffer[10]; // always set to array depth of `audio_play_buffers_in_queue_max` !!!
+static const int audio_play_buffers_in_queue_max = 3; // BAD: !!! always keep in sync with NavitAudio.java `public static final int n_audio_in_buffer_max_count = 3;` !!!
+uint8_t *audio_play_buffer[3]; // always set to array depth of `audio_play_buffers_in_queue_max` !!!
 static const uint8_t empty_buffer[20000];
-long audio_play_buffer_size[10]; // always set to array depth of `audio_play_buffers_in_queue_max` !!!
+long audio_play_buffer_size[3]; // always set to array depth of `audio_play_buffers_in_queue_max` !!!
 int empty_play_buffer_size =
         1920 * 2; // to be changed later, we dont know the incoming audio setup yet
 int audio_play_buffers_in_queue = 0;
@@ -159,6 +159,8 @@ int player_state_current = _STOPPED;
 #define PLAY_BUFFERS_BETWEEN_PLAY_AND_PROCESS1 2
 pthread_mutex_t play_buffer_queued_count_mutex;
 int play_buffer_queued_count_mutex_valid = 0;
+uint64_t t1_prev = 0;
+uint64_t t2_prev = 0;
 
 const int samples_per_frame_for_48000_40ms = 1920;
 
@@ -209,6 +211,9 @@ static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
 
 // ----- function defs ------
+
+static uint64_t current_time_monotonic_default();
+
 void
 Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNIEnv *env,
                                                                              jclass clazz,
@@ -279,6 +284,18 @@ int android_find_class_global(char *name, jclass *ret)
     return 1;
 }
 
+// --------------------------
+
+
+// gives a counter value that increaes every millisecond
+static uint64_t current_time_monotonic_default()
+{
+    uint64_t time = 0;
+    struct timespec clock_mono;
+    clock_gettime(CLOCK_MONOTONIC, &clock_mono);
+    time = 1000ULL * clock_mono.tv_sec + (clock_mono.tv_nsec / 1000000ULL);
+    return time;
+}
 // --------------------------
 
 // this callback handler is called every time a buffer finishes recording
@@ -515,26 +532,56 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 // this callback handler is called every time a buffer finishes playing
 void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 {
+    if (bq == NULL)
+    {
+        return;
+    }
+
+    if (bqPlayerBufferQueue == NULL)
+    {
+        return;
+    }
+
     pthread_mutex_lock(&play_buffer_queued_count_mutex);
 
     int nextSize = 0;
     int8_t *nextBuffer = NULL;
 
     SLAndroidSimpleBufferQueueState state5;
-    (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state5);
+    (*bq)->GetState(bq, &state5);
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                         "bqPlayerCallback:4:buffered=%d", (int) state5.count);
 #endif
 
-    if (audio_play_buffers_in_queue > 0)
+    if (audio_play_buffers_in_queue > (audio_play_buffers_in_queue_max - 1))
+    {
+        // HINT: should not get here
+        pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+        return;
+    }
+    else if (audio_play_buffers_in_queue > 0)
     {
         // HINT: lookup table to go back in buffer index
         // DO NOT CHANGE
-        const int buf_idx_back[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+        const int buf_idx_back[] = {0, 1, 2, 0, 1, 2, 0, 1, 2};
         const int use_buffer_index = buf_idx_back[audio_play_buffers_in_queue_max +
                                                   audio_play_buffers_curbuf_index -
                                                   (audio_play_buffers_in_queue - 1)];
+#ifdef DEBUG_NATIVE_AUDIO_DEEP
+        printf("AAAAAAAA:002 %d %d queue:%d bq:%d\n", audio_play_buffers_curbuf_index,
+               use_buffer_index,
+               audio_play_buffers_in_queue, (int) state5.count);
+#endif
+
+#ifdef DEBUG_NATIVE_AUDIO_DEEP
+        uint64_t t2 = current_time_monotonic_default();
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "bqPlayerCallback:delta=%lu", (unsigned long) (t2 - t2_prev));
+        t2_prev = t2;
+#endif
+
+
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "bqPlayerCallback:idx:%d", use_buffer_index);
@@ -544,8 +591,9 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         nextSize = audio_play_buffer_size[use_buffer_index];
 
         SLresult result;
-        result = (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
-                                                 (SLuint32) nextSize);
+        result = (*bq)->Enqueue(bq, nextBuffer,
+                                (SLuint32) nextSize);
+
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "bqPlayerCallback:3:Enqueue:idx=%d audio_play_buffers_in_queue=%d audio_play_buffers_curbuf_index=%d audio_play_buffers_in_queue_max=%d",
@@ -573,8 +621,8 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
     if (state5.count < 1)
     {
-        (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, empty_buffer,
-                                        (SLuint32) empty_play_buffer_size);
+        (*bq)->Enqueue(bq, empty_buffer,
+                       (SLuint32) empty_play_buffer_size);
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "bqPlayerCallback:x:Enqueue:empty_buffer %p %d", (void *) empty_buffer,
@@ -1104,6 +1152,10 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffe
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
 
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_JNI_audio_buffer:num=%d, len=%d",
+                        (int) num,
+                        (int) buffer_size_in_bytes);
+
     audio_play_buffer[num] = (uint8_t *) (*jnienv2)->GetDirectBufferAddress(jnienv2, buffer);
     jlong capacity = buffer_size_in_bytes; // (*jnienv2)->GetDirectBufferCapacity(jnienv2, buffer);
     audio_play_buffer_size[num] = (long) capacity;
@@ -1117,6 +1169,13 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         audio_out_vu_value = 0.0f;
         return -1;
     }
+
+    if (bqPlayerBufferQueue == NULL)
+    {
+        audio_out_vu_value = 0.0f;
+        return -2;
+    }
+
     int8_t *nextBuffer = (int8_t *) audio_play_buffer[bufnum];
     int nextSize = audio_play_buffer_size[bufnum];
     empty_play_buffer_size = nextSize;
@@ -1186,8 +1245,23 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         }
 
         pthread_mutex_lock(&play_buffer_queued_count_mutex);
-        audio_play_buffers_in_queue++;
+        if (audio_play_buffers_in_queue > (audio_play_buffers_in_queue_max - 1))
+        {
+            audio_play_buffers_in_queue = audio_play_buffers_in_queue_max - 2;
+        }
+        else
+        {
+            audio_play_buffers_in_queue++;
+        }
         audio_play_buffers_curbuf_index = bufnum;
+
+// #ifdef DEBUG_NATIVE_AUDIO_DEEP
+        uint64_t t1 = current_time_monotonic_default();
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "PlayPCM16:delta=%lu", (unsigned long) (t1 - t1_prev));
+        t1_prev = t1;
+//#endif
+
         pthread_mutex_unlock(&play_buffer_queued_count_mutex);
 
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
