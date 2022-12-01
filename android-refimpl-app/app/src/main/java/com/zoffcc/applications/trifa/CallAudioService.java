@@ -154,15 +154,8 @@ public class CallAudioService extends Service
                     {
                         d1 = SystemClock.uptimeMillis();
 
-                        res = MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
-                                                                       NativeAudio.sampling_rate, 0);
-
-                        if (res == -1)
-                        {
-                            Thread.sleep(5);
-                            MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
-                                                                     NativeAudio.sampling_rate, 1);
-                        }
+                        MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
+                                                                 NativeAudio.sampling_rate, 0);
 
                         delta = (int) (SystemClock.uptimeMillis() - d1);
 
@@ -176,7 +169,7 @@ public class CallAudioService extends Service
                             sleep_millis_current = sleep_millis + 5;
                         }
 
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 300)); // sleep
+                        Thread.sleep(sleep_millis_current); // sleep
                     }
                 }
                 catch (Exception e)
