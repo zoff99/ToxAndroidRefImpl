@@ -99,6 +99,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename
 import static com.zoffcc.applications.trifa.HelperGeneric.put_vfs_image_on_imageview_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_ear;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_headset;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_loudspeaker;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_bitrates;
@@ -153,7 +154,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static ImageButton camera_toggle_button = null;
     static ImageButton mute_button = null;
     static Button video_box_speaker_button = null;
-    static boolean video_speaker_state = true;
     static Button video_box_aec_button = null;
     static View video_box_aec = null;
     ImageButton misc_button = null;
@@ -781,7 +781,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         try
         {
             video_box_speaker_button.setText("Speaker: ON");
-            video_speaker_state = true;
             AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
             set_audio_to_loudspeaker(manager);
         }
@@ -798,7 +797,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 {
                     try
                     {
-                        if (video_speaker_state == false)
+                        if (Callstate.audio_speaker == false)
                         {
                             video_box_speaker_button.setText("Speaker: OFF");
                         }
@@ -814,20 +813,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 }
                 else if (event.getAction() == MotionEvent.ACTION_UP)
                 {
-                    AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
                     try
                     {
-                        if (video_speaker_state == false)
+                        if (Callstate.audio_speaker == false)
                         {
-                            set_audio_to_ear(manager);
+                            set_audio_to_loudspeaker(audio_manager_s);
                             video_box_speaker_button.setText("Speaker: ON");
-                            video_speaker_state = true;
                         }
                         else
                         {
-                            set_audio_to_loudspeaker(manager);
+                            set_audio_to_ear(audio_manager_s);
                             video_box_speaker_button.setText("Speaker: OFF");
-                            video_speaker_state = false;
                         }
                     }
                     catch (Exception e)
@@ -1627,7 +1623,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (isBluetoothConnected())
                 {
-                    Log.i(TAG, "startBluetoothSco");
+                    Log.i(TAG, "AUDIOROUTE:startBluetoothSco");
                     manager.startBluetoothSco();
                     // manager.setBluetoothScoOn(true);
                     Callstate.audio_device = 2;
@@ -1636,11 +1632,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 else
                 {
                     // headset plugged in
-                    Log.i(TAG, "onReceive:headset:plugged in");
-                    manager.setSpeakerphoneOn(false);
-                    manager.setWiredHeadsetOn(true);
+                    Log.i(TAG, "AUDIOROUTE:onReceive:headset:plugged in");
                     Callstate.audio_device = 1;
-                    Callstate.audio_speaker = false;
+                    set_audio_to_headset(manager);
                     update_audio_device_icon();
                     // manager.setBluetoothScoOn(false);
                 }
@@ -1967,12 +1961,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (isBluetoothConnected())
                 {
-                    Log.i(TAG, "stopBluetoothSco:2");
-                    // manager.setBluetoothScoOn(false);
+                    Log.i(TAG, "AUDIOROUTE:stopBluetoothSco:2");
                     Callstate.audio_device = 0;
-                    Callstate.audio_speaker = true;
-                    audio_manager_s.setSpeakerphoneOn(true);
                     manager.stopBluetoothSco();
+                    set_audio_to_loudspeaker(manager);
                 }
             }
         }
@@ -2403,13 +2395,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
         {
-            // Log.i(TAG, "onSensorChanged:value=" + event.values[0] + " max=" + proximity_sensor.getMaximumRange());
+            Log.i(TAG, "onSensorChanged:value=" + event.values[0] + " max=" + proximity_sensor.getMaximumRange());
             if (event.values[0] < proximity_sensor.getMaximumRange())
             {
                 // close to ear
                 if (Callstate.audio_speaker == true)
                 {
-                    Log.i(TAG, "onSensorChanged:--> EAR");
+                    Log.i(TAG, "AUDIOROUTE:onSensorChanged:--> EAR");
 
                     try
                     {
@@ -2418,10 +2410,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             set_aec_active(0);
                             AudioManager manager = (AudioManager) context_s.getSystemService(Context.AUDIO_SERVICE);
                             set_audio_to_ear(manager);
-                            Log.i(TAG, "onSensorChanged:--> EAR:set_audio_to_ear()");
+                            Log.i(TAG, "AUDIOROUTE:onSensorChanged:--> EAR:set_audio_to_ear()");
                             turnOffScreen();
-                            Log.i(TAG, "onSensorChanged:--> EAR:turnOffScreen()");
-                            Callstate.audio_speaker = false;
+                            Log.i(TAG, "AUDIOROUTE:onSensorChanged:--> EAR:turnOffScreen()");
                         }
                     }
                     catch (Exception e)
@@ -2434,7 +2425,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 // away from ear
                 if (Callstate.audio_speaker == false)
                 {
-                    Log.i(TAG, "onSensorChanged:--> speaker");
+                    Log.i(TAG, "AUDIOROUTE:onSensorChanged:--> speaker");
 
                     try
                     {
@@ -2451,8 +2442,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             AudioManager manager = (AudioManager) context_s.getSystemService(Context.AUDIO_SERVICE);
                             set_audio_to_loudspeaker(manager);
                             turnOnScreen();
-                            Log.i(TAG, "onSensorChanged:--> speaker:turnOnScreen()");
-                            Callstate.audio_speaker = true;
+                            Log.i(TAG, "AUDIOROUTE:onSensorChanged:--> speaker:turnOnScreen()");
                         }
                     }
                     catch (Exception e)

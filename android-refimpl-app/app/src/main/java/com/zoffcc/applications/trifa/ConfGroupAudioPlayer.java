@@ -84,8 +84,6 @@ public class ConfGroupAudioPlayer extends AppCompatActivity
         try
         {
             set_calling_audio_mode();
-            manager.setSpeakerphoneOn(true);
-            Callstate.audio_speaker = true;
         }
         catch (Exception ee)
         {

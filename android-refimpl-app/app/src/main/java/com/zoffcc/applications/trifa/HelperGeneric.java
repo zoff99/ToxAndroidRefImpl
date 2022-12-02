@@ -4449,7 +4449,7 @@ public class HelperGeneric
         }
     }
 
-    public static void reset_audio_mode()
+    synchronized public static void reset_audio_mode()
     {
         try
         {
@@ -4461,7 +4461,7 @@ public class HelperGeneric
         }
     }
 
-    public static void set_calling_audio_mode()
+    synchronized public static void set_calling_audio_mode()
     {
         try
         {
@@ -4474,33 +4474,56 @@ public class HelperGeneric
         }
     }
 
-    public static void set_audio_to_loudspeaker(AudioManager manager)
+    synchronized public static void set_audio_to_loudspeaker(AudioManager manager)
     {
         try
         {
-            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            manager.setWiredHeadsetOn(false);
-            manager.setBluetoothScoOn(false);
-            manager.setSpeakerphoneOn(false);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
-    public static void set_audio_to_ear(AudioManager manager)
-    {
-        try
-        {
+            Log.i(TAG,"AUDIOROUTE:set_audio_to_loudspeaker");
             manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             manager.setWiredHeadsetOn(false);
             manager.setBluetoothScoOn(false);
             manager.setSpeakerphoneOn(true);
+            Callstate.audio_speaker = true;
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG,"AUDIOROUTE:set_audio_to_loudspeaker:EE:"+e.getMessage());
+        }
+    }
+
+    synchronized public static void set_audio_to_ear(AudioManager manager)
+    {
+        try
+        {
+            Log.i(TAG,"AUDIOROUTE:set_audio_to_ear");
+            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            manager.setWiredHeadsetOn(false);
+            manager.setBluetoothScoOn(false);
+            manager.setSpeakerphoneOn(false);
+            Callstate.audio_speaker = false;
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG,"AUDIOROUTE:set_audio_to_ear:EE:"+e.getMessage());
+        }
+    }
+
+    synchronized public static void set_audio_to_headset(AudioManager manager)
+    {
+        try
+        {
+            Log.i(TAG,"AUDIOROUTE:set_audio_to_headset");
+            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+            manager.setBluetoothScoOn(false);
+            manager.setSpeakerphoneOn(false);
+            manager.setWiredHeadsetOn(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG,"AUDIOROUTE:set_audio_to_headset:EE:"+e.getMessage());
         }
     }
 }

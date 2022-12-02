@@ -9,6 +9,9 @@ import android.util.Log;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_audio_device_icon;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group_audio_device_icon;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_ear;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_headset;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_loudspeaker;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
 
 class HeadsetStateReceiver extends BroadcastReceiver
@@ -38,9 +41,8 @@ class HeadsetStateReceiver extends BroadcastReceiver
                     if (intent.getIntExtra("state", 0) == 1)
                     {
                         // headset plugged in
-                        Log.i(TAG, "onReceive:headset:plugged in");
-                        audio_manager_s.setSpeakerphoneOn(false);
-                        audio_manager_s.setWiredHeadsetOn(true);
+                        Log.i(TAG, "AUDIOROUTE:onReceive:headset:plugged in");
+                        set_audio_to_headset(audio_manager_s);
                         Callstate.audio_device = 1;
                         try
                         {
@@ -61,8 +63,7 @@ class HeadsetStateReceiver extends BroadcastReceiver
                     else
                     {
                         // headset unplugged
-                        Log.i(TAG, "onReceive:headset:unplugged");
-                        audio_manager_s.setWiredHeadsetOn(false);
+                        Log.i(TAG, "AUDIOROUTE:onReceive:headset:unplugged");
                         Callstate.audio_device = 0;
                         try
                         {
@@ -79,19 +80,20 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         {
                         }
 
-                        if ((ConferenceAudioActivity.activity_state == 1) || (ConfGroupAudioService.activity_state == 1))
+                        if ((ConferenceAudioActivity.activity_state == 1) ||
+                            (ConfGroupAudioService.activity_state == 1))
                         {
-                            audio_manager_s.setSpeakerphoneOn(true);
+                            set_audio_to_loudspeaker(audio_manager_s);
                         }
                         else
                         {
                             if (Callstate.audio_speaker)
                             {
-                                audio_manager_s.setSpeakerphoneOn(true);
+                                set_audio_to_loudspeaker(audio_manager_s);
                             }
                             else
                             {
-                                audio_manager_s.setSpeakerphoneOn(false);
+                                set_audio_to_ear(audio_manager_s);
                             }
                         }
                     }
@@ -126,10 +128,10 @@ class HeadsetStateReceiver extends BroadcastReceiver
             {
                 int a2dpState = bluetoothAdapter.getProfileConnectionState(BluetoothProfile.A2DP);
                 int headSetState = bluetoothAdapter.getProfileConnectionState(BluetoothProfile.HEADSET);
-                return (
-                    (a2dpState == BluetoothAdapter.STATE_CONNECTED || a2dpState == BluetoothAdapter.STATE_CONNECTING) &&
-                    (headSetState == BluetoothAdapter.STATE_CONNECTED ||
-                     headSetState == BluetoothAdapter.STATE_CONNECTING));
+                return ((a2dpState == BluetoothAdapter.STATE_CONNECTED ||
+                         a2dpState == BluetoothAdapter.STATE_CONNECTING) &&
+                        (headSetState == BluetoothAdapter.STATE_CONNECTED ||
+                         headSetState == BluetoothAdapter.STATE_CONNECTING));
             }
             else
             {

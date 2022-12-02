@@ -67,6 +67,7 @@ import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_c
 import static com.zoffcc.applications.trifa.HelperFriend.resolve_name_for_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_headset;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_group_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
@@ -413,8 +414,6 @@ public class ConferenceAudioActivity extends AppCompatActivity
         try
         {
             set_calling_audio_mode();
-            manager.setSpeakerphoneOn(true);
-            Callstate.audio_speaker = true;
         }
         catch (Exception ee)
         {
@@ -508,7 +507,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
             {
                 if (isBluetoothConnected())
                 {
-                    Log.i(TAG, "startBluetoothSco");
+                    Log.i(TAG, "AUDIOROUTE:startBluetoothSco");
                     manager.startBluetoothSco();
                     Callstate.audio_device = 2;
                     update_group_audio_device_icon();
@@ -516,13 +515,10 @@ public class ConferenceAudioActivity extends AppCompatActivity
                 else
                 {
                     // headset plugged in
-                    Log.i(TAG, "onReceive:headset:plugged in");
-                    manager.setSpeakerphoneOn(false);
-                    manager.setWiredHeadsetOn(true);
+                    Log.i(TAG, "AUDIOROUTE:onReceive:headset:plugged in");
                     Callstate.audio_device = 1;
-                    Callstate.audio_speaker = false;
+                    set_audio_to_headset(manager);
                     update_group_audio_device_icon();
-                    // manager.setBluetoothScoOn(false);
                 }
             }
             else
@@ -812,7 +808,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
             {
                 if (isBluetoothConnected())
                 {
-                    Log.i(TAG, "stopBluetoothSco:1");
+                    Log.i(TAG, "AUDIOROUTE:stopBluetoothSco:1");
                     // manager.setBluetoothScoOn(false);
                     manager.stopBluetoothSco();
                 }

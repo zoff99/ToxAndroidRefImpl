@@ -48,6 +48,7 @@ import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConn
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_headset;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
@@ -227,7 +228,7 @@ public class ConfGroupAudioService extends Service
                     {
                         if (isBluetoothConnected())
                         {
-                            Log.i(TAG, "startBluetoothSco");
+                            Log.i(TAG, "AUDIOROUTE:startBluetoothSco");
                             manager.startBluetoothSco();
                             Callstate.audio_device = 2;
                             // manager.setBluetoothScoOn(true);
@@ -235,12 +236,9 @@ public class ConfGroupAudioService extends Service
                         else
                         {
                             // headset plugged in
-                            Log.i(TAG, "onReceive:headset:plugged in");
-                            manager.setSpeakerphoneOn(false);
-                            manager.setWiredHeadsetOn(true);
+                            Log.i(TAG, "AUDIOROUTE:onReceive:headset:plugged in");
                             Callstate.audio_device = 1;
-                            Callstate.audio_speaker = false;
-                            // manager.setBluetoothScoOn(false);
+                            set_audio_to_headset(manager);
                         }
                     }
                     else
@@ -340,7 +338,7 @@ public class ConfGroupAudioService extends Service
                     {
                         if (isBluetoothConnected())
                         {
-                            Log.i(TAG, "stopBluetoothSco:1");
+                            Log.i(TAG, "AUDIOROUTE:stopBluetoothSco:1");
                             // manager.setBluetoothScoOn(false);
                             manager.stopBluetoothSco();
                         }
