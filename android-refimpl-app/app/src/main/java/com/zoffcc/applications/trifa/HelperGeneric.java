@@ -110,7 +110,6 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__speakerphone_tweak;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_CUSTOM_WRITE_CACHE;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
@@ -4453,6 +4452,7 @@ public class HelperGeneric
     {
         try
         {
+            print_stack_trace();
             MainActivity.audio_manager_s.setMode(AudioManager.MODE_NORMAL);
         }
         catch (Exception e)
@@ -4463,22 +4463,15 @@ public class HelperGeneric
 
     synchronized public static void set_calling_audio_mode()
     {
-        try
-        {
-            AudioManager manager = (AudioManager) context_s.getSystemService(Context.AUDIO_SERVICE);
-            set_audio_to_loudspeaker(manager);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        // NOOP , now!
     }
 
     synchronized public static void set_audio_to_loudspeaker(AudioManager manager)
     {
         try
         {
-            Log.i(TAG,"AUDIOROUTE:set_audio_to_loudspeaker");
+            Log.i(TAG, "AUDIOROUTE:set_audio_to_loudspeaker");
+            print_stack_trace();
             manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             manager.setWiredHeadsetOn(false);
             manager.setBluetoothScoOn(false);
@@ -4488,7 +4481,7 @@ public class HelperGeneric
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG,"AUDIOROUTE:set_audio_to_loudspeaker:EE:"+e.getMessage());
+            Log.i(TAG, "AUDIOROUTE:set_audio_to_loudspeaker:EE:" + e.getMessage());
         }
     }
 
@@ -4496,7 +4489,8 @@ public class HelperGeneric
     {
         try
         {
-            Log.i(TAG,"AUDIOROUTE:set_audio_to_ear");
+            Log.i(TAG, "AUDIOROUTE:set_audio_to_ear");
+            print_stack_trace();
             manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             manager.setWiredHeadsetOn(false);
             manager.setBluetoothScoOn(false);
@@ -4506,7 +4500,7 @@ public class HelperGeneric
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG,"AUDIOROUTE:set_audio_to_ear:EE:"+e.getMessage());
+            Log.i(TAG, "AUDIOROUTE:set_audio_to_ear:EE:" + e.getMessage());
         }
     }
 
@@ -4514,7 +4508,8 @@ public class HelperGeneric
     {
         try
         {
-            Log.i(TAG,"AUDIOROUTE:set_audio_to_headset");
+            Log.i(TAG, "AUDIOROUTE:set_audio_to_headset");
+            print_stack_trace();
             manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
             manager.setBluetoothScoOn(false);
             manager.setSpeakerphoneOn(false);
@@ -4523,7 +4518,7 @@ public class HelperGeneric
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG,"AUDIOROUTE:set_audio_to_headset:EE:"+e.getMessage());
+            Log.i(TAG, "AUDIOROUTE:set_audio_to_headset:EE:" + e.getMessage());
         }
     }
 }

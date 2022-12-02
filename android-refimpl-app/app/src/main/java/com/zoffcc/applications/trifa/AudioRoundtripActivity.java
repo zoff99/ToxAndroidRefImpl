@@ -41,6 +41,7 @@ import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_loudspeaker;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
@@ -207,19 +208,8 @@ public class AudioRoundtripActivity extends AppCompatActivity
                     e2.printStackTrace();
                 }
 
-
                 AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                try
-                {
-                    set_calling_audio_mode();
-                }
-                catch (Exception ee)
-                {
-                    ee.printStackTrace();
-                }
-
-
-                set_calling_audio_mode();
+                set_audio_to_loudspeaker(manager);
                 int sample_count = 1920;
                 int sampling_rate = 48000;
                 int channels = 1;
@@ -472,16 +462,6 @@ public class AudioRoundtripActivity extends AppCompatActivity
         }
 
 
-        AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        try
-        {
-            set_calling_audio_mode();
-            manager.setSpeakerphoneOn(false);
-        }
-        catch (Exception ee)
-        {
-            ee.printStackTrace();
-        }
         reset_audio_mode();
         try
         {

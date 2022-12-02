@@ -25,20 +25,21 @@ class HeadsetStateReceiver extends BroadcastReceiver
         {
             if (isInitialStickyBroadcast())
             {
-                Log.i(TAG, "onReceive:headset:isInitialStickyBroadcast");
+                Log.i(TAG, "AUDIOROUTE:onReceive:headset:isInitialStickyBroadcast");
             }
 
-            Log.i(TAG, "onReceive:" + intent + " isBluetoothConnected=" + isBluetoothConnected());
+            Log.i(TAG, "AUDIOROUTE:onReceive:" + intent + " isBluetoothConnected=" + isBluetoothConnected());
 
             if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1) ||
                 (ConfGroupAudioService.activity_state == 1) || (CallAudioService.activity_state == 1))
             {
-                // AAAAAAAAAAAAUDIO:1111111
                 if (intent.getAction().equals("android.intent.action.HEADSET_PLUG"))
                 {
-                    // Log.i(TAG, "onReceive:" + intent + ":" + intent.getIntExtra("state", 0) + ":" + intent.getStringExtra("name") + ":" + intent.getIntExtra("microphone", 0));
+                    Log.i(TAG,
+                          "AUDIOROUTE:onReceive:" + intent + " state=" + intent.getIntExtra("state", -1) + " name=" +
+                          intent.getStringExtra("name") + " mic=" + intent.getIntExtra("microphone", -1));
 
-                    if (intent.getIntExtra("state", 0) == 1)
+                    if (intent.getIntExtra("state", -1) == 1)
                     {
                         // headset plugged in
                         Log.i(TAG, "AUDIOROUTE:onReceive:headset:plugged in");
@@ -58,9 +59,8 @@ class HeadsetStateReceiver extends BroadcastReceiver
                         catch (Exception e2)
                         {
                         }
-                        // audio_manager_s.setBluetoothScoOn(false);
                     }
-                    else
+                    else if (intent.getIntExtra("state", -1) == 0)
                     {
                         // headset unplugged
                         Log.i(TAG, "AUDIOROUTE:onReceive:headset:unplugged");

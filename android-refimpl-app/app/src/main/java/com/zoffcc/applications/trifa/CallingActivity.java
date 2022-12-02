@@ -780,9 +780,16 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
         try
         {
-            video_box_speaker_button.setText("Speaker: ON");
-            AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-            set_audio_to_loudspeaker(manager);
+            if (!dh._Detect())
+            {
+                video_box_speaker_button.setText("Speaker: ON");
+                AudioManager manager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                set_audio_to_loudspeaker(manager);
+            }
+            else
+            {
+                video_box_speaker_button.setText("Speaker: OFF");
+            }
         }
         catch (Exception ignored)
         {
