@@ -168,7 +168,7 @@ rm -Rf "$_SDK_"
 
 mkdir -p "$_SDK_"
 mv -v tools "$_SDK_"/
-yes | "$_SDK_"/tools/bin/sdkmanager --licenses > /dev/null 2>&1
+yes | "$_SDK_"/tools/bin/sdkmanager --licenses # > /dev/null 2>&1
 
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries ------------------------------
@@ -196,6 +196,8 @@ echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
 # -- why is this not just called "cmake" ? --
 echo y | $ANDROID_HOME/tools/bin/sdkmanager "ndk;21.0.6113669"
 echo y | $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.1.5948944"
+
+$ANDROID_HOME/tools/bin/sdkmanager --licenses # > /dev/null 2>&1
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries
