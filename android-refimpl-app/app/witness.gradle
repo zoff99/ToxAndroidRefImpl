@@ -1,7 +1,5 @@
 dependencyVerification {
     verify = [
-        'and:sdk:platforms:android.jar:173d24a7b972769008d3c789073c21b3be6a8ecdbf946bacb9ef261b70fdfa54',
-        'and:sdk:platforms:core-for-system-modules.jar:52ec516d06906261b56cb1a42010093416abeb1d81c8625779a95032597808dc',
         'androidx.activity:activity-ktx:1.2.2:activity-ktx-1.2.2.aar:9829e13d6a6b045b03b21a330512e091dc76eb5b3ded0d88d1ab0509cf84a50e',
         'androidx.activity:activity:1.2.4:activity-1.2.4.aar:ae8e9c7de57e387d2ad90e73f3a5a5dfd502bd4f034c1dccfdb3506d1d2df81a',
         'androidx.annotation:annotation-experimental:1.1.0:annotation-experimental-1.1.0.aar:0157de61a2064047896a058080f3fd67ba57ad9a94857b3f7a363660243e3f90',
