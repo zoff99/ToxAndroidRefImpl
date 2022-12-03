@@ -31,6 +31,8 @@ jobs:
             ssh gzip tar
             coreutils
             python
+            openjdk-11-jdk
+            openjdk-11-jre
             libncurses5
 
       - checkout
