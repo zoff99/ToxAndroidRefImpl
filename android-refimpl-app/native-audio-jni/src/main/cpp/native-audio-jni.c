@@ -212,8 +212,6 @@ static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
 
 // ----- function defs ------
 
-static uint64_t current_time_monotonic_default();
-
 void
 Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffer(JNIEnv *env,
                                                                              jclass clazz,
@@ -288,6 +286,7 @@ int android_find_class_global(char *name, jclass *ret)
 
 
 // gives a counter value that increaes every millisecond
+#if 0
 static uint64_t current_time_monotonic_default()
 {
     uint64_t time = 0;
@@ -296,6 +295,7 @@ static uint64_t current_time_monotonic_default()
     time = 1000ULL * clock_mono.tv_sec + (clock_mono.tv_nsec / 1000000ULL);
     return time;
 }
+#endif
 // --------------------------
 
 // this callback handler is called every time a buffer finishes recording
@@ -1255,12 +1255,12 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         }
         audio_play_buffers_curbuf_index = bufnum;
 
-// #ifdef DEBUG_NATIVE_AUDIO_DEEP
+#ifdef DEBUG_NATIVE_AUDIO_DEEP
         uint64_t t1 = current_time_monotonic_default();
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "PlayPCM16:delta=%lu", (unsigned long) (t1 - t1_prev));
         t1_prev = t1;
-//#endif
+#endif
 
         pthread_mutex_unlock(&play_buffer_queued_count_mutex);
 
