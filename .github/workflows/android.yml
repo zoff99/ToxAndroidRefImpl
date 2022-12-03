@@ -41,6 +41,9 @@ jobs:
     - name: install cliclick
       run:  brew install cliclick
 
+    - name: install java11
+      run:  brew install java11
+
     - name: macos-version1
       run: sw_vers -productVersion
 
