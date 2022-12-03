@@ -35,6 +35,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.os.Build;
@@ -72,6 +73,7 @@ import java.nio.ByteBuffer;
 import java.nio.MappedByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -393,10 +395,8 @@ public class HelperGeneric
         try
         {
             // TODO: cache me!!
-            conf_temp = orma.selectFromConferenceDB().
-                    tox_conference_numberEq(conference_number).
-                    and().
-                    conference_activeEq(true).toList().get(0);
+            conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
+                    conference_number).and().conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
             // Log.i(TAG, "conference_message_add_from_sync:conf_id=" + conf_id);
         }
@@ -778,8 +778,7 @@ public class HelperGeneric
     {
         try
         {
-            List<FriendList> fl = orma.selectFromFriendList().
-                    toList();
+            List<FriendList> fl = orma.selectFromFriendList().toList();
 
             if (fl != null)
             {
@@ -1057,9 +1056,8 @@ public class HelperGeneric
             //
             //            os.write(buffer, 0, len);
             //            os.close();
-            java.io.InputStream ins = context.getResources().
-                    openRawResource(context.getResources().
-                            getIdentifier("ic_plus_sign", "drawable", context.getPackageName()));
+            java.io.InputStream ins = context.getResources().openRawResource(
+                    context.getResources().getIdentifier("ic_plus_sign", "drawable", context.getPackageName()));
             byte[] buffer = new byte[1024];
             int length;
 
@@ -1268,52 +1266,30 @@ public class HelperGeneric
                 {
                     if (is_friend_avatar)
                     {
-                        GlideApp.
-                                with(c).
-                                load(f1).
-                                placeholder(R.drawable.round_loading_animation).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                        fl.avatar_update_timestamp)).
-                                skipMemoryCache(false).
-                                into(v);
+                        GlideApp.with(c).load(f1).placeholder(R.drawable.round_loading_animation).diskCacheStrategy(
+                                DiskCacheStrategy.RESOURCE).signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                fl.avatar_update_timestamp)).skipMemoryCache(false).into(v);
                     }
                     else
                     {
-                        GlideApp.
-                                with(c).
-                                load(f1).
-                                placeholder(R.drawable.round_loading_animation).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(force_update).
-                                into(v);
+                        GlideApp.with(c).load(f1).placeholder(R.drawable.round_loading_animation).diskCacheStrategy(
+                                DiskCacheStrategy.RESOURCE).skipMemoryCache(force_update).into(v);
                     }
                 }
                 else
                 {
                     if (is_friend_avatar)
                     {
-                        GlideApp.
-                                with(c).
-                                load(f1).
-                                placeholder(placholder).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                        "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                        fl.avatar_update_timestamp)).
-                                skipMemoryCache(false).
-                                into(v);
+                        GlideApp.with(c).load(f1).placeholder(placholder).diskCacheStrategy(
+                                DiskCacheStrategy.RESOURCE).signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                fl.avatar_update_timestamp)).skipMemoryCache(false).into(v);
                     }
                     else
                     {
-                        GlideApp.
-                                with(c).
-                                load(f1).
-                                placeholder(placholder).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(force_update).
-                                into(v);
+                        GlideApp.with(c).load(f1).placeholder(placholder).diskCacheStrategy(
+                                DiskCacheStrategy.RESOURCE).skipMemoryCache(force_update).into(v);
                     }
                 }
             }
@@ -1323,13 +1299,8 @@ public class HelperGeneric
                 java.io.FileInputStream fis = new java.io.FileInputStream(f1);
                 byte[] byteArray = new byte[(int) f1.length()];
                 fis.read(byteArray, 0, (int) f1.length());
-                GlideApp.
-                        with(c).
-                        load(byteArray).
-                        placeholder(placholder).
-                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                        skipMemoryCache(force_update).
-                        into(v);
+                GlideApp.with(c).load(byteArray).placeholder(placholder).diskCacheStrategy(
+                        DiskCacheStrategy.RESOURCE).skipMemoryCache(force_update).into(v);
             }
         }
         catch (Exception e)
@@ -1351,56 +1322,32 @@ public class HelperGeneric
             {
                 if (is_friend_avatar)
                 {
-                    GlideApp.
-                            with(c).
-                            asBitmap().
-                            load(f1).
-                            placeholder(R.drawable.round_loading_animation).
-                            diskCacheStrategy(DiskCacheStrategy.NONE).
-                            signature(new com.bumptech.glide.signature.StringSignatureZ(
+                    GlideApp.with(c).asBitmap().load(f1).placeholder(
+                            R.drawable.round_loading_animation).diskCacheStrategy(DiskCacheStrategy.NONE).signature(
+                            new com.bumptech.glide.signature.StringSignatureZ(
                                     "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                    fl.avatar_update_timestamp)).
-                            skipMemoryCache(false).
-                            into(notificationTarget);
+                                    fl.avatar_update_timestamp)).skipMemoryCache(false).into(notificationTarget);
                 }
                 else
                 {
-                    GlideApp.
-                            with(c).
-                            asBitmap().
-                            load(f1).
-                            placeholder(R.drawable.round_loading_animation).
-                            diskCacheStrategy(DiskCacheStrategy.NONE).
-                            skipMemoryCache(force_update).
-                            into(notificationTarget);
+                    GlideApp.with(c).asBitmap().load(f1).placeholder(
+                            R.drawable.round_loading_animation).diskCacheStrategy(
+                            DiskCacheStrategy.NONE).skipMemoryCache(force_update).into(notificationTarget);
                 }
             }
             else
             {
                 if (is_friend_avatar)
                 {
-                    GlideApp.
-                            with(c).
-                            asBitmap().
-                            load(f1).
-                            placeholder(placholder).
-                            diskCacheStrategy(DiskCacheStrategy.NONE).
-                            signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                    "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                    fl.avatar_update_timestamp)).
-                            skipMemoryCache(false).
-                            into(notificationTarget);
+                    GlideApp.with(c).asBitmap().load(f1).placeholder(placholder).diskCacheStrategy(
+                            DiskCacheStrategy.NONE).signature(new com.bumptech.glide.signature.StringSignatureZ(
+                            "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                            fl.avatar_update_timestamp)).skipMemoryCache(false).into(notificationTarget);
                 }
                 else
                 {
-                    GlideApp.
-                            with(c).
-                            asBitmap().
-                            load(f1).
-                            placeholder(placholder).
-                            diskCacheStrategy(DiskCacheStrategy.NONE).
-                            skipMemoryCache(force_update).
-                            into(notificationTarget);
+                    GlideApp.with(c).asBitmap().load(f1).placeholder(placholder).diskCacheStrategy(
+                            DiskCacheStrategy.NONE).skipMemoryCache(force_update).into(notificationTarget);
                 }
             }
         }
@@ -2348,12 +2295,10 @@ public class HelperGeneric
                 }
                 else
                 {
-                    int friend_con_status = orma.selectFromFriendList().
-                            tox_public_key_stringEq(friend_pubkey).
-                            get(0).TOX_CONNECTION_real;
-                    int relay_con_status = orma.selectFromFriendList().
-                            tox_public_key_stringEq(relay_).
-                            get(0).TOX_CONNECTION_real;
+                    int friend_con_status = orma.selectFromFriendList().tox_public_key_stringEq(friend_pubkey).get(
+                            0).TOX_CONNECTION_real;
+                    int relay_con_status = orma.selectFromFriendList().tox_public_key_stringEq(relay_).get(
+                            0).TOX_CONNECTION_real;
 
                     if ((friend_con_status != TOX_CONNECTION_NONE.value) ||
                         (relay_con_status != TOX_CONNECTION_NONE.value))
@@ -2495,10 +2440,9 @@ public class HelperGeneric
             {
                 Log.i(TAG, "global_last_activity_for_battery_savings_ts:002:*PING*");
             }
-            final int len_low_byte = raw_message_length_buf.
-                    array()[raw_message_length_buf.arrayOffset()] & 0xFF;
-            final int len_high_byte = (raw_message_length_buf.
-                    array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
+            final int len_low_byte = raw_message_length_buf.array()[raw_message_length_buf.arrayOffset()] & 0xFF;
+            final int len_high_byte =
+                    (raw_message_length_buf.array()[raw_message_length_buf.arrayOffset() + 1] & 0xFF) * 256;
             final int raw_message_length_int = len_low_byte + len_high_byte;
 
             result.error_num = res;
@@ -2607,10 +2551,9 @@ public class HelperGeneric
             {
                 msgV3hash_hex_string = HelperGeneric.bytesToHex(msgV3hash_bin, 0, msgV3hash_bin.length);
 
-                int got_messages = orma.selectFromMessage().
-                        tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                        directionEq(0).
-                        msg_idv3_hashEq(msgV3hash_hex_string).count();
+                int got_messages = orma.selectFromMessage().tox_friendpubkeyEq(
+                        HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(0).msg_idv3_hashEq(
+                        msgV3hash_hex_string).count();
 
                 // Log.i(TAG, "friend_message:friend:" + friend_number + " msgV3hash_hex_string:" + msgV3hash_hex_string +
                 //           " got_messages=" + got_messages);
@@ -2633,10 +2576,9 @@ public class HelperGeneric
 
             if (msgV3hash_bin != null)
             {
-                int got_messages_mirrored = orma.selectFromMessage().
-                        tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                        directionEq(1).
-                        msg_idv3_hashEq(msgV3hash_hex_string).count();
+                int got_messages_mirrored = orma.selectFromMessage().tox_friendpubkeyEq(
+                        HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(1).msg_idv3_hashEq(
+                        msgV3hash_hex_string).count();
 
                 //Log.i(TAG, "update_friend_msgv3_capability:got_messages_mirrored=" + got_messages_mirrored + " hash1=" +
                 //           msgV3hash_bin + " " + msgV3hash_hex_string);
@@ -3668,8 +3610,7 @@ public class HelperGeneric
             // TODO: check if there is a possible SQL injection here
             //       the good news is that only text that the user entered himself will go here
             //       so a user would have to want to self sabotage, by trying to inject here
-            String tmp_str = search_string_in.
-                    replace("\\", "\\\\"). // \ -> \\
+            String tmp_str = search_string_in.replace("\\", "\\\\"). // \ -> \\
                     replace("%", "\\%"). // % -> \%
                     replace("_", "\\_"). // _ -> \_
                     replace("'", "''"); // ' -> ''
@@ -4338,13 +4279,8 @@ public class HelperGeneric
                     if (f1.length() > 0)
                     {
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
-                        GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(img_avatar);
+                        GlideApp.with(context).load(f1).diskCacheStrategy(DiskCacheStrategy.RESOURCE).skipMemoryCache(
+                                false).apply(glide_options).into(img_avatar);
                     }
                 }
             }
@@ -4382,17 +4318,11 @@ public class HelperGeneric
                     if (f1.length() > 0)
                     {
                         final RequestOptions glide_options = new RequestOptions().fitCenter();
-                        GlideApp.
-                                with(context).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                        GlideApp.with(context).load(f1).diskCacheStrategy(DiskCacheStrategy.RESOURCE).signature(
+                                new com.bumptech.glide.signature.StringSignatureZ(
                                         "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                        fl.avatar_update_timestamp)).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                priority(Priority.HIGH).
-                                into(img_avatar);
+                                        fl.avatar_update_timestamp)).skipMemoryCache(false).apply(
+                                glide_options).priority(Priority.HIGH).into(img_avatar);
                     }
                 }
             }
@@ -4448,12 +4378,21 @@ public class HelperGeneric
         }
     }
 
+    synchronized public static void set_calling_audio_mode()
+    {
+        // NOOP , now!
+    }
+
     synchronized public static void reset_audio_mode()
     {
         try
         {
             print_stack_trace();
             MainActivity.audio_manager_s.setMode(AudioManager.MODE_NORMAL);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+            {
+                MainActivity.audio_manager_s.clearCommunicationDevice();
+            }
         }
         catch (Exception e)
         {
@@ -4461,22 +4400,43 @@ public class HelperGeneric
         }
     }
 
-    synchronized public static void set_calling_audio_mode()
-    {
-        // NOOP , now!
-    }
-
     synchronized public static void set_audio_to_loudspeaker(AudioManager manager)
     {
         try
         {
             Log.i(TAG, "AUDIOROUTE:set_audio_to_loudspeaker");
-            print_stack_trace();
-            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            manager.setWiredHeadsetOn(false);
-            manager.setBluetoothScoOn(false);
-            manager.setSpeakerphoneOn(true);
-            Callstate.audio_speaker = true;
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+            {
+                manager.setMode(AudioManager.MODE_NORMAL);
+                Boolean result = null;
+                ArrayList<Integer> targetTypes = new ArrayList<>();
+                targetTypes.add(AudioDeviceInfo.TYPE_BUILTIN_SPEAKER);
+                List<AudioDeviceInfo> devices = manager.getAvailableCommunicationDevices();
+                for (Integer targetType : targetTypes)
+                {
+                    for (AudioDeviceInfo device : devices)
+                    {
+                        if (device.getType() == targetType)
+                        {
+                            result = manager.setCommunicationDevice(device);
+                            Log.i(TAG, "AUDIOROUTE:setCommunicationDevice type:" + targetType + " result:" + result);
+                            if (result)
+                            {
+                                Callstate.audio_speaker = true;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                print_stack_trace();
+                manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                manager.setWiredHeadsetOn(false);
+                manager.setBluetoothScoOn(false);
+                manager.setSpeakerphoneOn(true);
+                Callstate.audio_speaker = true;
+            }
         }
         catch (Exception e)
         {
@@ -4490,12 +4450,39 @@ public class HelperGeneric
         try
         {
             Log.i(TAG, "AUDIOROUTE:set_audio_to_ear");
-            print_stack_trace();
-            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            manager.setWiredHeadsetOn(false);
-            manager.setBluetoothScoOn(false);
-            manager.setSpeakerphoneOn(false);
-            Callstate.audio_speaker = false;
+
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+            {
+                manager.setMode(AudioManager.MODE_NORMAL);
+                Boolean result = null;
+                ArrayList<Integer> targetTypes = new ArrayList<>();
+                targetTypes.add(AudioDeviceInfo.TYPE_BUILTIN_EARPIECE);
+                List<AudioDeviceInfo> devices = manager.getAvailableCommunicationDevices();
+                for (Integer targetType : targetTypes)
+                {
+                    for (AudioDeviceInfo device : devices)
+                    {
+                        if (device.getType() == targetType)
+                        {
+                            result = manager.setCommunicationDevice(device);
+                            Log.i(TAG, "AUDIOROUTE:setCommunicationDevice type:" + targetType + " result:" + result);
+                            if (result)
+                            {
+                                Callstate.audio_speaker = false;
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                print_stack_trace();
+                manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                manager.setWiredHeadsetOn(false);
+                manager.setBluetoothScoOn(false);
+                manager.setSpeakerphoneOn(false);
+                Callstate.audio_speaker = false;
+            }
         }
         catch (Exception e)
         {
@@ -4509,11 +4496,37 @@ public class HelperGeneric
         try
         {
             Log.i(TAG, "AUDIOROUTE:set_audio_to_headset");
-            print_stack_trace();
-            manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            manager.setBluetoothScoOn(false);
-            manager.setSpeakerphoneOn(false);
-            manager.setWiredHeadsetOn(true);
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S)
+            {
+                manager.setMode(AudioManager.MODE_NORMAL);
+                Boolean result = null;
+                ArrayList<Integer> targetTypes = new ArrayList<>();
+                targetTypes.add(AudioDeviceInfo.TYPE_WIRED_HEADSET);
+                List<AudioDeviceInfo> devices = manager.getAvailableCommunicationDevices();
+                for (Integer targetType : targetTypes)
+                {
+                    for (AudioDeviceInfo device : devices)
+                    {
+                        if (device.getType() == targetType)
+                        {
+                            result = manager.setCommunicationDevice(device);
+                            Log.i(TAG, "AUDIOROUTE:setCommunicationDevice type:" + targetType + " result:" + result);
+                            if (result)
+                            {
+                                // HINT: set some var here?
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                print_stack_trace();
+                manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+                manager.setBluetoothScoOn(false);
+                manager.setSpeakerphoneOn(false);
+                manager.setWiredHeadsetOn(true);
+            }
         }
         catch (Exception e)
         {

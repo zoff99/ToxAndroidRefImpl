@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.util.Log;
 
 import static com.zoffcc.applications.trifa.CallingActivity.update_audio_device_icon;
@@ -29,6 +30,16 @@ class HeadsetStateReceiver extends BroadcastReceiver
             }
 
             Log.i(TAG, "AUDIOROUTE:onReceive:" + intent + " isBluetoothConnected=" + isBluetoothConnected());
+
+            Bundle bundle = intent.getExtras();
+            if (bundle != null)
+            {
+                for (String key : bundle.keySet())
+                {
+                    Log.i(TAG, "AUDIOROUTE:onReceive:intent_dump:" + key + " : " +
+                               (bundle.get(key) != null ? bundle.get(key) : "NULL"));
+                }
+            }
 
             if ((CallingActivity.activity_state == 1) || (ConferenceAudioActivity.activity_state == 1) ||
                 (ConfGroupAudioService.activity_state == 1) || (CallAudioService.activity_state == 1))

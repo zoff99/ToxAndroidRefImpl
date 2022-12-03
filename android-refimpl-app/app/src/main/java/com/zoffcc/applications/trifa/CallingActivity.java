@@ -979,10 +979,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             misc_button.setVisibility(View.VISIBLE);
             misc_button_pad.setVisibility(View.VISIBLE);
 
-            Drawable d8 = new IconicsDrawable(this).
-                    icon(GoogleMaterial.Icon.gmd_touch_app).
-                    backgroundColor(Color.TRANSPARENT).color(getResources().
-                    getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            Drawable d8 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_touch_app).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
             misc_button.setImageDrawable(d8);
 
             misc_button.setOnTouchListener(new View.OnTouchListener()
@@ -994,10 +992,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         try
                         {
-                            Drawable d1a = new IconicsDrawable(v.getContext()).
-                                    icon(GoogleMaterial.Icon.gmd_touch_app).
-                                    backgroundColor(Color.TRANSPARENT).color(getResources().
-                                    getColor(R.color.md_green_600)).sizeDp(50);
+                            Drawable d1a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_touch_app).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.md_green_600)).sizeDp(50);
                             misc_button.setImageDrawable(d1a);
                         }
                         catch (Exception e)
@@ -1009,10 +1006,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         try
                         {
-                            Drawable d2a = new IconicsDrawable(v.getContext()).
-                                    icon(GoogleMaterial.Icon.gmd_touch_app).
-                                    backgroundColor(Color.TRANSPARENT).color(getResources().
-                                    getColor(R.color.colorPrimaryDark)).sizeDp(50);
+                            Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                    GoogleMaterial.Icon.gmd_touch_app).backgroundColor(Color.TRANSPARENT).color(
+                                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             misc_button.setImageDrawable(d2a);
 
                             // send misc. message to friend, and do NOT save to DB
@@ -2116,24 +2112,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             CameraSelector cameraSelector = null;
             if (active_camera_type == FRONT_CAMERA_USED)
             {
-                cameraSelector = new CameraSelector.Builder().
-                        requireLensFacing(CameraSelector.LENS_FACING_FRONT).
-                        build();
+                cameraSelector = new CameraSelector.Builder().requireLensFacing(
+                        CameraSelector.LENS_FACING_FRONT).build();
                 drawingOverlay.flipimage = true;
             }
             else
             {
-                cameraSelector = new CameraSelector.Builder().
-                        requireLensFacing(CameraSelector.LENS_FACING_BACK).
-                        build();
+                cameraSelector = new CameraSelector.Builder().requireLensFacing(
+                        CameraSelector.LENS_FACING_BACK).build();
                 drawingOverlay.flipimage = false;
             }
 
             preview.setSurfaceProvider(cameraXPreview.getSurfaceProvider());
-            ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().
-                    setOutputImageFormat(ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888).
-                    setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).
-                    build();
+            ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setOutputImageFormat(
+                    ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888).setBackpressureStrategy(
+                    ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
 
             imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(),
                                       (VideoFrameAnalyserTFLite) videoFrameAnalyser_tflite);
@@ -2837,9 +2830,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         Log.i(TAG, "TOXAV_DECODER_VIDEO_BUFFER_MS:EE:" + e.getMessage());
                     }
 
-                    video_add_delay_slider_infotext_01.setText(context_s.getString(R.string.
-                                                                                           CallingActivity_0) + " " +
-                                                               PREF__video_play_delay_ms + " ms");
+                    video_add_delay_slider_infotext_01.setText(
+                            context_s.getString(R.string.CallingActivity_0) + " " + PREF__video_play_delay_ms + " ms");
                 }
                 catch (Exception e)
                 {
