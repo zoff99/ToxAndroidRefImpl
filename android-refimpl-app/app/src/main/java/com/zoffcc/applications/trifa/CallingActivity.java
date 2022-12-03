@@ -155,6 +155,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static ImageButton mute_button = null;
     static Button video_box_speaker_button = null;
     static Button video_box_aec_button = null;
+    static View video_speaker_aec = null;
     static View video_box_aec = null;
     ImageButton misc_button = null;
     TextView misc_button_pad = null;
@@ -302,6 +303,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         video_box_aec_button = findViewById(R.id.video_box_aec_button);
         video_box_speaker_button = findViewById(R.id.video_box_speaker_button);
         video_box_aec = findViewById(R.id.video_box_aec);
+        video_speaker_aec = findViewById(R.id.video_speaker_aec);
         audio_device_icon = (ImageView) findViewById(R.id.audio_device_icon);
         misc_button = (ImageButton) findViewById(R.id.misc_button);
         misc_button_pad = (TextView) findViewById(R.id.misc_button_pad);
@@ -2670,6 +2672,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.VISIBLE);
                         CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.VISIBLE);
                         CallingActivity.video_box_aec.setVisibility(View.VISIBLE);
+                        CallingActivity.video_speaker_aec.setVisibility(View.VISIBLE);
                     }
                     catch (Exception e)
                     {
@@ -2703,6 +2706,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_box_aec.setVisibility(View.VISIBLE);
+                            CallingActivity.video_speaker_aec.setVisibility(View.VISIBLE);
 
                         }
                         else
@@ -2713,7 +2717,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_box_aec.setVisibility(View.INVISIBLE);
-
+                            CallingActivity.video_speaker_aec.setVisibility(View.INVISIBLE);
                         }
                     }
                     catch (Exception e)
