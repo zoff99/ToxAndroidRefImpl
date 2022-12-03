@@ -643,11 +643,8 @@ public class MainActivity extends AppCompatActivity
                     builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
                 }
 
-                orma = builder.name(dbs_path).
-                        readOnMainThread(AccessThreadConstraint.NONE).
-                        writeOnMainThread(AccessThreadConstraint.NONE).
-                        trace(ORMA_TRACE).
-                        build();
+                orma = builder.name(dbs_path).readOnMainThread(AccessThreadConstraint.NONE).writeOnMainThread(
+                        AccessThreadConstraint.NONE).trace(ORMA_TRACE).build();
                 // Log.i(TAG, "db:open=OK:path=" + dbs_path);
             }
             catch (Exception e)
@@ -681,11 +678,8 @@ public class MainActivity extends AppCompatActivity
 
                 try
                 {
-                    orma = builder.name(dbs_path).
-                            readOnMainThread(AccessThreadConstraint.WARNING).
-                            writeOnMainThread(AccessThreadConstraint.WARNING).
-                            trace(ORMA_TRACE).
-                            build();
+                    orma = builder.name(dbs_path).readOnMainThread(AccessThreadConstraint.WARNING).writeOnMainThread(
+                            AccessThreadConstraint.WARNING).trace(ORMA_TRACE).build();
                 }
                 catch (Exception e4)
                 {
@@ -927,43 +921,41 @@ public class MainActivity extends AppCompatActivity
                     PREF__orbot_enabled = true;
                     Log.i(TAG, "waiting_for_orbot_info:F1");
                     HelperGeneric.waiting_for_orbot_info(false);
-                    OrbotHelper.get(this).statusTimeout(120 * 1000).
-                            addStatusCallback(new StatusCallback()
-                            {
-                                @Override
-                                public void onEnabled(Intent statusIntent)
-                                {
-                                }
+                    OrbotHelper.get(this).statusTimeout(120 * 1000).addStatusCallback(new StatusCallback()
+                    {
+                        @Override
+                        public void onEnabled(Intent statusIntent)
+                        {
+                        }
 
-                                @Override
-                                public void onStarting()
-                                {
-                                }
+                        @Override
+                        public void onStarting()
+                        {
+                        }
 
-                                @Override
-                                public void onStopping()
-                                {
-                                }
+                        @Override
+                        public void onStopping()
+                        {
+                        }
 
-                                @Override
-                                public void onDisabled()
-                                {
-                                    // we got a broadcast with a status of off, so keep waiting
-                                }
+                        @Override
+                        public void onDisabled()
+                        {
+                            // we got a broadcast with a status of off, so keep waiting
+                        }
 
-                                @Override
-                                public void onStatusTimeout()
-                                {
-                                    // throw new RuntimeException("Orbot status request timed out");
-                                    Log.i(TAG, "waiting_for_orbot_info:EEO1:" + "Orbot status request timed out");
-                                }
+                        @Override
+                        public void onStatusTimeout()
+                        {
+                            // throw new RuntimeException("Orbot status request timed out");
+                            Log.i(TAG, "waiting_for_orbot_info:EEO1:" + "Orbot status request timed out");
+                        }
 
-                                @Override
-                                public void onNotYetInstalled()
-                                {
-                                }
-                            }).
-                            init(); // allow 60 seconds to connect to Orbot
+                        @Override
+                        public void onNotYetInstalled()
+                        {
+                        }
+                    }).init(); // allow 60 seconds to connect to Orbot
                 }
                 else
                 {
@@ -982,43 +974,41 @@ public class MainActivity extends AppCompatActivity
                         HelperGeneric.waiting_for_orbot_info(false);
                     }
 
-                    OrbotHelper.get(this).statusTimeout(120 * 1000).
-                            addStatusCallback(new StatusCallback()
-                            {
-                                @Override
-                                public void onEnabled(Intent statusIntent)
-                                {
-                                }
+                    OrbotHelper.get(this).statusTimeout(120 * 1000).addStatusCallback(new StatusCallback()
+                    {
+                        @Override
+                        public void onEnabled(Intent statusIntent)
+                        {
+                        }
 
-                                @Override
-                                public void onStarting()
-                                {
-                                }
+                        @Override
+                        public void onStarting()
+                        {
+                        }
 
-                                @Override
-                                public void onStopping()
-                                {
-                                }
+                        @Override
+                        public void onStopping()
+                        {
+                        }
 
-                                @Override
-                                public void onDisabled()
-                                {
-                                    // we got a broadcast with a status of off, so keep waiting
-                                }
+                        @Override
+                        public void onDisabled()
+                        {
+                            // we got a broadcast with a status of off, so keep waiting
+                        }
 
-                                @Override
-                                public void onStatusTimeout()
-                                {
-                                    // throw new RuntimeException("Orbot status request timed out");
-                                    Log.i(TAG, "waiting_for_orbot_info:EEO2:" + "Orbot status request timed out");
-                                }
+                        @Override
+                        public void onStatusTimeout()
+                        {
+                            // throw new RuntimeException("Orbot status request timed out");
+                            Log.i(TAG, "waiting_for_orbot_info:EEO2:" + "Orbot status request timed out");
+                        }
 
-                                @Override
-                                public void onNotYetInstalled()
-                                {
-                                }
-                            }).
-                            init(); // allow 60 seconds to connect to Orbot
+                        @Override
+                        public void onNotYetInstalled()
+                        {
+                        }
+                    }).init(); // allow 60 seconds to connect to Orbot
                 }
             }
             else
@@ -1264,11 +1254,8 @@ public class MainActivity extends AppCompatActivity
         {
             top_imageview2.setBackgroundColor(Color.TRANSPARENT);
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
-            final Drawable d1 = new IconicsDrawable(this).
-                    icon(FontAwesome.Icon.faw_exclamation_circle).
-                    paddingDp(15).
-                    color(getResources().getColor(R.color.md_red_600)).
-                    sizeDp(100);
+            final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_exclamation_circle).paddingDp(
+                    15).color(getResources().getColor(R.color.md_red_600)).sizeDp(100);
             top_imageview2.setImageDrawable(d1);
             fadeInAndShowImage(top_imageview2, 5000);
         }
@@ -1282,11 +1269,8 @@ public class MainActivity extends AppCompatActivity
         {
             // show icon for PUSH tip
             top_imageview3.setBackgroundColor(Color.TRANSPARENT);
-            final Drawable d1 = new IconicsDrawable(this).
-                    icon(FontAwesome.Icon.faw_info_circle).
-                    paddingDp(15).
-                    color(getResources().getColor(R.color.md_yellow_600)).
-                    sizeDp(100);
+            final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_info_circle).paddingDp(15).color(
+                    getResources().getColor(R.color.md_yellow_600)).sizeDp(100);
             top_imageview3.setImageDrawable(d1);
             fadeInAndShowImage(top_imageview3, 5000);
         }
@@ -1374,18 +1358,13 @@ public class MainActivity extends AppCompatActivity
                 R.string.MainActivity_about).withIcon(GoogleMaterial.Icon.gmd_info);
         PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName(
                 R.string.MainActivity_exit).withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
-        final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).
-                color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
-        profile_d_item = new ProfileDrawerItem().
-                withName("me").
-                withIcon(d1);
+        final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(
+                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
+        profile_d_item = new ProfileDrawerItem().withName("me").withIcon(d1);
         // Create the AccountHeader
-        main_drawer_header = new AccountHeaderBuilder().
-                withSelectionListEnabledForSingleProfile(false).
-                withActivity(this).
-                withCompactStyle(true).
-                addProfiles(profile_d_item).
-                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
+        main_drawer_header = new AccountHeaderBuilder().withSelectionListEnabledForSingleProfile(false).withActivity(
+                this).withCompactStyle(true).addProfiles(profile_d_item).withOnAccountHeaderListener(
+                new AccountHeader.OnAccountHeaderListener()
                 {
                     @Override
                     public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
@@ -1394,19 +1373,15 @@ public class MainActivity extends AppCompatActivity
                     }
                 }).build();
         // create the drawer and remember the `Drawer` result object
-        main_drawer = new DrawerBuilder().
-                withActivity(this).
-                withInnerShadow(false).
-                withRootView(R.id.drawer_container).
-                withShowDrawerOnFirstLaunch(false).
-                withActionBarDrawerToggleAnimated(true).
-                withActionBarDrawerToggle(true).
-                withToolbar(toolbar).
-                addDrawerItems(item1, new DividerDrawerItem(), item2, item3, item4, item5, new DividerDrawerItem(),
-                               item6).
-                withTranslucentStatusBar(false).
-                withAccountHeader(main_drawer_header).
-                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+        main_drawer = new DrawerBuilder().withActivity(this).withInnerShadow(false).withRootView(
+                R.id.drawer_container).withShowDrawerOnFirstLaunch(false).withActionBarDrawerToggleAnimated(
+                true).withActionBarDrawerToggle(true).withToolbar(toolbar).addDrawerItems(item1,
+                                                                                          new DividerDrawerItem(),
+                                                                                          item2, item3, item4, item5,
+                                                                                          new DividerDrawerItem(),
+                                                                                          item6).withTranslucentStatusBar(
+                false).withAccountHeader(main_drawer_header).withOnDrawerItemClickListener(
+                new Drawer.OnDrawerItemClickListener()
                 {
                     @Override
                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
@@ -2391,11 +2366,8 @@ public class MainActivity extends AppCompatActivity
         {
             top_imageview2.setBackgroundColor(Color.TRANSPARENT);
             // top_imageview.setBackgroundColor(Color.parseColor("#C62828"));
-            final Drawable d1 = new IconicsDrawable(this).
-                    icon(FontAwesome.Icon.faw_exclamation_circle).
-                    paddingDp(15).
-                    color(getResources().getColor(R.color.md_red_600)).
-                    sizeDp(100);
+            final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_exclamation_circle).paddingDp(
+                    15).color(getResources().getColor(R.color.md_red_600)).sizeDp(100);
             top_imageview2.setImageDrawable(d1);
             top_imageview2.setVisibility(View.VISIBLE);
         }
@@ -2409,11 +2381,8 @@ public class MainActivity extends AppCompatActivity
         {
             // show icon for PUSH tip
             top_imageview3.setBackgroundColor(Color.TRANSPARENT);
-            final Drawable d1 = new IconicsDrawable(this).
-                    icon(FontAwesome.Icon.faw_info_circle).
-                    paddingDp(15).
-                    color(getResources().getColor(R.color.md_yellow_600)).
-                    sizeDp(100);
+            final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_info_circle).paddingDp(15).color(
+                    getResources().getColor(R.color.md_yellow_600)).sizeDp(100);
             top_imageview3.setImageDrawable(d1);
             top_imageview3.setVisibility(View.VISIBLE);
         }
@@ -2429,29 +2398,28 @@ public class MainActivity extends AppCompatActivity
             {
                 try
                 {
-                    AlertDialog ad = new AlertDialog.Builder(view.getContext()).
-                            setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
+                    AlertDialog ad = new AlertDialog.Builder(view.getContext()).setNegativeButton(
+                            R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
                             {
                                 public void onClick(DialogInterface dialog, int id)
                                 {
                                 }
-                            }).
-                            setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
-                                              new DialogInterface.OnClickListener()
-                                              {
-                                                  public void onClick(DialogInterface dialog, int id)
-                                                  {
-                                                      try
-                                                      {
-                                                          Intent i = new Intent(Intent.ACTION_VIEW);
-                                                          i.setData(Uri.parse(TOX_PUSH_SETUP_HOWTO_URL));
-                                                          startActivity(i);
-                                                      }
-                                                      catch (Exception e)
-                                                      {
-                                                      }
-                                                  }
-                                              }).create();
+                            }).setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
+                                                 new DialogInterface.OnClickListener()
+                                                 {
+                                                     public void onClick(DialogInterface dialog, int id)
+                                                     {
+                                                         try
+                                                         {
+                                                             Intent i = new Intent(Intent.ACTION_VIEW);
+                                                             i.setData(Uri.parse(TOX_PUSH_SETUP_HOWTO_URL));
+                                                             startActivity(i);
+                                                         }
+                                                         catch (Exception e)
+                                                         {
+                                                         }
+                                                     }
+                                                 }).create();
                     ad.setTitle(getString(R.string.MainActivity_setup_push_tip_title));
                     ad.setMessage(getString(R.string.MainActivity_setup_push_tip_text));
                     ad.setCancelable(false);
@@ -2870,21 +2838,20 @@ public class MainActivity extends AppCompatActivity
 
                     if (resolve_activity != null)
                     {
-                        AlertDialog ad = new AlertDialog.Builder(this).
-                                setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
+                        AlertDialog ad = new AlertDialog.Builder(this).setNegativeButton(
+                                R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
                                 {
                                     public void onClick(DialogInterface dialog, int id)
                                     {
                                     }
-                                }).
-                                setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
-                                                  new DialogInterface.OnClickListener()
-                                                  {
-                                                      public void onClick(DialogInterface dialog, int id)
-                                                      {
-                                                          startActivity(intent);
-                                                      }
-                                                  }).create();
+                                }).setPositiveButton(R.string.MainActivity_ok_take_me_there_button,
+                                                     new DialogInterface.OnClickListener()
+                                                     {
+                                                         public void onClick(DialogInterface dialog, int id)
+                                                         {
+                                                             startActivity(intent);
+                                                         }
+                                                     }).create();
                         ad.setTitle(getString(R.string.MainActivity_info_dialog_title));
                         ad.setMessage(getString(R.string.MainActivity_add_to_batt_opt));
                         ad.setCancelable(false);
@@ -2905,23 +2872,26 @@ public class MainActivity extends AppCompatActivity
             if (get_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK) != null)
             {
                 // ok we have a new token, show the user a dialog to ask if we should use it
-                AlertDialog ad = new AlertDialog.Builder(this).
-                        setNegativeButton(R.string.MainActivity_no_button, new DialogInterface.OnClickListener()
-                        {
-                            public void onClick(DialogInterface dialog, int id)
-                            {
-                                try
-                                {
-                                    del_g_opts(NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                    Log.i(TAG, "del_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" + e.getMessage());
-                                }
-                            }
-                        }).
-                        setPositiveButton(R.string.MainActivity_yes_button, new DialogInterface.OnClickListener()
+                AlertDialog ad = new AlertDialog.Builder(this).setNegativeButton(R.string.MainActivity_no_button,
+                                                                                 new DialogInterface.OnClickListener()
+                                                                                 {
+                                                                                     public void onClick(DialogInterface dialog, int id)
+                                                                                     {
+                                                                                         try
+                                                                                         {
+                                                                                             del_g_opts(
+                                                                                                     NOTIFICATION_TOKEN_DB_KEY_NEED_ACK);
+                                                                                         }
+                                                                                         catch (Exception e)
+                                                                                         {
+                                                                                             e.printStackTrace();
+                                                                                             Log.i(TAG,
+                                                                                                   "del_NOTIFICATION_TOKEN_DB_KEY_NEED_ACK:EE01:" +
+                                                                                                   e.getMessage());
+                                                                                         }
+                                                                                     }
+                                                                                 }).setPositiveButton(
+                        R.string.MainActivity_yes_button, new DialogInterface.OnClickListener()
                         {
                             public void onClick(DialogInterface dialog, int id)
                             {
@@ -4644,11 +4614,8 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         // Log.i(TAG, "check_for_stale_ft:001:friend=" + f);
-                        List<Filetransfer> fts_active = orma.selectFromFiletransfer().
-                                file_numberNotEq(-1).
-                                kindEq(TOX_FILE_KIND_DATA.value).
-                                tox_public_key_stringEq(f.tox_public_key_string).
-                                toList();
+                        List<Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).kindEq(
+                                TOX_FILE_KIND_DATA.value).tox_public_key_stringEq(f.tox_public_key_string).toList();
                         for (Filetransfer ft : fts_active)
                         {
                             // Log.i(TAG, "check_for_stale_ft:002:ft=" + ft);
@@ -4878,12 +4845,9 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            final int m_try = orma.selectFromMessage().
-                    msg_id_hashEq(message_id_hash_as_hex_string).
-                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    directionEq(1).
-                    readEq(false).
-                    toList().size();
+            final int m_try = orma.selectFromMessage().msg_id_hashEq(message_id_hash_as_hex_string).tox_friendpubkeyEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(1).readEq(
+                    false).toList().size();
 
             if (m_try < 1)
             {
@@ -4897,12 +4861,9 @@ public class MainActivity extends AppCompatActivity
                     if (friend_of_relay != null)
                     {
 
-                        Message m = orma.selectFromMessage().
-                                msg_id_hashEq(message_id_hash_as_hex_string).
-                                tox_friendpubkeyEq(friend_of_relay.tox_public_key_string).
-                                directionEq(1).
-                                readEq(false).
-                                toList().get(0);
+                        Message m = orma.selectFromMessage().msg_id_hashEq(
+                                message_id_hash_as_hex_string).tox_friendpubkeyEq(
+                                friend_of_relay.tox_public_key_string).directionEq(1).readEq(false).toList().get(0);
 
                         if (m != null)
                         {
@@ -4936,12 +4897,9 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            final Message m = orma.selectFromMessage().
-                    msg_id_hashEq(message_id_hash_as_hex_string).
-                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    directionEq(1).
-                    readEq(false).
-                    toList().get(0);
+            final Message m = orma.selectFromMessage().msg_id_hashEq(message_id_hash_as_hex_string).tox_friendpubkeyEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(1).readEq(
+                    false).toList().get(0);
 
             if (m != null)
             {
@@ -5009,12 +4967,9 @@ public class MainActivity extends AppCompatActivity
             }
 
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
-            final Message m = orma.selectFromMessage().
-                    message_idEq(message_id).
-                    tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    directionEq(1).
-                    orderByIdDesc().
-                    toList().get(0);
+            final Message m = orma.selectFromMessage().message_idEq(message_id).tox_friendpubkeyEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(
+                    1).orderByIdDesc().toList().get(0);
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
 
             // Log.i(TAG, "friend_read_receipt:m=" + m);
@@ -5500,13 +5455,10 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            Filetransfer ft = orma.selectFromFiletransfer().
-                    directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).
-                    stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
-                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    file_numberEq(file_number).
-                    orderByIdDesc().
-                    get(0);
+            Filetransfer ft = orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).stateNotEq(
+                    TOX_FILE_CONTROL_CANCEL.value).tox_public_key_stringEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).file_numberEq(
+                    file_number).orderByIdDesc().get(0);
 
             if (ft == null)
             {
@@ -5578,13 +5530,10 @@ public class MainActivity extends AppCompatActivity
                     file_.filesize = ft.filesize;
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
-                    filedb_id = orma.selectFromFileDB().
-                            tox_public_key_stringEq(ft.tox_public_key_string).
-                            and().file_nameEq(ft.file_name).
-                            and().path_nameEq(ft.path_name).
-                            and().directionEq(ft.direction).
-                            and().filesizeEq(ft.filesize).
-                            orderByIdDesc().get(0).id;
+                    filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
+                            ft.tox_public_key_string).and().file_nameEq(ft.file_name).and().path_nameEq(
+                            ft.path_name).and().directionEq(ft.direction).and().filesizeEq(
+                            ft.filesize).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
 
                     // Log.i(TAG, "file_chunk_request:file_READY:001:f.id=" + ft.id);
@@ -5726,13 +5675,10 @@ public class MainActivity extends AppCompatActivity
                     file_.filesize = ft.filesize;
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
-                    filedb_id = orma.selectFromFileDB().
-                            tox_public_key_stringEq(ft.tox_public_key_string).
-                            and().file_nameEq(ft.file_name).
-                            and().path_nameEq(ft.path_name).
-                            and().directionEq(ft.direction).
-                            and().filesizeEq(ft.filesize).
-                            orderByIdDesc().get(0).id;
+                    filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
+                            ft.tox_public_key_string).and().file_nameEq(ft.file_name).and().path_nameEq(
+                            ft.path_name).and().directionEq(ft.direction).and().filesizeEq(
+                            ft.filesize).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
 
                     // Log.i(TAG, "file_chunk_request:file_READY:001:f.id=" + ft.id);
@@ -6263,13 +6209,9 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            f = orma.selectFromFiletransfer().
-                    directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
-                    file_numberEq(file_number).
-                    stateNotEq(TOX_FILE_CONTROL_CANCEL.value).
-                    tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    orderByIdDesc().
-                    get(0);
+            f = orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_INCOMING.value).file_numberEq(
+                    file_number).stateNotEq(TOX_FILE_CONTROL_CANCEL.value).tox_public_key_stringEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).orderByIdDesc().get(0);
 
             if (f == null)
             {
@@ -6609,10 +6551,8 @@ public class MainActivity extends AppCompatActivity
         try
         {
             // TODO: cache me!!
-            conf_temp = orma.selectFromConferenceDB().
-                    tox_conference_numberEq(conference_number).
-                    and().
-                    conference_activeEq(true).toList().get(0);
+            conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
+                    conference_number).and().conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
         }
         catch (Exception e)
@@ -6726,17 +6666,14 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     // TODO: cache me!!
-                    conf_temp2 = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                            and().
-                            conference_activeEq(true).
-                            get(0);
+                    conf_temp2 = orma.selectFromConferenceDB().tox_conference_numberEq(
+                            conference_number).and().conference_activeEq(true).get(0);
 
                     if (conf_temp2 != null)
                     {
                         // update it in the Database
-                        orma.updateConferenceDB().
-                                conference_identifierEq(conf_temp2.conference_identifier).
-                                name(title).execute();
+                        orma.updateConferenceDB().conference_identifierEq(conf_temp2.conference_identifier).name(
+                                title).execute();
                     }
                 }
                 catch (Exception e)
@@ -6785,10 +6722,8 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // TODO: cache me!!
-                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                        and().
-                        conference_activeEq(true).
-                        get(0);
+                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
+                        conference_number).and().conference_activeEq(true).get(0);
             }
             catch (Exception e)
             {
@@ -6920,10 +6855,8 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // TODO: cache me!!
-                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(conference_number).
-                        and().
-                        conference_activeEq(true).
-                        get(0);
+                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
+                        conference_number).and().conference_activeEq(true).get(0);
             }
             catch (Exception e)
             {
@@ -7172,6 +7105,24 @@ public class MainActivity extends AppCompatActivity
             native_audio_lib_loaded = false;
             Log.i(TAG, "loadLibrary native-audio-jni failed!");
             e.printStackTrace();
+
+            final Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Thread.sleep(6 * 1000);
+                        display_toast("loadLibrary native-audio-jni failed!", false, 5000);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.i(TAG, "loadLibrary native-audio-jni failed: toast failed to show");
+                    }
+                }
+            };
+            t.start();
         }
 
         if (NDK_STDOUT_LOGGING)
@@ -7264,8 +7215,8 @@ public class MainActivity extends AppCompatActivity
                             }
                             try
                             {
-                                final GroupDB conf3 = orma.selectFromGroupDB().
-                                        group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
+                                final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                                        group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
                                 cc.group_item = GroupDB.deep_copy(conf3);
@@ -7335,8 +7286,8 @@ public class MainActivity extends AppCompatActivity
                             }
                             try
                             {
-                                final GroupDB conf3 = orma.selectFromGroupDB().
-                                        group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
+                                final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                                        group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
                                 cc.group_item = GroupDB.deep_copy(conf3);
@@ -7404,8 +7355,8 @@ public class MainActivity extends AppCompatActivity
                             set_group_active(group_identifier);
                             try
                             {
-                                final GroupDB conf3 = orma.selectFromGroupDB().
-                                        group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
+                                final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                                        group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
                                 cc.group_item = GroupDB.deep_copy(conf3);
