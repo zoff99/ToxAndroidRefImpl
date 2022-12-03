@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.4.1)
+project("native-audio-jni")
 
 add_subdirectory(webrtc6)
 include_directories(./webrtc6)
