@@ -69,15 +69,9 @@
 #endif
 
 
-// HINT: it may not be working properly
-// #define USE_ECHO_CANCELLATION 1
-
 // ------- Android/JNI stuff -------
 // #include <android/log.h>
 #include <jni.h>
-#ifdef USE_ECHO_CANCELLATION
-#include "filter_audio/filter_audio.h"
-#endif
 // ------- Android/JNI stuff -------
 
 
@@ -85,8 +79,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 84
-static const char global_version_string[] = "0.99.84";
+#define VERSION_PATCH 85
+static const char global_version_string[] = "0.99.85";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -174,10 +168,6 @@ bool global_toxav_valid = false;
 CallControl mytox_CC;
 pthread_t tid[3]; // 0 -> toxav_iterate thread, 1 -> video iterate thread, 2 -> audio iterate thread
 
-#ifdef USE_ECHO_CANCELLATION
-Filter_Audio *filteraudio = NULL;
-#endif
-
 uint8_t filteraudio_active = 1;
 uint8_t filteraudio_incompatible_1 = 1;
 uint8_t filteraudio_incompatible_2 = 1;
@@ -218,18 +208,16 @@ long audio_buffer_pcm_1_size = 0;
 uint8_t *audio_buffer_pcm_2 = NULL;
 long audio_buffer_pcm_2_size = 0;
 
-uint32_t recording_samling_rate = 48000;
-int16_t global_audio_frame_duration_ms = 60;
 uint8_t global_av_call_active = 0;
 
 int audio_play_volume_percent_c = 10;
 float volumeMultiplier = -20.0f;
 
-#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 60
+#define PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS 40
 long global_group_audio_acitve_num = -1;
 long global_videocall_audio_acitve_num = -1;
 int global_videocall_audio_sample_rate = 48000;
-int global_videocall_audio_channels = 2;
+int global_videocall_audio_channels = 1;
 long global_group_audio_peerbuffers = 0;
 uint64_t global_call_audio_last_pts = 0;
 uint64_t global_group_audio_last_process_incoming = 0;
@@ -240,7 +228,7 @@ int16_t *global___audio_group_ret_buf = NULL;
 int16_t *global___audio_group_temp_buf = NULL;
 pthread_mutex_t group_audio___mutex;
 
-#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES ((48000*(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 10)/1000) * 2) // XY ms PCM16 buffer @48kHz mono int16_t values
+#define GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES (48000*(PROCESS_GROUP_INCOMING_AUDIO_EVERY_MS * 20)/1000) // XY ms PCM16 buffer @48kHz mono int16_t values
 
 // -------- _callbacks_ --------
 jmethodID android_tox_callback_self_connection_status_cb_method = NULL;
@@ -760,90 +748,6 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     free(full_path_filename);
     return tox;
 }
-
-
-void stop_filter_audio()
-{
-#ifdef USE_ECHO_CANCELLATION
-
-    /* Prepare filter_audio */
-    if(filteraudio != NULL)
-    {
-        dbg(9, "filter_audio: shutdown");
-        kill_filter_audio(filteraudio);
-        filteraudio = NULL;
-    }
-
-#endif
-}
-
-void start_filter_audio(uint32_t in_samplerate)
-{
-#ifdef USE_ECHO_CANCELLATION
-
-    if(filteraudio)
-    {
-        stop_filter_audio();
-    }
-
-    /* Prepare filter_audio */
-    filteraudio = new_filter_audio(in_samplerate);
-    dbg(9, "filter_audio: prepare. samplerate=%d", (int)in_samplerate);
-
-    if(filteraudio != NULL)
-    {
-        /* Enable/disable filters. 1 to enable, 0 to disable. */
-        int echo_ = 1;
-        int noise_ = 0;
-        int gain_ = 0;
-        int vad_ = 0;
-        enable_disable_filters(filteraudio, echo_, noise_, gain_, vad_);
-    }
-
-#endif
-}
-
-/*
- * input_latency_ms mostly set to "0" (zero)
- * use frame_duration_ms for cumulative value
- */
-void set_delay_ms_filter_audio(int16_t input_latency_ms, int16_t frame_duration_ms)
-{
-#ifdef USE_ECHO_CANCELLATION
-    /* It's essential that echo delay is set correctly; it's the most important part of the
-     * echo cancellation process. If the delay is not set to the acceptable values the AEC
-     * will not be able to recover. Given that it's not that easy to figure out the exact
-     * time it takes for a signal to get from Output to the Input, setting it to suggested
-     * input device latency + frame duration works really good and gives the filter ability
-     * to adjust it internally after some time (usually up to 6-7 seconds in my tests when
-     * the error is about 20%).
-     */
-    dbg(9, "filter_audio: set delay in ms=%d", (int)(input_latency_ms + frame_duration_ms));
-
-    if(filteraudio)
-    {
-        set_echo_delay_ms(filteraudio, (input_latency_ms + frame_duration_ms));
-    }
-
-    /*
-     */
-#endif
-}
-
-void restart_filter_audio(uint32_t in_samplerate)
-{
-#ifdef USE_ECHO_CANCELLATION
-    dbg(9, "filter_audio: restart. samplerate=%d", (int)in_samplerate);
-
-    if(filteraudio)
-    {
-        stop_filter_audio();
-    }
-
-    start_filter_audio(in_samplerate);
-#endif
-}
-
 
 void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len)
 {
@@ -2351,46 +2255,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer2(JNIEnv 
 // ----- get audio buffer from Java -----
 
 JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_restart_1filteraudio(JNIEnv *env, jobject thiz,
-        jlong in_samplerate)
-{
-    restart_filter_audio((uint32_t)in_samplerate);
-}
-
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1frame_1duration_1ms(JNIEnv *env, jobject thiz,
-        jint audio_frame_duration_ms)
-{
-    global_audio_frame_duration_ms = (int16_t)audio_frame_duration_ms;
-#ifdef USE_ECHO_CANCELLATION
-
-    if(filteraudio)
-    {
-        set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
-    }
-
-#endif
-}
-
-
-JNIEXPORT void JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_set_1filteraudio_1active(JNIEnv *env, jobject thiz,
-        jint filteraudio_active_new)
-{
-#ifdef USE_ECHO_CANCELLATION
-
-    if(((uint8_t)filteraudio_active_new == 0) || ((uint8_t)filteraudio_active_new == 1))
-    {
-        filteraudio_active = (uint8_t)filteraudio_active_new;
-        dbg(2, "setting filteraudio_active=%d", (int)filteraudio_active);
-    }
-
-#endif
-}
-
-
-
-JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_crgb2yuv(JNIEnv *env, jobject thiz, jobject rgba_buf,
         jobject yuv_buf, jint w_yuv, jint h_yuv, jint w_rgba, jint h_rgba)
 {
@@ -2686,7 +2550,7 @@ void *thread_video_av(void *data)
         //usleep((av_iterate_interval / 2) * 1000);
         if(global_av_call_active == 1)
         {
-            usleep(10 * 1000);
+            usleep(20 * 1000);
         }
         else
         {
@@ -2720,7 +2584,7 @@ void *thread_audio_av(void *data)
 #endif
 
     int delta = 0;
-    int want_iterate_ms = 5;
+    int want_iterate_ms = 10;
     int will_sleep_ms = want_iterate_ms;
     int64_t start_time = current_time_monotonic_default();
     while(toxav_audio_thread_stop != 1)
@@ -2744,7 +2608,7 @@ void *thread_audio_av(void *data)
                 will_sleep_ms = want_iterate_ms + 5;
             }
             // dbg(9, "aiterate_sleep:delta=%d will_sleep_ms=%d", delta, will_sleep_ms);
-            usleep((will_sleep_ms * 1000) - 1);
+            usleep(will_sleep_ms * 1000);
         }
         else
         {
@@ -2902,8 +2766,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 
     android_tox_log_cb(1, "xxx.c", 1234, "function_name", "logging test");
 
-    start_filter_audio(recording_samling_rate);
-    set_delay_ms_filter_audio(0, global_audio_frame_duration_ms);
     // -------- resumable FTs: not working fully yet, so turn it off --------
     //**NEW**// tox_set_filetransfer_resumable(true);
     // tox_set_filetransfer_resumable(false);
@@ -3486,7 +3348,6 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
 {
     global_toxav_valid = false;
     dbg(9, "tox_kill ... START");
-    stop_filter_audio();
     toxav_iterate_thread_stop = 1;
     pthread_join(tid[0], NULL); // wait for toxav iterate thread to end
     toxav_video_thread_stop = 1;
@@ -5391,37 +5252,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1group_1send_1audio(JNIEnv
     if(audio_buffer_pcm_1)
     {
         int16_t *pcm = (int16_t *)audio_buffer_pcm_1;
-#ifdef USE_ECHO_CANCELLATION
-
-        if(((int)channels == 1) && ((int)sampling_rate == 48000))
-        {
-            filteraudio_incompatible_1 = 0;
-        }
-        else
-        {
-            filteraudio_incompatible_1 = 1;
-        }
-
-        // TODO: need some locking here!
-        if(recording_samling_rate != (uint32_t)sampling_rate)
-        {
-            recording_samling_rate = (uint32_t)sampling_rate;
-            restart_filter_audio((uint32_t)sampling_rate);
-        }
-
-        // TODO: need some locking here!
-
-        if(sample_count > 0)
-        {
-            if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
-                    && (filteraudio_incompatible_2 == 0))
-            {
-                filter_audio(filteraudio, pcm, (unsigned int)sample_count);
-            }
-        }
-
-#endif
-
         int res = toxav_group_send_audio(tox_global, (uint32_t)groupnumber, pcm, (size_t)sample_count,
                                           (uint8_t)channels, (uint32_t)sampling_rate);
 
@@ -8333,36 +8163,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
             (int8_t)pcm[3], (int8_t)pcm[4], (int8_t)pcm[5],
             (int8_t)pcm[6]);
 #endif
-#ifdef USE_ECHO_CANCELLATION
-
-        if(((int)channels == 1) && ((int)sampling_rate == 48000))
-        {
-            filteraudio_incompatible_1 = 0;
-        }
-        else
-        {
-            filteraudio_incompatible_1 = 1;
-        }
-
-        // TODO: need some locking here!
-        if(recording_samling_rate != (uint32_t)sampling_rate)
-        {
-            recording_samling_rate = (uint32_t)sampling_rate;
-            restart_filter_audio((uint32_t)sampling_rate);
-        }
-
-        // TODO: need some locking here!
-
-        if(sample_count > 0)
-        {
-            if((filteraudio) && (pcm) && (filteraudio_active == 1) && (filteraudio_incompatible_1 == 0)
-                    && (filteraudio_incompatible_2 == 0))
-            {
-                filter_audio(filteraudio, pcm, (unsigned int)sample_count);
-            }
-        }
-
-#endif
         bool res = toxav_audio_send_frame(tox_av_global, (uint32_t)friend_number, pcm, (size_t)sample_count,
                                           (uint8_t)channels, (uint32_t)sampling_rate, &error);
 
@@ -8387,10 +8187,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv
 
             }
         }
-
-
-
-
     }
 
     return (jint)error;
