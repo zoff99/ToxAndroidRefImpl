@@ -61,6 +61,7 @@ jobs:
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           printf 'dependencyVerification {\nverify = [\n]\n}\n' > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+          export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
           cd android-refimpl-app ; ./gradlew assemble
           cliclick -m verbose m:12,34
           screencapture -T 42 -x -t png /Users/runner/screen01.png &
