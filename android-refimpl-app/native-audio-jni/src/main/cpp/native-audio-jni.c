@@ -286,7 +286,10 @@ int android_find_class_global(char *name, jclass *ret)
 
 
 // gives a counter value that increaes every millisecond
-#if 0
+#ifdef DEBUG_NATIVE_AUDIO_DEEP
+
+static uint64_t current_time_monotonic_default();
+
 static uint64_t current_time_monotonic_default()
 {
     uint64_t time = 0;
