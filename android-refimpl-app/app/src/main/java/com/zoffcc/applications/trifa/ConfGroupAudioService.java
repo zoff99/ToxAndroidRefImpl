@@ -308,11 +308,7 @@ public class ConfGroupAudioService extends Service
                             sleep_millis_current = sleep_millis + 5;
                         }
 
-                        //if (delta > 5)
-                        //{
-                        //    Log.i(TAG, "delta=" + delta + " sleep_millis_current=" + sleep_millis_current);
-                        //}
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 300)); // sleep
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 5000)); // sleep
                     }
                 }
                 catch (Exception e)
