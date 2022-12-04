@@ -5189,8 +5189,6 @@ public class MainActivity extends AppCompatActivity
                     //      "xxxxxxxxxxxxx2:" + real_sender_text_.length() + " " + real_sender_text_.substring(8, 9) +
                     //      " " + real_sender_text_.substring(9) + " " + real_sender_text_.substring(0, 8));
 
-                    Log.i(TAG, "real_sender_text_=" + real_sender_text_);
-
                     if ((real_sender_text_.length() > 8) && (real_sender_text_.startsWith(":", 8)))
                     {
                         real_sender_text = real_sender_text_.substring(9);
