@@ -17,16 +17,6 @@
  * Boston, MA  02110-1301, USA.
  */
 
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            url "https://jitpack.io"
-        }
-    }
-}
-
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
@@ -229,10 +219,6 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    dexOptions {
-        javaMaxHeapSize "2g"
-    }
-
     dependenciesInfo {
         // Disables dependency metadata when building APKs.
         includeInApk = false
@@ -248,6 +234,7 @@ android {
     defaultConfig {
         applicationId "com.zoffcc.applications.trifa"
         minSdkVersion 19
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 30
         versionCode 10182
         versionName "1.0.182"
@@ -267,19 +254,18 @@ android {
 
     buildTypes {
         debug {
+            crunchPngs false
+            ext.enableCrashlytics = false
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'),
-                    'proguard-rules.pro',
-                    'proguard-glide.pro',
-                    //'proguard-mikepenz-android-iconics.pro',
-                    //'proguard-rounded-image-view.pro',
-                    'proguard-support-v7-appcompat.pro',
-                    'proguard-gson.pro'
+            shrinkResources false
+            // proguardFile ('proguard-disable.pro')
         }
         release {
+            crunchPngs false
+            ext.enableCrashlytics = false
             minifyEnabled false
-            proguardFiles = buildTypes.debug.proguardFiles
-            testProguardFile 'proguard-project-test.pro'
+            shrinkResources false
+            // proguardFile ('proguard-disable.pro')
         }
 
         /*
@@ -296,8 +282,8 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(path: ':native-audio-jni', configuration: 'default')
-    implementation project(path: ':loggingstdout', configuration: 'default')
+    implementation project(path: ':native-audio-jni')
+    implementation project(path: ':loggingstdout')
     annotationProcessor project(':orma_processor')
     //
     //
@@ -447,9 +433,3 @@ dependencies {
 }
 
 apply from: 'gradle_witness_ng.gradle'
-
-tasks.matching { task ->
-    task.name.startsWith('assembleRelease')
-}.all { task ->
-    task.dependsOn 'assembleDebug'
-}

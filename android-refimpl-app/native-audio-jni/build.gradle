@@ -1,12 +1,3 @@
-buildscript {
-    repositories {
-        google()
-        mavenCentral()
-        maven {
-            url "https://jitpack.io"
-        }
-    }
-}
 
 plugins {
     id 'com.android.library'
@@ -39,14 +30,8 @@ android {
 
         externalNativeBuild {
             cmake {
-                // arguments "-DANDROID_ARM_NEON=TRUE"
-                // arguments "-G\"BorlandMakeFiles\""
                 cFlags "-g -O3"
                 cppFlags "-g -O3"
-                // targets 'native-audio-jni'
-                // armeabi-v7a, arm64-v8a, x86, x86_64
-                // * does not work * // abiFilters "armeabi-v7a", "x86"
-                // cppFlags "-fexceptions"
             }
 
             ndk {
@@ -55,30 +40,14 @@ android {
                 abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
             }
         }
-
-        buildTypes {
-            debug {
-                minifyEnabled false
-            }
-            release {
-                minifyEnabled false
-            }
-        }
+        versionCode 10000
+        versionName '1.0.0'
     }
 
     lintOptions {
         checkReleaseBuilds false
         abortOnError false
     }
-
-    /*
-    flavorDimensions "version"
-    productFlavors {
-        full {
-            dimension "version"
-        }
-    }
-    */
 
     android {
         ndkVersion "20.1.5948944"
@@ -92,7 +61,3 @@ android {
     }
     ndkVersion '20.1.5948944'
 }
-
-//dependencies {
-//    implementation 'com.android.tools.lint:lint-gradle:30.0.0-alpha06'
-//}

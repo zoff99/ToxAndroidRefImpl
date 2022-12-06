@@ -20,6 +20,8 @@ android {
                 abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
             }
         }
+        versionCode 10000
+        versionName '1.0.0'
     }
 
     lintOptions {
