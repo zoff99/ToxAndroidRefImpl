@@ -267,15 +267,6 @@ android {
             shrinkResources false
             // proguardFile ('proguard-disable.pro')
         }
-
-        /*
-        flavorDimensions "version"
-        productFlavors {
-            full {
-                dimension "version"
-            }
-        }
-        */
     }
 }
 
