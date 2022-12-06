@@ -216,7 +216,7 @@ project.task('printDependencies').doLast {
 }
 
 tasks.matching { task ->
-    task.name.startsWith('assembleDebug')
+    task.name.startsWith('assemble')
 }.all { task ->
     task.dependsOn pinChecksums
 }
