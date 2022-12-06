@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.zoffcc.applications.trifa
 
 import android.content.Context
