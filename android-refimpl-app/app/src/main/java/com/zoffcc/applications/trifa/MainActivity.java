@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__force_udp_only = false;
     static boolean PREF__use_incognito_keyboard = true;
     static boolean PREF__speakerphone_tweak = false;
-    public static float PREF_mic_gain_factor = 2.0f;
+    public static float PREF_mic_gain_factor = 1.0f;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int FRAME_SIZE_FIXED = 40; // this is only for recording audio!
@@ -2344,7 +2344,7 @@ public class MainActivity extends AppCompatActivity
         {
             PREF_mic_gain_factor = (float) (settings.getInt("mic_gain_factor", 1));
             Log.i(TAG, "PREF_mic_gain_factor:1=" + PREF_mic_gain_factor);
-            PREF_mic_gain_factor = PREF_mic_gain_factor + 1.0f;
+            // PREF_mic_gain_factor = PREF_mic_gain_factor + 1.0f;
 
             if (PREF_mic_gain_factor < 1.0f)
             {
@@ -2358,7 +2358,7 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            PREF_mic_gain_factor = 2.0f;
+            PREF_mic_gain_factor = 1.0f;
             Log.i(TAG, "PREF_mic_gain_factor:E=" + PREF_mic_gain_factor);
             e.printStackTrace();
         }

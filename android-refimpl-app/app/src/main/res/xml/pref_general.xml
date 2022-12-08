@@ -175,10 +175,10 @@
             android:title="@string/pref_title_allow_screen_off_in_audio_call" />
 
         <SeekBarPreference
-            android:defaultValue="2"
+            android:defaultValue="1"
             android:key="mic_gain_factor"
-            android:max="29"
-            android:min="0"
+            android:max="30"
+            android:min="1"
             android:summary="@string/pref_description_mic_gain_factor"
             android:title="@string/pref_title_mic_gain_factor" />
 
