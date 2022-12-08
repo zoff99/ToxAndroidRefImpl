@@ -42,7 +42,6 @@ import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_loudspeaker;
-import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_read_length;
@@ -157,7 +156,7 @@ public class AudioRoundtripActivity extends AppCompatActivity
         });
     }
 
-    public static byte[] createSinWaveBuffer(double freq, int ms)
+    public static byte[] createSineWaveBuffer(double freq, int ms)
     {
         final int SAMPLE_RATE = 48000;
         int samples = (int) ((ms * SAMPLE_RATE) / 1000);
@@ -320,17 +319,17 @@ public class AudioRoundtripActivity extends AppCompatActivity
                     }
                 }
                 audio_buffer_2.position(0);
+                set_audio_to_loudspeaker(manager);
                 /*
                  *
                  * init native audio
                  *
                  */
 
-
                 try
                 {
                     d1 = 0;
-                    byte[] toneBuffer = createSinWaveBuffer(800, 80); // yeah it's bytes. but it'll do for now
+                    byte[] toneBuffer = createSineWaveBuffer(800, 80); // yeah it's bytes. but it'll do for now
                     Log.i(TAG, "LatencyTestThread:toneBuffer:" + toneBuffer.length);
                     byte[] silenceBuffer = new byte[3840];
                     Log.i(TAG, "LatencyTestThread:silenceBuffer:" + silenceBuffer.length);
