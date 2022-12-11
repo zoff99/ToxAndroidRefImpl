@@ -827,13 +827,10 @@ public class TrifaToxService extends Service
 
                 try
                 {
-                    // android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
                     this.setName("tox_iterate()");
                 }
                 catch (Exception e)
                 {
-                    e.printStackTrace();
-                    Log.i(TAG, "thread set name:" + e.getMessage());
                 }
 
                 // ------ correct startup order ------
@@ -1055,8 +1052,6 @@ public class TrifaToxService extends Service
 
                 long tox_iteration_interval_ms = tox_iteration_interval();
                 Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
-
-                boolean tox_iterate_thread_high_prio = false;
 
                 MainActivity.tox_iterate();
 
@@ -1533,23 +1528,12 @@ public class TrifaToxService extends Service
                         if (Callstate.audio_group_active)
                         {
                             tox_iteration_interval_ms = 5; // if we are in a group audio call iterate more often
+                            // Log.i(TAG, "(tox_iteration_interval_ms):001");
                         }
                         else
                         {
                             tox_iteration_interval_ms = 10; // if we are in a video/audio call iterate more often
-
-                            if (!tox_iterate_thread_high_prio)
-                            {
-                                try
-                                {
-                                    tox_iterate_thread_high_prio = true;
-                                    this.setName("tox_iterate()+");
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                }
-                            }
+                            // Log.i(TAG, "(tox_iteration_interval_ms):002");
                         }
                     }
                     else
@@ -1560,6 +1544,11 @@ public class TrifaToxService extends Service
                             {
                                 // iterate faster if outgoing filetransfers are active
                                 tox_iteration_interval_ms = 5;
+                                // Log.i(TAG, "(tox_iteration_interval_ms):004");
+                            }
+                            else
+                            {
+                                tox_iteration_interval_ms = tox_iteration_interval();
                             }
                         }
                         else if (global_last_activity_incoming_ft_ts > -1)
@@ -1568,29 +1557,26 @@ public class TrifaToxService extends Service
                             {
                                 // iterate faster if incoming filetransfers are active
                                 tox_iteration_interval_ms = 5;
+                                // Log.i(TAG, "(tox_iteration_interval_ms):005");
+                            }
+                            else
+                            {
+                                tox_iteration_interval_ms = tox_iteration_interval();
                             }
                         }
                         else
                         {
                             // tox_iteration_interval_ms = Math.max(100, MainActivity.tox_iteration_interval());
                             tox_iteration_interval_ms = tox_iteration_interval();
-                            // Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
+                            // Log.i(TAG, "tox_iteration_interval_ms:006=" + tox_iteration_interval_ms);
                         }
 
-                        if (tox_iterate_thread_high_prio)
+                        if (tox_iteration_interval_ms == 50)
                         {
-                            try
-                            {
-                                tox_iterate_thread_high_prio = false;
-                                this.setName("tox_iterate()");
-                                android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DEFAULT);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
+                            // HINT: when nothing special is happening, iterate less often to save battery
+                            tox_iteration_interval_ms = 100;
+                            // Log.i(TAG, "tox_iteration_interval_ms:007=" + tox_iteration_interval_ms);
                         }
-
                     }
 
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
