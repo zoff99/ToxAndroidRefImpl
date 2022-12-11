@@ -168,6 +168,24 @@ const int samples_per_frame_for_48000_40ms = 1920;
 #ifdef WEBRTC_AEC
 void *webrtc_aecmInst = NULL;
 NsxHandle *nsxInst = NULL;
+// -----------------------
+#define MINIAUDIO_IMPLEMENTATION
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdouble-promotion"
+#pragma GCC diagnostic ignored "-Watomic-implicit-seq-cst"
+#pragma GCC diagnostic ignored "-Wbad-function-cast"
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+#pragma GCC diagnostic ignored "-Wvector-conversion"
+#pragma GCC diagnostic ignored "-Wtautological-type-limit-compare"
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wextra"
+#pragma GCC diagnostic ignored "-Wall"
+#include "miniaudio.h"
+#pragma GCC diagnostic pop
+ma_resampler_config miniaudio_downsample_config;
+ma_resampler miniaudio_downsample_resampler;
+ma_resampler_config miniaudio_upsample_config;
+ma_resampler miniaudio_upsample_resampler;
 #endif
 // --------- AEC ---------
 
@@ -821,6 +839,34 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     if ((channels == 1) && (sampleRate == 48000))
     {
 #ifdef WEBRTC_AEC
+
+        miniaudio_downsample_config = ma_resampler_config_init(
+            ma_format_s16,
+            1,
+            48000,
+            16000,
+            ma_resample_algorithm_linear);
+
+        ma_result result1 = ma_resampler_init(&miniaudio_downsample_config, NULL, &miniaudio_downsample_resampler);
+        if (result1 != MA_SUCCESS) {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "ma_resampler_init downsample -----> ERROR");
+        }
+        ma_resampler_set_rate(&miniaudio_downsample_resampler, 48000, 16000);
+
+        miniaudio_upsample_config = ma_resampler_config_init(
+            ma_format_s16,
+            1,
+            16000,
+            48000,
+            ma_resample_algorithm_linear);
+
+        ma_result result2 = ma_resampler_init(&miniaudio_upsample_config, NULL, &miniaudio_upsample_resampler);
+        if (result2 != MA_SUCCESS) {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "ma_resampler_init upsample -----> ERROR");
+        }
+        ma_resampler_set_rate(&miniaudio_upsample_resampler, 16000, 48000);
+
+
         pcm_buf_resampled = calloc(1, sizeof(int16_t) * samples_per_frame_for_48000_40ms);
         pcm_buf_out_resampled = calloc(1, sizeof(int16_t) * samples_per_frame_for_48000_40ms);
         nsxInst = WebRtcNsx_Create();
@@ -1461,6 +1507,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         pcm_buf_resampled = NULL;
         free(pcm_buf_out_resampled);
         pcm_buf_out_resampled = NULL;
+        ma_resampler_uninit(&miniaudio_downsample_resampler, NULL);
+        ma_resampler_uninit(&miniaudio_upsample_resampler, NULL);
 #endif
     }
 
@@ -1622,6 +1670,14 @@ static int32_t upsample_16000_to_48000_basic(int16_t *in, int16_t *out, int32_t 
         return -1;
     }
 
+    ma_uint64 frameCountIn  = sample_count;
+    ma_uint64 frameCountOut = sample_count * 3;
+    ma_result result = ma_resampler_process_pcm_frames(&miniaudio_upsample_resampler, in, &frameCountIn, out, &frameCountOut);
+    if (result != MA_SUCCESS) {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "upsample_16000_to_48000_basic::error!!");
+    }
+
+#if 0
     int16_t tmp1;
     int16_t tmp2;
     int16_t v1;
@@ -1640,6 +1696,7 @@ static int32_t upsample_16000_to_48000_basic(int16_t *in, int16_t *out, int32_t 
         out++;
         in++;
     }
+#endif
 
     return 0;
 }
@@ -1651,12 +1708,21 @@ static int32_t downsample_48000_to_16000_basic(int16_t *in, int16_t *out, int32_
         return -1;
     }
 
+    ma_uint64 frameCountIn  = sample_count;
+    ma_uint64 frameCountOut = sample_count / 3;
+    ma_result result = ma_resampler_process_pcm_frames(&miniaudio_downsample_resampler, in, &frameCountIn, out, &frameCountOut);
+    if (result != MA_SUCCESS) {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "downsample_48000_to_16000_basic::error!!");
+    }
+
+#if 0
     for (int i = 0; i < (sample_count / 3); i++)
     {
         *out = *(in + 0);
         out++;
         in = in + 3;
     }
+#endif
 
     return 0;
 }
