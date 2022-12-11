@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.0.183](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.183) (2022-12-08)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.182...1.0.183)
+
+**Closed issues:**
+
+- Build fails app:pinChecksums [\#379](https://github.com/zoff99/ToxAndroidRefImpl/issues/379)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#378](https://github.com/zoff99/ToxAndroidRefImpl/pull/378) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#377](https://github.com/zoff99/ToxAndroidRefImpl/pull/377) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#376](https://github.com/zoff99/ToxAndroidRefImpl/pull/376) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#375](https://github.com/zoff99/ToxAndroidRefImpl/pull/375) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#374](https://github.com/zoff99/ToxAndroidRefImpl/pull/374) ([weblate](https://github.com/weblate))
+
 ## [1.0.182](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.182) (2022-11-11)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.181...1.0.182)
@@ -821,6 +837,7 @@
 - Translations update from Weblate [\#190](https://github.com/zoff99/ToxAndroidRefImpl/pull/190) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#189](https://github.com/zoff99/ToxAndroidRefImpl/pull/189) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#188](https://github.com/zoff99/ToxAndroidRefImpl/pull/188) ([weblate](https://github.com/weblate))
+- Translations update from Weblate [\#178](https://github.com/zoff99/ToxAndroidRefImpl/pull/178) ([weblate](https://github.com/weblate))
 
 ## [1.0.70](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.70) (2020-10-01)
 
@@ -838,7 +855,6 @@
 - Translations update from Weblate [\#182](https://github.com/zoff99/ToxAndroidRefImpl/pull/182) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#180](https://github.com/zoff99/ToxAndroidRefImpl/pull/180) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#179](https://github.com/zoff99/ToxAndroidRefImpl/pull/179) ([weblate](https://github.com/weblate))
-- Translations update from Weblate [\#178](https://github.com/zoff99/ToxAndroidRefImpl/pull/178) ([weblate](https://github.com/weblate))
 
 ## [1.0.69](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.69) (2020-09-15)
 
@@ -976,6 +992,7 @@
 **Merged pull requests:**
 
 - Issue \#72: delegate onLongClick event to message\_container listener \(part 2\) [\#144](https://github.com/zoff99/ToxAndroidRefImpl/pull/144) ([rainbyte](https://github.com/rainbyte))
+- Fix issue \#72: delegate onLongClick event to message\_container listener [\#143](https://github.com/zoff99/ToxAndroidRefImpl/pull/143) ([rainbyte](https://github.com/rainbyte))
 
 ## [1.0.47](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.47) (2020-05-24)
 
