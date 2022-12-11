@@ -7136,6 +7136,24 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "loadLibrary loggingstdout failed!");
                 e.printStackTrace();
+
+                final Thread t = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            Thread.sleep(6 * 1000);
+                            display_toast("loadLibrary loggingstdout failed!", false, 5000);
+                        }
+                        catch (Exception e)
+                        {
+                            Log.i(TAG, "loadLibrary loggingstdout failed: toast failed to show");
+                        }
+                    }
+                };
+                t.start();
             }
         }
     }
