@@ -885,7 +885,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         // ----------------------------------------------------------
         // mode          : 0: Mild, 1: Medium , 2: Aggressive
         // ----------------------------------------------------------
-        int res3 = WebRtcNsx_set_policy(nsxInst, 2);
+        int res3 = WebRtcNsx_set_policy(nsxInst, 0);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcNsx_set_policy:res=%d",
                             res3);
