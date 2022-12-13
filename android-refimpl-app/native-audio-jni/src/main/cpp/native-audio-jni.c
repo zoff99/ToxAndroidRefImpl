@@ -840,6 +840,9 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     {
 #ifdef WEBRTC_AEC
 
+        // ----------------------------------------------------------
+        // Audio Resampling
+        //
         miniaudio_downsample_config = ma_resampler_config_init(
             ma_format_s16,
             1,
@@ -865,29 +868,51 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
             __android_log_print(ANDROID_LOG_INFO, LOGTAG, "ma_resampler_init upsample -----> ERROR");
         }
         ma_resampler_set_rate(&miniaudio_upsample_resampler, 16000, 48000);
-
+        //
+        // ----------------------------------------------------------
 
         pcm_buf_resampled = calloc(1, sizeof(int16_t) * samples_per_frame_for_48000_40ms);
         pcm_buf_out_resampled = calloc(1, sizeof(int16_t) * samples_per_frame_for_48000_40ms);
+
+        // ----------------------------------------------------------
+        // Noise Suppression
+        //
         nsxInst = WebRtcNsx_Create();
         int res1 = WebRtcNsx_Init(nsxInst, sampleRate); // only at 16kHz MONO
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcNsx_Init:res=%d",
                             res1);
+        // ----------------------------------------------------------
+        // mode          : 0: Mild, 1: Medium , 2: Aggressive
+        // ----------------------------------------------------------
         int res3 = WebRtcNsx_set_policy(nsxInst, 2);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcNsx_set_policy:res=%d",
                             res3);
+        //
+        // ----------------------------------------------------------
 
+
+        // ----------------------------------------------------------
+        // Acoustic Echo Cancellation
+        //
         webrtc_aecmInst = WebRtcAecm_Create();
         int32_t res2 = WebRtcAecm_Init(webrtc_aecmInst, sampleRate / 3); // only at 16kHz MONO
+        // ----------------------------------------------------------
+        // typedef struct {
+        //     int16_t cngMode;            // AecmFalse, AecmTrue (default)
+        //     int16_t echoMode;           // 0, 1, 2, 3 (default), 4
+        // } AecmConfig;
+        // ----------------------------------------------------------
         AecmConfig config;
         config.echoMode = AecmTrue;
-        config.cngMode = 2;
+        config.cngMode = 4;
         WebRtcAecm_set_config(webrtc_aecmInst, config);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcAecm_Init:res=%d sampleRate=%d",
                             res2, sampleRate);
+        //
+        // ----------------------------------------------------------
 #endif
         filteraudio_used = true;
     }
