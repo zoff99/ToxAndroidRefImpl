@@ -182,6 +182,12 @@
             android:summary="@string/pref_description_mic_gain_factor"
             android:title="@string/pref_title_mic_gain_factor" />
 
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="mic_gain_factor_toggle"
+            android:summary="@string/pref_description_mic_gain_factor_toggle"
+            android:title="@string/pref_title_mic_gain_factor_toggle" />
+
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/pref_higher_audio_quality_titles"

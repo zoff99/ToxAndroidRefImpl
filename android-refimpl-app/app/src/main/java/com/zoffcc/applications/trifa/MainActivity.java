@@ -450,6 +450,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__use_incognito_keyboard = true;
     static boolean PREF__speakerphone_tweak = false;
     public static float PREF_mic_gain_factor = 1.0f;
+    public static boolean PREF__mic_gain_factor_toggle = false;
     // from toxav/toxav.h -> valid values: 2.5, 5, 10, 20, 40 or 60 millseconds
     // 120 is also valid!!
     static int FRAME_SIZE_FIXED = 40; // this is only for recording audio!
@@ -831,6 +832,7 @@ public class MainActivity extends AppCompatActivity
         PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
         PREF__use_incognito_keyboard = settings.getBoolean("use_incognito_keyboard", true);
         PREF__speakerphone_tweak = settings.getBoolean("speakerphone_tweak", false);
+        PREF__mic_gain_factor_toggle = settings.getBoolean("mic_gain_factor_toggle", false);
         PREF__window_security = settings.getBoolean("window_security", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
 
@@ -2260,6 +2262,7 @@ public class MainActivity extends AppCompatActivity
         PREF__force_udp_only = settings.getBoolean("force_udp_only", false);
         PREF__use_incognito_keyboard = settings.getBoolean("use_incognito_keyboard", true);
         PREF__speakerphone_tweak = settings.getBoolean("speakerphone_tweak", false);
+        PREF__mic_gain_factor_toggle = settings.getBoolean("mic_gain_factor_toggle", false);
         PREF__window_security = settings.getBoolean("window_security", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
         PREF__tox_set_do_not_sync_av = settings.getBoolean("X_tox_set_do_not_sync_av", false);

@@ -37,11 +37,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainToggle;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_loudspeaker;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__mic_gain_factor_toggle;
 import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
 import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_read_length;
@@ -338,7 +340,8 @@ public class AudioRoundtripActivity extends AppCompatActivity
                     final long sound_iters = 2;
                     long cur_iter = 0;
                     LatencyTestActive = true;
-                    setMicGainFactor(2.0f);
+                    setMicGainToggle(false);
+                    setMicGainFactor(1.0f);
                     while (test_running)
                     {
                         //Log.i(TAG, "LatencyTestThread:fill_play_buffer:" +
@@ -408,6 +411,7 @@ public class AudioRoundtripActivity extends AppCompatActivity
                 }
 
                 LatencyTestActive = false;
+                setMicGainToggle(PREF__mic_gain_factor_toggle);
                 setMicGainFactor(PREF_mic_gain_factor);
 
                 try
@@ -471,7 +475,7 @@ public class AudioRoundtripActivity extends AppCompatActivity
             e2.printStackTrace();
         }
 
-
+        setMicGainToggle(PREF__mic_gain_factor_toggle);
         setMicGainFactor(PREF_mic_gain_factor);
         roundtrip_time_textview.setText("test finished");
     }

@@ -198,6 +198,8 @@ int rec_buf_pointer_next = 0;
 int rec_state = _STOPPED;
 #define RECORD_BUFFERS_BETWEEN_REC_AND_PROCESS 2
 float wanted_mic_gain = 1.0f;
+float wanted_mic_gain_lower = 1.0f;
+bool wanted_mic_gain_lower_volume = false;
 
 jclass NativeAudio_class = NULL;
 jmethodID rec_buffer_ready_method = NULL;
@@ -483,7 +485,14 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             int32_t temp = 0;
             for (loop = 0; loop < this_buffer_size_pcm16; loop++)
             {
-                temp = (int16_t) (*this_buffer_pcm16) * wanted_mic_gain;
+                if (wanted_mic_gain_lower_volume)
+                {
+                    temp = (int16_t) ((float) (*this_buffer_pcm16) * wanted_mic_gain_lower);
+                }
+                else
+                {
+                    temp = (int16_t) ((float) (*this_buffer_pcm16) * wanted_mic_gain);
+                }
                 if (temp > INT16_MAX)
                 {
                     temp = INT16_MAX;
@@ -1299,6 +1308,14 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1rec_1buffe
     audio_rec_buffer_size[num] = (long) capacity;
 }
 
+void
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_setMicGainToggle(JNIEnv *env, jclass clazz,
+                                                                      jboolean lower_volume)
+{
+    wanted_mic_gain_lower_volume = (bool)lower_volume;
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "setMicGainToggle:%d (true==%d)",
+                        (int) wanted_mic_gain_lower_volume, (int)true);
+}
 
 void
 Java_com_zoffcc_applications_nativeaudio_NativeAudio_setMicGainFactor(JNIEnv *env, jclass clazz,
@@ -1309,6 +1326,34 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_setMicGainFactor(JNIEnv *en
         wanted_mic_gain = (float) gain_factor;
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "setMicGainFactor:%f",
                             (double) wanted_mic_gain);
+
+        if (gain_factor == 1.0f)
+        {
+            wanted_mic_gain_lower = 0.9f;
+        }
+        else if (gain_factor == 2.0f)
+        {
+            wanted_mic_gain_lower = 0.8f;
+        }
+        else if (gain_factor == 3.0f)
+        {
+            wanted_mic_gain_lower = 0.6f;
+        }
+        else if (gain_factor == 4.0f)
+        {
+            wanted_mic_gain_lower = 0.5f;
+        }
+        else if (gain_factor == 5.0f)
+        {
+            wanted_mic_gain_lower = 0.4f;
+        }
+        else
+        {
+            wanted_mic_gain_lower = 0.35f;
+        }
+
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "setMicGainFactor:lower:%f",
+                            (double) wanted_mic_gain_lower);
     }
 }
 

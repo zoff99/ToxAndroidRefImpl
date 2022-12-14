@@ -33,6 +33,7 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.n_rec_audio_in_buf
 import static com.zoffcc.applications.nativeaudio.NativeAudio.native_audio_engine_down;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.semaphore_audioprocessing_02;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainToggle;
 import static com.zoffcc.applications.trifa.AudioReceiver.native_audio_engine_running;
 import static com.zoffcc.applications.trifa.AudioRoundtripActivity.LatencyTestActive;
 import static com.zoffcc.applications.trifa.AudioRoundtripActivity.measured_audio_latency;
@@ -45,6 +46,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperGeneric.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__mic_gain_factor_toggle;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_native_audio_play;
 import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
 import static com.zoffcc.applications.trifa.MainActivity.audio_manager_s;
@@ -208,6 +210,7 @@ public class AudioRecording extends Thread
         {
             Log.i(TAG, "audio_rec:StartREC:001");
             Log.i(TAG, "PREF_MicGainFactor=" + PREF_mic_gain_factor);
+            setMicGainToggle(PREF__mic_gain_factor_toggle);
             setMicGainFactor(PREF_mic_gain_factor);
             NativeAudio.StartREC();
             Log.i(TAG, "audio_rec:StartREC:002");
