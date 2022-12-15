@@ -894,7 +894,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         // ----------------------------------------------------------
         // mode          : 0: Mild, 1: Medium , 2: Aggressive
         // ----------------------------------------------------------
-        int res3 = WebRtcNsx_set_policy(nsxInst, 0);
+        int res3 = WebRtcNsx_set_policy(nsxInst, 2);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcNsx_set_policy:res=%d",
                             res3);
@@ -915,7 +915,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         // ----------------------------------------------------------
         AecmConfig config;
         config.echoMode = AecmTrue;
-        config.cngMode = 4;
+        config.cngMode = 2;
         WebRtcAecm_set_config(webrtc_aecmInst, config);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcAecm_Init:res=%d sampleRate=%d",
