@@ -1850,7 +1850,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             else
             {
-                Log.i(TAG,"restart_audio_system__normal_call:005");
+                Log.i(TAG,"restart_audio_system__normal_call:005:preset_TRUE");
                 HelperGeneric.restart_audio_system();
             }
         }

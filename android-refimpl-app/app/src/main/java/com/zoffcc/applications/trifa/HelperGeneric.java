@@ -4411,7 +4411,7 @@ public class HelperGeneric
 
         if ((Callstate.state != 0) || (Callstate.audio_group_active))
         {
-            Log.i(TAG,"restart_audio_system__normal_call:001");
+            Log.i(TAG,"restart_audio_system__normal_call:001:preset_TRUE");
             restart_audio_system();
         }
     }
@@ -4428,7 +4428,7 @@ public class HelperGeneric
 
         if ((Callstate.state != 0) || (Callstate.audio_group_active))
         {
-            Log.i(TAG,"restart_audio_system__normal_call:002");
+            Log.i(TAG,"restart_audio_system__normal_call:002:preset_TRUE");
             restart_audio_system();
         }
 
@@ -4524,7 +4524,7 @@ public class HelperGeneric
 
             if ((Callstate.state != 0) || (Callstate.audio_group_active))
             {
-                Log.i(TAG,"restart_audio_system__normal_call:003");
+                Log.i(TAG,"restart_audio_system__normal_call:003:preset_false");
                 restart_audio_system();
             }
         }
@@ -4582,7 +4582,7 @@ public class HelperGeneric
 
             if ((Callstate.state != 0) || (Callstate.audio_group_active))
             {
-                Log.i(TAG,"restart_audio_system__normal_call:004");
+                Log.i(TAG,"restart_audio_system__normal_call:004:preset_false");
                 restart_audio_system();
             }
         }
