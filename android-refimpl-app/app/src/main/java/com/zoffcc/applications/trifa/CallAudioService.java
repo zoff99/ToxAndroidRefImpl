@@ -176,7 +176,7 @@ public class CallAudioService extends Service
                             sleep_millis_current = sleep_millis + 5;
                         }
 
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 5000)); // sleep
+                        Thread.sleep(sleep_millis_current - 1, (1000000 - 1000)); // sleep
                     }
                 }
                 catch (Exception e)

@@ -89,6 +89,7 @@ import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_rec_preset;
 import static com.zoffcc.applications.trifa.CallingActivity.feed_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.fetch_from_h264_encoder;
 import static com.zoffcc.applications.trifa.CallingActivity.global_sps_pps_nal_unit_bytes;
@@ -159,6 +160,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 public class HelperGeneric
 {
+    static final Object audio_system_start_stop_lock = new Object();
     /*
      all stuff here should be moved somewhere else at some point
      */
@@ -4398,10 +4400,38 @@ public class HelperGeneric
         {
             e.printStackTrace();
         }
+
+        try
+        {
+            set_rec_preset(true);
+        }
+        catch(Exception ignored)
+        {
+        }
+
+        if ((Callstate.state != 0) || (Callstate.audio_group_active))
+        {
+            Log.i(TAG,"restart_audio_system__normal_call:001");
+            restart_audio_system();
+        }
     }
 
     synchronized public static void set_audio_to_loudspeaker(AudioManager manager)
     {
+        try
+        {
+            set_rec_preset(true);
+        }
+        catch(Exception ignored)
+        {
+        }
+
+        if ((Callstate.state != 0) || (Callstate.audio_group_active))
+        {
+            Log.i(TAG,"restart_audio_system__normal_call:002");
+            restart_audio_system();
+        }
+
         try
         {
             Log.i(TAG, "AUDIOROUTE:set_audio_to_loudspeaker");
@@ -4483,6 +4513,20 @@ public class HelperGeneric
                 manager.setSpeakerphoneOn(false);
                 Callstate.audio_speaker = false;
             }
+
+            try
+            {
+                set_rec_preset(false);
+            }
+            catch(Exception ignored)
+            {
+            }
+
+            if ((Callstate.state != 0) || (Callstate.audio_group_active))
+            {
+                Log.i(TAG,"restart_audio_system__normal_call:003");
+                restart_audio_system();
+            }
         }
         catch (Exception e)
         {
@@ -4527,11 +4571,95 @@ public class HelperGeneric
                 manager.setSpeakerphoneOn(false);
                 manager.setWiredHeadsetOn(true);
             }
+
+            try
+            {
+                set_rec_preset(false);
+            }
+            catch(Exception ignored)
+            {
+            }
+
+            if ((Callstate.state != 0) || (Callstate.audio_group_active))
+            {
+                Log.i(TAG,"restart_audio_system__normal_call:004");
+                restart_audio_system();
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
             Log.i(TAG, "AUDIOROUTE:set_audio_to_headset:EE:" + e.getMessage());
+        }
+    }
+
+    static void restart_audio_system()
+    {
+        stop_audio_system();
+        start_audio_system();
+    }
+
+    static void start_audio_system()
+    {
+        synchronized (audio_system_start_stop_lock)
+        {
+            try
+            {
+                if (AudioReceiver.stopped)
+                {
+                    CallingActivity.audio_receiver_thread = new AudioReceiver();
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                if (AudioRecording.stopped)
+                {
+                    CallingActivity.audio_thread = new AudioRecording();
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    static void stop_audio_system()
+    {
+        synchronized (audio_system_start_stop_lock)
+        {
+            try
+            {
+                if (!AudioRecording.stopped)
+                {
+                    AudioRecording.close();
+                    CallingActivity.audio_thread.join();
+                    CallingActivity.audio_thread = null;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                if (!AudioReceiver.stopped)
+                {
+                    AudioReceiver.close();
+                    CallingActivity.audio_receiver_thread.join();
+                    CallingActivity.audio_receiver_thread = null;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 }

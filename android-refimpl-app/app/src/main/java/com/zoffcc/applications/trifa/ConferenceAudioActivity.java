@@ -59,8 +59,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
-import static com.zoffcc.applications.trifa.CallingActivity.audio_receiver_thread;
-import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
+import static com.zoffcc.applications.trifa.HelperGeneric.restart_audio_system;
+import static com.zoffcc.applications.trifa.HelperGeneric.stop_audio_system;
 import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
 import static com.zoffcc.applications.trifa.HelperConference.is_conference_active;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
@@ -572,57 +572,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
                     WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON | WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON);
         }
 
-        try
-        {
-            if (!AudioRecording.stopped)
-            {
-                AudioRecording.close();
-                audio_thread.join();
-                audio_thread = null;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (!AudioReceiver.stopped)
-            {
-                AudioReceiver.close();
-                audio_receiver_thread.join();
-                audio_receiver_thread = null;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (AudioRecording.stopped)
-            {
-                audio_thread = new AudioRecording();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (AudioReceiver.stopped)
-            {
-                audio_receiver_thread = new AudioReceiver();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        restart_audio_system();
 
         // update every x times per second -----------
         final int update_per_sec = 8;
@@ -766,31 +716,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         push_to_talk_active = false;
         activity_state = 0;
 
-        try
-        {
-            if (!AudioRecording.stopped)
-            {
-                AudioRecording.close();
-                audio_thread.join();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (!AudioReceiver.stopped)
-            {
-                AudioReceiver.close();
-                audio_receiver_thread.join();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        stop_audio_system();
 
         global_showing_anygroupview = false;
 
@@ -1471,31 +1397,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         push_to_talk_active = false;
         activity_state = 0;
 
-        try
-        {
-            if (!AudioRecording.stopped)
-            {
-                AudioRecording.close();
-                audio_thread.join();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (!AudioReceiver.stopped)
-            {
-                AudioReceiver.close();
-                audio_receiver_thread.join();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        stop_audio_system();
 
         Log.i(TAG, "show_add_friend_conference");
         Intent intent = new Intent(this, FriendSelectSingleActivity.class);

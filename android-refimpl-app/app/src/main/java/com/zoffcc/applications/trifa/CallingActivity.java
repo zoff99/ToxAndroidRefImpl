@@ -88,6 +88,7 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.get_aec_active;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_rec_preset;
 import static com.zoffcc.applications.trifa.CameraWrapper.camera_preview_call_back_ts_first_frame;
 import static com.zoffcc.applications.trifa.CameraWrapper.getRotation;
 import static com.zoffcc.applications.trifa.CustomVideoImageView.video_output_orentation_update;
@@ -1663,57 +1664,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensor_manager.registerListener(this, accelerometer_sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-        try
-        {
-            if (!AudioRecording.stopped)
-            {
-                AudioRecording.close();
-                audio_thread.join();
-                audio_thread = null;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (!AudioReceiver.stopped)
-            {
-                AudioReceiver.close();
-                audio_receiver_thread.join();
-                audio_receiver_thread = null;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (AudioReceiver.stopped)
-            {
-                audio_receiver_thread = new AudioReceiver();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (AudioRecording.stopped)
-            {
-                audio_thread = new AudioRecording();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        Log.i(TAG,"restart_audio_system__normal_call:101");
+        HelperGeneric.restart_audio_system();
 
         // update call time every second -----------
         final Handler ha = new Handler();
@@ -1882,6 +1834,27 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         super.onPause();
 
+        try
+        {
+            set_rec_preset(true);
+        }
+        catch(Exception ignored)
+        {
+        }
+
+        if ((Callstate.state != 0) || (Callstate.audio_group_active))
+        {
+            if (Callstate.audio_group_active)
+            {
+
+            }
+            else
+            {
+                Log.i(TAG,"restart_audio_system__normal_call:005");
+                HelperGeneric.restart_audio_system();
+            }
+        }
+
         sensor_manager.unregisterListener(this);
 
         try
@@ -1929,32 +1902,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
 
         stop_ringtone();
-
-        try
-        {
-            if (!AudioRecording.stopped)
-            {
-                AudioRecording.close();
-                audio_thread.join();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (!AudioReceiver.stopped)
-            {
-                AudioReceiver.close();
-                audio_receiver_thread.join();
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        HelperGeneric.stop_audio_system();
 
         // ------ shutdown audio device ------
         // ------ shutdown audio device ------

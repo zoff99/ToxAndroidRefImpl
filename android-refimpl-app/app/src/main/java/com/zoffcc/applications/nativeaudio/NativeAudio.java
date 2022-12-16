@@ -206,6 +206,8 @@ public class NativeAudio
 
     public static native void set_aec_active(int active);
 
+    public static native void set_rec_preset(boolean with_loud_speaker);
+
     public static native int get_aec_active();
 
     public static native void set_audio_aec_delay(int delay);

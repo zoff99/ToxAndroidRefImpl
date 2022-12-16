@@ -177,6 +177,8 @@ NsxHandle *nsxInst = NULL;
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 #pragma GCC diagnostic ignored "-Wvector-conversion"
 #pragma GCC diagnostic ignored "-Wtautological-type-limit-compare"
+#pragma GCC diagnostic ignored "-Wextra-semi-stmt"
+#pragma GCC diagnostic ignored "-Wimplicit-fallthrough"
 #pragma GCC diagnostic ignored "-Wpedantic"
 #pragma GCC diagnostic ignored "-Wextra"
 #pragma GCC diagnostic ignored "-Wall"
@@ -200,6 +202,7 @@ int rec_state = _STOPPED;
 float wanted_mic_gain = 1.0f;
 float wanted_mic_gain_lower = 1.0f;
 bool wanted_mic_gain_lower_volume = false;
+bool use_with_louderspeaker = true;
 
 jclass NativeAudio_class = NULL;
 jmethodID rec_buffer_ready_method = NULL;
@@ -279,7 +282,7 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 }
 
 
-JNIEnv *jni_getenv()
+JNIEnv *jni_getenv(void)
 {
     JNIEnv *env_this;
     (*cachedJVM)->GetEnv(cachedJVM, (void **) &env_this, JNI_VERSION_1_6);
@@ -476,36 +479,44 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 #endif
             }
 
+            int16_t *this_buffer_pcm16 = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
+            int this_buffer_size_pcm16 = audio_rec_buffer_size[rec_buf_pointer_start] / 2;
+
             // TODO: make this better? faster?
             // --------------------------------------------------
             // increase GAIN manually and rather slow:
-            int16_t *this_buffer_pcm16 = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
-            int this_buffer_size_pcm16 = audio_rec_buffer_size[rec_buf_pointer_start] / 2;
-            int loop = 0;
-            int32_t temp = 0;
-            for (loop = 0; loop < this_buffer_size_pcm16; loop++)
+            if ((!wanted_mic_gain_lower_volume) && (wanted_mic_gain == 1.0f))
             {
-                if (wanted_mic_gain_lower_volume)
+                // gain == 1.0, so do nothing
+            }
+            else
+            {
+                int loop = 0;
+                int32_t temp = 0;
+                for (loop = 0; loop < this_buffer_size_pcm16; loop++)
                 {
-                    temp = (int16_t) ((float) (*this_buffer_pcm16) * wanted_mic_gain_lower);
-                }
-                else
-                {
-                    temp = (int16_t) ((float) (*this_buffer_pcm16) * wanted_mic_gain);
-                }
-                if (temp > INT16_MAX)
-                {
-                    temp = INT16_MAX;
-                }
-                else if (temp < INT16_MIN)
-                {
-                    temp = INT16_MIN;
-                }
+                    if (wanted_mic_gain_lower_volume)
+                    {
+                        temp = (int16_t) ((float) (*this_buffer_pcm16) * wanted_mic_gain_lower);
+                    }
+                    else
+                    {
+                        temp = (int16_t) ((int32_t)(*this_buffer_pcm16) * (int32_t)wanted_mic_gain);
+                    }
+                    if (temp > INT16_MAX)
+                    {
+                        temp = INT16_MAX;
+                    }
+                    else if (temp < INT16_MIN)
+                    {
+                        temp = INT16_MIN;
+                    }
 
-                // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "gain:old=%d new=%d",
-                //                     (*this_buffer_pcm16), (int16_t) temp);
-                *this_buffer_pcm16 = (int16_t) temp;
-                this_buffer_pcm16++;
+                    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "gain:old=%d new=%d",
+                    //                     (*this_buffer_pcm16), (int16_t) temp);
+                    *this_buffer_pcm16 = (int16_t) temp;
+                    this_buffer_pcm16++;
+                }
             }
             // --------------------------------------------------
 
@@ -710,8 +721,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
 
     /*
      * create audio player:
-     *     fast audio does not support when SL_IID_EFFECTSEND is required, skip it
-     *     for fast audio case
+     *     fast audio does not support SL_IID_EFFECTSEND
      */
 #define  num_params  3
     const SLInterfaceID ids[num_params] = {SL_IID_BUFFERQUEUE,
@@ -730,9 +740,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     assert(SL_RESULT_SUCCESS == result);
     (void) result;
 
-#if 1
     // ----------------------------------------------------------
-    // Code for working with ear speaker by setting stream type to STREAM_VOICE ??
     SLAndroidConfigurationItf playerConfig;
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_ANDROIDCONFIGURATION,
                                              &playerConfig);
@@ -773,8 +781,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     }
     // ----------------------------------------------------------
 
-#endif
-
     // realize the player
     result = (*bqPlayerObject)->Realize(bqPlayerObject, SL_BOOLEAN_FALSE);
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
@@ -805,7 +811,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                         (int) result, (int) SL_RESULT_SUCCESS);
     (void) result;
 
-#if 1
     // get the volume interface
     result = (*bqPlayerObject)->GetInterface(bqPlayerObject, SL_IID_VOLUME, &bqPlayerVolume);
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
@@ -827,8 +832,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
 
     // set max volume
     (*bqPlayerVolume)->SetVolumeLevel(bqPlayerVolume, maxVolume);
-
-#endif
 
     // set the player's state
     result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
@@ -1019,9 +1022,13 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
                             "createAudioRecorder:SL_IID_ANDROIDCONFIGURATION...");
 
         SLuint32 presetValue = SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION;
+        if (use_with_louderspeaker)
+        {
+            presetValue = SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION;
+        }
         // SL_ANDROID_RECORDING_PRESET_UNPROCESSED <--- ??
-        // SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION
-        // SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION
+        // SL_ANDROID_RECORDING_PRESET_VOICE_RECOGNITION <-- low latency
+        // SL_ANDROID_RECORDING_PRESET_VOICE_COMMUNICATION <-- high latency
         (*inputConfig)->SetConfiguration(inputConfig,
                                          SL_ANDROID_KEY_RECORDING_PRESET,
                                          &presetValue,
@@ -1087,22 +1094,22 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
 
 #if 0
     /* Enable AEC if requested */
-    if (aec)
+    SLAndroidAcousticEchoCancellationItf aecItf;
+    result = (*recorderObject)->GetInterface(
+        recorderObject, SL_IID_ANDROIDACOUSTICECHOCANCELLATION, (void *) &aecItf);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:AEC is %savailable",
+                        SL_RESULT_SUCCESS == result ? "" : "not ");
+    if (SL_RESULT_SUCCESS == result)
     {
-        SLAndroidAcousticEchoCancellationItf aecItf;
-        result = (*recorderObject)->GetInterface(
-            recorderObject, SL_IID_ANDROIDACOUSTICECHOCANCELLATION, (void *) &aecItf);
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:AEC is %savailable",
-                            SL_RESULT_SUCCESS == result ? "" : "not ");
-        if (SL_RESULT_SUCCESS == result)
-        {
-            result = (*aecItf)->SetEnabled(aecItf, true);
-            SLboolean enabled;
-            result = (*aecItf)->IsEnabled(aecItf, &enabled);
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:AEC is %s",
-                                enabled ? "enabled" : "not enabled");
-        }
+        result = (*aecItf)->SetEnabled(aecItf, true);
+        SLboolean enabled;
+        result = (*aecItf)->IsEnabled(aecItf, &enabled);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "createAudioRecorder:AEC is %s",
+                            enabled ? "enabled" : "not enabled");
     }
+#endif
+
+#if 0
     /* Enable AGC if requested */
     if (agc)
     {
@@ -1687,6 +1694,14 @@ float audio_vu(const int16_t *pcm_data, uint32_t sample_count)
 
     float vu = 20.0f * logf(sum);
     return vu;
+}
+
+void
+Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1rec_1preset(JNIEnv *env, jclass clazz,
+                                                                      jboolean with_loud_speaker)
+{
+    use_with_louderspeaker = with_loud_speaker;
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "set_rec_preset:use_with_louderspeaker=%d", use_with_louderspeaker);
 }
 
 void
