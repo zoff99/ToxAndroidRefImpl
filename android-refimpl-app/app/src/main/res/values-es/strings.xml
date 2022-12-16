@@ -9,7 +9,7 @@
     <string name="set_password_message_password_dont_match">Las contraseñas no coinciden</string>
     <string name="title_activity_calling">Llamada</string>
     <string name="title_activity_profile">Perfil</string>
-    <string name="title_activity_settings">Configurar</string>
+    <string name="title_activity_settings">Ajustes</string>
     <string name="title_activity_crash">Choque</string>
     <string name="title_activity_friendinfo">Información de amigo</string>
     <string name="title_activity_conferencepeerinfo">Informaciones sobre el par</string>
@@ -411,4 +411,6 @@
 \n¡¡El ingreso a un Grupo Público a través del ID de Grupo no está funcionando todavía!!</string>
     <string name="layout___load_network_connections">cargar las conexiones de red</string>
     <string name="layout___audio_roundtrip_test_start">Prueba de la latencia del audio</string>
+    <string name="pref_title_mic_gain_factor_toggle">La ganancia del micrófono reduce el volumen</string>
+    <string name="pref_description_mic_gain_factor_toggle">Si su micrófono graba con demasiada sensibilidad, habilite esta configuración y el factor de ganancia del micrófono reducirá el volumen del micrófono</string>
 </resources>
