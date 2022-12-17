@@ -32,6 +32,11 @@
     <dimen name="emoji_size_in_textview">36dp</dimen>
     <!-- size of emoji in the TextViews -->
 
+    <!-- emoji values -->
+    <!-- 36dp was the original default value -->
+    <dimen name="emoji_grid_view_column_width">50dp</dimen>
+    <!-- emoji values -->
+
     <dimen name="message_entry_padding">0dp</dimen>
     <dimen name="message_entry_datetime_bottom_padding">10dp</dimen>
     <dimen name="message_entry_datetime_bottom_padding_small">0dp</dimen>
