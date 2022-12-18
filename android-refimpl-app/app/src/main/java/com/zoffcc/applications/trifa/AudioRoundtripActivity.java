@@ -38,10 +38,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainFactor;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.setMicGainToggle;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_rec_preset;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
+import static com.zoffcc.applications.trifa.HelperGeneric.restart_audio_system;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_loudspeaker;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__mic_gain_factor_toggle;
 import static com.zoffcc.applications.trifa.MainActivity.PREF_mic_gain_factor;
@@ -56,6 +58,8 @@ public class AudioRoundtripActivity extends AppCompatActivity
     private TextView roundtrip_time_textview;
     private TextView roundtrip_info_textview;
     private Button roundtrip_start_button;
+    private Button fastpath_toggle_button = null;
+    private boolean fastpath_active = false;
     private boolean test_running = false;
     private Thread LatencyTestThread = null;
     public static boolean LatencyTestActive = false;
@@ -71,6 +75,7 @@ public class AudioRoundtripActivity extends AppCompatActivity
         roundtrip_time_textview = findViewById(R.id.roundtrip_time_textview);
         roundtrip_info_textview = findViewById(R.id.roundtrip_info_textview);
         roundtrip_start_button = findViewById(R.id.roundtrip_start_button);
+        fastpath_toggle_button = findViewById(R.id.fastpath_toggle_button);
 
         try
         {
@@ -121,6 +126,46 @@ public class AudioRoundtripActivity extends AppCompatActivity
         super.onResume();
         test_running = false;
         LatencyTestActive = false;
+
+        fastpath_active = false;
+        try
+        {
+            set_rec_preset(!fastpath_active);
+        }
+        catch (Exception ignored)
+        {
+        }
+        fastpath_toggle_button.setText("slow audio path");
+
+        fastpath_toggle_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                try
+                {
+                    if (test_running)
+                    {
+                        if (fastpath_active)
+                        {
+                            fastpath_active = false;
+                            switch_fast_audio_path(fastpath_active);
+                            fastpath_toggle_button.setText("slow audio path");
+                        }
+                        else
+                        {
+                            fastpath_active = true;
+                            switch_fast_audio_path(fastpath_active);
+                            fastpath_toggle_button.setText("fast audio path");
+                        }
+                    }
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+        });
+
         roundtrip_start_button.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -322,6 +367,10 @@ public class AudioRoundtripActivity extends AppCompatActivity
                 }
                 audio_buffer_2.position(0);
                 set_audio_to_loudspeaker(manager);
+
+                fastpath_active = false;
+                switch_fast_audio_path(false);
+
                 /*
                  *
                  * init native audio
@@ -447,6 +496,38 @@ public class AudioRoundtripActivity extends AppCompatActivity
             }
         };
         LatencyTestThread.start();
+    }
+
+    private void switch_fast_audio_path(final boolean enable_fast_path)
+    {
+        if (enable_fast_path)
+        {
+            // ------------ test with fast audio path ------------
+            try
+            {
+                set_rec_preset(false);
+            }
+            catch (Exception ignored)
+            {
+            }
+            Log.i(TAG, "restart_audio_system__normal_call:201:preset_false");
+            restart_audio_system();
+            // ------------ test with fast audio path ------------
+        }
+        else
+        {
+            // ------------ test with "slower" audio path ------------
+            try
+            {
+                set_rec_preset(true);
+            }
+            catch (Exception ignored)
+            {
+            }
+            Log.i(TAG, "restart_audio_system__normal_call:202:preset_TRUE");
+            restart_audio_system();
+            // ------------ test with "slower" audio path ------------
+        }
     }
 
     @Override

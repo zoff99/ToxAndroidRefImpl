@@ -35,6 +35,17 @@
         android:textSize="13sp"
         tools:ignore="HardcodedText" />
 
+    <Button
+        android:id="@+id/fastpath_toggle_button"
+        android:layout_width="wrap_content"
+        android:layout_height="60dp"
+        android:layout_gravity="center_vertical|center_horizontal"
+        android:layout_margin="10dp"
+        android:gravity="center"
+        android:text="fast audio path"
+        android:textAllCaps="false"
+        tools:ignore="HardcodedText" />
+
     <TextView
         android:id="@+id/roundtrip_time_textview"
         android:layout_width="match_parent"
