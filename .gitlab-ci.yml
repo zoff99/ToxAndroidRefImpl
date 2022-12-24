@@ -71,6 +71,8 @@ assembleDebug:
   interruptible: true
   stage: build
   script:
+    - apt-get --quiet install --yes openjdk-11-jdk-headless
+    - java -version
     - ./gradlew assembleDebug
   artifacts:
     paths:
