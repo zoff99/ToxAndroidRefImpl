@@ -5345,7 +5345,7 @@ public class MainActivity extends AppCompatActivity
     {
         if (PREF__X_battery_saving_mode)
         {
-            Log.i(TAG, "global_last_activity_for_battery_savings_ts:008:*PING*");
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:008:*PING*:file_recv_control_cb");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG, "file_recv_control:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_CONTROL);
@@ -5828,7 +5828,7 @@ public class MainActivity extends AppCompatActivity
 
         if (PREF__X_battery_saving_mode)
         {
-            Log.i(TAG, "global_last_activity_for_battery_savings_ts:010:*PING*");
+            Log.i(TAG, "global_last_activity_for_battery_savings_ts:010:*PING*:file_recv_cb");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         // Log.i(TAG,
