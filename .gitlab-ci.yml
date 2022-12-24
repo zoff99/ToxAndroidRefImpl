@@ -53,6 +53,7 @@ before_script:
   - sdkmanager --sdk_root=${ANDROID_HOME} "cmake;3.6.4111459"
   - sdkmanager --sdk_root=${ANDROID_HOME} "ndk;21.0.6113669"
   - sdkmanager --sdk_root=${ANDROID_HOME} "ndk;20.1.5948944"
+  - sdkmanager --sdk_root=${ANDROID_HOME} "ndk;23.2.8568313"
 
   - ls -al; pwd; id -a
   # Not necessary, but just for surity
