@@ -221,6 +221,11 @@ public class AudioReceiver extends Thread
             debug__audio_play_buf05 = NativeAudio.n_buf_size_in_bytes;
         }
 
+        if (NativeAudio.n_buf_size_in_bytes< 3840)
+        {
+            NativeAudio.n_buf_size_in_bytes = 3840;
+        }
+
         if (PREF__X_audio_play_buffer_custom > 0)
         {
             if (PREF__X_audio_play_buffer_custom < 500000)

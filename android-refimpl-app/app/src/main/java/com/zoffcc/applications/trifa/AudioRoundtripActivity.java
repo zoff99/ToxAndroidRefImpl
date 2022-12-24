@@ -429,11 +429,28 @@ public class AudioRoundtripActivity extends AppCompatActivity
                             }
 
                             Log.i(TAG, "LatencyTestThread:--sound--");
-                            NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(toneBuffer);
+                            try
+                            {
+                                NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].rewind();
+                                NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(toneBuffer,0,NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].limit());
+                            }
+                            catch(Exception e2)
+                            {
+                                e2.printStackTrace();
+                            }
                         }
                         else
                         {
-                            NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(silenceBuffer);
+                            try
+                            {
+                                NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].rewind();
+                                Log.i(TAG, "bufsize1:"+NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].limit()+" bufsize2:"+silenceBuffer.length);
+                                NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].put(silenceBuffer,0,NativeAudio.n_audio_buffer[NativeAudio.n_cur_buf].limit());
+                            }
+                            catch(Exception e1)
+                            {
+                                e1.printStackTrace();
+                            }
                         }
 
                         audio_buffer_2.position(0);
