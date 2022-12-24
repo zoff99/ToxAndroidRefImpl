@@ -75,7 +75,7 @@ assembleDebug:
     - apt-get --quiet install --yes openjdk-11-jdk-headless
     - rm -v $(which java)
     - java -version
-    - ./gradlew assembleDebug
+    - unset JAVA_HOME ; ./gradlew assembleDebug
   artifacts:
     paths:
       - android-refimpl-app/app/build/outputs/
