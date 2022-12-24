@@ -73,6 +73,7 @@ assembleDebug:
   stage: build
   script:
     - apt-get --quiet install --yes openjdk-11-jdk-headless
+    - rm -v $(which java)
     - java -version
     - ./gradlew assembleDebug
   artifacts:
