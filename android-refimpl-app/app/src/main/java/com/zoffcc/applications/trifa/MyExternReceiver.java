@@ -108,7 +108,7 @@ public class MyExternReceiver extends BroadcastReceiver
                                 Intent fullScreenIntent = new Intent(context, StartMainActivityWrapper.class);
                                 PendingIntent fullScreenPendingIntent = PendingIntent.getActivity(context, 0,
                                                                                                   fullScreenIntent,
-                                                                                                  PendingIntent.FLAG_UPDATE_CURRENT);
+                                                                                                  PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
 
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                                 {

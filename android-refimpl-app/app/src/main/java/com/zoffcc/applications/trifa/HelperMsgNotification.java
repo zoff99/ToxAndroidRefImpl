@@ -157,7 +157,7 @@ public class HelperMsgNotification
                                     "com.zoffcc.applications.trifa." + (long) (Math.random() * 100000));
                             notificationIntent.putExtra("CLEAR_NEW_MESSAGE_NOTIFICATION", "1");
                             PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent,
-                                                                                    0);
+                                                                                    PendingIntent.FLAG_IMMUTABLE);
                             // -- notification ------------------
                             // -- notification -----------------
                             NotificationCompat.Builder b;

@@ -1184,7 +1184,7 @@ public class TrifaToxService extends Service
                                 // intentWakeFullBroacastReceiver.addFlags(Intent.FLAG_RECEIVER_FOREGROUND);
                                 PendingIntent alarmIntent = PendingIntent.getBroadcast(getApplicationContext(), 1001,
                                                                                        intent_wakeup,
-                                                                                       PendingIntent.FLAG_CANCEL_CURRENT);
+                                                                                       PendingIntent.FLAG_CANCEL_CURRENT|PendingIntent.FLAG_IMMUTABLE);
                                 getApplicationContext();
                                 AlarmManager alarmManager = (AlarmManager) getApplicationContext().getSystemService(
                                         ALARM_SERVICE);

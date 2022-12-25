@@ -50,7 +50,7 @@ public class HelperToxNotification
 
         Intent notificationIntent = new Intent(c, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         // -- notification ------------------
         // -- notification ------------------
@@ -178,7 +178,7 @@ public class HelperToxNotification
         {
             b.setOnlyAlertOnce(false);
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         if (bootstrapping)
         {
