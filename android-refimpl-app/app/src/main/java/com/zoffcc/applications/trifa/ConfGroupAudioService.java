@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_c
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_headset;
+import static com.zoffcc.applications.trifa.HelperGeneric.stop_audio_system;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
@@ -437,7 +438,7 @@ public class ConfGroupAudioService extends Service
         Intent stopIntent = new Intent(this, ButtonReceiver.class);
         stopIntent.setAction(ACTION_STOP);
         PendingIntent playPendingIntent = PendingIntent.getBroadcast(this, ACTION_STOP_ID, stopIntent,
-                                                                     PendingIntent.FLAG_UPDATE_CURRENT);
+                                                                     PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.status_bar_stop, playPendingIntent);
         bigViews.setOnClickPendingIntent(R.id.status_bar_stop, playPendingIntent);
         // *************
@@ -446,7 +447,7 @@ public class ConfGroupAudioService extends Service
         Intent pauseIntent = new Intent(this, ButtonReceiver.class);
         pauseIntent.setAction(ACTION_PAUSE);
         PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, ACTION_PAUSE_ID, pauseIntent,
-                                                                      PendingIntent.FLAG_UPDATE_CURRENT);
+                                                                      PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
         bigViews.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
         // *************
@@ -458,21 +459,6 @@ public class ConfGroupAudioService extends Service
 
         views.setTextViewText(R.id.status_bar_artist_name, "Tox:" + "GroupAudio");
         bigViews.setTextViewText(R.id.status_bar_artist_name, "Tox:" + "GroupAudio");
-
-        int notificationAction = android.R.drawable.ic_media_pause;//needs to be initialized
-        PendingIntent play_pauseAction = null;
-
-        //Build a new notification according to the current state of the MediaPlayer
-        if (playbackStatus == GAS_PLAYING)
-        {
-            notificationAction = android.R.drawable.ic_media_pause;
-            // play_pauseAction = playbackAction(1);
-        }
-        else // if (playbackStatus == GAS_PAUSED)
-        {
-            notificationAction = android.R.drawable.ic_media_play;
-            // play_pauseAction = playbackAction(0);
-        }
 
         NotificationCompat.Builder b;
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
@@ -500,7 +486,7 @@ public class ConfGroupAudioService extends Service
 
         Intent notificationIntent = new Intent(this, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         b.setContentIntent(pendingIntent);
 
@@ -570,6 +556,7 @@ public class ConfGroupAudioService extends Service
         if (stop_full)
         {
             reset_audio_mode();
+            stop_audio_system();
         }
 
         removeNotification();
@@ -642,7 +629,7 @@ public class ConfGroupAudioService extends Service
                 playIntent.setAction(ACTION_PLAY);
                 PendingIntent pausePendingIntent = PendingIntent.getBroadcast(context_gas_static, ACTION_PLAY_ID,
                                                                               playIntent,
-                                                                              PendingIntent.FLAG_UPDATE_CURRENT);
+                                                                              PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
                 views.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
                 bigViews.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
             }
@@ -689,7 +676,7 @@ public class ConfGroupAudioService extends Service
                 pauseIntent.setAction(ACTION_PAUSE);
                 PendingIntent pausePendingIntent = PendingIntent.getBroadcast(context_gas_static, ACTION_PAUSE_ID,
                                                                               pauseIntent,
-                                                                              PendingIntent.FLAG_UPDATE_CURRENT);
+                                                                              PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
                 views.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
                 bigViews.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
             }

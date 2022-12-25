@@ -276,7 +276,7 @@ public class CallAudioService extends Service
         Intent stopIntent = new Intent(this, ButtonReceiver.class);
         stopIntent.setAction(ACTION_STOP);
         PendingIntent playPendingIntent = PendingIntent.getBroadcast(this, ACTION_STOP_ID, stopIntent,
-                                                                     PendingIntent.FLAG_UPDATE_CURRENT);
+                                                                     PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.status_bar_stop, playPendingIntent);
         bigViews.setOnClickPendingIntent(R.id.status_bar_stop, playPendingIntent);
         // *************
@@ -285,7 +285,7 @@ public class CallAudioService extends Service
         Intent pauseIntent = new Intent(this, ButtonReceiver.class);
         pauseIntent.setAction(ACTION_MUTE);
         PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, ACTION_MUTE_ID, pauseIntent,
-                                                                      PendingIntent.FLAG_UPDATE_CURRENT);
+                                                                      PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
         bigViews.setOnClickPendingIntent(R.id.status_bar_play, pausePendingIntent);
         // *************
@@ -324,7 +324,7 @@ public class CallAudioService extends Service
 
         Intent notificationIntent = new Intent(this, CallingActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
         b.setContentIntent(pendingIntent);
 

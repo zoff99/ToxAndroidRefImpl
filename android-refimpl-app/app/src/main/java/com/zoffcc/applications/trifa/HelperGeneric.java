@@ -3644,6 +3644,23 @@ public class HelperGeneric
         }
     }
 
+    /*
+     *
+     * print the caller method and filename and linenumer
+     *
+     */
+    static void get_caller_method()
+    {
+        try
+        {
+            Log.i(TAG, "CALLED_BY:" + Thread.currentThread().getStackTrace()[4].getMethodName() + " " +
+                       Thread.currentThread().getStackTrace()[4].getFileName() + ":" + Thread.currentThread().getStackTrace()[4].getLineNumber());
+        }
+        catch(Exception ignored)
+        {
+        }
+    }
+
     static void draw_main_top_icon__real(ImageView view, Context c, int blur_color, boolean is_fg)
     {
         try
@@ -4387,6 +4404,7 @@ public class HelperGeneric
 
     synchronized public static void reset_audio_mode()
     {
+        get_caller_method();
         try
         {
             print_stack_trace();
@@ -4411,8 +4429,8 @@ public class HelperGeneric
 
         if ((Callstate.state != 0) || (Callstate.audio_group_active))
         {
-            Log.i(TAG,"restart_audio_system__normal_call:001:preset_TRUE");
-            restart_audio_system();
+            Log.i(TAG,"stop_audio_system:001:preset_TRUE");
+            stop_audio_system();
         }
     }
 
@@ -4595,12 +4613,17 @@ public class HelperGeneric
 
     static void restart_audio_system()
     {
+        get_caller_method();
+        Log.i(TAG, "restart_audio_system:enter");
         stop_audio_system();
         start_audio_system();
+        Log.i(TAG, "restart_audio_system:DONE");
     }
 
     static void start_audio_system()
     {
+        get_caller_method();
+        Log.i(TAG, "start_audio_system:enter");
         synchronized (audio_system_start_stop_lock)
         {
             try
@@ -4627,10 +4650,13 @@ public class HelperGeneric
                 e.printStackTrace();
             }
         }
+        Log.i(TAG, "start_audio_system:DONE");
     }
 
     static void stop_audio_system()
     {
+        get_caller_method();
+        Log.i(TAG, "stop_audio_system:enter");
         synchronized (audio_system_start_stop_lock)
         {
             try
@@ -4661,5 +4687,6 @@ public class HelperGeneric
                 e.printStackTrace();
             }
         }
+        Log.i(TAG, "stop_audio_system:DONE");
     }
 }
