@@ -44,7 +44,9 @@
 
     <uses-sdk tools:overrideLibrary="src.java.org.tensorflow.lite.task.vision"/>
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH"
+        android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.WAKE_LOCK"/>
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.INTERNET"/>
@@ -59,6 +61,7 @@
     <!--<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>-->
     <uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
 
     <application
@@ -75,7 +78,8 @@
         <activity
             android:name=".StartMainActivityWrapper"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -240,7 +244,8 @@
             android:excludeFromRecents="true"
             android:label="@string/title_activity_share"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateHidden">
+            android:windowSoftInputMode="stateHidden"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.SEND"/>
                 <category android:name="android.intent.category.DEFAULT"/>
@@ -286,7 +291,8 @@
 
         <receiver
             android:name=".ConnectionManager"
-            android:label="NetworkConnection">
+            android:label="NetworkConnection"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE"/>
             </intent-filter>
@@ -296,7 +302,8 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".PowerReceiver">
+        <receiver android:name=".PowerReceiver"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
@@ -327,13 +334,12 @@
         <receiver android:name=".CallAudioService$ButtonReceiver" android:enabled="true">
         </receiver>
 
-        <receiver android:name=".WakeupAlarmReceiver" android:enabled="true">
-
+        <receiver android:name=".WakeupAlarmReceiver" android:enabled="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.zoffcc.applications.trifa.TOXSERVICE_ALARM">
                 </action>
             </intent-filter>
-
         </receiver>
 
         <receiver android:name=".MyExternReceiver" android:enabled="true" android:exported="true">
