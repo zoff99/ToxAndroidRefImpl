@@ -39,6 +39,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
@@ -179,7 +180,7 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         final String unicode_MEMO = "\uD83D\uDCDD";
         final String unicode_ARROW_LEFT = "←";
 
-        if (m.msg_version == 1)
+        if ((m.msg_version == 1) || (get_friend_msgv3_capability(m.tox_friendpubkey) == 1))
         {
             date_time.setText(unicode_ARROW_LEFT + long_date_time_format(m.sent_timestamp) + "\n" +
                               unicode_Mobile_Phone_With_Arrow + long_date_time_format(m.rcvd_timestamp));
