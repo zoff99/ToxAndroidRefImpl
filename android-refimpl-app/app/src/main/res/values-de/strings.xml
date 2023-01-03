@@ -389,4 +389,20 @@
     <string name="add_group_activity_help">Erstellen Sie eine neue private Gruppe (nur auf Einladung) mit einem bestimmten Gruppennamen.</string>
     <string name="join_public_group_activity_help">Tritt einer öffentlichen Gruppe mit der angegebenen Gruppen-ID bei.</string>
     <string name="FriendListHolder_toggle_notification_silent_title">Benachrichtigung umschalten</string>
+    <string name="layout___group_name">Gruppenname</string>
+    <string name="layout___load_network_connections">Netzwerkverbindungen laden</string>
+    <string name="pref_description_mic_gain_factor_toggle">Wenn Ihr Mikrofon mit einer zu hohen Empfindlichkeit aufnimmt, aktivieren Sie diese Einstellung und der Mikrofonverstärkungsfaktor wird die Lautstärke des Mikrofons tatsächlich verringern</string>
+    <string name="layout___create_new_private_group">Neue private Gruppe erstellen</string>
+    <string name="layout___create_new_public_group">Neue öffentliche Gruppe erstellen</string>
+    <string name="layout___add_friend">Freund hinzufügen</string>
+    <string name="layout___join_public_group">Öffentliche Gruppe beitreten</string>
+    <string name="layout___group_name2">Gruppenname:</string>
+    <string name="pref_title_mic_gain_factor_toggle">Mikrofonverstärkung für geringere Lautstärke</string>
+    <string name="layout___group_id">Gruppen-ID</string>
+    <string name="layout___audio_roundtrip_test_start">Audio-Latenztest</string>
+    <string name="layout___group_id2">Gruppen-ID:</string>
+    <string name="layout___group_mypubjkey2">Mein Pubkey:</string>
+    <string name="layout___group_myname2">mein Name in der Gruppe:</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">Dateien direkt aus dem verschlüsselten Speicher über Intent öffnen. Dies kann potenziell gefährlich sein, da andere bösartige Anwendungen andere Dateien in TRIfAs verschlüsseltem Speicher öffnen könnten.</string>
+    <string name="incoming_filetransfer_size_too_large">Eingehende Dateien zu groß. Es können nur Dateien bis zu 2 GBytes empfangen werden.</string>
 </resources>

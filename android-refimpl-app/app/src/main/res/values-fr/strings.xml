@@ -425,4 +425,7 @@
     <string name="join_public_group_activity_warning">Attention :
 \nrejoindre un groupe public via l\'ID du groupe ne fonctionne pas encore !</string>
     <string name="layout___load_network_connections">charger les connexions réseau</string>
+    <string name="layout___audio_roundtrip_test_start">Test de latence audio</string>
+    <string name="pref_title_mic_gain_factor_toggle">Gain du micro pour baisser le volume</string>
+    <string name="pref_description_mic_gain_factor_toggle">Si votre microphone enregistre avec trop de sensibilité, activez ce paramètre et le facteur de gain du microphone diminuera le volume du microphone</string>
 </resources>
