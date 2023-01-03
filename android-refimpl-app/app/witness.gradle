@@ -201,7 +201,7 @@ dependencyVerification {
         'net.java.dev.jna:jna-platform:5.6.0:jna-platform-5.6.0.jar:9ecea8bf2b1b39963939d18b70464eef60c508fed8820f9dcaba0c35518eabf7',
         'net.java.dev.jna:jna:5.6.0:jna-5.6.0.jar:5557e235a8aa2f9766d5dc609d67948f2a8832c2d796cea9ef1d6cbe0b3b7eaf',
         'net.sf.kxml:kxml2:2.3.0:kxml2-2.3.0.jar:f264dd9f79a1fde10ce5ecc53221eff24be4c9331c830b7d52f2f08a7b633de2',
-        'net.zetetic:android-database-sqlcipher:4.5.2:android-database-sqlcipher-4.5.2.aar:b2da30b889989d5f6aac9d3e80dabd3664e96fc13c02c69d35616c16dacad189',
+        'net.zetetic:android-database-sqlcipher:4.5.3:android-database-sqlcipher-4.5.3.aar:2a46619ced15d76e94980182f5571db2e93960b6518c08ece2b8591abe117575',
         'org.antlr:antlr4-runtime:4.6:antlr4-runtime-4.6.jar:08b519ce8883f9e0c92d5e16b911dbbb3d29faa434efc4c3c62435341ec4b332',
         'org.bouncycastle:bcprov-jdk15on:1.68:bcprov-jdk15on-1.68.jar:f732a46c8de7e2232f2007c682a21d1f4cc8a8a0149b6b7bd6aa1afdc65a0f8d',
         'org.checkerframework:checker-compat-qual:2.5.5:checker-compat-qual-2.5.5.jar:11d134b245e9cacc474514d2d66b5b8618f8039a1465cdc55bbc0b34e0008b7a',
