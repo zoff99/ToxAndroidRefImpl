@@ -311,4 +311,7 @@
     <string name="join_public_group_activity_warning">Aviso:
 \nentrar em Grupo Público via ID de Grupo não está funcionando ainda!!</string>
     <string name="layout___load_network_connections">carregar conexões de rede</string>
+    <string name="layout___audio_roundtrip_test_start">Teste de Latência de Áudio</string>
+    <string name="pref_title_mic_gain_factor_toggle">Ganho de microfone para diminuir o volume</string>
+    <string name="pref_description_mic_gain_factor_toggle">Se o seu microfone capta com muita sensibilidade, ative esta configuração e o Fator de Ganho de Microfone diminuirá o volume do microfone</string>
 </resources>
