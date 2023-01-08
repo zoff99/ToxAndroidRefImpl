@@ -127,6 +127,18 @@ chmod a+rx /usr/bin/gas-preprocessor.pl
 export ORIG_PATH_=$PATH
 
 
+echo ""
+echo ""
+echo "--------------------------------"
+echo "clang version:"
+c++ --version
+echo "--------------------------------"
+echo "java version:"
+java -version
+echo "--------------------------------"
+echo ""
+echo ""
+
 
 #### ARM build ###############################################
 
