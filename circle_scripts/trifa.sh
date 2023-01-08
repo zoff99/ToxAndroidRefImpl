@@ -201,10 +201,11 @@ echo y | sdkmanager "platforms;android-27"
 # cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
 echo y | sdkmanager "cmake;3.6.4111459"
 # -- why is this not just called "cmake" ? --
+echo y | sdkmanager "ndk;23.2.8568313"
 echo y | sdkmanager "ndk;21.0.6113669"
 echo y | sdkmanager "ndk;20.1.5948944"
 
-sdkmanager --licenses # > /dev/null 2>&1
+yes | sdkmanager --licenses # > /dev/null 2>&1
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries
