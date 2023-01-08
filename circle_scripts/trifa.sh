@@ -177,7 +177,6 @@ mv cmdline-tools tools || true
 mv -v tools "$_SDK_"/
 
 mkdir -p "$_SDK_"/cmdline-tools/
-ln -s "$_SDK_"/tools "$_SDK_"/cmdline-tools/latest
 ln -s "$_SDK_"/tools "$_SDK_"/cmdline-tools/5.0
 
 yes | sdkmanager --licenses # > /dev/null 2>&1
