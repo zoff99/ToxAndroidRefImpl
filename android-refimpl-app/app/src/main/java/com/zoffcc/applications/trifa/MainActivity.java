@@ -7059,6 +7059,28 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static void android_tox_callback_group_connection_status_cb_method(long group_number, int a_TOX_GROUP_CONNECTION_STATUS)
+    {
+        Log.i(TAG, "group_connection_status_cb:group_number=" + group_number + " status=" + a_TOX_GROUP_CONNECTION_STATUS);
+
+        update_group_in_friendlist(group_number);
+
+        try
+        {
+            if (group_message_list_activity != null)
+            {
+                if (group_message_list_activity.get_current_group_id().equals(tox_group_by_groupnum__wrapper(group_number)))
+                {
+                    group_message_list_activity.set_group_connection_status_icon();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     static void android_tox_callback_group_topic_cb_method(long group_number, long peer_id, String topic, long topic_length)
     {
         // Log.i(TAG, "group_topic_cb: groupnum=" + group_number + " peer=" + peer_id + " topic=" + topic);

@@ -186,6 +186,26 @@ public class HelperGroup
         }
     }
 
+    static void update_group_in_friendlist(long group_num)
+    {
+        try
+        {
+            final String group_identifier = tox_group_by_groupnum__wrapper(group_num);
+            Log.i(TAG, "new_or_updated_group:*update*");
+            final GroupDB conf3 = orma.selectFromGroupDB().
+                    group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
+            // update in "friendlist"
+            CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+            cc.is_friend = COMBINED_IS_GROUP;
+            cc.group_item = GroupDB.deep_copy(conf3);
+            MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+        }
+        catch (Exception e3)
+        {
+            Log.i(TAG, "update_group_in_friendlist:EE3:" + e3.getMessage());
+        }
+    }
+
     public static long tox_group_by_groupid__wrapper(@NonNull String group_id_string)
     {
         ByteBuffer group_id_buffer = ByteBuffer.allocateDirect(GROUP_ID_LENGTH);

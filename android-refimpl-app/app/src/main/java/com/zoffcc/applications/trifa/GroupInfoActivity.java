@@ -21,6 +21,8 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -29,7 +31,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_reconnect;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_role;
@@ -43,8 +47,10 @@ public class GroupInfoActivity extends AppCompatActivity
     EditText this_title = null;
     EditText group_myname_text = null;
     TextView this_privacy_status_text = null;
+    TextView group_connection_status_text = null;
     TextView group_myrole_text = null;
     TextView group_mypubkey_text = null;
+    Button group_reconnect_button = null;
     String group_id = "-1";
 
     @Override
@@ -61,7 +67,17 @@ public class GroupInfoActivity extends AppCompatActivity
         this_title = (EditText) findViewById(R.id.group_name_text);
         group_myname_text = (EditText) findViewById(R.id.group_myname_text);
         this_privacy_status_text = (TextView) findViewById(R.id.group_privacy_status_text);
+        group_connection_status_text = (TextView) findViewById(R.id.group_connection_status_text);
         group_myrole_text = (TextView) findViewById(R.id.group_myrole_text);
+        group_reconnect_button = (Button) findViewById(R.id.group_reconnect_button);
+
+        try
+        {
+            group_reconnect_button.setVisibility(View.GONE);
+        }
+        catch(Exception ignored)
+        {
+        }
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -140,6 +156,26 @@ public class GroupInfoActivity extends AppCompatActivity
 
         this_privacy_status_text.setText(privacy_state_text);
 
+        group_update_connected_status_on_groupinfo(group_num);
+
+        final long group_num_ = group_num;
+        group_reconnect_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    tox_group_reconnect(group_num_);
+                    group_update_connected_status_on_groupinfo(group_num_);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         try
         {
             final int myrole = tox_group_self_get_role(group_num);
@@ -148,6 +184,26 @@ public class GroupInfoActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    private void group_update_connected_status_on_groupinfo(final long group_num)
+    {
+        try
+        {
+            final int is_connected = tox_group_is_connected(group_num);
+            group_connection_status_text.setText(TRIFAGlobals.TOX_GROUP_CONNECTION_STATUS.value_str(is_connected));
+            if (is_connected == TRIFAGlobals.TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_CONNECTED.value)
+            {
+                group_reconnect_button.setVisibility(View.GONE);
+            }
+            else
+            {
+                group_reconnect_button.setVisibility(View.VISIBLE);
+            }
+        }
+        catch(Exception ignored)
+        {
         }
     }
 

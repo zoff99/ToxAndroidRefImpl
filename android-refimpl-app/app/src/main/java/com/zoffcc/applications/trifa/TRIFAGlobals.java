@@ -308,4 +308,35 @@ public class TRIFAGlobals
         }
     }
 
+    public enum TOX_GROUP_CONNECTION_STATUS
+    {
+        TOX_GROUP_CONNECTION_STATUS_ERROR(-1),
+        TOX_GROUP_CONNECTION_STATUS_CONNECTING(0),
+        TOX_GROUP_CONNECTION_STATUS_CONNECTED(1);
+
+        public final int value;
+
+        TOX_GROUP_CONNECTION_STATUS(int value)
+        {
+            this.value = value;
+        }
+
+        public static String value_str(int value)
+        {
+            if (value == TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_ERROR.value)
+            {
+                return "STATUS_ERROR";
+            }
+            else if (value == TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_CONNECTING.value)
+            {
+                return "STATUS_CONNECTING ...";
+            }
+            else if (value == TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_CONNECTED.value)
+            {
+                return "STATUS_CONNECTED";
+            }
+
+            return "STATUS_UNKNOWN";
+        }
+    }
 }

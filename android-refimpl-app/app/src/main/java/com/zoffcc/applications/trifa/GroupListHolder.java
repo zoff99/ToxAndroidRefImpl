@@ -47,6 +47,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wr
 import static com.zoffcc.applications.trifa.MainActivity.PREF__dark_mode_pref;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_leave;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
@@ -199,13 +200,26 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             statusText.setText("#" + fl.tox_group_number);
         }
 
-        if (fl.group_active)
+        try
         {
-            imageView.setImageResource(R.drawable.circle_green);
+            if (fl.group_active)
+            {
+                if (tox_group_is_connected(tox_group_by_groupid__wrapper(fl.group_identifier)) == TRIFAGlobals.TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_CONNECTED.value)
+                {
+                    imageView.setImageResource(R.drawable.circle_green);
+                }
+                else
+                {
+                    imageView.setImageResource(R.drawable.circle_orange);
+                }
+            }
+            else
+            {
+                imageView.setImageResource(R.drawable.circle_red);
+            }
         }
-        else
+        catch(Exception ignored)
         {
-            imageView.setImageResource(R.drawable.circle_red);
         }
 
         String group_title = tox_group_get_name(group_number);

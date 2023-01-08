@@ -86,6 +86,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_offline_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_connection_status;
@@ -660,7 +661,14 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                     if (is_group_active(group_id_prev))
                     {
-                        ml_icon.setImageResource(R.drawable.circle_green);
+                        if (tox_group_is_connected(tox_group_by_groupid__wrapper(group_id_prev)) == TRIFAGlobals.TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_CONNECTED.value)
+                        {
+                            ml_icon.setImageResource(R.drawable.circle_green);
+                        }
+                        else
+                        {
+                            ml_icon.setImageResource(R.drawable.circle_orange);
+                        }
                     }
                     else
                     {
