@@ -59,12 +59,14 @@ pkgs="
     zip grep file ca-certificates autotools-dev autoconf automake
     git bc wget rsync cmake make pkg-config libtool
     ssh gzip tar
+    openjdk-11-jdk
     coreutils
     python
     libncurses5
 "
 
 for i in $pkgs ; do
+    echo "apt-get install --force-yes --no-install-recommends $i"
     redirect_cmd apt-get install $qqq -y --force-yes --no-install-recommends $i
 done
 
@@ -73,6 +75,9 @@ echo ""
 echo "--------------------------------"
 echo "clang version:"
 c++ --version
+echo "--------------------------------"
+echo "java version:"
+java -version
 echo "--------------------------------"
 echo ""
 echo ""

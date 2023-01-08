@@ -22,6 +22,7 @@ export WRKSPACEDIR="$_HOME_""/workspace/"
 export CIRCLE_ARTIFACTS="$_HOME_""/artefacts/"
 mkdir -p $WRKSPACEDIR
 mkdir -p $CIRCLE_ARTIFACTS
+_ANDROID_SDK_TOOLS="7583922"
 
 
 export qqq=""
@@ -145,10 +146,15 @@ mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
+sdkmanager()
+{
+    command ${_SDK_}/tools/bin/sdkmanager --sdk_root=${_SDK_}/tools "$@"
+}
+type -a sdkmanager
 
 if [ "$download_full""x" == "1x" ]; then
     cd $WRKSPACEDIR
-    redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
+    redirect_cmd curl https://dl.google.com/android/repository/commandlinetools-linux-${_ANDROID_SDK_TOOLS}_latest.zip -o sdk.zip
 
     cd $WRKSPACEDIR
     redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
@@ -156,7 +162,7 @@ fi
 
 cd $WRKSPACEDIR
 # --- verfiy SDK package ---
-echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
+echo '124f2d5115eee365df6cf3228ffbca6fc3911d16f8025bebd5b1c6e2fcfa7faf  sdk.zip' \
     > sdk.zip.sha256
 sha256sum -c sdk.zip.sha256 || exit 1
 # --- verfiy SDK package ---
@@ -167,37 +173,38 @@ rm -Rf "$_SDK_"
 # -- clean SDK dir --
 
 mkdir -p "$_SDK_"
+mv cmdline-tools tools || true
 mv -v tools "$_SDK_"/
-yes | "$_SDK_"/tools/bin/sdkmanager --licenses # > /dev/null 2>&1
+yes | sdkmanager --licenses # > /dev/null 2>&1
 
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries ------------------------------
-$ANDROID_HOME/tools/bin/sdkmanager --update
+sdkmanager --update
 ANDROID_VERSION=26
 ANDROID_BUILD_TOOLS_VERSION=26.0.2
-redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
+sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
     "platforms;android-${ANDROID_VERSION}" \
     "platform-tools"
 ANDROID_VERSION=25
-redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
+sdkmanager "platforms;android-${ANDROID_VERSION}"
 ANDROID_BUILD_TOOLS_VERSION=23.0.3
-redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
 ANDROID_BUILD_TOOLS_VERSION=25.0.0
-redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
+sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
 
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3"
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
+echo y | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
+echo y | sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
+echo y | sdkmanager "build-tools;27.0.3"
+echo y | sdkmanager "platforms;android-27"
 # -- why is this not just called "cmake" ? --
 # cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
+echo y | sdkmanager "cmake;3.6.4111459"
 # -- why is this not just called "cmake" ? --
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "ndk;21.0.6113669"
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.1.5948944"
+echo y | sdkmanager "ndk;21.0.6113669"
+echo y | sdkmanager "ndk;20.1.5948944"
 
-$ANDROID_HOME/tools/bin/sdkmanager --licenses # > /dev/null 2>&1
+sdkmanager --licenses # > /dev/null 2>&1
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries ------------------------------
 # Install Android Build Tool and Libraries
