@@ -227,6 +227,10 @@ rm -Rf "$_NDK_"
 mv -v android-ndk-r13b "$_NDK_"
 
 
+ls -al /root/work/trifa_inst/sdk/licenses/
+
+
+
 
 echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
 chmod u+x $_HOME_/pp
@@ -329,8 +333,8 @@ if [ "$CIRCLE_BRANCH""x" == "zoff99/maven_artefactx" ]; then
     :
 else
     echo "Building TRIfA app"
-    ./gradlew :app:dependencies || echo "OK"
-    ./gradlew assembleDebug # this is a workaround to build problems, not sure how to fix it otherwise
+    ./gradlew :app:dependencies || echo "IGNORE"
+    ./gradlew assembleDebug || yes | sdkmanager --licenses # this is a workaround to build problems, not sure how to fix it otherwise
     ./gradlew :app:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :app:build --stacktrace --no-daemon # first build may FAIL
 fi
 # --------- GRADLE - build app -------------
