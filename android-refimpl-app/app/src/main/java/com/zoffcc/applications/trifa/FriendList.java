@@ -68,6 +68,10 @@ public class FriendList
     @Nullable
     String avatar_filename = null;
 
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
+    @Nullable
+    String avatar_ftid_hex = null;
+
     @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
     @Nullable
     boolean avatar_update = false; // has avatar changed for this friend?
@@ -130,6 +134,7 @@ public class FriendList
         out.push_url = in.push_url;
         out.capabilities = in.capabilities;
         out.msgv3_capability = in.msgv3_capability;
+        out.avatar_ftid_hex = in.avatar_ftid_hex;
 
         return out;
     }
@@ -146,7 +151,7 @@ public class FriendList
                    ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
                    sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name +
                    ", avatar_update=" + avatar_update + ", added_timestamp=" + added_timestamp + ", push_url=" +
-                   "*****" + ", capabilities=" + capabilities;
+                   "*****" + ", capabilities=" + capabilities + ", avatar_ftid_hex=" + avatar_ftid_hex;
         }
         catch (Exception e)
         {

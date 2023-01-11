@@ -209,7 +209,7 @@ public class Identicon
             out.flush();
             out.close();
 
-            set_friend_avatar(pubkey, vfs_path, vfs_filename);
+            set_friend_avatar(pubkey, vfs_path, vfs_filename, null);
         }
         catch (Exception e)
         {

@@ -755,8 +755,7 @@ public class TrifaToxService extends Service
                 groupid_buf3.get(groupid_buffer, 0, GROUP_ID_LENGTH);
                 String group_identifier = bytes_to_hex(groupid_buffer);
                 int is_connected = tox_group_is_connected(conf_);
-                Log.i(TAG, "load group num=" + group_numbers[conf_] + " connected=" + is_connected + " group_id=" +
-                           group_identifier + " offset=" + groupid_buf3.arrayOffset());
+                Log.i(TAG, "load group num=" + group_numbers[conf_] + " connected=" + is_connected);
 
                 new_or_updated_group(group_numbers[conf_], tox_friend_get_public_key__wrapper(0), group_identifier,
                                      tox_group_get_privacy_state(group_numbers[conf_]));

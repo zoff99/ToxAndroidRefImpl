@@ -542,6 +542,7 @@ public class HelperFriend
             orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                     avatar_pathname(null).
                     avatar_filename(null).
+                    avatar_ftid_hex(null).
                     avatar_update(false).
                     avatar_update_timestamp(System.currentTimeMillis()).
                     execute();
@@ -555,12 +556,18 @@ public class HelperFriend
         }
     }
 
-    static void set_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name)
+    static void set_friend_avatar(String friend_pubkey, String avatar_path_name, String avatar_file_name, String avatar_ftid_hex)
     {
         try
         {
             boolean avatar_filesize_non_zero = false;
             info.guardianproject.iocipher.File f1 = null;
+
+            String avatar_ftid_hex_wrap = avatar_ftid_hex;
+            if (avatar_ftid_hex_wrap!= null)
+            {
+                avatar_ftid_hex_wrap = avatar_ftid_hex_wrap.toUpperCase();
+            }
 
             try
             {
@@ -585,6 +592,7 @@ public class HelperFriend
                 orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                         avatar_pathname(avatar_path_name).
                         avatar_filename(avatar_file_name).
+                        avatar_ftid_hex(avatar_ftid_hex_wrap).
                         avatar_update(false).
                         avatar_update_timestamp(System.currentTimeMillis()).
                         execute();
@@ -594,6 +602,7 @@ public class HelperFriend
                 orma.updateFriendList().tox_public_key_stringEq(friend_pubkey).
                         avatar_pathname(null).
                         avatar_filename(null).
+                        avatar_ftid_hex(null).
                         avatar_update(false).
                         avatar_update_timestamp(System.currentTimeMillis()).
                         execute();
@@ -622,6 +631,20 @@ public class HelperFriend
             Log.i(TAG, "set_friend_avatar_update:EE:" + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    static String get_friend_avatar_saved_hash_hex(String friend_pubkey)
+    {
+        String ret = null;
+        try
+        {
+            ret = orma.selectFromFriendList().tox_public_key_stringEq(friend_pubkey).
+                    get(0).avatar_ftid_hex.toUpperCase();
+        }
+        catch (Exception e)
+        {
+        }
+        return ret;
     }
 
     static void add_friend_to_system(final String friend_public_key, final boolean as_friends_relay, final String owner_public_key)

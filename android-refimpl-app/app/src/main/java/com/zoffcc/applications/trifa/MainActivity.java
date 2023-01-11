@@ -143,6 +143,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.flush_and_close_v
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
+import static com.zoffcc.applications.trifa.HelperFriend.get_friend_avatar_saved_hash_hex;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
@@ -4626,7 +4627,6 @@ public class MainActivity extends AppCompatActivity
 
                             ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
                             tox_file_get_file_id(friend_number, ft.file_number, file_id_buffer);
-                            MainActivity.tox_messagev3_get_new_message_id(file_id_buffer);
                             final String file_id_buffer_hex = HelperGeneric.bytesToHex(file_id_buffer.array(),
                                                                                        file_id_buffer.arrayOffset(),
                                                                                        file_id_buffer.limit()).toUpperCase();
@@ -5873,6 +5873,28 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
+            ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
+            tox_file_get_file_id(friend_number, file_number, file_id_buffer);
+            final String file_id_buffer_hex = HelperGeneric.bytesToHex(file_id_buffer.array(),
+                                                                       file_id_buffer.arrayOffset(),
+                                                                       file_id_buffer.limit()).toUpperCase();
+            final String saved_hash_hex = get_friend_avatar_saved_hash_hex(HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
+            Log.i(TAG, "file_recv:TOX_FILE_KIND_AVATAR:incoming hash:" + file_id_buffer_hex + " saved hash:" + saved_hash_hex);
+
+            if ((file_id_buffer_hex != null) && (saved_hash_hex != null) && (saved_hash_hex.equals(file_id_buffer_hex)))
+            {
+                Log.i(TAG, "file_recv:avatar_hash_is_the_same");
+                try
+                {
+                    tox_file_control(friend_number, file_number, TOX_FILE_CONTROL_CANCEL.value);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                return;
+            }
+
             String file_name_avatar = FRIEND_AVATAR_FILENAME;
             Filetransfer f = new Filetransfer();
             f.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(friend_number);
@@ -5917,7 +5939,6 @@ public class MainActivity extends AppCompatActivity
 
             ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
             tox_file_get_file_id(friend_number, file_number, file_id_buffer);
-            MainActivity.tox_messagev3_get_new_message_id(file_id_buffer);
             final String file_id_buffer_hex = HelperGeneric.bytesToHex(file_id_buffer.array(),
                                                                        file_id_buffer.arrayOffset(),
                                                                        file_id_buffer.limit()).toUpperCase();
@@ -6282,10 +6303,16 @@ public class MainActivity extends AppCompatActivity
 
                 if (f.kind == TOX_FILE_KIND_AVATAR.value)
                 {
+                    ByteBuffer file_id_buffer = ByteBuffer.allocateDirect(TOX_FILE_ID_LENGTH);
+                    tox_file_get_file_id(friend_number, file_number, file_id_buffer);
+                    final String file_id_buffer_hex = HelperGeneric.bytesToHex(file_id_buffer.array(),
+                                                                               file_id_buffer.arrayOffset(),
+                                                                               file_id_buffer.limit()).toUpperCase();
+
                     // we have received an avatar image for a friend. and the filetransfer is complete here
                     HelperFriend.set_friend_avatar(HelperFriend.tox_friend_get_public_key__wrapper(friend_number),
                                                    VFS_PREFIX + VFS_FILE_DIR + "/" + f.tox_public_key_string + "/",
-                                                   f.file_name);
+                                                   f.file_name, file_id_buffer_hex);
                     // Log.i(TAG, "file_recv_chunk:kind=avatar:set_friend_avatar:" + VFS_PREFIX + VFS_FILE_DIR + "/" +
                     //           f.tox_public_key_string + "/" + f.file_name);
                 }
