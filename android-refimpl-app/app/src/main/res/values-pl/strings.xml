@@ -19,7 +19,7 @@
     <string name="pref_description_higher_audio_quality">Użyj lepiej jakości dzwięku.
 \nZmiana wymaga PONOWNEGO URUCHOMIENIA!</string>
     <string name="pref_title_higher_audio_quality">Jakość dzwięku</string>
-    <string name="pref_description_mic_gain_factor">Ustaw większe wzmocnienie, jeśli mikrofon nagrywa z małą głośnością.</string>
+    <string name="pref_description_mic_gain_factor">Ustaw większe wzmocnienie, jeśli mikrofon nagrywa z małą głośnością</string>
     <string name="pref_title_mic_gain_factor">Wzmocnienie mikrofonu</string>
     <string name="pref_description_camera_get_preview_format">Format podglądu kamery zdaje się być w niepasującym formacie dla niektórych telefonów komórkowych</string>
     <string name="pref_title_camera_get_preview_format">Format podglądu kamery</string>
@@ -35,13 +35,13 @@
     <string name="pref_description_auto_accept_all_upto">Automatycznie akceptuj pliki do 200MB</string>
     <string name="pref_title_auto_accept_all_upto">Automatycznie akceptuj wszelkie pliki</string>
     <string name="pref_description_auto_accept_video">Akceptuj automatycznie filmy do 40MB</string>
-    <string name="pref_description_auto_accept_image">"Akceptuj automatycznie  obrazki powyżej 12MB"</string>
+    <string name="pref_description_auto_accept_image">Akceptuj automatycznie obrazki powyżej 12MB</string>
     <string name="pref_title_auto_accept_image">Automatycznie pokaż obrazki</string>
     <string name="pref_title_auto_accept_video">Automatycznie pokaż filmy</string>
-    <string name="pref_header_general">Generalnie</string>
+    <string name="pref_header_general">Ogólne</string>
     <string name="settings_toolbar_title">Ustawienia</string>
-    <string name="title_activity_set_password">Ustal hasło</string>
-    <string name="title_activity_aboutpage">O…</string>
+    <string name="title_activity_set_password">Ustaw Hasło</string>
+    <string name="title_activity_aboutpage">O programie</string>
     <string name="title_activity_friendinfo">Info znajomego</string>
     <string name="title_activity_conferencepeerinfo">Info o kontakcie</string>
     <string name="conference_audio_activity_player_name">Odtwarzacz konferencji audio</string>
@@ -51,11 +51,11 @@
     <string name="pref_description_orbot_enabled">Musisz zainstalować Orbot aby tego użyć.
 \nZmiana wymaga PONOWNEGO URUCHOMIENIA!</string>
     <string name="pref_title_X_use_native_audio_play">Natywny system audio</string>
-    <string name="pref_description_X_zoom_incoming_video">umożliwiać powiększanie okna wideo za pomocą szczypania. To nie działa w pełni!</string>
+    <string name="pref_description_X_zoom_incoming_video">umożliwienie powiększania okna wideo za pomocą gestów. Funkcja nie jest w pełni zaimplementowana!</string>
     <string name="pref_title_X_zoom_incoming_video">Powiększ okno wideo</string>
-    <string name="pref_description_allow_screen_off_in_audio_call">Jeśli występują problemy z wyłączaniem ekranu podczas połączenia Audiocall, należy ustawić tę opcję na wyłączoną</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Jeśli występują problemy z wyłączaniem ekranu podczas połączenia Audio, należy ustawić tę opcję na wyłączoną</string>
     <string name="pref_title_allow_screen_off_in_audio_call">Wyłącz ekran</string>
-    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">udostępnianie plików w TRIfA za pomocą funkcji udostępniania intencji.</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">udostępnianie plików w TRIfA za pomocą innej aplikacji.</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">udostępnianie plików</string>
     <string name="pref_description_U_keep_nospam">zachowaj wartość NoSpam. To nie jest bezpieczne, aktywuj tylko jeśli wiesz co robisz!</string>
     <string name="pref_title_U_keep_nospam">utrzymywać NoSpam</string>
@@ -63,7 +63,7 @@
     <string name="pref_title_local_discovery_enabled">Wykrywanie sieci LAN</string>
     <string name="pref_description_conference_show_system_messages">wyświetlanie komunikatów systemowych w konferencjach</string>
     <string name="pref_title_conference_show_system_messages">Komunikaty systemowe</string>
-    <string name="pref_description_set_fps">spróbuj ustawić 15fps video framerate, może to spowodować awarię na niektórych telefonach</string>
+    <string name="pref_description_set_fps">spróbuj ustawić częstotliwość 15 klatek na sekundę, może to spowodować awarię na niektórych telefonach</string>
     <string name="pref_title_set_fps">Ustaw fps</string>
     <string name="pref_title_download_push_msg_app">Pobierz aplikację Push Message App</string>
     <string name="pref_description_use_push_service">UWAGA: Będzie korzystać z Google FCM lub Unified Push do oszczędzania baterii i przepustowości.
@@ -82,7 +82,7 @@
 \nGoogle już na to nie pozwala, począwszy od Androida 10</string>
     <string name="pref_title_start_on_boot">Uruchom przy starcie</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">Koder H264 powinien używać ramek odświeżania wewnętrznego</string>
-    <string name="pref_title_h264_encoder_use_intra_refresh">H264 odświeżanie wewnętrzne</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 z algorytmem intra-refresh dla połączeń video</string>
     <string name="pref_title_fps_half">Najniższy fps</string>
     <string name="pref_title_orbot_enabled">Włącz pośrednika TOR</string>
     <string name="pref_description_force_udp_only">wymusi to tryb tylko UDP, niektóre kontakty mogą być nieosiągalne przy włączonym tym ustawieniu
@@ -93,7 +93,7 @@
     <string name="pref_description_X_audio_recording_frame_size">Domyślne ustawienie to 40 ms</string>
     <string name="MainActivity_yes_button">Tak</string>
     <string name="MainActivity_ok_take_me_there_button">OK, zabierz mnie tam</string>
-    <string name="pref_title_toxirc_muted_peers_01">Wycisz użytkowników Toxirc</string>
+    <string name="pref_title_toxirc_muted_peers_01">Wyciszeni Użytkownicy Toxirc Bridge</string>
     <string name="pref_description_toxirc_muted_peers_02">Wyciszony użytkownik 2 (pozostawić puste, jeśli nie jest używany)</string>
     <string name="pref_title_add_friends_to_messages">Dodaj znajomych do wiadomości</string>
     <string name="pref_title_X_battery_saving_timeout">Czas offline w trybie oszczędzania baterii</string>
@@ -113,13 +113,13 @@
     <string name="MainActivity_new_noti_token_dialog_title">Token</string>
     <string name="pref_description_X_misc_button_enabled">!! Eksperymentalne !!!
 \nDodaj Przycisk na Ekranie Połączenia, aby wysłać wiadomość</string>
-    <string name="pref_title_X_tox_set_do_not_sync_av">NIE synchronizuj AV</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">NIE synchronizuj A/V</string>
     <string name="pref_title_X_eac_delay_ms">Opóźnienie AEC</string>
     <string name="pref_header_data_sync">Dane i synchronizacja</string>
-    <string name="pref_title_sound">Dzwięk</string>
+    <string name="pref_title_sound">Dźwięk</string>
     <string name="MainActivity_profile">Profil</string>
     <string name="MainActivity_about">O programie</string>
-    <string name="MainActivity_friend_is_typing">pisze</string>
+    <string name="MainActivity_friend_is_typing">pisze ...</string>
     <string name="pref_title_X_battery_saving_mode">Tryb oszczędzania baterii</string>
     <string name="pref_description_X_tox_set_do_not_sync_av">!! Eksperymentalne !!!
 \nNie synchronizuj obrazu ani dźwięku. Użyj tego ustawienia, jeśli masz problemy z połączeniem video, jako ostateczność.</string>
@@ -132,19 +132,186 @@
     <string name="pref_description_X_battery_saving_mode">!! Eksperymentalne !!!
 \nPozwoli to zaoszczędzić trochę więcej baterii, ale wysyłanie i odbieranie wiadomości będzie trwało dłużej.
 \nPrawdopodobnie również inne złe efekty!</string>
-    <string name="pref_title_video_uv_reversed">Odwróć kamerę</string>
+    <string name="pref_title_video_uv_reversed">Odwróć UV w Wideo</string>
     <string name="pref_title_X_audio_play_buffer_custom">Bufor odtwarzania dźwięku</string>
     <string name="pref_description_X_audio_play_buffer_custom">!! Eksperymentalne !!!
 \nBufor odtwarzania audio w bajtach, ustaw na 0 aby wyłączyć ustawienia własne</string>
     <string name="pref_description_toxirc_muted_peers_01">Wyciszony użytkownik 1 (pozostawić puste, jeśli nie jest używany)</string>
     <string name="pref_description_min_audio_samplingrate_out">Domyślne ustawienie to 48000 Hz</string>
     <string name="pref_title_sync_frequency">Częstotliwość synchronizacji</string>
-    <string name="pref_title_min_audio_samplingrate_out">Próbnik audio</string>
-    <string name="pref_title_X_audio_recording_frame_size">Audionagrywanie Rozmiar ramki</string>
+    <string name="pref_title_min_audio_samplingrate_out">Próbkowanie audio</string>
+    <string name="pref_title_X_audio_recording_frame_size">Rozmiar ramki dla nagrywania Dźwięku</string>
     <string name="pref_description_X_battery_saving_timeout">Domyślne ustawienie to 15 minut</string>
     <string name="MainActivity_available">Dostępny</string>
-    <string name="pref_title_new_message_notifications">Powiadomienia nowej wiadomości</string>
+    <string name="pref_title_new_message_notifications">Powiadomienia o nowej wiadomości</string>
     <string name="MainActivity_maint">Konserwacja</string>
     <string name="MainActivity_exit">Wyjście</string>
     <string name="MainActivity_new_noti_token_dialog_text">Otrzymano nowy token powiadomień. Używać tego tokena\?</string>
+    <string name="invite_join_conference_success">Zostałeś zaproszony do Grupy Konferencyjnej</string>
+    <string name="layout___set_app_language">ustaw język Aplikacji</string>
+    <string name="layout___online">Online</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">włącz/wyłącz Powiadomienia</string>
+    <string name="layout___conf_title">Tytuł:</string>
+    <string name="Aboutpage_2">wyślij raport Awarii poprzez Email</string>
+    <string name="CallingActivity_23">Opóźnienie Wideo:</string>
+    <string name="messages_search_default_text">wyszukaj ...</string>
+    <string name="layout___info">Informacje</string>
+    <string name="layout___reset_bootstrapnodes_to_default">zresetuj węzły rozruchowe do ustawień początkowych</string>
+    <string name="layout___skip">pomiń</string>
+    <string name="layout___set_password">Ustaw Hasło</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Podział widoku wiadomości na strony</string>
+    <string name="pref_title_allow_push_server_ntfy">Pozwól na Serwer ntfy.sh</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Ustaw liczbę wiadomości wyświetlanych na stronie. 0 oznacza brak podziału</string>
+    <string name="add_group_activity_add">Stwórz Grupę</string>
+    <string name="join_group_activity_join">Dołącz do Grupy</string>
+    <string name="GroupActivityActive">Aktywni:</string>
+    <string name="Aboutpage_4">odczyt danych o awarii ...</string>
+    <string name="Aboutpage_6">Co to jest Tox\?</string>
+    <string name="CallingActivity_0">Opóźnienie Wideo:</string>
+    <string name="layout___pubkey">Klucz publiczny:</string>
+    <string name="layout___capabilities">Możliwości:</string>
+    <string name="layout___name">Nazwa</string>
+    <string name="layout___friends_pushurl">Adres URL Push Kontaktu:</string>
+    <string name="layout___error_getting_active_network_connections">*błąd, nie można uzyskać listy aktywnych połączeń sieciowych*</string>
+    <string name="layout___create_new_public_group">Utwórz nową Grupę Publiczną</string>
+    <string name="layout___join_public_group">Dołącz do Grupy Publicznej</string>
+    <string name="layout___password">Hasło</string>
+    <string name="title_activity_groupinfo">Info o Grupie</string>
+    <string name="pref_title_use_camera_x">Usuń tło</string>
+    <string name="pref_description_use_camera_x">!! Eksperymentalne !!
+\nUżycie CameraX i usunięcie tła w rozmowach Video
+\nFunkcja obecnie może nie działać w pełni!</string>
+    <string name="join_public_group_joined">Dołączyłeś do Grupy Publicznej</string>
+    <string name="add_public_group_failed">Nie udało się utworzyć nowej Grupy Publicznej</string>
+    <string name="add_public_group_success">Utworzyłeś nową Grupę Publiczną</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Czy chcesz usunąć swoje Zdjęcie Profilowe\?</string>
+    <string name="ConferenceAudioActivity_10">Lista Użytkowników</string>
+    <string name="ConferenceAudioActivity_18">rozmowa ...</string>
+    <string name="ConferenceAudioActivity_17">Naciśnij i Mów</string>
+    <string name="layout___enter_pass_longtext">Wpisz Hasło
+\nBrak możliwości odzyskania utraconego hasła!</string>
+    <string name="layout___unlock">Odblokuj</string>
+    <string name="layout___friends_relay_pubkey">Klucz Publiczny Węzła Kontaktu:</string>
+    <string name="layout___remove_friends_relay">usuń węzeł Kontaktu</string>
+    <string name="layout___export_tox_savedata_unsecure">wyeksportuj zachowane dane tox *niebezpieczne*</string>
+    <string name="layout___iobrowser_start">przeglądaj Magazyn zaszyfrowany</string>
+    <string name="layout___audio_roundtrip_test_start">Testuj opóźnienia Audio</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">wyeksportuj zaszyfrowane czaty *niebezpieczne*</string>
+    <string name="layout___im_port_tox_savadata_unsecure">zaimportuj zapisane dane tox *niebezpieczne*</string>
+    <string name="layout___remove_own_relay">usuń własny Węzeł</string>
+    <string name="layout___load_network_connections">załaduj połączenia sieciowe</string>
+    <string name="layout___own_pushurl">Adres URL serwera Push:</string>
+    <string name="layout___remove_own_pushurl">usuń adres URL serwera Push</string>
+    <string name="layout___new_random_nospam">nowy przypadkowy NOSPAM</string>
+    <string name="layout___own_pubkey">Własny Klucz Publiczny:</string>
+    <string name="layout___copy_toxid">kopiuj ToxID</string>
+    <string name="layout___your_toxidenticon">Twój ToxIdenticon</string>
+    <string name="layout___password_again">Powtórz Hasło</string>
+    <string name="layout___leave">Wyjdź</string>
+    <string name="layout___create_text_group">Utwórz nową Grupę Tekstową</string>
+    <string name="layout___create_audio_group">Utwórz nową Grupę Audio</string>
+    <string name="layout___delete">Usuń</string>
+    <string name="layout___migdb_do_not_close">NIE ZAMYKAJ tego okna</string>
+    <string name="layout___create_new_private_group">Utwórz nową Grupę Prywatną</string>
+    <string name="title_activity_wrong_credentials">Błąd Uwierzytelnienia</string>
+    <string name="pref_title_use_incognito_keyboard2">Klawiatura incognito</string>
+    <string name="MainActivity_notification_new_message2">nowa Wiadomość</string>
+    <string name="MainActivity_notification_new_message">nowa Wiadomość</string>
+    <string name="MainActivity_error_starting_email_app">Błąd, nie można uruchomić aplikacji Email</string>
+    <string name="MainActivity_toast_msgs_deleted">Wiadomości usunięte</string>
+    <string name="MainActivity_notification_new_message3">nowa Wiadomość</string>
+    <string name="Aboutpage_5a">TRIfA klient Tox dla Android</string>
+    <string name="layout___delete_all_avatar_icons">usuń wszystkie ikony Awatarów</string>
+    <string name="layout___update_bootstrapnodes_from_internet">zaktualizuj węzły rozruchowe z Internetu</string>
+    <string name="layout___reset_favorite_emoji_list">skasuj listę ulubionych Emoji</string>
+    <string name="AddFriendActivity_3">nieprawidłowy ToxID</string>
+    <string name="layout___click_image_to_change_your_avatar">wybierz Obraz żeby zmienić swój Awatar</string>
+    <string name="layout___toxid">ToxID</string>
+    <string name="layout___export">Wyeksportuj</string>
+    <string name="join_public_activity_name">Dołącz do Grupy Publicznej</string>
+    <string name="title_activity_grouppeerinfo">Info o Kontaktach Grupy</string>
+    <string name="pref_description_use_incognito_keyboard2">włącz opcję, aby zablokować funkcję uczenia się klawiatury na podstawie wpisanych wyrazów</string>
+    <string name="add_private_group_success">Utworzyłeś nową Grupę Prywatną</string>
+    <string name="pref_description_fps_half">Częstotliwość wyświetlania klatek zmniejszona o 1/2: np. 12fps zamiast 25fps</string>
+    <string name="join_public_group_activity_help">Dołącz do Grupy Publicznej z danym ID Grupy.</string>
+    <string name="MainActivity_button_ok">Ok</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">otwórz plik z zaszyfrowanego magazynu</string>
+    <string name="add_public_group_activity_name">Stwórz Grupę Publiczną</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">otwórz pliki z zaszyfrowanego magazynu w zewnętrznej aplikacji. Jest to potencjalnie niebezpieczne, gdyż może pozwolić na dostęp również do innych plików w tym magazynie.</string>
+    <string name="Aboutpage_8">wykorzystane biblioteki:</string>
+    <string name="layout___alias">Pseudonim</string>
+    <string name="MainActivity_toast_msg_deleted">Wiadomość usunięta</string>
+    <string name="pref_title_speakerphone_tweak">Poprawa pracy Głośnika w Połączeniach głosowych</string>
+    <string name="join_public_group_failed">Nie udało się dołączyć do Grupy Publicznej</string>
+    <string name="add_group_activity_name">Stwórz Grupę Prywatną</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">przerwij transfer pliku</string>
+    <string name="group_message_list_activity_name">Grupa</string>
+    <string name="MainActivity_toast_msg_exported">Wiadomość wyeksportowana</string>
+    <string name="pref_title_X_misc_button_enabled">Przycisk Różne</string>
+    <string name="add_public_group_activity_help">Utwórz nową Grupę Publiczną z daną Nazwą Grupy.</string>
+    <string name="add_friend_success">Nowy Kontakt został dodany</string>
+    <string name="Aboutpage_5b">Wersja:</string>
+    <string name="AddFriendActivity_4">Brak ToxID</string>
+    <string name="GroupActivityOffline">Nieaktywni:</string>
+    <string name="layout___group_name">Nazwa Grupy</string>
+    <string name="pref_title_mic_gain_factor_toggle">Ustaw poziom wzmocnienia mikrofonu dla obniżenia głośności</string>
+    <string name="pref_description_enable_ngc_features">!! Eksperymentalne !!
+\nFunkcja NIE działająca w pełni!!</string>
+    <string name="add_private_group_failed">Nie udało się utworzyć nowej Grupy Prywatnej</string>
+    <string name="MainActivity_notification_new_message4">nowa Wiadomość</string>
+    <string name="MainActivity_notification_new_message5">nowa Wiadomość</string>
+    <string name="MainActivity_setup_push_tip_title">Ustaw Powiadomienia Push</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Usuń Zdjęcie Profilowe</string>
+    <string name="incoming_filetransfer_size_too_large">Za duży rozmiar pliku przychodzącego. Odbierane mogą być tylko pliki poniżej 2 GB.</string>
+    <string name="layout___group_id">ID Grupy</string>
+    <string name="layout___scan_qr_code">skanuj Kod QR</string>
+    <string name="layout___push_to_talk">Naciśnij i mów</string>
+    <string name="layout___nick">Pseudonim:</string>
+    <string name="layout___conf_id">ID Konferencji:</string>
+    <string name="layout___group_id2">ID Grupy:</string>
+    <string name="layout___group_mypubjkey2">Mój klucz publiczny:</string>
+    <string name="layout___status">Status:</string>
+    <string name="add_friend_failed">Nie udało się dodać Kontaktu</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">Czy chcesz wł/wył Powiadomienia dla tego Kontaktu\?</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">Czy chcesz przerwać transfer tego pliku\?</string>
+    <string name="MainActivity_no_email_app_found">Nie znaleziono aplikacji do obsługi poczty Email</string>
+    <string name="Aboutpage_0">Log awarii TRIfA</string>
+    <string name="layout___waiting_for_orbot">oczekiwanie na Orbot ...</string>
+    <string name="layout___clear_glide_cache">wyczyść Glide Cache</string>
+    <string name="layout___run_vacuum_on_sql_database">uruchom oczyszczanie bazy SQL</string>
+    <string name="layout___remove_friends_pushurl">usuń adres Push Kontaktu</string>
+    <string name="layout___test_notification_sound">testuj dźwięk Powiadomień</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">wyeksportuj zaszyfrowane pliki *niebezpieczne*</string>
+    <string name="layout___copy">Kopiuj</string>
+    <string name="layout___migdb_text">Migruj plik bazy danych</string>
+    <string name="layout___active_network_connections">aktywne Połączenia Sieciowe:</string>
+    <string name="layout___add_as_toxproxy">dodaj jako ToxProxy</string>
+    <string name="layout___peer_name">nazwa peer\'a</string>
+    <string name="layout___relay_pubkey">Klucz Publiczny Węzła:</string>
+    <string name="join_public_group_activity_warning">Ostrzeżenie:
+\ndołączanie do Grupy Publicznej poprzez ID Grupy jeszcze nie działa!!</string>
+    <string name="invite_friend_success">Zaproszenie od Kontaktu potwierdzone</string>
+    <string name="invite_join_group_success">Zostałeś zaproszony do Grupy</string>
+    <string name="layout___add_friend">Dodaj Znajomych</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC - Nowe Czaty Grupowe</string>
+    <string name="pref_description_speakerphone_tweak">Włącz opcję, jeżeli podczas rozmowy Aplikacja nie przełącza się automatycznie na Głośnik.</string>
+    <string name="pref_description_allow_push_server_ntfy">UWAGA: Zezwolenie na użycie serwera ntfy.sh do wysyłania powiadomień push może powodować wyciek metadanych lub znaczników czasowych podczas otrzymywania powiadomienia. Serwer ntfy.sh NIE obsługuje haseł i NIE obsługuje uwierzytelniania. Włączasz opcję na SWOJE ryzyko.</string>
+    <string name="wrong_credentials_error">Błąd Uwierzytelnienia</string>
+    <string name="pref_title_custom_bootstrap_nodes">Użyj Własnych węzłów Startowych</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">anuluj transfer Pliku</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">Czy chcesz anulować transfer tego Pliku\?</string>
+    <string name="pref_description_mic_gain_factor_toggle">Włącz opcję, jeżeli mikrofon ma za dużą czułość i dźwięk jest przesterowany. Obniży to poziom głośności mikrofonu</string>
+    <string name="MainActivity_setup_push_tip_text">Brak zainstalowanej i skonfigurowanej aplikacji dla powiadomień Push. TRIfA działa poprawnie bez powiadomień Push, jednak żeby otrzymywać wiadomości w czasie rzeczywistym TRIfA musi być cały czas online. Opcja może zmniejszyć wykorzystanie sieci oraz użycie baterii.
+\n
+\nCzy chcesz się teraz dowiedzieć jak skonfigurować powiadomienia Push\?</string>
+    <string name="layout___group_name2">Nazwa Grupy:</string>
+    <string name="layout___group_myname2">Moja Nazwa w Grupie:</string>
+    <string name="add_group_activity_help">Utwórz nową Grupę Prywatną(tylko zaproszeni) z daną nazwą Grupy.</string>
+    <string name="layout___run_analyze_on_sql_database">przeanalizuj bazę SQL</string>
+    <string name="layout___test_ringtone_sound">testuj dźwięk Dzwonka</string>
+    <string name="layout___set_password_or_skip">Ustaw Hasło lub pomiń.
+\n
+\nWybierając \"pomiń\" hasło zostanie
+\nwygenerowane automatycznie
+\nNIE MA możliwości odzyskania hasła!</string>
 </resources>
