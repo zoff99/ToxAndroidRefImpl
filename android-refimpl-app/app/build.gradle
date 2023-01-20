@@ -364,7 +364,7 @@ dependencies {
     //
     //
     //
-    implementation 'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.93'
+    implementation 'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.94'
     //
     //
     //
