@@ -25,6 +25,9 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -32,6 +35,8 @@ import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
@@ -55,11 +60,18 @@ public class GroupPeerInfoActivity extends AppCompatActivity
     EditText group_send_private_message = null;
     String peer_pubkey = null;
     TextView group_peerrole_text = null;
+    AppCompatButton group_kickpeer_button = null;
+    AppCompatSpinner group_peerrole_select = null;
+    private String[] tox_ngc_group_role_items;
+    boolean first_select = true;
+
     String group_id = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        first_select = true;
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_peer_info);
 
@@ -73,6 +85,40 @@ public class GroupPeerInfoActivity extends AppCompatActivity
         peer_name = (TextView) findViewById(R.id.pi_nick_text);
         group_peerrole_text = (TextView) findViewById(R.id.group_peerrole_text);
         group_send_private_message = (EditText) findViewById(R.id.group_send_private_message);
+        group_kickpeer_button = findViewById(R.id.group_kickpeer_button);
+        group_peerrole_select = findViewById(R.id.group_peerrole_select);
+
+
+        this.tox_ngc_group_role_items = new String[] {
+                "---", "TOX_GROUP_ROLE_MODERATOR", "TOX_GROUP_ROLE_USER", "TOX_GROUP_ROLE_OBSERVER"
+        };
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this,
+                                                                android.R.layout.simple_spinner_item, tox_ngc_group_role_items);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        group_peerrole_select.setAdapter(adapter);
+
+        group_peerrole_select.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener()
+        {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
+            {
+                if (first_select)
+                {
+                    first_select = false;
+                    Log.i(TAG, "selected_new_role:first_select");
+                }
+                else
+                {
+                    Log.i(TAG, "selected_new_role:" + parent.getItemAtPosition(position));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent)
+            {
+
+            }
+        });
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -96,10 +142,33 @@ public class GroupPeerInfoActivity extends AppCompatActivity
             final int peerrole = tox_group_peer_get_role(group_num,
                                                          get_group_peernum_from_peer_pubkey(group_id, peer_pubkey));
             group_peerrole_text.setText(ToxVars.Tox_Group_Role.value_str(peerrole));
+            if (peerrole == 1)
+            {
+                group_peerrole_select.setSelection(1);
+            }
+            else if (peerrole == 2)
+            {
+                group_peerrole_select.setSelection(2);
+            }
+            else if (peerrole == 3)
+            {
+                group_peerrole_select.setSelection(3);
+            }
+            else
+            {
+                group_peerrole_select.setSelection(0);
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            try
+            {
+                group_peerrole_select.setSelection(0);
+            }
+            catch(Exception e2)
+            {
+            }
         }
 
         try
@@ -108,10 +177,9 @@ public class GroupPeerInfoActivity extends AppCompatActivity
             int peer_color_bg = ChatColors.get_shade(
                     ChatColors.PeerAvatarColors[hash_to_bucket(peer_pubkey, ChatColors.get_size())], peer_pubkey);
 
-            final Drawable smiley_face = new IconicsDrawable(context_s).
-                    icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                    backgroundColor(Color.TRANSPARENT).
-                    color(peer_color_fg).sizeDp(70);
+            final Drawable smiley_face = new IconicsDrawable(context_s).icon(
+                    GoogleMaterial.Icon.gmd_sentiment_satisfied).backgroundColor(Color.TRANSPARENT).color(
+                    peer_color_fg).sizeDp(70);
 
             profile_icon.setPadding((int) dp2px(0), (int) dp2px(0), (int) dp2px(0), (int) dp2px(0));
             profile_icon.setImageDrawable(smiley_face);
@@ -134,7 +202,6 @@ public class GroupPeerInfoActivity extends AppCompatActivity
     protected void onPause()
     {
         super.onPause();
-        // TODO dirty hack
 
         try
         {
@@ -174,5 +241,13 @@ public class GroupPeerInfoActivity extends AppCompatActivity
         catch (Exception ignored)
         {
         }
+
+        first_select = true;
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
     }
 }

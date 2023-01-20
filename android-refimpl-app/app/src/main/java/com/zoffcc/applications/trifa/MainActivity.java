@@ -3331,6 +3331,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_group_get_privacy_state(long group_number);
 
+    public static native int tox_group_mod_kick_peer(long group_number, long peer_id);
+
+    public static native int tox_group_mod_set_role(long group_number, long peer_id, int a_Tox_Group_Role);
+
     public static native String tox_group_peer_get_public_key(long group_number, long peer_id);
 
     public static native long tox_group_peer_by_public_key(long group_number, @NonNull String peer_public_key_string);
