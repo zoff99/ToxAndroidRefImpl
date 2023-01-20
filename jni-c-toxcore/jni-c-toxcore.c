@@ -6669,6 +6669,58 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1topic(JNIEnv *e
 }
 
 JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1kick_1peer(JNIEnv *env, jobject thiz, jlong group_number,
+            jlong peer_id)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Mod_Kick_Peer error;
+    uint32_t res = tox_group_mod_kick_peer(tox_global, (uint32_t)group_number, (uint32_t)peer_id, &error);
+
+    if (error != TOX_ERR_GROUP_MOD_KICK_PEER_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1set_1role(JNIEnv *env, jobject thiz, jlong group_number,
+            jlong peer_id, jint role)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Mod_Set_Role error;
+    uint32_t res = tox_group_mod_set_role(tox_global, (uint32_t)group_number, (uint32_t)peer_id, (Tox_Group_Role)role, &error);
+
+    if (error != TOX_ERR_GROUP_MOD_SET_ROLE_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1connection_1status(JNIEnv *env, jobject thiz, jlong group_number,
             jlong peer_id)
 {
