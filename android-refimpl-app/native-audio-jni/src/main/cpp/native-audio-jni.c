@@ -1183,13 +1183,17 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffe
     audio_play_buffer_size[num] = (long) capacity;
 }
 
-jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env, jclass clazz,
-                                                                    jint bufnum)
+jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env, jclass clazz, jint bufnum)
 {
     if (playing_state == _SHUTDOWN)
     {
         audio_out_vu_value = 0.0f;
         return -1;
+    }
+
+    if (bqPlayerPlay == NULL)
+    {
+        return -2;
     }
 
     if (bqPlayerBufferQueue == NULL)
@@ -1543,10 +1547,18 @@ jboolean Java_com_zoffcc_applications_nativeaudio_NativeAudio_StopPCM16(JNIEnv *
 
     // set the player's state
     SLresult result;
-    result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "player_state:res_007=%d SL_RESULT_SUCCESS=%d STOPPED",
-                        (int) result, (int) SL_RESULT_SUCCESS);
+    if (bqPlayerPlay != NULL)
+    {
+        result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "player_state:res_007=%d SL_RESULT_SUCCESS=%d STOPPED",
+                            (int) result, (int) SL_RESULT_SUCCESS);
+    }
+    else
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "player_state:res_008:bqPlayerPlay == NULL");
+    }
     (void) result;
 
     player_state_current = _STOPPED;
