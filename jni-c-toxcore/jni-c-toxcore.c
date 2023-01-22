@@ -7563,7 +7563,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1private_1messa
     const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
 
     const jbyteArray stringJbytes1 = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)peer_public_key_string, getBytes, charsetName);
-    const jsize plength1 = (*env)->GetArrayLength(env, stringJbytes1);
     jbyte* pBytes1 = (*env)->GetByteArrayElements(env, stringJbytes1, NULL);
 
     const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)message, getBytes, charsetName);
