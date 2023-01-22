@@ -3117,7 +3117,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1get_1all_1tcp_1relays(JNIEn
         return (jstring)NULL;
     }
 
-    tox_get_all_tcp_relays(tox_global, (uint8_t *)result_c);
+    tox_get_all_tcp_relays(tox_global, (char *)result_c);
     jstring result = c_safe_string_from_java((char *)result_c, length);
     return result;
 }
@@ -3134,7 +3134,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1get_1all_1udp_1connections(
         return (jstring)NULL;
     }
 
-    tox_get_all_udp_connections(tox_global, (uint8_t *)result_c);
+    tox_get_all_udp_connections(tox_global, (char *)result_c);
     jstring result = c_safe_string_from_java((char *)result_c, length);
     return result;
 }
