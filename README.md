@@ -39,7 +39,7 @@ TRIfA (exlcuding toxcore) uses the Google Firebase service and a third party ser
 
 Get in touch
 =
-* Join the TRIfA Tox Groupchat: tox:154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762<br>
+* Join the TRIfA Tox Groupchat: <a href="tox://154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762">tox://154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762</a><br>
 * <a href="https://kiwiirc.com/nextclient/irc.libera.chat/toktok">Join Tox IRC Channel</a><br>
 
 Import/Export
