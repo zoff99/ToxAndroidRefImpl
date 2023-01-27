@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.0.191](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.191) (2023-01-21)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.190...1.0.191)
+
+## [1.0.190](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.190) (2023-01-20)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.189...1.0.190)
+
+**Implemented enhancements:**
+
+- How to change auto generated usernames [\#391](https://github.com/zoff99/ToxAndroidRefImpl/issues/391)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#393](https://github.com/zoff99/ToxAndroidRefImpl/pull/393) ([weblate](https://github.com/weblate))
+
+## [1.0.189](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.189) (2023-01-03)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.188...1.0.189)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#390](https://github.com/zoff99/ToxAndroidRefImpl/pull/390) ([weblate](https://github.com/weblate))
+
+## [1.0.188](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.188) (2023-01-03)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.187...1.0.188)
+
+**Implemented enhancements:**
+
+- Random default friend [\#345](https://github.com/zoff99/ToxAndroidRefImpl/issues/345)
+
 ## [1.0.187](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.187) (2022-12-25)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.186...1.0.187)
