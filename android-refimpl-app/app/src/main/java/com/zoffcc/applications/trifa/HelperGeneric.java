@@ -4150,6 +4150,18 @@ public class HelperGeneric
         }
     }
 
+    static String filter_out_non_hex_chars(final String in)
+    {
+        if (in == null)
+        {
+            // string is null
+            return null;
+        }
+
+        final String out = in.toUpperCase().replaceAll("[^0-9A-F]", "");
+        return out;
+    }
+
     static boolean is_valid_tox_public_key(final String pubkey)
     {
         if (pubkey == null)

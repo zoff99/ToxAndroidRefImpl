@@ -33,9 +33,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.filter_out_non_hex_chars;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_file_sharing_to_trifa_via_intent;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MessageListActivity.add_attachment;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_ADDRESS_SIZE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 
 public class ShareActivity extends AppCompatActivity
@@ -126,6 +129,16 @@ public class ShareActivity extends AppCompatActivity
                     // TODO:
                     // check if app is running and unlocked -> otherwise start and unlock it
                     // then open "add" screen and fill in this ToxID
+                    final String key_only = dataString.replaceFirst("tox:", "");
+                    final String key_only_sanitzied = filter_out_non_hex_chars(key_only);
+                    if (key_only_sanitzied.length() == (TOX_ADDRESS_SIZE * 2))
+                    {
+                        handleToxFriendInvite(key_only_sanitzied);
+                    }
+                    else if (key_only_sanitzied.length() == (TOX_GROUP_CHAT_ID_SIZE * 2))
+                    {
+                        handleToxNGCPublicGroupInvite(key_only_sanitzied);
+                    }
                 }
             }
             else
@@ -217,6 +230,22 @@ public class ShareActivity extends AppCompatActivity
                 }
             }
         }
+    }
+
+    void handleToxFriendInvite(final String friend_pubkey)
+    {
+        Log.i(TAG, "handleToxFriendInvite:friend_pubkey=" + friend_pubkey);
+        // ** // MessageListActivity.show_messagelist_for_friend(this, friend_pubkey);
+        // close this share activity
+        this.finish();
+    }
+
+    void handleToxNGCPublicGroupInvite(final String ngc_group_pubkey)
+    {
+        Log.i(TAG, "handleToxFriendInvite:ngc_group_pubkey=" + ngc_group_pubkey);
+        // ** // MessageListActivity.show_messagelist_for_friend(this, ngc_group_pubkey);
+        // close this share activity
+        this.finish();
     }
 
     void handleSendText(Intent intent, String friend_pubkey)
