@@ -18,5 +18,5 @@ Tox is free software. That's free as in freedom, as well as in price. This means
 <br>
 * Join discussion on Matrix: https://matrix.to/#/#trifa:matrix.org
 <br>
-* Join the TRIfA Tox Groupchat: tox://154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762
+* Join the TRIfA Tox Groupchat: 154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762
 <br>
