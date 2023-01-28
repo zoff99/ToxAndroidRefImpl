@@ -19,10 +19,12 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +35,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import static com.zoffcc.applications.trifa.HelperGroup.do_join_public_group;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 
 public class JoinPublicGroupActivity extends AppCompatActivity
@@ -111,6 +114,19 @@ public class JoinPublicGroupActivity extends AppCompatActivity
             {
             }
         });
+
+        try
+        {
+            Intent intent = getIntent();
+            String ngc_group_pubkey = intent.getStringExtra("ngc_group_pubkey");
+            if ((ngc_group_pubkey != null) && (ngc_group_pubkey.length() > 1))
+            {
+                groupid_text.setText(ngc_group_pubkey);
+            }
+        }
+        catch(Exception e)
+        {
+        }
     }
 
     public void join_group_public_clicked(View v)
@@ -122,6 +138,7 @@ public class JoinPublicGroupActivity extends AppCompatActivity
             if (groupid_text.getText().length() > 0)
             {
                 group_name_ok = true;
+                Log.i(TAG, "001");
             }
         }
 
@@ -133,8 +150,14 @@ public class JoinPublicGroupActivity extends AppCompatActivity
                     replace("\n", "").
                     replaceAll("[^a-fA-F0-9]", "");
 
+            Log.i(TAG, "002");
             intent.putExtra("group_id", group_id_clean);
+            Log.i(TAG, "003");
+
+            do_join_public_group(intent);
+
             setResult(RESULT_OK, intent);
+            Log.i(TAG, "004");
         }
         else
         {
@@ -146,5 +169,12 @@ public class JoinPublicGroupActivity extends AppCompatActivity
     public void cancel_clicked(View v)
     {
         finish();
+    }
+
+    static void show_join_public_group_activity(Context c, final String ngc_group_pubkey)
+    {
+        Intent intent = new Intent(c, JoinPublicGroupActivity.class);
+        intent.putExtra("ngc_group_pubkey", ngc_group_pubkey);
+        c.startActivity(intent);
     }
 }

@@ -264,7 +264,6 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
-import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_AWAY;
@@ -7392,65 +7391,7 @@ public class MainActivity extends AppCompatActivity
         {
             if (resultCode == RESULT_OK)
             {
-                try
-                {
-
-                    String group_id = data.getStringExtra("group_id");
-                    Log.i(TAG, "join_group:group_id:>" + group_id + "<");
-
-                    ByteBuffer join_chat_id_buffer = ByteBuffer.allocateDirect(TOX_GROUP_CHAT_ID_SIZE);
-                    byte[] data_join = HelperGeneric.hex_to_bytes(group_id.toUpperCase());
-                    join_chat_id_buffer.put(data_join);
-                    join_chat_id_buffer.rewind();
-
-                    long new_group_num = tox_group_join(join_chat_id_buffer, TOX_GROUP_CHAT_ID_SIZE,
-                                                        "peer " + getRandomString(4), null);
-
-                    Log.i(TAG, "join_group:new groupnum:=" + new_group_num);
-
-                    if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
-                    {
-                        ByteBuffer groupid_buf = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
-                        if (tox_group_get_chat_id(new_group_num, groupid_buf) == 0)
-                        {
-                            byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
-                            groupid_buf.get(groupid_buffer, 0, GROUP_ID_LENGTH);
-                            String group_identifier = bytes_to_hex(groupid_buffer);
-
-                            int privacy_state = tox_group_get_privacy_state(new_group_num);
-
-                            Log.i(TAG, "join_group:group num=" + new_group_num + " privacy_state=" + privacy_state +
-                                       " group_id=" + group_identifier + " offset=" + groupid_buf.arrayOffset());
-
-                            HelperGroup.add_group_wrapper(0, new_group_num, group_identifier, privacy_state);
-
-                            display_toast(getString(R.string.join_public_group_joined), false, 300);
-                            set_group_active(group_identifier);
-                            try
-                            {
-                                final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
-                                        group_identifier.toLowerCase()).toList().get(0);
-                                CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
-                                cc.is_friend = COMBINED_IS_CONFERENCE;
-                                cc.group_item = GroupDB.deep_copy(conf3);
-                                MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
-                            }
-                            catch (Exception e3)
-                            {
-                                e3.printStackTrace();
-                            }
-                        }
-                    }
-                    else
-                    {
-                        display_toast(getString(R.string.join_public_group_failed), false, 300);
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "join_group:EE01:" + e.getMessage());
-                }
+                // HelperGroup.do_join_public_group(data);
             }
             else
             {

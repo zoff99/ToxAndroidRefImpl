@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 
@@ -27,6 +28,7 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
@@ -46,6 +48,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTIO
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperGroup
@@ -173,7 +176,7 @@ public class HelperGroup
                 catch (Exception e4)
                 {
                     e4.printStackTrace();
-                    Log.i(TAG, "new_or_updated_group:EE4:" + e4.getMessage());
+                    // Log.i(TAG, "new_or_updated_group:EE4:" + e4.getMessage());
                 }
 
                 return;
@@ -916,6 +919,68 @@ public class HelperGroup
         if (do_notification)
         {
             change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+        }
+    }
+
+    static void do_join_public_group(Intent data)
+    {
+        try
+        {
+            String group_id = data.getStringExtra("group_id");
+            Log.i(TAG, "join_group:group_id:>" + group_id + "<");
+
+            ByteBuffer join_chat_id_buffer = ByteBuffer.allocateDirect(TOX_GROUP_CHAT_ID_SIZE);
+            byte[] data_join = HelperGeneric.hex_to_bytes(group_id.toUpperCase());
+            join_chat_id_buffer.put(data_join);
+            join_chat_id_buffer.rewind();
+
+            long new_group_num = MainActivity.tox_group_join(join_chat_id_buffer, TOX_GROUP_CHAT_ID_SIZE,
+                                                             "peer " + MainActivity.getRandomString(4), null);
+
+            Log.i(TAG, "join_group:new groupnum:=" + new_group_num);
+
+            if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
+            {
+                ByteBuffer groupid_buf = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
+                if (tox_group_get_chat_id(new_group_num, groupid_buf) == 0)
+                {
+                    byte[] groupid_buffer = new byte[GROUP_ID_LENGTH];
+                    groupid_buf.get(groupid_buffer, 0, GROUP_ID_LENGTH);
+                    String group_identifier = bytes_to_hex(groupid_buffer);
+
+                    int privacy_state = MainActivity.tox_group_get_privacy_state(new_group_num);
+
+                    Log.i(TAG, "join_group:group num=" + new_group_num + " privacy_state=" + privacy_state +
+                                            " group_id=" + group_identifier + " offset=" + groupid_buf.arrayOffset());
+
+                    add_group_wrapper(0, new_group_num, group_identifier, privacy_state);
+
+                    display_toast(MainActivity.context_s.getString(R.string.join_public_group_joined), false, 300);
+                    set_group_active(group_identifier);
+                    try
+                    {
+                        final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                                group_identifier.toLowerCase()).toList().get(0);
+                        CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
+                        cc.is_friend = COMBINED_IS_CONFERENCE;
+                        cc.group_item = GroupDB.deep_copy(conf3);
+                        MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
+                    }
+                    catch (Exception e3)
+                    {
+                        // e3.printStackTrace();
+                    }
+                }
+            }
+            else
+            {
+                display_toast(MainActivity.context_s.getString(R.string.join_public_group_failed), false, 300);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "join_group:EE01:" + e.getMessage());
         }
     }
 }
