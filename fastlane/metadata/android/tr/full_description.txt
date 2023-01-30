@@ -16,7 +16,7 @@ Tox, ücretsiz olmasının yanı sıra özgür bir yazılımdır. Bu, Tox'un —
 <b>Daha Fazla Bilgi:</b><br>
 * Tox hakkında: https://tox.zoff.cc
 <br>
-* Matrix üzerinde tartışmaya katılın: https://matrix.to/#/#trifa:matrix.org
+* TRIfA Tox grup sohberine katılın: https://trifagrp.tox.zoff.cc/
 <br>
-* Tox IRC kanalına katılın: https://matrix.to/#/#toktok:libera.chat
+* Matrix üzerinde tartışmaya katılın: https://matrix.to/#/#trifa:matrix.org
 <br>
