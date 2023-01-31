@@ -26,7 +26,7 @@
     <string name="settings_toolbar_title">الإعدادات</string>
     <string name="pref_header_general">جنرال لواء</string>
     <string name="pref_title_auto_accept_image">قبول تلقائي للصورة</string>
-    <string name="pref_description_auto_accept_image">قبول تلقائي للصور والصور التي يصل حجمها إلى 6 ميغابايت</string>
+    <string name="pref_description_auto_accept_image">قبول تلقائي للصور والصور التي يصل حجمها إلى 12 ميغابايت</string>
     <string name="pref_title_video_uv_reversed">عكس الأشعة فوق البنفسجية في الفيديو</string>
     <string name="pref_description_video_uv_reversed">اعكس ترتيب الطائرات فوق البنفسجية في فيديو الكاميرا</string>
     <string name="pref_title_software_echo_cancel">إلغاء الصدى</string>
@@ -285,7 +285,7 @@
     <string name="pref_title_global_font_size">حجم الخط</string>
     <string name="pref_description_video_cam_resolution">أبعاد الفيديو المستعملة في المكالمات</string>
     <string name="pref_title_video_cam_resolution">أبعاد الكاميرا</string>
-    <string name="pref_description_auto_accept_video">قبول تلقائي لمقاطع فيديو يصل حجمها إلى 20 ميغابايت</string>
+    <string name="pref_description_auto_accept_video">قبول تلقائي لمقاطع فيديو يصل حجمها إلى 40 ميغابايت</string>
     <string name="pref_title_auto_accept_video">إقبل الفيديوهات تلقائيا</string>
     <string name="conference_audio_activity_player_name">مشغل المؤتمر الصوتي</string>
     <string name="layout___migdb_do_not_close">عدم إغلاق هذه الشاشة</string>
@@ -319,4 +319,100 @@
     <string name="pref_title_compact_chatlist">قائمة الدردشة المضغوطة</string>
     <string name="pref_description_compact_friendlist">اجعل قائمة الأصدقاء أكثر إحكاما ، إذا كانت لديك قائمة كبيرة من الأصدقاء</string>
     <string name="pref_title_compact_friendlist">قائمة الأصدقاء المضغوطة</string>
+    <string name="invite_friend_success">لقد تلقيت طلب صداقة</string>
+    <string name="layout___create_new_public_group">إنشاء مجموعة عامة جديدة</string>
+    <string name="layout___join_public_group">انضم إلى مجموعة عامة</string>
+    <string name="pref_title_speakerphone_tweak">إصلاح مكبر الصوت للمكالمات</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">فتح الملفات مباشرة من التخزين المشفر عبر Intent. قد يكون هذا خطيرًا ، لأن التطبيقات الضارة الأخرى يمكن أن تفتح ملفات أخرى في وحدة التخزين المشفرة في TRIfA.</string>
+    <string name="pref_title_mic_gain_factor_toggle">كسب الميكروفون لخفض مستوى الصوت</string>
+    <string name="pref_description_mic_gain_factor_toggle">إذا كان الميكروفون الخاص بك يسجل بحساسية كبيرة جدًا ، فقم بتمكين هذا الإعداد وسيقوم عامل كسب الميكروفون في الواقع بخفض مستوى صوت الميكروفون</string>
+    <string name="pref_description_use_push_service">تحذير: سيستخدم هذا Google FCM أو Unified Push لحفظ البطارية والنطاق الترددي.
+\nسيجعل التطبيق HTTPS: اتصالات ببعض خوادم PUSH مباشرة (وليس عبر Tox).
+\nقم بتنشيط هذا فقط إذا قبلت ذلك.
+\nتحتاج هذه الميزة إلى تثبيت تطبيق Tox Push Message.</string>
+    <string name="pref_title_download_push_msg_app">تحميل تطبيقة جوجل الخاصة بخدمة push</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">مشاركة الملفات على TRIfA عبر Share Intent.</string>
+    <string name="add_private_group_success">لقد قمت بإنشاء مجموعة خاصة</string>
+    <string name="pref_title_use_camera_x">إزالة الخلفية</string>
+    <string name="pref_description_enable_ngc_features">!! تجريبي !!
+\nهذا لا يعمل بشكل كامل !!</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC - دردشات المجموعة الجديدة</string>
+    <string name="pref_description_toxirc_muted_peers_03">مستخدم كتم الصوت 3 (اتركه فارغا إذا لم يتم استخدامه)</string>
+    <string name="add_public_group_success">لقد قمت بإنشاء مجموعة عامة</string>
+    <string name="join_public_group_activity_help">انضم إلى مجموعة عامة باستخدام معرف المجموعة المحدد.</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">إلغاء نقل الملفات</string>
+    <string name="join_public_group_activity_warning">تحذير:
+\nالانضمام إلى مجموعة عامة عبر معرف المجموعة لا يعمل بعد !!</string>
+    <string name="join_public_group_failed">فشل الانضمام إلى المجموعة العامة</string>
+    <string name="join_group_activity_join">إنضم للمجموعة</string>
+    <string name="join_public_group_joined">لقد انضممت إلى المجموعة العامة</string>
+    <string name="invite_join_group_success">لقد تمت دعوتك إلى مجموعة</string>
+    <string name="invite_join_conference_success">لقد تمت دعوتك إلى مجموعة المؤتمر</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">هل تريد إلغاء هذا الملف؟</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">تبديل الإعلام</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">هل تريد تبديل صمت الإشعارات لهذا الصديق؟</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">هل تريد ازالة صورة حسابك؟</string>
+    <string name="layout___own_pushurl">دفع URL:</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">ترحيل الرسائل</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">قم بتعيين عدد الرسائل المراد عرضها في كل صفحة. 0 يعني عدم وجود ترحيل</string>
+    <string name="pref_title_allow_push_server_ntfy">السماح بخادم ntfy.sh</string>
+    <string name="pref_description_allow_push_server_ntfy">تحذير: اسمح لخادم ntfy.sh بدفع الإشعارات ، فقد يؤدي ذلك إلى تسريب البيانات الوصفية للطوابع الزمنية عند تلقي إشعارات الدفع ، إذا اشترك أحد الأصدقاء برمز الدفع الخاص بك. ntfy.sh ليس لديه كلمات مرور ولا مصادقة. لقد تم تحذيرك.</string>
+    <string name="pref_description_speakerphone_tweak">إذا لم يتحول التطبيق إلى مكبر الصوت في مكالمة ، فحاول تنشيط هذا الإصلاح.</string>
+    <string name="incoming_filetransfer_size_too_large">حجم الملف الوارد كبير جدًا. يمكن استلام الملفات التي تصل إلى 2 غيغابايت فقط.</string>
+    <string name="layout___group_name">اسم المجموعة</string>
+    <string name="pref_title_window_security">منع لقطات تصوير الشاشة</string>
+    <string name="title_activity_groupinfo">معلومات المجموعة</string>
+    <string name="layout___create_new_private_group">إنشاء مجموعة خاصة جديدة</string>
+    <string name="layout___audio_roundtrip_test_start">اختبار الكمون الصوتي</string>
+    <string name="layout___export_tox_encrypted_files_unsecure">تصدير الملفات المشفرة
+\n\"غير آمن\"</string>
+    <string name="layout___load_network_connections">تحميل اتصالات الشبكة</string>
+    <string name="layout___remove_own_pushurl">إزالة Push URL</string>
+    <string name="layout___group_id">معرف مجموعة</string>
+    <string name="add_public_group_activity_name">إنشاء مجموعة عامة</string>
+    <string name="pref_description_use_camera_x">!! تجريبي !!
+\nاستخدم CameraX وقم بإزالة الخلفية في مكالمات الفيديو
+\nقد لا يعمل هذا بشكل كامل حتى الآن ، يرجى توخي الحذر وعدم الاعتماد على هذا للعمل دائمًا!</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">ازالة صورة حسابك</string>
+    <string name="title_activity_grouppeerinfo">مجموعة الأقران</string>
+    <string name="pref_description_window_security">اختار المنع يضع علامة امان للتطبيقات
+\nهذا يمنع تصوير وتسجيل الشاشة</string>
+    <string name="join_public_activity_name">انضم إلى المجموعة العامة</string>
+    <string name="layout___export_tox_encrypted_chats_unsecure">تصدير تلمحلدثات المشفرة
+\n\"غير آمن\"</string>
+    <string name="MainActivity_setup_push_tip_text">لم تقم بتثبيت تطبيق Push Notification وإعداد إعلام Push Notification. ستعمل TRIfA بشكل كامل بدون إشعار الدفع ، ولكن يجب أن تكون متصلاً بالإنترنت باستمرار لتلقي الرسائل. مع التنبيه الفوري يمكنك حفظ البطارية وعرض النطاق الترددي للإنترنت.
+\n
+\nهل تريد أن ترى كيف يمكنك إعداد إشعارات الدفع الآن؟</string>
+    <string name="layout___group_myname2">اسمي في المجموعة:</string>
+    <string name="pref_title_use_incognito_keyboard2">لوحة مفاتيح غبية</string>
+    <string name="layout___add_friend">أضف صديق</string>
+    <string name="pref_description_use_incognito_keyboard2">اختر هذه اللوحة اذا اردت منع لوحة المفاتيح من ان تتعلم من كلماتك</string>
+    <string name="pref_title_use_push_service">استعما خدمة push من جوجل</string>
+    <string name="pref_title_toxirc_muted_peers_01">تم كتم المستخدمين Toxirc Bridge</string>
+    <string name="pref_description_toxirc_muted_peers_01">مستخدم كتم الصوت 1 (اتركه فارغا إذا لم يتم استخدامه)</string>
+    <string name="layout___group_mypubjkey2">بلدي بابكي:</string>
+    <string name="pref_title_custom_bootstrap_nodes">استخدم عقد Bootstrap المخصصة</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">فتح الملفات من التخزين المشفر</string>
+    <string name="add_group_activity_help">قم بإنشاء مجموعة خاصة جديدة (بدعوة فقط) باسم مجموعة محدد.</string>
+    <string name="add_public_group_activity_help">أنشئ مجموعة عامة جديدة باسم مجموعة محدد.</string>
+    <string name="add_group_activity_add">إنشاء مجموعة</string>
+    <string name="add_public_group_failed">فشل إنشاء مجموعة عامة</string>
+    <string name="add_friend_failed">فشل إضافة صديق</string>
+    <string name="add_friend_success">لقد قمت بإضافة صديق جديد</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">إلغاء نقل الملفات</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">هل تريد إلغاء هذا الملف؟</string>
+    <string name="layout___group_name2">اسم المجموعة:</string>
+    <string name="layout___capabilities">الامكانيات:</string>
+    <string name="pref_description_toxirc_muted_peers_02">مستخدم كتم الصوت 2 (اتركه فارغا إذا لم يتم استخدامه)</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">مشاركة الملفات</string>
+    <string name="add_private_group_failed">فشل إنشاء مجموعة خاصة</string>
+    <string name="layout___conf_title">العنوان:</string>
+    <string name="layout___friends_pushurl">أصدقاء دفع URL:</string>
+    <string name="title_activity_conferenceinfo">معلومات الاجتماع</string>
+    <string name="add_group_activity_name">إنشاء مجموعة خاصة</string>
+    <string name="group_message_list_activity_name">مجموعة</string>
+    <string name="MainActivity_setup_push_tip_title">إعداد إعلام دفع</string>
+    <string name="layout___conf_id">معرف المؤتمر:</string>
+    <string name="layout___group_id2">معرف مجموعة:</string>
+    <string name="layout___remove_friends_pushurl">إزالة الأصدقاء دفع URL</string>
 </resources>
