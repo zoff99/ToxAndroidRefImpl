@@ -16,7 +16,7 @@ Tox 是自由软件。自由且免费。这意味着 Tox 属于您 — 使用，
 <b>更多信息：</b><br>
 *关于 Tox: https://tox.zoff.cc
 <br>
-*加入 Matrix 上的讨论: https://matrix.to/#/#trifa:matrix.org
+* 加入 TRIfA Tox 群聊：https://trifagrp.tox.zoff.cc/
 <br>
-*加入 Tox IRC 频道: https://matrix.to/#/#toktok:libera.chat
+*加入Matrix 上的讨论: https://matrix.to/#/#trifa:matrix.org
 <br>
