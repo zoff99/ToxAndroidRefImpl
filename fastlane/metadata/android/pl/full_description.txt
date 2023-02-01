@@ -16,7 +16,7 @@ Tox to darmowe oprogramowanie. To za darmo jak w wolności, a także w cenie. Oz
 <b>Więcej informacji:</b><br>
 * O Tox: https://tox.zoff.cc
 <br>
-* Dołącz do dyskusji na temat Matrix: https://matrix.to/#/#trifa:matrix.org
+* Dołącz do czatu grupy TRIfA Tox: https://trifagrp.tox.zoff.cc/
 <br>
-* Dołącz do kanału IRC Tox: https://matrix.to/#/#toktok:libera.chat
+* Dołącz do dyskusji na temat Matrix: https://matrix.to/#/#trifa:matrix.org
 <br>

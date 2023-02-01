@@ -15,5 +15,8 @@ Tox è un software libero.È libero come in libertà, oltre che gratuito nel pre
 
 <b>Ulteriori informazioni:</b><br>
 * Su Tox: https://tox.zoff.cc
+<br>
+* Partecipa alla chat del gruppo TRIfA Tox: https://trifagrp.tox.zoff.cc/
+<br>
 * Partecipa alla discussione su Matrix: https://matrix.to/#/#trifa:matrix.org
-* Entra nel canale IRC Tox: https://matrix.to/#/#toktok:libera.chat
+<br>
