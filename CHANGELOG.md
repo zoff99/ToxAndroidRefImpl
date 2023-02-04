@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.0.193](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.193) (2023-02-04)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.192...1.0.193)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#396](https://github.com/zoff99/ToxAndroidRefImpl/pull/396) ([weblate](https://github.com/weblate))
+
+## [1.0.192](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.192) (2023-01-29)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.191...1.0.192)
+
 ## [1.0.191](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.191) (2023-01-21)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.190...1.0.191)
