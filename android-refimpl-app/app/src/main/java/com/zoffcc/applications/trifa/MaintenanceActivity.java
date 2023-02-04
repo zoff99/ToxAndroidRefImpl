@@ -857,10 +857,23 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                     bn2.key_hex = nl_entry.getPublicKey().toUpperCase();
                                     bn2.udp_node = true;
                                     bn2.num = num_udp;
-                                    if ((bn2.ip != null) && (bn2.port > 0) && (bn2.key_hex != null))
+                                    if ((bn2.ip != null) && (!bn2.ip.equalsIgnoreCase("none")) && (bn2.port > 0) && (bn2.key_hex != null))
                                     {
                                         orma.insertIntoBootstrapNodeEntryDB(bn2);
                                         Log.i(TAG, "add UDP node:" + bn2);
+                                        num_udp++;
+                                    }
+
+                                    BootstrapNodeEntryDB bn2_ip6 = new BootstrapNodeEntryDB();
+                                    bn2_ip6.ip = nl_entry.getIpv6();
+                                    bn2_ip6.port = nl_entry.getPort();
+                                    bn2_ip6.key_hex = nl_entry.getPublicKey().toUpperCase();
+                                    bn2_ip6.udp_node = true;
+                                    bn2_ip6.num = num_udp;
+                                    if ((!bn2_ip6.ip.equalsIgnoreCase("-")) && (bn2_ip6.port > 0) && (bn2_ip6.key_hex != null))
+                                    {
+                                        orma.insertIntoBootstrapNodeEntryDB(bn2_ip6);
+                                        Log.i(TAG, "add UDP ipv6 node:" + bn2_ip6);
                                         num_udp++;
                                     }
                                 }
@@ -881,15 +894,43 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                     {
                                         BootstrapNodeEntryDB bn2 = new BootstrapNodeEntryDB();
                                         bn2.ip = nl_entry.getIpv4();
+                                        int tcp_ports_count = nl_entry.getTcpPorts().size();
                                         bn2.port = nl_entry.getTcpPorts().get(k);
                                         bn2.key_hex = nl_entry.getPublicKey().toUpperCase();
                                         bn2.udp_node = false;
-                                        bn2.num = num_tcp;
-                                        if ((bn2.ip != null) && (bn2.port > 0) && (bn2.key_hex != null))
+                                        if ((bn2.ip != null) && (!bn2.ip.equalsIgnoreCase("none")) && (bn2.port > 0) && (bn2.key_hex != null))
                                         {
-                                            orma.insertIntoBootstrapNodeEntryDB(bn2);
-                                            Log.i(TAG, "add tcp node:" + bn2);
-                                            num_tcp++;
+                                            for (int p=0;p<tcp_ports_count;p++)
+                                            {
+                                                bn2.num = num_tcp;
+                                                bn2.port = nl_entry.getTcpPorts().get(p);
+                                                orma.insertIntoBootstrapNodeEntryDB(bn2);
+                                                Log.i(TAG, "add tcp node:" + bn2);
+                                                num_tcp++;
+                                            }
+                                        }
+
+                                        BootstrapNodeEntryDB bn2_ip6 = new BootstrapNodeEntryDB();
+                                        bn2_ip6.ip = nl_entry.getIpv6();
+                                        int tcp_ports_count_ip6 = nl_entry.getTcpPorts().size();
+                                        bn2_ip6.key_hex = nl_entry.getPublicKey().toUpperCase();
+                                        bn2_ip6.udp_node = false;
+                                        bn2_ip6.num = num_tcp;
+                                        if ((!bn2_ip6.ip.equalsIgnoreCase("-")) && (tcp_ports_count_ip6 > 0) && (bn2_ip6.key_hex != null))
+                                        {
+                                            for (int p=0;p<tcp_ports_count_ip6;p++)
+                                            {
+                                                BootstrapNodeEntryDB bn2_ip6_ = new BootstrapNodeEntryDB();
+                                                bn2_ip6_.ip = nl_entry.getIpv6();
+                                                bn2_ip6_.port = nl_entry.getTcpPorts().get(p);
+                                                bn2_ip6_.key_hex = nl_entry.getPublicKey().toUpperCase();
+                                                bn2_ip6_.udp_node = false;
+                                                bn2_ip6_.num = num_tcp;
+
+                                                orma.insertIntoBootstrapNodeEntryDB(bn2_ip6_);
+                                                Log.i(TAG, "add tcp ipv6 node:" + bn2_ip6_);
+                                                num_tcp++;
+                                            }
                                         }
                                     }
                                     catch (Exception e)
