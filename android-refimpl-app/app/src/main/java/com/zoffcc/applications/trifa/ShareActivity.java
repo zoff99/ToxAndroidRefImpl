@@ -242,7 +242,13 @@ public class ShareActivity extends AppCompatActivity
 
     void handleToxNGCPublicGroupInvite(final String ngc_group_pubkey)
     {
-        Log.i(TAG, "handleToxFriendInvite:ngc_group_pubkey=" + ngc_group_pubkey);
+        try
+        {
+            Log.i(TAG, "handleToxFriendInvite:ngc_group_pubkey=" + ngc_group_pubkey.substring(0, 5));
+        }
+        catch(Exception ignored)
+        {
+        }
         JoinPublicGroupActivity.show_join_public_group_activity(this, ngc_group_pubkey);
         // close this share activity
         this.finish();
