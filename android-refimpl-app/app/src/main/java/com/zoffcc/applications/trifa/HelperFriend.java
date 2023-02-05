@@ -1440,7 +1440,7 @@ public class HelperFriend
                 final int res = tox_friend_send_lossless_packet(tox_friend_by_public_key__wrapper(friend_pubkey),
                                                                 data_bin, data_bin_len);
                 // Log.i(TAG, "send_pushurl_to_friend:" +
-                //           get_friend_name_from_num(friend_number) + ":send push url:RES=" + res);
+                //           get_friend_name_from_pubkey(friend_pubkey) + ":send push url:RES=" + res);
             }
         }
     }
