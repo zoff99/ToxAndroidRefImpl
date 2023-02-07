@@ -265,4 +265,53 @@
     <string name="pref_description_message_paging_num_msgs_per_page">Definir o número de mensagem para mostrar por página. 0 significa sem paginação</string>
     <string name="title_activity_groupinfo">Informação do grupo</string>
     <string name="pref_description_allow_push_server_ntfy">AVISO: Permitir servidor ntfy.sh para notificações push, isso pode vazar seus metadados de carimbo de tempo quando você recebe notificações push, se um(a) amigo(a) inscreve você com token push. ntfy.ah NÃO tem senhas e NÃO tem autenticação. você foi avisado.</string>
+    <string name="invite_join_group_success">Foi convidado para um Grupo</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_message">Deseja cancelar esta transferência de ficheiros\?</string>
+    <string name="layout___group_id2">ID do grupo:</string>
+    <string name="layout___group_name2">Nome do grupo:</string>
+    <string name="layout___group_myname2">o meu nome no grupo:</string>
+    <string name="layout___group_mypubjkey2">Minha Pubkey:</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">abre ficheiros diretamente do armazenamento criptografado via Intent. Isso pode ser potencialmente perigoso, porque outras apps maliciosas podem abrir outros ficheiros no armazenamento criptografado do TRIfA.</string>
+    <string name="add_group_activity_help">Criar um novo Grupo Privado (apenas por convite) com um nome de Grupo determinado.</string>
+    <string name="add_public_group_activity_help">Criar um novo Grupo Público com um nome de Grupo determinado.</string>
+    <string name="join_public_group_activity_help">Entrar num Grupo Público com o ID de Grupo dado.</string>
+    <string name="add_group_activity_add">Criar Grupo</string>
+    <string name="join_group_activity_join">Entrar no Grupo</string>
+    <string name="FriendListHolder_toggle_notification_silent_message">Deseja ativar/desativar o Silêncio de Notificações para este Amigo\?</string>
+    <string name="layout___add_friend">Adicionar Amigo</string>
+    <string name="layout___audio_roundtrip_test_start">Teste de Latência de Áudio</string>
+    <string name="layout___load_network_connections">carregar conexões de rede</string>
+    <string name="pref_title_mic_gain_factor_toggle">Ganho de microfone para diminuir o volume</string>
+    <string name="pref_description_mic_gain_factor_toggle">Se o seu microfone capta com muita sensibilidade, ative esta configuração e o Fator de Ganho de Microfone diminuirá o volume do microfone</string>
+    <string name="pref_title_allow_enable_ngc_features">NGC - Novos Bate-papos em grupo</string>
+    <string name="pref_description_enable_ngc_features">!! Experimental !!
+\nIsso NÃO está funcionando completamente!!</string>
+    <string name="join_public_group_joined">Entrou no grupo público</string>
+    <string name="add_public_group_failed">Falha ao criar um grupo público</string>
+    <string name="FriendListHolder_toggle_notification_silent_title">ativar/desativar Notificações</string>
+    <string name="MessageListHolder_file_incoming_cancel_ft_title">cancelar transferência de ficheiros</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_title">cancelar a transferência de ficheiros</string>
+    <string name="MessageListHolder_file_outgoing_cancel_ft_message">Deseja cancelar esta transferência de ficheiros\?</string>
+    <string name="MainActivity_setup_push_tip_title">Configurações de notificação por push</string>
+    <string name="MainActivity_setup_push_tip_text">Não instalou o App de Notificação por Push nem configurou a Notificação por Push. O TRIfA funcionará plenamente sem a Notificação por Push, mas precisa estar conectado constantemente para receber mensagens. Com a Notificação por Push pode economizar bateria e largura de banda de internet.
+\n
+\nDeseja ver como pode configurar a Notificação por Push agora\?</string>
+    <string name="ProfileActivity_delete_avatar_dialog_title">Remover foto do perfil</string>
+    <string name="ProfileActivity_delete_avatar_dialog_text">Deseja remover o sua foto de perfil\?</string>
+    <string name="incoming_filetransfer_size_too_large">O ficheiro a ser recebido é muito grande. Somente ficheiros de até 2 GBytes podem ser recebidos.</string>
+    <string name="layout___group_name">Nome do Grupo</string>
+    <string name="layout___group_id">ID do grupo</string>
+    <string name="layout___create_new_private_group">Criar novo Grupo Privado</string>
+    <string name="layout___create_new_public_group">Criar novo Grupo Público</string>
+    <string name="layout___join_public_group">Entrar num Grupo Público</string>
+    <string name="join_public_group_failed">Falha ao entrar no grupo público</string>
+    <string name="add_public_group_success">Criou um Grupo Público</string>
+    <string name="add_friend_success">Adicionou um novo amigo</string>
+    <string name="invite_friend_success">Recebeu um Pedido de Amizade</string>
+    <string name="invite_join_conference_success">Foi convidado para um Grupo de Conferência</string>
+    <string name="join_public_group_activity_warning">Aviso:
+\nentrar em Grupo Público via ID de Grupo não está funcionando ainda!!</string>
+    <string name="add_private_group_failed">Falha ao criar um grupo privado</string>
+    <string name="add_private_group_success">Criou um Grupo Privado</string>
+    <string name="add_friend_failed">Falha ao adicionar amigo</string>
 </resources>
