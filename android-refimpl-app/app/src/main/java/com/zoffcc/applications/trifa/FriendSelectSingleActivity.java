@@ -92,7 +92,13 @@ public class FriendSelectSingleActivity extends ListActivity
             this.finish();
         }
 
-        Log.i(TAG, "onCreate:002:fl.size()=" + fl.size());
+        try
+        {
+            Log.i(TAG, "onCreate:002:fl.size()=" + fl.size());
+        }
+        catch (Exception ignored)
+        {
+        }
 
         try
         {
