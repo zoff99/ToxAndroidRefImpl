@@ -65,6 +65,9 @@
 #include <android/asset_manager.h>
 #include <android/asset_manager_jni.h>
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-macros"
+#pragma clang diagnostic ignored "-Wdeclaration-after-statement"
 /*
  *
  *
@@ -460,7 +463,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                                     pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
                                     pcm_buf_out_resampled + (x * sample_count_split_downsampled),
                                     sample_count_split_downsampled,
-                                    audio_aec_delay
+                                    (int16_t)audio_aec_delay
                             );
                             // suppress unused var
                             (void) res;
@@ -1697,7 +1700,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
 
 float audio_vu(const int16_t *pcm_data, uint32_t sample_count)
 {
-    float sum = 0.0;
+    float sum = 0.0f;
 
     for (uint32_t i = 0; i < sample_count; i++)
     {
@@ -1823,3 +1826,5 @@ static int32_t downsample_48000_to_16000_basic(int16_t *in, int16_t *out, int32_
 
     return 0;
 }
+
+#pragma clang diagnostic pop
