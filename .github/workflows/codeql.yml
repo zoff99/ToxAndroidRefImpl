@@ -50,6 +50,7 @@ jobs:
         # filter out all test files unless they contain a sql-injection vulnerability
         patterns: |
           -**/webrtc6/**
+          -**/miniaudio.h
         input: sarif-results/${{ matrix.language }}.sarif
         output: sarif-results/${{ matrix.language }}.sarif
 
