@@ -81,221 +81,234 @@ public class FriendSelectSingleAdapter extends ArrayAdapter<FriendSelectSingle>
         final Drawable d_lock = new IconicsDrawable(context).
                 icon(FontAwesome.Icon.faw_lock).color(context.getResources().
                 getColor(R.color.colorPrimaryDark)).sizeDp(80);
-        final FriendList fl = main_get_friend(friend_entry.pubkey);
-        // ------ now fill with data ------
-        textViewName.setText(friend_entry.getName());
-        avatar.setImageDrawable(d_lock);
-        try
+
+        if (friend_entry.getType() == 0)
         {
-            if (VFS_ENCRYPT)
+            final FriendList fl = main_get_friend(friend_entry.pubkey);
+
+            // ------ now fill with data ------
+            textViewName.setText(friend_entry.getName());
+            avatar.setImageDrawable(d_lock);
+            try
             {
-                boolean need_create_identicon = true;
-
-                info.guardianproject.iocipher.File f1 = null;
-                try
+                if (VFS_ENCRYPT)
                 {
-                    f1 = new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                    boolean need_create_identicon = true;
 
-                if ((f1 != null) && (fl.avatar_pathname != null))
-                {
-                    if (f1.length() > 0)
-                    {
-                        // Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + fl.avatar_filename);
-                        final RequestOptions glide_options = new RequestOptions().fitCenter();
-                        GlideApp.
-                                with(avatar.getContext()).
-                                load(f1).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                placeholder(d_lock).
-                                priority(Priority.HIGH).
-                                skipMemoryCache(false).
-                                apply(glide_options).
-                                into(avatar);
-
-                        need_create_identicon = false;
-                    }
-                    else
-                    {
-                        avatar.setImageDrawable(d_lock);
-                    }
-                }
-
-                if (need_create_identicon)
-                {
-                    // no avatar icon? create and use Identicon ------------
-                    create_avatar_identicon_for_pubkey(fl.tox_public_key_string);
-
-
-                    // -- ok, now try to show the avtar icon again --
-
-                    String new_avatar_pathname = VFS_PREFIX + VFS_FILE_DIR + "/" + fl.tox_public_key_string + "/";
-                    String new_avatar_filename = FRIEND_AVATAR_FILENAME;
-                    f1 = null;
+                    info.guardianproject.iocipher.File f1 = null;
                     try
                     {
-                        f1 = new info.guardianproject.iocipher.File(new_avatar_pathname + "/" + new_avatar_filename);
+                        f1 = new info.guardianproject.iocipher.File(fl.avatar_pathname + "/" + fl.avatar_filename);
                     }
                     catch (Exception e)
                     {
                         e.printStackTrace();
                     }
 
-                    if ((f1 != null) && (new_avatar_pathname != null))
+                    if ((f1 != null) && (fl.avatar_pathname != null))
                     {
                         if (f1.length() > 0)
                         {
-                            // Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + new_avatar_filename);
-
+                            // Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + fl.avatar_filename);
                             final RequestOptions glide_options = new RequestOptions().fitCenter();
                             GlideApp.
                                     with(avatar.getContext()).
                                     load(f1).
                                     diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                    signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                            "_avatar_" + new_avatar_pathname + "/" + FRIEND_AVATAR_FILENAME + "_" +
-                                            fl.avatar_update_timestamp)).
                                     placeholder(d_lock).
                                     priority(Priority.HIGH).
                                     skipMemoryCache(false).
                                     apply(glide_options).
                                     into(avatar);
+
+                            need_create_identicon = false;
                         }
                         else
                         {
-                            // ok still nothing, show that default "lock" icon
                             avatar.setImageDrawable(d_lock);
                         }
                     }
-                    // -- ok, now try to show the avtar icon again --
 
-                    // no avatar icon? create and use Identicon ------------
-                }
+                    if (need_create_identicon)
+                    {
+                        // no avatar icon? create and use Identicon ------------
+                        create_avatar_identicon_for_pubkey(fl.tox_public_key_string);
 
 
-            } // VFS_ENCRYPT -- END --
-            else
-            {
-                java.io.File f1 = null;
-                try
+                        // -- ok, now try to show the avtar icon again --
+
+                        String new_avatar_pathname = VFS_PREFIX + VFS_FILE_DIR + "/" + fl.tox_public_key_string + "/";
+                        String new_avatar_filename = FRIEND_AVATAR_FILENAME;
+                        f1 = null;
+                        try
+                        {
+                            f1 = new info.guardianproject.iocipher.File(new_avatar_pathname + "/" + new_avatar_filename);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
+                        if ((f1 != null) && (new_avatar_pathname != null))
+                        {
+                            if (f1.length() > 0)
+                            {
+                                // Log.i(TAG, "AVATAR_GLIDE:" + ":" + fl.name + ":" + new_avatar_filename);
+
+                                final RequestOptions glide_options = new RequestOptions().fitCenter();
+                                GlideApp.
+                                        with(avatar.getContext()).
+                                        load(f1).
+                                        diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                        signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                        "_avatar_" + new_avatar_pathname + "/" + FRIEND_AVATAR_FILENAME + "_" +
+                                        fl.avatar_update_timestamp)).
+                                        placeholder(d_lock).
+                                        priority(Priority.HIGH).
+                                        skipMemoryCache(false).
+                                        apply(glide_options).
+                                        into(avatar);
+                            }
+                            else
+                            {
+                                // ok still nothing, show that default "lock" icon
+                                avatar.setImageDrawable(d_lock);
+                            }
+                        }
+                        // -- ok, now try to show the avtar icon again --
+
+                        // no avatar icon? create and use Identicon ------------
+                    }
+
+
+                } // VFS_ENCRYPT -- END --
+                else
                 {
-                    f1 = new java.io.File(fl.avatar_pathname + "/" + fl.avatar_filename);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                    java.io.File f1 = null;
+                    try
+                    {
+                        f1 = new java.io.File(fl.avatar_pathname + "/" + fl.avatar_filename);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
 
-                if ((f1 != null) && (fl.avatar_pathname != null))
-                {
-                    java.io.FileInputStream fis = new java.io.FileInputStream(f1);
+                    if ((f1 != null) && (fl.avatar_pathname != null))
+                    {
+                        java.io.FileInputStream fis = new java.io.FileInputStream(f1);
 
-                    byte[] byteArray = new byte[(int) f1.length()];
-                    fis.read(byteArray, 0, (int) f1.length());
-                    fis.close();
+                        byte[] byteArray = new byte[(int) f1.length()];
+                        fis.read(byteArray, 0, (int) f1.length());
+                        fis.close();
 
-                    final RequestOptions glide_options = new RequestOptions().fitCenter();
-                    GlideApp.
-                            with(context).
-                            load(byteArray).
-                            placeholder(d_lock).
-                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                            signature(new com.bumptech.glide.signature.StringSignatureZ(
-                                    "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
-                                    fl.avatar_update_timestamp)).
-                            skipMemoryCache(false).
-                            apply(glide_options).
-                            into(avatar);
+                        final RequestOptions glide_options = new RequestOptions().fitCenter();
+                        GlideApp.
+                                with(context).
+                                load(byteArray).
+                                placeholder(d_lock).
+                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                                signature(new com.bumptech.glide.signature.StringSignatureZ(
+                                "_avatar_" + fl.avatar_pathname + "/" + fl.avatar_filename + "_" +
+                                fl.avatar_update_timestamp)).
+                                skipMemoryCache(false).
+                                apply(glide_options).
+                                into(avatar);
+                    }
                 }
             }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        f_status_icon.setVisibility(View.VISIBLE);
-        f_relay_icon.setVisibility(View.INVISIBLE);
-
-        String relay_ = get_relay_for_friend(fl.tox_public_key_string);
-
-        if (relay_ != null) // friend HAS a relay
-        {
-            FriendList relay_fl = main_get_friend(tox_friend_by_public_key__wrapper(relay_));
-
-            if (relay_fl != null)
+            catch (Exception e)
             {
-                if (fl.TOX_CONNECTION_real == 0)
+                e.printStackTrace();
+            }
+
+            f_status_icon.setVisibility(View.VISIBLE);
+            f_relay_icon.setVisibility(View.INVISIBLE);
+
+            String relay_ = get_relay_for_friend(fl.tox_public_key_string);
+
+            if (relay_ != null) // friend HAS a relay
+            {
+                FriendList relay_fl = main_get_friend(tox_friend_by_public_key__wrapper(relay_));
+
+                if (relay_fl != null)
                 {
-                    f_status_icon.setImageResource(R.drawable.circle_red);
+                    if (fl.TOX_CONNECTION_real == 0)
+                    {
+                        f_status_icon.setImageResource(R.drawable.circle_red);
+                    }
+                    else
+                    {
+                        f_status_icon.setImageResource(R.drawable.circle_green);
+                    }
+
+                    if (relay_fl.TOX_CONNECTION_real == 0)
+                    {
+                        f_relay_icon.setImageResource(R.drawable.circle_red);
+                    }
+                    else
+                    {
+                        f_relay_icon.setImageResource(R.drawable.circle_green);
+                    }
+
+                    f_status_icon.setVisibility(View.VISIBLE);
+                    f_relay_icon.setVisibility(View.VISIBLE);
+                }
+            }
+            else // friend has no relay
+            {
+                // Log.d(TAG, "004");
+
+                String get_pushurl_for_friend = get_pushurl_for_friend(fl.tox_public_key_string);
+
+                if ((get_pushurl_for_friend != null) && (get_pushurl_for_friend.length() > "https:".length()))
+                {
+                    // friend has push support
+                    f_relay_icon.setImageResource(R.drawable.circle_orange);
+                    f_relay_icon.setVisibility(View.VISIBLE);
                 }
                 else
                 {
-                    f_status_icon.setImageResource(R.drawable.circle_green);
+                    if (fl.TOX_CONNECTION == 0)
+                    {
+                        f_status_icon.setImageResource(R.drawable.circle_red);
+                    }
+                    else
+                    {
+                        f_status_icon.setImageResource(R.drawable.circle_green);
+                    }
                 }
-
-                if (relay_fl.TOX_CONNECTION_real == 0)
-                {
-                    f_relay_icon.setImageResource(R.drawable.circle_red);
-                }
-                else
-                {
-                    f_relay_icon.setImageResource(R.drawable.circle_green);
-                }
-
-                f_status_icon.setVisibility(View.VISIBLE);
-                f_relay_icon.setVisibility(View.VISIBLE);
             }
+
+            try
+            {
+                if (fl.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
+                {
+                    avatar.setBorderColor(Color.parseColor("#40000000"));
+                }
+                else if (fl.TOX_CONNECTION_real == TOX_CONNECTION_TCP.value)
+                {
+                    avatar.setBorderColor(Color.parseColor("#FFCE00"));
+                }
+                else // UDP
+                {
+                    avatar.setBorderColor(Color.parseColor("#04B431"));
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            // ------ now fill with data ------
         }
-        else // friend has no relay
+        else if (friend_entry.getType() == 2)
         {
-            // Log.d(TAG, "004");
-
-            String get_pushurl_for_friend = get_pushurl_for_friend(fl.tox_public_key_string);
-
-            if ((get_pushurl_for_friend != null) && (get_pushurl_for_friend.length() > "https:".length()))
-            {
-                // friend has push support
-                f_relay_icon.setImageResource(R.drawable.circle_orange);
-                f_relay_icon.setVisibility(View.VISIBLE);
-            }
-            else
-            {
-                if (fl.TOX_CONNECTION == 0)
-                {
-                    f_status_icon.setImageResource(R.drawable.circle_red);
-                }
-                else
-                {
-                    f_status_icon.setImageResource(R.drawable.circle_green);
-                }
-            }
+            f_status_icon.setVisibility(View.INVISIBLE);
+            f_relay_icon.setVisibility(View.INVISIBLE);
+            avatar.setBorderColor(Color.parseColor("#40000000"));
+            textViewName.setText(friend_entry.getName());
         }
 
-        try
-        {
-            if (fl.TOX_CONNECTION_real == TOX_CONNECTION_NONE.value)
-            {
-                avatar.setBorderColor(Color.parseColor("#40000000"));
-            }
-            else if (fl.TOX_CONNECTION_real == TOX_CONNECTION_TCP.value)
-            {
-                avatar.setBorderColor(Color.parseColor("#FFCE00"));
-            }
-            else // UDP
-            {
-                avatar.setBorderColor(Color.parseColor("#04B431"));
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        // ------ now fill with data ------
         return view;
     }
 }

@@ -143,6 +143,7 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.flush_and_close_v
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.save_group_incoming_file;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_avatar_saved_hash_hex;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_name_from_pubkey;
@@ -152,6 +153,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.send_pushurl_to_all_fri
 import static com.zoffcc.applications.trifa.HelperFriend.send_pushurl_to_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_capabilities;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
@@ -265,6 +267,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILENAME_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_AWAY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_BUSY;
@@ -3351,6 +3354,8 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_group_is_connected(long group_number);
 
     public static native int tox_group_reconnect(long group_number);
+
+    public static native int tox_group_send_custom_packet(long group_number, int lossless, @NonNull byte[] data, int data_length);
 
     /**
      * Send a text chat message to the group.
@@ -7122,6 +7127,209 @@ public class MainActivity extends AppCompatActivity
         update_group_in_db_topic(group_identifier, topic);
         update_group_in_friendlist(group_identifier);
         update_group_in_groupmessagelist(group_identifier);
+    }
+
+    static void android_tox_callback_group_custom_packet_cb_method(long group_number, long peer_id, final byte[] data, long length)
+    {
+        try
+        {
+            Log.i(TAG,
+                  "group_custom_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
+                  " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
+        }
+        catch(Exception e)
+        {
+        }
+
+        // check for correct signature of packets
+        final long header = 6 + 1 + 1 + 32 + 4 + 255;
+        if ((length > 37000L) || (length < (header + 1)))
+        {
+            Log.i(TAG, "group_custom_packet_cb: data length has wrong size: " + length);
+            return;
+        }
+
+            // @formatter:off
+            /*
+            | what      | Length in bytes| Contents                                           |
+            |------     |--------        |------------------                                  |
+            | magic     |       6        |  0x667788113435                                    |
+            | version   |       1        |  0x01                                              |
+            | pkt id    |       1        |  0x11
+             */
+            // @formatter:on
+
+            if (
+                    (data[0] == (byte)0x66) &&
+                    (data[1] == (byte)0x77) &&
+                    (data[2] == (byte)0x88) &&
+                    (data[3] == (byte)0x11) &&
+                    (data[4] == (byte)0x34) &&
+                    (data[5] == (byte)0x35))
+            {
+                if ((data[6] == (byte)0x1) && (data[7] == (byte)0x11))
+                {
+                    // HINT: ok we have a group file
+                    global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+
+                    long res = tox_group_self_get_peer_id(group_number);
+                    if (res == peer_id)
+                    {
+                        // HINT: do not add our own messages, they are already in the DB!
+                        Log.i(TAG, "group_custom_packet_cb:gn=" + group_number + " peerid=" + peer_id + " ignoring own file");
+                        return;
+                    }
+
+                    boolean do_notification = true;
+                    boolean do_badge_update = true;
+                    String group_id = "-1";
+                    GroupDB group_temp = null;
+
+                    try
+                    {
+                        group_id = tox_group_by_groupnum__wrapper(group_number);
+                        group_temp = orma.selectFromGroupDB().
+                                group_identifierEq(group_id.toLowerCase()).
+                                toList().get(0);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+
+                    if (group_id.compareTo("-1") == 0)
+                    {
+                        display_toast("group_custom_packet_cb:ERROR 001 with incoming Group File!", true, 0);
+                        return;
+                    }
+
+                    if (group_temp.group_identifier.toLowerCase().compareTo(group_id.toLowerCase()) != 0)
+                    {
+                        display_toast("group_custom_packet_cb:ERROR 002 with incoming Group File!", true, 0);
+                        return;
+                    }
+
+                    try
+                    {
+                        if (group_temp.notification_silent)
+                        {
+                            do_notification = false;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        // e.printStackTrace();
+                        do_notification = false;
+                    }
+
+                    if (group_message_list_activity != null)
+                    {
+                        Log.i(TAG,
+                              "group_custom_packet_cb:noti_and_badge:002group:" + group_message_list_activity.get_current_group_id() + ":" + group_id);
+                        if (group_message_list_activity.get_current_group_id().equals(group_id))
+                        {
+                            // no notifcation and no badge update
+                            do_notification = false;
+                            do_badge_update = false;
+                        }
+                    }
+
+                    ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+                    hash_bytes.put(data, 8, 32);
+                    ByteBuffer filename_bytes = ByteBuffer.allocateDirect(TOX_MAX_FILENAME_LENGTH);
+                    filename_bytes.put(data, 8 + 32, 255);
+                    filename_bytes.rewind();
+                    String filename = "image.jpg";
+                    try
+                    {
+                        // filename = new String(filename_bytes.array(), StandardCharsets.UTF_8);
+                    }
+                    catch(Exception e)
+                    {
+                    }
+
+                    long file_size = length - header;
+                    if (file_size < 1)
+                    {
+                        Log.i(TAG, "group_custom_packet_cb:group_custom_packet_cb: file size less than 1 byte");
+                        return;
+                    }
+
+                    String filename_corrected = get_incoming_filetransfer_local_filename(filename, group_id.toLowerCase());
+
+                    Log.i(TAG, "group_custom_packet_cb:filename="+filename+" filename_corrected="+filename_corrected);
+
+                    GroupMessage m = new GroupMessage();
+                    m.is_new = do_badge_update;
+                    m.tox_group_peer_pubkey = HelperGroup.tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+                    m.direction = 0; // msg received
+                    m.TOX_MESSAGE_TYPE = 0;
+                    m.read = false;
+                    m.tox_group_peername = null;
+                    m.private_message = 0;
+                    m.group_identifier = group_id.toLowerCase();
+                    m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
+                    m.rcvd_timestamp = System.currentTimeMillis();
+                    m.sent_timestamp = System.currentTimeMillis();
+                    m.text = filename_corrected + "\n" + file_size + " bytes";
+                    m.message_id_tox = "";
+                    m.was_synced = false;
+                    m.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + m.group_identifier + "/";
+                    m.file_name = filename_corrected;
+                    m.filename_fullpath = m.path_name + m.file_name;
+                    m.storage_frame_work = false;
+                    m.msg_id_hash = bytebuffer_to_hexstring(hash_bytes, true);
+                    m.filesize = file_size;
+
+                    try
+                    {
+                        m.tox_group_peername = HelperGroup.tox_group_peer_get_name__wrapper(m.group_identifier,
+                                                                                            m.tox_group_peer_pubkey);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
+                            m.path_name + "/" + m.file_name);
+                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
+                    f2.mkdirs();
+
+                    save_group_incoming_file(m.path_name, m.file_name, data, header, file_size);
+
+                    if (group_message_list_activity != null)
+                    {
+                        if (group_message_list_activity.get_current_group_id().equals(group_id.toLowerCase()))
+                        {
+                            HelperGroup.insert_into_group_message_db(m, true);
+                        }
+                        else
+                        {
+                            HelperGroup.insert_into_group_message_db(m, false);
+                        }
+                    }
+                    else
+                    {
+                        long new_msg_id = HelperGroup.insert_into_group_message_db(m, false);
+                        Log.i(TAG, "group_custom_packet_cb:new_msg_id=" + new_msg_id);
+                    }
+
+                    HelperFriend.add_all_friends_clear_wrapper(0);
+
+                    if (do_notification)
+                    {
+                        change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+                    }
+                }
+                else
+                {
+                    Log.i(TAG, "group_custom_packet_cb:wrong signature 222");
+                }
+            }
+            else
+            {
+                Log.i(TAG, "group_custom_packet_cb:wrong signature 111");
+            }
     }
 
     // -------- called by native new Group methods --------

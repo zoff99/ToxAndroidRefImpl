@@ -172,6 +172,7 @@ dependencyVerification {
         'com.vanniktech:emoji:0.7.0:emoji-0.7.0.aar:66f5981f8b5f93e82d2d4b3fa4c6299904d686ca62a2366e61de723b20253707',
         'commons-io:commons-io:2.4:commons-io-2.4.jar:cc6a41dc3eaacc9e440a6bd0d2890b20d36b4ee408fe2d67122f328bb6e01581',
         'de.hdodenhof:circleimageview:2.2.0:circleimageview-2.2.0.aar:bc34761dcd5036229ac1ffed6b5b1bef722ad5b097a2c8bba1c5ed2cd4b5c82b',
+        'id.zelory:compressor:2.1.1:compressor-2.1.1.aar:b20e2ba288b0ff1404196ee55416fb3ac242cfd5001887bbd195ad962cf91ffb',
         'info.guardianproject.netcipher:netcipher:2.1.0:netcipher-2.1.0.jar:0a9c84e18588d11a5bcd72f8de271437dd835fa78b0af902dc1bf612c06cb2a5',
         'io.github.l4digital:fastscroll:3.0.0-beta.3:fastscroll-3.0.0-beta.3.aar:95cea00298c0bc4611c290cd4010fd61a51a140ab5504fc176baf2e970004989',
         'io.grpc:grpc-api:1.39.0:grpc-api-1.39.0.jar:4e80074dc2c627372044599cf873bf644450a218c58af48c03d5bb086cced484',

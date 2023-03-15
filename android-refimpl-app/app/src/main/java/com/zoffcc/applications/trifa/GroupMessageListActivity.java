@@ -19,12 +19,16 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.DocumentsContract;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -54,7 +58,7 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
-import java.util.Map;
+import java.nio.ByteBuffer;
 
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
@@ -62,15 +66,21 @@ import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.documentfile.provider.DocumentFile;
+import id.zelory.compressor.Compressor;
 
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.copy_outgoing_file_to_sdcard_dir;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.io_file_copy;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
+import static com.zoffcc.applications.trifa.HelperGroup.send_group_image;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
@@ -96,11 +106,14 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
@@ -124,6 +137,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
     static MenuItem amode_info_menu_item = null;
+    static boolean oncreate_finished = false;
     SearchView messageSearchView = null;
 
     // main drawer ----------
@@ -139,6 +153,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
+        oncreate_finished = false;
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
@@ -172,29 +187,24 @@ public class GroupMessageListActivity extends AppCompatActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).
-                color(getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
+        final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).color(
+                getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
 
-        group_message_profile_item = new ProfileDrawerItem().
-                withName("Userlist").
-                withIcon(drawer_header_icon);
+        group_message_profile_item = new ProfileDrawerItem().withName("Userlist").withIcon(drawer_header_icon);
 
         // Create the AccountHeader
-        group_message_drawer_header = new AccountHeaderBuilder().
-                withActivity(this).
-                withSelectionListEnabledForSingleProfile(false).
-                withTextColor(getResources().getColor(R.color.md_dark_primary_text)).
-                withHeaderBackground(R.color.colorHeader).
-                withCompactStyle(true).
-                addProfiles(group_message_profile_item).
-                withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
-                {
-                    @Override
-                    public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
-                    {
-                        return false;
-                    }
-                }).build();
+        group_message_drawer_header = new AccountHeaderBuilder().withActivity(
+                this).withSelectionListEnabledForSingleProfile(false).withTextColor(
+                getResources().getColor(R.color.md_dark_primary_text)).withHeaderBackground(
+                R.color.colorHeader).withCompactStyle(true).addProfiles(
+                group_message_profile_item).withOnAccountHeaderListener(new AccountHeader.OnAccountHeaderListener()
+        {
+            @Override
+            public boolean onProfileChanged(View view, IProfile profile, boolean currentProfile)
+            {
+                return false;
+            }
+        }).build();
 
         //        PrimaryDrawerItem item1 = new PrimaryDrawerItem().withIdentifier(1).
         //                withIdentifier(1L).
@@ -203,36 +213,30 @@ public class GroupMessageListActivity extends AppCompatActivity
 
 
         // create the drawer and remember the `Drawer` result object
-        group_message_drawer = new DrawerBuilder().
-                withActivity(this).
-                withAccountHeader(group_message_drawer_header).
-                withInnerShadow(false).
-                withRootView(R.id.drawer_container).
-                withShowDrawerOnFirstLaunch(false).
-                withActionBarDrawerToggleAnimated(true).
-                withActionBarDrawerToggle(true).
-                withToolbar(toolbar).
-                withTranslucentStatusBar(false).
-                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+        group_message_drawer = new DrawerBuilder().withActivity(this).withAccountHeader(
+                group_message_drawer_header).withInnerShadow(false).withRootView(
+                R.id.drawer_container).withShowDrawerOnFirstLaunch(false).withActionBarDrawerToggleAnimated(
+                true).withActionBarDrawerToggle(true).withToolbar(toolbar).withTranslucentStatusBar(
+                false).withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+        {
+            @Override
+            public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+            {
+                Log.i(TAG, "drawer:item=" + position);
+                if (position == 1)
                 {
-                    @Override
-                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                    // profile
+                    try
                     {
-                        Log.i(TAG, "drawer:item=" + position);
-                        if (position == 1)
-                        {
-                            // profile
-                            try
-                            {
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
-                        }
-                        return true;
                     }
-                }).build();
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                return true;
+            }
+        }).build();
 
 
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
@@ -354,11 +358,9 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         setUpEmojiPopup();
 
-        final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                color(getResources().
-                        getColor(R.color.icon_colors)).
-                sizeDp(80);
+        final Drawable d1 = new IconicsDrawable(getBaseContext()).icon(
+                GoogleMaterial.Icon.gmd_sentiment_satisfied).color(getResources().getColor(R.color.icon_colors)).sizeDp(
+                80);
 
         insert_emoji.setImageDrawable(d1);
 
@@ -402,6 +404,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         set_peer_names_and_avatars();
 
         Log.i(TAG, "onCreate:099");
+        oncreate_finished = true;
     }
 
     synchronized void set_peer_count_header()
@@ -605,11 +608,8 @@ public class GroupMessageListActivity extends AppCompatActivity
             @Override
             public void onEmojiPopupShown()
             {
-                final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                        icon(FontAwesome.Icon.faw_keyboard).
-                        color(getResources().
-                                getColor(R.color.icon_colors)).
-                        sizeDp(80);
+                final Drawable d1 = new IconicsDrawable(getBaseContext()).icon(FontAwesome.Icon.faw_keyboard).color(
+                        getResources().getColor(R.color.icon_colors)).sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.about_icon_email);
@@ -626,11 +626,9 @@ public class GroupMessageListActivity extends AppCompatActivity
             @Override
             public void onEmojiPopupDismiss()
             {
-                final Drawable d1 = new IconicsDrawable(getBaseContext()).
-                        icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
-                        color(getResources().
-                                getColor(R.color.icon_colors)).
-                        sizeDp(80);
+                final Drawable d1 = new IconicsDrawable(getBaseContext()).icon(
+                        GoogleMaterial.Icon.gmd_sentiment_satisfied).color(
+                        getResources().getColor(R.color.icon_colors)).sizeDp(80);
 
                 insert_emoji.setImageDrawable(d1);
                 // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
@@ -661,7 +659,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                     if (is_group_active(group_id_prev))
                     {
-                        if (tox_group_is_connected(tox_group_by_groupid__wrapper(group_id_prev)) == TRIFAGlobals.TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_CONNECTED.value)
+                        if (tox_group_is_connected(tox_group_by_groupid__wrapper(group_id_prev)) ==
+                            TRIFAGlobals.TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_CONNECTED.value)
                         {
                             ml_icon.setImageResource(R.drawable.circle_green);
                         }
@@ -801,9 +800,171 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         }
         catch (Exception e)
-
         {
             e.printStackTrace();
+        }
+    }
+
+
+    static void add_attachment_ngc(Context c, Intent data, Intent orig_intent, String groupid_local, boolean activity_group_num)
+    {
+        Log.i(TAG, "add_attachment:001");
+
+        try
+        {
+            String fileName = null;
+
+            try
+            {
+                DocumentFile documentFile = DocumentFile.fromSingleUri(c, data.getData());
+
+                fileName = documentFile.getName();
+                // Log.i(TAG, "file_attach_for_send:documentFile:fileName=" + fileName);
+                // Log.i(TAG, "file_attach_for_send:documentFile:fileLength=" + documentFile.length());
+
+                ContentResolver cr = c.getApplicationContext().getContentResolver();
+                Cursor metaCursor = cr.query(data.getData(), null, null, null, null);
+                if (metaCursor != null)
+                {
+                    try
+                    {
+                        if (metaCursor.moveToFirst())
+                        {
+                            String file_path = metaCursor.getString(0);
+                            // Log.i(TAG, "file_attach_for_send:metaCursor_path:fp=" + file_path);
+                            // Log.i(TAG, "file_attach_for_send:metaCursor_path:column names=" +
+                            //            metaCursor.getColumnNames().length);
+                            int j;
+                            for (j = 0; j < metaCursor.getColumnNames().length; j++)
+                            {
+                                // Log.i(TAG, "file_attach_for_send:metaCursor_path:column name=" +
+                                //           metaCursor.getColumnName(j));
+                                // Log.i(TAG,
+                                //       "file_attach_for_send:metaCursor_path:column data=" + metaCursor.getString(j));
+                                if (metaCursor.getColumnName(j).equals(DocumentsContract.Document.COLUMN_DISPLAY_NAME))
+                                {
+                                    if (metaCursor.getString(j) != null)
+                                    {
+                                        if (metaCursor.getString(j).length() > 0)
+                                        {
+                                            fileName = metaCursor.getString(j);
+                                            // Log.i(TAG, "file_attach_for_send:filename new=" + fileName);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        metaCursor.close();
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            final String fileName_ = fileName;
+
+            if (fileName_ != null)
+            {
+                if (activity_group_num)
+                {
+                    final Thread t = new Thread()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            if (groupid_local.equals("-1"))
+                            {
+                                // ok, we need to wait for onResume to finish and give us the friendnum
+                                Log.i(TAG,
+                                      "add_outgoing_file:ok, we need to wait for onResume to finish and give us the friendnum");
+                                long loop = 0;
+                                while (loop < 100)
+                                {
+                                    loop++;
+                                    try
+                                    {
+                                        Thread.sleep(20);
+                                    }
+                                    catch (InterruptedException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+
+                                    if (MainActivity.group_message_list_activity != null)
+                                    {
+                                        if (!MainActivity.group_message_list_activity.get_current_group_id().equals(
+                                                "-1"))
+                                        {
+                                            // got friendnum
+                                            Log.i(TAG, "add_outgoing_file:got groupnum");
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                loop = 0;
+                                while (loop < 1000)
+                                {
+                                    loop++;
+                                    try
+                                    {
+                                        Thread.sleep(20);
+                                    }
+                                    catch (InterruptedException e)
+                                    {
+                                        e.printStackTrace();
+                                    }
+
+                                    if (oncreate_finished)
+                                    {
+                                        Log.i(TAG, "add_outgoing_file:oncreate_finished");
+                                        break;
+                                    }
+                                }
+                            }
+
+                            try
+                            {
+                                Thread.sleep(50);
+                            }
+                            catch (InterruptedException e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            if (MainActivity.group_message_list_activity != null)
+                            {
+                                if (!MainActivity.group_message_list_activity.get_current_group_id().equals("-1"))
+                                {
+                                    // sorry, still no friendnum
+                                    Log.i(TAG, "add_outgoing_file:sorry, still no groupnum");
+                                    return;
+                                }
+                            }
+
+                            add_outgoing_file(c, MainActivity.group_message_list_activity.get_current_group_id(),
+                                              data.getData().toString(), fileName_, data.getData(), false,
+                                              activity_group_num);
+                        }
+                    };
+                    t.start();
+                }
+                else
+                {
+                    add_outgoing_file(c, groupid_local, data.getData().toString(), fileName_, data.getData(), false,
+                                      activity_group_num);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "select_file:22:EE1:" + e.getMessage());
         }
     }
 
@@ -1055,12 +1216,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                                         }
 
                                         new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
-                                                                                      peer_pubkey).
-                                                withIdentifier(peernum).
-                                                withName(name).
-                                                withBadge("" + peernum).withBadgeStyle(
-                                                new BadgeStyle().withTextColor(Color.WHITE).withColorRes(badge_color)).
-                                                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                                                                                      peer_pubkey).withIdentifier(
+                                                peernum).withName(name).withBadge("" + peernum).withBadgeStyle(
+                                                new BadgeStyle().withTextColor(Color.WHITE).withColorRes(
+                                                        badge_color)).withOnDrawerItemClickListener(
+                                                new Drawer.OnDrawerItemClickListener()
                                                 {
                                                     @Override
                                                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
@@ -1077,11 +1237,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     catch (Exception e)
                                     {
                                         e.printStackTrace();
-                                        new_item = new ConferenceCustomDrawerPeerItem(false, null).
-                                                withIdentifier(peernum).
-                                                withName(name).
-                                                withIcon(GoogleMaterial.Icon.gmd_face).
-                                                withOnDrawerItemClickListener(new Drawer.OnDrawerItemClickListener()
+                                        new_item = new ConferenceCustomDrawerPeerItem(false, null).withIdentifier(
+                                                peernum).withName(name).withIcon(
+                                                GoogleMaterial.Icon.gmd_face).withOnDrawerItemClickListener(
+                                                new Drawer.OnDrawerItemClickListener()
                                                 {
                                                     @Override
                                                     public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
@@ -1193,6 +1352,195 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
             }
         }
+    }
+
+    static void add_outgoing_file(Context c, String groupid, String filepath, String filename, Uri uri, boolean real_file_path, boolean update_message_view)
+    {
+        long file_size = -1;
+        try
+        {
+            DocumentFile documentFile = DocumentFile.fromSingleUri(c, uri);
+            String fileName = documentFile.getName();
+            Log.i(TAG, "add_outgoing_file:documentFile:fileName=" + fileName);
+            Log.i(TAG, "add_outgoing_file:documentFile:fileLength=" + documentFile.length());
+
+            file_size = documentFile.length();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            // file length unknown?
+            return;
+        }
+
+        if (file_size < 1)
+        {
+            // file length "zero"?
+            return;
+        }
+
+
+        if (file_size < FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK) // less than xxx Bytes filesize
+        {
+            MessageListActivity.outgoing_file_wrapped ofw = copy_outgoing_file_to_sdcard_dir(filepath, filename,
+                                                                                             file_size);
+
+            if (ofw == null)
+            {
+                return;
+            }
+
+            // reducing the file size down to hopefully 37kbytes -------------------
+            try
+            {
+                java.io.File ff1 = new java.io.File(ofw.filepath_wrapped + "/" + ofw.filename_wrapped);
+                Log.i(TAG, "fsize_before=" + ff1.length());
+
+                /*
+                int new_size_factor = 100;
+                while (ff1.length() > 36500)
+                {
+                    HelperGeneric.saveBitmapToFile(ff1, new_size_factor);
+                    new_size_factor = new_size_factor - 10;
+                    Log.i(TAG,"fsize_after=" + ff1.length());
+                }
+                */
+
+                long new_len = ff1.length();
+                int quality = 70;
+                int max_width = 800;
+                java.io.File ff2 = null;
+                while (new_len > 36500)
+                {
+                    ff2 = new Compressor(c).setMaxWidth(max_width).setQuality(quality).compressToFile(ff1);
+                    new_len = ff2.length();
+                    Log.i(TAG, "fsize_after=" + new_len + " " + quality + " " + max_width + " " + ff2.getAbsolutePath());
+                    quality = quality - 10;
+                    if (quality < 3)
+                    {
+                        try
+                        {
+                            io_file_copy(ff2, ff1);
+                            Log.i(TAG, "file copied:BREAK");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.i(TAG, "file copy error:EE003:BREAK" + e.getMessage());
+                        }
+                        try
+                        {
+                            ff2.delete();
+                            Log.i(TAG, "temp file deleted:001:BREAK");
+                        }
+                        catch (Exception e2)
+                        {
+                        }
+                        break;
+                    }
+
+                    if (max_width > 80)
+                    {
+                        max_width = max_width - 20;
+                    }
+
+                    if (new_len <= 36500)
+                    {
+                        try
+                        {
+                            io_file_copy(ff2, ff1);
+                            Log.i(TAG, "file copied");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.i(TAG, "file copy error:EE003" + e.getMessage());
+                        }
+                        try
+                        {
+                            ff2.delete();
+                            Log.i(TAG, "temp file deleted:001");
+                        }
+                        catch (Exception e2)
+                        {
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            ff2.delete();
+                            Log.i(TAG, "temp file deleted:002");
+                        }
+                        catch (Exception e2)
+                        {
+                        }
+                    }
+                }
+
+                Log.i(TAG, "fsize_after:END=" + ff1.length() + " " + ff1.getAbsolutePath());
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "compressToFile:EE003:" + e.getMessage());
+                e.printStackTrace();
+            }
+            // reducing the file size down to hopefully 37kbytes -------------------
+
+            Log.i(TAG, "add_outgoing_file:001");
+
+            // add FT message to UI
+            GroupMessage m = new GroupMessage();
+            m.is_new = false; // own messages are always "not new"
+            m.tox_group_peer_pubkey = tox_group_self_get_public_key(
+                    tox_group_by_groupid__wrapper(groupid)).toUpperCase();
+            m.direction = 1; // msg sent
+            m.TOX_MESSAGE_TYPE = 0;
+            m.read = true; // !!!! there is not "read status" with conferences in Tox !!!!
+            m.tox_group_peername = null;
+            m.private_message = 0;
+            m.group_identifier = groupid.toLowerCase();
+            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
+            m.sent_timestamp = System.currentTimeMillis();
+            m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
+            m.text = ofw.filename_wrapped + "\n" + ofw.file_size_wrapped + " bytes";
+            m.was_synced = false;
+            m.filename_fullpath = new java.io.File(ofw.filepath_wrapped + "/" + ofw.filename_wrapped).getAbsolutePath();
+            m.storage_frame_work = false;
+            try
+            {
+                m.filesize = new java.io.File(ofw.filepath_wrapped + "/" + ofw.filename_wrapped).length();
+            }
+            catch (Exception ee)
+            {
+                m.filesize = 0;
+            }
+
+            ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+            MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
+            m.msg_id_hash = bytebuffer_to_hexstring(hash_bytes, true);
+            m.message_id_tox = "";
+            insert_into_group_message_db(m, true);
+            Log.i(TAG, "add_outgoing_file:090");
+
+            // now send the file to the group as custom package ----------
+            send_group_image(m);
+            // now send the file to the group as custom package ----------
+        }
+        else
+        {
+            // HINT: should never get here, since ngc has max filesize of about 37kbytes only
+        }
+    }
+
+    static void show_messagelist_for_id(Context c, String id, String fill_out_text)
+    {
+        Intent intent = new Intent(c, GroupMessageListActivity.class);
+        if (fill_out_text != null)
+        {
+            intent.putExtra("fillouttext", fill_out_text);
+        }
+        intent.putExtra("group_id", id);
+        c.startActivity(intent);
     }
 
     public void scroll_to_bottom(View v)

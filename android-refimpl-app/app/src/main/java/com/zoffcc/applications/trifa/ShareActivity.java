@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.add_attachment_ngc;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.filter_out_non_hex_chars;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_file_sharing_to_trifa_via_intent;
@@ -94,6 +95,7 @@ public class ShareActivity extends AppCompatActivity
                 {
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
                     intent_friend_selection.putExtra("offline", 1);
+                    intent_friend_selection.putExtra("ngc_groups", 1);
                     startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
                 }
             }
@@ -183,7 +185,7 @@ public class ShareActivity extends AppCompatActivity
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        // Log.i(TAG, "onActivityResult:intent=" + data);
+        Log.i(TAG, "onActivityResult:intent=" + data);
         if (requestCode == SelectFriendSingleActivity_ID)
         {
             if (resultCode == RESULT_OK)
@@ -191,9 +193,21 @@ public class ShareActivity extends AppCompatActivity
                 try
                 {
                     String result_friend_pubkey = data.getData().toString();
+                    Log.i(TAG, "onActivityResult:result_friend_pubkey=" + result_friend_pubkey);
                     if (result_friend_pubkey != null)
                     {
-                        if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)
+                        if (result_friend_pubkey.length() <= 2)
+                        {
+                            Log.i(TAG, "onActivityResult:result_friend_pubkey.length()=" + result_friend_pubkey.length());
+                            return;
+                        }
+
+                        int item_type = Integer.parseInt(result_friend_pubkey.substring(0, 1));
+                        String item_id = result_friend_pubkey.substring(2);
+
+                        Log.i(TAG,"item_type=" + item_type + " item_id="+item_id.length()+ " "+item_id);
+
+                        if ((item_id.length() == TOX_PUBLIC_KEY_SIZE * 2) && (item_type == 0))
                         {
                             // Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey + " intent=" +
                             //            intent);
@@ -202,11 +216,11 @@ public class ShareActivity extends AppCompatActivity
                             {
                                 if ("text/plain".equals(type))
                                 {
-                                    handleSendText(intent, result_friend_pubkey);
+                                    handleSendText(intent, item_id);
                                 }
                                 else
                                 {
-                                    handleSendImage(intent, result_friend_pubkey);
+                                    handleSendImage(intent, item_id);
                                 }
                                 return;
                             }
@@ -214,19 +228,36 @@ public class ShareActivity extends AppCompatActivity
                             {
                                 if (type.startsWith("image/"))
                                 {
-                                    handleSendMultipleImages(intent, result_friend_pubkey);
+                                    handleSendMultipleImages(intent, item_id);
                                 }
                                 else
                                 {
-                                    handleSendMultipleImages(intent, result_friend_pubkey);
+                                    handleSendMultipleImages(intent, item_id);
+                                }
+                                return;
+                            }
+                        }
+                        else if (item_type == 2)
+                        {
+                            if (Intent.ACTION_SEND.equals(action) && type != null)
+                            {
+                                if ("text/plain".equals(type))
+                                {
+                                    // TODO: write me
+                                }
+                                else
+                                {
+                                    handleSendImage(intent, item_id, 2);
                                 }
                                 return;
                             }
                         }
                     }
                 }
-                catch (Exception ignored)
+                catch (Exception e)
                 {
+                    Log.i(TAG, "EE03:"+ e.getMessage());
+                    e.printStackTrace();
                 }
             }
         }
@@ -268,14 +299,27 @@ public class ShareActivity extends AppCompatActivity
 
     void handleSendImage(Intent intent, String friend_pubkey)
     {
+        handleSendImage(intent, friend_pubkey, 0);
+    }
+
+    void handleSendImage(Intent intent, String id, int type)
+    {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
         if (imageUri != null)
         {
             Intent intent_fixup = new Intent();
             intent_fixup.setData(imageUri);
-            // Intent { dat=content://com.android.providers.media.documents/document/image:12345 flg=0x43 }
-            add_attachment(this, intent_fixup, intent, tox_friend_by_public_key__wrapper(friend_pubkey), false);
-            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey, null);
+            if (type == 0)
+            {
+                // Intent { dat=content://com.android.providers.media.documents/document/image:12345 flg=0x43 }
+                add_attachment(this, intent_fixup, intent, tox_friend_by_public_key__wrapper(id), false);
+                MessageListActivity.show_messagelist_for_friend(this, id, null);
+            }
+            else if (type == 2)
+            {
+                add_attachment_ngc(this, intent_fixup, intent, id, false);
+                GroupMessageListActivity.show_messagelist_for_id(this, id, null);
+            }
             // close this share activity
             this.finish();
         }

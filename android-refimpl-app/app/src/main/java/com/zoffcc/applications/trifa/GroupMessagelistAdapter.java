@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 
 public class GroupMessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
@@ -76,6 +77,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                                                                             false);
                 }
                 return new GroupMessageListHolder_text_incoming_not_read(view, this.context);
+
             case Message_model.TEXT_INCOMING_HAVE_READ:
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
@@ -85,7 +87,6 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
-                //return new ConferenceMessageListHolder_text_incoming_read(view, this.context);
                 return new GroupMessageListHolder_error(view, this.context);
 
             case Message_model.TEXT_OUTGOING_NOT_READ:
@@ -97,8 +98,8 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
-                // return new ConferenceMessageListHolder_text_outgoing_not_read(view, this.context);
                 return new GroupMessageListHolder_error(view, this.context);
+
             case Message_model.TEXT_OUTGOING_HAVE_READ:
                 if (PREF__compact_chatlist)
                 {
@@ -112,6 +113,31 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                 }
                 return new GroupMessageListHolder_text_outgoing_read(view, this.context);
 
+            case Message_model.FILE_INCOMING_STATE_CANCEL:
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent,
+                                                                            false);
+                }
+                return new GroupMessageListHolder_file_incoming_state_cancel(view, this.context);
+
+            case Message_model.FILE_OUTGOING_STATE_CANCEL:
+                if (PREF__compact_chatlist)
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing_compact,
+                                                                            parent, false);
+                }
+                else
+                {
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent,
+                                                                            false);
+                }
+                return new GroupMessageListHolder_file_outgoing_state_cancel(view, this.context);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_error, parent, false);
@@ -122,44 +148,65 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     public int getItemViewType(int position)
     {
         GroupMessage my_msg = this.messagelistitems.get(position);
-
         {
-            // TEXT -------------
-            if (my_msg.direction == 0)
+            if (my_msg.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
             {
-                // msg to me
-                if (my_msg.read)
+                // FILE -------------
+                if (my_msg.direction == 0)
                 {
-                    // has read ***NOT USED***
-                    // Log.i(TAG, "Message_model.TEXT_INCOMING_HAVE_READ");
-                    return Message_model.TEXT_INCOMING_HAVE_READ;
+                    // incoming file -----------
+                    // ------- STATE: CANCEL -------------
+                    return Message_model.FILE_INCOMING_STATE_CANCEL;
+                    // ------- STATE: CANCEL -------------
                 }
                 else
                 {
-                    // not yet read
-                    // Log.i(TAG, "Message_model.TEXT_INCOMING_NOT_READ");
-                    return Message_model.TEXT_INCOMING_NOT_READ;
+                    // outgoing file -----------
+                    // ------- STATE: CANCEL -------------
+                    return Message_model.FILE_OUTGOING_STATE_CANCEL;
+                    // ------- STATE: CANCEL -------------
                 }
-                // msg to me
+                // FILE -------------
             }
             else
             {
-                // msg from me
-                if (my_msg.read)
+                // TEXT -------------
+                if (my_msg.direction == 0)
                 {
-                    // has read
-                    // Log.i(TAG, "Message_model.TEXT_OUTGOING_HAVE_READ");
-                    return Message_model.TEXT_OUTGOING_HAVE_READ;
+                    // msg to me
+                    if (my_msg.read)
+                    {
+                        // has read ***NOT USED***
+                        // Log.i(TAG, "Message_model.TEXT_INCOMING_HAVE_READ");
+                        return Message_model.TEXT_INCOMING_HAVE_READ;
+                    }
+                    else
+                    {
+                        // not yet read
+                        // Log.i(TAG, "Message_model.TEXT_INCOMING_NOT_READ");
+                        return Message_model.TEXT_INCOMING_NOT_READ;
+                    }
+                    // msg to me
                 }
                 else
                 {
-                    // not yet read ***NOT USED***
-                    // Log.i(TAG, "Message_model.TEXT_OUTGOING_NOT_READ");
-                    return Message_model.TEXT_OUTGOING_NOT_READ;
+                    // msg from me
+                    if (my_msg.read)
+                    {
+                        // has read
+                        // Log.i(TAG, "Message_model.TEXT_OUTGOING_HAVE_READ");
+                        return Message_model.TEXT_OUTGOING_HAVE_READ;
+                    }
+                    else
+                    {
+                        // not yet read ***NOT USED***
+                        // Log.i(TAG, "Message_model.TEXT_OUTGOING_NOT_READ");
+                        return Message_model.TEXT_OUTGOING_NOT_READ;
+                    }
+                    // msg from me
                 }
-                // msg from me
+                // TEXT -------------
             }
-            // TEXT -------------
         }
 
         // return Message_model.ERROR_UNKNOWN;
@@ -196,6 +243,14 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                     break;
                 case Message_model.TEXT_OUTGOING_HAVE_READ:
                     ((GroupMessageListHolder_text_outgoing_read) holder).bindMessageList(m2);
+                    break;
+
+                case Message_model.FILE_INCOMING_STATE_CANCEL:
+                    ((GroupMessageListHolder_file_incoming_state_cancel) holder).bindMessageList(m2);
+                    break;
+
+                case Message_model.FILE_OUTGOING_STATE_CANCEL:
+                    ((GroupMessageListHolder_file_outgoing_state_cancel) holder).bindMessageList(m2);
                     break;
 
                 default:

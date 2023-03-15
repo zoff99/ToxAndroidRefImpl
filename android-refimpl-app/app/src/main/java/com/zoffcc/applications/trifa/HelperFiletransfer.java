@@ -66,6 +66,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_ANYK
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
@@ -1249,6 +1250,32 @@ public class HelperFiletransfer
         {
             e.printStackTrace();
             display_toast("opening outgoing file failed", false, 0);
+        }
+    }
+
+    static void save_group_incoming_file(String file_path_name, String file_name, byte[] data, long buffer_offset, long write_bytes)
+    {
+        try
+        {
+            if (buffer_offset >= 2100000L)
+            {
+                return;
+            }
+            if (write_bytes >= 2100000L)
+            {
+                return;
+            }
+
+            info.guardianproject.iocipher.File outfile = new info.guardianproject.iocipher.File(file_path_name + "/" + file_name);
+            info.guardianproject.iocipher.FileOutputStream outputStream = new info.guardianproject.iocipher.FileOutputStream(outfile);
+            outputStream.write(data, (int)buffer_offset, (int)write_bytes);
+            outputStream.flush();
+            outputStream.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "save_group_incoming_file:EE");
         }
     }
 }

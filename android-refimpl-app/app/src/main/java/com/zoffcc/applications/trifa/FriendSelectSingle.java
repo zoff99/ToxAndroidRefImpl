@@ -23,18 +23,30 @@ public class FriendSelectSingle
 {
     String name;
     String pubkey;
+    int type;
+
+    public FriendSelectSingle(String name, String pubkey, int type)
+    {
+        this.name = name;
+        this.pubkey = pubkey;
+        this.type = type; // 0 -> friend, 2 -> ngc group
+    }
 
     public FriendSelectSingle(String name, String pubkey)
     {
         this.name = name;
         this.pubkey = pubkey;
+        this.type = 0; // 0 -> friend, 2 -> ngc group
     }
 
     public String getName()
     {
         return name;
     }
-
+    public int getType()
+    {
+        return type;
+    }
     public String getPK()
     {
         return pubkey;

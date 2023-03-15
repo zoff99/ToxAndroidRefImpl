@@ -23,7 +23,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 
+import com.zoffcc.applications.nativeaudio.NativeAudio;
+
+import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -43,6 +48,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
@@ -920,6 +926,115 @@ public class HelperGroup
         {
             change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
         }
+    }
+
+    static void send_group_image(final GroupMessage g)
+    {
+        // @formatter:off
+        /*
+           40000 max bytes length for custom lossless NGC packets.
+           37000 max bytes length for file and header, to leave some space for offline message syncing.
+
+        | what      | Length in bytes| Contents                                           |
+        |------     |--------        |------------------                                  |
+        | magic     |       6        |  0x667788113435                                    |
+        | version   |       1        |  0x01                                              |
+        | pkt id    |       1        |  0x11                                              |
+        | msg id    |      32        | *uint8_t  to uniquely identify the message         |
+        | create ts |       4        |  uint32_t unixtimestamp in UTC of local wall clock |
+        | filename  |     255        |  len TOX_MAX_FILENAME_LENGTH                       |
+        |           |                |      data first, then pad with NULL bytes          |
+        | data      |[1, 1334]       |  bytes of file data, zero length files not allowed!|
+
+
+        header size: 299 bytes
+        data   size: 1 - 36701 bytes
+         */
+        // @formatter:on
+
+        final long header = 6 + 1 + 1 + 32 + 4 + 255;
+        long data_length = header + g.filesize;
+
+        if ((data_length > 37000L) || (data_length < (header + 1)))
+        {
+            Log.i(TAG, "send_group_image: data length has wrong size: " + data_length);
+            return;
+        }
+
+        ByteBuffer data_buf = ByteBuffer.allocateDirect((int)data_length);
+
+        data_buf.rewind();
+        //
+        data_buf.put((byte)0x66);
+        data_buf.put((byte)0x77);
+        data_buf.put((byte)0x88);
+        data_buf.put((byte)0x11);
+        data_buf.put((byte)0x34);
+        data_buf.put((byte)0x35);
+        //
+        data_buf.put((byte)0x01);
+        //
+        data_buf.put((byte)0x11);
+        //
+        data_buf.put(HelperGeneric.hex_to_bytes(g.msg_id_hash));
+        //
+        // TODO: write actual timestamp into buffer
+        data_buf.put((byte)0x0);
+        data_buf.put((byte)0x0);
+        data_buf.put((byte)0x0);
+        data_buf.put((byte)0x0);
+        //
+        byte[] fn = "image.jpg".getBytes(StandardCharsets.UTF_8);
+        data_buf.put(fn);
+        for (int k=0;k<(255 - fn.length);k++)
+        {
+            // fill with null bytes up to 255 for the filename
+            data_buf.put((byte) 0x0);
+        }
+        // -- now fill the data from file --
+        java.io.File img_file = new java.io.File(g.filename_fullpath);
+
+
+
+
+        long length_sum = 0;
+        java.io.FileInputStream is = null;
+        try
+        {
+            is = new java.io.FileInputStream(img_file);
+            byte[] buffer = new byte[1024];
+            int length;
+
+            while ((length = is.read(buffer)) > 0)
+            {
+                data_buf.put(buffer, 0, length);
+                length_sum = length_sum + length;
+                Log.i(TAG,"put " + length + " bytes into buffer");
+            }
+        }
+        catch(Exception e)
+        {
+        }
+        finally
+        {
+            try
+            {
+                is.close();
+            }
+            catch(Exception e2)
+            {
+            }
+        }
+        Log.i(TAG,"put " + length_sum + " bytes TOTAL into buffer, and should match " + g.filesize);
+        // -- now fill the data from file --
+
+        byte[] data = new byte[(int)data_length];
+        data_buf.rewind();
+        data_buf.get(data);
+        tox_group_send_custom_packet(tox_group_by_groupid__wrapper(g.group_identifier),
+                                     1,
+                                     data,
+                                     (int)data_length);
     }
 
     static void do_join_public_group(Intent data)

@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,6 +53,13 @@ public class FriendSelectSingleActivity extends ListActivity
             also_offline_friends = extras.getInt("offline", 0);
         }
 
+        int also_ngc_groups = 0;
+        if (extras != null)
+        {
+            also_ngc_groups = extras.getInt("ngc_groups", 0);
+        }
+        Log.i(TAG, "onCreate:also_ngc_groups=" + also_ngc_groups);
+
         List<FriendList> fl = null;
         try
         {
@@ -75,21 +83,42 @@ public class FriendSelectSingleActivity extends ListActivity
                         toList();
             }
 
-            if (fl == null)
+            if (also_ngc_groups == 0)
             {
-                this.finish();
-            }
+                if (fl == null)
+                {
+                    this.finish();
+                }
 
-            if (fl.size() < 1)
-            {
-                this.finish();
+                if (fl.size() < 1)
+                {
+                    this.finish();
+                }
             }
-
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            this.finish();
+            if (also_ngc_groups == 0)
+            {
+                this.finish();
+            }
+        }
+
+        List<GroupDB> gr = null;
+        if (also_ngc_groups == 1)
+        {
+            try
+            {
+                gr = orma.selectFromGroupDB().
+                        orderByNotification_silentAsc().
+                        orderByNameAsc().
+                        toList();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
 
         try
@@ -102,8 +131,16 @@ public class FriendSelectSingleActivity extends ListActivity
 
         try
         {
+            Log.i(TAG, "onCreate:002:gr.size()=" + gr.size());
+        }
+        catch (Exception ignored)
+        {
+        }
 
+        try
+        {
             friends_list = new ArrayList<>();
+
             for (FriendList f : fl)
             {
                 if (f.alias_name == null)
@@ -119,6 +156,19 @@ public class FriendSelectSingleActivity extends ListActivity
                     friends_list.add(new FriendSelectSingle(f.alias_name, f.tox_public_key_string));
                 }
             }
+
+            try
+            {
+                for (GroupDB g : gr)
+                {
+                    friends_list.add(new FriendSelectSingle("NGC Group: " + g.name, g.group_identifier, 2));
+                }
+            }
+            catch(Exception e)
+            {
+                Log.i(TAG, "onCreate:EE001:add:gr:" +e.getMessage());
+            }
+
             FriendSelectSingleAdapter adapter = new FriendSelectSingleAdapter(this,
                                                                               R.layout.friend_select_single_single_list_item_view_custom,
                                                                               friends_list);
@@ -130,12 +180,18 @@ public class FriendSelectSingleActivity extends ListActivity
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id)
                 {
                     Intent data = new Intent();
-                    String return_friend_pubkey = null;
-
                     try
                     {
-                        return_friend_pubkey = friends_list.get((int) id).pubkey;
-                        data.setData(Uri.parse(return_friend_pubkey));
+                        if (friends_list.get((int) id).getType() == 0)
+                        {
+                            String return_friend_pubkey = "0:" + friends_list.get((int) id).pubkey;
+                            data.setData(Uri.parse(return_friend_pubkey));
+                        }
+                        else if (friends_list.get((int) id).getType() == 2)
+                        {
+                            String return_ngc_id = "2:" + friends_list.get((int) id).pubkey;
+                            data.setData(Uri.parse(return_ngc_id));
+                        }
                         setResult(RESULT_OK, data);
                     }
                     catch (Exception e3)

@@ -4701,4 +4701,47 @@ public class HelperGeneric
         }
         Log.i(TAG, "stop_audio_system:DONE");
     }
+
+    static public File saveBitmapToFile(File file, final int REQUIRED_SIZE)
+    {
+        try {
+
+            // BitmapFactory options to downsize the image
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            o.inSampleSize = 6;
+            // factor of downsizing the image
+
+            java.io.FileInputStream inputStream = new java.io.FileInputStream(file);
+            BitmapFactory.decodeStream(inputStream, null, o);
+            inputStream.close();
+
+            // Find the correct scale value. It should be the power of 2.
+            int scale = 1;
+            while(o.outWidth / scale / 2 >= REQUIRED_SIZE &&
+                  o.outHeight / scale / 2 >= REQUIRED_SIZE)
+            {
+                scale *= 2;
+            }
+
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            inputStream = new java.io.FileInputStream(file);
+
+            Bitmap selectedBitmap = BitmapFactory.decodeStream(inputStream, null, o2);
+            inputStream.close();
+
+            // here i override the original image file
+            file.createNewFile();
+            java.io.FileOutputStream outputStream = new java.io.FileOutputStream(file);
+
+            selectedBitmap.compress(Bitmap.CompressFormat.JPEG, 80 , outputStream);
+
+            return file;
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
 }
