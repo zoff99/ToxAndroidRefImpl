@@ -216,24 +216,24 @@ static float audio_out_vu_value = 0.0f;
 
 // engine interfaces
 static SLObjectItf engineObject = NULL;
-static SLEngineItf engineEngine;
+static SLEngineItf engineEngine = NULL;
 
 // output mix interfaces
 static SLObjectItf outputMixObject = NULL;
 
 // buffer queue player interfaces
 static SLObjectItf bqPlayerObject = NULL;
-static SLPlayItf bqPlayerPlay;
-static SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue;
-static SLEffectSendItf bqPlayerEffectSend;
-static SLMuteSoloItf bqPlayerMuteSolo;
-static SLVolumeItf bqPlayerVolume;
+static SLPlayItf bqPlayerPlay = NULL;
+static SLAndroidSimpleBufferQueueItf bqPlayerBufferQueue = NULL;
+static SLEffectSendItf bqPlayerEffectSend = NULL;
+static SLMuteSoloItf bqPlayerMuteSolo = NULL;
+static SLVolumeItf bqPlayerVolume = NULL;
 static SLmilliHertz bqPlayerSampleRate = 0;
 
 // recorder interfaces
 static SLObjectItf recorderObject = NULL;
-static SLRecordItf recorderRecord;
-static SLAndroidSimpleBufferQueueItf recorderBufferQueue;
+static SLRecordItf recorderRecord = NULL;
+static SLAndroidSimpleBufferQueueItf recorderBufferQueue = NULL;
 
 
 // ----- function defs ------
@@ -666,8 +666,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                                                                                        jint eac_delay_ms)
 {
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "createBufferQueueAudioPlayer:start:engineEngine=%p",
-                        (const void *) engineEngine);
+                        "createBufferQueueAudioPlayer:start:engineEngine");
 
     SLresult result;
     if (sampleRate >= 0)
