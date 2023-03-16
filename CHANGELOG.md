@@ -1,5 +1,26 @@
 # Changelog
 
+## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.195...HEAD)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#399](https://github.com/zoff99/ToxAndroidRefImpl/pull/399) ([weblate](https://github.com/weblate))
+
+## [1.0.195](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.195) (2023-02-09)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.194...1.0.195)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#398](https://github.com/zoff99/ToxAndroidRefImpl/pull/398) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#397](https://github.com/zoff99/ToxAndroidRefImpl/pull/397) ([weblate](https://github.com/weblate))
+
+## [1.0.194](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.194) (2023-02-04)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.193...1.0.194)
+
 ## [1.0.193](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.193) (2023-02-04)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.192...1.0.193)
@@ -827,7 +848,6 @@
 **Merged pull requests:**
 
 - Translations update from Weblate [\#204](https://github.com/zoff99/ToxAndroidRefImpl/pull/204) ([weblate](https://github.com/weblate))
-- Translations update from Weblate [\#203](https://github.com/zoff99/ToxAndroidRefImpl/pull/203) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#202](https://github.com/zoff99/ToxAndroidRefImpl/pull/202) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#201](https://github.com/zoff99/ToxAndroidRefImpl/pull/201) ([weblate](https://github.com/weblate))
 
@@ -872,6 +892,7 @@
 
 **Merged pull requests:**
 
+- Translations update from Weblate [\#203](https://github.com/zoff99/ToxAndroidRefImpl/pull/203) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#195](https://github.com/zoff99/ToxAndroidRefImpl/pull/195) ([weblate](https://github.com/weblate))
 - Translations update from Weblate [\#194](https://github.com/zoff99/ToxAndroidRefImpl/pull/194) ([weblate](https://github.com/weblate))
 
