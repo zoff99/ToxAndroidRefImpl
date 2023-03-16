@@ -59,6 +59,9 @@ public class ToxVars
     public static final int TOX_MSGV3_GUARD = 2;
     public static final int TOX_MSGV3_MAX_MESSAGE_LENGTH = (TOX_MAX_MESSAGE_LENGTH - TOX_MSGV3_MSGID_LENGTH -
                                                             TOX_MSGV3_TIMESTAMP_LENGTH - TOX_MSGV3_GUARD);
+
+    public static final int TOX_MAX_NGC_FILESIZE = 36701;
+    public static final int TOX_MAX_NGC_FILE_AND_HEADER_SIZE = 37000;
     // TODO: get these with the appropriate JNI functions!
     // ------ global defines ------
     // ------ global defines ------

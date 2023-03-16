@@ -64,6 +64,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_fo
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILENAME_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_FILE_AND_HEADER_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperGroup
@@ -953,7 +954,7 @@ public class HelperGroup
         | create ts |       4        |  uint32_t unixtimestamp in UTC of local wall clock |
         | filename  |     255        |  len TOX_MAX_FILENAME_LENGTH                       |
         |           |                |      data first, then pad with NULL bytes          |
-        | data      |[1, 1334]       |  bytes of file data, zero length files not allowed!|
+        | data      |[1, 36701]      |  bytes of file data, zero length files not allowed!|
 
 
         header size: 299 bytes
@@ -964,7 +965,7 @@ public class HelperGroup
         final long header = 6 + 1 + 1 + 32 + 4 + 255;
         long data_length = header + g.filesize;
 
-        if ((data_length > 37000L) || (data_length < (header + 1)))
+        if ((data_length > TOX_MAX_NGC_FILE_AND_HEADER_SIZE) || (data_length < (header + 1)))
         {
             Log.i(TAG, "send_group_image: data length has wrong size: " + data_length);
             return;

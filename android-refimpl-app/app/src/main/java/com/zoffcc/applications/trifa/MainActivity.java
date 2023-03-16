@@ -266,6 +266,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_FILE_AND_HEADER_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_AWAY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_BUSY;
@@ -7141,7 +7142,7 @@ public class MainActivity extends AppCompatActivity
 
         // check for correct signature of packets
         final long header = 6 + 1 + 1 + 32 + 4 + 255;
-        if ((length > 37000L) || (length < (header + 1)))
+        if ((length > TOX_MAX_NGC_FILE_AND_HEADER_SIZE) || (length < (header + 1)))
         {
             Log.i(TAG, "group_custom_packet_cb: data length has wrong size: " + length);
             return;

@@ -115,6 +115,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MS
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_FILESIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
@@ -1411,7 +1412,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 int quality = 70;
                 int max_width = 800;
                 java.io.File ff2 = null;
-                while (new_len > 36500)
+                while (new_len > TOX_MAX_NGC_FILESIZE)
                 {
                     ff2 = new Compressor(c).
                             setMaxWidth(max_width).
@@ -1448,7 +1449,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                         max_width = max_width - 20;
                     }
 
-                    if (new_len <= 36500)
+                    if (new_len <= TOX_MAX_NGC_FILESIZE)
                     {
                         try
                         {
