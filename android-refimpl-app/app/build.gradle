@@ -33,7 +33,7 @@ def getGitHash = { ->
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
     compileOptions.encoding = 'UTF-8'
     // generatedDensities = []
@@ -368,14 +368,13 @@ dependencies {
     //
     //
     //
-    //noinspection GradleCompatible
-    implementation 'androidx.collection:collection:1.1.0'
-    implementation 'androidx.core:core:1.6.0'
-    implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'androidx.fragment:fragment:1.4.1'
+    implementation 'androidx.collection:collection:1.2.0'
+    implementation 'androidx.core:core:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.fragment:fragment:1.5.5'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'com.google.android.material:material:1.4.0'
-    implementation 'androidx.recyclerview:recyclerview:1.2.1'
+    implementation 'com.google.android.material:material:1.8.0'
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.multidex:multidex:2.0.1'
