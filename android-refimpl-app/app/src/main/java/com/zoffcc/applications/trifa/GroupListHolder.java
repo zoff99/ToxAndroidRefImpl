@@ -39,8 +39,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.delete_group;
+import static com.zoffcc.applications.trifa.HelperGroup.delete_group_all_files;
 import static com.zoffcc.applications.trifa.HelperGroup.delete_group_all_messages;
 import static com.zoffcc.applications.trifa.HelperGroup.group_identifier_short;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
@@ -405,6 +407,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                 }
 
                 Log.i(TAG, "onMenuItemClick:info:33");
+                delete_group_all_files(f2.group_identifier);
                 delete_group_all_messages(f2.group_identifier);
                 delete_group(f2.group_identifier);
                 Log.i(TAG, "onMenuItemClick:info:34");

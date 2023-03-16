@@ -508,6 +508,8 @@ public class MainActivity extends AppCompatActivity
     static List<Long> selected_messages_incoming_file = new ArrayList<Long>();
     static List<Long> selected_conference_messages = new ArrayList<Long>();
     static List<Long> selected_group_messages = new ArrayList<Long>();
+    static List<Long> selected_group_messages_text_only = new ArrayList<Long>();
+    static List<Long> selected_group_messages_incoming_file = new ArrayList<Long>();
     //
     // YUV conversion -------
     static ScriptIntrinsicYuvToRGB yuvToRgb = null;
@@ -8151,6 +8153,62 @@ public class MainActivity extends AppCompatActivity
                     long mid = (Long) i.next();
                     final GroupMessage m_to_delete = orma.selectFromGroupMessage().idEq(mid).get(0);
 
+                    // ---------- delete file if this message is an outgoing file ----------
+                    if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                    {
+                        if (m_to_delete.direction == 1)
+                        {
+                            try
+                            {
+                                // cleanup duplicated outgoing files from provider here ************
+                                if (m_to_delete.storage_frame_work == false)
+                                {
+                                    if (m_to_delete.filename_fullpath.startsWith(SD_CARD_FILES_OUTGOING_WRAPPER_DIR))
+                                    {
+                                        // HINT: real file (no storage framework) and correct directory, delete the file now
+                                        try
+                                        {
+                                            new File(m_to_delete.filename_fullpath).delete();
+                                        }
+                                        catch (Exception e)
+                                        {
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                                Log.i(TAG, "delete_selected_messages_asynchtask:EE4:" + e.getMessage());
+                            }
+                        }
+                    }
+                    // ---------- delete file if this message is an outgoing file ----------
+
+                    // ---------- delete VFS file if this message is an incoming file ----------
+                    if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                    {
+                        if (m_to_delete.direction == 0)
+                        {
+                            try
+                            {
+                                info.guardianproject.iocipher.File f_vfs = new info.guardianproject.iocipher.File(
+                                        m_to_delete.path_name + "/" + m_to_delete.file_name);
+
+                                if (f_vfs.exists())
+                                {
+                                    f_vfs.delete();
+                                }
+                            }
+                            catch (Exception e6)
+                            {
+                                e6.printStackTrace();
+                                Log.i(TAG, "delete_selected_messages_asynchtask:EE5:" + e6.getMessage());
+                            }
+                        }
+                    }
+                    // ---------- delete VFS file if this message is an incoming file ----------
+
                     // ---------- delete the message itself ----------
                     try
                     {
@@ -8196,7 +8254,7 @@ public class MainActivity extends AppCompatActivity
                             }
 
                             // let message delete animation finish (maybe use yet another asynctask here?) ------------
-                            orma.deleteFromConferenceMessage().idEq(message_id_to_delete).execute();
+                            orma.deleteFromGroupMessage().idEq(message_id_to_delete).execute();
                         }
                         catch (Exception e)
                         {

@@ -40,6 +40,8 @@ import static com.zoffcc.applications.trifa.HelperMessage.show_select_group_mess
 import static com.zoffcc.applications.trifa.HelperMessage.show_select_message_info;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
@@ -147,7 +149,17 @@ public class ToolbarActionMode implements ActionMode.Callback
             case R.id.action_save:
                 action_active = true;
                 // Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show(); // Show toast
-                save_selected_messages(context);
+                if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
+                {
+                    // normal chat view
+                    save_selected_messages(context);
+                }
+                else
+                {
+                    // group chat view
+                    // TODO: write me
+                }
+
                 mode.finish(); // Finish action mode
                 break;
 
@@ -188,6 +200,8 @@ public class ToolbarActionMode implements ActionMode.Callback
                 selected_conference_messages.clear();
 
                 selected_group_messages.clear();
+                selected_group_messages_incoming_file.clear();
+                selected_group_messages_text_only.clear();
 
                 selected_messages.clear();
                 selected_messages_incoming_file.clear();

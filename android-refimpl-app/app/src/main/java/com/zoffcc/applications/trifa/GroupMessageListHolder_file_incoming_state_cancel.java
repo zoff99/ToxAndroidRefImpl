@@ -63,7 +63,10 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
+import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE_FT_NORMAL;
@@ -165,12 +168,32 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         }
 
         is_selected = false;
+        if (selected_group_messages.isEmpty())
+        {
+            is_selected = false;
+        }
+        else
+        {
+            is_selected = selected_group_messages.contains(m.id);
+        }
+
+        if (is_selected)
+        {
+            layout_message_container.setBackgroundColor(Color.GRAY);
+        }
+        else
+        {
+            layout_message_container.setBackgroundColor(Color.TRANSPARENT);
+        }
 
         resize_viewgroup(ft_preview_container, 150);
         resize_view(ft_preview_image, 150);
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
+
+        layout_message_container.setOnClickListener(onclick_listener);
+        layout_message_container.setOnLongClickListener(onlongclick_listener);
 
         date_time.setText(long_date_time_format(m.rcvd_timestamp));
 
@@ -409,6 +432,28 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         // Log.i(TAG, "onLongClick");
         return true;
     }
+
+    private View.OnClickListener onclick_listener = new View.OnClickListener()
+    {
+        @Override
+        public void onClick(final View v)
+        {
+            is_selected = GroupMessageListActivity.onClick_message_helper(v, is_selected, message_);
+        }
+    };
+
+    private View.OnLongClickListener onlongclick_listener = new View.OnLongClickListener()
+    {
+        @Override
+        public boolean onLongClick(final View v)
+        {
+            GroupMessageListActivity.long_click_message_return res =
+                    GroupMessageListActivity.onLongClick_message_helper(context, v, is_selected,
+                                                                                           message_);
+            is_selected = res.is_selected;
+            return res.ret_value;
+        }
+    };
 
     private void resize_viewgroup(ViewGroup vg, int height_in_dp)
     {

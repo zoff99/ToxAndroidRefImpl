@@ -92,7 +92,13 @@ import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActiv
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
+import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_offline_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
@@ -164,6 +170,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         amode_save_menu_item = null;
         amode_info_menu_item = null;
         selected_group_messages.clear();
+        selected_group_messages_text_only.clear();
+        selected_group_messages_incoming_file.clear();
 
         try
         {
@@ -807,7 +815,6 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
     }
 
-
     static void add_attachment_ngc(Context c, Intent data, Intent orig_intent, String groupid_local, boolean activity_group_num)
     {
         Log.i(TAG, "add_attachment:001");
@@ -979,6 +986,17 @@ public class GroupMessageListActivity extends AppCompatActivity
                 v.setBackgroundColor(Color.TRANSPARENT);
                 is_selected = false;
                 selected_group_messages.remove(message_.id);
+                selected_group_messages_text_only.remove(message_.id);
+                selected_group_messages_incoming_file.remove(message_.id);
+                if (selected_group_messages_incoming_file.size() == selected_group_messages.size())
+                {
+                    amode_save_menu_item.setVisible(true);
+                }
+                else
+                {
+                    amode_save_menu_item.setVisible(false);
+                }
+
                 if (selected_group_messages.size() == 1)
                 {
                     amode_info_menu_item.setVisible(true);
@@ -1008,6 +1026,28 @@ public class GroupMessageListActivity extends AppCompatActivity
                     v.setBackgroundColor(Color.GRAY);
                     is_selected = true;
                     selected_group_messages.add(message_.id);
+
+                    if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_TYPE_TEXT.value)
+                    {
+                        selected_group_messages_text_only.add(message_.id);
+                    }
+                    else if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                    {
+                        if (message_.direction == 0)
+                        {
+                            selected_group_messages_incoming_file.add(message_.id);
+                        }
+                    }
+
+                    if (selected_group_messages_incoming_file.size() == selected_group_messages.size())
+                    {
+                        amode_save_menu_item.setVisible(true);
+                    }
+                    else
+                    {
+                        amode_save_menu_item.setVisible(false);
+                    }
+
 
                     if (selected_group_messages.size() == 1)
                     {
@@ -1056,10 +1096,33 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         amode = MainActivity.group_message_list_activity.startSupportActionMode(
                                 new ToolbarActionMode(context));
+                        amode_save_menu_item = amode.getMenu().findItem(R.id.action_save);
                         amode_info_menu_item = amode.getMenu().findItem(R.id.action_info);
                         v.setBackgroundColor(Color.GRAY);
                         ret.is_selected = true;
                         selected_group_messages.add(message_.id);
+
+                        if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_TYPE_TEXT.value)
+                        {
+                            selected_group_messages_text_only.add(message_.id);
+                        }
+                        else if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                        {
+                            if (message_.direction == 0)
+                            {
+                                selected_group_messages_incoming_file.add(message_.id);
+                            }
+                        }
+
+                        if (selected_group_messages_incoming_file.size() == selected_group_messages.size())
+                        {
+                            amode_save_menu_item.setVisible(true);
+                        }
+                        else
+                        {
+                            amode_save_menu_item.setVisible(false);
+                        }
+
 
                         if (selected_group_messages.size() == 1)
                         {

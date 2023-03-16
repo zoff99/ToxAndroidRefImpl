@@ -29,12 +29,14 @@ import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
+import static com.zoffcc.applications.trifa.HelperConference.delete_selected_group_messages;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.save_group_incoming_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
@@ -44,6 +46,9 @@ import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_h
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
+import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
@@ -54,6 +59,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
@@ -525,6 +531,39 @@ public class HelperGroup
         }
         catch (Exception ignored)
         {
+        }
+    }
+
+    static void delete_group_all_files(final String group_identifier)
+    {
+        try
+        {
+            Iterator<GroupMessage> i1 = orma.selectFromGroupMessage().group_identifierEq(group_identifier.toLowerCase()).
+                    directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
+                    TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
+                    toList().iterator();
+            selected_group_messages.clear();
+            selected_group_messages_text_only.clear();
+            selected_group_messages_incoming_file.clear();
+
+            while (i1.hasNext())
+            {
+                try
+                {
+                    MainActivity.selected_group_messages.add(i1.next().id);
+                    MainActivity.selected_group_messages_incoming_file.add(i1.next().id);
+                }
+                catch (Exception e2)
+                {
+                    e2.printStackTrace();
+                }
+            }
+
+            HelperConference.delete_selected_group_messages(MainActivity.main_activity_s, false, "deleting Messages ...");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
