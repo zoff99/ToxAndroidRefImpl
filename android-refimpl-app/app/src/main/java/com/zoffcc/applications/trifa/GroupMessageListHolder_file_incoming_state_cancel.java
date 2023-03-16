@@ -27,6 +27,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -52,15 +53,21 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_if_incoming_file_was_exported;
+import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
+import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE_FT_NORMAL;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -128,7 +135,10 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
         message_ = m;
 
-        int drawable_id = R.drawable.rounded_orange_bg_with_border;
+        String message__tox_peername = m.tox_group_peername;
+        String message__tox_peerpubkey = m.tox_group_peer_pubkey;
+
+        int drawable_id = R.drawable.rounded_orange_bg;
         try
         {
             final int sdk = android.os.Build.VERSION.SDK_INT;
@@ -188,7 +198,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
             try
             {
                 String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
-                Log.i(TAG, "mimetype=" + mimeType + " " + message.filename_fullpath.toLowerCase());
+                // Log.i(TAG, "mimetype=" + mimeType + " " + message.filename_fullpath.toLowerCase());
                 if (mimeType.startsWith("image/"))
                 {
                     is_image = true;
@@ -287,6 +297,103 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
             ft_preview_container.setVisibility(View.VISIBLE);
             ft_preview_image.setVisibility(View.VISIBLE);
 
+
+        try
+        {
+            String peer_name = tox_group_peer_get_name__wrapper(m.group_identifier, message__tox_peerpubkey);
+
+            if (peer_name == null)
+            {
+                peer_name = message__tox_peername;
+
+                if ((peer_name == null) || (message__tox_peername.equals("")) || (peer_name.equals("-1")))
+                {
+                    peer_name = "Unknown";
+                }
+            }
+            else
+            {
+                if (peer_name.equals("-1"))
+                {
+                    if ((message__tox_peername == null) || (message__tox_peername.equals("")))
+                    {
+                        peer_name = "Unknown";
+                    }
+                    else
+                    {
+                        peer_name = message__tox_peername;
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "bindMessageList:EE:" + e.getMessage());
+        }
+
+
+            textView.setTextColor(Color.BLACK);
+
+        int peer_color_fg = context.getResources().getColor(R.color.colorPrimaryDark);
+        int peer_color_bg = context.getResources().getColor(R.color.material_drawer_background);
+
+        try
+        {
+            if (message__tox_peerpubkey.compareTo("-1") == 0)
+            {
+                peer_color_bg = TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
+            }
+            else
+            {
+                peer_color_bg = ChatColors.get_shade(
+                        ChatColors.PeerAvatarColors[hash_to_bucket(message__tox_peerpubkey, ChatColors.get_size())],
+                        message__tox_peerpubkey);
+            }
+            // peer_color_bg_with_alpha = (peer_color_bg & 0x00FFFFFF) | (alpha_value << 24);
+            textView.setTextColor(Color.BLACK);
+
+            if (isColorDarkBrightness(peer_color_bg))
+            {
+                textView.setTextColor(darkenColor(Color.WHITE, 0.1f));
+                //
+                final int linkcolor_for_other_bg = darkenColor(Color.YELLOW, 0.1f);
+                textView.setMentionModeColor(linkcolor_for_other_bg);
+                textView.setHashtagModeColor(linkcolor_for_other_bg);
+                textView.setUrlModeColor(linkcolor_for_other_bg);
+                textView.setPhoneModeColor(linkcolor_for_other_bg);
+                textView.setEmailModeColor(linkcolor_for_other_bg);
+                textView.setCustomModeColor(linkcolor_for_other_bg);
+                textView.setLinkTextColor(linkcolor_for_other_bg);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+
+        // we need to do the rounded corner background manually here, to change the color ---------------
+        GradientDrawable shape = new GradientDrawable();
+        shape.setShape(GradientDrawable.RECTANGLE);
+        shape.setCornerRadii(
+                new float[]{CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX, CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX});
+        shape.setColor(peer_color_bg);
+        // shape.setStroke(3, borderColor);
+        rounded_bg_container.setBackground(shape);
+        // we need to do the rounded corner background manually here, to change the color ---------------
+
+        final Drawable smiley_face = new IconicsDrawable(context).
+                icon(GoogleMaterial.Icon.gmd_sentiment_satisfied).
+                backgroundColor(peer_color_bg).
+                color(peer_color_fg).sizeDp(70);
+
+        date_time.setVisibility(View.VISIBLE);
+        img_avatar.setVisibility(View.VISIBLE);
+
+        message_text_date.setVisibility(View.GONE);
+
+        img_avatar.setImageDrawable(smiley_face);
         HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
     }
 

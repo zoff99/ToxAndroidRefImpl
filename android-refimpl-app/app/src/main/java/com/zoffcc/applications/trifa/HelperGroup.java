@@ -35,6 +35,9 @@ import androidx.annotation.NonNull;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.save_group_incoming_file;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
@@ -51,10 +54,16 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILENAME_LENGTH;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class HelperGroup
@@ -702,8 +711,8 @@ public class HelperGroup
 
         if (group_message_list_activity != null)
         {
-            Log.i(TAG,
-                  "noti_and_badge:002group:" + group_message_list_activity.get_current_group_id() + ":" + group_id);
+            //Log.i(TAG,
+            //      "noti_and_badge:002group:" + group_message_list_activity.get_current_group_id() + ":" + group_id);
             if (group_message_list_activity.get_current_group_id().equals(group_id))
             {
                 // no notifcation and no badge update
@@ -985,6 +994,16 @@ public class HelperGroup
         data_buf.put((byte)0x0);
         //
         byte[] fn = "image.jpg".getBytes(StandardCharsets.UTF_8);
+        try
+        {
+            if (g.file_name.getBytes(StandardCharsets.UTF_8).length <= 255)
+            {
+                fn = g.file_name.getBytes(StandardCharsets.UTF_8);
+            }
+        }
+        catch(Exception ignored)
+        {
+        }
         data_buf.put(fn);
         for (int k=0;k<(255 - fn.length);k++)
         {
@@ -1096,6 +1115,215 @@ public class HelperGroup
         {
             e.printStackTrace();
             Log.i(TAG, "join_group:EE01:" + e.getMessage());
+        }
+    }
+
+    static void handle_incoming_group_file(long group_number, long peer_id, byte[] data, long length, long header)
+    {
+        // HINT: ok we have a group file
+        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+
+        try
+        {
+            long res = tox_group_self_get_peer_id(group_number);
+            if (res == peer_id)
+            {
+                // HINT: do not add our own messages, they are already in the DB!
+                Log.i(TAG, "group_custom_packet_cb:gn=" + group_number + " peerid=" + peer_id + " ignoring own file");
+                return;
+            }
+
+            boolean do_notification = true;
+            boolean do_badge_update = true;
+            String group_id = "-1";
+            GroupDB group_temp = null;
+
+            try
+            {
+                group_id = tox_group_by_groupnum__wrapper(group_number);
+                group_temp = orma.selectFromGroupDB().
+                        group_identifierEq(group_id.toLowerCase()).
+                        toList().get(0);
+            }
+            catch (Exception ignored)
+            {
+            }
+
+            if (group_id.compareTo("-1") == 0)
+            {
+                display_toast("group_custom_packet_cb:ERROR 001 with incoming Group File!", true, 0);
+                return;
+            }
+
+            if (group_temp.group_identifier.toLowerCase().compareTo(group_id.toLowerCase()) != 0)
+            {
+                display_toast("group_custom_packet_cb:ERROR 002 with incoming Group File!", true, 0);
+                return;
+            }
+
+            try
+            {
+                if (group_temp.notification_silent)
+                {
+                    do_notification = false;
+                }
+            }
+            catch (Exception e)
+            {
+                // e.printStackTrace();
+                do_notification = false;
+            }
+
+            if (group_message_list_activity != null)
+            {
+                //Log.i(TAG,
+                //      "group_custom_packet_cb:noti_and_badge:002group:" + group_message_list_activity.get_current_group_id() + ":" + group_id);
+                if (group_message_list_activity.get_current_group_id().equals(group_id))
+                {
+                    // no notifcation and no badge update
+                    do_notification = false;
+                    do_badge_update = false;
+                }
+            }
+
+            ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+            hash_bytes.put(data, 8, 32);
+            //Log.i(TAG, "group_custom_packet_cb:filename:"+hash_bytes.arrayOffset()+" "
+            //           +hash_bytes.limit()+" "+hash_bytes.array().length);
+            //Log.i(TAG, "group_custom_packet_cb:hash_bytes hex="
+            //           + HelperGeneric.bytesToHex(hash_bytes.array(),hash_bytes.arrayOffset(),hash_bytes.limit()));
+
+            // TODO: fix me!
+            long timestamp = ((byte)data[8+32]<<3) + ((byte)data[8+32+1]<<2) + ((byte)data[8+32+2]<<1) + (byte)data[8+32+3];
+
+            ByteBuffer filename_bytes = ByteBuffer.allocateDirect(TOX_MAX_FILENAME_LENGTH);
+            filename_bytes.put(data, 8 + 32 + 4, 255);
+            filename_bytes.rewind();
+            String filename = "image.jpg";
+            try
+            {
+                byte[] filename_byte_buf = new byte[255];
+                Arrays.fill(filename_byte_buf, (byte)0x0);
+                filename_bytes.rewind();
+                filename_bytes.get(filename_byte_buf);
+
+                int start_index = 0;
+                int end_index = 254;
+                for(int j=0;j<255;j++)
+                {
+                    if (filename_byte_buf[j] == 0)
+                    {
+                        start_index = j+1;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                for(int j=254;j>=0;j--)
+                {
+                    if (filename_byte_buf[j] == 0)
+                    {
+                        end_index = j;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                byte[] filename_byte_buf_stripped = Arrays.copyOfRange(filename_byte_buf,start_index,end_index);
+                filename = new String(filename_byte_buf_stripped, StandardCharsets.UTF_8);
+                //Log.i(TAG,"group_custom_packet_cb:filename str=" + filename);
+
+                //Log.i(TAG, "group_custom_packet_cb:filename:"+filename_bytes.arrayOffset()+" "
+                //+filename_bytes.limit()+" "+filename_bytes.array().length);
+                //Log.i(TAG, "group_custom_packet_cb:filename hex="
+                //           + HelperGeneric.bytesToHex(filename_bytes.array(),filename_bytes.arrayOffset(),filename_bytes.limit()));
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            long file_size = length - header;
+            if (file_size < 1)
+            {
+                Log.i(TAG, "group_custom_packet_cb: file size less than 1 byte");
+                return;
+            }
+
+            String filename_corrected = get_incoming_filetransfer_local_filename(filename, group_id.toLowerCase());
+
+            // Log.i(TAG, "group_custom_packet_cb:filename=" + filename + " filename_corrected=" + filename_corrected);
+
+            GroupMessage m = new GroupMessage();
+            m.is_new = do_badge_update;
+            m.tox_group_peer_pubkey = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+            m.direction = 0; // msg received
+            m.TOX_MESSAGE_TYPE = 0;
+            m.read = false;
+            m.tox_group_peername = null;
+            m.private_message = 0;
+            m.group_identifier = group_id.toLowerCase();
+            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
+            m.rcvd_timestamp = System.currentTimeMillis();
+            m.sent_timestamp = System.currentTimeMillis();
+            m.text = filename_corrected + "\n" + file_size + " bytes";
+            m.message_id_tox = "";
+            m.was_synced = false;
+            m.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + m.group_identifier + "/";
+            m.file_name = filename_corrected;
+            m.filename_fullpath = m.path_name + m.file_name;
+            m.storage_frame_work = false;
+            m.msg_id_hash = bytebuffer_to_hexstring(hash_bytes, true);
+            m.filesize = file_size;
+
+            try
+            {
+                m.tox_group_peername = tox_group_peer_get_name__wrapper(m.group_identifier,
+                                                                        m.tox_group_peer_pubkey);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
+                    m.path_name + "/" + m.file_name);
+            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
+            f2.mkdirs();
+
+            save_group_incoming_file(m.path_name, m.file_name, data, header, file_size);
+
+            if (group_message_list_activity != null)
+            {
+                if (group_message_list_activity.get_current_group_id().equals(group_id.toLowerCase()))
+                {
+                    insert_into_group_message_db(m, true);
+                }
+                else
+                {
+                    insert_into_group_message_db(m, false);
+                }
+            }
+            else
+            {
+                long new_msg_id = insert_into_group_message_db(m, false);
+                Log.i(TAG, "group_custom_packet_cb:new_msg_id=" + new_msg_id);
+            }
+
+            HelperFriend.add_all_friends_clear_wrapper(0);
+
+            if (do_notification)
+            {
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 }

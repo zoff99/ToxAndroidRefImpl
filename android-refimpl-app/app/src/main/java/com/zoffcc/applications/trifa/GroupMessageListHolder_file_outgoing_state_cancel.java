@@ -100,7 +100,7 @@ public class GroupMessageListHolder_file_outgoing_state_cancel  extends Recycler
 
         message_ = m;
 
-        int drawable_id = R.drawable.rounded_blue_bg_with_border;
+        int drawable_id = R.drawable.rounded_blue_bg;
         try
         {
             final int sdk = android.os.Build.VERSION.SDK_INT;

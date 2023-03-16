@@ -23,6 +23,7 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -1412,7 +1413,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                 java.io.File ff2 = null;
                 while (new_len > 36500)
                 {
-                    ff2 = new Compressor(c).setMaxWidth(max_width).setQuality(quality).compressToFile(ff1);
+                    ff2 = new Compressor(c).
+                            setMaxWidth(max_width).
+                            setQuality(quality).
+                            setCompressFormat(Bitmap.CompressFormat.WEBP).
+                            compressToFile(ff1);
                     new_len = ff2.length();
                     Log.i(TAG, "fsize_after=" + new_len + " " + quality + " " + max_width + " " + ff2.getAbsolutePath());
                     quality = quality - 10;
@@ -1504,6 +1509,8 @@ public class GroupMessageListActivity extends AppCompatActivity
             m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
             m.text = ofw.filename_wrapped + "\n" + ofw.file_size_wrapped + " bytes";
             m.was_synced = false;
+            m.path_name = ofw.filepath_wrapped;
+            m.file_name = ofw.filename_wrapped;
             m.filename_fullpath = new java.io.File(ofw.filepath_wrapped + "/" + ofw.filename_wrapped).getAbsolutePath();
             m.storage_frame_work = false;
             try
