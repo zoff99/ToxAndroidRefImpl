@@ -167,6 +167,7 @@ public class GroupMessageListHolder_file_outgoing_state_cancel  extends Recycler
         textView.setAutoLinkText("" + message.text + "\n OK");
 
         boolean is_image = false;
+        boolean is_video = false;
         try
         {
             String mimeType = null;
@@ -191,6 +192,25 @@ public class GroupMessageListHolder_file_outgoing_state_cancel  extends Recycler
         {
             e.printStackTrace();
         }
+
+        if (!is_image)
+        {
+            try
+            {
+                String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+                if (mimeType.startsWith("video/"))
+                {
+                    is_video = true;
+                }
+            }
+            catch (Exception e)
+            {
+                // e.printStackTrace();
+            }
+        }
+
+        // set default image
+        ft_preview_image.setImageResource(R.drawable.round_loading_animation);
 
         if (is_image)
         {
@@ -291,8 +311,23 @@ public class GroupMessageListHolder_file_outgoing_state_cancel  extends Recycler
                 }
             }
         }
-        else
+        else if (is_video)  // ---- a video ----
         {
+            final Drawable d4 = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_ondemand_video).
+                    backgroundColor(Color.TRANSPARENT).
+                    color(Color.parseColor("#AA000000")).sizeDp(50);
+
+            ft_preview_image.setImageDrawable(d4);
+        }
+        else // ---- not an image or a video ----
+        {
+            final Drawable d3 = new IconicsDrawable(this.context).
+                    icon(GoogleMaterial.Icon.gmd_attachment).
+                    backgroundColor(Color.TRANSPARENT).
+                    color(Color.parseColor("#AA000000")).sizeDp(50);
+
+            ft_preview_image.setImageDrawable(d3);
         }
 
         ft_preview_container.setVisibility(View.VISIBLE);

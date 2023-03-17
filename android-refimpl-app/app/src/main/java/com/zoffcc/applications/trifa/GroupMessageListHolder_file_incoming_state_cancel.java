@@ -210,115 +210,146 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
         textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
 
-            textView.setAutoLinkText("" + message.text + "\n OK");
-            if (MESSAGE_TEXT_SIZE[PREF__global_font_size] > MESSAGE_TEXT_SIZE_FT_NORMAL)
-            {
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE_FT_NORMAL);
-            }
+        textView.setAutoLinkText("" + message.text + "\n OK");
+        if (MESSAGE_TEXT_SIZE[PREF__global_font_size] > MESSAGE_TEXT_SIZE_FT_NORMAL)
+        {
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE_FT_NORMAL);
+        }
 
-            boolean is_image = false;
-            boolean is_video = false;
+        boolean is_image = false;
+        boolean is_video = false;
+        try
+        {
+            String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
+            // Log.i(TAG, "mimetype=" + mimeType + " " + message.filename_fullpath.toLowerCase());
+            if (mimeType.startsWith("image/"))
+            {
+                is_image = true;
+            }
+        }
+        catch (Exception e)
+        {
+            // e.printStackTrace();
+        }
+
+        if (!is_image)
+        {
             try
             {
                 String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
-                // Log.i(TAG, "mimetype=" + mimeType + " " + message.filename_fullpath.toLowerCase());
-                if (mimeType.startsWith("image/"))
+                if (mimeType.startsWith("video/"))
                 {
-                    is_image = true;
+                    is_video = true;
                 }
             }
             catch (Exception e)
             {
                 // e.printStackTrace();
             }
+        }
 
-            if (is_image)
+        // set default image
+        ft_preview_image.setImageResource(R.drawable.round_loading_animation);
+
+        if (is_image)
+        {
+
+            ft_preview_image.setImageResource(R.drawable.round_loading_animation);
+
+            if (PREF__compact_chatlist)
             {
+                textView.setVisibility(View.GONE);
+                imageView.setVisibility(View.GONE);
+            }
+            else
+            {
+                textView.setVisibility(View.VISIBLE);
+                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
+            }
 
-                ft_preview_image.setImageResource(R.drawable.round_loading_animation);
-
-                if (PREF__compact_chatlist)
+            if (VFS_ENCRYPT)
+            {
+                ft_preview_image.setOnTouchListener(new View.OnTouchListener()
                 {
-                    textView.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
-                }
-                else
-                {
-                    textView.setVisibility(View.VISIBLE);
-                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
-                }
-
-                if (VFS_ENCRYPT)
-                {
-                    ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event)
                     {
-                        @Override
-                        public boolean onTouch(View v, MotionEvent event)
+                        if (event.getAction() == MotionEvent.ACTION_UP)
                         {
-                            if (event.getAction() == MotionEvent.ACTION_UP)
+                            try
                             {
-                                try
-                                {
-                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
-                                    intent.putExtra("image_filename", message2.filename_fullpath);
-                                    v.getContext().startActivity(intent);
-                                }
-                                catch (Exception e)
-                                {
-                                    e.printStackTrace();
-                                    Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
-                                }
+                                Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
+                                intent.putExtra("image_filename", message2.filename_fullpath);
+                                v.getContext().startActivity(intent);
                             }
-                            else
+                            catch (Exception e)
                             {
+                                e.printStackTrace();
+                                Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
                             }
-                            return true;
                         }
-                    });
-
-
-                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
-                            message2.filename_fullpath);
-                    try
-                    {
-                        // Log.i(TAG, "glide:img:001");
-
-                        final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(
-                                new RoundedCorners((int) dp2px(20)));
-                        // apply(glide_options).
-
-                        // loadImageFromUri(context, Uri.fromFile(new File(message2.filename_fullpath)), ft_preview_image,
-                        //                  true);
-                        GlideApp.
-                                with(context).
-                                load(f2).
-                                diskCacheStrategy(DiskCacheStrategy.RESOURCE).
-                                skipMemoryCache(false).
-                                priority(Priority.LOW).
-                                placeholder(R.drawable.round_loading_animation).
-                                into(ft_preview_image);
-                        // Log.i(TAG, "glide:img:002");
-
+                        else
+                        {
+                        }
+                        return true;
                     }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
+                });
+
+
+                info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(
+                        message2.filename_fullpath);
+                try
+                {
+                    // Log.i(TAG, "glide:img:001");
+
+                    final RequestOptions glide_options = new RequestOptions().fitCenter().optionalTransform(
+                            new RoundedCorners((int) dp2px(20)));
+                    // apply(glide_options).
+
+                    // loadImageFromUri(context, Uri.fromFile(new File(message2.filename_fullpath)), ft_preview_image,
+                    //                  true);
+                    GlideApp.
+                            with(context).
+                            load(f2).
+                            diskCacheStrategy(DiskCacheStrategy.RESOURCE).
+                            skipMemoryCache(false).
+                            priority(Priority.LOW).
+                            placeholder(R.drawable.round_loading_animation).
+                            into(ft_preview_image);
+                    // Log.i(TAG, "glide:img:002");
+
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
                 }
             }
-            else if (is_video)  // ---- a video ----
-            {
-            }
-            else // ---- not an image or a video ----
-            {
-            }
+        }
+        else if (is_video)  // ---- a video ----
+        {
+            final Drawable d4 = new IconicsDrawable(context).
+                    icon(GoogleMaterial.Icon.gmd_ondemand_video).
+                    backgroundColor(Color.TRANSPARENT).
+                    color(Color.parseColor("#AA000000")).sizeDp(50);
 
-            ft_export_button_container.setVisibility(View.VISIBLE);
-            ft_export_button.setVisibility(View.GONE);
-            ft_share_button.setVisibility(View.GONE);
+            ft_preview_image.setImageDrawable(d4);
+        }
+        else // ---- not an image or a video ----
+        {
+            final Drawable d3 = new IconicsDrawable(this.context).
+                    icon(GoogleMaterial.Icon.gmd_attachment).
+                    backgroundColor(Color.TRANSPARENT).
+                    color(Color.parseColor("#AA000000")).sizeDp(50);
 
-            ft_preview_container.setVisibility(View.VISIBLE);
-            ft_preview_image.setVisibility(View.VISIBLE);
+            ft_preview_image.setImageDrawable(d3);
+        }
+
+        ft_export_button_container.setVisibility(View.VISIBLE);
+        ft_export_button.setVisibility(View.GONE);
+        ft_share_button.setVisibility(View.GONE);
+
+        ft_preview_container.setVisibility(View.VISIBLE);
+        ft_preview_image.setVisibility(View.VISIBLE);
 
 
         try
