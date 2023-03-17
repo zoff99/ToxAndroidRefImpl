@@ -47,7 +47,7 @@ jobs:
     - name: align and sign apk
       run: |
         zipalign -p 4 /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug-aligned.apk
-        apksigner sign --ks debug.keystore --ks-pass "android" --ks-key-alias androiddebugkey --out /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk --verbose /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug-aligned.apk
+        apksigner sign --ks debug.keystore --ks-pass "pass:android" --ks-key-alias androiddebugkey --out /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk --verbose /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug-aligned.apk
 
     - name: upload apk
       uses: actions/upload-artifact@v3
