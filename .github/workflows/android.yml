@@ -43,8 +43,6 @@ jobs:
         cat android-refimpl-app/app/build.gradle | grep applicationId
         sed -i -e 's#applicationId "com.zoffcc.applications.trifa"#applicationId "com.zoffcc.applications.trifa_debug"#' android-refimpl-app/app/build.gradle
         cat android-refimpl-app/app/build.gradle | grep applicationId
-        sed -i -e 's#package="com.zoffcc.applications.trifa"#package="com.zoffcc.applications.trifa_debug"#' android-refimpl-app/app/src/main/AndroidManifest.xml
-        cat android-refimpl-app/app/src/main/AndroidManifest.xml | grep "package="
 
     - name: Build with Gradle
       run: cd android-refimpl-app ; ./gradlew assemble ; find . -name '*.apk'
