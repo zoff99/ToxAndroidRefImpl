@@ -41,7 +41,8 @@ jobs:
     - name: Rename artifact for nightly upload
       if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
       run: |
-        cp app/build/outputs/apk/debug/app-debug.apk TRIfA-nightly.apk
+        pwd
+        cp /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk TRIfA-nightly.apk
     - name: Upload to nightly release
       uses: ncipollo/release-action@v1
       if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
