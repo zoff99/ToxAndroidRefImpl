@@ -117,37 +117,12 @@ jobs:
             echo "===========9========="
             ls -al /usr/bin/java
             id
-            sudo rm -f /usr/bin/java
-            export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
+            export PATH="/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.1/Contents/Home/bin:$PATH"
             java -version
+            exit 2
 
     - name: install cliclick
       run:  brew install cliclick
-
-    - name: install java11
-      run:  brew install java11
-
-    - name: test java2
-      run:  |
-            type java
-            echo "===========1========="
-            java -version || exit 0
-            echo "===========2========="
-            /usr/libexec/java_home -V
-            echo "===========3========="
-            /usr/libexec/java_home -v 11
-            echo "===========4========="
-            export JAVA_HOME=$(/usr/libexec/java_home -v11)
-            echo "===========5========="
-            java -version
-            echo "===========6========="
-            $JAVA_HOME/bin/java -version
-            echo "===========7========="
-            $JAVA_HOME/bin/javac -version
-            echo "===========8========="
-            ls -al /usr/local/Cellar/openjdk/
-            echo "===========9========="
-            java -version
 
     - name: macos-version1
       run: sw_vers -productVersion
