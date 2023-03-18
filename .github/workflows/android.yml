@@ -143,6 +143,7 @@ jobs:
         emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+          echo 'org.gradle.java.home=/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.1/Contents/Home' >> /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/gradle.properties
           printf 'dependencyVerification {\nverify = [\n]\n}\n' > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           export JAVA_HOME=$(/usr/libexec/java_home -v11)
           export PATH="/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.1/Contents/Home/bin:$PATH"
