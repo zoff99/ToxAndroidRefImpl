@@ -67,6 +67,80 @@ public class StartMainActivityWrapperTest
                                                                                Manifest.permission.WRITE_EXTERNAL_STORAGE);
     private Activity currentActivity = null;
 
+    private static void wait_(final long seconds)
+    {
+        wait_(seconds, null);
+    }
+
+    private static void wait_(final long seconds, String custom_message_addon)
+    {
+        if (custom_message_addon != null)
+        {
+            Log.i(TAG, "sleeping " + seconds + " seconds " + custom_message_addon);
+        }
+        else
+        {
+            Log.i(TAG, "sleeping " + seconds + " seconds");
+        }
+        SystemClock.sleep(seconds * 1000);
+        Log.i(TAG, "sleeping ended");
+    }
+
+    private static void remove_pubgroup()
+    {
+        Log.i(TAG,"remove group");
+        Matcher<View> m = allOf(withId(R.id.f_conf_container_parent));
+        ViewInteraction pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
+        pub_group.perform(longClick());
+
+        try
+        {
+            onView(withId(R.id.item_delete)).perform(click());
+        }
+        catch (NoMatchingViewException e)
+        {
+            onView(withText(R.string.layout___delete)).perform(click());
+        }
+
+        onView(withText("Yes")).perform(click());
+        wait_(61, "for group removal to settle");
+    }
+
+    private static void join_pubgroup()
+    {
+        Log.i(TAG,"add group");
+
+        try
+        {
+            openContextualActionModeOverflowMenu();
+        }
+        catch (Exception e3)
+        {
+            e3.printStackTrace();
+        }
+
+        try
+        {
+            onView(withId(R.id.item_join_group_public)).perform(click());
+        }
+        catch (NoMatchingViewException e)
+        {
+            try
+            {
+                openContextualActionModeOverflowMenu();
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+            }
+            onView(withText(R.string.layout___join_public_group)).perform(click());
+        }
+
+        onView(withId(R.id.group_join_group_id)).perform(replaceText(TRIFA_PUBLIC_GROUP_ID));
+        onView(withId(R.id.friend_joingroup)).perform(click());
+        wait_(1);
+    }
+
     private static Matcher<View> getElementFromMatchAtPosition(final Matcher<View> matcher, final int position)
     {
         return new BaseMatcher<View>()
@@ -96,32 +170,6 @@ public class StartMainActivityWrapperTest
         };
     }
 
-    public String getViewInteractionText(ViewInteraction matcher)
-    {
-        final String[] text = new String[1];
-        ViewAction va = new ViewAction()
-        {
-            @Override
-            public Matcher<View> getConstraints() {
-                return isAssignableFrom(TextView.class);
-            }
-
-            @Override
-            public String getDescription(){
-                return "Text of the view";
-            }
-
-            @Override
-            public void perform(UiController uiController, View view) {
-                TextView tv = (TextView) view;
-                text[0] = tv.getText().toString();
-            }
-        };
-
-        matcher.perform(va);
-        return text[0];
-    }
-
     @Test
     public void Test_Startup()
     {
@@ -144,9 +192,7 @@ public class StartMainActivityWrapperTest
         }
         else
         {
-            // cause ERROR -----
-            onView(withId(R.id.bugButton)).perform(replaceText(MOCK_PASSWORD));
-            // cause ERROR -----
+            cause_error();
         }
 
         Log.i(TAG, "checking for AlertDialog");
@@ -178,18 +224,13 @@ public class StartMainActivityWrapperTest
         {
             tox_online = MainActivity.tox_self_get_connection_status() != 0;
             // HINT: wait for tox to get online
-            final int seconds_sleep1 = 1;
-            Log.i(TAG, "sleeping for " + seconds_sleep1 + " seconds until we are online");
-            SystemClock.sleep(seconds_sleep1 * 1000);
+            wait_(1, "for tox to get online");
         }
 
         // HINT: after we are online give it another 10 seconds
-        final int seconds_sleep1 = 5;
-        Log.i(TAG, "sleeping for " + seconds_sleep1 + " seconds");
-        SystemClock.sleep(seconds_sleep1 * 1000);
+        wait_(5);
 
-        onView(allOf(withId(R.id.f_avatar_icon), withParent(withId(R.id.friend_line_container)))).
-                perform(click());
+        onView(allOf(withId(R.id.f_avatar_icon), withParent(withId(R.id.friend_line_container)))).perform(click());
 
         onView(withId(R.id.ml_new_message)).perform(click());
         onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG));
@@ -204,10 +245,7 @@ public class StartMainActivityWrapperTest
         }
 
         Espresso.closeSoftKeyboard();
-
-        final int seconds_sleep2 = 1;
-        Log.i(TAG, "sleeping for " + seconds_sleep2 + " seconds");
-        SystemClock.sleep(seconds_sleep2 * 1000);
+        wait_(1);
 
         try
         {
@@ -218,10 +256,7 @@ public class StartMainActivityWrapperTest
         }
 
         join_pubgroup();
-
-        final int seconds_sleep3 = 1;
-        Log.i(TAG, "sleeping for " + seconds_sleep3 + " seconds until");
-        SystemClock.sleep(seconds_sleep3 * 1000);
+        wait_(1);
 
         Matcher<View> m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
         ViewInteraction pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
@@ -230,71 +265,53 @@ public class StartMainActivityWrapperTest
 
         boolean group_connected = false;
         int sleep_cycles = 0;
+        int rejoin_cycles = 0;
         while (!group_connected)
         {
             if (sleep_cycles > 10)
             {
-                Log.i(TAG, "sleep_cycles:STOP=" + sleep_cycles);
+                if (rejoin_cycles > 2)
+                {
+                    Log.i(TAG, "rejoin_cycles:STOP=" + rejoin_cycles);
+                    Log.i(TAG, "group never joined");
+                    cause_error();
+                }
+                Log.i(TAG, "sleep_cycles:STOP:sleep_cycles=" + sleep_cycles+ " rejoin_cycles=" + rejoin_cycles);
                 sleep_cycles = 0;
                 group_connected = false;
 
                 remove_pubgroup();
                 join_pubgroup();
+                rejoin_cycles++;
             }
 
             // find group again
             m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
             pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
             String text002 = getViewInteractionText(pub_group);
-            Log.i(TAG, "text_is[2]=" + text002+ " sleep_cycles=" + sleep_cycles);
+            Log.i(TAG, "text_is[2]=" + text002 + " sleep_cycles=" + sleep_cycles);
             if (text002.contains("Users:1(0)"))
             {
-                final int seconds_sleep4 = 2;
-                Log.i(TAG, "sleeping for " + seconds_sleep4 + " seconds until we join the group");
-                SystemClock.sleep(seconds_sleep4 * 1000);
+                wait_(2, "for group to connect");
                 sleep_cycles++;
             }
             else
             {
+                Log.i(TAG, "group_is_connected");
                 group_connected = true;
             }
         }
 
         // TODO: check if the public group actually connected ...
-
-        final int seconds_sleep99 = 240;
-        Log.i(TAG, "sleeping for " + seconds_sleep99 + " seconds");
-        SystemClock.sleep(seconds_sleep99 * 1000);
-        Log.i(TAG, "sleeping ended");
+        wait_(120);
     }
 
-    private static void remove_pubgroup()
+    private static void cause_error()
     {
-    }
-
-    private static void join_pubgroup()
-    {
-        openContextualActionModeOverflowMenu();
-
-        try
-        {
-            onView(withId(R.id.item_join_group_public)).perform(click());
-        }
-        catch (NoMatchingViewException e)
-        {
-            try
-            {
-                openContextualActionModeOverflowMenu();
-            }
-            catch (Exception e2)
-            {
-                e2.printStackTrace();
-            }
-            onView(withText(R.string.layout___join_public_group)).perform(click());
-        }
-
-        onView(withId(R.id.group_join_group_id)).perform(replaceText(TRIFA_PUBLIC_GROUP_ID));
-        onView(withId(R.id.friend_joingroup)).perform(click());
+        Log.i(TAG, "___ERROR_at_TESTS___");
+        // cause ERROR -----
+        onView(withId(R.id.bugButton)).perform(replaceText(MOCK_PASSWORD));
+        // cause ERROR -----
     }
 
     @Before
@@ -342,5 +359,34 @@ public class StartMainActivityWrapperTest
             SystemClock.sleep(2000);
         }
         // ----- persmission -----
+    }
+
+    public String getViewInteractionText(ViewInteraction matcher)
+    {
+        final String[] text = new String[1];
+        ViewAction va = new ViewAction()
+        {
+            @Override
+            public Matcher<View> getConstraints()
+            {
+                return isAssignableFrom(TextView.class);
+            }
+
+            @Override
+            public String getDescription()
+            {
+                return "Text of the view";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view)
+            {
+                TextView tv = (TextView) view;
+                text[0] = tv.getText().toString();
+            }
+        };
+
+        matcher.perform(va);
+        return text[0];
     }
 }
