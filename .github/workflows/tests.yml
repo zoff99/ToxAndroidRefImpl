@@ -14,7 +14,7 @@ jobs:
       timeout-minutes: 60
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
+        api-level: 26
         target: default
         profile: Nexus 6
         arch: x86_64
@@ -83,7 +83,7 @@ jobs:
       timeout-minutes: 60
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
+        api-level: 26
         target: default
         profile: Nexus 6
         arch: x86_64

@@ -16,6 +16,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -32,6 +33,7 @@ import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 
 import static androidx.test.InstrumentationRegistry.getTargetContext;
+import static androidx.test.core.graphics.BitmapStorage.writeToTestStorage;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu;
 import static androidx.test.espresso.action.ViewActions.click;
@@ -41,9 +43,11 @@ import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.matcher.ViewMatchers.withParent;
 import static androidx.test.espresso.matcher.ViewMatchers.withText;
+import static androidx.test.espresso.screenshot.ViewInteractionCapture.captureToBitmap;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static androidx.test.runner.lifecycle.Stage.RESUMED;
 import static org.hamcrest.CoreMatchers.allOf;
@@ -102,16 +106,19 @@ public class StartMainActivityWrapperTest
             wait_(1, "until app is showing");
         }
 
+        screenshot("001");
 
         if (cur_act.equals("CheckPasswordActivity"))
         {
             onView(withId(R.id.password_1_c)).perform(replaceText(MOCK_PASSWORD));
+            screenshot("002a");
             onView(withId(R.id.set_button_2)).perform(click());
         }
         else if (cur_act.equals("SetPasswordActivity"))
         {
             onView(withId(R.id.password_1)).perform(replaceText(MOCK_PASSWORD));
             onView(withId(R.id.password_2)).perform(replaceText(MOCK_PASSWORD));
+            screenshot("002b");
             onView(withId(R.id.set_button)).perform(click());
         }
         else
@@ -133,7 +140,6 @@ public class StartMainActivityWrapperTest
         */
             // click NO on Dialog asking to disable battery optimisations for app
             onView(withId(android.R.id.button2)).inRoot(isDialog()).check(matches(isDisplayed())).perform(click());
-
             Log.i(TAG, "AlertDialog: \"NO\" button clicked");
 
         }
@@ -154,6 +160,7 @@ public class StartMainActivityWrapperTest
         // HINT: after we are online give it another 10 seconds
         wait_(5);
 
+        screenshot("004");
         onView(allOf(withId(R.id.f_avatar_icon), withParent(withId(R.id.friend_line_container)))).perform(click());
 
         onView(withId(R.id.ml_new_message)).perform(click());
@@ -170,6 +177,7 @@ public class StartMainActivityWrapperTest
 
         Espresso.closeSoftKeyboard();
         wait_(1);
+        screenshot("005");
 
         try
         {
@@ -186,6 +194,8 @@ public class StartMainActivityWrapperTest
         ViewInteraction pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
         String text001 = getViewInteractionText(pub_group);
         Log.i(TAG, "text_is=" + text001);
+
+        screenshot("006");
 
         boolean group_connected = false;
         int sleep_cycles = 0;
@@ -226,8 +236,24 @@ public class StartMainActivityWrapperTest
             }
         }
 
-        // TODO: check if the public group actually connected ...
+        screenshot("007");
+
         wait_(120);
+        screenshot("099");
+    }
+
+    private static void screenshot(final String num)
+    {
+        try
+        {
+            writeToTestStorage(captureToBitmap(onView(isRoot())), "test_" + num);
+            Log.i(TAG, "capture screenshot: "+ "test_" + num + ".png");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "ERROR on capturing screenshot: "+ "test_" + num + ".png" + " E:" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     private static void wait_(final long seconds)
