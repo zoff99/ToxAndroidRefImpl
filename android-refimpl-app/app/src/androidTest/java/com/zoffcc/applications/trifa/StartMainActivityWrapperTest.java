@@ -67,6 +67,169 @@ public class StartMainActivityWrapperTest
                                                                                Manifest.permission.WRITE_EXTERNAL_STORAGE);
     private Activity currentActivity = null;
 
+    @Test
+    public void Test_Startup()
+    {
+        Log.i(TAG, "Test_Startup");
+        ActivityScenario<StartMainActivityWrapper> scenario = rule.getScenario();
+
+
+        String cur_act = getActivityInstance().getLocalClassName();
+        Log.i(TAG, "ACT:" + cur_act);
+
+        boolean showing_app = false;
+        int app_showing_cycles = 0;
+        while (!showing_app)
+        {
+            if (app_showing_cycles > 120)
+            {
+                Log.i(TAG, "App did not load");
+                cause_error(1);
+            }
+            cur_act = getActivityInstance().getLocalClassName();
+            if (cur_act.equals("CheckPasswordActivity"))
+            {
+                showing_app = true;
+            }
+            else if (cur_act.equals("SetPasswordActivity"))
+            {
+                showing_app = true;
+            }
+            else
+            {
+                app_showing_cycles++;
+            }
+            wait_(1, "until app is showing");
+        }
+
+
+        if (cur_act.equals("CheckPasswordActivity"))
+        {
+            onView(withId(R.id.password_1_c)).perform(replaceText(MOCK_PASSWORD));
+            onView(withId(R.id.set_button_2)).perform(click());
+        }
+        else if (cur_act.equals("SetPasswordActivity"))
+        {
+            onView(withId(R.id.password_1)).perform(replaceText(MOCK_PASSWORD));
+            onView(withId(R.id.password_2)).perform(replaceText(MOCK_PASSWORD));
+            onView(withId(R.id.set_button)).perform(click());
+        }
+        else
+        {
+            cause_error(2);
+        }
+
+        Log.i(TAG, "checking for AlertDialog");
+
+        try
+        {
+            onView(withId(android.R.id.button2)).check(matches(isDisplayed()));
+
+        /*
+        For an AlertDialog, the id assigned for each button is:
+        POSITIVE: android.R.id.button1
+        NEGATIVE: android.R.id.button2
+        NEUTRAL: android.R.id.button3
+        */
+            // click NO on Dialog asking to disable battery optimisations for app
+            onView(withId(android.R.id.button2)).inRoot(isDialog()).check(matches(isDisplayed())).perform(click());
+
+            Log.i(TAG, "AlertDialog: \"NO\" button clicked");
+
+        }
+        catch (NoMatchingViewException e)
+        {
+            //view not displayed logic
+            Log.i(TAG, "checking for AlertDialog:View does not show, that is ok");
+        }
+
+        boolean tox_online = false;
+        while (!tox_online)
+        {
+            tox_online = MainActivity.tox_self_get_connection_status() != 0;
+            // HINT: wait for tox to get online
+            wait_(1, "for tox to get online");
+        }
+
+        // HINT: after we are online give it another 10 seconds
+        wait_(5);
+
+        onView(allOf(withId(R.id.f_avatar_icon), withParent(withId(R.id.friend_line_container)))).perform(click());
+
+        onView(withId(R.id.ml_new_message)).perform(click());
+        onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG));
+        onView(withId(R.id.ml_button_01)).perform(click());
+
+        Espresso.closeSoftKeyboard();
+
+        for (int i = 0; i < 3; i++)
+        {
+            onView(withId(R.id.ml_new_message)).perform(replaceText("test:" + i));
+            onView(withId(R.id.ml_button_01)).perform(click());
+        }
+
+        Espresso.closeSoftKeyboard();
+        wait_(1);
+
+        try
+        {
+            Espresso.pressBack();
+        }
+        catch (Exception e)
+        {
+        }
+
+        join_pubgroup();
+        wait_(1);
+
+        Matcher<View> m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
+        ViewInteraction pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
+        String text001 = getViewInteractionText(pub_group);
+        Log.i(TAG, "text_is=" + text001);
+
+        boolean group_connected = false;
+        int sleep_cycles = 0;
+        int rejoin_cycles = 0;
+        while (!group_connected)
+        {
+            if (sleep_cycles > 10)
+            {
+                if (rejoin_cycles > 2)
+                {
+                    Log.i(TAG, "rejoin_cycles:STOP=" + rejoin_cycles);
+                    Log.i(TAG, "group never joined");
+                    cause_error(3);
+                }
+                Log.i(TAG, "sleep_cycles:STOP:sleep_cycles=" + sleep_cycles+ " rejoin_cycles=" + rejoin_cycles);
+                sleep_cycles = 0;
+                group_connected = false;
+
+                remove_pubgroup();
+                join_pubgroup();
+                rejoin_cycles++;
+            }
+
+            // find group again
+            m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
+            pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
+            String text002 = getViewInteractionText(pub_group);
+            Log.i(TAG, "text_is[2]=" + text002 + " sleep_cycles=" + sleep_cycles);
+            if (text002.contains("Users:1(0)"))
+            {
+                wait_(2, "for group to connect");
+                sleep_cycles++;
+            }
+            else
+            {
+                Log.i(TAG, "group_is_connected");
+                group_connected = true;
+            }
+        }
+
+        // TODO: check if the public group actually connected ...
+        wait_(120);
+    }
+
     private static void wait_(final long seconds)
     {
         wait_(seconds, null);
@@ -170,148 +333,25 @@ public class StartMainActivityWrapperTest
         };
     }
 
-    @Test
-    public void Test_Startup()
+    private static void cause_error(int errnum)
     {
-        Log.i(TAG, "Test_Startup");
-        ActivityScenario<StartMainActivityWrapper> scenario = rule.getScenario();
-
-        String cur_act = getActivityInstance().getLocalClassName();
-        Log.i(TAG, "ACT:" + cur_act);
-
-        if (cur_act.equals("CheckPasswordActivity"))
+        Log.i(TAG, "___ERROR_at_TESTS___:" + errnum);
+        if (errnum == 1)
         {
-            onView(withId(R.id.password_1_c)).perform(replaceText(MOCK_PASSWORD));
-            onView(withId(R.id.set_button_2)).perform(click());
+            onView(withId(R.id.bugButton1)).perform(replaceText(MOCK_PASSWORD));
         }
-        else if (cur_act.equals("SetPasswordActivity"))
+        else if (errnum == 2)
         {
-            onView(withId(R.id.password_1)).perform(replaceText(MOCK_PASSWORD));
-            onView(withId(R.id.password_2)).perform(replaceText(MOCK_PASSWORD));
-            onView(withId(R.id.set_button)).perform(click());
+            onView(withId(R.id.bugButton2)).perform(replaceText(MOCK_PASSWORD));
+        }
+        else if (errnum == 3)
+        {
+            onView(withId(R.id.bugButton3)).perform(replaceText(MOCK_PASSWORD));
         }
         else
         {
-            cause_error();
+            onView(withId(R.id.bugButton)).perform(replaceText(MOCK_PASSWORD));
         }
-
-        Log.i(TAG, "checking for AlertDialog");
-
-        try
-        {
-            onView(withId(android.R.id.button2)).check(matches(isDisplayed()));
-
-        /*
-        For an AlertDialog, the id assigned for each button is:
-        POSITIVE: android.R.id.button1
-        NEGATIVE: android.R.id.button2
-        NEUTRAL: android.R.id.button3
-        */
-            // click NO on Dialog asking to disable battery optimisations for app
-            onView(withId(android.R.id.button2)).inRoot(isDialog()).check(matches(isDisplayed())).perform(click());
-
-            Log.i(TAG, "AlertDialog: \"NO\" button clicked");
-
-        }
-        catch (NoMatchingViewException e)
-        {
-            //view not displayed logic
-            Log.i(TAG, "checking for AlertDialog:View does not show, that is ok");
-        }
-
-        boolean tox_online = false;
-        while (!tox_online)
-        {
-            tox_online = MainActivity.tox_self_get_connection_status() != 0;
-            // HINT: wait for tox to get online
-            wait_(1, "for tox to get online");
-        }
-
-        // HINT: after we are online give it another 10 seconds
-        wait_(5);
-
-        onView(allOf(withId(R.id.f_avatar_icon), withParent(withId(R.id.friend_line_container)))).perform(click());
-
-        onView(withId(R.id.ml_new_message)).perform(click());
-        onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG));
-        onView(withId(R.id.ml_button_01)).perform(click());
-
-        Espresso.closeSoftKeyboard();
-
-        for (int i = 0; i < 3; i++)
-        {
-            onView(withId(R.id.ml_new_message)).perform(replaceText("test:" + i));
-            onView(withId(R.id.ml_button_01)).perform(click());
-        }
-
-        Espresso.closeSoftKeyboard();
-        wait_(1);
-
-        try
-        {
-            Espresso.pressBack();
-        }
-        catch (Exception e)
-        {
-        }
-
-        join_pubgroup();
-        wait_(1);
-
-        Matcher<View> m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
-        ViewInteraction pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
-        String text001 = getViewInteractionText(pub_group);
-        Log.i(TAG, "text_is=" + text001);
-
-        boolean group_connected = false;
-        int sleep_cycles = 0;
-        int rejoin_cycles = 0;
-        while (!group_connected)
-        {
-            if (sleep_cycles > 10)
-            {
-                if (rejoin_cycles > 2)
-                {
-                    Log.i(TAG, "rejoin_cycles:STOP=" + rejoin_cycles);
-                    Log.i(TAG, "group never joined");
-                    cause_error();
-                }
-                Log.i(TAG, "sleep_cycles:STOP:sleep_cycles=" + sleep_cycles+ " rejoin_cycles=" + rejoin_cycles);
-                sleep_cycles = 0;
-                group_connected = false;
-
-                remove_pubgroup();
-                join_pubgroup();
-                rejoin_cycles++;
-            }
-
-            // find group again
-            m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
-            pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
-            String text002 = getViewInteractionText(pub_group);
-            Log.i(TAG, "text_is[2]=" + text002 + " sleep_cycles=" + sleep_cycles);
-            if (text002.contains("Users:1(0)"))
-            {
-                wait_(2, "for group to connect");
-                sleep_cycles++;
-            }
-            else
-            {
-                Log.i(TAG, "group_is_connected");
-                group_connected = true;
-            }
-        }
-
-        // TODO: check if the public group actually connected ...
-        wait_(120);
-    }
-
-    private static void cause_error()
-    {
-        Log.i(TAG, "___ERROR_at_TESTS___");
-        // cause ERROR -----
-        onView(withId(R.id.bugButton)).perform(replaceText(MOCK_PASSWORD));
-        // cause ERROR -----
     }
 
     @Before
