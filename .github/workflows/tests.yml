@@ -3,9 +3,45 @@ name: App Tests
 on: [push, pull_request]
 
 jobs:
+  android-test-linux:
+    runs-on: ubuntu-latest-4-cores
+    if: ${{ true }}
+    steps:
+    - uses: actions/checkout@v3
+
+    # See https://github.blog/changelog/2023-02-23-hardware-accelerated-android-virtualization-on-actions-windows-and-linux-larger-hosted-runners/
+    - name: Enable KVM group perms
+      run: |
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
+
+    - name: android test
+      timeout-minutes: 60
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 29
+        target: default
+        profile: Nexus 6
+        arch: x86_64
+        ndk: 21.0.6113669
+        cmake: 3.10.2.4988404
+        emulator-options: -no-window -accel on -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: false
+        disable-spellchecker: true
+        disk-size: 4096M
+        ram-size: 2048M
+        script: |
+          pwd
+          java -version
+          cd android-refimpl-app ; ./gradlew assemble
+          adb logcat -c
+          adb logcat > logcat.txt &
+          cd android-refimpl-app ; ./gradlew connectedAndroidTest || echo "NOERR"
+
   android-test:
     runs-on: macos-latest
-    if: ${{ true }}  # disable for now
+    if: ${{ true }}
     steps:
     - uses: actions/checkout@v3
 
@@ -51,9 +87,11 @@ jobs:
        ffmpeg -nostdin -f avfoundation -i 0 recording.mov &
 
     - name: android test
+      timeout-minutes: 60
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
+        target: default
         profile: Nexus 6
         arch: x86_64
         # ndk: 16.1.4479499
@@ -61,7 +99,7 @@ jobs:
         # ndk: 20.1.5948944
         cmake: 3.10.2.4988404
         emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-        disable-animations: true
+        disable-animations: false
         disable-spellchecker: true
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
