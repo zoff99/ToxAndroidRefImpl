@@ -4,7 +4,12 @@ import android.Manifest;
 import android.app.Activity;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -17,6 +22,9 @@ import java.util.Collection;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.Espresso;
 import androidx.test.espresso.NoMatchingViewException;
+import androidx.test.espresso.UiController;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.ViewInteraction;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
@@ -25,14 +33,20 @@ import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
 
 import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.openContextualActionModeOverflowMenu;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.longClick;
 import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withParent;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static androidx.test.runner.lifecycle.Stage.RESUMED;
+import static org.hamcrest.CoreMatchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
 @LargeTest
@@ -41,18 +55,72 @@ public class StartMainActivityWrapperTest
     private static final String TAG = "TEST001";
     //
     private static final String MOCK_PASSWORD = "öWOIA>C9iq2v<q0230i2q4$&%$/S3p95ig0_92";
-    private Activity currentActivity = null;
     private static final String MOCK_TEST_MSG = "Hello, test äößß";
-    //
-
+    private static final String TRIFA_PUBLIC_GROUP_ID = "154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762";
     @Rule
     public ActivityScenarioRule<StartMainActivityWrapper> rule = new ActivityScenarioRule<>(
             StartMainActivityWrapper.class);
-
+    //
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA,
                                                                                Manifest.permission.RECORD_AUDIO,
                                                                                Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    private Activity currentActivity = null;
+
+    private static Matcher<View> getElementFromMatchAtPosition(final Matcher<View> matcher, final int position)
+    {
+        return new BaseMatcher<View>()
+        {
+            int counter = 0;
+
+            @Override
+            public boolean matches(final Object item)
+            {
+                if (matcher.matches(item))
+                {
+                    if (counter == position)
+                    {
+                        counter++;
+                        return true;
+                    }
+                    counter++;
+                }
+                return false;
+            }
+
+            @Override
+            public void describeTo(final Description description)
+            {
+                description.appendText("Element at hierarchy position " + position);
+            }
+        };
+    }
+
+    public String getViewInteractionText(ViewInteraction matcher)
+    {
+        final String[] text = new String[1];
+        ViewAction va = new ViewAction()
+        {
+            @Override
+            public Matcher<View> getConstraints() {
+                return isAssignableFrom(TextView.class);
+            }
+
+            @Override
+            public String getDescription(){
+                return "Text of the view";
+            }
+
+            @Override
+            public void perform(UiController uiController, View view) {
+                TextView tv = (TextView) view;
+                text[0] = tv.getText().toString();
+            }
+        };
+
+        matcher.perform(va);
+        return text[0];
+    }
 
     @Test
     public void Test_Startup()
@@ -85,8 +153,7 @@ public class StartMainActivityWrapperTest
 
         try
         {
-            onView(withId(android.R.id.button2)).
-                    check(matches(isDisplayed()));
+            onView(withId(android.R.id.button2)).check(matches(isDisplayed()));
 
         /*
         For an AlertDialog, the id assigned for each button is:
@@ -95,10 +162,7 @@ public class StartMainActivityWrapperTest
         NEUTRAL: android.R.id.button3
         */
             // click NO on Dialog asking to disable battery optimisations for app
-            onView(withId(android.R.id.button2)).
-                    inRoot(isDialog()).
-                    check(matches(isDisplayed())).
-                    perform(click());
+            onView(withId(android.R.id.button2)).inRoot(isDialog()).check(matches(isDisplayed())).perform(click());
 
             Log.i(TAG, "AlertDialog: \"NO\" button clicked");
 
@@ -109,7 +173,23 @@ public class StartMainActivityWrapperTest
             Log.i(TAG, "checking for AlertDialog:View does not show, that is ok");
         }
 
-        onView(withId(R.id.f_avatar_icon)).perform(click());
+        boolean tox_online = false;
+        while (!tox_online)
+        {
+            tox_online = MainActivity.tox_self_get_connection_status() != 0;
+            // HINT: wait for tox to get online
+            final int seconds_sleep1 = 1;
+            Log.i(TAG, "sleeping for " + seconds_sleep1 + " seconds until we are online");
+            SystemClock.sleep(seconds_sleep1 * 1000);
+        }
+
+        // HINT: after we are online give it another 10 seconds
+        final int seconds_sleep1 = 5;
+        Log.i(TAG, "sleeping for " + seconds_sleep1 + " seconds");
+        SystemClock.sleep(seconds_sleep1 * 1000);
+
+        onView(allOf(withId(R.id.f_avatar_icon), withParent(withId(R.id.friend_line_container)))).
+                perform(click());
 
         onView(withId(R.id.ml_new_message)).perform(click());
         onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG));
@@ -125,11 +205,96 @@ public class StartMainActivityWrapperTest
 
         Espresso.closeSoftKeyboard();
 
-        final int seconds_sleep = 240;
-        Log.i(TAG, "sleeping for " + seconds_sleep + " seconds");
-        // sleep x seconds
-        SystemClock.sleep(seconds_sleep * 1000);
+        final int seconds_sleep2 = 1;
+        Log.i(TAG, "sleeping for " + seconds_sleep2 + " seconds");
+        SystemClock.sleep(seconds_sleep2 * 1000);
+
+        try
+        {
+            Espresso.pressBack();
+        }
+        catch (Exception e)
+        {
+        }
+
+        join_pubgroup();
+
+        final int seconds_sleep3 = 1;
+        Log.i(TAG, "sleeping for " + seconds_sleep3 + " seconds until");
+        SystemClock.sleep(seconds_sleep3 * 1000);
+
+        Matcher<View> m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
+        ViewInteraction pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
+        String text001 = getViewInteractionText(pub_group);
+        Log.i(TAG, "text_is=" + text001);
+
+        boolean group_connected = false;
+        int sleep_cycles = 0;
+        while (!group_connected)
+        {
+            if (sleep_cycles > 10)
+            {
+                Log.i(TAG, "sleep_cycles:STOP=" + sleep_cycles);
+                sleep_cycles = 0;
+                group_connected = false;
+
+                remove_pubgroup();
+                join_pubgroup();
+            }
+
+            // find group again
+            m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
+            pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
+            String text002 = getViewInteractionText(pub_group);
+            Log.i(TAG, "text_is[2]=" + text002+ " sleep_cycles=" + sleep_cycles);
+            if (text002.contains("Users:1(0)"))
+            {
+                final int seconds_sleep4 = 2;
+                Log.i(TAG, "sleeping for " + seconds_sleep4 + " seconds until we join the group");
+                SystemClock.sleep(seconds_sleep4 * 1000);
+                sleep_cycles++;
+            }
+            else
+            {
+                group_connected = true;
+            }
+        }
+
+        // TODO: check if the public group actually connected ...
+
+        final int seconds_sleep99 = 240;
+        Log.i(TAG, "sleeping for " + seconds_sleep99 + " seconds");
+        SystemClock.sleep(seconds_sleep99 * 1000);
         Log.i(TAG, "sleeping ended");
+    }
+
+    private static void remove_pubgroup()
+    {
+    }
+
+    private static void join_pubgroup()
+    {
+        openContextualActionModeOverflowMenu();
+
+        try
+        {
+            onView(withId(R.id.item_join_group_public)).perform(click());
+        }
+        catch (NoMatchingViewException e)
+        {
+            try
+            {
+                openContextualActionModeOverflowMenu();
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+            }
+            onView(withText(R.string.layout___join_public_group)).perform(click());
+        }
+
+        onView(withId(R.id.group_join_group_id)).perform(replaceText(TRIFA_PUBLIC_GROUP_ID));
+        onView(withId(R.id.friend_joingroup)).perform(click());
     }
 
     @Before
