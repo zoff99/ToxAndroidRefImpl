@@ -94,13 +94,39 @@ jobs:
     if: ${{ true }}  # disable for now
     steps:
     - uses: actions/checkout@v3
+
+    - name: test java1
+      run:  |
+            type java
+            echo "===========1========="
+            java -version || exit 0
+            echo "===========2========="
+            /usr/libexec/java_home -V
+            echo "===========3========="
+            /usr/libexec/java_home -v 11
+            echo "===========4========="
+            export JAVA_HOME=$(/usr/libexec/java_home -v11)
+            echo "===========5========="
+            java -version
+            echo "===========6========="
+            $JAVA_HOME/bin/java -version
+            echo "===========7========="
+            $JAVA_HOME/bin/javac -version
+            echo "===========8========="
+            ls -al /usr/local/Cellar/openjdk/
+            echo "===========9========="
+            ls -al /usr/bin/java
+            id
+            rm -f /usr/bin/java
+            java -version
+
     - name: install cliclick
       run:  brew install cliclick
 
     - name: install java11
       run:  brew install java11
 
-    - name: test java1
+    - name: test java2
       run:  |
             type java
             echo "===========1========="
