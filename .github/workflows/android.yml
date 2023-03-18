@@ -117,7 +117,8 @@ jobs:
             echo "===========9========="
             ls -al /usr/bin/java
             id
-            rm -f /usr/bin/java
+            sudo rm -f /usr/bin/java
+            export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
             java -version
 
     - name: install cliclick
@@ -146,7 +147,6 @@ jobs:
             echo "===========8========="
             ls -al /usr/local/Cellar/openjdk/
             echo "===========9========="
-            rm -f /usr/bin/java
             java -version
 
     - name: macos-version1
@@ -171,6 +171,7 @@ jobs:
           export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
           ls -al /usr/local/opt/openjdk@11/
           export JAVA_HOME="/usr/local/opt/openjdk@11/"
+          export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
           java -version
           cd android-refimpl-app ; ./gradlew assemble
           cliclick -m verbose m:12,34
