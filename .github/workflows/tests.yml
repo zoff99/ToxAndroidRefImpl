@@ -97,9 +97,9 @@ jobs:
           adb logcat -c
           adb logcat > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt &
           echo 'sleep 240' > /Users/runner/a.sh
-          echo 'adb shell "screencap -p /storage/emulated/0/screen.png1"' >> /Users/runner/a.sh
+          echo 'adb shell "screencap -p /storage/emulated/0/screen1.png"' >> /Users/runner/a.sh
           echo 'adb pull "/storage/emulated/0/screen1.png" /Users/runner/screen_adb_01.png' >> /Users/runner/a.sh
-          echo 'sleep 10' >> /Users/runner/a.sh
+          echo 'sleep 60' >> /Users/runner/a.sh
           echo 'adb shell "screencap -p /storage/emulated/0/screen2.png"' >> /Users/runner/a.sh
           echo 'adb pull "/storage/emulated/0/screen2.png" /Users/runner/screen_adb_02.png' >> /Users/runner/a.sh
           cat /Users/runner/a.sh
