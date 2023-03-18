@@ -45,6 +45,11 @@ jobs:
     - name: macos-version2
       run: system_profiler SPSoftwareDataType
 
+    - name: Run FFMPEG
+      run: |
+       brew install ffmpeg
+       ffmpeg -nostdin -f avfoundation -i 0 recording.mov &
+
     - name: android test
       uses: reactivecircus/android-emulator-runner@v2
       with:
@@ -88,9 +93,24 @@ jobs:
           screencapture -T 300 -x -t png /Users/runner/screen99.png &
           cd android-refimpl-app ; ./gradlew connectedAndroidTest || echo "NOERR"
 
+    - name: Stop Recording
+      continue-on-error: true
+      shell: bash
+      run: |
+       PID=$(ps aux | grep -m 1 ffmpeg | awk '{print $2}')
+       python -c "import os, signal; os.kill($PID, signal.SIGINT)"
+
     - name: upload screenshots
       uses: actions/upload-artifact@v3
       with:
         name: macscreen
         path: |
           /Users/runner/screen*.png
+
+    - name: upload video
+      if: always()
+      continue-on-error: true
+      uses: actions/upload-artifact@master
+      with:
+       name: Recording
+       path: recording.mov
