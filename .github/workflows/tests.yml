@@ -91,6 +91,8 @@ jobs:
           screencapture -T 69 -x -t png /Users/runner/screen20.png &
           screencapture -T 240 -x -t png /Users/runner/screen98.png &
           screencapture -T 300 -x -t png /Users/runner/screen99.png &
+          adb logcat -c
+          adb logcat > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt &
           cd android-refimpl-app ; ./gradlew connectedAndroidTest || echo "NOERR"
 
     - name: Stop Recording
@@ -106,6 +108,13 @@ jobs:
         name: macscreen
         path: |
           /Users/runner/screen*.png
+
+    - name: upload logcat output
+      uses: actions/upload-artifact@v3
+      with:
+        name: logcat
+        path: |
+          /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
 
     - name: upload video
       if: always()
