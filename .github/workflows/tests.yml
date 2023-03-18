@@ -135,7 +135,7 @@ jobs:
           screencapture -T 69 -x -t png /Users/runner/screen20.png &
           screencapture -T 240 -x -t png /Users/runner/screen98.png &
           screencapture -T 300 -x -t png /Users/runner/screen99.png &
-          adb logcat -c
+          adb logcat -c || echo "NOERR"
           adb logcat > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt &
           echo 'sleep 240' > /Users/runner/a.sh
           echo 'adb shell "screencap -p /storage/emulated/0/screen1.png"' >> /Users/runner/a.sh
