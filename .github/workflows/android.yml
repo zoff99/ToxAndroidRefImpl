@@ -103,14 +103,25 @@ jobs:
     - name: test java1
       run:  |
             type java
+            echo "===========1========="
             java -version || exit 0
+            echo "===========2========="
             /usr/libexec/java_home -V
+            echo "===========3========="
             /usr/libexec/java_home -v 11
+            echo "===========4========="
             export JAVA_HOME=$(/usr/libexec/java_home -v11)
+            echo "===========5========="
             java -version
+            echo "===========6========="
             $JAVA_HOME/bin/java -version
+            echo "===========7========="
             $JAVA_HOME/bin/javac -version
+            echo "===========8========="
             ls -al /usr/local/Cellar/openjdk/
+            echo "===========9========="
+            rm -f /usr/bin/java
+            java -version
 
     - name: macos-version1
       run: sw_vers -productVersion
@@ -134,6 +145,7 @@ jobs:
           export PATH="/usr/local/opt/openjdk@11/bin:$PATH"
           ls -al /usr/local/opt/openjdk@11/
           export JAVA_HOME="/usr/local/opt/openjdk@11/"
+          java -version
           cd android-refimpl-app ; ./gradlew assemble
           cliclick -m verbose m:12,34
           screencapture -T 42 -x -t png /Users/runner/screen01.png &
