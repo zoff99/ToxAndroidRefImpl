@@ -1,6 +1,18 @@
 name: Android CI
 
-on: [push, pull_request]
+  push:
+    paths-ignore:
+     - 'README.md'
+     - '.github/workflows/tests.yml'
+  pull_request:
+    paths-ignore:
+     - 'README.md'
+     - '.github/workflows/tests.yml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
 
 jobs:
   update-nightly-tag:

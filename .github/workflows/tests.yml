@@ -1,6 +1,18 @@
 name: App Tests
 
-on: [push, pull_request]
+  push:
+    paths-ignore:
+     - 'README.md'
+     - '.github/workflows/android.yml'
+  pull_request:
+    paths-ignore:
+     - 'README.md'
+     - '.github/workflows/android.yml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
 
 jobs:
   android-test-linux:
