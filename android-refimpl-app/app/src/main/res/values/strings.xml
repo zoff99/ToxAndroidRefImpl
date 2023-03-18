@@ -345,7 +345,7 @@
     <string name="add_group_activity_help">Create a new Private (invite only) Group with a given Group Name.</string>
     <string name="add_public_group_activity_help">Create a new Public Group with a given Group Name.</string>
     <string name="join_public_group_activity_help">Join a Public Group with the given Group ID.</string>
-    <string name="join_public_group_activity_warning">Warning:\njoining a Public Group via Group ID is not working yet!!</string>
+    <string name="join_public_group_activity_warning">Warning:\njoining a Public Group via Group ID is not reliably working yet!!</string>
     <string name="add_group_activity_add">Create Group</string>
     <string name="join_group_activity_join">Join Group</string>
     <string name="cancel">Cancel</string>
