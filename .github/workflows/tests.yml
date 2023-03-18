@@ -80,11 +80,9 @@ jobs:
        ffmpeg -nostdin -f avfoundation -i 0 recording.mov &
 
     - name: android test
-      timeout-minutes: 60
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 26
-        target: default
+        api-level: 29
         profile: Nexus 6
         arch: x86_64
         # ndk: 16.1.4479499
@@ -92,7 +90,7 @@ jobs:
         # ndk: 20.1.5948944
         cmake: 3.10.2.4988404
         emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
-        disable-animations: false
+        disable-animations: true
         disable-spellchecker: true
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
@@ -130,7 +128,7 @@ jobs:
           echo 'sleep 240' > /Users/runner/a.sh
           echo 'adb shell "screencap -p /storage/emulated/0/screen1.png"' >> /Users/runner/a.sh
           echo 'adb pull "/storage/emulated/0/screen1.png" /Users/runner/screen_adb_01.png' >> /Users/runner/a.sh
-          echo 'sleep 60' >> /Users/runner/a.sh
+          echo 'sleep 10' >> /Users/runner/a.sh
           echo 'adb shell "screencap -p /storage/emulated/0/screen2.png"' >> /Users/runner/a.sh
           echo 'adb pull "/storage/emulated/0/screen2.png" /Users/runner/screen_adb_02.png' >> /Users/runner/a.sh
           cat /Users/runner/a.sh
