@@ -91,7 +91,7 @@ jobs:
 
   android-test:
     runs-on: macos-latest
-    if: ${{ false }}  # disable for now
+    if: ${{ true }}  # disable for now
     steps:
     - uses: actions/checkout@v3
     - name: install cliclick
