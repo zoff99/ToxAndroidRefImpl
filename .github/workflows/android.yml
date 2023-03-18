@@ -135,12 +135,12 @@ jobs:
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 30
-        # arch: x86_64
+        arch: x86_64
         # ndk: 16.1.4479499
         ndk: 21.0.6113669
         # ndk: 20.1.5948944
         cmake: 3.10.2.4988404
-        # emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+        emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           echo 'org.gradle.java.home=/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.1/Contents/Home' >> /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/gradle.properties
