@@ -101,7 +101,7 @@ jobs:
         ndk: 21.0.6113669
         # ndk: 20.1.5948944
         cmake: 3.10.2.4988404
-        emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+        emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         disable-spellchecker: true
         script: |
