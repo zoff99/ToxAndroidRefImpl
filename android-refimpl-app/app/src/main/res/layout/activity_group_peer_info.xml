@@ -125,20 +125,59 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="15dp"
-                android:fontFamily="monospace"
-                android:gravity="center_horizontal"
-                android:visibility="gone"
-                android:text="set new peer role in group"
-                android:textSize="16sp" />
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text="Set new Peer role:"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <androidx.appcompat.widget.AppCompatSpinner
-                android:id="@+id/group_peerrole_select"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <androidx.appcompat.widget.AppCompatSpinner
+                    android:id="@+id/group_peerrole_select"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="left"
+                    android:layout_weight="80"
+                    android:textSize="13sp" />
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/group_peerrole_set_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="right"
+                    android:layout_weight="10"
+                    android:gravity="center"
+                    android:text="Set new Role"
+                    android:textAllCaps="false"
+                    android:textSize="13sp" />
+
+            </LinearLayout>
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/group_peer_debug_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:visibility="gone"
                 android:layout_gravity="center"
-                android:layout_marginBottom="15dp" />
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                android:text="send private random" />
 
             <TextView
                 android:layout_width="match_parent"
@@ -150,8 +189,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="15dp"
-                android:visibility="gone"
-                android:text="kick peer from group" />
+                android:text="kick peer from group"
+                android:visibility="visible" />
 
             <TextView
                 android:layout_width="match_parent"

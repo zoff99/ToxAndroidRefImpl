@@ -34,6 +34,8 @@ import android.widget.TextView;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import java.util.Random;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatSpinner;
@@ -46,8 +48,11 @@ import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_messag
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_mod_kick_peer;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_mod_set_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_private_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_private_message_by_peerpubkey;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 
@@ -62,16 +67,14 @@ public class GroupPeerInfoActivity extends AppCompatActivity
     TextView group_peerrole_text = null;
     AppCompatButton group_kickpeer_button = null;
     AppCompatSpinner group_peerrole_select = null;
-    private String[] tox_ngc_group_role_items;
-    boolean first_select = true;
-
     String group_id = null;
+    private String[] tox_ngc_group_role_items;
+    private AppCompatButton group_peer_debug_button = null;
+    private AppCompatButton group_peerrole_set_button = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
-        first_select = true;
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_group_peer_info);
 
@@ -87,13 +90,32 @@ public class GroupPeerInfoActivity extends AppCompatActivity
         group_send_private_message = (EditText) findViewById(R.id.group_send_private_message);
         group_kickpeer_button = findViewById(R.id.group_kickpeer_button);
         group_peerrole_select = findViewById(R.id.group_peerrole_select);
+        group_peerrole_set_button = findViewById(R.id.group_peerrole_set_button);
 
+        group_peer_debug_button = findViewById(R.id.group_peer_debug_button);
+        group_peer_debug_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                try
+                {
+                    final int len = 37000;
+                    byte[] d = new byte[len];
+                    new Random().nextBytes(d);
+                    tox_group_send_custom_private_packet(group_num,
+                                                         get_group_peernum_from_peer_pubkey(group_id, peer_pubkey), 1,
+                                                         d, len);
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+        });
 
-        this.tox_ngc_group_role_items = new String[] {
-                "---", "TOX_GROUP_ROLE_MODERATOR", "TOX_GROUP_ROLE_USER", "TOX_GROUP_ROLE_OBSERVER"
-        };
-        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this,
-                                                                android.R.layout.simple_spinner_item, tox_ngc_group_role_items);
+        this.tox_ngc_group_role_items = new String[]{"---", "TOX_GROUP_ROLE_MODERATOR", "TOX_GROUP_ROLE_USER", "TOX_GROUP_ROLE_OBSERVER"};
+        ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
+                                                                tox_ngc_group_role_items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         group_peerrole_select.setAdapter(adapter);
 
@@ -102,21 +124,68 @@ public class GroupPeerInfoActivity extends AppCompatActivity
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id)
             {
-                if (first_select)
-                {
-                    first_select = false;
-                    Log.i(TAG, "selected_new_role:first_select");
-                }
-                else
-                {
-                    Log.i(TAG, "selected_new_role:" + parent.getItemAtPosition(position));
-                }
+                Log.i(TAG, "selected_new_role:" + parent.getItemAtPosition(position));
             }
 
             @Override
             public void onNothingSelected(AdapterView<?> parent)
             {
 
+            }
+        });
+
+        group_peerrole_set_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                try
+                {
+                    String role_str = (String) group_peerrole_select.getSelectedItem();
+                    int new_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_USER.value;
+                    if (role_str.equals("TOX_GROUP_ROLE_MODERATOR"))
+                    {
+                        new_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_MODERATOR.value;
+                    }
+                    else if (role_str.equals("TOX_GROUP_ROLE_USER"))
+                    {
+                        new_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_USER.value;
+                    }
+                    else if (role_str.equals("TOX_GROUP_ROLE_OBSERVER"))
+                    {
+                        new_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value;
+                    }
+                    else
+                    {
+                        // nothing valid selected
+                        return;
+                    }
+
+                    int result = tox_group_mod_set_role(group_num,
+                                                        get_group_peernum_from_peer_pubkey(group_id, peer_pubkey),
+                                                        new_role);
+                    Log.i(TAG, "setting new role to: " + new_role + " result=" + result);
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+        });
+
+        group_kickpeer_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                try
+                {
+                    int result = tox_group_mod_kick_peer(group_num,
+                                                         get_group_peernum_from_peer_pubkey(group_id, peer_pubkey));
+                    Log.i(TAG, "kicking peer. result=" + result);
+                }
+                catch (Exception ignored)
+                {
+                }
             }
         });
 
@@ -166,7 +235,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
             {
                 group_peerrole_select.setSelection(0);
             }
-            catch(Exception e2)
+            catch (Exception e2)
             {
             }
         }
@@ -241,8 +310,6 @@ public class GroupPeerInfoActivity extends AppCompatActivity
         catch (Exception ignored)
         {
         }
-
-        first_select = true;
     }
 
     @Override

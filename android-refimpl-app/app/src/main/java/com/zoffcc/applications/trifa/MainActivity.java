@@ -3358,6 +3358,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_group_send_custom_packet(long group_number, int lossless, @NonNull byte[] data, int data_length);
 
+    public static native int tox_group_send_custom_private_packet(long group_number, long peer_id, int lossless, @NonNull byte[] data, int data_length);
+
     /**
      * Send a text chat message to the group.
      * <p>
@@ -7181,6 +7183,47 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
             }
+    }
+
+    static void android_tox_callback_group_custom_private_packet_cb_method(long group_number, long peer_id, final byte[] data, long length)
+    {
+        try
+        {
+            Log.i(TAG,
+                  "group_custom_private_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
+                  " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
+        }
+        catch(Exception e)
+        {
+        }
+
+        // check for correct signature of packets
+        final long header = 6 + 1 + 1 + 32 + 4 + 255;
+        if ((length > TOX_MAX_NGC_FILE_AND_HEADER_SIZE) || (length < (header + 1)))
+        {
+            Log.i(TAG, "group_custom_private_packet_cb: data length has wrong size: " + length);
+            return;
+        }
+
+        // @formatter:off
+            /*
+            | what      | Length in bytes| Contents                                           |
+            |------     |--------        |------------------                                  |
+            | magic     |       6        |  0x667788113435                                    |
+            | version   |       1        |  0x01                                              |
+             */
+        // @formatter:on
+
+        if (
+                (data[0] == (byte)0x66) &&
+                (data[1] == (byte)0x77) &&
+                (data[2] == (byte)0x88) &&
+                (data[3] == (byte)0x11) &&
+                (data[4] == (byte)0x34) &&
+                (data[5] == (byte)0x35))
+        {
+
+        }
     }
 
     // -------- called by native new Group methods --------
