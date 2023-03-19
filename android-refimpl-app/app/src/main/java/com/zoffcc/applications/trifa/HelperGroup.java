@@ -674,6 +674,7 @@ public class HelperGroup
         m.text = system_message;
         m.message_id_tox = "";
         m.was_synced = false;
+        m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
 
         if (group_message_list_activity != null)
         {
@@ -794,6 +795,7 @@ public class HelperGroup
         m.text = message_;
         m.message_id_tox = message_id_;
         m.was_synced = false;
+        m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
         // Log.i(TAG, "message_id_tox=" + message_id_ + " message_id=" + message_id);
 
         try
@@ -860,7 +862,16 @@ public class HelperGroup
         }
     }
 
-    static void group_message_add_from_sync(final String group_identifier, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id)
+    static void group_message_add_from_sync(final String group_identifier, long peer_number2,
+                                            String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message,
+                                            long length, long sent_timestamp_in_ms, String message_id)
+    {
+        group_message_add_from_sync(group_identifier, peer_number2, peer_pubkey, a_TOX_MESSAGE_TYPE, message,
+                                    length, sent_timestamp_in_ms, message_id,
+                                    TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value);
+    }
+
+    static void group_message_add_from_sync(final String group_identifier, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id, int sync_type)
     {
         // Log.i(TAG,
         //       "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" + message);
@@ -951,6 +962,7 @@ public class HelperGroup
         m.text = message;
         m.message_id_tox = message_id;
         m.was_synced = true;
+        m.TRIFA_SYNC_TYPE = sync_type;
 
         try
         {
@@ -1332,6 +1344,7 @@ public class HelperGroup
             m.text = filename_corrected + "\n" + file_size + " bytes";
             m.message_id_tox = "";
             m.was_synced = false;
+            m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
             m.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + m.group_identifier + "/";
             m.file_name = filename_corrected;
             m.filename_fullpath = m.path_name + m.file_name;
@@ -1409,7 +1422,7 @@ public class HelperGroup
             {
                 try
                 {
-                    // HINT: sleep "9 + random(0 .. 8)" seconds
+                    // HINT: sleep "9 + random(0 .. 7)" seconds
                     Random rand = new Random();
                     int rndi = rand.nextInt(8);
                     int n = 9 + rndi;
@@ -1540,7 +1553,7 @@ public class HelperGroup
         try
         {
             Random rand = new Random();
-            int rndi = rand.nextInt(300);
+            int rndi = rand.nextInt(301);
             int n = 300 + rndi;
             Log.i(TAG, "send_ngch_syncmsg: sleep for " + n + " ms");
             Thread.sleep(n);
@@ -1779,7 +1792,8 @@ public class HelperGroup
 
                 group_message_add_from_sync(group_identifier, sender_peer_num, original_sender_peerpubkey,
                                             TRIFA_MSG_TYPE_TEXT.value, message_str, message_str.length(),
-                                            (timestamp * 1000), message_id_tox);
+                                            (timestamp * 1000), message_id_tox,
+                                            TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value);
             }
             catch(Exception e)
             {

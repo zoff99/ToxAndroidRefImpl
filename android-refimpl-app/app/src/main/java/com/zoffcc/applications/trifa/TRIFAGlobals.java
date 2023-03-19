@@ -103,6 +103,8 @@ public class TRIFAGlobals
     final static String TOXIRC_TOKTOK_GROUPID = "fcd19cef34d5fcc970562c849808c370fb6c54fbc1a1c74d9691582ed597dd61";
     final static String TOXIRC_NGC_PUBKEY = "7C6F258261CB4BB3A1ADD7756728558926E8BD794E340FC1DED13343726FDB75";
     final static String TOXIRC_TOKTOK_IRC_USER_PUBKEY = "05D78D2393A4DFB689912C567341EC5B1B2E1591B1FE14B46CBD31899F6F5";
+    //
+    final static String TOX_TRIFA_PUBLIC_GROUPID = "154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762";
     // ----------
 
     final static boolean ADD_BOTS_ON_STARTUP = true;
@@ -284,6 +286,17 @@ public class TRIFAGlobals
         }
     }
 
+    public static enum TRIFA_SYNC_TYPE
+    {
+        TRIFA_SYNC_TYPE_NONE(0), TRIFA_SYNC_TYPE_TOXPROXY(1), TRIFA_SYNC_TYPE_NGC_PEERS(2);
+
+        public int value;
+
+        private TRIFA_SYNC_TYPE(int value)
+        {
+            this.value = value;
+        }
+    }
 
     public static enum CONTROL_PROXY_MESSAGE_TYPE
     {

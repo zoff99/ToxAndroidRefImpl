@@ -782,6 +782,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
                 m.text = msg;
                 m.was_synced = false;
+                m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
 
                 if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
@@ -1573,6 +1574,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
             m.text = ofw.filename_wrapped + "\n" + ofw.file_size_wrapped + " bytes";
             m.was_synced = false;
+            m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
             m.path_name = ofw.filepath_wrapped;
             m.file_name = ofw.filename_wrapped;
             m.filename_fullpath = new java.io.File(ofw.filepath_wrapped + "/" + ofw.filename_wrapped).getAbsolutePath();

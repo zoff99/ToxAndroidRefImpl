@@ -214,6 +214,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_PUSH_SETUP_HOWTO_URL;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_TRIFA_PUBLIC_GROUPID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
@@ -5303,9 +5304,28 @@ public class MainActivity extends AppCompatActivity
                             return;
                         }
 
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        if (real_conference_id.equals(TOX_TRIFA_PUBLIC_GROUPID))
+                        {
+                            Log.i(TAG, "DEBUG:ignoring toxproxy for TOX_TRIFA_PUBLIC_GROUPID:DEBUG");
+                            return;
+                        }
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+                        // ========= DEBUG =========
+
                         group_message_add_from_sync(real_conference_id, sender_peer_num, real_sender_peer_pubkey,
                                                     TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
-                                                    sync_msg_received_timestamp, real_send_message_id);
+                                                    sync_msg_received_timestamp, real_send_message_id,
+                                                    TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_TOXPROXY.value);
 
                         send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
                                                            (System.currentTimeMillis() / 1000));

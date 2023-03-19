@@ -520,8 +520,21 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
 
             if (m.was_synced)
             {
-                // synced from ToxProxy
-                imageView.setImageResource(R.drawable.circle_orange);
+                try
+                {
+                    if (m.TRIFA_SYNC_TYPE == TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value)
+                    {
+                        imageView.setImageResource(R.drawable.circle_pink);
+                    }
+                    else
+                    {
+                        imageView.setImageResource(R.drawable.circle_orange);
+                    }
+                }
+                catch(Exception e3)
+                {
+                    imageView.setImageResource(R.drawable.circle_orange);
+                }
             }
             else
             {

@@ -301,6 +301,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                         m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
                         m.text = private_message_text;
                         m.was_synced = false;
+                        m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
 
                         insert_into_group_message_db(m, true);
                     }
