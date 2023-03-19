@@ -79,8 +79,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 85
-static const char global_version_string[] = "0.99.85";
+#define VERSION_PATCH 86
+static const char global_version_string[] = "0.99.86";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -269,6 +269,7 @@ jmethodID android_tox_callback_group_self_join_cb_method = NULL;
 jmethodID android_tox_callback_group_topic_cb_method = NULL;
 jmethodID android_tox_callback_group_privacy_state_cb_method = NULL;
 jmethodID android_tox_callback_group_custom_packet_cb_method = NULL;
+jmethodID android_tox_callback_group_custom_private_packet_cb_method = NULL;
 // -------- _newGroup-callbacks_ -----
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
@@ -361,6 +362,9 @@ void group_peer_exit_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_G
                         const uint8_t *name, size_t name_length, const uint8_t *part_message, size_t length, void *user_data);
 
 void group_custom_packet_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *data,
+                        size_t length, void *user_data);
+
+void group_custom_private_packet_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *data,
                         size_t length, void *user_data);
 
 void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *name,
@@ -1010,6 +1014,7 @@ void init_tox_callbacks()
     tox_callback_group_topic(tox_global, group_topic_cb);
     tox_callback_group_privacy_state(tox_global, group_privacy_state_cb);
     tox_callback_group_custom_packet(tox_global, group_custom_packet_cb);
+    tox_callback_group_custom_private_packet(tox_global, group_custom_private_packet_cb);
 #endif
     // -------- newGroups _callbacks_ --------
 
@@ -2772,6 +2777,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_group_privacy_state_cb_method", "(JI)V");
     android_tox_callback_group_custom_packet_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_custom_packet_cb_method", "(JJ[BJ)V");
+    android_tox_callback_group_custom_private_packet_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_custom_private_packet_cb_method", "(JJ[BJ)V");
     // -------- _newGroup _callbacks_ --------
 
     dbg(9, "linking callbacks ... READY");
@@ -7162,6 +7169,50 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1custom_1packet
 #endif
 }
 
+bool tox_group_send_custom_private_packet(const Tox *tox, uint32_t group_number, uint32_t peer_id, bool lossless,
+        const uint8_t *data, size_t length,
+        Tox_Err_Group_Send_Custom_Private_Packet *error);
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1custom_1private_1packet(JNIEnv *env, jobject thiz, jlong group_number,
+        jlong peer_id, jint lossless, jbyteArray data, jint data_length)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    bool lossless_b = false;
+    if (lossless == 1)
+    {
+        lossless_b = true;
+    }
+
+    jbyte *data2 = (*env)->GetByteArrayElements(env, data, 0);
+    Tox_Err_Group_Send_Custom_Private_Packet error;
+    bool res = tox_group_send_custom_private_packet(tox_global,
+                                            (uint32_t)group_number,
+                                            (uint32_t)peer_id,
+                                            lossless_b,
+                                            (const uint8_t *)data2,
+                                            (size_t)data_length,
+                                            &error);
+    (*env)->ReleaseByteArrayElements(env, data, data2, JNI_ABORT); /* abort to not copy back contents */
+
+    if (error != TOX_ERR_GROUP_SEND_CUSTOM_PRIVATE_PACKET_OK)
+    {
+        return (jint)(-99);
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1reconnect(JNIEnv *env, jobject thiz, jlong group_number)
 {
@@ -7850,6 +7901,35 @@ void group_custom_packet_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, c
                         size_t length, void *user_data)
 {
     android_tox_callback_group_custom_packet_cb(group_number, peer_id, data, length);
+}
+
+void android_tox_callback_group_custom_private_packet_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *data, size_t length)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+    jbyteArray data2 = (*jnienv2)->NewByteArray(jnienv2, (int)length);
+
+    if(data2 == NULL)
+    {
+    }
+
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    (*jnienv2)->SetByteArrayRegion(jnienv2, data2, 0, (int)length, (const jbyte *)data);
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    // TODO: !! assuming sizeof(jbyte) == sizeof(uint8_t) !!
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_custom_private_packet_cb_method, (jlong)(unsigned long long)group_number,
+                                     (jlong)(unsigned long long)peer_id,
+                                     data2, (jlong)(unsigned long long)length);
+    // delete jobject --------
+    (*jnienv2)->DeleteLocalRef(jnienv2, data2);
+}
+
+void group_custom_private_packet_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *data,
+                        size_t length, void *user_data)
+{
+    android_tox_callback_group_custom_private_packet_cb(group_number, peer_id, data, length);
 }
 
 void android_tox_callback_group_peer_name_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *name, size_t length)
