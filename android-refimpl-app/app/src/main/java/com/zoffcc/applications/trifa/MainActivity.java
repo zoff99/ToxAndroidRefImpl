@@ -168,9 +168,13 @@ import static com.zoffcc.applications.trifa.HelperGroup.android_tox_callback_gro
 import static com.zoffcc.applications.trifa.HelperGroup.get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.group_message_add_from_sync;
 import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_group_file;
+import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_sync_group_message;
+import static com.zoffcc.applications.trifa.HelperGroup.send_ngch_request;
 import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
+import static com.zoffcc.applications.trifa.HelperGroup.sync_group_message_history;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupnum__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_privacy_state;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_topic;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_friendlist;
@@ -200,6 +204,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_GROUP_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
@@ -5284,7 +5289,7 @@ public class MainActivity extends AppCompatActivity
 
                         GroupMessage gm = get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey(
                                 real_conference_id, real_sender_peer_pubkey, sync_msg_received_timestamp,
-                                real_send_message_id, MESSAGE_SYNC_DOUBLE_INTERVAL_SECS, false, real_sender_text);
+                                real_send_message_id, MESSAGE_GROUP_SYNC_DOUBLE_INTERVAL_SECS, real_sender_text);
 
                         // Log.i(TAG, "m.message_id_tox=" + real_send_message_id);
 
@@ -7053,6 +7058,11 @@ public class MainActivity extends AppCompatActivity
         update_group_in_friendlist(temp_group_identifier);
         update_group_in_groupmessagelist(temp_group_identifier);
         add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " joined the group");
+        int privacy_state = tox_group_get_privacy_state(group_number);
+        if (privacy_state == ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value)
+        {
+            send_ngch_request(temp_group_identifier, tox_group_peer_get_public_key__wrapper(group_number, peer_id));
+        }
     }
 
     static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a_Tox_Group_Exit_Type)
@@ -7197,9 +7207,23 @@ public class MainActivity extends AppCompatActivity
         {
         }
 
+        try
+        {
+            long res = tox_group_self_get_peer_id(group_number);
+            if (res == peer_id)
+            {
+                // HINT: ignore own packets
+                Log.i(TAG, "group_custom_private_packet_cb:gn=" + group_number + " peerid=" + peer_id + " ignoring own packet");
+                return;
+            }
+        }
+        catch(Exception e)
+        {
+        }
+
         // check for correct signature of packets
-        final long header = 6 + 1 + 1 + 32 + 4 + 255;
-        if ((length > TOX_MAX_NGC_FILE_AND_HEADER_SIZE) || (length < (header + 1)))
+        final long header = 6 + 1 + 1;
+        if ((length > TOX_MAX_NGC_FILE_AND_HEADER_SIZE) || (length < header))
         {
             Log.i(TAG, "group_custom_private_packet_cb: data length has wrong size: " + length);
             return;
@@ -7222,7 +7246,28 @@ public class MainActivity extends AppCompatActivity
                 (data[4] == (byte)0x34) &&
                 (data[5] == (byte)0x35))
         {
-
+            if ((data[6] == (byte)0x1) && (data[7] == (byte)0x1))
+            {
+                Log.i(TAG, "group_custom_private_packet_cb: got ngch_request");
+                int privacy_state = tox_group_get_privacy_state(group_number);
+                if (privacy_state == ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value)
+                {
+                    sync_group_message_history(group_number, peer_id);
+                }
+                else
+                {
+                    Log.i(TAG, "group_custom_private_packet_cb: only sync history for public groups!");
+                }
+            }
+            else if ((data[6] == (byte)0x1) && (data[7] == (byte)0x2))
+            {
+                final int header_syncmsg = 6 + 1 + 1 + 4 + 32 + 4 + 25;
+                if (length >= (header_syncmsg + 1))
+                {
+                    Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncmsg");
+                    handle_incoming_sync_group_message(group_number, peer_id, data, length);
+                }
+            }
         }
     }
 

@@ -78,6 +78,9 @@ public class TRIFAGlobals
 
     public static final int MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION = 4;
 
+    public static final int TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES = 25;
+    public static final int TOX_NGC_HISTORY_SYNC_MAX_SECONDS_BACK = 130 * 60; // 130 minutes
+
     public static final int FAB_SCROLL_TO_BOTTOM_FADEOUT_MS = 300;
     public static final int FAB_SCROLL_TO_BOTTOM_FADEIN_MS = 200;
 
@@ -251,6 +254,8 @@ public class TRIFAGlobals
     static int CONFERENCE_CHAT_DRAWER_ICON_CORNER_RADIUS_IN_PX = 20;
 
     static int MESSAGE_SYNC_DOUBLE_INTERVAL_SECS = 20;
+    static int MESSAGE_GROUP_SYNC_DOUBLE_INTERVAL_SECS = 300;
+    static int MESSAGE_GROUP_HISTORY_SYNC_DOUBLE_INTERVAL_SECS = 60 * 24 * 1; // 1 day
     static long MESSAGE_V2_MSG_SENT_OK = (Long.MAX_VALUE - 1);
 
     public static enum TRIFA_FT_DIRECTION
