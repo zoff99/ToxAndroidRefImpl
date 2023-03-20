@@ -86,6 +86,21 @@ public class GroupMessage
     @Nullable
     int TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
 
+    @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
+    int sync_confirmations = 0;
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String tox_group_peer_pubkey_syncer_01;
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String tox_group_peer_pubkey_syncer_02;
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    @Nullable
+    String tox_group_peer_pubkey_syncer_03;
+
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
     String msg_id_hash = null; // 32 byte hash
@@ -138,6 +153,10 @@ public class GroupMessage
         out.filename_fullpath = in.filename_fullpath;
         out.storage_frame_work = in.storage_frame_work;
         out.TRIFA_SYNC_TYPE = in.TRIFA_SYNC_TYPE;
+        out.sync_confirmations = in.sync_confirmations;
+        out.tox_group_peer_pubkey_syncer_01 = in.tox_group_peer_pubkey_syncer_01;
+        out.tox_group_peer_pubkey_syncer_02 = in.tox_group_peer_pubkey_syncer_02;
+        out.tox_group_peer_pubkey_syncer_03 = in.tox_group_peer_pubkey_syncer_03;
 
         return out;
     }

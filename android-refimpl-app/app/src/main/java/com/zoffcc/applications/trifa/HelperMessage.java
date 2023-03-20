@@ -893,6 +893,11 @@ public class HelperMessage
                                         "direction:"+m.direction+"\n"+
                                         "private_message:"+m.private_message+"\n"+
                                         "was_synced:"+m.was_synced+"\n"+
+                                        "TRIFA_SYNC_TYPE:"+m.TRIFA_SYNC_TYPE+"\n"+
+                                        "sync_confirmations:"+m.sync_confirmations+"\n"+
+                                        "sync_1:"+m.tox_group_peer_pubkey_syncer_01+"\n"+
+                                        "sync_2:"+m.tox_group_peer_pubkey_syncer_02+"\n"+
+                                        "sync_3:"+m.tox_group_peer_pubkey_syncer_03+"\n"+
                                         "read:"+m.read+"\n"+
                                         "tox_group_peer_pubkey:"+m.tox_group_peer_pubkey+"\n"+
                                         "group_identifier:"+m.group_identifier+"\n"+
@@ -902,7 +907,8 @@ public class HelperMessage
                                         "sent_timestamp:"+long_date_time_format_or_empty(m.sent_timestamp)+"\n"+
                                         "rcvd_timestamp:"+m.rcvd_timestamp+"\n"+
                                         "rcvd_timestamp:"+long_date_time_format_or_empty(m.rcvd_timestamp)+"\n"+
-                                        "TOX_MESSAGE_TYPE:"+m.TOX_MESSAGE_TYPE+"\n"
+                                        "TOX_MESSAGE_TYPE:"+m.TOX_MESSAGE_TYPE+"\n"+
+                                        "filename_fullpath:"+m.filename_fullpath+"\n"
                                 ).
                                 setTitle("Message Info").
                                 setCancelable(false).

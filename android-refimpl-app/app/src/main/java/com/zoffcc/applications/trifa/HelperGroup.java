@@ -49,9 +49,12 @@ import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_not
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.android_tox_callback_conference_title_cb_method;
 import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
@@ -862,20 +865,21 @@ public class HelperGroup
         }
     }
 
-    static void group_message_add_from_sync(final String group_identifier, long peer_number2,
+    static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey, long peer_number2,
                                             String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message,
                                             long length, long sent_timestamp_in_ms, String message_id)
     {
-        group_message_add_from_sync(group_identifier, peer_number2, peer_pubkey, a_TOX_MESSAGE_TYPE, message,
+        group_message_add_from_sync(group_identifier, syncer_pubkey, peer_number2, peer_pubkey, a_TOX_MESSAGE_TYPE, message,
                                     length, sent_timestamp_in_ms, message_id,
                                     TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value);
     }
 
-    static void group_message_add_from_sync(final String group_identifier, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id, int sync_type)
+    static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id, int sync_type)
     {
         // Log.i(TAG,
         //       "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" + message);
 
+        long group_num_ = tox_group_by_groupid__wrapper(group_identifier);
         int res = -1;
         if (peer_number2 == -1)
         {
@@ -883,7 +887,6 @@ public class HelperGroup
         }
         else
         {
-            long group_num_ = tox_group_by_groupid__wrapper(group_identifier);
             final long my_peer_num = tox_group_self_get_peer_id(group_num_);
             if (my_peer_num == peer_number2)
             {
@@ -963,6 +966,15 @@ public class HelperGroup
         m.message_id_tox = message_id;
         m.was_synced = true;
         m.TRIFA_SYNC_TYPE = sync_type;
+        if (sync_type == TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value)
+        {
+            Log.i(TAG, "add syncer_pubkey_01:" + syncer_pubkey);
+            m.tox_group_peer_pubkey_syncer_01 = syncer_pubkey;
+        }
+        else
+        {
+            m.tox_group_peer_pubkey_syncer_01 = null;
+        }
 
         try
         {
@@ -1682,6 +1694,7 @@ public class HelperGroup
             }
 
             final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
+            final String syncer_pubkey = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
 
             ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_GROUP_PEER_PUBLIC_KEY_SIZE);
             hash_bytes.put(data, 8 + 4, 32);
@@ -1715,6 +1728,20 @@ public class HelperGroup
                                                timestamp_byte_buffer.limit()));
 
             Log.i(TAG, "handle_incoming_sync_group_message:timestamp=" + timestamp);
+
+            if (timestamp > ((System.currentTimeMillis() / 1000) + (60 * 5)))
+            {
+                long delta_t = timestamp - (System.currentTimeMillis() / 1000);
+                Log.i(TAG, "handle_incoming_sync_group_message:delta t=" + delta_t + " do NOT sync messages from the future");
+                return;
+            }
+            else if (timestamp < ((System.currentTimeMillis() / 1000) - (60 * 200)))
+            {
+                long delta_t = (System.currentTimeMillis() / 1000) - timestamp;
+                Log.i(TAG, "handle_incoming_sync_group_message:delta t=" + (-delta_t) + " do NOT sync messages that are too old");
+                return;
+            }
+
             //
             //
             //
@@ -1784,13 +1811,79 @@ public class HelperGroup
                         group_identifier, original_sender_peerpubkey, (timestamp * 1000),
                         message_id_tox, MESSAGE_GROUP_HISTORY_SYNC_DOUBLE_INTERVAL_SECS, message_str);
 
+                try
+                {
+                    if ((message_id_tox != null) && (message_id_tox.length()>1))
+                    {
+                        GroupMessage gmsg = orma.selectFromGroupMessage().group_identifierEq(group_identifier).
+                                tox_group_peer_pubkeyEq(original_sender_peerpubkey).
+                                message_id_toxEq(message_id_tox).
+                                textEq(message_str).toList().get(0);
+                        if (gmsg != null)
+                        {
+                            if (gmsg.was_synced)
+                            {
+                                Log.i(TAG,"handle_incoming_sync_group_message:syn_conf: message_id_tox="
+                                          +message_id_tox+ ", syncer=" + syncer_pubkey);
+                                if (gmsg.sync_confirmations == 0)
+                                {
+                                    if (!syncer_pubkey.equals(gmsg.tox_group_peer_pubkey_syncer_01))
+                                    {
+                                        // its a new syncer
+                                        orma.updateGroupMessage().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(
+                                                original_sender_peerpubkey).message_id_toxEq(message_id_tox).textEq(
+                                                message_str).sync_confirmations(gmsg.sync_confirmations + 1).
+                                                tox_group_peer_pubkey_syncer_01(syncer_pubkey).
+                                                execute();
+                                        Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=1, syncer=" + syncer_pubkey);
+                                        update_group_message_in_list(gmsg);
+                                    }
+                                }
+                                else if (gmsg.sync_confirmations == 1)
+                                {
+                                    if ((!syncer_pubkey.equals(gmsg.tox_group_peer_pubkey_syncer_01)) &&
+                                        (!syncer_pubkey.equals(gmsg.tox_group_peer_pubkey_syncer_02)))
+                                    {
+                                        // its a new syncer
+                                        orma.updateGroupMessage().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(
+                                                original_sender_peerpubkey).message_id_toxEq(message_id_tox).textEq(
+                                                message_str).sync_confirmations(gmsg.sync_confirmations + 1).
+                                                tox_group_peer_pubkey_syncer_02(syncer_pubkey).
+                                                execute();
+                                        Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=2, syncer=" + syncer_pubkey);
+                                        update_group_message_in_list(gmsg);
+                                    }
+                                }
+                                else if (gmsg.sync_confirmations == 2)
+                                {
+                                    if ((!syncer_pubkey.equals(gmsg.tox_group_peer_pubkey_syncer_01)) &&
+                                        (!syncer_pubkey.equals(gmsg.tox_group_peer_pubkey_syncer_02)) &&
+                                        (!syncer_pubkey.equals(gmsg.tox_group_peer_pubkey_syncer_03)))
+                                    {
+                                        // its a new syncer
+                                        orma.updateGroupMessage().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(
+                                                original_sender_peerpubkey).message_id_toxEq(message_id_tox).textEq(
+                                                message_str).sync_confirmations(gmsg.sync_confirmations + 1).execute();
+                                        Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=3, syncer=" + syncer_pubkey);
+                                        update_group_message_in_list(gmsg);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
+                    Log.i(TAG,"handle_incoming_sync_group_message:EE003:" + e.getMessage());
+                }
+
                 if (gm != null)
                 {
                     Log.i(TAG,"handle_incoming_sync_group_message:potential double message:" + message_str);
                     return;
                 }
 
-                group_message_add_from_sync(group_identifier, sender_peer_num, original_sender_peerpubkey,
+                group_message_add_from_sync(group_identifier, syncer_pubkey, sender_peer_num, original_sender_peerpubkey,
                                             TRIFA_MSG_TYPE_TEXT.value, message_str, message_str.length(),
                                             (timestamp * 1000), message_id_tox,
                                             TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value);
@@ -1805,6 +1898,46 @@ public class HelperGroup
         {
             e.printStackTrace();
             Log.i(TAG, "handle_incoming_sync_group_message:EE001:" + e.getMessage());
+        }
+    }
+
+    private static void update_group_message_in_list(final GroupMessage gmsg)
+    {
+        try
+        {
+            if ((MainActivity.group_message_list_fragment != null)
+                && (gmsg.group_identifier.equals(MainActivity.group_message_list_fragment.current_group_id)))
+                {
+                    //
+                }
+            else
+            {
+                // we are not showing that ngc group now
+                return;
+            }
+
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        MainActivity.group_message_list_fragment.modify_message(gmsg);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
+        }
+        catch(Exception e)
+        {
         }
     }
 }

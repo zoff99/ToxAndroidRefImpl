@@ -34,6 +34,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.amulyakhare.textdrawable.TextDrawable;
 import com.daimajia.swipe.SwipeLayout;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.AutoLinkOnClickListener;
@@ -529,6 +530,19 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
                     else
                     {
                         imageView.setImageResource(R.drawable.circle_orange);
+                    }
+
+                    if (m.sync_confirmations > 0)
+                    {
+                        String confirmations_text = "" + m.sync_confirmations;
+                        if (m.sync_confirmations > 9)
+                        {
+                            confirmations_text = "+";
+                        }
+
+                        final TextDrawable drawable2 = TextDrawable.builder().beginConfig().textColor(Color.WHITE).bold().width(60).height(60).fontSize(58).endConfig().buildRound(
+                                confirmations_text, Color.GRAY);
+                        imageView.setImageDrawable(drawable2);
                     }
                 }
                 catch(Exception e3)

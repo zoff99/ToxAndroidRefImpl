@@ -5310,11 +5310,11 @@ public class MainActivity extends AppCompatActivity
                         // ========= DEBUG =========
                         // ========= DEBUG =========
                         // ========= DEBUG =========
-                        if (real_conference_id.equals(TOX_TRIFA_PUBLIC_GROUPID))
-                        {
-                            Log.i(TAG, "DEBUG:ignoring toxproxy for TOX_TRIFA_PUBLIC_GROUPID:DEBUG");
-                            return;
-                        }
+                        //if (real_conference_id.equals(TOX_TRIFA_PUBLIC_GROUPID))
+                        //{
+                        //    Log.i(TAG, "DEBUG:ignoring toxproxy for TOX_TRIFA_PUBLIC_GROUPID:DEBUG");
+                        //    return;
+                        //}
                         // ========= DEBUG =========
                         // ========= DEBUG =========
                         // ========= DEBUG =========
@@ -5322,7 +5322,7 @@ public class MainActivity extends AppCompatActivity
                         // ========= DEBUG =========
                         // ========= DEBUG =========
 
-                        group_message_add_from_sync(real_conference_id, sender_peer_num, real_sender_peer_pubkey,
+                        group_message_add_from_sync(real_conference_id, null, sender_peer_num, real_sender_peer_pubkey,
                                                     TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
                                                     sync_msg_received_timestamp, real_send_message_id,
                                                     TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_TOXPROXY.value);
