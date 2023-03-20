@@ -1833,7 +1833,7 @@ public class HelperGroup
                                         orma.updateGroupMessage().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(
                                                 original_sender_peerpubkey).message_id_toxEq(message_id_tox).textEq(
                                                 message_str).sync_confirmations(gmsg.sync_confirmations + 1).
-                                                tox_group_peer_pubkey_syncer_01(syncer_pubkey).
+                                                tox_group_peer_pubkey_syncer_02(syncer_pubkey).
                                                 execute();
                                         Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=1, syncer=" + syncer_pubkey);
                                         update_group_message_in_list(gmsg);
@@ -1848,7 +1848,7 @@ public class HelperGroup
                                         orma.updateGroupMessage().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(
                                                 original_sender_peerpubkey).message_id_toxEq(message_id_tox).textEq(
                                                 message_str).sync_confirmations(gmsg.sync_confirmations + 1).
-                                                tox_group_peer_pubkey_syncer_02(syncer_pubkey).
+                                                tox_group_peer_pubkey_syncer_03(syncer_pubkey).
                                                 execute();
                                         Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=2, syncer=" + syncer_pubkey);
                                         update_group_message_in_list(gmsg);
