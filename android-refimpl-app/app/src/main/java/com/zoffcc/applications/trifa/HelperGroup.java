@@ -39,6 +39,7 @@ import androidx.annotation.NonNull;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.HelperConference.delete_selected_group_messages;
+import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.save_group_incoming_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
@@ -867,14 +868,17 @@ public class HelperGroup
 
     static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey, long peer_number2,
                                             String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message,
-                                            long length, long sent_timestamp_in_ms, String message_id)
+                                            long length, long sent_timestamp_in_ms, String message_id, final String peer_name)
     {
         group_message_add_from_sync(group_identifier, syncer_pubkey, peer_number2, peer_pubkey, a_TOX_MESSAGE_TYPE, message,
                                     length, sent_timestamp_in_ms, message_id,
-                                    TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value);
+                                    TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value, peer_name);
     }
 
-    static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey, long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message, long length, long sent_timestamp_in_ms, String message_id, int sync_type)
+    static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey,
+                                            long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE,
+                                            String message, long length, long sent_timestamp_in_ms,
+                                            String message_id, int sync_type, final String peer_name)
     {
         // Log.i(TAG,
         //       "group_message_add_from_sync:cf_num=" + group_identifier + " pnum=" + peer_number2 + " msg=" + message);
@@ -957,7 +961,7 @@ public class HelperGroup
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.read = false;
-        m.tox_group_peername = null;
+        m.tox_group_peername = peer_name;
         m.group_identifier = group_identifier;
         m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
         m.sent_timestamp = sent_timestamp_in_ms;
@@ -976,13 +980,16 @@ public class HelperGroup
             m.tox_group_peer_pubkey_syncer_01 = null;
         }
 
-        try
+        if (m.tox_group_peername == null)
         {
-            m.tox_group_peername = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            try
+            {
+                m.tox_group_peername = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
         }
 
         if (group_message_list_activity != null)
@@ -1516,7 +1523,7 @@ public class HelperGroup
 
                     Iterator<GroupMessage> i1 =  orma.selectFromGroupMessage()
                             .group_identifierEq(group_identifier)
-                            .TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value)
+                            // .TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value)
                             .private_messageEq(0)
                             .tox_group_peer_pubkeyNotEq("-1")
                             .sent_timestampGt(sync_from_ts)
@@ -1536,7 +1543,14 @@ public class HelperGroup
                                            + gm.sent_timestamp + " syncts=" + sync_from_ts + " "
                                            + gm.tox_group_peer_pubkey + " " +
                                            gm.message_id_tox + " " + gm.msg_id_hash);
-                                send_ngch_syncmsg(group_identifier, peer_pubkey, gm);
+                                if (gm.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
+                                {
+                                    send_ngch_syncfile(group_identifier, peer_pubkey, gm);
+                                }
+                                else
+                                {
+                                    send_ngch_syncmsg(group_identifier, peer_pubkey, gm);
+                                }
                             }
                             else
                             {
@@ -1678,6 +1692,186 @@ public class HelperGroup
         {
             e.printStackTrace();
             Log.i(TAG, "send_ngch_syncmsg:EE:" + e.getMessage());
+        }
+    }
+
+    private static void send_ngch_syncfile(final String group_identifier, final String peer_pubkey, final GroupMessage m)
+    {
+        try
+        {
+            Random rand = new Random();
+            int rndi = rand.nextInt(301);
+            int n = 300 + rndi;
+            Log.i(TAG, "send_ngch_syncfile: sleep for " + n + " ms");
+            Thread.sleep(n);
+            //
+            final int header_length = 6 + 1 + 1 + 32 + 32 + 4 + 25 + 255;
+            final info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
+                m.path_name + "/" + m.file_name);
+            final java.io.File f2 = new java.io.File(m.path_name + "/" + m.file_name);
+
+            long data_length_ = header_length;
+            long f_length = 0;
+            if (m.direction == 1)
+            {
+                // outgoing file
+                data_length_ = data_length_ + f2.length();
+                f_length = f2.length();
+            }
+            else
+            {
+                // incoming file
+                data_length_ = data_length_ + f1.length();
+                f_length = f1.length();
+            }
+
+            Log.i(TAG, "send_ngch_syncfile: file=" + m.path_name + "__/__" + m.file_name + " " + m.filename_fullpath);
+            Log.i(TAG, "send_ngch_syncfile: data_length=" + data_length_ + " header_length=" +
+                       header_length + " filesize=" + f_length);
+
+            if (data_length_ < (header_length + 1) || (data_length_ > 40000))
+            {
+                Log.i(TAG, "send_ngch_syncfile: some error in calculating data length");
+                return;
+            }
+
+            final int data_length = (int)data_length_;
+            ByteBuffer data_buf = ByteBuffer.allocateDirect(data_length);
+
+            data_buf.rewind();
+            //
+            data_buf.put((byte) 0x66);
+            data_buf.put((byte) 0x77);
+            data_buf.put((byte) 0x88);
+            data_buf.put((byte) 0x11);
+            data_buf.put((byte) 0x34);
+            data_buf.put((byte) 0x35);
+            //
+            data_buf.put((byte) 0x1);
+            //
+            data_buf.put((byte) 0x3);
+            // should be 32 bytes
+            try
+            {
+                data_buf.put(HelperGeneric.hex_to_bytes(m.msg_id_hash), 0,32);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                for(int jj=0;jj<32;jj++)
+                {
+                    data_buf.put((byte) 0x0);
+                }
+            }
+            // should be 32 bytes
+            try
+            {
+                data_buf.put(HelperGeneric.hex_to_bytes(m.tox_group_peer_pubkey), 0, 32);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                for(int jj=0;jj<32;jj++)
+                {
+                    data_buf.put((byte) 0x0);
+                }
+            }
+            //
+            // unix timestamp
+            long timestamp_tmp = (m.sent_timestamp / 1000);
+            Log.i(TAG,"send_ngch_syncfile:outgoing_timestamp=" + timestamp_tmp);
+            ByteBuffer temp_buffer = ByteBuffer.allocate(8);
+            temp_buffer.putLong(timestamp_tmp).order(ByteOrder.BIG_ENDIAN);
+            temp_buffer.position(4);
+            data_buf.put(temp_buffer);
+            Log.i(TAG,"send_ngch_syncmsg:send_ts_bytes:" +
+                      HelperGeneric.bytesToHex(temp_buffer.array(), temp_buffer.arrayOffset(), temp_buffer.limit()));
+            //
+            byte[] fn = "peer".getBytes(StandardCharsets.UTF_8);
+            try
+            {
+                final String peer_name = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey);
+                if (peer_name.getBytes(StandardCharsets.UTF_8).length > TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES)
+                {
+                    fn = Arrays.copyOfRange(peer_name.getBytes(StandardCharsets.UTF_8),0,TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES);
+                }
+                else
+                {
+                    fn = peer_name.getBytes(StandardCharsets.UTF_8);
+                }
+            }
+            catch(Exception e)
+            {
+            }
+            data_buf.put(fn);
+            for (int k=0;k<(TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES - fn.length);k++)
+            {
+                // fill with null bytes up to TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES for the peername
+                data_buf.put((byte) 0x0);
+            }
+            //
+            //
+            //
+            byte[] filename_bytes = "image.jpg".getBytes(StandardCharsets.UTF_8);
+            try
+            {
+                if (m.file_name.getBytes(StandardCharsets.UTF_8).length > TOX_MAX_FILENAME_LENGTH)
+                {
+                    filename_bytes = Arrays.copyOfRange(m.file_name.getBytes(StandardCharsets.UTF_8),0,TOX_MAX_FILENAME_LENGTH);
+                }
+                else
+                {
+                    filename_bytes = m.file_name.getBytes(StandardCharsets.UTF_8);
+                }
+            }
+            catch(Exception e)
+            {
+            }
+            data_buf.put(filename_bytes);
+            for (int k=0;k<(TOX_MAX_FILENAME_LENGTH - filename_bytes.length);k++)
+            {
+                // fill with null bytes up to TOX_MAX_FILENAME_LENGTH for the peername
+                data_buf.put((byte) 0x0);
+            }
+            //
+            //
+            // -- now fill the file data --
+
+            byte[] file_raw_data = null;
+            if (m.direction == 1)
+            {
+                // outgoing file
+                java.io.FileInputStream inputStream = new java.io.FileInputStream(f2);
+                file_raw_data = new byte[(int)f2.length()];
+                inputStream.read(file_raw_data);
+                inputStream.close();
+            }
+            else
+            {
+                // incoming file
+                info.guardianproject.iocipher.FileInputStream inputStream = new info.guardianproject.iocipher.FileInputStream(f1);
+                file_raw_data = new byte[(int)f1.length()];
+                inputStream.read(file_raw_data);
+                inputStream.close();
+            }
+
+            data_buf.put(file_raw_data);
+            //
+            //
+            //
+            byte[] data = new byte[data_length];
+            data_buf.rewind();
+            data_buf.get(data);
+            int result = tox_group_send_custom_private_packet(tox_group_by_groupid__wrapper(group_identifier),
+                                                              get_group_peernum_from_peer_pubkey(group_identifier,
+                                                                                                 peer_pubkey), 1, data,
+                                                              data_length);
+            Log.i(TAG, "send_ngch_syncfile: sending request:result=" + result);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "send_ngch_syncfile:EE:" + e.getMessage());
         }
     }
 
@@ -1886,7 +2080,8 @@ public class HelperGroup
                 group_message_add_from_sync(group_identifier, syncer_pubkey, sender_peer_num, original_sender_peerpubkey,
                                             TRIFA_MSG_TYPE_TEXT.value, message_str, message_str.length(),
                                             (timestamp * 1000), message_id_tox,
-                                            TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value);
+                                            TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value,
+                                            peer_name);
             }
             catch(Exception e)
             {
@@ -1898,6 +2093,299 @@ public class HelperGroup
         {
             e.printStackTrace();
             Log.i(TAG, "handle_incoming_sync_group_message:EE001:" + e.getMessage());
+        }
+    }
+
+    static void handle_incoming_sync_group_file(final long group_number, final long peer_id, final byte[] data, final long length)
+    {
+        try
+        {
+            long res = tox_group_self_get_peer_id(group_number);
+            if (res == peer_id)
+            {
+                // HINT: do not add our own messages, they are already in the DB!
+                Log.i(TAG, "handle_incoming_sync_group_file:gn=" + group_number + " peerid=" + peer_id + " ignoring self");
+                return;
+            }
+
+            final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
+            final String syncer_pubkey = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+
+            ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_GROUP_PEER_PUBLIC_KEY_SIZE);
+            hash_bytes.put(data, 8 + 32, 32);
+            final String original_sender_peerpubkey = HelperGeneric.bytesToHex(hash_bytes.array(),hash_bytes.arrayOffset(),hash_bytes.limit()).toUpperCase();
+            Log.i(TAG, "handle_incoming_sync_group_file:peerpubkey hex=" + original_sender_peerpubkey);
+
+            if (tox_group_self_get_public_key(group_number).toUpperCase().equalsIgnoreCase(original_sender_peerpubkey))
+            {
+                // HINT: do not add our own files, they are already in the DB!
+                Log.i(TAG, "handle_incoming_sync_group_file:gn=" + group_number + " peerid=" + peer_id + " ignoring myself as original sender");
+                return;
+            }
+            //
+            //
+            // HINT: putting 4 bytes unsigned int in big endian format into a java "long" is more complex than i thought
+            ByteBuffer timestamp_byte_buffer = ByteBuffer.allocateDirect(8);
+            timestamp_byte_buffer.put((byte)0x0);
+            timestamp_byte_buffer.put((byte)0x0);
+            timestamp_byte_buffer.put((byte)0x0);
+            timestamp_byte_buffer.put((byte)0x0);
+            timestamp_byte_buffer.put(data, 8+32+32, 4);
+            timestamp_byte_buffer.order(ByteOrder.BIG_ENDIAN);
+            timestamp_byte_buffer.rewind();
+            long timestamp = timestamp_byte_buffer.getLong();
+            Log.i(TAG,"handle_incoming_sync_group_file:got_ts_bytes:" +
+                      HelperGeneric.bytesToHex(data, 8+32+32, 4));
+            timestamp_byte_buffer.rewind();
+            Log.i(TAG,"handle_incoming_sync_group_file:got_ts_bytes:bytebuffer:" +
+                      HelperGeneric.bytesToHex(timestamp_byte_buffer.array(),
+                                               timestamp_byte_buffer.arrayOffset(),
+                                               timestamp_byte_buffer.limit()));
+
+            Log.i(TAG, "handle_incoming_sync_group_file:timestamp=" + timestamp);
+
+            if (timestamp > ((System.currentTimeMillis() / 1000) + (60 * 5)))
+            {
+                long delta_t = timestamp - (System.currentTimeMillis() / 1000);
+                Log.i(TAG, "handle_incoming_sync_group_file:delta t=" + delta_t + " do NOT sync files from the future");
+                return;
+            }
+            else if (timestamp < ((System.currentTimeMillis() / 1000) - (60 * 200)))
+            {
+                long delta_t = (System.currentTimeMillis() / 1000) - timestamp;
+                Log.i(TAG, "handle_incoming_sync_group_file:delta t=" + (-delta_t) + " do NOT sync files that are too old");
+                return;
+            }
+
+            //
+            //
+            //
+            ByteBuffer hash_msg_id_bytes = ByteBuffer.allocateDirect(32);
+            hash_msg_id_bytes.put(data, 8, 32);
+            final String message_id_hash = HelperGeneric.bytesToHex(hash_msg_id_bytes.array(),hash_msg_id_bytes.arrayOffset(),hash_msg_id_bytes.limit()).toLowerCase();
+            Log.i(TAG, "handle_incoming_sync_group_file:message_id_hash hex=" + message_id_hash);
+            //
+            //
+            ByteBuffer name_buffer = ByteBuffer.allocateDirect(TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES);
+            name_buffer.put(data, 8 + 32 + 32 + 4, TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES);
+            name_buffer.rewind();
+            String peer_name = "peer";
+            try
+            {
+                byte[] name_byte_buf = new byte[TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES];
+                Arrays.fill(name_byte_buf, (byte)0x0);
+                name_buffer.rewind();
+                name_buffer.get(name_byte_buf);
+
+                int start_index = 0;
+                int end_index = TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES - 1;
+                for(int j=0;j<TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES;j++)
+                {
+                    if (name_byte_buf[j] == 0)
+                    {
+                        start_index = j+1;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                for(int j=(TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES-1);j>=0;j--)
+                {
+                    if (name_byte_buf[j] == 0)
+                    {
+                        end_index = j;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                byte[] peername_byte_buf_stripped = Arrays.copyOfRange(name_byte_buf, start_index,end_index);
+                peer_name = new String(peername_byte_buf_stripped, StandardCharsets.UTF_8);
+                Log.i(TAG,"handle_incoming_sync_group_file:peer_name str=" + peer_name);
+                //
+                //
+                //
+                // TODO: fixme, get real filename
+                final String filename = "image.jpg";
+                //
+                //
+                //
+                final int header = 6+1+1+32+32+4+25+255;
+                long filedata_size = length - header;
+                if ((filedata_size < 1) || (filedata_size > 37000))
+                {
+                    Log.i(TAG, "handle_incoming_sync_group_file: file size less than 1 byte or larger than 37000 bytes");
+                    return;
+                }
+
+                byte[] file_byte_buf = Arrays.copyOfRange(data, header, (int)length);
+
+                long sender_peer_num = HelperGroup.get_group_peernum_from_peer_pubkey(group_identifier,
+                                                                                      original_sender_peerpubkey);
+
+                try
+                {
+                    if (group_identifier!=null)
+                    {
+                        GroupMessage gm = orma.selectFromGroupMessage().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(original_sender_peerpubkey).msg_id_hashEq(
+                                message_id_hash).toList().get(0);
+
+                        if (gm != null)
+                        {
+                            Log.i(TAG, "handle_incoming_sync_group_file:potential double file, message_id_hash:" + message_id_hash);
+                            return;
+                        }
+                    }
+                }
+                catch(Exception e)
+                {
+                }
+
+                group_file_add_from_sync(group_identifier, syncer_pubkey, sender_peer_num, original_sender_peerpubkey,
+                                            file_byte_buf, filename, peer_name,
+                                            (timestamp * 1000), message_id_hash,
+                                            TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG,"handle_incoming_sync_group_file:EE002:" + e.getMessage());
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "handle_incoming_sync_group_file:EE001:" + e.getMessage());
+        }
+    }
+
+    private static void group_file_add_from_sync(final String group_identifier, final String syncer_pubkey, final long sender_peer_num,
+                                                 final String original_sender_peerpubkey,
+                                                 final byte[] file_byte_buf, final String filename,
+                                                 final String peer_name,
+                                                 final long timestamp, final String message_id_hash,
+                                                 final int aTRIFA_SYNC_TYPE)
+    {
+        boolean do_notification = true;
+        boolean do_badge_update = true;
+        String group_id = group_identifier;
+        GroupDB group_temp = null;
+
+        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+
+        try
+        {
+            try
+            {
+                group_temp = orma.selectFromGroupDB().
+                        group_identifierEq(group_id.toLowerCase()).
+                        toList().get(0);
+            }
+            catch (Exception ignored)
+            {
+            }
+
+            if (group_id.compareTo("-1") == 0)
+            {
+                display_toast("group_file_add_from_sync:ERROR 001 with incoming Group File!", true, 0);
+                return;
+            }
+
+            if (group_temp.group_identifier.toLowerCase().compareTo(group_id.toLowerCase()) != 0)
+            {
+                display_toast("group_file_add_from_sync:ERROR 002 with incoming Group File!", true, 0);
+                return;
+            }
+
+
+            try
+            {
+                if (group_temp.notification_silent)
+                {
+                    do_notification = false;
+                }
+            }
+            catch (Exception e)
+            {
+                // e.printStackTrace();
+                do_notification = false;
+            }
+
+            if (group_message_list_activity != null)
+            {
+                if (group_message_list_activity.get_current_group_id().equals(group_id))
+                {
+                    // no notifcation and no badge update
+                    do_notification = false;
+                    do_badge_update = false;
+                }
+            }
+
+            String filename_corrected = get_incoming_filetransfer_local_filename(filename, group_id.toLowerCase());
+
+            GroupMessage m = new GroupMessage();
+            m.is_new = do_badge_update;
+            m.tox_group_peer_pubkey = original_sender_peerpubkey;
+            m.direction = 0; // msg received
+            m.TOX_MESSAGE_TYPE = 0;
+            m.read = false;
+            m.tox_group_peername = peer_name;
+            m.private_message = 0;
+            m.group_identifier = group_id.toLowerCase();
+            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_FILE.value;
+            m.rcvd_timestamp = System.currentTimeMillis();
+            m.sent_timestamp = timestamp;
+            m.text = filename_corrected + "\n" + file_byte_buf.length + " bytes";
+            m.message_id_tox = "";
+            m.was_synced = true;
+            m.TRIFA_SYNC_TYPE = aTRIFA_SYNC_TYPE;
+            m.path_name = VFS_PREFIX + VFS_FILE_DIR + "/" + m.group_identifier + "/";
+            m.file_name = filename_corrected;
+            m.filename_fullpath = m.path_name + m.file_name;
+            m.storage_frame_work = false;
+            m.msg_id_hash = message_id_hash;
+            m.filesize = file_byte_buf.length;
+            m.tox_group_peer_pubkey_syncer_01 = syncer_pubkey;
+
+
+            info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
+                    m.path_name + "/" + m.file_name);
+            info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(f1.getParent());
+            f2.mkdirs();
+
+            save_group_incoming_file(m.path_name, m.file_name, file_byte_buf, 0, file_byte_buf.length);
+
+            if (group_message_list_activity != null)
+            {
+                if (group_message_list_activity.get_current_group_id().equals(group_id.toLowerCase()))
+                {
+                    insert_into_group_message_db(m, true);
+                }
+                else
+                {
+                    insert_into_group_message_db(m, false);
+                }
+            }
+            else
+            {
+                long new_msg_id = insert_into_group_message_db(m, false);
+                Log.i(TAG, "group_file_add_from_sync:new_msg_id=" + new_msg_id);
+            }
+
+            HelperFriend.add_all_friends_clear_wrapper(0);
+
+            if (do_notification)
+            {
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 

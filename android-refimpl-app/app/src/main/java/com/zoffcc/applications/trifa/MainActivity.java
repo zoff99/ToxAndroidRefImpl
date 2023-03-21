@@ -168,6 +168,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.android_tox_callback_gro
 import static com.zoffcc.applications.trifa.HelperGroup.get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.group_message_add_from_sync;
 import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_group_file;
+import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_sync_group_file;
 import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_sync_group_message;
 import static com.zoffcc.applications.trifa.HelperGroup.send_ngch_request;
 import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
@@ -5325,7 +5326,8 @@ public class MainActivity extends AppCompatActivity
                         group_message_add_from_sync(real_conference_id, null, sender_peer_num, real_sender_peer_pubkey,
                                                     TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
                                                     sync_msg_received_timestamp, real_send_message_id,
-                                                    TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_TOXPROXY.value);
+                                                    TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_TOXPROXY.value,
+                                                    null);
 
                         send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
                                                            (System.currentTimeMillis() / 1000));
@@ -7286,6 +7288,16 @@ public class MainActivity extends AppCompatActivity
                 {
                     Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncmsg");
                     handle_incoming_sync_group_message(group_number, peer_id, data, length);
+                }
+            }
+            else if ((data[6] == (byte)0x1) && (data[7] == (byte)0x3))
+            {
+                Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncfile:xxxxxxx");
+                final int header_syncfile = 6 + 1 + 1 + 32 + 32 + 4 + 25 + 255;
+                if (length >= (header_syncfile + 1))
+                {
+                    Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncfile");
+                    handle_incoming_sync_group_file(group_number, peer_id, data, length);
                 }
             }
         }
