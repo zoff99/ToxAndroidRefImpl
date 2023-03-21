@@ -116,12 +116,12 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
             case Message_model.FILE_INCOMING_STATE_CANCEL:
                 if (PREF__compact_chatlist)
                 {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming_compact,
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_group_list_ft_incoming_compact,
                                                                             parent, false);
                 }
                 else
                 {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_incoming, parent,
+                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_group_list_ft_incoming, parent,
                                                                             false);
                 }
                 return new GroupMessageListHolder_file_incoming_state_cancel(view, this.context);
