@@ -2162,7 +2162,7 @@ public class HelperGroup
             //
             ByteBuffer hash_msg_id_bytes = ByteBuffer.allocateDirect(32);
             hash_msg_id_bytes.put(data, 8, 32);
-            final String message_id_hash = HelperGeneric.bytesToHex(hash_msg_id_bytes.array(),hash_msg_id_bytes.arrayOffset(),hash_msg_id_bytes.limit()).toLowerCase();
+            final String message_id_hash = HelperGeneric.bytesToHex(hash_msg_id_bytes.array(),hash_msg_id_bytes.arrayOffset(),hash_msg_id_bytes.limit()).toUpperCase();
             Log.i(TAG, "handle_incoming_sync_group_file:message_id_hash hex=" + message_id_hash);
             //
             //
@@ -2263,7 +2263,8 @@ public class HelperGroup
         }
     }
 
-    private static void group_file_add_from_sync(final String group_identifier, final String syncer_pubkey, final long sender_peer_num,
+    private static void group_file_add_from_sync(final String group_identifier, final String syncer_pubkey,
+                                                 final long sender_peer_num,
                                                  final String original_sender_peerpubkey,
                                                  final byte[] file_byte_buf, final String filename,
                                                  final String peer_name,
