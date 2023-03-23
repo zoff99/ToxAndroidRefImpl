@@ -151,6 +151,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt
 import static com.zoffcc.applications.trifa.HelperFriend.send_pushurl_to_all_friends;
 import static com.zoffcc.applications.trifa.HelperFriend.send_pushurl_to_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_capabilities;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
@@ -5323,7 +5324,16 @@ public class MainActivity extends AppCompatActivity
                         // ========= DEBUG =========
                         // ========= DEBUG =========
 
-                        group_message_add_from_sync(real_conference_id, null, sender_peer_num, real_sender_peer_pubkey,
+                        String syncer_pubkey = null;
+                        try
+                        {
+                            syncer_pubkey = tox_friend_get_public_key__wrapper(friend_number);
+                        }
+                        catch(Exception e)
+                        {
+                        }
+
+                        group_message_add_from_sync(real_conference_id, syncer_pubkey, sender_peer_num, real_sender_peer_pubkey,
                                                     TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
                                                     sync_msg_received_timestamp, real_send_message_id,
                                                     TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_TOXPROXY.value,

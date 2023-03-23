@@ -867,16 +867,6 @@ public class HelperGroup
     }
 
     static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey,
-                                            long peer_number2,String peer_pubkey, int a_TOX_MESSAGE_TYPE,
-                                            String message, long length, long sent_timestamp_in_ms,
-                                            String message_id, final String peer_name)
-    {
-        group_message_add_from_sync(group_identifier, syncer_pubkey, peer_number2, peer_pubkey, a_TOX_MESSAGE_TYPE, message,
-                                    length, sent_timestamp_in_ms, message_id,
-                                    TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value, peer_name);
-    }
-
-    static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey,
                                             long peer_number2, String peer_pubkey, int a_TOX_MESSAGE_TYPE,
                                             String message, long length, long sent_timestamp_in_ms,
                                             String message_id, int sync_type, final String peer_name)
@@ -971,16 +961,8 @@ public class HelperGroup
         m.message_id_tox = message_id;
         m.was_synced = true;
         m.TRIFA_SYNC_TYPE = sync_type;
-        if (sync_type == TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value)
-        {
-            Log.i(TAG, "add syncer_pubkey_01:" + syncer_pubkey);
-            m.tox_group_peer_pubkey_syncer_01 = syncer_pubkey;
-        }
-        else
-        {
-            m.tox_group_peer_pubkey_syncer_01 = null;
-            Log.i(TAG, "add syncer_pubkey_01:*NULL:002*");
-        }
+        Log.i(TAG, "add TRIFA_SYNC_TYPE=" + sync_type + " syncer_pubkey_01:" + syncer_pubkey);
+        m.tox_group_peer_pubkey_syncer_01 = syncer_pubkey;
 
         if (m.tox_group_peername == null)
         {
