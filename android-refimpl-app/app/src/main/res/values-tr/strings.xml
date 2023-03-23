@@ -415,7 +415,7 @@
     <string name="invite_join_conference_success">Bir konferans grubuna davet edildiniz</string>
     <string name="layout___load_network_connections">ağ bağlantılarını yükle</string>
     <string name="join_public_group_activity_warning">Uyarı:
-\nGrup kimliği aracılığıyla bir Genel Gruba katılmak henüz çalışmıyor!!</string>
+\nGrup kimliği aracılığıyla bir Genel Gruba katılmak henüz güvenilir bir şekilde çalışmıyor!!</string>
     <string name="layout___audio_roundtrip_test_start">Ses Gecikme Testi</string>
     <string name="pref_title_mic_gain_factor_toggle">Sesi azaltmak için mikrofon kazancı</string>
     <string name="pref_description_mic_gain_factor_toggle">Mikrofonunuz çok fazla hassasiyetle kayıt yapıyorsa, bu ayarı etkinleştirin ve mikrofon kazanç çarpanı mikrofonun ses seviyesini düşürsün</string>

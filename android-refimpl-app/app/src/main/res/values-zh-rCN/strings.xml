@@ -437,7 +437,7 @@
     <string name="invite_join_group_success">你已应邀进群</string>
     <string name="layout___load_network_connections">加载网络连接</string>
     <string name="join_public_group_activity_warning">警告：
-\n尚无法通过群 ID 加入公共群！！</string>
+\n尚无法稳定地通过群 ID 加入公共群！！</string>
     <string name="layout___audio_roundtrip_test_start">音频延迟测试</string>
     <string name="pref_title_mic_gain_factor_toggle">麦克风增益降低音量</string>
     <string name="pref_description_mic_gain_factor_toggle">如果你的麦克风录音灵敏度太高，启用这个设置，麦克风增益因子会降低麦克风的音量</string>
