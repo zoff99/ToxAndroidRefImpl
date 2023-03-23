@@ -866,9 +866,10 @@ public class HelperGroup
         }
     }
 
-    static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey, long peer_number2,
-                                            String peer_pubkey, int a_TOX_MESSAGE_TYPE, String message,
-                                            long length, long sent_timestamp_in_ms, String message_id, final String peer_name)
+    static void group_message_add_from_sync(final String group_identifier, final String syncer_pubkey,
+                                            long peer_number2,String peer_pubkey, int a_TOX_MESSAGE_TYPE,
+                                            String message, long length, long sent_timestamp_in_ms,
+                                            String message_id, final String peer_name)
     {
         group_message_add_from_sync(group_identifier, syncer_pubkey, peer_number2, peer_pubkey, a_TOX_MESSAGE_TYPE, message,
                                     length, sent_timestamp_in_ms, message_id,
@@ -978,6 +979,7 @@ public class HelperGroup
         else
         {
             m.tox_group_peer_pubkey_syncer_01 = null;
+            Log.i(TAG, "add syncer_pubkey_01:*NULL:002*");
         }
 
         if (m.tox_group_peername == null)
@@ -2030,6 +2032,8 @@ public class HelperGroup
                                                 tox_group_peer_pubkey_syncer_02(syncer_pubkey).
                                                 execute();
                                         Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=1, syncer=" + syncer_pubkey);
+                                        gmsg.sync_confirmations++;
+                                        gmsg.tox_group_peer_pubkey_syncer_02 = syncer_pubkey;
                                         update_group_message_in_list(gmsg);
                                     }
                                 }
@@ -2045,6 +2049,8 @@ public class HelperGroup
                                                 tox_group_peer_pubkey_syncer_03(syncer_pubkey).
                                                 execute();
                                         Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=2, syncer=" + syncer_pubkey);
+                                        gmsg.sync_confirmations++;
+                                        gmsg.tox_group_peer_pubkey_syncer_03 = syncer_pubkey;
                                         update_group_message_in_list(gmsg);
                                     }
                                 }
@@ -2059,6 +2065,7 @@ public class HelperGroup
                                                 original_sender_peerpubkey).message_id_toxEq(message_id_tox).textEq(
                                                 message_str).sync_confirmations(gmsg.sync_confirmations + 1).execute();
                                         Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=3, syncer=" + syncer_pubkey);
+                                        gmsg.sync_confirmations++;
                                         update_group_message_in_list(gmsg);
                                     }
                                 }
