@@ -917,22 +917,20 @@ public class MainActivity extends AppCompatActivity
         // ------- access the clipboard -------
         clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
         // ------- access the clipboard -------
-        PREF__orbot_enabled = false;
-        boolean PREF__orbot_enabled__temp = settings.getBoolean("orbot_enabled", false);
+        PREF__orbot_enabled = settings.getBoolean("orbot_enabled", false);
 
-        if (PREF__orbot_enabled__temp)
+        if (PREF__orbot_enabled)
         {
             Log.i(TAG, "M:STARTUP:wait for orbot");
             boolean orbot_installed = OrbotHelper.isOrbotInstalled(this);
 
-            if (orbot_installed)
+            //if (orbot_installed)
             {
                 boolean orbot_running = orbot_is_really_running; // OrbotHelper.isOrbotRunning(this);
                 Log.i(TAG, "waiting_for_orbot_info:orbot_running=" + orbot_running);
 
                 if (orbot_running)
                 {
-                    PREF__orbot_enabled = true;
                     Log.i(TAG, "waiting_for_orbot_info:F1");
                     HelperGeneric.waiting_for_orbot_info(false);
                     OrbotHelper.get(this).statusTimeout(120 * 1000).addStatusCallback(new StatusCallback()
@@ -977,7 +975,6 @@ public class MainActivity extends AppCompatActivity
 
                     if (OrbotHelper.requestStartTor(this))
                     {
-                        PREF__orbot_enabled = true;
                         Log.i(TAG, "waiting_for_orbot_info:*T2");
                         HelperGeneric.waiting_for_orbot_info(true);
                     }
@@ -1025,6 +1022,7 @@ public class MainActivity extends AppCompatActivity
                     }).init(); // allow 60 seconds to connect to Orbot
                 }
             }
+            /*
             else
             {
                 Log.i(TAG, "waiting_for_orbot_info:F4");
@@ -1040,6 +1038,7 @@ public class MainActivity extends AppCompatActivity
                     e.printStackTrace();
                 }
             }
+             */
         }
         else
         {
