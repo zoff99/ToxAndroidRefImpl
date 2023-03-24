@@ -52,13 +52,14 @@ jobs:
 
     - name: Change to debug ID
       run: |
+        datestr=$(date '+%Y%m%d%H%M%S')
         cat android-refimpl-app/app/build.gradle | grep applicationId
-        sed -i -e 's#applicationId "com.zoffcc.applications.trifa"#applicationId "com.zoffcc.applications.trifa_debug"#' android-refimpl-app/app/build.gradle
+        sed -i -e 's#applicationId "com.zoffcc.applications.trifa"#applicationId "com.zoffcc.applications.trifa_debug_'"$datestr"'"#' android-refimpl-app/app/build.gradle
         cat android-refimpl-app/app/build.gradle | grep applicationId
-        grep -rli std_fileprovider|grep -e '.java' -e '.xml'|xargs -L1 sed -i -e 's#com.zoffcc.applications.trifa.std_fileprovider#com.zoffcc.applications.trifa.std_fileprovider_debug#'
-        grep -rli "com.zoffcc.applications.trifa.ext2_provider"|grep -e '.java' -e '.xml'|xargs -L1 sed -i -e 's#com.zoffcc.applications.trifa.ext2_provider#com.zoffcc.applications.trifa.ext2_provider_debug#'
-        grep -rli "com.zoffcc.applications.trifa.ext1_fileprovider"|grep -e '.java' -e '.xml'| xargs -L1 sed -i -e 's#com.zoffcc.applications.trifa.ext1_fileprovider#com.zoffcc.applications.trifa.ext1_fileprovider_debug#'
-        sed -i -e 's#android:label="TRIfA"#android:label="DEBUG TRIfA"#' android-refimpl-app/app/src/main/AndroidManifest.xml
+        grep -rli std_fileprovider|grep -e '.java' -e '.xml'|xargs -L1 sed -i -e 's#com.zoffcc.applications.trifa.std_fileprovider#com.zoffcc.applications.trifa.std_fileprovider_debug_'"$datestr"'#'
+        grep -rli "com.zoffcc.applications.trifa.ext2_provider"|grep -e '.java' -e '.xml'|xargs -L1 sed -i -e 's#com.zoffcc.applications.trifa.ext2_provider#com.zoffcc.applications.trifa.ext2_provider_debug_'"$datestr"'#'
+        grep -rli "com.zoffcc.applications.trifa.ext1_fileprovider"|grep -e '.java' -e '.xml'| xargs -L1 sed -i -e 's#com.zoffcc.applications.trifa.ext1_fileprovider#com.zoffcc.applications.trifa.ext1_fileprovider_debug_'"$datestr"'#'
+        sed -i -e 's#android:label="TRIfA"#android:label="DEBUG TRIfA '"$datestr"'"#' android-refimpl-app/app/src/main/AndroidManifest.xml
         cat android-refimpl-app/app/src/main/AndroidManifest.xml|grep 'android:label='
 
     - name: Build with Gradle
