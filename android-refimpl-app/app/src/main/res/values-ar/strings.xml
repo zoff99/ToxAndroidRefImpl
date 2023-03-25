@@ -342,7 +342,7 @@
     <string name="join_public_group_activity_help">انضم إلى مجموعة عامة باستخدام معرف المجموعة المحدد.</string>
     <string name="MessageListHolder_file_incoming_cancel_ft_title">إلغاء نقل الملفات</string>
     <string name="join_public_group_activity_warning">تحذير:
-\nالانضمام إلى مجموعة عامة عبر معرف المجموعة لا يعمل بعد !!</string>
+\nالانضمام إلى مجموعة عامة عبر معرف المجموعة لا يعمل بشكل موثوق حتى الآن !!</string>
     <string name="join_public_group_failed">فشل الانضمام إلى المجموعة العامة</string>
     <string name="join_group_activity_join">إنضم للمجموعة</string>
     <string name="join_public_group_joined">لقد انضممت إلى المجموعة العامة</string>

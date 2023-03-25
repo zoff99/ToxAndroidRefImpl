@@ -371,7 +371,7 @@
     <string name="pref_description_allow_push_server_ntfy">WARNUNG: Lassen Sie den ntfy.sh-Server für Push-Benachrichtigungen zu, dies kann Ihre Metadaten von Zeitstempeln verlieren, wenn Sie Push-Benachrichtigungen erhalten, wenn ein Freund sich mit Ihrem Push-Token anmeldet. ntfy.sh hat KEINE Passwörter und KEINE Authentifizierung. du wurdest gewarnt.</string>
     <string name="add_public_group_activity_help">Erstellen Sie eine neue öffentliche Gruppe mit einem bestimmten Gruppennamen.</string>
     <string name="join_public_group_activity_warning">Warnung:
-\nDer Beitritt zu einer öffentlichen Gruppe über die Gruppen-ID funktioniert noch nicht!!</string>
+\nDer Beitritt zu einer öffentlichen Gruppe über die Gruppen-ID funktioniert noch nicht zuverlässig!!</string>
     <string name="join_public_group_failed">Der Beitritt zur öffentlichen Gruppe ist fehlgeschlagen</string>
     <string name="add_public_group_success">Sie haben eine öffentliche Gruppe erstellt</string>
     <string name="invite_friend_success">Sie haben eine Freundschaftsanfrage erhalten</string>

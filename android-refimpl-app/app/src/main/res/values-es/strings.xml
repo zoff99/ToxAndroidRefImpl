@@ -408,7 +408,7 @@
     <string name="invite_join_group_success">Has sido invitado a un grupo</string>
     <string name="invite_join_conference_success">Has sido invitado a un Grupo de Conferencia</string>
     <string name="join_public_group_activity_warning">Advertencia:
-\n¡¡El ingreso a un Grupo Público a través del ID de Grupo no está funcionando todavía!!</string>
+\n¡¡El ingreso a un Grupo Público a través del ID de Grupo no está funcionando todavía de manera fiable!!</string>
     <string name="layout___load_network_connections">cargar las conexiones de red</string>
     <string name="layout___audio_roundtrip_test_start">Prueba de la latencia del audio</string>
     <string name="pref_title_mic_gain_factor_toggle">La ganancia del micrófono reduce el volumen</string>
