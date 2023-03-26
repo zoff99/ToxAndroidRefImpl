@@ -1514,7 +1514,7 @@ public class HelperGroup
                             .orderByRcvd_timestampAsc()
                             .toList().iterator();
 
-                    Log.i(TAG, "sync_group_message_history:i1:" + i1);
+                    // Log.i(TAG, "sync_group_message_history:i1:" + i1);
 
                     while (i1.hasNext())
                     {
@@ -1968,7 +1968,7 @@ public class HelperGroup
 
                 byte[] peername_byte_buf_stripped = Arrays.copyOfRange(name_byte_buf, start_index,end_index);
                 peer_name = new String(peername_byte_buf_stripped, StandardCharsets.UTF_8);
-                Log.i(TAG,"handle_incoming_sync_group_message:peer_name str=" + peer_name);
+                // Log.i(TAG,"handle_incoming_sync_group_message:peer_name str=" + peer_name);
                 //
                 final int header = 6+1+1+4+32+4+25; // 73 bytes
                 long text_size = length - header;
@@ -1980,7 +1980,7 @@ public class HelperGroup
 
                 byte[] text_byte_buf = Arrays.copyOfRange(data, header, (int)length);
                 String message_str = new String(text_byte_buf, StandardCharsets.UTF_8);
-                Log.i(TAG,"handle_incoming_sync_group_message:message str=" + message_str);
+                // Log.i(TAG,"handle_incoming_sync_group_message:message str=" + message_str);
 
                 long sender_peer_num = HelperGroup.get_group_peernum_from_peer_pubkey(group_identifier,
                                                                                       original_sender_peerpubkey);
@@ -2194,7 +2194,7 @@ public class HelperGroup
 
                 byte[] peername_byte_buf_stripped = Arrays.copyOfRange(name_byte_buf, start_index,end_index);
                 peer_name = new String(peername_byte_buf_stripped, StandardCharsets.UTF_8);
-                Log.i(TAG,"handle_incoming_sync_group_file:peer_name str=" + peer_name);
+                // Log.i(TAG,"handle_incoming_sync_group_file:peer_name str=" + peer_name);
                 //
                 //
                 //

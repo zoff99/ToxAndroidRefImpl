@@ -7230,9 +7230,9 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            Log.i(TAG,
-                  "group_custom_private_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
-                  " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
+            //Log.i(TAG,
+            //      "group_custom_private_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
+            //      " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
         }
         catch(Exception e)
         {
