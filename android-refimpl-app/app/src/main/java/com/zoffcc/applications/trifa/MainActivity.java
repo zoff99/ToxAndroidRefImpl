@@ -1370,6 +1370,8 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(
                 R.string.MainActivity_about).withIcon(GoogleMaterial.Icon.gmd_info);
         PrimaryDrawerItem item6 = new PrimaryDrawerItem().withIdentifier(6).withName(
+                R.string.MainActivity_join_trifa_groupchat).withIcon(GoogleMaterial.Icon.gmd_info);
+        PrimaryDrawerItem item7 = new PrimaryDrawerItem().withIdentifier(7).withName(
                 R.string.MainActivity_exit).withIcon(GoogleMaterial.Icon.gmd_exit_to_app);
         final Drawable d1 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_lock).color(
                 getResources().getColor(R.color.colorPrimaryDark)).sizeDp(100);
@@ -1392,7 +1394,9 @@ public class MainActivity extends AppCompatActivity
                                                                                           new DividerDrawerItem(),
                                                                                           item2, item3, item4, item5,
                                                                                           new DividerDrawerItem(),
-                                                                                          item6).withTranslucentStatusBar(
+                                                                                          item6,
+                                                                                          new DividerDrawerItem(),
+                                                                                          item7).withTranslucentStatusBar(
                 false).withAccountHeader(main_drawer_header).withOnDrawerItemClickListener(
                 new Drawer.OnDrawerItemClickListener()
                 {
@@ -1489,6 +1493,25 @@ public class MainActivity extends AppCompatActivity
                             // -- clear Glide cache --
                         }
                         else if (position == 8)
+                        {
+                            // Join TRIfA public NGC group chat
+                            try
+                            {
+                                if (is_tox_started)
+                                {
+                                    JoinPublicGroupActivity.show_join_public_group_activity(view.getContext(), TOX_TRIFA_PUBLIC_GROUPID);
+                                }
+                                else
+                                {
+                                    display_toast_with_context_custom_duration(view.getContext(),"Tox not yet started!", 2000, 100);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                        else if (position == 10)
                         {
                             // Exit
                             try
