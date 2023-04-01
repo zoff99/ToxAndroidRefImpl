@@ -101,9 +101,19 @@ public class ShareActivity extends AppCompatActivity
             }
             else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null)
             {
-                Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
-                intent_friend_selection.putExtra("offline", 1);
-                startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
+                if ("text/plain".equals(type))
+                {
+                    Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
+                    intent_friend_selection.putExtra("offline", 1);
+                    startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
+                }
+                else
+                {
+                    Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
+                    intent_friend_selection.putExtra("offline", 1);
+                    intent_friend_selection.putExtra("ngc_groups", 1);
+                    startActivityForResult(intent_friend_selection, SelectFriendSingleActivity_ID);
+                }
             }
             else if (Intent.ACTION_VIEW.equals(action))
             {
@@ -220,7 +230,7 @@ public class ShareActivity extends AppCompatActivity
                                 }
                                 else
                                 {
-                                    handleSendImage(intent, item_id);
+                                    handleSendImage(intent, item_id, 0);
                                 }
                                 return;
                             }
@@ -228,11 +238,11 @@ public class ShareActivity extends AppCompatActivity
                             {
                                 if (type.startsWith("image/"))
                                 {
-                                    handleSendMultipleImages(intent, item_id);
+                                    handleSendMultipleImages(intent, item_id, 0);
                                 }
                                 else
                                 {
-                                    handleSendMultipleImages(intent, item_id);
+                                    handleSendMultipleImages(intent, item_id, 0);
                                 }
                                 return;
                             }
@@ -248,6 +258,18 @@ public class ShareActivity extends AppCompatActivity
                                 else
                                 {
                                     handleSendImage(intent, item_id, 2);
+                                }
+                                return;
+                            }
+                            else if (Intent.ACTION_SEND_MULTIPLE.equals(action) && type != null)
+                            {
+                                if (type.startsWith("image/"))
+                                {
+                                    handleSendMultipleImages(intent, item_id, 2);
+                                }
+                                else
+                                {
+                                    // TODO: write me
                                 }
                                 return;
                             }
@@ -297,11 +319,6 @@ public class ShareActivity extends AppCompatActivity
         }
     }
 
-    void handleSendImage(Intent intent, String friend_pubkey)
-    {
-        handleSendImage(intent, friend_pubkey, 0);
-    }
-
     void handleSendImage(Intent intent, String id, int type)
     {
         Uri imageUri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
@@ -325,7 +342,7 @@ public class ShareActivity extends AppCompatActivity
         }
     }
 
-    void handleSendMultipleImages(Intent intent, String friend_pubkey)
+    void handleSendMultipleImages(Intent intent, String id, int type)
     {
         ArrayList<Uri> imageUris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
         if (imageUris != null)
@@ -334,9 +351,24 @@ public class ShareActivity extends AppCompatActivity
             {
                 Intent intent_fixup = new Intent();
                 intent_fixup.setData(imageUri);
-                add_attachment(this, intent_fixup, intent, tox_friend_by_public_key__wrapper(friend_pubkey), false);
+                if (type == 0)
+                {
+                    add_attachment(this, intent_fixup, intent, tox_friend_by_public_key__wrapper(id), false);
+                }
+                else if (type == 2)
+                {
+                    add_attachment_ngc(this, intent_fixup, intent, id, false);
+                }
             }
-            MessageListActivity.show_messagelist_for_friend(this, friend_pubkey, null);
+
+            if (type == 0)
+            {
+                MessageListActivity.show_messagelist_for_friend(this, id, null);
+            }
+            else if (type == 2)
+            {
+                GroupMessageListActivity.show_messagelist_for_id(this, id, null);
+            }
             // close this share activity
             this.finish();
         }
