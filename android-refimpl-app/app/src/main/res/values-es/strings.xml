@@ -192,7 +192,7 @@
     <string name="add_friend_activity_add">Añadir amigo</string>
     <string name="cancel">Cancelar</string>
     <string name="MainActivity_profile">Perfil</string>
-    <string name="MainActivity_settings">Configuraciones</string>
+    <string name="MainActivity_settings">Ajustes</string>
     <string name="MainActivity_logout_login">Cerrar sesión /Iniciar sesión</string>
     <string name="MainActivity_maint">Mantenimiento</string>
     <string name="MainActivity_about">Acerca de</string>
@@ -413,4 +413,5 @@
     <string name="layout___audio_roundtrip_test_start">Prueba de la latencia del audio</string>
     <string name="pref_title_mic_gain_factor_toggle">La ganancia del micrófono reduce el volumen</string>
     <string name="pref_description_mic_gain_factor_toggle">Si su micrófono graba con demasiada sensibilidad, habilite esta configuración y el factor de ganancia del micrófono reducirá el volumen del micrófono</string>
+    <string name="MainActivity_join_trifa_groupchat">Únete al Grupo de Información</string>
 </resources>
