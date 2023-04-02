@@ -75,6 +75,7 @@ import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_searc
 import static com.zoffcc.applications.trifa.HelperFiletransfer.copy_outgoing_file_to_sdcard_dir;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
+import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.io_file_copy;
@@ -1486,7 +1487,17 @@ public class GroupMessageListActivity extends AppCompatActivity
                     new_len = ff2.length();
                     Log.i(TAG, "fsize_after=" + new_len + " " + quality + " " + max_width + " " + ff2.getAbsolutePath());
                     quality = quality - 10;
-                    if (quality < 3)
+                    if (quality < 10)
+                    {
+                        quality = 4;
+                    }
+
+                    if (max_width > 80)
+                    {
+                        max_width = max_width - 20;
+                    }
+
+                    if (max_width < 80)
                     {
                         try
                         {
@@ -1506,11 +1517,6 @@ public class GroupMessageListActivity extends AppCompatActivity
                         {
                         }
                         break;
-                    }
-
-                    if (max_width > 80)
-                    {
-                        max_width = max_width - 20;
                     }
 
                     if (new_len <= TOX_MAX_NGC_FILESIZE)
@@ -1548,6 +1554,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
 
                 Log.i(TAG, "fsize_after:END=" + ff1.length() + " " + ff1.getAbsolutePath());
+
+                if (ff1.length() > TOX_MAX_NGC_FILESIZE)
+                {
+                    display_toast("Group Image shrinking failed", true, 50);
+                }
             }
             catch (Exception e)
             {
