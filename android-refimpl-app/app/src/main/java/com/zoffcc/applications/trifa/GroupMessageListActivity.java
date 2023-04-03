@@ -83,6 +83,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_p
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.send_group_image;
+import static com.zoffcc.applications.trifa.HelperGroup.shrink_image_file;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
@@ -957,7 +958,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     return;
                                 }
                             }
-
+                            Log.i(TAG, "add_outgoing_file:add_outgoing_file:thread_01");
                             add_outgoing_file(c, MainActivity.group_message_list_activity.get_current_group_id(),
                                               data.getData().toString(), fileName_, data.getData(), false,
                                               activity_group_num);
@@ -967,8 +968,17 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
                 else
                 {
-                    add_outgoing_file(c, groupid_local, data.getData().toString(), fileName_, data.getData(), false,
-                                      activity_group_num);
+                    final Thread t2 = new Thread()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            Log.i(TAG, "add_outgoing_file:add_outgoing_file:thread_02");
+                            add_outgoing_file(c, groupid_local, data.getData().toString(), fileName_, data.getData(),
+                                              false, activity_group_num);
+                        }
+                    };
+                    t2.start();
                 }
             }
         }
@@ -1458,113 +1468,9 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
 
             // reducing the file size down to hopefully 37kbytes -------------------
-            try
-            {
-                java.io.File ff1 = new java.io.File(ofw.filepath_wrapped + "/" + ofw.filename_wrapped);
-                Log.i(TAG, "fsize_before=" + ff1.length());
-
-                /*
-                int new_size_factor = 100;
-                while (ff1.length() > 36500)
-                {
-                    HelperGeneric.saveBitmapToFile(ff1, new_size_factor);
-                    new_size_factor = new_size_factor - 10;
-                    Log.i(TAG,"fsize_after=" + ff1.length());
-                }
-                */
-
-                long new_len = ff1.length();
-                int quality = 70;
-                int max_width = 800;
-                java.io.File ff2 = null;
-                while (new_len > TOX_MAX_NGC_FILESIZE)
-                {
-                    ff2 = new Compressor(c).
-                            setMaxWidth(max_width).
-                            setQuality(quality).
-                            setCompressFormat(Bitmap.CompressFormat.WEBP).
-                            compressToFile(ff1);
-                    new_len = ff2.length();
-                    Log.i(TAG, "fsize_after=" + new_len + " " + quality + " " + max_width + " " + ff2.getAbsolutePath());
-                    quality = quality - 10;
-                    if (quality < 10)
-                    {
-                        quality = 4;
-                    }
-
-                    if (max_width > 80)
-                    {
-                        max_width = max_width - 20;
-                    }
-
-                    if (max_width < 80)
-                    {
-                        try
-                        {
-                            io_file_copy(ff2, ff1);
-                            Log.i(TAG, "file copied:BREAK");
-                        }
-                        catch (Exception e)
-                        {
-                            Log.i(TAG, "file copy error:EE003:BREAK" + e.getMessage());
-                        }
-                        try
-                        {
-                            ff2.delete();
-                            Log.i(TAG, "temp file deleted:001:BREAK");
-                        }
-                        catch (Exception e2)
-                        {
-                        }
-                        break;
-                    }
-
-                    if (new_len <= TOX_MAX_NGC_FILESIZE)
-                    {
-                        try
-                        {
-                            io_file_copy(ff2, ff1);
-                            Log.i(TAG, "file copied");
-                        }
-                        catch (Exception e)
-                        {
-                            Log.i(TAG, "file copy error:EE003" + e.getMessage());
-                        }
-                        try
-                        {
-                            ff2.delete();
-                            Log.i(TAG, "temp file deleted:001");
-                        }
-                        catch (Exception e2)
-                        {
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        try
-                        {
-                            ff2.delete();
-                            Log.i(TAG, "temp file deleted:002");
-                        }
-                        catch (Exception e2)
-                        {
-                        }
-                    }
-                }
-
-                Log.i(TAG, "fsize_after:END=" + ff1.length() + " " + ff1.getAbsolutePath());
-
-                if (ff1.length() > TOX_MAX_NGC_FILESIZE)
-                {
-                    display_toast("Group Image shrinking failed", true, 50);
-                }
-            }
-            catch (Exception e)
-            {
-                Log.i(TAG, "compressToFile:EE003:" + e.getMessage());
-                e.printStackTrace();
-            }
+            Log.i(TAG, "add_outgoing_file:shrink:start");
+            shrink_image_file(c, ofw);
+            Log.i(TAG, "add_outgoing_file:shrink:done");
             // reducing the file size down to hopefully 37kbytes -------------------
 
             Log.i(TAG, "add_outgoing_file:001");
@@ -1607,7 +1513,9 @@ public class GroupMessageListActivity extends AppCompatActivity
             Log.i(TAG, "add_outgoing_file:090");
 
             // now send the file to the group as custom package ----------
+            Log.i(TAG, "add_outgoing_file:091:send_group_image:start");
             send_group_image(m);
+            Log.i(TAG, "add_outgoing_file:092:send_group_image:done");
             // now send the file to the group as custom package ----------
         }
         else

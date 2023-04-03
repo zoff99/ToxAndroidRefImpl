@@ -19,8 +19,10 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
@@ -35,6 +37,7 @@ import java.util.Locale;
 import java.util.Random;
 
 import androidx.annotation.NonNull;
+import id.zelory.compressor.Compressor;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
@@ -46,6 +49,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstrin
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.io_file_copy;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.android_tox_callback_conference_title_cb_method;
@@ -84,6 +88,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_PEER_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILENAME_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_FILESIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_FILE_AND_HEADER_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -1128,6 +1133,106 @@ public class HelperGroup
                                      1,
                                      data,
                                      (int)data_length);
+    }
+
+    static void shrink_image_file(Context c, MessageListActivity.outgoing_file_wrapped ofw)
+    {
+        try
+        {
+            java.io.File ff1 = new java.io.File(ofw.filepath_wrapped + "/" + ofw.filename_wrapped);
+            Log.i(TAG, "shrink_image_file:fsize_before=" + ff1.length());
+
+            long new_len = ff1.length();
+            int quality = 70;
+            int max_width = 800;
+            java.io.File ff2 = null;
+
+            while (new_len > TOX_MAX_NGC_FILESIZE)
+            {
+                ff2 = new Compressor(c).
+                        setMaxWidth(max_width).
+                        setQuality(quality).
+                        setCompressFormat(Bitmap.CompressFormat.WEBP).
+                        compressToFile(ff1);
+                new_len = ff2.length();
+                Log.i(TAG, "shrink_image_file:fsize_after=" +
+                           new_len + " " + quality + " " + max_width + " " + ff2.getAbsolutePath());
+                quality = quality - 10;
+                if (quality < 10)
+                {
+                    quality = 4;
+                }
+
+                max_width = max_width - 20;
+
+                if (max_width <= 80)
+                {
+                    try
+                    {
+                        io_file_copy(ff2, ff1);
+                        Log.i(TAG, "shrink_image_file:file copied:BREAK");
+                    }
+                    catch (Exception e)
+                    {
+                        Log.i(TAG, "shrink_image_file:file copy error:EE003:BREAK" + e.getMessage());
+                    }
+                    try
+                    {
+                        ff2.delete();
+                        Log.i(TAG, "shrink_image_file:temp file deleted:001:BREAK");
+                    }
+                    catch (Exception ignored)
+                    {
+                    }
+                    break;
+                }
+
+                if (new_len <= TOX_MAX_NGC_FILESIZE)
+                {
+                    try
+                    {
+                        io_file_copy(ff2, ff1);
+                        Log.i(TAG, "shrink_image_file:file copied");
+                    }
+                    catch (Exception e)
+                    {
+                        Log.i(TAG, "shrink_image_file:file copy error:EE003" + e.getMessage());
+                    }
+                    try
+                    {
+                        ff2.delete();
+                        Log.i(TAG, "shrink_image_file:temp file deleted:001");
+                    }
+                    catch (Exception ignored)
+                    {
+                    }
+                    break;
+                }
+                else
+                {
+                    try
+                    {
+                        ff2.delete();
+                        Log.i(TAG, "shrink_image_file:temp file deleted:002");
+                    }
+                    catch (Exception ignored)
+                    {
+                    }
+                }
+            }
+
+            Log.i(TAG, "shrink_image_file:fsize_after:END=" + ff1.length() + " " + ff1.getAbsolutePath());
+
+            if (ff1.length() > TOX_MAX_NGC_FILESIZE)
+            {
+                display_toast("Group Image shrinking failed", true, 50);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "shrink_image_file:compressToFile:EE003:" + e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     static void do_join_public_group(Intent data)
