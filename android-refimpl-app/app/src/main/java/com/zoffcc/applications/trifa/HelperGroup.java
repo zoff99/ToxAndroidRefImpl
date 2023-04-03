@@ -1143,29 +1143,64 @@ public class HelperGroup
             Log.i(TAG, "shrink_image_file:fsize_before=" + ff1.length());
 
             long new_len = ff1.length();
-            int quality = 70;
             int max_width = 800;
             java.io.File ff2 = null;
 
+            final int[] qualityies = new int[]{70, 50, 30, 10, 4, 2, 1, 0};
+            int count = 0;
+            int quality = qualityies[count];
+
             while (new_len > TOX_MAX_NGC_FILESIZE)
             {
-                ff2 = new Compressor(c).
-                        setMaxWidth(max_width).
-                        setQuality(quality).
-                        setCompressFormat(Bitmap.CompressFormat.WEBP).
-                        compressToFile(ff1);
+                if (quality == 0)
+                {
+                    // @formatter:off
+                    ff2 = new Compressor(c).
+                            setMaxWidth(max_width).
+                            setMaxHeight(max_width).
+                            setQuality(quality).
+                            setCompressFormat(Bitmap.CompressFormat.PNG).
+                            compressToFile(ff1);
+                    // @formatter:on
+                }
+                else
+                {
+                    // @formatter:off
+                    ff2 = new Compressor(c).
+                            setMaxWidth(max_width).
+                            setQuality(quality).
+                            setCompressFormat(Bitmap.CompressFormat.WEBP).
+                            compressToFile(ff1);
+                    // @formatter:on
+                }
                 new_len = ff2.length();
                 Log.i(TAG, "shrink_image_file:fsize_after=" +
                            new_len + " " + quality + " " + max_width + " " + ff2.getAbsolutePath());
-                quality = quality - 10;
-                if (quality < 10)
+                count++;
+                if (count < qualityies.length)
                 {
-                    quality = 4;
+                    quality = qualityies[count];
+                    Log.i(TAG, "shrink_image_file:A:count=" + count + " qualityies.length=" + qualityies.length + " quality=" + quality);
+                }
+                else
+                {
+                    Log.i(TAG, "shrink_image_file:B:count=" + count + " qualityies.length=" + qualityies.length + " quality=" + quality);
                 }
 
-                max_width = max_width - 20;
+                if (quality > 0)
+                {
+                    max_width = max_width - 20;
+                }
+                else
+                {
+                    max_width = max_width / 2;
+                    if (max_width < 30)
+                    {
+                        max_width = 30;
+                    }
+                }
 
-                if (max_width <= 80)
+                if (max_width <= 30)
                 {
                     try
                     {
