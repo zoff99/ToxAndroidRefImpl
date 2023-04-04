@@ -127,6 +127,8 @@ public class TRIFAGlobals
 
     final static int FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK =
             800 * 1024 * 1024; // above this size we need Storage Framework for outgoing FTs
+    final static int FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL = 20 * 1024 * 1024; // 20MByte max outgoing NGC filesize
+    final static int FT_OUTGOING_FILESIZE_FRIEND_MAX_TOTAL = 2 * 1000 * 1000 * 1000; // 2Gbyte max outoing filesize
 
     static boolean orbot_is_really_running = false;
 

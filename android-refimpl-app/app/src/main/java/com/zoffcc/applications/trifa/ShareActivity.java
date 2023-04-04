@@ -85,7 +85,7 @@ public class ShareActivity extends AppCompatActivity
             }
             else if (Intent.ACTION_SEND.equals(action) && type != null)
             {
-                if ("text/plain".equals(type))
+                if (("text/plain".equals(type)) && (intent.getStringExtra(Intent.EXTRA_TEXT) != null))
                 {
                     Intent intent_friend_selection = new Intent(this, FriendSelectSingleActivity.class);
                     intent_friend_selection.putExtra("offline", 1);
@@ -215,21 +215,22 @@ public class ShareActivity extends AppCompatActivity
                         int item_type = Integer.parseInt(result_friend_pubkey.substring(0, 1));
                         String item_id = result_friend_pubkey.substring(2);
 
-                        Log.i(TAG,"item_type=" + item_type + " item_id="+item_id.length()+ " "+item_id);
+                        // Log.i(TAG, "type="+ type + " action=" + action + " item_type=" + item_type + " item_id="+item_id.length()+ " "+item_id);
+                        // Log.i(TAG, "onActivityResult:intent:" + intent);
+                        // Log.i(TAG, "onActivityResult:Intent.EXTRA_TEXT:" + intent.getStringExtra(Intent.EXTRA_TEXT));
 
                         if ((item_id.length() == TOX_PUBLIC_KEY_SIZE * 2) && (item_type == 0))
                         {
-                            // Log.i(TAG, "onActivityResult:result_friend_pubkey:" + result_friend_pubkey + " intent=" +
-                            //            intent);
-
                             if (Intent.ACTION_SEND.equals(action) && type != null)
                             {
-                                if ("text/plain".equals(type))
+                                if (("text/plain".equals(type)) && (intent.getStringExtra(Intent.EXTRA_TEXT) != null))
                                 {
+                                    Log.i(TAG,"handle:001");
                                     handleSendText(intent, item_id);
                                 }
                                 else
                                 {
+                                    Log.i(TAG,"handle:002");
                                     handleSendImage(intent, item_id, 0);
                                 }
                                 return;
@@ -238,10 +239,12 @@ public class ShareActivity extends AppCompatActivity
                             {
                                 if (type.startsWith("image/"))
                                 {
+                                    Log.i(TAG,"handle:003");
                                     handleSendMultipleImages(intent, item_id, 0);
                                 }
                                 else
                                 {
+                                    Log.i(TAG,"handle:004");
                                     handleSendMultipleImages(intent, item_id, 0);
                                 }
                                 return;
@@ -251,12 +254,14 @@ public class ShareActivity extends AppCompatActivity
                         {
                             if (Intent.ACTION_SEND.equals(action) && type != null)
                             {
-                                if ("text/plain".equals(type))
+                                if (("text/plain".equals(type)) && (intent.getStringExtra(Intent.EXTRA_TEXT) != null))
                                 {
                                     // TODO: write me
+                                    Log.i(TAG,"handle:011");
                                 }
                                 else
                                 {
+                                    Log.i(TAG,"handle:012");
                                     handleSendImage(intent, item_id, 2);
                                 }
                                 return;
@@ -265,11 +270,13 @@ public class ShareActivity extends AppCompatActivity
                             {
                                 if (type.startsWith("image/"))
                                 {
+                                    Log.i(TAG,"handle:013");
                                     handleSendMultipleImages(intent, item_id, 2);
                                 }
                                 else
                                 {
-                                    // TODO: write me
+                                    Log.i(TAG,"handle:014");
+                                    handleSendMultipleImages(intent, item_id, 2);
                                 }
                                 return;
                             }
