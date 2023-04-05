@@ -1,13 +1,5 @@
 name: Screenshot Tests
 on:
-  push:
-    paths-ignore:
-     - 'README.md'
-     - '.github/workflows/android.yml'
-  pull_request:
-    paths-ignore:
-     - 'README.md'
-     - '.github/workflows/android.yml'
   workflow_dispatch:
     inputs:
       version:
@@ -21,7 +13,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: android test
+    - name: android screenshot test
       timeout-minutes: 240
       uses: reactivecircus/android-emulator-runner@v2
       with:
