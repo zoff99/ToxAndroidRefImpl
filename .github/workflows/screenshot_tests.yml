@@ -17,7 +17,7 @@ on:
 jobs:
   android-screenshot-linux:
     runs-on: ubuntu-latest
-    if: ${{ false }}
+    if: ${{ true }}
     steps:
     - uses: actions/checkout@v3
 
