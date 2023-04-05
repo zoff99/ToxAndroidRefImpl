@@ -28,7 +28,7 @@ jobs:
         api-level: 21
         target: default
         profile: Nexus 6
-        arch: arm64-v8
+        arch: arm64-v8a
         ndk: 21.0.6113669
         cmake: 3.10.2.4988404
         ram-size: 1024
