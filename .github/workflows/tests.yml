@@ -107,6 +107,7 @@ jobs:
         disable-spellchecker: true
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+          sed -i -e 's#a.getWindow().addFlags#//a.getWindow().addFlagsXXYY#' /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/CallingActivity.java
           echo 'org.gradle.java.home=/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.1/Contents/Home' >> /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/gradle.properties
           printf 'dependencyVerification {\nverify = [\n]\n}\n' > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           export JAVA_HOME=$(/usr/libexec/java_home -v11)
