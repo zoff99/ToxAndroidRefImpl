@@ -32,7 +32,7 @@ jobs:
         arch: x86_64
         ndk: 21.0.6113669
         cmake: 3.10.2.4988404
-        emulator-options: -no-window -accel off -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        emulator-options: -no-window -accel off -gpu guest -noaudio -no-boot-anim -camera-back none
         disable-animations: false
         disable-spellchecker: true
         disk-size: 4096M
