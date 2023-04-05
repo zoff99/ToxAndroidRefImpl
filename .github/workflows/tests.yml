@@ -14,38 +14,10 @@ on:
         description: dummy
         default: dummy
 
-jobs:
-  android-test-linux:
-    # runs-on: ubuntu-latest-4-cores
-    runs-on: ubuntu-latest
-    if: ${{ false }}
-    steps:
-    - uses: actions/checkout@v3
-
-    - name: android test
-      timeout-minutes: 60
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 26
-        target: default
-        profile: Nexus 6
-        arch: x86_64
-        ndk: 21.0.6113669
-        cmake: 3.10.2.4988404
-        emulator-options: -no-window -accel off -gpu guest -noaudio -no-boot-anim -camera-back none
-        disable-animations: false
-        disable-spellchecker: true
-        disk-size: 4096M
-        script: |
-          pwd
-          java -version
-          cd android-refimpl-app ; ./gradlew assemble
-          adb logcat -c
-          adb logcat > logcat.txt &
-          cd android-refimpl-app ; ./gradlew connectedAndroidTest || echo "NOERR"
-
   android-test:
     runs-on: macos-latest
+    permissions:
+      contents: write
     if: ${{ true }}
     steps:
     - uses: actions/checkout@v3
@@ -86,11 +58,6 @@ jobs:
     - name: macos-version2
       run: system_profiler SPSoftwareDataType
 
-    - name: Run FFMPEG
-      run: |
-       brew install ffmpeg
-       ffmpeg -nostdin -f avfoundation -i 0 recording.mov &
-
     - name: android test
       timeout-minutes: 120
       uses: reactivecircus/android-emulator-runner@v2
@@ -98,11 +65,9 @@ jobs:
         api-level: 29
         profile: Nexus 6
         arch: x86_64
-        # ndk: 16.1.4479499
         ndk: 21.0.6113669
-        # ndk: 20.1.5948944
         cmake: 3.10.2.4988404
-        emulator-options: -gpu guest -no-snapshot -noaudio -no-boot-anim -camera-back none
+        emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         disable-spellchecker: true
         script: |
@@ -151,13 +116,6 @@ jobs:
           bash /Users/runner/a.sh &
           cd android-refimpl-app ; ./gradlew connectedAndroidTest || echo "NOERR"
 
-    - name: Stop Recording
-      continue-on-error: true
-      shell: bash
-      run: |
-       PID=$(ps aux | grep -m 1 ffmpeg | awk '{print $2}')
-       python -c "import os, signal; os.kill($PID, signal.SIGINT)"
-
     - name: upload screenshots
       uses: actions/upload-artifact@v3
       with:
@@ -173,10 +131,21 @@ jobs:
         path: |
           /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
 
-    - name: upload video
-      if: always()
-      continue-on-error: true
-      uses: actions/upload-artifact@master
+    - name: Rename artifact for nightly upload
+      if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
+      run: |
+        pwd
+        cp -av /Users/runner/screen_adb_02.png screen_shot_android.png
+
+    - name: Upload to nightly release
+      uses: ncipollo/release-action@v1
+      if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
       with:
-       name: Recording
-       path: recording.mov
+        allowUpdates: true
+        tag: nightly
+        omitBodyDuringUpdate: true
+        omitNameDuringUpdate: true
+        prerelease: true
+        replacesArtifacts: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: "screen_shot_android.png"
