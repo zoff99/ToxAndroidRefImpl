@@ -92,6 +92,7 @@ jobs:
        ffmpeg -nostdin -f avfoundation -i 0 recording.mov &
 
     - name: android test
+      timeout-minutes: 120
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: 29
@@ -101,7 +102,7 @@ jobs:
         ndk: 21.0.6113669
         # ndk: 20.1.5948944
         cmake: 3.10.2.4988404
-        emulator-options: -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim -camera-back none
+        emulator-options: -gpu guest -no-snapshot -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         disable-spellchecker: true
         script: |
