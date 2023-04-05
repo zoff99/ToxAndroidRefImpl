@@ -2,7 +2,10 @@ package com.zoffcc.applications.trifa;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
@@ -50,6 +53,7 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static androidx.test.espresso.screenshot.ViewInteractionCapture.captureToBitmap;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static androidx.test.runner.lifecycle.Stage.RESUMED;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static org.hamcrest.CoreMatchers.allOf;
 
 @RunWith(AndroidJUnit4.class)
@@ -106,6 +110,10 @@ public class StartMainActivityWrapperTest
             wait_(1, "until app is showing");
         }
 
+        setSharedPrefs();
+        PREF__window_security = false;
+        Log.i(TAG, "PREF__window_security:002=" + PREF__window_security);
+
         screenshot("001");
 
         if (cur_act.equals("CheckPasswordActivity"))
@@ -156,6 +164,10 @@ public class StartMainActivityWrapperTest
             // HINT: wait for tox to get online
             wait_(1, "for tox to get online");
         }
+
+        setSharedPrefs();
+        PREF__window_security = false;
+        Log.i(TAG, "PREF__window_security:001=" + PREF__window_security);
 
         // HINT: after we are online give it another 10 seconds
         wait_(5);
@@ -378,6 +390,17 @@ public class StartMainActivityWrapperTest
         {
             onView(withId(R.id.bugButton)).perform(replaceText(MOCK_PASSWORD));
         }
+    }
+
+    public void setSharedPrefs()
+    {
+        SharedPreferences sharedPreferences =
+                PreferenceManager.getDefaultSharedPreferences(getInstrumentation().getContext());
+        SharedPreferences.Editor editor = sharedPreferences.edit() ;
+        editor.putBoolean("window_security", false) ;
+        editor.apply();
+        editor.commit();
+        Log.i(TAG ,"Setting up shared prefs");
     }
 
     @Before
