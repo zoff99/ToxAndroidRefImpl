@@ -1283,7 +1283,7 @@ public class HelperGroup
             join_chat_id_buffer.rewind();
 
             long new_group_num = MainActivity.tox_group_join(join_chat_id_buffer, TOX_GROUP_CHAT_ID_SIZE,
-                                                             "peer " + MainActivity.getRandomString(4), null);
+                                                             RandomNameGenerator.getFullName(new Random()), null);
 
             Log.i(TAG, "join_group:new groupnum:=" + new_group_num);
 

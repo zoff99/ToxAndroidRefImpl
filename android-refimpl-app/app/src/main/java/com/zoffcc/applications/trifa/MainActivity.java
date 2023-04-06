@@ -7468,7 +7468,7 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "create_group:name:>" + group_name + "<");
                     long new_group_num = tox_group_new(
                             ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PRIVATE.value, group_name,
-                            "peer " + getRandomString(4));
+                            RandomNameGenerator.getFullName(new Random()));
 
                     Log.i(TAG, "create_group:new groupnum:=" + new_group_num);
 
@@ -7538,7 +7538,7 @@ public class MainActivity extends AppCompatActivity
                     Log.i(TAG, "create_group:name:>" + group_name + "<");
                     long new_group_num = tox_group_new(
                             ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value, group_name,
-                            "peer " + getRandomString(4));
+                            RandomNameGenerator.getFullName(new Random()));
 
                     Log.i(TAG, "create_group:new groupnum:=" + new_group_num);
 
