@@ -63,7 +63,7 @@ jobs:
       timeout-minutes: 120
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 29
+        api-level: 31
         profile: Nexus 6
         arch: x86_64
         ndk: 21.0.6113669
