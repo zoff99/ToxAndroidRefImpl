@@ -1,8 +1,28 @@
 # Changelog
 
-## [nightly](https://github.com/zoff99/ToxAndroidRefImpl/tree/nightly) (2023-04-01)
+## [1.0.201](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.201) (2023-04-10)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.197...nightly)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/nightly...1.0.201)
+
+## [nightly](https://github.com/zoff99/ToxAndroidRefImpl/tree/nightly) (2023-04-10)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.200...nightly)
+
+## [1.0.200](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.200) (2023-04-06)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.199...1.0.200)
+
+## [1.0.199](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.199) (2023-04-03)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.198...1.0.199)
+
+## [1.0.198](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.198) (2023-04-03)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.197...1.0.198)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#403](https://github.com/zoff99/ToxAndroidRefImpl/pull/403) ([weblate](https://github.com/weblate))
 
 ## [1.0.197](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.197) (2023-03-28)
 
@@ -1340,6 +1360,7 @@
 - Updates [\#54](https://github.com/zoff99/ToxAndroidRefImpl/pull/54) ([zoff99](https://github.com/zoff99))
 - add contact URLs [\#52](https://github.com/zoff99/ToxAndroidRefImpl/pull/52) ([zoff99](https://github.com/zoff99))
 - add url [\#51](https://github.com/zoff99/ToxAndroidRefImpl/pull/51) ([zoff99](https://github.com/zoff99))
+- add f-droid metadata [\#50](https://github.com/zoff99/ToxAndroidRefImpl/pull/50) ([zoff99](https://github.com/zoff99))
 - add AEC \(software echo cancellation\) [\#43](https://github.com/zoff99/ToxAndroidRefImpl/pull/43) ([zoff99](https://github.com/zoff99))
 
 ## [1.0.14](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.14) (2018-02-10)
