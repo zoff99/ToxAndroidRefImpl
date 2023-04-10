@@ -44,7 +44,7 @@ jobs:
       run:  |
             pwd
             $(which ruby) $(which github_changelog_generator) -u zoff99 -p ToxAndroidRefImpl \
-            --exclude-tags "$(git tag -l 'trifajni*'| tr '\n' ',')" \
+            --exclude-tags "$(git tag -l 'trifajni*'| tr '\n' ',')nightly" \
                --token "$CHANGELOG_GEN_TOKEN"
 
     - name: chmod
