@@ -161,6 +161,7 @@ public class FriendSelectSingleActivity extends ListActivity
             {
                 for (GroupDB g : gr)
                 {
+                    // Log.i(TAG, "g___:" + g);
                     friends_list.add(new FriendSelectSingle("NGC Group: " + g.name, g.group_identifier, 2));
                 }
             }

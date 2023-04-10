@@ -1415,7 +1415,8 @@ public class ConferenceAudioActivity extends AppCompatActivity
             {
                 try
                 {
-                    String result_friend_pubkey = data.getData().toString();
+                    int item_type = Integer.parseInt( data.getData().toString().substring(0, 1));
+                    String result_friend_pubkey = data.getData().toString().substring(2);
                     if (result_friend_pubkey != null)
                     {
                         if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)

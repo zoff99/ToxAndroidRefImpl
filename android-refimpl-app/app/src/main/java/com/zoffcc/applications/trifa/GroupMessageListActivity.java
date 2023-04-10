@@ -1382,20 +1382,24 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
 
+        Log.i(TAG, "onActivityResult:tox_group_invite_friend:start");
         if (requestCode == SelectFriendSingleActivity_ID)
         {
+            Log.i(TAG, "onActivityResult:tox_group_invite_friend:001");
             if (resultCode == RESULT_OK)
             {
+                Log.i(TAG, "onActivityResult:tox_group_invite_friend:002");
                 try
                 {
-                    String result_friend_pubkey = data.getData().toString();
+                    int item_type = Integer.parseInt( data.getData().toString().substring(0, 1));
+                    String result_friend_pubkey = data.getData().toString().substring(2);
+                    Log.i(TAG, "onActivityResult:tox_group_invite_friend:003:");
                     if (result_friend_pubkey != null)
                     {
+                        Log.i(TAG, "onActivityResult:tox_group_invite_friend:004:");
                         if (result_friend_pubkey.length() == TOX_PUBLIC_KEY_SIZE * 2)
                         {
-                            Log.i(TAG, "onActivityResult:tox_group_invite_friend:result_friend_pubkey:" +
-                                       result_friend_pubkey);
-
+                            Log.i(TAG, "onActivityResult:tox_group_invite_friend:result_friend_pubkey:ok");
                             long friend_num_temp_safety2 = tox_friend_by_public_key__wrapper(result_friend_pubkey);
                             if (friend_num_temp_safety2 > 0)
                             {
