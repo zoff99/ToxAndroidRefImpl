@@ -2,11 +2,7 @@
 
 ## [1.0.201](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.201) (2023-04-10)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/nightly...1.0.201)
-
-## [nightly](https://github.com/zoff99/ToxAndroidRefImpl/tree/nightly) (2023-04-10)
-
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.200...nightly)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.200...1.0.201)
 
 ## [1.0.200](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.200) (2023-04-06)
 
@@ -269,11 +265,6 @@
 ## [1.0.165](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.165) (2022-08-27)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.164...1.0.165)
-
-**Merged pull requests:**
-
-- Translations update from Hosted Weblate [\#349](https://github.com/zoff99/ToxAndroidRefImpl/pull/349) ([weblate](https://github.com/weblate))
-- Translations update from Hosted Weblate [\#348](https://github.com/zoff99/ToxAndroidRefImpl/pull/348) ([weblate](https://github.com/weblate))
 
 ## [1.0.164](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.164) (2022-08-13)
 
