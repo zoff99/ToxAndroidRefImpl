@@ -30,7 +30,7 @@ jobs:
 
     - name: install github-changelog-generator
       run:  |
-            git clone https://github.com/github-changelog-generator/github-changelog-generator
+            git clone https://github.com/github-changelog-generator/github-changelog-generator -b v1.16.4
             cd github-changelog-generator/
             sudo $(which gem) build github_changelog_generator.gemspec
             sudo $(which gem) install -N github_changelog_generator-1.16.4.gem
