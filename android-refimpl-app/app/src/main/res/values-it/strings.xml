@@ -413,4 +413,5 @@
     <string name="invite_join_conference_success">Siete stati invitati a una conferenza di gruppo</string>
     <string name="layout___group_id">ID di gruppo</string>
     <string name="layout___group_id2">ID di gruppo:</string>
+    <string name="MainActivity_join_trifa_groupchat">Iscriviti al Gruppo Info</string>
 </resources>
