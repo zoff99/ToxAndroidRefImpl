@@ -342,7 +342,6 @@ public class StartExportImportTest
         wait_(5);
         Log.i(TAG, "Pressing \"YES\" button to restart TRIfA");
         dialog_press_positive(8);
-
     }
 
     private static void dialog_press_positive(final int errnum)
