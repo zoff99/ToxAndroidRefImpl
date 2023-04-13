@@ -1,4 +1,4 @@
-name: App Tests
+name: App Tests Generic
 on:
   push:
     paths-ignore:
@@ -15,7 +15,7 @@ on:
         default: dummy
 
 jobs:
-  android-test:
+  android-test_generic:
     runs-on: macos-latest
     permissions:
       contents: write
@@ -46,7 +46,7 @@ jobs:
             ls -al /usr/bin/java
             echo "==========10========="
             id
-            export PATH="/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.1/Contents/Home/bin:$PATH"
+            export PATH="/Users/runner/hostedtoolcache/Java_Adopt_jdk/11.0.18-10/x64/Contents/Home/bin:$PATH"
             echo "==========11========="
             java -version
 
@@ -74,10 +74,10 @@ jobs:
         script: |
           rm -f /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           sed -i -e 's#a.getWindow().addFlags#//a.getWindow().addFlagsXXYY#' /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/CallingActivity.java
-          echo 'org.gradle.java.home=/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.1/Contents/Home' >> /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/gradle.properties
+          echo 'org.gradle.java.home=/Users/runner/hostedtoolcache/Java_Adopt_jdk/11.0.18-10/x64/Contents/Home' >> /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/gradle.properties
           printf 'dependencyVerification {\nverify = [\n]\n}\n' > /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
           export JAVA_HOME=$(/usr/libexec/java_home -v11)
-          export PATH="/Library/Java/JavaVirtualMachines/graalvm-ce-java11-22.3.1/Contents/Home/bin:$PATH"
+          export PATH="/Users/runner/hostedtoolcache/Java_Adopt_jdk/11.0.18-10/x64/Contents/Home/bin:$PATH"
           java -version
           cd android-refimpl-app ; ./gradlew assemble
           cliclick -m verbose m:12,34
