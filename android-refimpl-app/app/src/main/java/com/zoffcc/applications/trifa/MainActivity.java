@@ -542,7 +542,7 @@ public class MainActivity extends AppCompatActivity
     // ---- lookup cache for conference drawer ----
 
     // main drawer ----------
-    Drawer main_drawer = null;
+    static Drawer main_drawer = null;
     AccountHeader main_drawer_header = null;
     ProfileDrawerItem profile_d_item = null;
     // main drawer ----------

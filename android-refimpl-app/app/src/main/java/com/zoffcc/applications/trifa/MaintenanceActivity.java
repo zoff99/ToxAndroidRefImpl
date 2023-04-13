@@ -496,7 +496,22 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                               {
                                                   public void onClick(DialogInterface dialog, int id)
                                                   {
-                                                      import_toxsave_file_unsecure(this_context);
+
+                                                      final Thread import_thread = new Thread()
+                                                      {
+                                                          @Override
+                                                          public void run()
+                                                          {
+                                                              try
+                                                              {
+                                                                  import_toxsave_file_unsecure(this_context);
+                                                              }
+                                                              catch (Exception ignored)
+                                                              {
+                                                              }
+                                                          }
+                                                      };
+                                                      import_thread.start();
                                                       return;
                                                   }
                                               });

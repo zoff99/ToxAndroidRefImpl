@@ -169,7 +169,7 @@ public class StartMainActivityWrapperTest
         PREF__window_security = false;
         Log.i(TAG, "PREF__window_security:001=" + PREF__window_security);
 
-        // HINT: after we are online give it another 10 seconds
+        // HINT: after we are online give it another 5 seconds
         wait_(5);
 
         screenshot("004");

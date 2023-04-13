@@ -156,6 +156,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.stop_tox_fg_done;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 public class HelperGeneric
@@ -3370,6 +3371,24 @@ public class HelperGeneric
             return;
         }
 
+        Log.i(TAG, "Waiting for ToxThread to stop ...");
+        try
+        {
+            while(true)
+            {
+                // HINT: wait for tox thread to stop ...
+                //noinspection BusyWait
+                Thread.sleep(50);
+                if ((stop_tox_fg_done) && (!is_tox_started))
+                {
+                    Log.i(TAG, "ToxThread has ended");
+                    break;
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
 
         File f_dst = new File(MainActivity.app_files_directory + "/" + "savedata.tox");
         try
@@ -3387,7 +3406,7 @@ public class HelperGeneric
                 // delete unencrypted import file
                 f_src.delete();
             }
-            catch (Exception e)
+            catch (Exception ignored)
             {
             }
         }
@@ -3396,47 +3415,17 @@ public class HelperGeneric
             e.printStackTrace();
         }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Import Tox Savedata");
+        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Import Tox ToxSaveFile");
         builder.setMessage("Import OK:" + "\n\n" + "Now TRIfA will restart");
 
         builder.setPositiveButton("Ok", new DialogInterface.OnClickListener()
         {
             public void onClick(DialogInterface dialog, int id)
             {
-                // -----------------------------------------
-                // wipe password
-                // SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(context);
-                //settings.edit().putString("DB_secrect_key", "").commit();
-                // -----------------------------------------
-                //
-                //
-                // -----------------------------------------
-                // wipe database
-                String dbs_path = context.getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-                //File f_dbs = new File(dbs_path);
-                //f_dbs.delete();
-                // wipe encrypted filesystem
-                String encfs_path = context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME;
-                //File encfs_dbs = new File(encfs_path);
-                //encfs_dbs.delete();
-                //
-                String encfs_path2 =
-                        context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-shm";
-                //File encfs_dbs2 = new File(encfs_path2);
-                //encfs_dbs2.delete();
-                //
-                String encfs_path3 =
-                        context.getDir("vfs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_VFS_NAME + "-wal";
-                //File encfs_dbs3 = new File(encfs_path3);
-                //encfs_dbs3.delete();
-                // -----------------------------------------
-                //
-                // after importing the file. just stop the app hard
-                // tox_service_fg.stop_me(true);
-                // MainActivity.exit();
                 try
                 {
+                    Log.i(TAG, "Import ToxSaveFile complete, now exiting the application.");
                     System.exit(0);
                 }
                 catch (Exception ignored)
@@ -3447,8 +3436,24 @@ public class HelperGeneric
         });
 
         // create and show the alert dialog
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        Runnable myRunnable = () -> {
+            try
+            {
+                final AlertDialog dialog = builder.create();
+                Log.i(TAG, "Import ToxSaveFile: show final Dialog.");
+                dialog.show();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "Import ToxSaveFile with ERRORs, still exiting the application.");
+                System.exit(0);
+            }
+        };
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
     }
 
     static void ls_file(File f)
