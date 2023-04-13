@@ -3390,6 +3390,21 @@ public class HelperGeneric
         {
         }
 
+        //
+        orma.deleteFromFriendList().execute();
+        orma.deleteFromConferenceDB().execute();
+        orma.deleteFromGroupDB().execute();
+        //
+        orma.deleteFromMessage();
+        orma.deleteFromConferenceMessage();
+        orma.deleteFromGroupMessage();
+        //
+        orma.deleteFromConferencePeerCacheDB();
+        orma.deleteFromFileDB();
+        orma.deleteFromFiletransfer();
+        orma.deleteFromRelayListDB();
+        //
+
         File f_dst = new File(MainActivity.app_files_directory + "/" + "savedata.tox");
         try
         {
