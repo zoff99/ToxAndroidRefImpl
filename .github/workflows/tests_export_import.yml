@@ -1,4 +1,4 @@
-name: App Tests
+name: App Tests Export_Import
 on:
   push:
     paths-ignore:
@@ -15,7 +15,7 @@ on:
         default: dummy
 
 jobs:
-  android-test:
+  android-test_export_import:
     runs-on: macos-latest
     permissions:
       contents: write
@@ -124,7 +124,7 @@ jobs:
           ls -al /Users/runner/a.sh
           chmod u+rx /Users/runner/a.sh
           bash /Users/runner/a.sh &
-          cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.StartMainActivityWrapperTest || echo "NOERR"
+          cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.StartExportImportTest || echo "NOERR"
 
     - name: upload screenshots
       uses: actions/upload-artifact@v3
@@ -140,22 +140,3 @@ jobs:
         name: logcat
         path: |
           /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
-
-    - name: Rename artifact for nightly upload
-      if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
-      run: |
-        pwd
-        cp -av /Users/runner/screen_adb_02.png screen_shot_android.png
-
-    - name: Upload to nightly release
-      uses: ncipollo/release-action@v1
-      if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
-      with:
-        allowUpdates: true
-        tag: nightly
-        omitBodyDuringUpdate: true
-        omitNameDuringUpdate: true
-        prerelease: true
-        replacesArtifacts: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: "screen_shot_android.png"
