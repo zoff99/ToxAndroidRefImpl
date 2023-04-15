@@ -76,3 +76,7 @@ Translations are under the terms of GNU General Public License (version 2 or lat
 
 See https://hosted.weblate.org/projects/trifa-a-tox-client-for-android/android-application/#information
 and https://hosted.weblate.org/projects/trifa-a-tox-client-for-android/f-droid-texts/#information
+
+Any use of this project's code by GitHub Copilot, past or present, is done
+without our permission.  We do not consent to GitHub's use of this project's
+code in Copilot.
