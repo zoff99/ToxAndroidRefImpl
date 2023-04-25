@@ -885,6 +885,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             {
                 if (activity_group_num)
                 {
+                    Log.i(TAG, "add_outgoing_file:activity_group_num:true");
                     final Thread t = new Thread()
                     {
                         @Override
@@ -969,12 +970,58 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
                 else
                 {
+                    Log.i(TAG, "add_outgoing_file:activity_group_num:FALSE");
                     final Thread t2 = new Thread()
                     {
                         @Override
                         public void run()
                         {
                             Log.i(TAG, "add_outgoing_file:add_outgoing_file:thread_02");
+
+                            long loop = 0;
+                            while (loop < 100)
+                            {
+                                loop++;
+                                try
+                                {
+                                    Thread.sleep(20);
+                                }
+                                catch (InterruptedException e)
+                                {
+                                    e.printStackTrace();
+                                }
+
+                                if (MainActivity.group_message_list_activity != null)
+                                {
+                                    if (!MainActivity.group_message_list_activity.get_current_group_id().equals(
+                                            "-1"))
+                                    {
+                                        // got friendnum
+                                        Log.i(TAG, "add_outgoing_file:got groupnum:02");
+                                        break;
+                                    }
+                                }
+                            }
+
+                            loop = 0;
+                            while (loop < 1000)
+                            {
+                                loop++;
+                                try
+                                {
+                                    Thread.sleep(20);
+                                }
+                                catch (InterruptedException e)
+                                {
+                                    e.printStackTrace();
+                                }
+
+                                if (oncreate_finished)
+                                {
+                                    Log.i(TAG, "add_outgoing_file:oncreate_finished:02");
+                                    break;
+                                }
+                            }
                             add_outgoing_file(c, groupid_local, data.getData().toString(), fileName_, data.getData(),
                                               false, activity_group_num);
                         }
