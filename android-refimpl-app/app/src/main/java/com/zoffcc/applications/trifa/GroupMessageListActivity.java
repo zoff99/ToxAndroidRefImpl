@@ -1524,11 +1524,18 @@ public class GroupMessageListActivity extends AppCompatActivity
                 return;
             }
 
-            // reducing the file size down to hopefully 37kbytes -------------------
-            Log.i(TAG, "add_outgoing_file:shrink:start");
-            shrink_image_file(c, ofw);
-            Log.i(TAG, "add_outgoing_file:shrink:done");
-            // reducing the file size down to hopefully 37kbytes -------------------
+            if (file_size > TOX_MAX_NGC_FILESIZE)
+            {
+                // reducing the file size down to hopefully 37kbytes -------------------
+                Log.i(TAG, "add_outgoing_file:shrink:start");
+                shrink_image_file(c, ofw);
+                Log.i(TAG, "add_outgoing_file:shrink:done");
+                // reducing the file size down to hopefully 37kbytes -------------------
+            }
+            else
+            {
+                Log.i(TAG, "add_outgoing_file:no_need_to_shrink_file");
+            }
 
             Log.i(TAG, "add_outgoing_file:001");
 
