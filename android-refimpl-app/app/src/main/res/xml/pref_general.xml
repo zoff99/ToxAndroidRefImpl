@@ -283,12 +283,6 @@
             android:summary="@string/pref_description_use_camera_x"
             android:title="@string/pref_title_use_camera_x" />
 
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="enable_ngc_features"
-            android:summary="@string/pref_description_enable_ngc_features"
-            android:title="@string/pref_title_allow_enable_ngc_features" />
-
         <EditTextPreference
             android:defaultValue="80"
             android:inputType="number"

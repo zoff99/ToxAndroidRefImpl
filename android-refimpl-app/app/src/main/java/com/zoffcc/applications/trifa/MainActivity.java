@@ -490,7 +490,6 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__hide_setup_push_tip = false;
     static boolean PREF__show_friendnumber_on_friendlist = false;
     static int PREF__dark_mode_pref = 0;
-    static boolean PREF__enable_ngc_features = true;
     static boolean PREF__allow_push_server_ntfy = false;
     static boolean PREF__messageview_paging = true;
     static int PREF__message_paging_num_msgs_per_page = 50;
@@ -1213,17 +1212,6 @@ public class MainActivity extends AppCompatActivity
             PREF__allow_push_server_ntfy = false;
         }
 
-
-        try
-        {
-            PREF__enable_ngc_features = settings.getBoolean("enable_ngc_features", true);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__enable_ngc_features = true;
-        }
-
         try
         {
             PREF__use_push_service = settings.getBoolean("use_push_service", true);
@@ -1761,14 +1749,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onCreateOptionsMenu(Menu menu)
     {
         getMenuInflater().inflate(R.menu.menu_main, menu);
-
-        if (!PREF__enable_ngc_features)
-        {
-            menu.removeItem(R.id.item_create_group_private);
-            menu.removeItem(R.id.item_create_group_public);
-            menu.removeItem(R.id.item_join_group_public);
-        }
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -2737,16 +2717,6 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__allow_push_server_ntfy = false;
-        }
-
-        try
-        {
-            PREF__enable_ngc_features = settings.getBoolean("enable_ngc_features", true);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__enable_ngc_features = true;
         }
 
         try
