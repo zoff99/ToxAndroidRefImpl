@@ -1565,10 +1565,10 @@ public class HelperGroup
             {
                 try
                 {
-                    // HINT: sleep "9 + random(0 .. 7)" seconds
+                    // HINT: sleep "5 + random(0 .. 6)" seconds
                     Random rand = new Random();
-                    int rndi = rand.nextInt(8);
-                    int n = 9 + rndi;
+                    int rndi = rand.nextInt(7);
+                    int n = 5 + rndi;
                     Log.i(TAG,"send_ngch_request: sleep for " + n + " seconds");
                     Thread.sleep(1000 * n);
                     //
