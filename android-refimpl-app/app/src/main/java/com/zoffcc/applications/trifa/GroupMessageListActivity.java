@@ -60,6 +60,10 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
@@ -473,6 +477,14 @@ public class GroupMessageListActivity extends AppCompatActivity
         t.start();
     }
 
+    static class group_list_peer
+    {
+        String peer_name;
+        long peer_num;
+        String peer_pubkey;
+        int peer_connection_status;
+    }
+
     synchronized void set_peer_names_and_avatars()
     {
         try
@@ -494,6 +506,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             long[] peers = tox_group_get_peerlist(conference_num);
             if (peers != null)
             {
+                List<group_list_peer> group_peers1 = new ArrayList<>();
                 long i = 0;
                 for (i = 0; i < num_peers; i++)
                 {
@@ -520,12 +533,38 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 ToxVars.Tox_Group_Role.value_char(peerrole) + " " + peer_name + " :" + peers[(int) i] +
                                 ": " + peer_pubkey_temp.substring(0, 6);
 
-                        add_group_user(peer_pubkey_temp, i, peer_name_temp,
-                                       tox_group_peer_get_connection_status(conference_num, peers[(int) i]));
+                        group_list_peer glp = new group_list_peer();
+                        glp.peer_pubkey = peer_pubkey_temp;
+                        glp.peer_num = i;
+                        glp.peer_name = peer_name_temp;
+                        glp.peer_connection_status = tox_group_peer_get_connection_status(conference_num, peers[(int) i]);
+                        group_peers1.add(glp);
                     }
-                    catch (Exception e)
+                    catch (Exception ignored)
                     {
                     }
+                }
+
+                try
+                {
+                    Collections.sort(group_peers1, new Comparator<group_list_peer>()
+                    {
+                        @Override
+                        public int compare(group_list_peer p1, group_list_peer p2)
+                        {
+                            String name1 = p1.peer_name;
+                            String name2 = p2.peer_name;
+                            return name1.compareToIgnoreCase(name2);
+                        }
+                    });
+                }
+                catch(Exception ignored)
+                {
+                }
+
+                for (group_list_peer peerl: group_peers1)
+                {
+                    add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status);
                 }
             }
         }
@@ -537,6 +576,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             long[] offline_peers = tox_group_get_offline_peerlist(conference_num);
             if (offline_peers != null)
             {
+                List<group_list_peer> group_peers_offline = new ArrayList<group_list_peer>();
                 long i = 0;
                 for (i = 0; i < offline_num_peers; i++)
                 {
@@ -549,12 +589,38 @@ public class GroupMessageListActivity extends AppCompatActivity
                         String peer_name_temp = "" + peer_name + " :" + offline_peers[(int) i] + ": " +
                                                 peer_pubkey_temp.substring(0, 6);
 
-                        add_group_user(peer_pubkey_temp, i, peer_name_temp,
-                                       ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value);
+                        group_list_peer glp3 = new group_list_peer();
+                        glp3.peer_pubkey = peer_pubkey_temp;
+                        glp3.peer_num = i;
+                        glp3.peer_name = peer_name_temp;
+                        glp3.peer_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                        group_peers_offline.add(glp3);
                     }
-                    catch (Exception e)
+                    catch (Exception ignored)
                     {
                     }
+                }
+
+                try
+                {
+                    Collections.sort(group_peers_offline, new Comparator<group_list_peer>()
+                    {
+                        @Override
+                        public int compare(group_list_peer p1, group_list_peer p2)
+                        {
+                            String name1 = p1.peer_name;
+                            String name2 = p2.peer_name;
+                            return name1.compareToIgnoreCase(name2);
+                        }
+                    });
+                }
+                catch(Exception ignored)
+                {
+                }
+
+                for (group_list_peer peerloffline: group_peers_offline)
+                {
+                    add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name, peerloffline.peer_connection_status);
                 }
             }
         }
