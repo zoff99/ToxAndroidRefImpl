@@ -376,8 +376,26 @@ public class HelperGroup
     {
         try
         {
-            return tox_group_peer_get_name(tox_group_by_groupid__wrapper(group_identifier),
+            String res = tox_group_peer_get_name(tox_group_by_groupid__wrapper(group_identifier),
                                            get_group_peernum_from_peer_pubkey(group_identifier, group_peer_pubkey));
+
+            if (res != null)
+            {
+                return res;
+            }
+
+            GroupPeerDB peer_from_db = null;
+            try
+            {
+                peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_identifier).
+                        tox_group_peer_pubkeyEq(group_peer_pubkey).toList().get(0);
+
+                return peer_from_db.peer_name;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
         }
         catch (Exception e)
         {
@@ -640,6 +658,29 @@ public class HelperGroup
         {
             // Log.i(TAG, "update_group_in_friendlist:EE1:" + e1.getMessage());
             // e1.printStackTrace();
+        }
+    }
+
+    static void add_group_peer_to_db(final long group_number, final String group_identifier,
+                                     final long peerid, final String group_peer_pubkey)
+    {
+        try
+        {
+            if (group_identifier != null)
+            {
+                GroupPeerDB p = new GroupPeerDB();
+                p.group_identifier = group_identifier;
+                p.tox_group_peer_pubkey = group_peer_pubkey;
+                p.peer_name = tox_group_peer_get_name__wrapper(group_identifier, group_peer_pubkey);
+                p.last_update_timestamp = System.currentTimeMillis();
+                p.first_join_timestamp = System.currentTimeMillis();
+                orma.insertIntoGroupPeerDB(p);
+            }
+
+            Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
+        }
+        catch (Exception ignored)
+        {
         }
     }
 

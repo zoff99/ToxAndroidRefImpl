@@ -109,6 +109,48 @@
                 android:layout_width="match_parent"
                 android:layout_height="20dp" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/peer_first_join_text_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="0"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="2dp"
+                    android:paddingBottom="15dp"
+                    android:text="@string/layout___peer_first_join_date"
+                    android:textAlignment="textStart"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/peer_first_join_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="800"
+                    android:fontFamily="monospace"
+                    android:paddingLeft="4dp"
+                    android:paddingBottom="15dp"
+                    android:text="1900 01 01 00:00:00"
+                    android:textIsSelectable="true"
+                    android:textSize="16sp"
+                    android:typeface="monospace" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
             <TextView
                 android:id="@+id/group_peerrole_text"
                 android:layout_width="match_parent"
@@ -164,20 +206,6 @@
                     android:textSize="13sp" />
 
             </LinearLayout>
-
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="20dp" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/group_peer_debug_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginTop="20dp"
-                android:visibility="gone"
-                android:text="send private random" />
 
             <TextView
                 android:layout_width="match_parent"

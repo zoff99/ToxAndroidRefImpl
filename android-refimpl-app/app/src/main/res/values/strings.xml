@@ -448,6 +448,7 @@
     <string name="layout___name">Name</string>
     <string name="layout___push_to_talk">Push to talk</string>
     <string name="layout___nick">Nick:</string>
+    <string name="layout___peer_first_join_date">First Join Date:</string>
     <string name="layout___conf_id">Conference ID:</string>
     <string name="layout___conf_title">Title:</string>
     <string name="layout___group_id2">Group ID:</string>

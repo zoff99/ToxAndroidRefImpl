@@ -43,6 +43,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
+import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
@@ -55,6 +56,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_publ
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_private_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_private_message_by_peerpubkey;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class GroupPeerInfoActivity extends AppCompatActivity
 {
@@ -65,11 +67,11 @@ public class GroupPeerInfoActivity extends AppCompatActivity
     EditText group_send_private_message = null;
     String peer_pubkey = null;
     TextView group_peerrole_text = null;
+    TextView peer_first_join_text = null;
     AppCompatButton group_kickpeer_button = null;
     AppCompatSpinner group_peerrole_select = null;
     String group_id = null;
     private String[] tox_ngc_group_role_items;
-    private AppCompatButton group_peer_debug_button = null;
     private AppCompatButton group_peerrole_set_button = null;
 
     @Override
@@ -91,27 +93,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
         group_kickpeer_button = findViewById(R.id.group_kickpeer_button);
         group_peerrole_select = findViewById(R.id.group_peerrole_select);
         group_peerrole_set_button = findViewById(R.id.group_peerrole_set_button);
-
-        group_peer_debug_button = findViewById(R.id.group_peer_debug_button);
-        group_peer_debug_button.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                try
-                {
-                    final int len = 37000;
-                    byte[] d = new byte[len];
-                    new Random().nextBytes(d);
-                    tox_group_send_custom_private_packet(group_num,
-                                                         get_group_peernum_from_peer_pubkey(group_id, peer_pubkey), 1,
-                                                         d, len);
-                }
-                catch (Exception ignored)
-                {
-                }
-            }
-        });
+        peer_first_join_text = findViewById(R.id.peer_first_join_text);
 
         this.tox_ngc_group_role_items = new String[]{"---", "TOX_GROUP_ROLE_MODERATOR", "TOX_GROUP_ROLE_USER", "TOX_GROUP_ROLE_OBSERVER"};
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
@@ -205,6 +187,17 @@ public class GroupPeerInfoActivity extends AppCompatActivity
 
         peer_toxid.setText(peer_pubkey);
         peer_name.setText(peer_name_txt);
+
+        peer_first_join_text.setText("unknown");
+        try
+        {
+           GroupPeerDB peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_id).
+                    tox_group_peer_pubkeyEq(peer_pubkey).toList().get(0);
+            peer_first_join_text.setText(long_date_time_format(peer_from_db.first_join_timestamp));
+        }
+        catch (Exception e)
+        {
+        }
 
         try
         {

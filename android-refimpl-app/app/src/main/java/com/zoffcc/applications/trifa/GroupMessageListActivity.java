@@ -121,6 +121,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_NEW_PEERS_TIMEDELTA_IN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
@@ -130,6 +131,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_fo
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_FILESIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
+import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
 public class GroupMessageListActivity extends AppCompatActivity
@@ -527,6 +529,24 @@ public class GroupMessageListActivity extends AppCompatActivity
                             e.printStackTrace();
                         }
 
+                        GroupPeerDB peer_from_db = null;
+                        try
+                        {
+                            peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_id).
+                                    tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                        }
+                        catch (Exception e)
+                        {
+                        }
+
+                        if (peer_from_db != null)
+                        {
+                            if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis())
+                            {
+                                peer_name = "_NEW_ " + peer_name;
+                            }
+                        }
+
                         // Log.i(TAG,
                         //      "groupnum=" + conference_num + " peernum=" + peers[(int) i] + " peer_name=" + peer_name);
                         String peer_name_temp =
@@ -584,6 +604,25 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, offline_peers[(int) i]);
                         String peer_name = tox_group_peer_get_name(conference_num, offline_peers[(int) i]);
+                        GroupPeerDB peer_from_db = null;
+                        try
+                        {
+                            peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_id).
+                                    tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                        }
+                        catch (Exception e)
+                        {
+                        }
+
+                        if (peer_from_db != null)
+                        {
+                            peer_name = peer_from_db.peer_name;
+                            if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis())
+                            {
+                                peer_name = "_NEW_ " + peer_name;
+                            }
+                        }
+
                         // Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
                         //           peer_name);
                         String peer_name_temp = "" + peer_name + " :" + offline_peers[(int) i] + ": " +

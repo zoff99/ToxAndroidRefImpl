@@ -164,6 +164,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
+import static com.zoffcc.applications.trifa.HelperGroup.add_group_peer_to_db;
 import static com.zoffcc.applications.trifa.HelperGroup.add_system_message_to_group_chat;
 import static com.zoffcc.applications.trifa.HelperGroup.android_tox_callback_group_message_cb_method_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey;
@@ -7081,6 +7082,15 @@ public class MainActivity extends AppCompatActivity
         final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
         update_group_in_friendlist(temp_group_identifier);
         update_group_in_groupmessagelist(temp_group_identifier);
+        String group_peer_pubkey = null;
+        try
+        {
+            group_peer_pubkey = tox_group_peer_get_public_key(group_number, peer_id);
+        }
+        catch(Exception e)
+        {
+        }
+        add_group_peer_to_db(group_number, temp_group_identifier, peer_id, group_peer_pubkey);
         add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " joined the group");
         int privacy_state = tox_group_get_privacy_state(group_number);
         if (privacy_state == ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value)
