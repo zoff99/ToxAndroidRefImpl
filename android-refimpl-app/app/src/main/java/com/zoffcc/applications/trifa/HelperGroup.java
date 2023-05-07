@@ -390,7 +390,14 @@ public class HelperGroup
                 peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_identifier).
                         tox_group_peer_pubkeyEq(group_peer_pubkey).toList().get(0);
 
-                return peer_from_db.peer_name;
+                if ((peer_from_db.peer_name!= null) && (peer_from_db.peer_name.length() > 0))
+                {
+                    return peer_from_db.peer_name;
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch (Exception e)
             {
@@ -661,6 +668,26 @@ public class HelperGroup
         }
     }
 
+    static void update_group_peer_in_db(final long group_number, final String group_identifier,
+                                        final long peerid, final String group_peer_pubkey)
+    {
+        try
+        {
+            if (group_identifier != null)
+            {
+                final String peer_name = tox_group_peer_get_name__wrapper(group_identifier, group_peer_pubkey);
+                orma.updateGroupPeerDB().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(group_peer_pubkey).
+                        peer_name(peer_name).last_update_timestamp(System.currentTimeMillis()).
+                        execute();
+            }
+
+            Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
+        }
+        catch (Exception ignored)
+        {
+        }
+    }
+
     static void add_group_peer_to_db(final long group_number, final String group_identifier,
                                      final long peerid, final String group_peer_pubkey)
     {
@@ -676,11 +703,14 @@ public class HelperGroup
                 p.first_join_timestamp = System.currentTimeMillis();
                 orma.insertIntoGroupPeerDB(p);
             }
-
-            Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
+            // Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
         }
-        catch (Exception ignored)
+        catch (Exception e)
         {
+            if (group_identifier != null)
+            {
+                update_group_peer_in_db(group_number, group_identifier, peerid, group_peer_pubkey);
+            }
         }
     }
 
@@ -2245,6 +2275,13 @@ public class HelperGroup
                 {
                     Log.i(TAG,"handle_incoming_sync_group_message:potential double message:" + message_str);
                     return;
+                }
+
+                final String peer_name_saved = tox_group_peer_get_name__wrapper(group_identifier, original_sender_peerpubkey);
+                if (peer_name_saved != null)
+                {
+                    // HINT: use saved name instead of name from sync message
+                    peer_name = peer_name_saved;
                 }
 
                 group_message_add_from_sync(group_identifier, syncer_pubkey, sender_peer_num, original_sender_peerpubkey,

@@ -177,11 +177,13 @@ import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.sync_group_message_history;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupnum__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_privacy_state;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_topic;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_friendlist;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_groupmessagelist;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_peer_in_db;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.HelperRelay.get_own_relay_connection_status_real;
@@ -5326,11 +5328,19 @@ public class MainActivity extends AppCompatActivity
                         {
                         }
 
+                        String peer_name = null;
+                        final String peer_name_saved = tox_group_peer_get_name__wrapper(real_conference_id, real_sender_peer_pubkey);
+                        if (peer_name_saved != null)
+                        {
+                            // HINT: use saved name instead of name from sync message
+                            peer_name = peer_name_saved;
+                        }
+
                         group_message_add_from_sync(real_conference_id, syncer_pubkey, sender_peer_num, real_sender_peer_pubkey,
                                                     TRIFA_MSG_TYPE_TEXT.value, real_sender_text, real_text_length,
                                                     sync_msg_received_timestamp, real_send_message_id,
                                                     TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_TOXPROXY.value,
-                                                    null);
+                                                    peer_name);
 
                         send_friend_msg_receipt_v2_wrapper(friend_number, 3, msg_id_buffer,
                                                            (System.currentTimeMillis() / 1000));
@@ -7114,7 +7124,16 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_group_peer_name_cb_method(long group_number, long peer_id)
     {
+        String group_peer_pubkey = null;
+        try
+        {
+            group_peer_pubkey = tox_group_peer_get_public_key(group_number, peer_id);
+        }
+        catch(Exception e)
+        {
+        }
         final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
+        update_group_peer_in_db(group_number, temp_group_identifier, peer_id, group_peer_pubkey);
         update_group_in_groupmessagelist(temp_group_identifier);
         add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " changed name");
     }
@@ -7135,6 +7154,14 @@ public class MainActivity extends AppCompatActivity
         update_savedata_file_wrapper();
         update_group_in_friendlist(group_identifier);
         update_group_in_groupmessagelist(group_identifier);
+        try
+        {
+            add_group_peer_to_db(group_number, group_identifier, tox_group_self_get_peer_id(group_number),
+                                 tox_group_self_get_public_key(group_number));
+        }
+        catch(Exception e)
+        {
+        }
         if (have_own_relay())
         {
             invite_to_group_own_relay(group_number);
