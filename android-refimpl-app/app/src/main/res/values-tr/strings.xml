@@ -420,4 +420,5 @@
     <string name="pref_title_mic_gain_factor_toggle">Sesi azaltmak için mikrofon kazancı</string>
     <string name="pref_description_mic_gain_factor_toggle">Mikrofonunuz çok fazla hassasiyetle kayıt yapıyorsa, bu ayarı etkinleştirin ve mikrofon kazanç çarpanı mikrofonun ses seviyesini düşürsün</string>
     <string name="MainActivity_join_trifa_groupchat">Bilgi Grubuna Katıl</string>
+    <string name="layout___peer_first_join_date">İlk Katılım Tarihi:</string>
 </resources>
