@@ -351,10 +351,8 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-    // HINT: can't update because of:
-    // https://github.com/vanniktech/Emoji/pull/465
-    // minSdk 21, targetSdk 29 & update all of the dependencies
-    implementation('com.vanniktech:emoji-google:0.7.0') {
+    // HINT: can't update to latest version:
+    implementation('com.vanniktech:emoji-google:0.9.0') {
         exclude group: 'com.android.support'
     }
     //
