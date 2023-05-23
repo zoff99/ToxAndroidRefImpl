@@ -233,7 +233,7 @@ android {
 
     defaultConfig {
         applicationId "com.zoffcc.applications.trifa"
-        minSdkVersion 19
+        minSdkVersion 21
         //noinspection OldTargetApi
         targetSdkVersion 31
         versionCode 10205
@@ -300,7 +300,7 @@ dependencies {
     //
     implementation("com.daimajia.swipelayout:library:1.2.0@aar")
     //
-    implementation('net.zetetic:android-database-sqlcipher:4.5.3@aar') {
+    implementation('net.zetetic:android-database-sqlcipher:4.5.4@aar') {
         transitive = true
     }
     //noinspection KtxExtensionAvailable
