@@ -310,7 +310,10 @@ if [ "$full""x" == "1x" ]; then
     mkdir -p "$_BLD_"
     cd "$_BLD_";
 
-    ECFLAGS="-Os -fpic -march=armv7-a -mfloat-abi=softfp -mfpu=neon -marm -mthumb -D__thumb__"
+    find "$_toolchain_"/arm-linux-androideabi/sysroot -name NdkMediaFormat.h
+    echo ${$_toolchain_}/arm-linux-androideabi/sysroot/usr/include
+
+    ECFLAGS="-Os -fpic -I${$_toolchain_}/arm-linux-androideabi/sysroot/usr/include -march=armv7-a -mfloat-abi=softfp -mfpu=neon -marm -mthumb -D__thumb__"
     ELDFLAGS=""
     ARCH_SPECIFIC="--arch=arm --cpu=armv7-a --cross-prefix=arm-linux-androideabi- --enable-cross-compile"
 
