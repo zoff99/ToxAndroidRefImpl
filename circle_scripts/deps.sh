@@ -680,7 +680,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/arm-linux-androideabi/sysroot/usr/lib/libavutil.a \
     coffeecatch.c coffeejni.c \
-    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
+    -lm -landroid "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
 
 res=$?
 
@@ -1259,7 +1259,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavutil.a \
     coffeecatch.c coffeejni.c \
-    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
+    -lm -landroid "$_NDK_"/sources/android/cpufeatures/cpu-features2.c || exit 1
 
 res=$?
 
@@ -1694,7 +1694,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     "$_toolchain_"/x86/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/x86/sysroot/usr/lib/libavutil.a \
     coffeecatch.c coffeejni.c \
-    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
+    -lm -landroid "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
 
 res=$?
 
@@ -2126,7 +2126,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavcodec.a \
     "$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr/lib/libavutil.a \
     coffeecatch.c coffeejni.c \
-    -lm "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
+    -lm -landroid "$_NDK_"/sources/android/cpufeatures/cpu-features.c || exit 1
 
 res=$?
 

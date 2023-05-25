@@ -74,6 +74,8 @@ bash ../circle_scripts/deps.sh || exit 1
 cd /root/work/build_dir/
 bash ../circle_scripts/trifa.sh || exit 1
 
+cp -av /root/work//artefacts/* /artefacts/
+
 chmod a+rwx -R /workspace/
 chmod a+rwx -R /artefacts/
 
