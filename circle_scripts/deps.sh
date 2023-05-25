@@ -17,7 +17,7 @@ build_yasm="1"
 ## ----------------------
 _FFMPEG_VERSION_="n6.0"
 _OPUS_VERSION_="v1.3.1"
-_VPX_VERSION_="v1.8.0"
+_VPX_VERSION_="v1.13.0"
 _LIBSODIUM_VERSION_="1.0.18"
 _X264_VERSION_="5db6aa6cab1b146e07b60cc1736a01f21da01154"
 _ANDROID_SDK_FILE_="sdk-tools-linux-4333796.zip"
@@ -84,22 +84,25 @@ redirect_cmd() {
 echo "installing system packages ..."
 export DEBIAN_FRONTEND=noninteractive
 
-redirect_cmd apt-get update $qqq
+if [ ! -e /installing_more_system_packages_done ]; then
+    redirect_cmd apt-get update $qqq
+    redirect_cmd apt-get install $qqq -y --force-yes lsb-release
+fi
 
-redirect_cmd apt-get install $qqq -y --force-yes lsb-release
 system__=$(lsb_release -i|cut -d ':' -f2|sed -e 's#\s##g')
 version__=$(lsb_release -r|cut -d ':' -f2|sed -e 's#\s##g')
 echo "compiling on: $system__ $version__"
 
-echo "installing more system packages ..."
+if [ ! -e /installing_more_system_packages_done ]; then
+    echo "installing more system packages ..."
 
-redirect_cmd apt-get install $qqq -y --force-yes wget
-redirect_cmd apt-get install $qqq -y --force-yes git
-redirect_cmd apt-get install $qqq -y --force-yes curl
+    redirect_cmd apt-get install $qqq -y --force-yes wget
+    redirect_cmd apt-get install $qqq -y --force-yes git
+    redirect_cmd apt-get install $qqq -y --force-yes curl
 
-redirect_cmd apt-get install $qqq -y --force-yes python-software-properties
-redirect_cmd apt-get install $qqq -y --force-yes software-properties-common
-
+    redirect_cmd apt-get install $qqq -y --force-yes python-software-properties
+    redirect_cmd apt-get install $qqq -y --force-yes software-properties-common
+fi
 
 pkgs="
     unzip
@@ -118,10 +121,11 @@ pkgs="
     openjdk-8-jdk
 "
 
-for i in $pkgs ; do
-    redirect_cmd apt-get install $qqq -y --force-yes $i
-done
-
+if [ ! -e /installing_more_system_packages_done ]; then
+    for i in $pkgs ; do
+        redirect_cmd apt-get install $qqq -y --force-yes $i
+    done
+fi
 
 wget "https://raw.githubusercontent.com/libav/gas-preprocessor/master/gas-preprocessor.pl" -O /usr/bin/gas-preprocessor.pl
 chmod a+rx /usr/bin/gas-preprocessor.pl
@@ -198,11 +202,18 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
+        if [ -e /sdk.zip ]; then
+            cp -v /sdk.zip sdk.zip
+        else
+            redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
+        fi
 
         cd $WRKSPACEDIR
-        # redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
-        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
+        if [ -e /ndk.zip ]; then
+            cp -v /ndk.zip ndk.zip
+        else
+            redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
+        fi
     fi
 
     cd $WRKSPACEDIR
@@ -305,6 +316,37 @@ if [ "$full""x" == "1x" ]; then
 
 
 
+    # --- LIBVPX ---
+    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
+    rm -Rf "$_BLD_"
+    mkdir -p "$_BLD_"
+
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
+                export CFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
+            CC=$AND_CC \
+            CXX=$AND_CXX \
+            AR="$_toolchain_"/arm-linux-androideabi/bin/arm-linux-androideabi-ar \
+            LD=$AND_CC \
+            AS=$AND_AS \
+            STRIP=strip \
+        $_s_/libvpx/configure \
+          --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
+          --disable-examples \
+          --disable-unit-tests \
+          --target=armv7-android-gcc \
+          --size-limit=16384x16384 \
+          --enable-onthefly-bitpacking \
+          --disable-runtime-cpu-detect \
+          --enable-realtime-only \
+          --enable-multi-res-encoding \
+          --enable-temporal-denoising || exit 1
+
+    cd "$_BLD_";make V=1 -j $_CPUS_ || exit 1
+    cd "$_BLD_";make install
+    # --- LIBVPX ---
+
+
+
     # --- LIBAV ---
     cd $_s_;git clone https://github.com/FFmpeg/FFmpeg libav
     cd $_s_/libav/; git checkout "$_FFMPEG_VERSION_"
@@ -370,32 +412,6 @@ if [ "$full""x" == "1x" ]; then
 
 
 
-    # --- LIBVPX ---
-    cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
-    rm -Rf "$_BLD_"
-    mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
-                export CFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
-        $_s_/libvpx/configure \
-          --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
-          --sdk-path="$_NDK_" \
-          --disable-examples \
-          --disable-unit-tests \
-          --target=armv7-android-gcc \
-          --size-limit=16384x16384 \
-          --enable-onthefly-bitpacking \
-          --disable-runtime-cpu-detect \
-          --enable-realtime-only \
-          --enable-multi-res-encoding \
-          --enable-temporal-denoising || exit 1
-
-    cd "$_BLD_";make V=1 -j $_CPUS_ || exit 1
-    cd "$_BLD_";make install
-    # --- LIBVPX ---
-
-
-
-
     # --- OPUS ---
     cd $_s_;git clone --depth=1 --branch="$_OPUS_VERSION_" https://github.com/xiph/opus.git
     cd $_s_/opus/;autoreconf -fi
@@ -448,7 +464,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
+    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
     --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
     --disable-soname-versions --host=arm-linux-androideabi \
     --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot \
@@ -648,7 +664,7 @@ echo ""
 git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
 
-cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
+cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     $WARNS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
@@ -761,10 +777,18 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
+        if [ -e /sdk.zip ]; then
+            cp -v /sdk.zip sdk.zip
+        else
+            redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
+        fi
 
         cd $WRKSPACEDIR
-        redirect_cmd curl http://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
+        if [ -e /ndk.zip ]; then
+            cp -v /ndk.zip ndk.zip
+        else
+            redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
+        fi
     fi
 
     cd $WRKSPACEDIR
@@ -930,14 +954,20 @@ if [ "$full""x" == "1x" ]; then
     # --- LIBVPX ---
     cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     cd $_s_;wget 'https://raw.githubusercontent.com/cmeng-git/vpx-android/de613e367ea86190955a836c3c0f2bc0f260562f/patches/10.libvpx_configure.sh.patch' -O aa.patch
-    cd $_s_; patch -p1 < aa.patch
+    # cd $_s_; patch -p1 < aa.patch
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
-                export CFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
+
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
+                export CFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
+            CC=$AND_CC \
+            CXX=$AND_CXX \
+            AR="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/bin/aarch64-linux-android-ar \
+            LD=$AND_CC \
+            AS=$AND_AS \
+            STRIP=strip \
         $_s_/libvpx/configure \
           --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
-          --sdk-path="$_NDK_" \
           --disable-examples \
           --disable-unit-tests \
           --target=arm64-android-gcc \
@@ -1010,7 +1040,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
+    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
     --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
     --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
     --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot \
@@ -1212,7 +1242,7 @@ echo "XX:""$git_hash_for_jni"":YY"
 
 set -x
 
-cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared \
+cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     $WARNS \
     $ASAN_CLANG_FLAGS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
@@ -1321,10 +1351,18 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
+        if [ -e /sdk.zip ]; then
+            cp -v /sdk.zip sdk.zip
+        else
+            redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
+        fi
 
         cd $WRKSPACEDIR
-        redirect_cmd curl http://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
+        if [ -e /ndk.zip ]; then
+            cp -v /ndk.zip ndk.zip
+        else
+            redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
+        fi
     fi
 
     cd $WRKSPACEDIR
@@ -1506,11 +1544,17 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
-                export CFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
+
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
+                export CFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
+            CC=$AND_CC \
+            CXX=$AND_CXX \
+            AR="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/bin/i686-linux-android-ar \
+            LD=$AND_CC \
+            AS=$AND_AS \
+            STRIP=strip \
         $_s_/libvpx/configure \
-          --prefix="$_toolchain_"/x86/sysroot/usr \
-          --sdk-path="$_NDK_" \
+          --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
           --disable-examples \
           --disable-unit-tests \
           --target=x86-android-gcc \
@@ -1522,6 +1566,8 @@ if [ "$full""x" == "1x" ]; then
           --enable-realtime-only \
           --enable-multi-res-encoding \
           --enable-temporal-denoising || exit 1
+
+
 
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
@@ -1582,7 +1628,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
+    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
     --prefix="$_toolchain_"/x86/sysroot/usr \
     --disable-soname-versions --host=x86 \
     --with-sysroot="$_toolchain_"/x86/sysroot \
@@ -1630,7 +1676,7 @@ WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implic
 git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
 
-cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
+cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
     -Wno-pointer-sign -Wno-unused-but-set-variable \
     $WARNS \
@@ -1717,7 +1763,7 @@ export AND_TOOLCHAIN_ARCH3="x86_64-linux-android"
 export AND_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin:$ORIG_PATH_"
 export AND_PKG_CONFIG_PATH="$_toolchain_/$AND_TOOLCHAIN_ARCH/sysroot/usr/lib/pkgconfig"
 export AND_CC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang"
-export AND_CS="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang-as"
+export AND_AS="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-as"
 export AND_GCC="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang"
 export AND_CXX="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-clang++"
 export AND_READELF="$_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-readelf"
@@ -1737,10 +1783,18 @@ if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
         cd $WRKSPACEDIR
-        redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
+        if [ -e /sdk.zip ]; then
+            cp -v /sdk.zip sdk.zip
+        else
+            redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_SDK_FILE_" -o sdk.zip
+        fi
 
         cd $WRKSPACEDIR
-        redirect_cmd curl http://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
+        if [ -e /ndk.zip ]; then
+            cp -v /ndk.zip ndk.zip
+        else
+            redirect_cmd curl https://dl.google.com/android/repository/"$_ANDROID_NDK_FILE_" -o ndk.zip
+        fi
     fi
 
     cd $WRKSPACEDIR
@@ -1922,23 +1976,29 @@ if [ "$full""x" == "1x" ]; then
     cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
-    cd "$_BLD_";export CXXFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
-                export CFLAGS=" -g -O3 $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures "; \
+
+    cd "$_BLD_";export CXXFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
+                export CFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
+            CC=$AND_CC \
+            CXX=$AND_CXX \
+            AR="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/bin/x86_64-linux-android-ar \
+            LD=$AND_CC \
+            AS=$AND_AS \
+            STRIP=strip \
         $_s_/libvpx/configure \
           --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
-          --sdk-path="$_NDK_" \
           --disable-examples \
           --disable-unit-tests \
           --target=x86_64-android-gcc \
-          --enable-runtime_cpu_detect \
+          --disable-mmx --disable-sse \
+          --disable-sse2 --disable-sse3 --disable-ssse3 --disable-sse4_1 \
+          --disable-avx --disable-avx2 --disable-avx512 \
+          --disable-runtime_cpu_detect \
           --size-limit=16384x16384 \
           --disable-onthefly-bitpacking \
           --enable-realtime-only \
           --enable-multi-res-encoding \
           --enable-temporal-denoising || exit 1
-
-#          --disable-mmx --disable-sse \
-#          --disable-sse2 --disable-sse3 --disable-ssse3 --disable-sse4_1 \
 
 
     cd "$_BLD_";make -j $_CPUS_ || exit 1
@@ -2000,7 +2060,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
+    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
     --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
     --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
     --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot \
@@ -2048,7 +2108,7 @@ WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implic
 git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
 
-cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -g -shared -Wall -Wextra \
+cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
     -Wno-pointer-sign -Wno-unused-but-set-variable \
     $WARNS \
