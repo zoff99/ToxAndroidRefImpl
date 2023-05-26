@@ -127,7 +127,7 @@ dependencyVerification {
         'com.github.medyo:android-about-page:1.2.4:android-about-page-1.2.4.aar:15108c8bdedf5975d2aa60604107017109a4ad3640e0e95fa97fd438d347eb5c',
         'com.github.zoff99:pkgs_TensorflowLiteAndroidMediapipeCPU:2.6.0:pkgs_TensorflowLiteAndroidMediapipeCPU-2.6.0.aar:b80831506ba64f7391a38c6ad34c1359d4953f20528665054ca7e995cd60a380',
         'com.github.zoff99:pkgs_TensorflowLiteAndroidMediapipeGPU:2.6.0:pkgs_TensorflowLiteAndroidMediapipeGPU-2.6.0.aar:08ddc31d4f7061c99a79f6757d59e35621ec8a0fcae48536c920a174dc147dd4',
-        'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.97:pkgs_ToxAndroidRefImpl-1.0.97.aar:fc28b5562d9fa258d63d8d632216cb92e4408d9f822e721a9e5545cae362222c',
+        'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.99:pkgs_ToxAndroidRefImpl-1.0.99.aar:674b9d0af8917445a3a0261510ff45c85a57474edcea4307e87c873fcabfaac7',
         'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0:pkgs_armchaAutoLinkTextView-0.3.0.aar:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
         'com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.104:pkgs_guardianprojectIOCipher-0.4.2.104.aar:6e5dc320b633682e0201c316994da5423a4ab236f0ac575d9c1a6d90c60d01f8',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0:pkgs_hotchemiPermissionsdispatcher-processor-3.2.0.jar:f7374192b263a94f63186dee91cb954c9369122519e4f08e055b72969699b52d',
