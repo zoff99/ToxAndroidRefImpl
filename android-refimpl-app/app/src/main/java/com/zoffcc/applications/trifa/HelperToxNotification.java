@@ -32,6 +32,7 @@ import android.widget.RemoteViews;
 import androidx.core.app.NotificationCompat;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.nmn3;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
@@ -67,7 +68,16 @@ public class HelperToxNotification
         {
             Log.i(TAG, "e_text_color:EE01:" + e_text_color.getMessage());
         }
-        notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
+
+        if (PREF__orbot_enabled)
+        {
+            notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE  [Tor Proxy]");
+        }
+        else
+        {
+            notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
+        }
+
         notification_view.setTextViewText(R.id.text, "");
 
         NotificationCompat.Builder b = null;
@@ -204,7 +214,14 @@ public class HelperToxNotification
                     b.setColor(Color.parseColor("#ffce00"));
                 }
             }
-            notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping" + " " + message);
+            if (PREF__orbot_enabled)
+            {
+                notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping [Tor Proxy]" + " " + message);
+            }
+            else
+            {
+                notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping" + " " + message);
+            }
         }
         else
         {
@@ -233,59 +250,95 @@ public class HelperToxNotification
                         b.setColor(Color.parseColor("#ff0000"));
                     }
                 }
-                notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE" + " " + message);
+                if (PREF__orbot_enabled)
+                {
+                    notification_view.setTextViewText(R.id.title,
+                                                      "Tox Service: " + "OFFLINE [Tor Proxy]" + " " + message);
+                }
+                else
+                {
+                    notification_view.setTextViewText(R.id.title,
+                                                      "Tox Service: " + "OFFLINE" + " " + message);
+                }
             }
             else
             {
-                if (a_TOXCONNECTION == 1)
+                if (PREF__orbot_enabled)
                 {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_torproxy);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                     {
-                        b_new.setSmallIcon(R.drawable.circle_green_notification);
+                        b_new.setSmallIcon(R.drawable.circle_torproxy_notification);
                     }
                     else
                     {
-                        b.setSmallIcon(R.drawable.circle_green_notification);
+                        b.setSmallIcon(R.drawable.circle_torproxy_notification);
                     }
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         {
-                            b_new.setColor(Color.parseColor("#04b431"));
+                            b_new.setColor(Color.parseColor("#7c16ae"));
                         }
                         else
                         {
-                            b.setColor(Color.parseColor("#04b431"));
+                            b.setColor(Color.parseColor("#7c16ae"));
                         }
                     }
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]" + " " + message);
-                    // get_network_connections();
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [Tor Proxy]" + " " + message);
                 }
-                else // if (a_TOXCONNECTION__f == 2)
+                else
                 {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                    if (a_TOXCONNECTION == 1)
                     {
-                        b_new.setSmallIcon(R.drawable.circle_green_notification);
-                    }
-                    else
-                    {
-                        b.setSmallIcon(R.drawable.circle_green_notification);
-                    }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    {
+                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         {
-                            b_new.setColor(Color.parseColor("#04b431"));
+                            b_new.setSmallIcon(R.drawable.circle_green_notification);
                         }
                         else
                         {
-                            b.setColor(Color.parseColor("#04b431"));
+                            b.setSmallIcon(R.drawable.circle_green_notification);
                         }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            {
+                                b_new.setColor(Color.parseColor("#04b431"));
+                            }
+                            else
+                            {
+                                b.setColor(Color.parseColor("#04b431"));
+                            }
+                        }
+                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]" + " " + message);
+                        // get_network_connections();
                     }
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]" + " " + message);
-                    // get_network_connections();
+                    else // if (a_TOXCONNECTION__f == 2)
+                    {
+                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        {
+                            b_new.setSmallIcon(R.drawable.circle_green_notification);
+                        }
+                        else
+                        {
+                            b.setSmallIcon(R.drawable.circle_green_notification);
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                        {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            {
+                                b_new.setColor(Color.parseColor("#04b431"));
+                            }
+                            else
+                            {
+                                b.setColor(Color.parseColor("#04b431"));
+                            }
+                        }
+                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]" + " " + message);
+                        // get_network_connections();
+                    }
                 }
             }
         }
