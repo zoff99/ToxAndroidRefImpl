@@ -310,8 +310,10 @@
     <string name="invite_friend_success">Recebeu um Pedido de Amizade</string>
     <string name="invite_join_conference_success">Foi convidado para um Grupo de Conferência</string>
     <string name="join_public_group_activity_warning">Aviso:
-\nentrar em Grupo Público via ID de Grupo não está funcionando ainda!!</string>
+\na adesão a um grupo público através do ID do grupo ainda não está a funcionar de forma fiável!!!</string>
     <string name="add_private_group_failed">Falha ao criar um grupo privado</string>
     <string name="add_private_group_success">Criou um Grupo Privado</string>
     <string name="add_friend_failed">Falha ao adicionar amigo</string>
+    <string name="layout___peer_first_join_date">Data da primeira adesão:</string>
+    <string name="MainActivity_join_trifa_groupchat">Aderir ao grupo de informação</string>
 </resources>
