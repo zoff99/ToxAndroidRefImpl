@@ -477,6 +477,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
     static int PREF__video_play_delay_ms = GLOBAL_INIT_PLAY_DELAY;
+    static int GLOBAL_AV_BUFFER_MS = 120;
     static int PREF__audio_group_play_volume_percent = 100;
     static boolean PREF__auto_accept_image = true;
     static boolean PREF__auto_accept_video = false;

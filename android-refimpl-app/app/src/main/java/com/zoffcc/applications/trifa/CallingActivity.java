@@ -105,6 +105,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_loudspeak
 import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_bitrates;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_fps;
+import static com.zoffcc.applications.trifa.MainActivity.GLOBAL_AV_BUFFER_MS;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_misc_button_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_in_audio_call;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
@@ -515,9 +516,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         PREF__video_play_delay_ms = progress_value * 5;
                         try
                         {
-                            toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+                            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                              ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
                                              -PREF__video_play_delay_ms);
+                            Log.i(TAG, "play_delay_ms=" + -PREF__video_play_delay_ms + ":res=" + res);
                         }
                         catch (Exception e)
                         {
@@ -529,9 +531,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         {
                             int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                        ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value,
-                                                       PREF__video_play_delay_ms);
-                            Log.i(TAG, "decoder buffer set to ms=" + TRIFAGlobals.VIDEO_DECODER_BUFFER_DELAY + ":res=" +
-                                       res);
+                                                       GLOBAL_AV_BUFFER_MS);
+                            Log.i(TAG,
+                                  "TOXAV_DECODER_VIDEO_BUFFER_MS:001 set to ms=" + GLOBAL_AV_BUFFER_MS + ":res=" + res);
                         }
                         catch (Exception e)
                         {
@@ -2772,9 +2774,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                    ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value,
-                                                   PREF__video_play_delay_ms);
+                                                   GLOBAL_AV_BUFFER_MS);
                         Log.i(TAG,
-                              "decoder buffer set to ms=" + TRIFAGlobals.VIDEO_DECODER_BUFFER_DELAY + ":res=" + res);
+                              "TOXAV_DECODER_VIDEO_BUFFER_MS:002 set to ms=" + GLOBAL_AV_BUFFER_MS + ":res=" + res);
                     }
                     catch (Exception e)
                     {

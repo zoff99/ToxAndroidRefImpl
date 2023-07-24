@@ -174,7 +174,7 @@ public class TRIFAGlobals
     final static int GLOBAL_MIN_VIDEO_BITRATE = 100;
     final static int GLOBAL_MIN_AUDIO_BITRATE = 6; // allowed values: (xx>=6) && (xx<=510)
 
-    final static int GLOBAL_INIT_PLAY_DELAY = 100;
+    final static int GLOBAL_INIT_PLAY_DELAY = 0;
     final static String GLOBAL_PLAY_DELAY_SETTING_NAME = "video_play_delay_ms4";
 
     static final int CAMPREVIEW_NUM_BUFFERS = 4;
