@@ -1588,6 +1588,7 @@ public class MainActivity extends AppCompatActivity
         mt.setText(mt.getText() + ", " + "jni-c-toxcore:v" + jnictoxcore_version());
         Log.i(TAG, "loaded:c-toxcore:v" + tox_version_major() + "." + tox_version_minor() + "." + tox_version_patch());
         Log.i(TAG, "loaded:jni-c-toxcore:v" + jnictoxcore_version());
+        Log.i(TAG, "loaded:libavutil:v" + libavutil_version());
 
         if ((!TOX_SERVICE_STARTED) || (vfs == null))
         {
@@ -3115,6 +3116,8 @@ public class MainActivity extends AppCompatActivity
     public static native long tox_version_patch();
 
     public static native String jnictoxcore_version();
+
+    public static native String libavutil_version();
 
     public static native long tox_max_filename_length();
 
