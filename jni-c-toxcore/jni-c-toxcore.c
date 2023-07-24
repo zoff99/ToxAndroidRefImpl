@@ -58,6 +58,7 @@
 #include <libavcodec/jni.h>
 #endif
 
+#include <libavutil/avutil.h>
 
 #ifdef __APPLE__
 #include <mach/clock.h>
@@ -3461,6 +3462,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_jnictoxcore_1version(JNIEnv *env
     return (*env)->NewStringUTF(env, global_version_string);
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_libavutil_1version(JNIEnv *env, jobject thiz)
+{
+    char libavutil_version_str[2000];
+    CLEAR(libavutil_version_str);
+    snprintf(libavutil_version_str, 1999, "%d.%d.%d", (int)LIBAVUTIL_VERSION_MAJOR, (int)LIBAVUTIL_VERSION_MINOR, (int)LIBAVUTIL_VERSION_MICRO);
+    return (*env)->NewStringUTF(env, libavutil_version_str);
+}
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1msg_1receipt_1v2(JNIEnv *env,
