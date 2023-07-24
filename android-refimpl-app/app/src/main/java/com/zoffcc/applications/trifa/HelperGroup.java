@@ -681,7 +681,7 @@ public class HelperGroup
                         execute();
             }
 
-            Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
+            // Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
         }
         catch (Exception ignored)
         {
@@ -1640,7 +1640,7 @@ public class HelperGroup
                     Random rand = new Random();
                     int rndi = rand.nextInt(7);
                     int n = 5 + rndi;
-                    Log.i(TAG,"send_ngch_request: sleep for " + n + " seconds");
+                    // Log.i(TAG,"send_ngch_request: sleep for " + n + " seconds");
                     Thread.sleep(1000 * n);
                     //
                     final int data_length = 6 + 1 + 1;
