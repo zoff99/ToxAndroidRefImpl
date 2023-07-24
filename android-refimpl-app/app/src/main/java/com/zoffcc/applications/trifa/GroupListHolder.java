@@ -425,7 +425,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                                 {
                                     // reload friendlist
                                     // TODO: only remove 1 item, don't clear all!! this can crash
-                                    MainActivity.friend_list_fragment.add_all_friends_clear(200);
+                                    MainActivity.friend_list_fragment.add_all_friends_clear(0);
                                 }
                             }
                             catch (Exception e)

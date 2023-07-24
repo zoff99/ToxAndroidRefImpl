@@ -262,7 +262,7 @@ public class ProfileActivity extends AppCompatActivity
                             if (friend_list_fragment != null)
                             {
                                 // reload friendlist
-                                friend_list_fragment.add_all_friends_clear(200);
+                                friend_list_fragment.add_all_friends_clear(0);
                             }
                         }
                         catch (Exception e)

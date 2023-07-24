@@ -426,7 +426,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                                 {
                                     // reload friendlist
                                     // TODO: only remove 1 item, don't clear all!! this can crash
-                                    MainActivity.friend_list_fragment.add_all_friends_clear(200);
+                                    MainActivity.friend_list_fragment.add_all_friends_clear(0);
                                 }
                             }
                             catch (Exception e)
@@ -493,7 +493,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
                                 {
                                     // reload friendlist
                                     // TODO: only remove 1 item, don't clear all!! this can crash
-                                    MainActivity.friend_list_fragment.add_all_friends_clear(200);
+                                    MainActivity.friend_list_fragment.add_all_friends_clear(0);
                                 }
                             }
                             catch (Exception e)

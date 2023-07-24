@@ -40,6 +40,7 @@ import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBIN
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ONE_HOUR_IN_MS;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -56,6 +57,8 @@ public class FriendListFragment extends Fragment
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     FriendlistAdapter adapter = null;
     public static Semaphore semaphore_friendlist_ui_01 = new Semaphore(1);
+    private static long add_all_friends_clear_last_trigger_ts = 0;
+    private static boolean add_all_friends_clear_trigger = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -536,13 +539,12 @@ public class FriendListFragment extends Fragment
         MainActivity.friend_list_fragment = this;
     }
 
-    void add_all_friends_clear(final int delay)
+    void add_all_friends_clear_real(final int delay)
     {
         // Log.i(TAG, "add_all_friends_clear");
 
         try
         {
-
             final Thread t = new Thread()
             {
                 @Override
@@ -695,7 +697,7 @@ public class FriendListFragment extends Fragment
                                             {
                                                 int new_messages_count = orma.selectFromGroupMessage().
                                                         group_identifierEq(
-                                                                n.group_identifier.toLowerCase()).and().is_newEq(
+                                                        n.group_identifier.toLowerCase()).and().is_newEq(
                                                         true).count();
 
                                                 if (new_messages_count > 0)
@@ -815,7 +817,7 @@ public class FriendListFragment extends Fragment
                                             {
                                                 new_messages_count = orma.selectFromGroupMessage().
                                                         group_identifierEq(
-                                                                n.group_identifier.toLowerCase()).and().is_newEq(
+                                                        n.group_identifier.toLowerCase()).and().is_newEq(
                                                         true).count();
                                             }
                                             catch (Exception e)
@@ -858,13 +860,48 @@ public class FriendListFragment extends Fragment
         }
         catch (Exception e)
         {
-            Log.i(TAG, "add_all_friends_clear:EE:" + e.getMessage());
+            Log.i(TAG, "add_all_friends_clear_real:EE:" + e.getMessage());
             e.printStackTrace();
         }
 
         // Log.i(TAG, "add_all_friends_clear:READY");
 
         // Log.i(TAG, "add_all_friends_clear:B:");
+    }
+
+    synchronized void add_all_friends_clear(final int delay)
+    {
+        // Log.i(TAG, "add_all_friends_clear:** CALL");
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - add_all_friends_clear_last_trigger_ts >= INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS)
+        {
+            add_all_friends_clear_trigger = false;
+            // Log.i(TAG, "add_all_friends_clear:-> REAL");
+            add_all_friends_clear_real(delay);
+            add_all_friends_clear_last_trigger_ts = currentTime;
+        }
+        else
+        {
+            add_all_friends_clear_trigger = true;
+            long delta_t_ms = currentTime - add_all_friends_clear_last_trigger_ts;
+            // Log.i(TAG, "add_all_friends_clear:  TRIG delta ms=" + delta_t_ms);
+            long trigger_in_ms_again = INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS - delta_t_ms;
+            if ((trigger_in_ms_again < 1) || (trigger_in_ms_again > (INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS + 1)))
+            {
+                trigger_in_ms_again = INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS;
+            }
+            final long trigger_in_ms_again_ = trigger_in_ms_again + 2;
+            final Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(trigger_in_ms_again_);
+                    // Log.i(TAG, "add_all_friends_clear:__ CALL from Trigger");
+                    add_all_friends_clear(0);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            thread.start();
+        }
     }
 
     // name is confusing, just update all friends!! already set to offline in DB

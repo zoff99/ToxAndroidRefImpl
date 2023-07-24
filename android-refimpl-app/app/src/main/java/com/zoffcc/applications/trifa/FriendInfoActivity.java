@@ -178,7 +178,7 @@ public class FriendInfoActivity extends AppCompatActivity
                         // update friendlist on screen
                         try
                         {
-                            friend_list_fragment.add_all_friends_clear(50);
+                            friend_list_fragment.add_all_friends_clear(0);
                         }
                         catch (Exception e)
                         {

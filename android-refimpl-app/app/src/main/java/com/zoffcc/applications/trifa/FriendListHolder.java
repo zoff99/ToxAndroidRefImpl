@@ -740,7 +740,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 {
                                     // reload friendlist
                                     // TODO: only remove 1 item, don't clear all!! this can crash
-                                    friend_list_fragment.add_all_friends_clear(200);
+                                    friend_list_fragment.add_all_friends_clear(0);
                                 }
                             }
                             catch (Exception e)
@@ -799,7 +799,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                     if (friend_list_fragment != null)
                                     {
                                         // reload friendlist
-                                        friend_list_fragment.add_all_friends_clear(200);
+                                        friend_list_fragment.add_all_friends_clear(0);
                                     }
                                 }
                                 catch (Exception e)

@@ -229,6 +229,8 @@ public class TRIFAGlobals
     static final int USE_MAX_NUMBER_OF_BOOTSTRAP_NODES = 8;
     static final int USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS = 8;
 
+    static final int INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS = 1000;
+
     // ---- lookup cache ----
     // static Map<String, info.guardianproject.iocipher.RandomAccessFile> cache_ft_fos = new HashMap<String, info.guardianproject.iocipher.RandomAccessFile>();
     static Map<String, BufferedOutputStreamCustom> cache_ft_fos = new HashMap<String, BufferedOutputStreamCustom>();
