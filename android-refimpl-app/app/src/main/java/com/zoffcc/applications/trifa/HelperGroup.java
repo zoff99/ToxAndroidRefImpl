@@ -1668,7 +1668,7 @@ public class HelperGroup
                             1,
                             data,
                             data_length);
-                    Log.i(TAG,"send_ngch_request: sending request:result=" + result);
+                    // Log.i(TAG,"send_ngch_request: sending request:result=" + result);
                 }
                 catch(Exception e)
                 {
@@ -1881,7 +1881,7 @@ public class HelperGroup
                                                               get_group_peernum_from_peer_pubkey(group_identifier,
                                                                                                  peer_pubkey), 1, data,
                                                               data_length);
-            Log.i(TAG, "send_ngch_syncmsg: sending request:result=" + result);
+            // Log.i(TAG, "send_ngch_syncmsg: sending request:result=" + result);
         }
         catch(Exception e)
         {
@@ -2061,7 +2061,7 @@ public class HelperGroup
                                                               get_group_peernum_from_peer_pubkey(group_identifier,
                                                                                                  peer_pubkey), 1, data,
                                                               data_length);
-            Log.i(TAG, "send_ngch_syncfile: sending request:result=" + result);
+            // Log.i(TAG, "send_ngch_syncfile: sending request:result=" + result);
         }
         catch(Exception e)
         {
