@@ -677,7 +677,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         }
     }
 
-    public void show_confirm_dialog(final View view, final FriendList f2)
+    public void show_delete_friend_confirm_dialog(final View view, final FriendList f2)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         builder.setTitle("Delete Friend?");
@@ -698,21 +698,21 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         {
                             long friend_num_temp = tox_friend_by_public_key__wrapper(f2.tox_public_key_string);
 
-                            Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp + " fn_safety=" + friend_num_temp);
+                            Log.i(TAG, "onMenuItemClick:1:fn=" + friend_num_temp);
 
                             // delete friends files -------
                             Log.i(TAG, "onMenuItemClick:1.c:fnum=" + friend_num_temp);
-                            delete_friend_all_files(friend_num_temp);
+                            delete_friend_all_files(f2.tox_public_key_string);
                             // delete friend  files -------
 
                             // delete friends FTs -------
                             Log.i(TAG, "onMenuItemClick:1.d:fnum=" + friend_num_temp);
-                            delete_friend_all_filetransfers(friend_num_temp);
+                            delete_friend_all_filetransfers(f2.tox_public_key_string);
                             // delete friend  FTs -------
 
                             // delete friends messages -------
                             Log.i(TAG, "onMenuItemClick:1.b:fnum=" + friend_num_temp);
-                            delete_friend_all_messages(friend_num_temp);
+                            delete_friend_all_messages(f2.tox_public_key_string);
                             // delete friend  messages -------
 
                             // delete friend -------
@@ -928,7 +928,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                         break;
                     case R.id.item_delete:
                         // delete friend -----------------
-                        show_confirm_dialog(v, f2);
+                        show_delete_friend_confirm_dialog(v, f2);
                         // delete friend -----------------
                         break;
                 }

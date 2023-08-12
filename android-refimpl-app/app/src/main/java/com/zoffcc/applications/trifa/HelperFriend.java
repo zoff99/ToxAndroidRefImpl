@@ -816,12 +816,11 @@ public class HelperFriend
         }
     }
 
-    static void delete_friend_all_files(final long friendnum)
+    static void delete_friend_all_files(final String friend_pubkey)
     {
         try
         {
-            Iterator<FileDB> i1 = orma.selectFromFileDB().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(friendnum)).
+            Iterator<FileDB> i1 = orma.selectFromFileDB().tox_public_key_stringEq(friend_pubkey).
                     directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
                     is_in_VFSEq(true).
                     toList().iterator();
@@ -835,7 +834,7 @@ public class HelperFriend
                 {
                     long file_id = i1.next().id;
                     long msg_id = orma.selectFromMessage().filedb_idEq(file_id).directionEq(0).
-                            tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).get(0).id;
+                            tox_friendpubkeyEq(friend_pubkey).get(0).id;
                     MainActivity.selected_messages.add(msg_id);
                     MainActivity.selected_messages_incoming_file.add(msg_id);
                 }
@@ -854,7 +853,7 @@ public class HelperFriend
 
         try
         {
-            orma.deleteFromFileDB().tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
+            orma.deleteFromFileDB().tox_public_key_stringEq(friend_pubkey).execute();
         }
         catch (Exception e)
         {
@@ -862,13 +861,12 @@ public class HelperFriend
         }
     }
 
-    static void delete_friend_all_filetransfers(final long friendnum)
+    static void delete_friend_all_filetransfers(final String friend_pubkey)
     {
         try
         {
-            Log.i(TAG, "delete_ft:ALL for friend=" + friendnum);
-            orma.deleteFromFiletransfer().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(friendnum)).execute();
+            Log.i(TAG, "delete_ft:ALL for friend=" + friend_pubkey);
+            orma.deleteFromFiletransfer().tox_public_key_stringEq(friend_pubkey).execute();
         }
         catch (Exception e)
         {
@@ -876,14 +874,21 @@ public class HelperFriend
         }
     }
 
-    static void delete_friend_all_messages(final long friendnum)
+    static void delete_friend_all_messages(final String friend_pubkey)
     {
         Thread t = new Thread()
         {
             @Override
             public void run()
             {
-                orma.deleteFromMessage().tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(friendnum)).execute();
+                try
+                {
+                    orma.deleteFromMessage().tox_friendpubkeyEq(friend_pubkey).execute();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
             }
         };
         t.start();
@@ -891,17 +896,24 @@ public class HelperFriend
 
     static void delete_friend(final String friend_pubkey)
     {
-        Thread t = new Thread()
-        {
-            @Override
-            public void run()
-            {
-                orma.deleteFromFriendList().
+        //Thread t = new Thread()
+        //{
+        //    @Override
+        //    public void run()
+        //    {
+                try
+                {
+                    orma.deleteFromFriendList().
                         tox_public_key_stringEq(friend_pubkey).
                         execute();
-            }
-        };
-        t.start();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+        //    }
+        //};
+        //t.start();
     }
 
     static void add_friend_real(String friend_tox_id)
