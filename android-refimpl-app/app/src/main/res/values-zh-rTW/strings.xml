@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="add_public_group_activity_name">建立公共聊天組</string>
+    <string name="join_public_activity_name">加入公共聊天</string>
+    <string name="message_list_activity_name">聊天</string>
+    <string name="conference_message_list_activity_name">文本會議</string>
+    <string name="add_group_activity_name">建立私密羣聊</string>
+    <string name="conference_audio_activity_player_name">音頻會議播放器</string>
+    <string name="set_password_message_empty">空密碼</string>
+    <string name="set_password_message_password_invalid">密碼過短</string>
+    <string name="title_activity_calling">呼叫</string>
+    <string name="title_activity_profile">個人文件</string>
+    <string name="title_activity_crash">崩潰</string>
+    <string name="title_activity_groupinfo">羣組信息</string>
+    <string name="title_activity_conferencepeerinfo">對方信息</string>
+    <string name="title_activity_aboutpage">關於</string>
+    <string name="title_activity_set_password">設置密碼</string>
+    <string name="title_activity_check_password">輸入密碼</string>
+    <string name="title_activity_share">用TRIfA打開</string>
+    <string name="title_activity_maintenance">管理</string>
+    <string name="pref_header_general">通用</string>
+    <string name="add_friend_activity_name">添加好友</string>
+    <string name="group_message_list_activity_name">羣</string>
+    <string name="conference_audio_activity_name">音頻會議</string>
+    <string name="set_password_message_password_dont_match">密碼不匹配</string>
+    <string name="title_activity_settings">設定</string>
+    <string name="title_activity_friendinfo">對方信息</string>
+    <string name="title_activity_conferenceinfo">會議信息</string>
+    <string name="settings_toolbar_title">設定</string>
+</resources>
