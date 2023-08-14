@@ -48,6 +48,8 @@ import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_p
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_groupmessagelist;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_peer_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_mod_kick_peer;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_mod_set_role;
@@ -147,6 +149,14 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                                                         get_group_peernum_from_peer_pubkey(group_id, peer_pubkey),
                                                         new_role);
                     Log.i(TAG, "setting new role to: " + new_role + " result=" + result);
+
+                    if (result == 1)
+                    {
+                        update_group_peer_in_db(group_num, group_id,
+                                                get_group_peernum_from_peer_pubkey(group_id, peer_pubkey),
+                                                peer_pubkey, new_role);
+                        update_group_in_groupmessagelist(group_id);
+                    }
                 }
                 catch (Exception ignored)
                 {
@@ -164,6 +174,15 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                     int result = tox_group_mod_kick_peer(group_num,
                                                          get_group_peernum_from_peer_pubkey(group_id, peer_pubkey));
                     Log.i(TAG, "kicking peer. result=" + result);
+
+                    if (result == 1)
+                    {
+                        update_group_peer_in_db(group_num, group_id,
+                                                get_group_peernum_from_peer_pubkey(group_id, peer_pubkey),
+                                                peer_pubkey, ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value);
+                        update_group_in_groupmessagelist(group_id);
+                    }
+
                 }
                 catch (Exception ignored)
                 {

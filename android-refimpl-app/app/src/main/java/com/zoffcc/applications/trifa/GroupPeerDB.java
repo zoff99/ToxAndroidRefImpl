@@ -48,6 +48,9 @@ public class GroupPeerDB
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long first_join_timestamp = -1L;
 
+    @Column(indexed = true, defaultExpr = "2", helpers = Column.Helpers.ALL)
+    int Tox_Group_Role = 2;
+
     static GroupPeerDB deep_copy(GroupPeerDB in)
     {
         GroupPeerDB out = new GroupPeerDB();
@@ -56,6 +59,7 @@ public class GroupPeerDB
         out.peer_name = in.peer_name;
         out.last_update_timestamp = in.last_update_timestamp;
         out.first_join_timestamp = in.first_join_timestamp;
+        out.Tox_Group_Role = in.Tox_Group_Role;
         return out;
     }
 
@@ -63,7 +67,8 @@ public class GroupPeerDB
     public String toString()
     {
         return "id=" + id + ", group_identifier=" + group_identifier + ", tox_group_peer_pubkey=" +
-               tox_group_peer_pubkey + ", peer_name=" + peer_name + ", last_update_timestamp=" + last_update_timestamp +
-               ", first_join_timestamp=" + first_join_timestamp;
+               tox_group_peer_pubkey.substring(0, 4) + ", peer_name=" + peer_name +
+               ", last_update_timestamp=" + last_update_timestamp +
+               ", first_join_timestamp=" + first_join_timestamp + ", Tox_Group_Role=" + Tox_Group_Role;
     }
 }

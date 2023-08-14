@@ -1642,6 +1642,55 @@ public class ToxVars
         }
     }
 
+    public static enum Tox_Group_Mod_Event
+    {
+
+        /**
+         * A peer has been kicked from the group.
+         */
+        TOX_GROUP_MOD_EVENT_KICK(0),
+        /**
+         * A peer as been given the observer role.
+         */
+        TOX_GROUP_MOD_EVENT_OBSERVER(1),
+        /**
+         * A peer has been given the user role.
+         */
+        TOX_GROUP_MOD_EVENT_USER(2),
+        /**
+         * A peer has been given the moderator role.
+         */
+        TOX_GROUP_MOD_EVENT_MODERATOR(3);
+
+        public int value;
+
+        private Tox_Group_Mod_Event(int value)
+        {
+            this.value = value;
+        }
+
+        public static String value_str(int value)
+        {
+            if (value == TOX_GROUP_MOD_EVENT_KICK.value)
+            {
+                return "TOX_GROUP_MOD_EVENT_KICK";
+            }
+            else if (value == TOX_GROUP_MOD_EVENT_OBSERVER.value)
+            {
+                return "TOX_GROUP_MOD_EVENT_OBSERVER";
+            }
+            else if (value == TOX_GROUP_MOD_EVENT_USER.value)
+            {
+                return "TOX_GROUP_MOD_EVENT_USER";
+            }
+            else if (value == TOX_GROUP_MOD_EVENT_MODERATOR.value)
+            {
+                return "TOX_GROUP_MOD_EVENT_MODERATOR";
+            }
+            return "UNKNOWN";
+        }
+    }
+
     public static enum TOX_GROUP_PRIVACY_STATE
     {
 

@@ -172,6 +172,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.group_message_add_from_s
 import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_group_file;
 import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_sync_group_file;
 import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_sync_group_message;
+import static com.zoffcc.applications.trifa.HelperGroup.is_group_muted_or_kicked_peer;
 import static com.zoffcc.applications.trifa.HelperGroup.send_ngch_request;
 import static com.zoffcc.applications.trifa.HelperGroup.set_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.sync_group_message_history;
@@ -7099,7 +7100,6 @@ public class MainActivity extends AppCompatActivity
 
         final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
         update_group_in_friendlist(temp_group_identifier);
-        update_group_in_groupmessagelist(temp_group_identifier);
         String group_peer_pubkey = null;
         try
         {
@@ -7108,8 +7108,14 @@ public class MainActivity extends AppCompatActivity
         catch(Exception e)
         {
         }
-        add_group_peer_to_db(group_number, temp_group_identifier, peer_id, group_peer_pubkey);
+        int peer_role = tox_group_peer_get_role(group_number, peer_id);
+        if (peer_role < 0)
+        {
+            peer_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value;
+        }
+        add_group_peer_to_db(group_number, temp_group_identifier, peer_id, group_peer_pubkey, peer_role);
         add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " joined the group");
+        update_group_in_groupmessagelist(temp_group_identifier);
         int privacy_state = tox_group_get_privacy_state(group_number);
         if (privacy_state == ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value)
         {
@@ -7141,7 +7147,13 @@ public class MainActivity extends AppCompatActivity
         {
         }
         final String temp_group_identifier = tox_group_by_groupnum__wrapper(group_number);
-        update_group_peer_in_db(group_number, temp_group_identifier, peer_id, group_peer_pubkey);
+
+        int peer_role = tox_group_peer_get_role(group_number, peer_id);
+        if (peer_role < 0)
+        {
+            peer_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value;
+        }
+        update_group_peer_in_db(group_number, temp_group_identifier, peer_id, group_peer_pubkey, peer_role);
         update_group_in_groupmessagelist(temp_group_identifier);
         add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " changed name");
     }
@@ -7162,10 +7174,15 @@ public class MainActivity extends AppCompatActivity
         update_savedata_file_wrapper();
         update_group_in_friendlist(group_identifier);
         update_group_in_groupmessagelist(group_identifier);
+        int peer_role = tox_group_self_get_role(group_number);
+        if (peer_role < 0)
+        {
+            peer_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value;
+        }
         try
         {
             add_group_peer_to_db(group_number, group_identifier, tox_group_self_get_peer_id(group_number),
-                                 tox_group_self_get_public_key(group_number));
+                                 tox_group_self_get_public_key(group_number), peer_role);
         }
         catch(Exception e)
         {
@@ -7173,6 +7190,53 @@ public class MainActivity extends AppCompatActivity
         if (have_own_relay())
         {
             invite_to_group_own_relay(group_number);
+        }
+    }
+
+    static void android_tox_callback_group_moderation_cb_method(long group_number, long source_peer_id, long target_peer_id, int a_Tox_Group_Mod_Event)
+    {
+        try
+        {
+            if ((source_peer_id == UINT32_MAX_JAVA) || (target_peer_id == UINT32_MAX_JAVA))
+            {
+                // Log.i(TAG, "group_moderation_cb:ERROR:group_number=" + group_number + " speer=" + source_peer_id + " tpeer=" + target_peer_id + " a_Tox_Group_Mod_Event=" + a_Tox_Group_Mod_Event);
+                return;
+            }
+
+            final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
+            Log.i(TAG, "group_moderation_cb:group_number=" + group_number + " group_identifier=" + group_identifier + " speer=" + source_peer_id + " tpeer=" + target_peer_id + " a_Tox_Group_Mod_Event=" + a_Tox_Group_Mod_Event);
+
+            String group_peer_pubkey = null;
+            try
+            {
+                group_peer_pubkey = tox_group_peer_get_public_key(group_number, target_peer_id);
+            }
+            catch(Exception e)
+            {
+                return;
+            }
+
+            if (a_Tox_Group_Mod_Event == ToxVars.Tox_Group_Mod_Event.TOX_GROUP_MOD_EVENT_USER.value)
+            {
+                update_group_peer_in_db(group_number, group_identifier, target_peer_id, group_peer_pubkey, a_Tox_Group_Mod_Event);
+                add_system_message_to_group_chat(group_identifier, "peer " + target_peer_id + " changed role to TOX_GROUP_MOD_EVENT_USER");
+            }
+            else if (a_Tox_Group_Mod_Event == ToxVars.Tox_Group_Mod_Event.TOX_GROUP_MOD_EVENT_OBSERVER.value)
+            {
+                update_group_peer_in_db(group_number, group_identifier, target_peer_id, group_peer_pubkey, a_Tox_Group_Mod_Event);
+                add_system_message_to_group_chat(group_identifier, "peer " + target_peer_id + " changed role to TOX_GROUP_MOD_EVENT_OBSERVER");
+            }
+            else if (a_Tox_Group_Mod_Event == ToxVars.Tox_Group_Mod_Event.TOX_GROUP_MOD_EVENT_MODERATOR.value)
+            {
+                update_group_peer_in_db(group_number, group_identifier, target_peer_id, group_peer_pubkey, a_Tox_Group_Mod_Event);
+                add_system_message_to_group_chat(group_identifier, "peer " + target_peer_id + " changed role to TOX_GROUP_MOD_EVENT_MODERATOR");
+            }
+
+            update_group_in_groupmessagelist(group_identifier);
+        }
+        catch(Exception e)
+        {
+
         }
     }
 
@@ -7222,6 +7286,13 @@ public class MainActivity extends AppCompatActivity
         catch(Exception e)
         {
         }
+
+        // check for muted or kicked peers
+        if (is_group_muted_or_kicked_peer(group_number, peer_id))
+        {
+            return;
+        }
+        // check for muted or kicked peers
 
         // check for correct signature of packets
         final long header = 6 + 1 + 1 + 32 + 4 + 255;
@@ -7289,6 +7360,13 @@ public class MainActivity extends AppCompatActivity
         catch(Exception e)
         {
         }
+
+        // check for muted or kicked peers
+        if (is_group_muted_or_kicked_peer(group_number, peer_id))
+        {
+            return;
+        }
+        // check for muted or kicked peers
 
         // check for correct signature of packets
         final long header = 6 + 1 + 1;

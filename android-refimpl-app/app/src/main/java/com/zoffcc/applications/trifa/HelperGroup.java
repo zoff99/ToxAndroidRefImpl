@@ -669,7 +669,8 @@ public class HelperGroup
     }
 
     static void update_group_peer_in_db(final long group_number, final String group_identifier,
-                                        final long peerid, final String group_peer_pubkey)
+                                        final long peerid, final String group_peer_pubkey,
+                                        int aTox_Group_Role)
     {
         try
         {
@@ -677,7 +678,9 @@ public class HelperGroup
             {
                 final String peer_name = tox_group_peer_get_name__wrapper(group_identifier, group_peer_pubkey);
                 orma.updateGroupPeerDB().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(group_peer_pubkey).
-                        peer_name(peer_name).last_update_timestamp(System.currentTimeMillis()).
+                        peer_name(peer_name).
+                        Tox_Group_Role(aTox_Group_Role).
+                        last_update_timestamp(System.currentTimeMillis()).
                         execute();
             }
 
@@ -689,7 +692,7 @@ public class HelperGroup
     }
 
     static void add_group_peer_to_db(final long group_number, final String group_identifier,
-                                     final long peerid, final String group_peer_pubkey)
+                                     final long peerid, final String group_peer_pubkey, int aTox_Group_Role)
     {
         try
         {
@@ -701,6 +704,7 @@ public class HelperGroup
                 p.peer_name = tox_group_peer_get_name__wrapper(group_identifier, group_peer_pubkey);
                 p.last_update_timestamp = System.currentTimeMillis();
                 p.first_join_timestamp = System.currentTimeMillis();
+                p.Tox_Group_Role = aTox_Group_Role;
                 orma.insertIntoGroupPeerDB(p);
             }
             // Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
@@ -709,8 +713,62 @@ public class HelperGroup
         {
             if (group_identifier != null)
             {
-                update_group_peer_in_db(group_number, group_identifier, peerid, group_peer_pubkey);
+                update_group_peer_in_db(group_number, group_identifier, peerid, group_peer_pubkey, aTox_Group_Role);
             }
+        }
+    }
+
+    static boolean is_group_muted_or_kicked_peer(final long group_number, final long peerid)
+    {
+        try
+        {
+            String group_id = "-1";
+            GroupDB group_temp = null;
+            try
+            {
+                group_id = tox_group_by_groupnum__wrapper(group_number);
+                group_temp = orma.selectFromGroupDB().group_identifierEq(group_id.toLowerCase()).toList().get(0);
+            }
+            catch(Exception ignored)
+            {
+            }
+            if (group_temp == null)
+            {
+                return true;
+            }
+
+            final String peer_pubkey = tox_group_peer_get_public_key__wrapper(group_number, peerid);
+            if (peer_pubkey == null)
+            {
+                return true;
+            }
+
+            return is_group_muted_or_kicked_peer(group_id, peer_pubkey);
+        }
+        catch (Exception ignored)
+        {
+            return true;
+        }
+    }
+
+    static boolean is_group_muted_or_kicked_peer(final String group_identifier, final String group_peer_pubkey)
+    {
+        try
+        {
+            final int peer_role = orma.selectFromGroupPeerDB().group_identifierEq(group_identifier.toLowerCase()).
+                    tox_group_peer_pubkeyEq(group_peer_pubkey).toList().get(0).Tox_Group_Role;
+            if (peer_role == ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        catch(Exception e)
+        {
+            return true;
         }
     }
 
@@ -2090,6 +2148,13 @@ public class HelperGroup
             final String original_sender_peerpubkey = HelperGeneric.bytesToHex(hash_bytes.array(),hash_bytes.arrayOffset(),hash_bytes.limit()).toUpperCase();
             Log.i(TAG, "handle_incoming_sync_group_message:peerpubkey hex=" + original_sender_peerpubkey);
 
+            // check for muted or kicked peers
+            if (is_group_muted_or_kicked_peer(group_identifier, original_sender_peerpubkey))
+            {
+                return;
+            }
+            // check for muted or kicked peers
+
             if (tox_group_self_get_public_key(group_number).toUpperCase().equalsIgnoreCase(original_sender_peerpubkey))
             {
                 // HINT: do not add our own messages, they are already in the DB!
@@ -2322,6 +2387,13 @@ public class HelperGroup
             hash_bytes.put(data, 8 + 32, 32);
             final String original_sender_peerpubkey = HelperGeneric.bytesToHex(hash_bytes.array(),hash_bytes.arrayOffset(),hash_bytes.limit()).toUpperCase();
             Log.i(TAG, "handle_incoming_sync_group_file:peerpubkey hex=" + original_sender_peerpubkey);
+
+            // check for muted or kicked peers
+            if (is_group_muted_or_kicked_peer(group_identifier, original_sender_peerpubkey))
+            {
+                return;
+            }
+            // check for muted or kicked peers
 
             if (tox_group_self_get_public_key(group_number).toUpperCase().equalsIgnoreCase(original_sender_peerpubkey))
             {
