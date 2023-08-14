@@ -82,8 +82,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 86
-static const char global_version_string[] = "0.99.86";
+#define VERSION_PATCH 87
+static const char global_version_string[] = "0.99.87";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -266,6 +266,7 @@ jmethodID android_tox_callback_group_invite_cb_method = NULL;
 jmethodID android_tox_callback_group_peer_join_cb_method = NULL;
 jmethodID android_tox_callback_group_peer_exit_cb_method = NULL;
 jmethodID android_tox_callback_group_peer_name_cb_method = NULL;
+jmethodID android_tox_callback_group_moderation_cb_method = NULL;
 jmethodID android_tox_callback_group_connection_status_cb_method = NULL;
 jmethodID android_tox_callback_group_join_fail_cb_method = NULL;
 jmethodID android_tox_callback_group_self_join_cb_method = NULL;
@@ -372,6 +373,8 @@ void group_custom_private_packet_cb(Tox *tox, uint32_t group_number, uint32_t pe
 
 void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *name,
                                     size_t length, void *user_data);
+void group_moderation_cb(Tox *tox, uint32_t group_number, uint32_t source_peer_id, uint32_t target_peer_id,
+                                     Tox_Group_Mod_Event mod_type, void *user_data);
 void group_connection_status_cb(Tox *tox, uint32_t group_number, int32_t status,
                                           void *user_data);
 
@@ -1013,6 +1016,7 @@ void init_tox_callbacks()
     tox_callback_group_join_fail(tox_global, group_join_fail_cb);
     tox_callback_group_self_join(tox_global, group_self_join_cb);
     tox_callback_group_peer_name(tox_global, group_peer_name_cb);
+    tox_callback_group_moderation(tox_global, group_moderation_cb);
     tox_callback_group_connection_status(tox_global, group_connection_status_cb);
     tox_callback_group_topic(tox_global, group_topic_cb);
     tox_callback_group_privacy_state(tox_global, group_privacy_state_cb);
@@ -2768,6 +2772,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_group_peer_exit_cb_method", "(JJI)V");
     android_tox_callback_group_peer_name_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_peer_name_cb_method", "(JJ)V");
+    android_tox_callback_group_moderation_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_moderation_cb_method", "(JJJI)V");
     android_tox_callback_group_connection_status_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
             "android_tox_callback_group_connection_status_cb_method", "(JI)V");
     android_tox_callback_group_join_fail_cb_method = (*env)->GetStaticMethodID(env, MainActivity,
@@ -7974,6 +7980,31 @@ void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const
 {
     android_tox_callback_group_peer_name_cb(group_number, peer_id, name, length);
 }
+
+
+
+void android_tox_callback_group_moderation_cb(uint32_t group_number, uint32_t source_peer_id, uint32_t target_peer_id, int mod_type)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_moderation_cb_method,
+                                     (jlong)group_number,
+                                     (jlong)source_peer_id,
+                                     (jlong)target_peer_id,
+                                     (jint)mod_type);
+}
+
+void group_moderation_cb(Tox *tox, uint32_t group_number, uint32_t source_peer_id, uint32_t target_peer_id,
+                                     Tox_Group_Mod_Event mod_type, void *user_data)
+
+{
+    android_tox_callback_group_moderation_cb(group_number, source_peer_id, target_peer_id, mod_type);
+}
+
+
+
 
 void android_tox_callback_group_connection_status_cb(uint32_t group_number, int32_t status)
 {
