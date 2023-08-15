@@ -8,8 +8,7 @@
     android:orientation="vertical"
     tools:context="com.zoffcc.applications.trifa.GroupMessageListActivity">
 
-    <androidx.appcompat.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -70,24 +69,30 @@
                     android:scaleType="centerInside"
                     android:src="@drawable/circle_green" />
 
-
                 <TextView
                     android:id="@+id/ml_maintext"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="center_vertical"
+                    android:layout_weight="1000"
                     android:padding="8dp"
                     android:text="@string/layout___name"
                     android:textColor="@color/md_black_1000"
                     android:textSize="15sp" />
 
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="1dp"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:text=""
-                    android:visibility="gone"></TextView>
+                <ImageButton
+                    android:id="@+id/add_friend_conference"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="7dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="show_add_friend_group"
+                    android:padding="3dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/baseline_person_add_alt_1_24" />
 
                 <ImageButton
                     android:id="@+id/ml_phone_icon"
@@ -97,14 +102,88 @@
                     android:layout_margin="7dp"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:clickable="true"
-                    android:onClick="start_call_to_friend"
+                    android:focusable="true"
+                    android:padding="7dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/circle_orange"
+                    android:visibility="gone" />
+
+                <ImageButton
+                    android:id="@+id/ml_video_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_margin="7dp"
+                    android:layout_weight="0"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:onClick="toggle_group_video"
                     android:padding="7dp"
                     android:scaleType="centerInside"
                     android:src="@drawable/circle_orange" />
 
-
             </LinearLayout>
 
+            <LinearLayout
+                android:id="@+id/ngc_video_view_container"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:background="@color/md_always_black_1000"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <com.zoffcc.applications.trifa.CustomVideoImageView
+                    android:id="@+id/ngc_video_view"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="0dp"
+                    android:layout_weight="100"
+                    android:background="@color/md_always_black_1000" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:background="@color/md_always_black_1000"
+                    android:orientation="vertical"
+                    android:layout_weight="50"
+                    android:visibility="visible">
+
+                    <com.zoffcc.applications.trifa.CustomVideoImageView
+                        android:id="@+id/ngc_video_own_view"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="60"
+                        android:background="@color/md_always_black_1000" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="30"
+                        android:background="@android:color/transparent"
+                        android:text=""></TextView>
+
+                    <ImageButton
+                        android:id="@+id/ngc_camera_toggle_button"
+                        android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+                        android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:clickable="true"
+                        android:keepScreenOn="true"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/circle_blue"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="20"
+                        android:background="@android:color/transparent"
+                        android:text=""></TextView>
+
+                </LinearLayout>
+            </LinearLayout>
 
             <fragment
                 android:id="@+id/ml_fragment"
@@ -195,7 +274,7 @@
 
         </LinearLayout>
 
-        <include layout="@layout/floating_action_button_group" />
+        <!--<include layout="@layout/floating_action_button_group" />-->
 
     </FrameLayout>
 

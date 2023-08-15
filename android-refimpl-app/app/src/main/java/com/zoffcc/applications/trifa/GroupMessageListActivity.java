@@ -19,19 +19,38 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.ImageFormat;
 import android.graphics.drawable.Drawable;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.Image;
+import android.media.ImageReader;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Process;
+import android.os.SystemClock;
 import android.provider.DocumentsContract;
 import android.util.Log;
+import android.util.Size;
 import android.view.KeyEvent;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -60,35 +79,48 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
 import androidx.annotation.Px;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.camera.core.impl.utils.CompareSizesByArea;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
+import androidx.renderscript.Allocation;
+import androidx.renderscript.Element;
+import androidx.renderscript.RenderScript;
+import androidx.renderscript.ScriptIntrinsicYuvToRGB;
+import androidx.renderscript.Type;
 
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
+import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.copy_outgoing_file_to_sdcard_dir;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_bytes;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.send_group_image;
 import static com.zoffcc.applications.trifa.HelperGroup.shrink_image_file;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__use_camera_x;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
@@ -110,8 +142,13 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_publ
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_savedpeer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_private_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_decode;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_encode;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_NEW_PEERS_TIMEDELTA_IN_MS;
@@ -131,7 +168,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 public class GroupMessageListActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.GrpMsgLstActivity";
-    String group_id = "-1";
+    static String group_id = "-1";
     String group_id_prev = "-1";
     //
     static com.vanniktech.emoji.EmojiEditText ml_new_group_message = null;
@@ -140,16 +177,57 @@ public class GroupMessageListActivity extends AppCompatActivity
     TextView ml_maintext = null;
     ViewGroup rootView = null;
     //
+    private static Thread NGC_Group_video_play_thread = null;
+    private static boolean NGC_Group_video_play_thread_running = false;
+    //
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
+    static View ngc_video_view_container = null;
+    static CustomVideoImageView ngc_video_view = null;
+    static CustomVideoImageView ngc_video_own_view = null;
+    ImageButton ngc_camera_toggle_button = null;
+    static final int NGC_FRONT_CAMERA_USED = 1;
+    static final int NGC_BACK_CAMERA_USED = 2;
+    static int ngc_active_camera_type = NGC_BACK_CAMERA_USED;
     ImageButton ml_phone_icon = null;
     ImageButton ml_button_01 = null;
+    static ImageButton ml_video_icon = null;
+    static boolean sending_video_to_group = false;
+    static String ngc_video_showing_video_from_peer_pubkey = "-1";
+    static long ngc_video_frame_last_incoming_ts = -1L;
+    static Bitmap ngc_video_frame_image = null;
+    static Bitmap ngc_own_video_frame_image = null;
+    static Allocation ngc_alloc_in = null;
+    static Allocation ngc_own_alloc_in = null;
+    static Allocation ngc_alloc_out = null;
+    static Allocation ngc_own_alloc_out = null;
+    static ScriptIntrinsicYuvToRGB ngc_yuvToRgb = null;
+    static ScriptIntrinsicYuvToRGB ngc_own_yuvToRgb = null;
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
     static MenuItem amode_info_menu_item = null;
     static boolean oncreate_finished = false;
     SearchView messageSearchView = null;
+    //
+    static long last_processed_camera_frame = -1;
+
+    private CameraDevice mCameraDevice;
+    private CameraCaptureSession mCaptureSession;
+    private ImageReader mImageReader;
+    private HandlerThread mBackgroundThread;
+    private Handler mBackgroundHandler;
+
+    // static byte[] y_buf__ = new byte[240 * 320];
+    static byte[] y_buf__ = new byte[480 * 640];
+    static byte[] u_buf__ = new byte[(480/2) * (640/2)];
+    static byte[] v_buf__ = new byte[(480/2) * (640/2)];
+
+    private static final int IMAGE_WIDTH = 640;
+    private static final int IMAGE_HEIGHT = 480;
+    private static final int MAX_IMAGES = 1;
+    //
+
 
     // main drawer ----------
     Drawer group_message_drawer = null;
@@ -168,6 +246,34 @@ public class GroupMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
+
+        // ---------- video stuff ----------
+        final int ngc_frame_width_px = 480; // + 32; // 240 + 16;
+        final int ngc_frame_height_px = 640; // 320;
+        ngc_video_frame_image = Bitmap.createBitmap(ngc_frame_width_px, ngc_frame_height_px, Bitmap.Config.ARGB_8888);
+        RenderScript rs = RenderScript.create(this);
+        ngc_yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
+        Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(ngc_frame_width_px).setY(ngc_frame_height_px);
+        yuvType.setYuvFormat(ImageFormat.YV12);
+        ngc_alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
+        Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(ngc_frame_width_px).setY(ngc_frame_height_px);
+        ngc_alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
+        //
+        //
+        final int ngc_own_frame_width_px = 480;
+        final int ngc_own_frame_height_px = 640;
+        ngc_own_video_frame_image = Bitmap.createBitmap(ngc_own_frame_width_px, ngc_own_frame_height_px, Bitmap.Config.ARGB_8888);
+        RenderScript own_rs = RenderScript.create(this);
+        ngc_own_yuvToRgb = ScriptIntrinsicYuvToRGB.create(own_rs, Element.U8_4(own_rs));
+        Type.Builder own_yuvType = new Type.Builder(own_rs, Element.U8(own_rs)).setX(ngc_own_frame_width_px).setY(ngc_own_frame_height_px);
+        own_yuvType.setYuvFormat(ImageFormat.YV12);
+        ngc_own_alloc_in = Allocation.createTyped(own_rs, own_yuvType.create(), Allocation.USAGE_SCRIPT);
+        Type.Builder own_rgbaType = new Type.Builder(own_rs, Element.RGBA_8888(own_rs)).setX(ngc_own_frame_width_px).setY(ngc_own_frame_height_px);
+        ngc_own_alloc_out = Allocation.createTyped(own_rs, own_rgbaType.create(), Allocation.USAGE_SCRIPT);
+        //
+        //
+        sending_video_to_group = false;
+        // ---------- video stuff ----------
 
         amode = null;
         amode_save_menu_item = null;
@@ -287,10 +393,106 @@ public class GroupMessageListActivity extends AppCompatActivity
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
         ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
         ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
+        ml_video_icon = (ImageButton) findViewById(R.id.ml_video_icon);
+        ngc_video_view_container = findViewById(R.id.ngc_video_view_container);
+        ngc_video_view = findViewById(R.id.ngc_video_view);
+        ngc_video_own_view = findViewById(R.id.ngc_video_own_view);
+        ngc_camera_toggle_button = (ImageButton) findViewById(R.id.ngc_camera_toggle_button);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
+
+        // on startup always use back camera
+        ngc_active_camera_type = NGC_BACK_CAMERA_USED;
+
+        if (ngc_active_camera_type == NGC_FRONT_CAMERA_USED)
+        {
+            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            ngc_camera_toggle_button.setImageDrawable(d5);
+            Log.i(TAG, "ngc_active_camera_type(5)=" + ngc_active_camera_type);
+        }
+        else
+        {
+            final Drawable d6 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            ngc_camera_toggle_button.setImageDrawable(d6);
+            Log.i(TAG, "ngc_active_camera_type(6)=" + ngc_active_camera_type);
+        }
+
+        ngc_camera_toggle_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                {
+                    Log.i(TAG, "active_camera_type(7)=" + ngc_active_camera_type);
+
+                    if (ngc_active_camera_type == NGC_FRONT_CAMERA_USED)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        ngc_camera_toggle_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        ngc_camera_toggle_button.setImageDrawable(d2a);
+                    }
+                }
+                else
+                {
+                    Log.i(TAG, "ngc_active_camera_type(8)=" + ngc_active_camera_type);
+
+                    if (ngc_active_camera_type == NGC_FRONT_CAMERA_USED)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_rear).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        ngc_camera_toggle_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_camera_front).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        ngc_camera_toggle_button.setImageDrawable(d2a);
+                    }
+
+                    try
+                    {
+                        if (ngc_active_camera_type == NGC_FRONT_CAMERA_USED)
+                        {
+                            ngc_active_camera_type = NGC_BACK_CAMERA_USED;
+                            Log.i(TAG, "ngc_active_camera_type(8a)=" + ngc_active_camera_type);
+                        }
+                        else
+                        {
+                            ngc_active_camera_type = NGC_FRONT_CAMERA_USED;
+                            Log.i(TAG, "ngc_active_camera_type(8b)=" + ngc_active_camera_type);
+                        }
+                        closeCamera();
+                        openCamera();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                return true;
+            }
+        });
 
         ml_phone_icon.setVisibility(View.GONE);
         ml_status_icon.setVisibility(View.INVISIBLE);
+
+        final Drawable d3 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_video).color(
+                getResources().getColor(R.color.icon_colors)).sizeDp(80);
+        ml_video_icon.setImageDrawable(d3);
+        ngc_video_view_container.setVisibility(View.GONE);
 
         ml_icon.setImageResource(R.drawable.circle_red);
         set_group_connection_status_icon();
@@ -526,8 +728,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                         GroupPeerDB peer_from_db = null;
                         try
                         {
-                            peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_id).
-                                    tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                            peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(
+                                    group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
                         }
                         catch (Exception e)
                         {
@@ -535,7 +737,8 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                         if (peer_from_db != null)
                         {
-                            if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis())
+                            if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) >
+                                System.currentTimeMillis())
                             {
                                 peer_name = "_NEW_ " + peer_name;
                             }
@@ -551,7 +754,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                         glp.peer_pubkey = peer_pubkey_temp;
                         glp.peer_num = i;
                         glp.peer_name = peer_name_temp;
-                        glp.peer_connection_status = tox_group_peer_get_connection_status(conference_num, peers[(int) i]);
+                        glp.peer_connection_status = tox_group_peer_get_connection_status(conference_num,
+                                                                                          peers[(int) i]);
                         group_peers1.add(glp);
                     }
                     catch (Exception ignored)
@@ -572,11 +776,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                         }
                     });
                 }
-                catch(Exception ignored)
+                catch (Exception ignored)
                 {
                 }
 
-                for (group_list_peer peerl: group_peers1)
+                for (group_list_peer peerl : group_peers1)
                 {
                     add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status);
                 }
@@ -598,8 +802,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                     GroupPeerDB peer_from_db = null;
                     try
                     {
-                        peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_id).
-                                tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                        peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(
+                                group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
                     }
                     catch (Exception e)
                     {
@@ -608,7 +812,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                     if (peer_from_db != null)
                     {
                         peer_name = peer_from_db.peer_name;
-                        if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis())
+                        if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) >
+                            System.currentTimeMillis())
                         {
                             peer_name = "_NEW_ " + peer_name;
                         }
@@ -616,8 +821,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                     // Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
                     //           peer_name);
-                    String peer_name_temp = "" + peer_name + " :" + i + ": " +
-                                            peer_pubkey_temp.substring(0, 6);
+                    String peer_name_temp = "" + peer_name + " :" + i + ": " + peer_pubkey_temp.substring(0, 6);
 
                     group_list_peer glp3 = new group_list_peer();
                     glp3.peer_pubkey = peer_pubkey_temp;
@@ -644,13 +848,14 @@ public class GroupMessageListActivity extends AppCompatActivity
                     }
                 });
             }
-            catch(Exception ignored)
+            catch (Exception ignored)
             {
             }
 
-            for (group_list_peer peerloffline: group_peers_offline)
+            for (group_list_peer peerloffline : group_peers_offline)
             {
-                add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name, peerloffline.peer_connection_status);
+                add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name,
+                               peerloffline.peer_connection_status);
             }
 
         }
@@ -663,6 +868,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onPause");
         super.onPause();
 
+        stop_group_video(this);
+        closeCamera();
         MainActivity.group_message_list_fragment = null;
         MainActivity.group_message_list_activity = null;
         // Log.i(TAG, "onPause:001:conf_id=" + conf_id);
@@ -677,7 +884,6 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             emojiPopup.dismiss();
         }
-
         super.onStop();
     }
 
@@ -686,6 +892,8 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+        stop_group_video(this);
+        closeCamera();
 
         // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
@@ -1089,8 +1297,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                                 if (MainActivity.group_message_list_activity != null)
                                 {
-                                    if (!MainActivity.group_message_list_activity.get_current_group_id().equals(
-                                            "-1"))
+                                    if (!MainActivity.group_message_list_activity.get_current_group_id().equals("-1"))
                                     {
                                         // got friendnum
                                         Log.i(TAG, "add_outgoing_file:got groupnum:02");
@@ -1521,6 +1728,589 @@ public class GroupMessageListActivity extends AppCompatActivity
         startActivityForResult(intent, SelectFriendSingleActivity_ID);
     }
 
+    public void openCamera()
+    {
+        CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        try {
+            String cameraId = manager.getCameraIdList()[0];
+            try
+            {
+                if (ngc_active_camera_type == NGC_FRONT_CAMERA_USED)
+                {
+                    for (String cameraId_iter : manager.getCameraIdList())
+                    {
+                        CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId_iter);
+                        if (characteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_FRONT)
+                        {
+                            cameraId = cameraId_iter;
+                        }
+                    }
+                }
+                else
+                {
+                    for (String cameraId_iter : manager.getCameraIdList())
+                    {
+                        CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId_iter);
+                        if (characteristics.get(CameraCharacteristics.LENS_FACING) == CameraCharacteristics.LENS_FACING_BACK)
+                        {
+                            cameraId = cameraId_iter;
+                        }
+                    }
+                }
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+            StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+            Size[] outputSizes = map.getOutputSizes(ImageFormat.YUV_420_888);
+            Size selectedSize = chooseOptimalSize(outputSizes, IMAGE_WIDTH, IMAGE_HEIGHT);
+            mImageReader = ImageReader.newInstance(selectedSize.getWidth(), selectedSize.getHeight(), ImageFormat.YUV_420_888, MAX_IMAGES);
+            mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
+            manager.openCamera(cameraId, mStateCallback, mBackgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private final CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
+        @Override
+        public void onOpened(CameraDevice camera) {
+            mCameraDevice = camera;
+            createCaptureSession();
+        }
+
+        @Override
+        public void onDisconnected(CameraDevice camera) {
+            camera.close();
+            mCameraDevice = null;
+        }
+
+        @Override
+        public void onError(CameraDevice camera, int error) {
+            camera.close();
+            mCameraDevice = null;
+        }
+    };
+
+    private void createCaptureSession() {
+        try {
+            Surface surface = mImageReader.getSurface();
+            CaptureRequest.Builder captureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            captureRequestBuilder.addTarget(surface);
+            mCameraDevice.createCaptureSession(Arrays.asList(surface), new CameraCaptureSession.StateCallback() {
+                @Override
+                public void onConfigured(CameraCaptureSession session) {
+                    mCaptureSession = session;
+                    startPreview();
+                }
+
+                @Override
+                public void onConfigureFailed(CameraCaptureSession session) {
+                    // Handle configuration failure
+                }
+            }, mBackgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startPreview() {
+        try {
+            CaptureRequest.Builder captureRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            captureRequestBuilder.addTarget(mImageReader.getSurface());
+            mCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
+        @Override
+        public void onImageAvailable(ImageReader reader) {
+            try
+            {
+                Image image = reader.acquireLatestImage();
+                if (image == null)
+                {
+                    return;
+                }
+
+                if ((last_processed_camera_frame == -1) || ((last_processed_camera_frame + 250) < System.currentTimeMillis()))
+                {
+                    last_processed_camera_frame = System.currentTimeMillis();
+
+                    int yRowStride = image.getPlanes()[0].getRowStride();
+                    int uRowStride = image.getPlanes()[1].getRowStride();
+                    int vRowStride = image.getPlanes()[2].getRowStride();
+                    int ypixelStride = image.getPlanes()[0].getPixelStride();
+                    int upixelStride = image.getPlanes()[1].getPixelStride();
+                    int vpixelStride = image.getPlanes()[2].getPixelStride();
+                    Log.i(TAG, "yRowStride="+ yRowStride +  " uRowStride=" + uRowStride + " vRowStride=" + vRowStride +
+                               " ypixelStride=" + ypixelStride + " upixelStride=" + upixelStride + " vpixelStride=" + vpixelStride);
+
+                    ByteBuffer y_buffer = image.getPlanes()[0].getBuffer();
+                    final int y_size_in_bytes = y_buffer.remaining();
+                    byte[] y_data = new byte[y_size_in_bytes];
+                    y_buffer.get(y_data);
+
+                    ByteBuffer u_buffer = image.getPlanes()[1].getBuffer();
+                    final int u_size_in_bytes = u_buffer.remaining();
+                    byte[] u_data = new byte[u_size_in_bytes];
+                    u_buffer.get(u_data);
+
+                    ByteBuffer v_buffer = image.getPlanes()[2].getBuffer();
+                    final int v_size_in_bytes = v_buffer.remaining();
+                    byte[] v_data = new byte[v_size_in_bytes];
+                    v_buffer.get(v_data);
+
+                    if ((upixelStride == 2) && (vpixelStride == upixelStride))
+                    {
+                        for (int b = 1; b < (u_size_in_bytes / upixelStride); b++)
+                        {
+                            u_data[b] = u_data[b * upixelStride];
+                            v_data[b] = v_data[b * vpixelStride];
+                        }
+                    }
+
+                    // Process the captured YUV frame data
+                    Log.i(TAG, "IIIIIIIIII:camera_image:bytes=" + y_size_in_bytes + " " + u_size_in_bytes + " " +
+                               v_size_in_bytes);
+
+                    //ByteBuffer yuv_frame_data_buf = ByteBuffer.allocateDirect(y_size_in_bytes + u_size_in_bytes + v_size_in_bytes);
+                    //yuv_frame_data_buf.rewind();
+                    //
+                    //yuv_frame_data_buf.put(y_data);
+                    //yuv_frame_data_buf.put(u_data);
+                    //yuv_frame_data_buf.put(v_data);
+
+                    //y_buffer.rewind();
+                    //u_buffer.rewind();
+                    //v_buffer.rewind();
+
+                    final byte[][] buf3 = {null};
+                    byte[] buf2 = new byte[((640 * 480) * 3 / 2)];
+                    buf3[0] = new byte[((640 * 480) * 3 / 2)];
+
+                    final int off_u = 640 * 480;
+                    final int off_v = (640 * 480) + (640 * 480) / 4;
+                    //y_buffer.get(buf2, 0, 640 * 480);
+                    //u_buffer.get(buf2, off_u, (640 * 480) / 4);
+                    //v_buffer.get(buf2, off_v, (640 * 480) / 4);
+
+                    System.arraycopy(y_data, 0, buf2, 0, off_u);
+                    System.arraycopy(u_data, 0, buf2, off_u, (off_u/4));
+                    System.arraycopy(v_data, 0, buf2, off_v, (off_u/4));
+
+                    byte[] finalBuf = buf2;
+                    Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                buf3[0] = YUV420rotate90(finalBuf, buf3[0], 640, 480);
+                                if (ngc_active_camera_type == NGC_FRONT_CAMERA_USED)
+                                {
+                                    // rotate 180 degrees more
+                                    byte[] buf4 = new byte[((640 * 480) * 3 / 2)];
+                                    buf4 = YUV420rotate90(buf3[0], buf4, 480, 640);
+                                    buf3[0] = YUV420rotate90(buf4, buf3[0], 640, 480);
+                                }
+                                //
+                                ngc_own_alloc_in.copyFrom(buf3[0]);
+                                ngc_own_yuvToRgb.setInput(ngc_own_alloc_in);
+                                ngc_own_yuvToRgb.forEach(ngc_own_alloc_out);
+                                ngc_own_alloc_out.copyTo(ngc_own_video_frame_image);
+                                ngc_video_own_view.setBitmap(ngc_own_video_frame_image);
+                                final int y_bytes_ = 640 * 480;
+                                final int uv_bytes_ = (640/2) * (480/2);
+                                System.arraycopy(buf3[0], 0, y_buf__, 0, y_bytes_);
+                                System.arraycopy(buf3[0], y_bytes_, u_buf__, 0, uv_bytes_);
+                                System.arraycopy(buf3[0], y_bytes_ + uv_bytes_, v_buf__, 0, uv_bytes_);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
+                    if (main_handler_s != null)
+                    {
+                        main_handler_s.post(myRunnable);
+                    }
+                }
+                else
+                {
+                    // Log.i(TAG, "IIIIIIIIII:camera_image:skip_frame");
+                }
+                image.close();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+    };
+
+    public void closeCamera()
+    {
+        try
+        {
+            if (mCaptureSession != null)
+            {
+                mCaptureSession.close();
+                mCaptureSession = null;
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (mCameraDevice != null) {
+                mCameraDevice.close();
+                mCameraDevice = null;
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (mImageReader != null) {
+                mImageReader.close();
+                mImageReader = null;
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @SuppressLint("RestrictedApi")
+    private Size chooseOptimalSize(Size[] choices, int width, int height) {
+        try
+        {
+            List<Size> bigEnough = new ArrayList<>();
+            for (Size option : choices)
+            {
+                if (option.getWidth() >= width && option.getHeight() >= height)
+                {
+                    bigEnough.add(option);
+                }
+            }
+            if (bigEnough.size() > 0)
+            {
+                return Collections.min(bigEnough, new CompareSizesByArea());
+            }
+            else
+            {
+                return choices[0];
+            }
+        }
+        catch(Exception e)
+        {
+            return new Size(640,480);
+        }
+    }
+
+    synchronized public static void stop_group_video(final Context c)
+    {
+        ngc_video_showing_video_from_peer_pubkey = "-1";
+        NGC_Group_video_play_thread_running = false;
+        Log.i(TAG,"NGC_Group_video_play_thread_running:false:001");
+        ngc_video_view_container.setVisibility(View.GONE);
+        sending_video_to_group = false;
+        final Drawable d3 = new IconicsDrawable(c).icon(FontAwesome.Icon.faw_video).color(
+                c.getResources().getColor(R.color.icon_colors)).sizeDp(80);
+        ml_video_icon.setPadding((int)dp2px(7), (int)dp2px(7), (int)dp2px(7), (int)dp2px(7));
+        ml_video_icon.setImageDrawable(d3);
+    }
+
+    public static void show_ngc_incoming_video_frame(final long group_number,
+                                                     final long peer_id,
+                                                     final byte[] yuv_frame_and_header,
+                                                     long length)
+    {
+        if ((ngc_video_frame_image != null) && (!ngc_video_frame_image.isRecycled()))
+        {
+            if (sending_video_to_group == true)
+            {
+                final String ngc_incoming_video_from_peer = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+                if (ngc_video_showing_video_from_peer_pubkey.equals("-1"))
+                {
+                    ngc_video_showing_video_from_peer_pubkey = ngc_incoming_video_from_peer;
+                }
+                else if (!ngc_video_showing_video_from_peer_pubkey.equalsIgnoreCase(ngc_incoming_video_from_peer))
+                {
+                    // we are already showing the video of a different peer in the group
+                    return;
+                }
+
+                // remove header from data (11 bytes)
+                final int yuv_bytes = (int) (length - 11);
+                if ((yuv_bytes > 0) && (yuv_bytes < 40000))
+                {
+                    // TODO: make faster and better. this is not optimized.
+                    final byte[] yuv_frame = new byte[yuv_bytes];
+                    int w2 = 480 + 32; // 240 + 16; // encoder stride added
+                    int h2 = 640; // 320;
+                    final int y_bytes2 = w2 * h2;
+                    final int u_bytes2 = (w2 * h2) / 4;
+                    final int v_bytes2 = (w2 * h2) / 4;
+                    final byte[] y_buf2 = new byte[y_bytes2];
+                    final byte[] u_buf2 = new byte[u_bytes2];
+                    final byte[] v_buf2 = new byte[v_bytes2];
+                    int ystride = -1;
+                    try
+                    {
+                        System.arraycopy(yuv_frame_and_header, 11, yuv_frame, 0, yuv_bytes);
+                        //
+                        ystride = toxav_ngc_video_decode(yuv_frame, yuv_bytes, w2, h2, y_buf2, u_buf2, v_buf2);
+                        if (ystride != -1)
+                        {
+                            Log.i(TAG, "toxav_ngc_video_decode:ystride=" + ystride);
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                        return;
+                    }
+                    final int ystride_ = ystride;
+                    //
+                    Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                if (ystride_ == -1)
+                                {
+                                    ngc_video_view.setImageResource(R.drawable.round_loading_animation);
+                                }
+                                else
+                                {
+                                    int w2_decoder = ystride_; // encoder stride
+                                    int w2_decoder_uv = ystride_ / 2; // encoder stride
+                                    int h2_decoder = 640; // 320;
+                                    int h2_decoder_uv = h2_decoder / 2;
+                                    final int y_bytes2_decoder = h2_decoder * w2_decoder;
+                                    final int u_bytes2_decoder = (h2_decoder_uv * w2_decoder_uv);
+                                    final int v_bytes2_decoder = (h2_decoder_uv * w2_decoder_uv);
+
+                                    ByteBuffer yuv_frame_data_buf = ByteBuffer.allocateDirect(
+                                            y_bytes2_decoder + u_bytes2_decoder + v_bytes2_decoder);
+                                    yuv_frame_data_buf.rewind();
+                                    //
+                                    yuv_frame_data_buf.put(y_buf2, 0, y_bytes2_decoder);
+                                    yuv_frame_data_buf.put(u_buf2, 0, u_bytes2_decoder);
+                                    yuv_frame_data_buf.put(v_buf2, 0, v_bytes2_decoder);
+                                    //
+                                    yuv_frame_data_buf.rewind();
+                                    ngc_alloc_in.copyFrom(yuv_frame_data_buf.array());
+                                    ngc_yuvToRgb.setInput(ngc_alloc_in);
+                                    ngc_yuvToRgb.forEach(ngc_alloc_out);
+                                    ngc_alloc_out.copyTo(ngc_video_frame_image);
+                                    ngc_video_view.setBitmap(ngc_video_frame_image);
+                                }
+                                ngc_video_frame_last_incoming_ts = System.currentTimeMillis();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
+                    if (main_handler_s != null)
+                    {
+                        main_handler_s.post(myRunnable);
+                    }
+                }
+            }
+        }
+    }
+
+    synchronized public static void start_group_video(final Context c)
+    {
+        // just in case there is a thread still running
+        ngc_video_showing_video_from_peer_pubkey = "-1";
+        NGC_Group_video_play_thread_running = false;
+        Log.i(TAG,"NGC_Group_video_play_thread_running:false:002");
+        ngc_video_view_container.setVisibility(View.VISIBLE);
+        final Drawable d3 = new IconicsDrawable(c).icon(FontAwesome.Icon.faw_video).color(
+                c.getResources().getColor(R.color.md_light_green_A700)).sizeDp(80);
+        ml_video_icon.setImageDrawable(d3);
+        ml_video_icon.setPadding((int)dp2px(0), (int)dp2px(0), (int)dp2px(0), (int)dp2px(0));
+        sending_video_to_group = true;
+
+        NGC_Group_video_play_thread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                final int sleep_millis = 250;
+                try
+                {
+                    this.setName("t_gv_play");
+                    android.os.Process.setThreadPriority(Thread.NORM_PRIORITY);
+                    android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_LESS_FAVORABLE);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+                try
+                {
+                    Thread.sleep(sleep_millis + 50);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    Log.i(TAG, "NGC_Group_video_play_thread:starting ...");
+                    NGC_Group_video_play_thread_running = true;
+                    Log.i(TAG,"NGC_Group_video_play_thread_running:true:003");
+                    while (NGC_Group_video_play_thread_running)
+                    {
+                        Log.i(TAG, "NGC_Group_video_play_thread:running --=>");
+                        final int w = 480; // 240;
+                        final int h = 640; // 320;
+                        final int video_enc_bitrate = 300;
+                        final int y_bytes = w * h;
+                        final int u_bytes = (w * h) / 4;
+                        final int v_bytes = (w * h) / 4;
+                        // byte[] y_buf = new byte[y_bytes];
+                        byte[] y_buf = y_buf__;
+                        byte[] u_buf = u_buf__;
+                        byte[] v_buf = v_buf__;
+                        byte[] encoded_vframe = new byte[40000];
+                        int encoded_bytes = toxav_ngc_video_encode(video_enc_bitrate, w,h,
+                                                                   y_buf, y_bytes,
+                                                                   u_buf, u_bytes,
+                                                                   v_buf, v_bytes,
+                                                                   encoded_vframe);
+                        Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes);
+
+                        if ((encoded_bytes < 1)||(encoded_bytes > 37000))
+                        {
+                            // some error with encoding
+                        }
+                        else
+                        {
+                            final int header_length = 6 + 1 + 1 + 1 + 1 + 1;
+                            long data_length_ = header_length + encoded_bytes;
+                            final int data_length = (int) data_length_;
+                            //
+                            try
+                            {
+                                ByteBuffer data_buf = ByteBuffer.allocateDirect(data_length);
+                                data_buf.rewind();
+                                //
+                                data_buf.put((byte) 0x66);
+                                data_buf.put((byte) 0x77);
+                                data_buf.put((byte) 0x88);
+                                data_buf.put((byte) 0x11);
+                                data_buf.put((byte) 0x34);
+                                data_buf.put((byte) 0x35);
+                                //
+                                data_buf.put((byte) 0x01);
+                                //
+                                data_buf.put((byte) 0x21);
+                                //
+                                data_buf.put((byte) w); // width: always 480
+                                data_buf.put((byte) h); // height: always 640
+                                data_buf.put((byte) 1); // codec: always 1  (1 -> H264)
+                                //
+                                data_buf.put(encoded_vframe, 0, encoded_bytes); // put encoded video frame into buffer
+                                //
+                                byte[] data = new byte[data_length];
+                                data_buf.rewind();
+                                data_buf.get(data);
+                                int result = tox_group_send_custom_packet(tox_group_by_groupid__wrapper(group_id), 1,
+                                                                          data, data_length);
+                                Log.i(TAG, "toxav_ngc_video_encode:tox_group_send_custom_packet:result=" + result);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                            //
+                            if ((ngc_video_frame_last_incoming_ts + (5 * 1000)) < System.currentTimeMillis())
+                            {
+                                if (ngc_video_frame_last_incoming_ts != -1)
+                                {
+                                    Log.i(TAG,
+                                          "toxav_ngc_video_encode:no incoming video for 5 seconds. resetting video and peer ...");
+                                    Runnable myRunnable = new Runnable()
+                                    {
+                                        @Override
+                                        public void run()
+                                        {
+                                            try
+                                            {
+                                                ngc_video_view.setImageResource(R.drawable.round_loading_animation);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                    };
+                                    if (main_handler_s != null)
+                                    {
+                                        main_handler_s.post(myRunnable);
+                                    }
+                                }
+                                ngc_video_frame_last_incoming_ts = -1;
+                                ngc_video_showing_video_from_peer_pubkey = "-1";
+                            }
+                        }
+                        //
+                        Thread.sleep(sleep_millis); // sleep
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                Log.i(TAG, "NGC_Group_video_play_thread:finished");
+            }
+        };
+
+        NGC_Group_video_play_thread.start();
+    }
+
+    public void toggle_group_video(View view)
+    {
+        if (sending_video_to_group)
+        {
+            stop_group_video(view.getContext());
+            closeCamera();
+        }
+        else
+        {
+            openCamera();
+            start_group_video(view.getContext());
+        }
+    }
+
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
@@ -1534,7 +2324,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 Log.i(TAG, "onActivityResult:tox_group_invite_friend:002");
                 try
                 {
-                    int item_type = Integer.parseInt( data.getData().toString().substring(0, 1));
+                    int item_type = Integer.parseInt(data.getData().toString().substring(0, 1));
                     String result_friend_pubkey = data.getData().toString().substring(2);
                     Log.i(TAG, "onActivityResult:tox_group_invite_friend:003:");
                     if (result_friend_pubkey != null)

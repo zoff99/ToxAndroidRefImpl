@@ -136,6 +136,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.update_calling_frien
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.ConfGroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
@@ -309,7 +310,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
-    final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
+    final static boolean NDK_STDOUT_LOGGING = true; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean DB_ENCRYPT = true; // set "true" always!
@@ -3437,6 +3438,10 @@ public class MainActivity extends AppCompatActivity
      * @return the group_number on success, UINT32_MAX on failure.
      */
     public static native long tox_group_invite_accept(long friend_number, @NonNull ByteBuffer invite_data_buffer, long invite_data_length, @NonNull String my_peer_name, String password);
+
+    public static native int toxav_ngc_video_encode(int vbitrate, int width, int height, byte[] y, int y_bytes, byte[] u, int u_bytes, byte[] v, int v_bytes, byte[] encoded_frame_bytes);
+
+    public static native int toxav_ngc_video_decode(byte[] encoded_frame_bytes, int encoded_frame_size_bytes, int width, int height, byte[] y, byte[] u, byte[] v);
     // --------------- new Groups -------------
     // --------------- new Groups -------------
     // --------------- new Groups -------------
@@ -7283,7 +7288,7 @@ public class MainActivity extends AppCompatActivity
             //      "group_custom_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
             //      " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
         }
-        catch(Exception e)
+        catch (Exception e)
         {
         }
 
@@ -7295,34 +7300,26 @@ public class MainActivity extends AppCompatActivity
         // check for muted or kicked peers
 
         // check for correct signature of packets
-        final long header = 6 + 1 + 1 + 32 + 4 + 255;
-        if ((length > TOX_MAX_NGC_FILE_AND_HEADER_SIZE) || (length < (header + 1)))
+        final long header_ngc_video = 6 + 1 + 1 + 1 + 1 + 1;
+        final long header_ngc_histsync_and_files = 6 + 1 + 1 + 32 + 4 + 255;
+        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_histsync_and_files + 1)))
         {
-            Log.i(TAG, "group_custom_packet_cb: data length has wrong size: " + length);
-            return;
-        }
-
             // @formatter:off
-            /*
-            | what      | Length in bytes| Contents                                           |
-            |------     |--------        |------------------                                  |
-            | magic     |       6        |  0x667788113435                                    |
-            | version   |       1        |  0x01                                              |
-            | pkt id    |       1        |  0x11
-             */
-            // @formatter:on
+                /*
+                | what      | Length in bytes| Contents                                           |
+                |------     |--------        |------------------                                  |
+                | magic     |       6        |  0x667788113435                                    |
+                | version   |       1        |  0x01                                              |
+                | pkt id    |       1        |  0x11
+                 */
+                // @formatter:on
 
-            if (
-                    (data[0] == (byte)0x66) &&
-                    (data[1] == (byte)0x77) &&
-                    (data[2] == (byte)0x88) &&
-                    (data[3] == (byte)0x11) &&
-                    (data[4] == (byte)0x34) &&
-                    (data[5] == (byte)0x35))
+            if ((data[0] == (byte) 0x66) && (data[1] == (byte) 0x77) && (data[2] == (byte) 0x88) &&
+                (data[3] == (byte) 0x11) && (data[4] == (byte) 0x34) && (data[5] == (byte) 0x35))
             {
-                if ((data[6] == (byte)0x1) && (data[7] == (byte)0x11))
+                if ((data[6] == (byte) 0x1) && (data[7] == (byte) 0x11))
                 {
-                    handle_incoming_group_file(group_number, peer_id, data, length, header);
+                    handle_incoming_group_file(group_number, peer_id, data, length, header_ngc_histsync_and_files);
                 }
                 else
                 {
@@ -7333,6 +7330,41 @@ public class MainActivity extends AppCompatActivity
             {
                 Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
             }
+        }
+        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video + 1)))
+        {
+            // @formatter:off
+                /*
+                | what      | Length in bytes| Contents                                           |
+                |------     |--------        |------------------                                  |
+                | magic     |       6        |  0x667788113435                                    |
+                | version   |       1        |  0x01                                              |
+                | pkt id    |       1        |  0x21
+                 */
+            // @formatter:on
+
+            if ((data[0] == (byte) 0x66) && (data[1] == (byte) 0x77) && (data[2] == (byte) 0x88) &&
+                (data[3] == (byte) 0x11) && (data[4] == (byte) 0x34) && (data[5] == (byte) 0x35))
+            {
+                if ((data[6] == (byte) 0x01) && (data[7] == (byte) 0x21)
+                    && (data[8] == (byte) 480) && (data[9] == (byte) 640) && (data[10] == (byte) 1))
+                {
+                    show_ngc_incoming_video_frame(group_number, peer_id, data, length);
+                }
+                else
+                {
+                    Log.i(TAG, "group_custom_packet_cb:wrong signature 2");
+                }
+            }
+            else
+            {
+                Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
+            }
+        }
+        else
+        {
+            Log.i(TAG, "group_custom_packet_cb: no valid packet size received, size:" + length);
+        }
     }
 
     static void android_tox_callback_group_custom_private_packet_cb_method(long group_number, long peer_id, final byte[] data, long length)

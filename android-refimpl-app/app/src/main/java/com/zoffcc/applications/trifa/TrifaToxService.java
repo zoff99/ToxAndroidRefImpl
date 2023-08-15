@@ -135,6 +135,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.MainActivity.tox_util_friend_resend_message_v2;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_decode;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_encode;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_LAST_SLEEP2;
@@ -1534,6 +1536,39 @@ public class TrifaToxService extends Service
                     }
 
                     MainActivity.tox_iterate();
+
+                    /*
+                    int w = 240;
+                    int h = 320;
+                    int y_bytes = w * h;
+                    int u_bytes = (w * h) / 4;
+                    int v_bytes = (w * h) / 4;
+                    byte[] y_buf = new byte[y_bytes];
+                    byte[] u_buf = new byte[u_bytes];
+                    byte[] v_buf = new byte[v_bytes];
+                    byte[] encoded_vframe = new byte[40000];
+                    int encoded_bytes = toxav_ngc_video_encode(300, 240,320,
+                                                               y_buf, y_bytes,
+                                                               u_buf, u_bytes,
+                                                               v_buf, v_bytes,
+                                                               encoded_vframe);
+                    Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes);
+                    int w2 = 240 + 16; // encoder stride added
+                    int h2 = 320;
+                    int y_bytes2 = w2 * h2;
+                    int u_bytes2 = (w2 * h2) / 4;
+                    int v_bytes2 = (w2 * h2) / 4;
+                    byte[] y_buf2 = new byte[y_bytes2];
+                    byte[] u_buf2 = new byte[u_bytes2];
+                    byte[] v_buf2 = new byte[v_bytes2];
+                    int ystride = toxav_ngc_video_decode(encoded_vframe,
+                                           encoded_bytes,
+                                           w2, h2,
+                                           y_buf2,
+                                           u_buf2,
+                                           v_buf2);
+                    Log.i(TAG, "toxav_ngc_video_decode:ystride=" + ystride);
+                    */
 
                     if ((Callstate.state != 0) || (Callstate.audio_group_active))
                     {
