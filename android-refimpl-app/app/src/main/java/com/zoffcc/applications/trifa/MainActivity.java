@@ -3340,8 +3340,6 @@ public class MainActivity extends AppCompatActivity
 
     public static native long[] tox_group_get_peerlist(long group_number);
 
-    public static native long[] tox_group_get_offline_peerlist(long group_number);
-
     public static native long tox_group_by_chat_id(@NonNull ByteBuffer chat_id_buffer);
 
     public static native int tox_group_get_privacy_state(long group_number);
@@ -3351,6 +3349,8 @@ public class MainActivity extends AppCompatActivity
     public static native int tox_group_mod_set_role(long group_number, long peer_id, int a_Tox_Group_Role);
 
     public static native String tox_group_peer_get_public_key(long group_number, long peer_id);
+
+    public static native String tox_group_savedpeer_get_public_key(long group_number, long slot_num);
 
     public static native long tox_group_peer_by_public_key(long group_number, @NonNull String peer_public_key_string);
 

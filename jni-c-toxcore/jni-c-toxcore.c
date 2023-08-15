@@ -6508,6 +6508,42 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1join(JNIEnv *env, jo
 }
 
 JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1savedpeer_1get_1public_1key(JNIEnv *env, jobject thiz,
+        jlong group_number, jlong slot_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jstring)NULL;
+#else
+    jstring result;
+
+    if(tox_global == NULL)
+    {
+        return (jstring)NULL;
+    }
+
+    uint8_t key_bin[TOX_GROUP_PEER_PUBLIC_KEY_SIZE];
+    CLEAR(key_bin);
+    Tox_Err_Group_Peer_Query error;
+    bool res = tox_group_savedpeer_get_public_key(tox_global, (uint32_t)group_number, (uint32_t)slot_number, key_bin, &error);
+
+    if(res == false)
+    {
+        result = (*env)->NewStringUTF(env, "-1"); // C style string to Java String
+    }
+    else
+    {
+        char key_hex[TOX_GROUP_PEER_PUBLIC_KEY_SIZE*2 + 1];
+        CLEAR(key_hex);
+        toxgppk_bin_to_hex(key_bin, key_hex);
+        key_hex[TOX_GROUP_PEER_PUBLIC_KEY_SIZE * 2] = '\0'; // fix to correct size of public key
+        result = (*env)->NewStringUTF(env, key_hex); // C style string to Java String
+    }
+
+    return result;
+#endif
+}
+
+JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong group_number, jlong peer_id)
 {
@@ -6976,57 +7012,6 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peerlist(JNIEnv
     jlongArray result;
     Tox_Err_Group_Peer_Query error2;
     tox_group_get_peerlist(tox_global, (uint32_t)group_number, peer_list, &error2);
-
-    if (error2 != TOX_ERR_GROUP_PEER_QUERY_OK)
-    {
-        if(peer_list)
-        {
-            free(peer_list);
-        }
-        return NULL;
-    }
-
-    result = (*env)->NewLongArray(env, numpeers);
-
-    if(result == NULL)
-    {
-        // TODO this would be bad!!
-    }
-
-    jlong buffer[numpeers];
-    size_t i = 0;
-
-    for(i=0; i<numpeers; i++)
-    {
-        buffer[i] = (long)peer_list_iter[i];
-    }
-
-    (*env)->SetLongArrayRegion(env, result, 0, numpeers, buffer);
-
-    if(peer_list)
-    {
-        free(peer_list);
-    }
-
-    return result;
-}
-
-JNIEXPORT jlongArray JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1offline_1peerlist(JNIEnv *env, jobject thiz, jlong group_number)
-{
-    Tox_Err_Group_Peer_Query error;
-    size_t numpeers = tox_group_offline_peer_count(tox_global, (uint32_t)group_number, &error);
-    if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
-    {
-        return NULL;
-    }
-
-    size_t memsize = (numpeers * sizeof(uint32_t));
-    uint32_t *peer_list = malloc(memsize);
-    uint32_t *peer_list_iter = peer_list;
-    jlongArray result;
-    Tox_Err_Group_Peer_Query error2;
-    tox_group_get_offline_peerlist(tox_global, (uint32_t)group_number, peer_list, &error2);
 
     if (error2 != TOX_ERR_GROUP_PEER_QUERY_OK)
     {

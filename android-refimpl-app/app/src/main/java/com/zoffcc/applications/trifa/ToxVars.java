@@ -52,6 +52,7 @@ public class ToxVars
     public static final int TOX_GROUP_MAX_PASSWORD_SIZE = 32;
     public static final int TOX_GROUP_CHAT_ID_SIZE = 32;
     public static final int TOX_GROUP_PEER_PUBLIC_KEY_SIZE = 32;
+    public static final int GC_MAX_SAVED_PEERS = 100;
     // -- Group chat numeric constants
     //
     public static final int TOX_MSGV3_MSGID_LENGTH = 32;

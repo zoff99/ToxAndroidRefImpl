@@ -23,7 +23,6 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -72,7 +71,6 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
-import id.zelory.compressor.Compressor;
 
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
@@ -82,7 +80,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstrin
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
-import static com.zoffcc.applications.trifa.HelperGeneric.io_file_copy;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
@@ -98,15 +95,10 @@ import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActiv
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.MainActivity.message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_incoming_file;
-import static com.zoffcc.applications.trifa.MainActivity.selected_messages_text_only;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_offline_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
@@ -116,6 +108,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_conn
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_savedpeer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -128,6 +121,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
+import static com.zoffcc.applications.trifa.ToxVars.GC_MAX_SAVED_PEERS;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_FILESIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -593,75 +587,72 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         if (offline_num_peers > 0)
         {
-            long[] offline_peers = tox_group_get_offline_peerlist(conference_num);
-            if (offline_peers != null)
+            List<group_list_peer> group_peers_offline = new ArrayList<group_list_peer>();
+            long i = 0;
+            for (i = 0; i < GC_MAX_SAVED_PEERS; i++)
             {
-                List<group_list_peer> group_peers_offline = new ArrayList<group_list_peer>();
-                long i = 0;
-                for (i = 0; i < offline_num_peers; i++)
-                {
-                    try
-                    {
-                        String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, offline_peers[(int) i]);
-                        String peer_name = tox_group_peer_get_name(conference_num, offline_peers[(int) i]);
-                        GroupPeerDB peer_from_db = null;
-                        try
-                        {
-                            peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_id).
-                                    tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
-                        }
-                        catch (Exception e)
-                        {
-                        }
-
-                        if (peer_from_db != null)
-                        {
-                            peer_name = peer_from_db.peer_name;
-                            if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis())
-                            {
-                                peer_name = "_NEW_ " + peer_name;
-                            }
-                        }
-
-                        // Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
-                        //           peer_name);
-                        String peer_name_temp = "" + peer_name + " :" + offline_peers[(int) i] + ": " +
-                                                peer_pubkey_temp.substring(0, 6);
-
-                        group_list_peer glp3 = new group_list_peer();
-                        glp3.peer_pubkey = peer_pubkey_temp;
-                        glp3.peer_num = i;
-                        glp3.peer_name = peer_name_temp;
-                        glp3.peer_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
-                        group_peers_offline.add(glp3);
-                    }
-                    catch (Exception ignored)
-                    {
-                    }
-                }
-
                 try
                 {
-                    Collections.sort(group_peers_offline, new Comparator<group_list_peer>()
+                    String peer_pubkey_temp = tox_group_savedpeer_get_public_key(conference_num, i);
+                    String peer_name = "offline " + i;
+                    GroupPeerDB peer_from_db = null;
+                    try
                     {
-                        @Override
-                        public int compare(group_list_peer p1, group_list_peer p2)
-                        {
-                            String name1 = p1.peer_name;
-                            String name2 = p2.peer_name;
-                            return name1.compareToIgnoreCase(name2);
-                        }
-                    });
-                }
-                catch(Exception ignored)
-                {
-                }
+                        peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_id).
+                                tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                    }
+                    catch (Exception e)
+                    {
+                    }
 
-                for (group_list_peer peerloffline: group_peers_offline)
+                    if (peer_from_db != null)
+                    {
+                        peer_name = peer_from_db.peer_name;
+                        if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis())
+                        {
+                            peer_name = "_NEW_ " + peer_name;
+                        }
+                    }
+
+                    // Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
+                    //           peer_name);
+                    String peer_name_temp = "" + peer_name + " :" + i + ": " +
+                                            peer_pubkey_temp.substring(0, 6);
+
+                    group_list_peer glp3 = new group_list_peer();
+                    glp3.peer_pubkey = peer_pubkey_temp;
+                    glp3.peer_num = i;
+                    glp3.peer_name = peer_name_temp;
+                    glp3.peer_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                    group_peers_offline.add(glp3);
+                }
+                catch (Exception ignored)
                 {
-                    add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name, peerloffline.peer_connection_status);
                 }
             }
+
+            try
+            {
+                Collections.sort(group_peers_offline, new Comparator<group_list_peer>()
+                {
+                    @Override
+                    public int compare(group_list_peer p1, group_list_peer p2)
+                    {
+                        String name1 = p1.peer_name;
+                        String name2 = p2.peer_name;
+                        return name1.compareToIgnoreCase(name2);
+                    }
+                });
+            }
+            catch(Exception ignored)
+            {
+            }
+
+            for (group_list_peer peerloffline: group_peers_offline)
+            {
+                add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name, peerloffline.peer_connection_status);
+            }
+
         }
 
     }
