@@ -4,7 +4,7 @@
     <item
         android:id="@+id/item_addfriend"
         android:title="@string/layout___add_friend"
-        android:icon="@drawable/ic_plus_sign"
+        android:icon="@drawable/baseline_person_add_alt_1_24"
         android:visible="true"
         app:showAsAction="always" />
     <item
