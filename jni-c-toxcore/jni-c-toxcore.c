@@ -82,8 +82,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 88
-static const char global_version_string[] = "0.99.88";
+#define VERSION_PATCH 89
+static const char global_version_string[] = "0.99.89";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -167,6 +167,7 @@ static int toxav_iterate_thread_stop = 0;
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
 ToxAV *tox_av_global = NULL;
+void *tox_av_ngc_coders_global = NULL;
 bool global_toxav_valid = false;
 CallControl mytox_CC;
 pthread_t tid[3]; // 0 -> toxav_iterate thread, 1 -> video iterate thread, 2 -> audio iterate thread
@@ -2879,6 +2880,9 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 #endif
     dbg(9, "linking AV callbacks ... READY");
     // init AV callbacks -------------------------------
+
+    tox_av_ngc_coders_global = toxav_ngc_video_init();
+
     // start toxav thread ------------------------------
     toxav_iterate_thread_stop = 0;
 
@@ -3383,6 +3387,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     pthread_join(tid[1], NULL); // wait for toxav video thread to end
     toxav_audio_thread_stop = 1;
     pthread_join(tid[2], NULL); // wait for toxav audio thread to end
+    toxav_ngc_video_kill(tox_av_ngc_coders_global);
+    tox_av_ngc_coders_global = NULL;
     toxav_kill(tox_av_global);
     tox_av_global = NULL;
 #ifdef TOX_HAVE_TOXUTIL
@@ -7141,6 +7147,127 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1is_1connected(JNIEnv
     else
     {
         return (jint)res;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv *env, jobject thiz,
+        jbyteArray encoded_frame_bytes,
+        jint encoded_frame_size_bytes,
+        jint width, jint height,
+        jbyteArray y,
+        jbyteArray u,
+        jbyteArray v
+        )
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if(global_toxav_valid != true)
+    {
+        return (jint)-99;
+    }
+
+    if (tox_av_ngc_coders_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if ((y == NULL) || (u == NULL) || (v == NULL) || (encoded_frame_bytes == NULL))
+    {
+        return (jint)-21;
+    }
+
+    jbyte *y_c = (*env)->GetByteArrayElements(env, y, 0);
+    jbyte *u_c = (*env)->GetByteArrayElements(env, u, 0);
+    jbyte *v_c = (*env)->GetByteArrayElements(env, v, 0);
+    jbyte *enc_c = (*env)->GetByteArrayElements(env, encoded_frame_bytes, 0);
+
+    int32_t y_stride;
+    int32_t u_stride;
+    int32_t v_stride;
+    bool res = toxav_ngc_video_decode(tox_av_ngc_coders_global,
+                                      enc_c, encoded_frame_size_bytes,
+                                      width, height,
+                                      (uint8_t *)y_c, (uint8_t *)u_c, (uint8_t *)v_c,
+                                      &y_stride, &u_stride, &v_stride);
+
+    (*env)->ReleaseByteArrayElements(env, y, y_c, JNI_COMMIT); /* DO copy back contents */
+    (*env)->ReleaseByteArrayElements(env, u, u_c, JNI_COMMIT); /* DO copy back contents */
+    (*env)->ReleaseByteArrayElements(env, v, v_c, JNI_COMMIT); /* DO copy back contents */
+    (*env)->ReleaseByteArrayElements(env, encoded_frame_bytes, enc_c, JNI_ABORT); /* abort to not copy back contents */
+
+    if(res == true)
+    {
+        return (jint)y_stride;
+    }
+    else
+    {
+        return (jint)-1;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv *env, jobject thiz,
+        jint vbitrate, jint width, jint height,
+        jbyteArray y, jint y_bytes,
+        jbyteArray u, jint u_bytes,
+        jbyteArray v, jint v_bytes,
+        jbyteArray encoded_frame_bytes)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if(global_toxav_valid != true)
+    {
+        return (jint)-99;
+    }
+
+    if (tox_av_ngc_coders_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if ((y == NULL) || (u == NULL) || (v == NULL) || (encoded_frame_bytes == NULL))
+    {
+        return (jint)-21;
+    }
+
+    jbyte *y_c = (*env)->GetByteArrayElements(env, y, 0);
+    jbyte *u_c = (*env)->GetByteArrayElements(env, u, 0);
+    jbyte *v_c = (*env)->GetByteArrayElements(env, v, 0);
+    jbyte *enc_c = (*env)->GetByteArrayElements(env, encoded_frame_bytes, 0);
+
+    uint32_t encoded_frame_size_bytes = 0;
+    bool res = toxav_ngc_video_encode(tox_av_ngc_coders_global,
+                                      vbitrate,
+                                      width, height,
+                                      (const uint8_t *)y_c, (const uint8_t *)u_c, (const uint8_t *)v_c,
+                                      (uint8_t *)enc_c, &encoded_frame_size_bytes);
+    (*env)->ReleaseByteArrayElements(env, y, y_c, JNI_ABORT); /* abort to not copy back contents */
+    (*env)->ReleaseByteArrayElements(env, u, u_c, JNI_ABORT); /* abort to not copy back contents */
+    (*env)->ReleaseByteArrayElements(env, v, v_c, JNI_ABORT); /* abort to not copy back contents */
+    (*env)->ReleaseByteArrayElements(env, encoded_frame_bytes, enc_c, JNI_COMMIT); /* DO copy back contents */
+
+    if(res == true)
+    {
+        return (jint)encoded_frame_size_bytes;
+    }
+    else
+    {
+        return (jint)-1;
     }
 #endif
 }
