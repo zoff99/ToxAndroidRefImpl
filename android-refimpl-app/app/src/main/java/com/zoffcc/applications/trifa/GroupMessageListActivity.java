@@ -118,15 +118,19 @@ import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
 import static com.zoffcc.applications.trifa.HelperGroup.ngc_get_index_video_incoming_peer_list;
 import static com.zoffcc.applications.trifa.HelperGroup.ngc_purge_video_incoming_peer_list;
 import static com.zoffcc.applications.trifa.HelperGroup.ngc_set_video_call_icon;
+import static com.zoffcc.applications.trifa.HelperGroup.ngc_set_video_info_text;
 import static com.zoffcc.applications.trifa.HelperGroup.ngc_update_video_incoming_peer_list;
 import static com.zoffcc.applications.trifa.HelperGroup.ngc_update_video_incoming_peer_list_ts;
 import static com.zoffcc.applications.trifa.HelperGroup.send_group_image;
 import static com.zoffcc.applications.trifa.HelperGroup.shrink_image_file;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_bitrate;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_frame_delta_ms;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_camera_x;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
@@ -198,6 +202,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     static CustomVideoImageView ngc_video_own_view = null;
     ImageButton ngc_camera_toggle_button = null;
     ImageButton ngc_camera_next_button = null;
+    static TextView ngc_camera_info_text = null;
     static final int NGC_FRONT_CAMERA_USED = 1;
     static final int NGC_BACK_CAMERA_USED = 2;
     static int ngc_active_camera_type = NGC_BACK_CAMERA_USED;
@@ -415,7 +420,10 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_video_own_view = findViewById(R.id.ngc_video_own_view);
         ngc_camera_toggle_button = (ImageButton) findViewById(R.id.ngc_camera_toggle_button);
         ngc_camera_next_button = (ImageButton) findViewById(R.id.ngc_camera_next_button);
+        ngc_camera_info_text = findViewById(R.id.ngc_camera_info_text);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
+
+        ngc_camera_info_text.setText("");
 
         final Drawable d9 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_rotate_right).backgroundColor(
                 Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
@@ -1017,6 +1025,21 @@ public class GroupMessageListActivity extends AppCompatActivity
                             {
                                 ngc_set_video_call_icon(NGC_VIDEO_ICON_STATE_INCOMING);
                             }
+                        }
+
+                        if (sending_video_to_group)
+                        {
+                            String peer_name_txt = "";
+                            if (!lookup_ngc_incoming_video_peer_list.isEmpty())
+                            {
+                                peer_name_txt = tox_group_peer_get_name__wrapper(group_id, ngc_video_showing_video_from_peer_pubkey);
+                                if ((peer_name_txt == null) || (peer_name_txt.equals("")) || (peer_name_txt.equals("-1")))
+                                {
+                                    peer_name_txt = "Unknown";
+                                }
+                            }
+                            ngc_set_video_info_text("#:" + lookup_ngc_incoming_video_peer_list.size()
+                                                    + "\n" + peer_name_txt);
                         }
 
                         try
@@ -1969,7 +1992,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                     return;
                 }
 
-                if ((last_processed_camera_frame == -1) || ((last_processed_camera_frame + 250) < System.currentTimeMillis()))
+                if ((last_processed_camera_frame == -1) || ((last_processed_camera_frame + PREF__ngc_video_frame_delta_ms)
+                                                            < System.currentTimeMillis()))
                 {
                     last_processed_camera_frame = System.currentTimeMillis();
 
@@ -2182,6 +2206,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             {
                 final String ngc_incoming_video_from_peer = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
                 ngc_update_video_incoming_peer_list(ngc_incoming_video_from_peer);
+
                 if (ngc_video_showing_video_from_peer_pubkey.equals("-1"))
                 {
                     ngc_video_showing_video_from_peer_pubkey = ngc_incoming_video_from_peer;
@@ -2293,7 +2318,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             @Override
             public void run()
             {
-                final int sleep_millis = 250;
+                final int sleep_millis = PREF__ngc_video_frame_delta_ms;
                 try
                 {
                     this.setName("t_gv_play");
@@ -2323,7 +2348,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                         Log.i(TAG, "NGC_Group_video_play_thread:running --=>");
                         final int w = 480; // 240;
                         final int h = 640; // 320;
-                        final int video_enc_bitrate = 300;
+                        final int video_enc_bitrate = PREF__ngc_video_bitrate;
                         final int y_bytes = w * h;
                         final int u_bytes = (w * h) / 4;
                         final int v_bytes = (w * h) / 4;

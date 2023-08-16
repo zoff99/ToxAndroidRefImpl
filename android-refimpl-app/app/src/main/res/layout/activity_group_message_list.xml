@@ -157,9 +157,11 @@
                         android:background="@color/md_always_black_1000" />
 
                     <TextView
+                        android:id="@+id/ngc_camera_info_text"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="20"
+                        android:layout_weight="35"
+                        android:textColor="@color/textColorPrimary"
                         android:background="@android:color/transparent"
                         android:text=""></TextView>
 

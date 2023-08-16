@@ -49,6 +49,7 @@ import static com.zoffcc.applications.trifa.GroupMessageListActivity.NGC_VIDEO_I
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.NGC_VIDEO_ICON_STATE_INCOMING;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.lookup_ngc_incoming_video_peer_list;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.ml_video_icon;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.ngc_camera_info_text;
 import static com.zoffcc.applications.trifa.HelperConference.delete_selected_group_messages;
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
@@ -2834,6 +2835,29 @@ public class HelperGroup
         catch (Exception e)
         {
             e.printStackTrace();
+        }
+    }
+
+    static void ngc_set_video_info_text(final String text)
+    {
+        final Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    ngc_camera_info_text.setText(text);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        };
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
         }
     }
 

@@ -2647,7 +2647,7 @@ void *thread_audio_av(void *data)
 
 void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, jobject thiz, jobject datadir,
         jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port,
-        jstring passphrase_j, jint enable_ipv6, jint force_udp_mode)
+        jstring passphrase_j, jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate)
 {
     const char *s = NULL;
     // SET GLOBAL JNIENV here, this is bad!!
@@ -2881,7 +2881,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "linking AV callbacks ... READY");
     // init AV callbacks -------------------------------
 
-    tox_av_ngc_coders_global = toxav_ngc_video_init();
+    tox_av_ngc_coders_global = toxav_ngc_video_init(ngc_video_bitrate);
 
     // start toxav thread ------------------------------
     toxav_iterate_thread_stop = 0;
@@ -2928,10 +2928,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, jobject datadir, jint udp_enabled,
         jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j,
-        jint enable_ipv6, jint force_udp_mode)
+        jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate)
 {
     Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled,
-                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j, enable_ipv6, force_udp_mode);
+                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j, enable_ipv6, force_udp_mode, ngc_video_bitrate);
 }
 
 
