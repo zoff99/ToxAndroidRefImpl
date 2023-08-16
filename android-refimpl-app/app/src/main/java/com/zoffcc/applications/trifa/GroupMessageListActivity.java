@@ -2196,8 +2196,17 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         if (MainActivity.group_message_list_activity == null)
         {
+            // NGC group activity not open
             return;
         }
+
+        final long conference_num = tox_group_by_groupid__wrapper(group_id);
+        if (conference_num != group_number)
+        {
+            // wrong NGC group
+            return;
+        }
+
         ngc_video_packet_last_incoming_ts = System.currentTimeMillis();
 
         if ((ngc_video_frame_image != null) && (!ngc_video_frame_image.isRecycled()))
@@ -2362,7 +2371,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                                                    u_buf, u_bytes,
                                                                    v_buf, v_bytes,
                                                                    encoded_vframe);
-                        Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes);
+                        // Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes);
 
                         if ((encoded_bytes < 1)||(encoded_bytes > 37000))
                         {

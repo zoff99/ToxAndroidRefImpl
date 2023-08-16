@@ -499,8 +499,9 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_push_server_ntfy = false;
     static boolean PREF__messageview_paging = true;
     static int PREF__message_paging_num_msgs_per_page = 50;
-    static int PREF__ngc_video_bitrate = 400; // ~400 kbits/s -> ~40 kbytes/s
-    static int PREF__ngc_video_frame_delta_ms = 250; // 250 ms -> 4 fps
+    static int PREF__ngc_video_bitrate = 500; // ~500 kbits/s -> ~50 kbytes/s
+    static int PREF__ngc_video_frame_delta_ms = 100; // 100 ms -> 10 fps
+    static int PREF__ngc_video_max_quantizer = 46; // 47 -> default, 51 -> lowest quality, 30 -> very high quality and lots of bandwidth!
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2057,7 +2058,8 @@ public class MainActivity extends AppCompatActivity
                                  PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                                  TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
                                          TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))),
-                                 PREF__ipv6_enabled_to_int, PREF__force_udp_only_to_int, PREF__ngc_video_bitrate);
+                                 PREF__ipv6_enabled_to_int, PREF__force_udp_only_to_int, PREF__ngc_video_bitrate,
+                                 PREF__ngc_video_max_quantizer);
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
@@ -2196,7 +2198,7 @@ public class MainActivity extends AppCompatActivity
                      PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                      TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
                              TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))), PREF__ipv6_enabled_to_int,
-                     PREF__force_udp_only_to_int, PREF__ngc_video_bitrate);
+                     PREF__force_udp_only_to_int, PREF__ngc_video_bitrate, PREF__ngc_video_max_quantizer);
 
                 Log.i(TAG, "set_all_conferences_inactive:001");
                 HelperConference.set_all_conferences_inactive();
@@ -3065,7 +3067,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase_hash, int enable_ipv6, int force_udp_only_mode, int ngc_video_bitrate);
+    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase_hash, int enable_ipv6, int force_udp_only_mode, int ngc_video_bitrate, int max_quantizer);
 
     public native String getNativeLibAPI();
 

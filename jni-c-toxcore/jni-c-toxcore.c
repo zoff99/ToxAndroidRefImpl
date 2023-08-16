@@ -82,8 +82,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 89
-static const char global_version_string[] = "0.99.89";
+#define VERSION_PATCH 90
+static const char global_version_string[] = "0.99.90";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -2647,7 +2647,7 @@ void *thread_audio_av(void *data)
 
 void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, jobject thiz, jobject datadir,
         jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port,
-        jstring passphrase_j, jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate)
+        jstring passphrase_j, jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate, jint max_quantizer)
 {
     const char *s = NULL;
     // SET GLOBAL JNIENV here, this is bad!!
@@ -2881,7 +2881,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "linking AV callbacks ... READY");
     // init AV callbacks -------------------------------
 
-    tox_av_ngc_coders_global = toxav_ngc_video_init(ngc_video_bitrate);
+    tox_av_ngc_coders_global = toxav_ngc_video_init(ngc_video_bitrate, max_quantizer);
 
     // start toxav thread ------------------------------
     toxav_iterate_thread_stop = 0;
@@ -2928,10 +2928,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, jobject datadir, jint udp_enabled,
         jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j,
-        jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate)
+        jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate, jint max_quantizer)
 {
     Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled,
-                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j, enable_ipv6, force_udp_mode, ngc_video_bitrate);
+                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j, enable_ipv6, force_udp_mode, ngc_video_bitrate, max_quantizer);
 }
 
 
