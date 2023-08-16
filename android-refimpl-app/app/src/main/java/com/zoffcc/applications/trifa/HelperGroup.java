@@ -23,8 +23,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.FileNotFoundException;
@@ -41,6 +44,11 @@ import id.zelory.compressor.Compressor;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.NGC_VIDEO_ICON_STATE_ACTIVE;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.NGC_VIDEO_ICON_STATE_INACTIVE;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.NGC_VIDEO_ICON_STATE_INCOMING;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.lookup_ngc_incoming_video_peer_list;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.ml_video_icon;
 import static com.zoffcc.applications.trifa.HelperConference.delete_selected_group_messages;
 import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
@@ -48,11 +56,13 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.save_group_incomi
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.io_file_copy;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.android_tox_callback_conference_title_cb_method;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
@@ -2706,6 +2716,186 @@ public class HelperGroup
         }
         catch(Exception e)
         {
+        }
+    }
+
+    static void ngc_update_video_incoming_peer_list(final String peer_pubkey)
+    {
+        lookup_ngc_incoming_video_peer_list.put(peer_pubkey, System.currentTimeMillis());
+        ngc_update_video_incoming_peer_list_ts();
+        Log.i(TAG, "ngc_update_video_incoming_peer_list entries=" + lookup_ngc_incoming_video_peer_list.size());
+    }
+
+    static void ngc_update_video_incoming_peer_list_ts()
+    {
+        if (lookup_ngc_incoming_video_peer_list.isEmpty())
+        {
+            return;
+        }
+        // remove all peers that have not sent video in the last 5 seconds
+        Iterator<Long> iterator = lookup_ngc_incoming_video_peer_list.values().iterator();
+        while (iterator.hasNext())
+        {
+            if (iterator.next() < (System.currentTimeMillis() - (5 * 1000)))
+            {
+                iterator.remove();
+            }
+        }
+    }
+
+    static void ngc_purge_video_incoming_peer_list()
+    {
+        lookup_ngc_incoming_video_peer_list.clear();
+    }
+
+    static void ngc_set_video_call_icon(final int state)
+    {
+        try
+        {
+            if (state == NGC_VIDEO_ICON_STATE_ACTIVE)
+            {
+                final Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            final Drawable d3 = new IconicsDrawable(context_s).
+                                    icon(FontAwesome.Icon.faw_video).color(context_s.getResources().
+                                    getColor(R.color.md_light_green_A700)).sizeDp(80);
+                            ml_video_icon.setImageDrawable(d3);
+                            ml_video_icon.setPadding((int) dp2px(0), (int) dp2px(0), (int) dp2px(0), (int) dp2px(0));
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+            else if (state == NGC_VIDEO_ICON_STATE_INCOMING)
+            {
+                final Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            final Drawable d3 = new IconicsDrawable(context_s).
+                                    icon(FontAwesome.Icon.faw_video).color(context_s.getResources().
+                                    getColor(R.color.md_amber_800)).sizeDp(80);
+                            ml_video_icon.setPadding((int) dp2px(7), (int) dp2px(7), (int) dp2px(7), (int) dp2px(7));
+                            ml_video_icon.setImageDrawable(d3);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+            else // state == NGC_VIDEO_ICON_STATE_INACTIVE
+            {
+                final Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            final Drawable d3 = new IconicsDrawable(context_s).
+                                    icon(FontAwesome.Icon.faw_video).color(context_s.getResources().
+                                    getColor(R.color.icon_colors)).sizeDp(80);
+                            ml_video_icon.setPadding((int) dp2px(7), (int) dp2px(7), (int) dp2px(7), (int) dp2px(7));
+                            ml_video_icon.setImageDrawable(d3);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static String ngc_get_index_video_incoming_peer_list(final int wanted_index)
+    {
+        if (lookup_ngc_incoming_video_peer_list.isEmpty())
+        {
+            return "-1";
+        }
+
+        if (wanted_index < 0)
+        {
+            return "-1";
+        }
+
+        // remove all peers that have not sent video in the last 5 seconds
+        if (lookup_ngc_incoming_video_peer_list.size() == 1)
+        {
+            try
+            {
+                final String peer_pubkey = (String) lookup_ngc_incoming_video_peer_list.keySet().toArray()[0];
+                try
+                {
+                    Log.i(TAG, "ngc_get_index_video_incoming_peer_list:peer_pubkey=" + peer_pubkey.substring(0, 6));
+                }
+                catch(Exception e)
+                {
+                }
+                return peer_pubkey;
+            }
+            catch(Exception e)
+            {
+                return "-1";
+            }
+        }
+
+        if (wanted_index >= lookup_ngc_incoming_video_peer_list.size())
+        {
+            try
+            {
+                final String peer_pubkey = (String) lookup_ngc_incoming_video_peer_list.keySet().
+                        toArray()[wanted_index % lookup_ngc_incoming_video_peer_list.size()];
+                Log.i(TAG, "ngc_get_index_video_incoming_peer_list:peer_pubkey=" + peer_pubkey);
+                return peer_pubkey;
+            }
+            catch(Exception e)
+            {
+                return "-1";
+            }
+        }
+        else
+        {
+            try
+            {
+                final String peer_pubkey = (String) lookup_ngc_incoming_video_peer_list.keySet().toArray()[wanted_index];
+                Log.i(TAG, "ngc_get_index_video_incoming_peer_list:peer_pubkey=" + peer_pubkey);
+                return peer_pubkey;
+            }
+            catch(Exception e)
+            {
+                return "-1";
+            }
         }
     }
 }

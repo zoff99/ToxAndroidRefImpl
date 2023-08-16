@@ -128,7 +128,7 @@
             <LinearLayout
                 android:id="@+id/ngc_video_view_container"
                 android:layout_width="match_parent"
-                android:layout_height="400dp"
+                android:layout_height="440dp"
                 android:background="@color/md_always_black_1000"
                 android:orientation="horizontal"
                 android:visibility="visible">
@@ -138,7 +138,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginTop="0dp"
-                    android:layout_weight="100"
+                    android:layout_weight="140"
                     android:background="@color/md_always_black_1000" />
 
                 <LinearLayout
@@ -159,7 +159,26 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="30"
+                        android:layout_weight="20"
+                        android:background="@android:color/transparent"
+                        android:text=""></TextView>
+
+                    <ImageButton
+                        android:id="@+id/ngc_camera_next_button"
+                        android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+                        android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:clickable="true"
+                        android:keepScreenOn="true"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/circle_blue"
+                        android:focusable="true" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="10"
                         android:background="@android:color/transparent"
                         android:text=""></TextView>
 
@@ -178,7 +197,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="20"
+                        android:layout_weight="3"
                         android:background="@android:color/transparent"
                         android:text=""></TextView>
 

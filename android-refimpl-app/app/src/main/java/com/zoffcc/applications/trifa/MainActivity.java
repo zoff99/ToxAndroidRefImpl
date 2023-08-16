@@ -7323,12 +7323,12 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    Log.i(TAG, "group_custom_packet_cb:wrong signature 2");
+                    // Log.i(TAG, "group_custom_packet_cb:wrong signature 2");
                 }
             }
             else
             {
-                Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
+                // Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
             }
         }
         if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video + 1)))
@@ -7353,12 +7353,12 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
-                    Log.i(TAG, "group_custom_packet_cb:wrong signature 2");
+                    // Log.i(TAG, "group_custom_packet_cb:wrong signature 2");
                 }
             }
             else
             {
-                Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
+                // Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
             }
         }
         else

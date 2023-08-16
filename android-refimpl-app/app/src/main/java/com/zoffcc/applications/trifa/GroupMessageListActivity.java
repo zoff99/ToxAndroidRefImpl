@@ -82,7 +82,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.Px;
 import androidx.annotation.RequiresApi;
@@ -113,6 +115,11 @@ import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_by
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
+import static com.zoffcc.applications.trifa.HelperGroup.ngc_get_index_video_incoming_peer_list;
+import static com.zoffcc.applications.trifa.HelperGroup.ngc_purge_video_incoming_peer_list;
+import static com.zoffcc.applications.trifa.HelperGroup.ngc_set_video_call_icon;
+import static com.zoffcc.applications.trifa.HelperGroup.ngc_update_video_incoming_peer_list;
+import static com.zoffcc.applications.trifa.HelperGroup.ngc_update_video_incoming_peer_list_ts;
 import static com.zoffcc.applications.trifa.HelperGroup.send_group_image;
 import static com.zoffcc.applications.trifa.HelperGroup.shrink_image_file;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
@@ -177,8 +184,12 @@ public class GroupMessageListActivity extends AppCompatActivity
     TextView ml_maintext = null;
     ViewGroup rootView = null;
     //
+    private static Thread NGC_Group_video_check_incoming_thread = null;
+    private static boolean NGC_Group_video_check_incoming_thread_running = false;
     private static Thread NGC_Group_video_play_thread = null;
     private static boolean NGC_Group_video_play_thread_running = false;
+    static Map<String, Long> lookup_ngc_incoming_video_peer_list = new HashMap<String, Long>();
+    static int ngc_incoming_video_peer_toggle_current_index = 0;
     //
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
@@ -186,15 +197,20 @@ public class GroupMessageListActivity extends AppCompatActivity
     static CustomVideoImageView ngc_video_view = null;
     static CustomVideoImageView ngc_video_own_view = null;
     ImageButton ngc_camera_toggle_button = null;
+    ImageButton ngc_camera_next_button = null;
     static final int NGC_FRONT_CAMERA_USED = 1;
     static final int NGC_BACK_CAMERA_USED = 2;
     static int ngc_active_camera_type = NGC_BACK_CAMERA_USED;
+    static final int NGC_VIDEO_ICON_STATE_INACTIVE = 0;
+    static final int NGC_VIDEO_ICON_STATE_INCOMING = 1;
+    static final int NGC_VIDEO_ICON_STATE_ACTIVE = 2;
     ImageButton ml_phone_icon = null;
     ImageButton ml_button_01 = null;
     static ImageButton ml_video_icon = null;
     static boolean sending_video_to_group = false;
     static String ngc_video_showing_video_from_peer_pubkey = "-1";
     static long ngc_video_frame_last_incoming_ts = -1L;
+    static long ngc_video_packet_last_incoming_ts = -1L;
     static Bitmap ngc_video_frame_image = null;
     static Bitmap ngc_own_video_frame_image = null;
     static Allocation ngc_alloc_in = null;
@@ -398,7 +414,12 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_video_view = findViewById(R.id.ngc_video_view);
         ngc_video_own_view = findViewById(R.id.ngc_video_own_view);
         ngc_camera_toggle_button = (ImageButton) findViewById(R.id.ngc_camera_toggle_button);
+        ngc_camera_next_button = (ImageButton) findViewById(R.id.ngc_camera_next_button);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
+
+        final Drawable d9 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_rotate_right).backgroundColor(
+                Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+        ngc_camera_next_button.setImageDrawable(d9);
 
         // on startup always use back camera
         ngc_active_camera_type = NGC_BACK_CAMERA_USED;
@@ -476,6 +497,49 @@ public class GroupMessageListActivity extends AppCompatActivity
                         }
                         closeCamera();
                         openCamera();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                return true;
+            }
+        });
+
+        ngc_camera_next_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                {
+                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                            GoogleMaterial.Icon.gmd_rotate_right).backgroundColor(Color.TRANSPARENT).color(
+                            getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                    ngc_camera_next_button.setImageDrawable(d2a);
+                }
+                else
+                {
+                    Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                            GoogleMaterial.Icon.gmd_rotate_right).backgroundColor(Color.TRANSPARENT).color(
+                            getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                    ngc_camera_next_button.setImageDrawable(d2a);
+
+                    try
+                    {
+                        // toggle to next ngc peer with incoming video
+                        if (ngc_incoming_video_peer_toggle_current_index < 1000)
+                        {
+                            ngc_incoming_video_peer_toggle_current_index++;
+                        }
+                        else
+                        {
+                            ngc_incoming_video_peer_toggle_current_index = 0;
+                        }
+                        ngc_video_showing_video_from_peer_pubkey = ngc_get_index_video_incoming_peer_list(ngc_incoming_video_peer_toggle_current_index);
+                        ngc_video_frame_last_incoming_ts = System.currentTimeMillis();
                     }
                     catch (Exception e)
                     {
@@ -872,6 +936,17 @@ public class GroupMessageListActivity extends AppCompatActivity
         closeCamera();
         MainActivity.group_message_list_fragment = null;
         MainActivity.group_message_list_activity = null;
+        ngc_video_packet_last_incoming_ts = -1;
+        NGC_Group_video_check_incoming_thread_running = false;
+        try
+        {
+            NGC_Group_video_check_incoming_thread.interrupt();
+        }
+        catch(Exception e)
+        {
+        }
+        ngc_purge_video_incoming_peer_list();
+        ngc_incoming_video_peer_toggle_current_index = 0;
         // Log.i(TAG, "onPause:001:conf_id=" + conf_id);
         group_id = "-1";
         // Log.i(TAG, "onPause:002:conf_id=" + conf_id);
@@ -894,6 +969,9 @@ public class GroupMessageListActivity extends AppCompatActivity
         super.onResume();
         stop_group_video(this);
         closeCamera();
+        ngc_video_packet_last_incoming_ts = -1;
+        ngc_incoming_video_peer_toggle_current_index = 0;
+        ngc_purge_video_incoming_peer_list();
 
         // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
@@ -907,6 +985,59 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         MainActivity.group_message_list_activity = this;
         wakeup_tox_thread();
+        NGC_Group_video_check_incoming_thread = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                Log.i(TAG, "NGC_Group_video_check_incoming_thread:starting ...");
+                Log.i(TAG, "NGC_Group_video_check_incoming_thread_running:true:003");
+                while (NGC_Group_video_check_incoming_thread_running)
+                {
+                    try
+                    {
+                        Log.i(TAG, "NGC_Group_video_check_incoming_thread:running --=>");
+                        ngc_update_video_incoming_peer_list_ts();
+                        if ((ngc_video_packet_last_incoming_ts + (2 * 1000)) < System.currentTimeMillis())
+                        {
+                            if (sending_video_to_group)
+                            {
+                            }
+                            else
+                            {
+                                ngc_set_video_call_icon(NGC_VIDEO_ICON_STATE_INACTIVE);
+                            }
+                        }
+                        else
+                        {
+                            if (sending_video_to_group)
+                            {
+                            }
+                            else
+                            {
+                                ngc_set_video_call_icon(NGC_VIDEO_ICON_STATE_INCOMING);
+                            }
+                        }
+
+                        try
+                        {
+                            Thread.sleep(2000);
+                        }
+                        catch(Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                Log.i(TAG, "NGC_Group_video_check_incoming_thread:finished");
+            }
+        };
+        NGC_Group_video_check_incoming_thread_running = true;
+        NGC_Group_video_check_incoming_thread.start();
     }
 
     private void setUpEmojiPopup()
@@ -1848,8 +1979,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                     int ypixelStride = image.getPlanes()[0].getPixelStride();
                     int upixelStride = image.getPlanes()[1].getPixelStride();
                     int vpixelStride = image.getPlanes()[2].getPixelStride();
-                    Log.i(TAG, "yRowStride="+ yRowStride +  " uRowStride=" + uRowStride + " vRowStride=" + vRowStride +
-                               " ypixelStride=" + ypixelStride + " upixelStride=" + upixelStride + " vpixelStride=" + vpixelStride);
+                    //Log.i(TAG, "yRowStride="+ yRowStride +  " uRowStride=" + uRowStride + " vRowStride=" + vRowStride +
+                    //           " ypixelStride=" + ypixelStride + " upixelStride=" + upixelStride + " vpixelStride=" + vpixelStride);
 
                     ByteBuffer y_buffer = image.getPlanes()[0].getBuffer();
                     final int y_size_in_bytes = y_buffer.remaining();
@@ -1876,8 +2007,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                     }
 
                     // Process the captured YUV frame data
-                    Log.i(TAG, "IIIIIIIIII:camera_image:bytes=" + y_size_in_bytes + " " + u_size_in_bytes + " " +
-                               v_size_in_bytes);
+                    //Log.i(TAG, "IIIIIIIIII:camera_image:bytes=" + y_size_in_bytes + " " + u_size_in_bytes + " " +
+                    //           v_size_in_bytes);
 
                     //ByteBuffer yuv_frame_data_buf = ByteBuffer.allocateDirect(y_size_in_bytes + u_size_in_bytes + v_size_in_bytes);
                     //yuv_frame_data_buf.rewind();
@@ -2031,10 +2162,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         Log.i(TAG,"NGC_Group_video_play_thread_running:false:001");
         ngc_video_view_container.setVisibility(View.GONE);
         sending_video_to_group = false;
-        final Drawable d3 = new IconicsDrawable(c).icon(FontAwesome.Icon.faw_video).color(
-                c.getResources().getColor(R.color.icon_colors)).sizeDp(80);
-        ml_video_icon.setPadding((int)dp2px(7), (int)dp2px(7), (int)dp2px(7), (int)dp2px(7));
-        ml_video_icon.setImageDrawable(d3);
+        ngc_set_video_call_icon(NGC_VIDEO_ICON_STATE_INACTIVE);
     }
 
     public static void show_ngc_incoming_video_frame(final long group_number,
@@ -2042,11 +2170,18 @@ public class GroupMessageListActivity extends AppCompatActivity
                                                      final byte[] yuv_frame_and_header,
                                                      long length)
     {
+        if (MainActivity.group_message_list_activity == null)
+        {
+            return;
+        }
+        ngc_video_packet_last_incoming_ts = System.currentTimeMillis();
+
         if ((ngc_video_frame_image != null) && (!ngc_video_frame_image.isRecycled()))
         {
             if (sending_video_to_group == true)
             {
                 final String ngc_incoming_video_from_peer = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+                ngc_update_video_incoming_peer_list(ngc_incoming_video_from_peer);
                 if (ngc_video_showing_video_from_peer_pubkey.equals("-1"))
                 {
                     ngc_video_showing_video_from_peer_pubkey = ngc_incoming_video_from_peer;
@@ -2150,11 +2285,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         NGC_Group_video_play_thread_running = false;
         Log.i(TAG,"NGC_Group_video_play_thread_running:false:002");
         ngc_video_view_container.setVisibility(View.VISIBLE);
-        final Drawable d3 = new IconicsDrawable(c).icon(FontAwesome.Icon.faw_video).color(
-                c.getResources().getColor(R.color.md_light_green_A700)).sizeDp(80);
-        ml_video_icon.setImageDrawable(d3);
-        ml_video_icon.setPadding((int)dp2px(0), (int)dp2px(0), (int)dp2px(0), (int)dp2px(0));
         sending_video_to_group = true;
+        ngc_set_video_call_icon(NGC_VIDEO_ICON_STATE_ACTIVE);
 
         NGC_Group_video_play_thread = new Thread()
         {
@@ -2306,6 +2438,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
         else
         {
+            ngc_incoming_video_peer_toggle_current_index = 0;
             openCamera();
             start_group_video(view.getContext());
         }
