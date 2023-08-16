@@ -1038,7 +1038,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     peer_name_txt = "Unknown";
                                 }
                             }
-                            ngc_set_video_info_text("#:" + lookup_ngc_incoming_video_peer_list.size()
+                            ngc_set_video_info_text("streams:" + lookup_ngc_incoming_video_peer_list.size()
                                                     + "\n" + peer_name_txt);
                         }
 
