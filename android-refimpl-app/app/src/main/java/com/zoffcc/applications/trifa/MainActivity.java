@@ -7076,7 +7076,7 @@ public class MainActivity extends AppCompatActivity
         invite_data_buf_wrapped.put(invite_data, 0, (int) invite_data_length);
         invite_data_buf_wrapped.rewind();
         long new_group_num = tox_group_invite_accept(friend_number, invite_data_buf_wrapped, invite_data_length,
-                                                     "name " + getRandomString(4), null);
+                                                     RandomNameGenerator.getFullName(new Random()), null);
 
         Log.i(TAG, "group_invite_cb:fn=" + friend_number + " got invited to group num=" + new_group_num);
         update_savedata_file_wrapper();
