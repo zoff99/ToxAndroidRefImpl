@@ -499,9 +499,9 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_push_server_ntfy = false;
     static boolean PREF__messageview_paging = true;
     static int PREF__message_paging_num_msgs_per_page = 50;
-    static int PREF__ngc_video_bitrate = 500; // ~500 kbits/s -> ~50 kbytes/s
+    static int PREF__ngc_video_bitrate = 600; // ~500 kbits/s -> ~50 kbytes/s
     static int PREF__ngc_video_frame_delta_ms = 100; // 100 ms -> 10 fps
-    static int PREF__ngc_video_max_quantizer = 46; // 47 -> default, 51 -> lowest quality, 30 -> very high quality and lots of bandwidth!
+    static int PREF__ngc_video_max_quantizer = 44; // 47 -> default, 51 -> lowest quality, 30 -> very high quality and lots of bandwidth!
 
     static String versionName = "";
     static int versionCode = -1;
