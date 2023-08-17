@@ -499,7 +499,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_push_server_ntfy = false;
     static boolean PREF__messageview_paging = true;
     static int PREF__message_paging_num_msgs_per_page = 50;
-    static int PREF__ngc_video_bitrate = 600; // ~500 kbits/s -> ~50 kbytes/s
+    static int PREF__ngc_video_bitrate = 650; // ~650 kbits/s -> ~65 kbytes/s
     static int PREF__ngc_video_frame_delta_ms = 100; // 100 ms -> 10 fps
     static int PREF__ngc_video_max_quantizer = 44; // 47 -> default, 51 -> lowest quality, 30 -> very high quality and lots of bandwidth!
 
@@ -5948,7 +5948,7 @@ public class MainActivity extends AppCompatActivity
                                                                        file_id_buffer.arrayOffset(),
                                                                        file_id_buffer.limit()).toUpperCase();
             final String saved_hash_hex = get_friend_avatar_saved_hash_hex(HelperFriend.tox_friend_get_public_key__wrapper(friend_number));
-            Log.i(TAG, "file_recv:TOX_FILE_KIND_AVATAR:incoming hash:" + file_id_buffer_hex + " saved hash:" + saved_hash_hex);
+            // Log.i(TAG, "file_recv:TOX_FILE_KIND_AVATAR:incoming hash:" + file_id_buffer_hex + " saved hash:" + saved_hash_hex);
 
             if ((file_id_buffer_hex != null) && (saved_hash_hex != null) && (saved_hash_hex.equals(file_id_buffer_hex)))
             {
@@ -7251,7 +7251,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_group_connection_status_cb_method(long group_number, int a_TOX_GROUP_CONNECTION_STATUS)
     {
-        Log.i(TAG, "group_connection_status_cb:group_number=" + group_number + " status=" + a_TOX_GROUP_CONNECTION_STATUS);
+        // Log.i(TAG, "group_connection_status_cb:group_number=" + group_number + " status=" + a_TOX_GROUP_CONNECTION_STATUS);
 
         update_group_in_friendlist(group_number);
 
@@ -7448,17 +7448,17 @@ public class MainActivity extends AppCompatActivity
                 final int header_syncmsg = 6 + 1 + 1 + 4 + 32 + 4 + 25;
                 if (length >= (header_syncmsg + 1))
                 {
-                    Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncmsg");
+                    // Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncmsg");
                     handle_incoming_sync_group_message(group_number, peer_id, data, length);
                 }
             }
             else if ((data[6] == (byte)0x1) && (data[7] == (byte)0x3))
             {
-                Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncfile:xxxxxxx");
+                // Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncfile:xxxxxxx");
                 final int header_syncfile = 6 + 1 + 1 + 32 + 32 + 4 + 25 + 255;
                 if (length >= (header_syncfile + 1))
                 {
-                    Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncfile");
+                    // Log.i(TAG, "group_custom_private_packet_cb: got ngch_syncfile");
                     handle_incoming_sync_group_file(group_number, peer_id, data, length);
                 }
             }
