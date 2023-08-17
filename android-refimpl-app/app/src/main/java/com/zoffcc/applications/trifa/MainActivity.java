@@ -7350,6 +7350,7 @@ public class MainActivity extends AppCompatActivity
             if ((data[0] == (byte) 0x66) && (data[1] == (byte) 0x77) && (data[2] == (byte) 0x88) &&
                 (data[3] == (byte) 0x11) && (data[4] == (byte) 0x34) && (data[5] == (byte) 0x35))
             {
+                // byte 640 and 480. LOL
                 if ((data[6] == (byte) 0x01) && (data[7] == (byte) 0x21)
                     && (data[8] == (byte) 480) && (data[9] == (byte) 640) && (data[10] == (byte) 1))
                 {

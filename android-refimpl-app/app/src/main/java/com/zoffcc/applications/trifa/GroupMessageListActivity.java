@@ -2399,8 +2399,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 //
                                 data_buf.put((byte) 0x21);
                                 //
-                                data_buf.put((byte) w); // width: always 480
-                                data_buf.put((byte) h); // height: always 640
+                                data_buf.put((byte) w); // width: always 480 --> LOL
+                                data_buf.put((byte) h); // height: always 640 --> LOL
                                 data_buf.put((byte) 1); // codec: always 1  (1 -> H264)
                                 //
                                 data_buf.put(encoded_vframe, 0, encoded_bytes); // put encoded video frame into buffer
