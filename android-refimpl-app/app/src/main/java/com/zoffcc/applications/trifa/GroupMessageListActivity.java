@@ -170,8 +170,10 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MS
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.ToxVars.GC_MAX_SAVED_PEERS;
+import static com.zoffcc.applications.trifa.ToxVars.MAX_GC_PACKET_CHUNK_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_FILESIZE;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_NGC_VIDEO_AND_HEADER_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
@@ -1004,7 +1006,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                     try
                     {
-                        Log.i(TAG, "NGC_Group_video_check_incoming_thread:running --=>");
+                        // Log.i(TAG, "NGC_Group_video_check_incoming_thread:running --=>");
                         ngc_update_video_incoming_peer_list_ts();
                         if ((ngc_video_packet_last_incoming_ts + (2 * 1000)) < System.currentTimeMillis())
                         {
@@ -1038,8 +1040,15 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     peer_name_txt = "Unknown";
                                 }
                             }
-                            ngc_set_video_info_text("streams:" + lookup_ngc_incoming_video_peer_list.size()
-                                                    + "\n" + peer_name_txt);
+                            if (lookup_ngc_incoming_video_peer_list.isEmpty())
+                            {
+                                ngc_set_video_info_text("streams:0");
+                            }
+                            else
+                            {
+                                ngc_set_video_info_text("streams:" + lookup_ngc_incoming_video_peer_list.size() + "\n" +
+                                                        peer_name_txt);
+                            }
                         }
 
                         try
@@ -1248,7 +1257,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {
                     long message_id = tox_group_send_message(tox_group_by_groupid__wrapper(group_id), 0, msg);
-                    Log.i(TAG, "tox_group_send_message:result=" + message_id + " m=" + m);
+                    // Log.i(TAG, "tox_group_send_message:result=" + message_id + " m=" + m);
                     if (PREF__X_battery_saving_mode)
                     {
                         Log.i(TAG, "global_last_activity_for_battery_savings_ts:001:*PING*");
@@ -2246,10 +2255,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                         System.arraycopy(yuv_frame_and_header, 11, yuv_frame, 0, yuv_bytes);
                         //
                         ystride = toxav_ngc_video_decode(yuv_frame, yuv_bytes, w2, h2, y_buf2, u_buf2, v_buf2);
-                        if (ystride != -1)
-                        {
-                            Log.i(TAG, "toxav_ngc_video_decode:ystride=" + ystride);
-                        }
+                        //if (ystride != -1)
+                        //{
+                        //    Log.i(TAG, "toxav_ngc_video_decode:ystride=" + ystride);
+                        //}
                     }
                     catch(Exception e)
                     {
@@ -2354,7 +2363,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     Log.i(TAG,"NGC_Group_video_play_thread_running:true:003");
                     while (NGC_Group_video_play_thread_running)
                     {
-                        Log.i(TAG, "NGC_Group_video_play_thread:running --=>");
+                        // Log.i(TAG, "NGC_Group_video_play_thread:running --=>");
                         final int w = 480; // 240;
                         final int h = 640; // 320;
                         final int video_enc_bitrate = PREF__ngc_video_bitrate;
@@ -2373,7 +2382,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                                                    encoded_vframe);
                         // Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes);
 
-                        if ((encoded_bytes < 1)||(encoded_bytes > 37000))
+                        if ((encoded_bytes < 1)||(encoded_bytes > TOX_MAX_NGC_VIDEO_AND_HEADER_SIZE))
                         {
                             // some error with encoding
                         }
@@ -2408,9 +2417,18 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 byte[] data = new byte[data_length];
                                 data_buf.rewind();
                                 data_buf.get(data);
-                                int result = tox_group_send_custom_packet(tox_group_by_groupid__wrapper(group_id), 1,
-                                                                          data, data_length);
-                                Log.i(TAG, "toxav_ngc_video_encode:tox_group_send_custom_packet:result=" + result);
+                                if (data_length < MAX_GC_PACKET_CHUNK_SIZE) // HINT: mabye use MAX_GC_PACKET_CHUNK_SIZE ?
+                                {
+                                    int result = tox_group_send_custom_packet(tox_group_by_groupid__wrapper(group_id), 0,
+                                                                              data, data_length);
+                                    // Log.i(TAG, "toxav_ngc_video_encode:ls:tox_group_send_custom_packet:result=" + result + " bytes=" + encoded_bytes);
+                                }
+                                else
+                                {
+                                    int result = tox_group_send_custom_packet(tox_group_by_groupid__wrapper(group_id), 1,
+                                                                              data, data_length);
+                                    // Log.i(TAG, "toxav_ngc_video_encode:LL:tox_group_send_custom_packet:result=" + result + " bytes=" + encoded_bytes);
+                                }
                             }
                             catch (Exception e)
                             {
