@@ -144,26 +144,26 @@
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_weight="50"
                     android:background="@color/md_always_black_1000"
                     android:orientation="vertical"
-                    android:layout_weight="50"
                     android:visibility="visible">
 
                     <com.zoffcc.applications.trifa.CustomVideoImageView
                         android:id="@+id/ngc_video_own_view"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="60"
+                        android:layout_weight="42"
                         android:background="@color/md_always_black_1000" />
 
                     <TextView
                         android:id="@+id/ngc_camera_info_text"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="35"
-                        android:textColor="@color/textColorPrimary"
+                        android:layout_weight="28"
                         android:background="@android:color/transparent"
-                        android:text=""></TextView>
+                        android:text=""
+                        android:textColor="@color/textColorPrimary" />
 
                     <ImageButton
                         android:id="@+id/ngc_camera_next_button"
@@ -172,17 +172,36 @@
                         android:layout_gravity="center"
                         android:background="@android:color/transparent"
                         android:clickable="true"
+                        android:focusable="true"
                         android:keepScreenOn="true"
                         android:scaleType="fitXY"
-                        android:src="@drawable/circle_blue"
-                        android:focusable="true" />
+                        android:src="@drawable/circle_blue" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="10"
+                        android:layout_weight="8"
                         android:background="@android:color/transparent"
-                        android:text=""></TextView>
+                        android:text="" />
+
+                    <ImageButton
+                        android:id="@+id/ngc_video_quality_toggle_button"
+                        android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+                        android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:keepScreenOn="true"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/circle_orange" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="8"
+                        android:background="@android:color/transparent"
+                        android:text="" />
 
                     <ImageButton
                         android:id="@+id/ngc_camera_toggle_button"
@@ -191,17 +210,17 @@
                         android:layout_gravity="center"
                         android:background="@android:color/transparent"
                         android:clickable="true"
+                        android:focusable="true"
                         android:keepScreenOn="true"
                         android:scaleType="fitXY"
-                        android:src="@drawable/circle_blue"
-                        android:focusable="true" />
+                        android:src="@drawable/circle_blue" />
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
                         android:layout_weight="3"
                         android:background="@android:color/transparent"
-                        android:text=""></TextView>
+                        android:text="" />
 
                 </LinearLayout>
             </LinearLayout>
@@ -232,7 +251,8 @@
                     android:singleLine="true"
                     android:text=""
                     android:textColor="@android:color/primary_text_light"
-                    android:textSize="12sp" />
+                    android:textSize="12sp"
+                    tools:ignore="NestedWeights" />
             </LinearLayout>
 
             <LinearLayout
@@ -268,7 +288,8 @@
                     android:singleLine="false"
                     android:text=""
                     android:textColor="@color/md_black_1000"
-                    android:textSize="19sp" />
+                    android:textSize="19sp"
+                    tools:ignore="NestedWeights" />
 
                 <LinearLayout
                     android:layout_width="50dp"

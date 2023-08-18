@@ -131,7 +131,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_bitrate;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_frame_delta_ms;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__use_camera_x;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_max_quantizer;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
@@ -162,6 +162,10 @@ import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_decode;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_encode;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_NGC_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_NGC_VIDEO_QUANTIZER;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_QUANTIZER;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_NEW_PEERS_TIMEDELTA_IN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
@@ -196,6 +200,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     private static boolean NGC_Group_video_play_thread_running = false;
     static Map<String, Long> lookup_ngc_incoming_video_peer_list = new HashMap<String, Long>();
     static int ngc_incoming_video_peer_toggle_current_index = 0;
+    static int flush_decoder = 0;
     //
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
@@ -204,6 +209,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     static CustomVideoImageView ngc_video_own_view = null;
     ImageButton ngc_camera_toggle_button = null;
     ImageButton ngc_camera_next_button = null;
+    ImageButton ngc_video_quality_toggle_button = null;
     static TextView ngc_camera_info_text = null;
     static final int NGC_FRONT_CAMERA_USED = 1;
     static final int NGC_BACK_CAMERA_USED = 2;
@@ -422,6 +428,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_video_own_view = findViewById(R.id.ngc_video_own_view);
         ngc_camera_toggle_button = (ImageButton) findViewById(R.id.ngc_camera_toggle_button);
         ngc_camera_next_button = (ImageButton) findViewById(R.id.ngc_camera_next_button);
+        ngc_video_quality_toggle_button = (ImageButton) findViewById(R.id.ngc_video_quality_toggle_button);
         ngc_camera_info_text = findViewById(R.id.ngc_camera_info_text);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
 
@@ -447,6 +454,22 @@ public class GroupMessageListActivity extends AppCompatActivity
                     Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
             ngc_camera_toggle_button.setImageDrawable(d6);
             Log.i(TAG, "ngc_active_camera_type(6)=" + ngc_active_camera_type);
+        }
+
+        PREF__ngc_video_bitrate = LOWER_NGC_VIDEO_BITRATE;
+        if (PREF__ngc_video_bitrate == LOWER_NGC_VIDEO_BITRATE)
+        {
+            Drawable d2a = new IconicsDrawable(this).icon(
+                    GoogleMaterial.Icon.gmd_photo_size_select_small).backgroundColor(Color.TRANSPARENT).color(
+                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+            ngc_video_quality_toggle_button.setImageDrawable(d2a);
+        }
+        else
+        {
+            Drawable d2a = new IconicsDrawable(this).icon(
+                    GoogleMaterial.Icon.gmd_hd).backgroundColor(Color.TRANSPARENT).color(
+                    getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+            ngc_video_quality_toggle_button.setImageDrawable(d2a);
         }
 
         ngc_camera_toggle_button.setOnTouchListener(new View.OnTouchListener()
@@ -548,8 +571,73 @@ public class GroupMessageListActivity extends AppCompatActivity
                         {
                             ngc_incoming_video_peer_toggle_current_index = 0;
                         }
+                        flush_decoder = 1;
                         ngc_video_showing_video_from_peer_pubkey = ngc_get_index_video_incoming_peer_list(ngc_incoming_video_peer_toggle_current_index);
                         ngc_video_frame_last_incoming_ts = System.currentTimeMillis();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                return true;
+            }
+        });
+
+        ngc_video_quality_toggle_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                {
+                    if (PREF__ngc_video_bitrate == LOWER_NGC_VIDEO_BITRATE)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_photo_size_select_small).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        ngc_video_quality_toggle_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_hd).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        ngc_video_quality_toggle_button.setImageDrawable(d2a);
+                    }
+                }
+                else
+                {
+                    if (PREF__ngc_video_bitrate == LOWER_NGC_VIDEO_BITRATE)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_hd).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        ngc_video_quality_toggle_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_photo_size_select_small).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        ngc_video_quality_toggle_button.setImageDrawable(d2a);
+                    }
+
+                    try
+                    {
+                        if (PREF__ngc_video_bitrate == LOWER_NGC_VIDEO_BITRATE)
+                        {
+                            PREF__ngc_video_bitrate = HIGHER_NGC_VIDEO_BITRATE;
+                            PREF__ngc_video_max_quantizer = HIGHER_NGC_VIDEO_QUANTIZER;
+                            Log.i(TAG, "PREF__ngc_video_bitrate(8a)=" + PREF__ngc_video_bitrate);
+                        }
+                        else
+                        {
+                            PREF__ngc_video_bitrate = LOWER_NGC_VIDEO_BITRATE;
+                            PREF__ngc_video_max_quantizer = LOWER_NGC_VIDEO_QUANTIZER;
+                            Log.i(TAG, "PREF__ngc_video_bitrate(8b)=" + PREF__ngc_video_bitrate);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -957,6 +1045,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
         ngc_purge_video_incoming_peer_list();
         ngc_incoming_video_peer_toggle_current_index = 0;
+        flush_decoder = 1;
         // Log.i(TAG, "onPause:001:conf_id=" + conf_id);
         group_id = "-1";
         // Log.i(TAG, "onPause:002:conf_id=" + conf_id);
@@ -981,6 +1070,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         closeCamera();
         ngc_video_packet_last_incoming_ts = -1;
         ngc_incoming_video_peer_toggle_current_index = 0;
+        flush_decoder = 1;
         ngc_purge_video_incoming_peer_list();
 
         // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
@@ -2254,11 +2344,12 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         System.arraycopy(yuv_frame_and_header, 11, yuv_frame, 0, yuv_bytes);
                         //
-                        ystride = toxav_ngc_video_decode(yuv_frame, yuv_bytes, w2, h2, y_buf2, u_buf2, v_buf2);
+                        ystride = toxav_ngc_video_decode(yuv_frame, yuv_bytes, w2, h2, y_buf2, u_buf2, v_buf2, flush_decoder);
                         //if (ystride != -1)
                         //{
                         //    Log.i(TAG, "toxav_ngc_video_decode:ystride=" + ystride);
                         //}
+                        flush_decoder = 0;
                     }
                     catch(Exception e)
                     {
@@ -2375,12 +2466,14 @@ public class GroupMessageListActivity extends AppCompatActivity
                         byte[] u_buf = u_buf__;
                         byte[] v_buf = v_buf__;
                         byte[] encoded_vframe = new byte[40000];
-                        int encoded_bytes = toxav_ngc_video_encode(video_enc_bitrate, w,h,
+                        int encoded_bytes = toxav_ngc_video_encode(video_enc_bitrate,
+                                                                   PREF__ngc_video_max_quantizer,
+                                                                   w,h,
                                                                    y_buf, y_bytes,
                                                                    u_buf, u_bytes,
                                                                    v_buf, v_bytes,
                                                                    encoded_vframe);
-                        // Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes);
+                        Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes + " video_enc_bitrate=" + video_enc_bitrate);
 
                         if ((encoded_bytes < 1)||(encoded_bytes > TOX_MAX_NGC_VIDEO_AND_HEADER_SIZE))
                         {
@@ -2491,6 +2584,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         else
         {
             ngc_incoming_video_peer_toggle_current_index = 0;
+            flush_decoder = 1;
             openCamera();
             start_group_video(view.getContext());
         }
