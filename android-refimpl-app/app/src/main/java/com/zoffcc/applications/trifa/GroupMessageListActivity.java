@@ -43,7 +43,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
-import android.os.SystemClock;
 import android.provider.DocumentsContract;
 import android.util.Log;
 import android.util.Size;
@@ -109,9 +108,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
-import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
-import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_bytes;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
@@ -154,10 +151,8 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_savedpeer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
-import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_private_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
-import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_enable_av;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_decode;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_encode;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK;
@@ -252,9 +247,9 @@ public class GroupMessageListActivity extends AppCompatActivity
     static byte[] u_buf__ = new byte[(480/2) * (640/2)];
     static byte[] v_buf__ = new byte[(480/2) * (640/2)];
 
-    private static final int IMAGE_WIDTH = 640;
-    private static final int IMAGE_HEIGHT = 480;
-    private static final int MAX_IMAGES = 1;
+    private static final int CAMERAX_NGC_IMAGE_WIDTH = 640;
+    private static final int CAMERAX_NGC_IMAGE_HEIGHT = 480;
+    private static final int CAMERAX_NGC_CAPTURE_MAX_IMAGES = 2;
     //
 
 
@@ -2019,12 +2014,15 @@ public class GroupMessageListActivity extends AppCompatActivity
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             Size[] outputSizes = map.getOutputSizes(ImageFormat.YUV_420_888);
-            Size selectedSize = chooseOptimalSize(outputSizes, IMAGE_WIDTH, IMAGE_HEIGHT);
-            mImageReader = ImageReader.newInstance(selectedSize.getWidth(), selectedSize.getHeight(), ImageFormat.YUV_420_888, MAX_IMAGES);
+            Size selectedSize = chooseOptimalSize(outputSizes, CAMERAX_NGC_IMAGE_WIDTH, CAMERAX_NGC_IMAGE_HEIGHT);
+            mImageReader = ImageReader.newInstance(selectedSize.getWidth(), selectedSize.getHeight(), ImageFormat.YUV_420_888,
+                                                   CAMERAX_NGC_CAPTURE_MAX_IMAGES);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
             manager.openCamera(cameraId, mStateCallback, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        } catch (Exception e2) {
+            e2.printStackTrace();
         }
     }
 
@@ -2067,6 +2065,8 @@ public class GroupMessageListActivity extends AppCompatActivity
             }, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        } catch (Exception e2) {
+            e2.printStackTrace();
         }
     }
 
@@ -2077,6 +2077,8 @@ public class GroupMessageListActivity extends AppCompatActivity
             mCaptureSession.setRepeatingRequest(captureRequestBuilder.build(), null, mBackgroundHandler);
         } catch (CameraAccessException e) {
             e.printStackTrace();
+        } catch (Exception e2) {
+            e2.printStackTrace();
         }
     }
 
@@ -2473,7 +2475,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                                                    u_buf, u_bytes,
                                                                    v_buf, v_bytes,
                                                                    encoded_vframe);
-                        Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes + " video_enc_bitrate=" + video_enc_bitrate);
+                        // Log.i(TAG, "toxav_ngc_video_encode:bytes=" + encoded_bytes + " video_enc_bitrate=" + video_enc_bitrate);
 
                         if ((encoded_bytes < 1)||(encoded_bytes > TOX_MAX_NGC_VIDEO_AND_HEADER_SIZE))
                         {
