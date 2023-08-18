@@ -7218,7 +7218,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv *env, jobject thiz,
-        jint vbitrate, jint width, jint height,
+        jint vbitrate, jint max_quantizer,
+        jint width, jint height,
         jbyteArray y, jint y_bytes,
         jbyteArray u, jint u_bytes,
         jbyteArray v, jint v_bytes,
@@ -7255,6 +7256,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv
     uint32_t encoded_frame_size_bytes = 0;
     bool res = toxav_ngc_video_encode(tox_av_ngc_coders_global,
                                       vbitrate,
+                                      max_quantizer,
                                       width, height,
                                       (const uint8_t *)y_c, (const uint8_t *)u_c, (const uint8_t *)v_c,
                                       (uint8_t *)enc_c, &encoded_frame_size_bytes);
