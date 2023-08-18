@@ -7158,7 +7158,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
         jint width, jint height,
         jbyteArray y,
         jbyteArray u,
-        jbyteArray v
+        jbyteArray v,
+        jint flush_decoder
         )
 {
 #ifndef HAVE_TOX_NGC
@@ -7196,7 +7197,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
                                       enc_c, encoded_frame_size_bytes,
                                       width, height,
                                       (uint8_t *)y_c, (uint8_t *)u_c, (uint8_t *)v_c,
-                                      &y_stride, &u_stride, &v_stride);
+                                      &y_stride, &u_stride, &v_stride,
+                                      flush_decoder);
 
     (*env)->ReleaseByteArrayElements(env, y, y_c, JNI_COMMIT); /* DO copy back contents */
     (*env)->ReleaseByteArrayElements(env, u, u_c, JNI_COMMIT); /* DO copy back contents */
