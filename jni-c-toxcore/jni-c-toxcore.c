@@ -82,8 +82,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 90
-static const char global_version_string[] = "0.99.90";
+#define VERSION_PATCH 91
+static const char global_version_string[] = "0.99.91";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -7158,7 +7158,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
         jint width, jint height,
         jbyteArray y,
         jbyteArray u,
-        jbyteArray v
+        jbyteArray v,
+        jint flush_decoder
         )
 {
 #ifndef HAVE_TOX_NGC
@@ -7196,7 +7197,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
                                       enc_c, encoded_frame_size_bytes,
                                       width, height,
                                       (uint8_t *)y_c, (uint8_t *)u_c, (uint8_t *)v_c,
-                                      &y_stride, &u_stride, &v_stride);
+                                      &y_stride, &u_stride, &v_stride,
+                                      flush_decoder);
 
     (*env)->ReleaseByteArrayElements(env, y, y_c, JNI_COMMIT); /* DO copy back contents */
     (*env)->ReleaseByteArrayElements(env, u, u_c, JNI_COMMIT); /* DO copy back contents */
@@ -7216,7 +7218,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv *env, jobject thiz,
-        jint vbitrate, jint width, jint height,
+        jint vbitrate, jint max_quantizer,
+        jint width, jint height,
         jbyteArray y, jint y_bytes,
         jbyteArray u, jint u_bytes,
         jbyteArray v, jint v_bytes,
@@ -7253,6 +7256,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv
     uint32_t encoded_frame_size_bytes = 0;
     bool res = toxav_ngc_video_encode(tox_av_ngc_coders_global,
                                       vbitrate,
+                                      max_quantizer,
                                       width, height,
                                       (const uint8_t *)y_c, (const uint8_t *)u_c, (const uint8_t *)v_c,
                                       (uint8_t *)enc_c, &encoded_frame_size_bytes);
