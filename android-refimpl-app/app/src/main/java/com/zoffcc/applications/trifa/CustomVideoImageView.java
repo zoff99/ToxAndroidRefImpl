@@ -179,22 +179,22 @@ public class CustomVideoImageView extends androidx.appcompat.widget.AppCompatIma
 
                             if (device_orientation == 90)
                             {
-                                Log.i(TAG, "rot_dev:270");
+                                // Log.i(TAG, "rot_dev:270");
                                 rot_needed = 270;
                             }
                             else if (device_orientation == 270)
                             {
-                                Log.i(TAG, "rot_dev:90");
+                                // Log.i(TAG, "rot_dev:90");
                                 rot_needed = 90;
                             }
                             else if (device_orientation == 180)
                             {
-                                Log.i(TAG, "rot_dev:180");
+                                // Log.i(TAG, "rot_dev:180");
                                 rot_needed = 180;
                             }
                             else
                             {
-                                Log.i(TAG, "rot_dev:0");
+                                // Log.i(TAG, "rot_dev:0");
                                 rot_needed = 0;
                             }
 
@@ -205,7 +205,7 @@ public class CustomVideoImageView extends androidx.appcompat.widget.AppCompatIma
 
                             if ((rot_needed == 0) || (rot_needed == 180))
                             {
-                                Log.i(TAG, "scale:1=1.0 " + img_w + " " + img_h + " " + mViewHeight + " " + mViewWidth);
+                                // Log.i(TAG, "scale:1=1.0 " + img_w + " " + img_h + " " + mViewHeight + " " + mViewWidth);
                                 this.setScaleX(1.0f);
                                 this.setScaleY(1.0f);
                             }
