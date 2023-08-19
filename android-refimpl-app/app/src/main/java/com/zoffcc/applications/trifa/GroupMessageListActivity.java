@@ -2251,6 +2251,26 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        try
+        {
+            flush_output_image();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private void flush_output_image()
+    {
+        try
+        {
+            ngc_video_view.setBitmap(null);
+        }
+        catch(Exception e)
+        {
+        }
     }
 
     @SuppressLint("RestrictedApi")
