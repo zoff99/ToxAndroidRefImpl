@@ -168,6 +168,7 @@ public class GroupInfoActivity extends AppCompatActivity
                 {
                     tox_group_reconnect(group_num_);
                     group_update_connected_status_on_groupinfo(group_num_);
+                    update_savedata_file_wrapper();
                 }
                 catch (Exception e)
                 {
@@ -222,6 +223,7 @@ public class GroupInfoActivity extends AppCompatActivity
                 {
                     int res = tox_group_self_set_name(tox_group_by_groupid__wrapper(group_id),
                                                       my_new_name);
+                    update_savedata_file_wrapper();
                     if (res == 1)
                     {
                         update_savedata_file_wrapper(); // after changing conference title

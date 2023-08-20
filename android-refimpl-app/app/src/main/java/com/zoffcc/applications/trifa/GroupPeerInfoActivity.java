@@ -44,6 +44,7 @@ import androidx.appcompat.widget.Toolbar;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
@@ -149,6 +150,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                                                         get_group_peernum_from_peer_pubkey(group_id, peer_pubkey),
                                                         new_role);
                     Log.i(TAG, "setting new role to: " + new_role + " result=" + result);
+                    update_savedata_file_wrapper();
 
                     if (result == 1)
                     {
@@ -174,7 +176,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                     int result = tox_group_mod_kick_peer(group_num,
                                                          get_group_peernum_from_peer_pubkey(group_id, peer_pubkey));
                     Log.i(TAG, "kicking peer. result=" + result);
-
+                    update_savedata_file_wrapper();
                     if (result == 1)
                     {
                         update_group_peer_in_db(group_num, group_id,

@@ -7068,6 +7068,7 @@ public class MainActivity extends AppCompatActivity
         add_system_message_to_group_chat(group_identifier, "privacy state changed to: " +
                                                            ToxVars.TOX_GROUP_PRIVACY_STATE.value_str(
                                                                    a_TOX_GROUP_PRIVACY_STATE));
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_group_invite_cb_method(long friend_number, final byte[] invite_data, final long invite_data_length, String group_name)
@@ -7132,6 +7133,7 @@ public class MainActivity extends AppCompatActivity
         {
             send_ngch_request(temp_group_identifier, tox_group_peer_get_public_key__wrapper(group_number, peer_id));
         }
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a_Tox_Group_Exit_Type)
@@ -7145,6 +7147,7 @@ public class MainActivity extends AppCompatActivity
         add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " left the group: " +
                                                                 ToxVars.Tox_Group_Exit_Type.value_str(
                                                                         a_Tox_Group_Exit_Type));
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_group_peer_name_cb_method(long group_number, long peer_id)
@@ -7167,12 +7170,14 @@ public class MainActivity extends AppCompatActivity
         update_group_peer_in_db(group_number, temp_group_identifier, peer_id, group_peer_pubkey, peer_role);
         update_group_in_groupmessagelist(temp_group_identifier);
         add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " changed name");
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_group_join_fail_cb_method(long group_number, int a_Tox_Group_Join_Fail)
     {
         Log.i(TAG, "group_join_fail_cb:group_number=" + group_number + " fail=" + a_Tox_Group_Join_Fail);
         final String group_identifier = tox_group_by_groupnum__wrapper(group_number);
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_group_self_join_cb_method(long group_number)
@@ -7244,6 +7249,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             update_group_in_groupmessagelist(group_identifier);
+            update_savedata_file_wrapper();
         }
         catch(Exception e)
         {
@@ -7271,6 +7277,7 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_group_topic_cb_method(long group_number, long peer_id, String topic, long topic_length)
@@ -7284,6 +7291,7 @@ public class MainActivity extends AppCompatActivity
         update_group_in_db_topic(group_identifier, topic);
         update_group_in_friendlist(group_identifier);
         update_group_in_groupmessagelist(group_identifier);
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_group_custom_packet_cb_method(long group_number, long peer_id, final byte[] data, long length)
@@ -7603,7 +7611,7 @@ public class MainActivity extends AppCompatActivity
                             RandomNameGenerator.getFullName(new Random()));
 
                     Log.i(TAG, "create_group:new groupnum:=" + new_group_num);
-
+                    update_savedata_file_wrapper();
                     if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
                     {
                         ByteBuffer groupid_buf = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);
@@ -7671,7 +7679,7 @@ public class MainActivity extends AppCompatActivity
                     long new_group_num = tox_group_new(
                             ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value, group_name,
                             RandomNameGenerator.getFullName(new Random()));
-
+                    update_savedata_file_wrapper();
                     Log.i(TAG, "create_group:new groupnum:=" + new_group_num);
 
                     if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))

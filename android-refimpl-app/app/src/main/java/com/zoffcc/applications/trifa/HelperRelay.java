@@ -28,6 +28,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online_real;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_push_server_ntfy;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
@@ -259,6 +260,7 @@ public class HelperRelay
                         final long group_num = tox_group_by_groupid__wrapper(conf.group_identifier);
                         int res = tox_group_invite_friend(group_num,
                                                           tox_friend_by_public_key__wrapper(relay_public_key_string));
+                        update_savedata_file_wrapper();
                     }
                 }
             }
@@ -271,8 +273,10 @@ public class HelperRelay
 
     static int invite_to_group_own_relay(long group_num)
     {
-        return tox_group_invite_friend(group_num,
+        int res = tox_group_invite_friend(group_num,
                                        tox_friend_by_public_key__wrapper(HelperRelay.get_own_relay_pubkey()));
+        update_savedata_file_wrapper();
+        return res;
     }
 
     static boolean is_any_relay(String friend_pubkey)

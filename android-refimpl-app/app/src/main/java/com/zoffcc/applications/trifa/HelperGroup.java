@@ -60,6 +60,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.io_file_copy;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.android_tox_callback_conference_title_cb_method;
@@ -1426,7 +1427,7 @@ public class HelperGroup
                                                              RandomNameGenerator.getFullName(new Random()), null);
 
             Log.i(TAG, "join_group:new groupnum:=" + new_group_num);
-
+            update_savedata_file_wrapper();
             if ((new_group_num >= 0) && (new_group_num < UINT32_MAX_JAVA))
             {
                 ByteBuffer groupid_buf = ByteBuffer.allocateDirect(GROUP_ID_LENGTH * 2);

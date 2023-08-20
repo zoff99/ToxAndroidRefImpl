@@ -109,6 +109,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstrin
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_active;
@@ -2657,6 +2658,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                         Log.d(TAG,
                                               "onActivityResult:info:tox_group_invite_friend:ERR:" + res_conf_invite);
                                     }
+                                    update_savedata_file_wrapper();
                                 }
                             }
                         }
