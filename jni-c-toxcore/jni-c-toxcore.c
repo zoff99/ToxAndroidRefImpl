@@ -435,7 +435,7 @@ void Pipe_dump(void *_buf);
 // functions -----------
 // functions -----------
 
-/*
+#ifdef ANDROID_MEDIACODEC_LOGGING
 #include <android/log.h>
 static void ff_log_callback(void *ptr, int level, const char *fmt, va_list vl)
 {
@@ -461,7 +461,7 @@ static void ff_log_callback(void *ptr, int level, const char *fmt, va_list vl)
         break;
     }
 }
-*/
+#endif
 
 void dbg(int level, const char *fmt, ...)
 {
@@ -1077,8 +1077,10 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
     {
     }
 
-//    av_log_set_level(AV_LOG_TRACE);
-//    av_log_set_callback(ff_log_callback);
+#ifdef ANDROID_MEDIACODEC_LOGGING
+    av_log_set_level(AV_LOG_TRACE);
+    av_log_set_callback(ff_log_callback);
+#endif
 
 #endif
     // dbg(0,"++ Found JVM ++");
