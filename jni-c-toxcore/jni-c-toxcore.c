@@ -435,9 +435,33 @@ void Pipe_dump(void *_buf);
 // functions -----------
 // functions -----------
 
+#ifdef ANDROID_MEDIACODEC_LOGGING
+#include <android/log.h>
+static void ff_log_callback(void *ptr, int level, const char *fmt, va_list vl)
+{
 
-
-
+    switch (level) {
+    case AV_LOG_DEBUG:
+        __android_log_vprint(ANDROID_LOG_DEBUG, "FFMPEG", fmt, vl);
+        break;
+    case AV_LOG_VERBOSE:
+        __android_log_vprint(ANDROID_LOG_VERBOSE, "FFMPEG", fmt, vl);
+        break;
+    case AV_LOG_INFO:
+        __android_log_vprint(ANDROID_LOG_INFO, "FFMPEG", fmt, vl);
+        break;
+    case AV_LOG_WARNING:
+        __android_log_vprint(ANDROID_LOG_WARN, "FFMPEG", fmt, vl);
+        break;
+    case AV_LOG_ERROR:
+        __android_log_vprint(ANDROID_LOG_ERROR, "FFMPEG", fmt, vl);
+        break;
+    default:
+        __android_log_vprint(ANDROID_LOG_DEBUG, "FFMPEG", fmt, vl);
+        break;
+    }
+}
+#endif
 
 void dbg(int level, const char *fmt, ...)
 {
@@ -1052,6 +1076,11 @@ JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
     if(av_jni_set_java_vm(jvm, NULL) != 0)
     {
     }
+
+#ifdef ANDROID_MEDIACODEC_LOGGING
+    av_log_set_level(AV_LOG_TRACE);
+    av_log_set_callback(ff_log_callback);
+#endif
 
 #endif
     // dbg(0,"++ Found JVM ++");
