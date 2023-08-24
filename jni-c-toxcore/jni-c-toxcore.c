@@ -6836,6 +6836,63 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1set_1role(JNIEn
 }
 
 JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peer_1limit(JNIEnv *env, jobject thiz, jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_State_Queries error;
+    uint16_t res = tox_group_get_peer_limit(tox_global, (uint32_t)group_number, &error);
+
+    if (error != TOX_ERR_GROUP_STATE_QUERIES_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1founder_1set_1peer_1limit(JNIEnv *env, jobject thiz, jlong group_number,
+            jint max_peers)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if ((max_peers > UINT16_MAX) || (max_peers < 1))
+    {
+        return (jint)-98;
+    }
+
+    Tox_Err_Group_Founder_Set_Peer_Limit error;
+    bool res = tox_group_founder_set_peer_limit(tox_global, (uint32_t)group_number, (uint16_t)max_peers, &error);
+
+    if (error != TOX_ERR_GROUP_FOUNDER_SET_PEER_LIMIT_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1connection_1status(JNIEnv *env, jobject thiz, jlong group_number,
             jlong peer_id)
 {
