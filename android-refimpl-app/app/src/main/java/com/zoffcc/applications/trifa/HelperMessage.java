@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.nio.ByteBuffer;
@@ -929,6 +930,14 @@ public class HelperMessage
 
                         final AlertDialog alert = builder.create();
                         alert.show();
+                        try
+                        {
+                            TextView textView = (TextView)alert.getWindow().getDecorView().findViewById(android.R.id.message);
+                            textView.setTextIsSelectable(true);
+                        }
+                        catch(Exception e)
+                        {
+                        }
                         // @formatter:on
                     }
                     catch (Exception e)
