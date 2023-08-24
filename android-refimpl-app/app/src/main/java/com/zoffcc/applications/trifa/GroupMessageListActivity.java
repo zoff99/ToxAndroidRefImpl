@@ -150,6 +150,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_savedpeer_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
@@ -839,6 +840,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         long peer_num;
         String peer_pubkey;
         int peer_connection_status;
+        boolean self;
     }
 
     synchronized void set_peer_names_and_avatars()
@@ -856,6 +858,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         final long conference_num = tox_group_by_groupid__wrapper(group_id);
         long num_peers = tox_group_peer_count(conference_num);
+        final long self_peer_id = tox_group_self_get_peer_id(conference_num);
 
         if (num_peers > 0)
         {
@@ -909,6 +912,14 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 ": " + peer_pubkey_temp.substring(0, 6);
 
                         group_list_peer glp = new group_list_peer();
+                        if (peers[(int) i] == self_peer_id)
+                        {
+                            glp.self = true;
+                        }
+                        else
+                        {
+                            glp.self = false;
+                        }
                         glp.peer_pubkey = peer_pubkey_temp;
                         glp.peer_num = i;
                         glp.peer_name = peer_name_temp;
@@ -940,7 +951,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                 for (group_list_peer peerl : group_peers1)
                 {
-                    add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status);
+                    add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status, peerl.self);
                 }
             }
         }
@@ -956,7 +967,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 try
                 {
                     String peer_pubkey_temp = tox_group_savedpeer_get_public_key(conference_num, i);
-                    String peer_name = "offline " + i;
+                    String peer_name = "zzzzzoffline " + i;
                     GroupPeerDB peer_from_db = null;
                     try
                     {
@@ -967,6 +978,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                     }
 
+                    String peerrole = "";
+
                     if (peer_from_db != null)
                     {
                         peer_name = peer_from_db.peer_name;
@@ -975,11 +988,12 @@ public class GroupMessageListActivity extends AppCompatActivity
                         {
                             peer_name = "_NEW_ " + peer_name;
                         }
+                        peerrole = ToxVars.Tox_Group_Role.value_char(peer_from_db.Tox_Group_Role) + " ";
                     }
 
                     // Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
                     //           peer_name);
-                    String peer_name_temp = "" + peer_name + " :" + i + ": " + peer_pubkey_temp.substring(0, 6);
+                    String peer_name_temp =  peerrole + peer_name + " :" + i + ": " + peer_pubkey_temp.substring(0, 6);
 
                     group_list_peer glp3 = new group_list_peer();
                     glp3.peer_pubkey = peer_pubkey_temp;
@@ -1013,7 +1027,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             for (group_list_peer peerloffline : group_peers_offline)
             {
                 add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name,
-                               peerloffline.peer_connection_status);
+                               peerloffline.peer_connection_status, false);
             }
 
         }
@@ -1859,7 +1873,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         // TODO: write me
     }
 
-    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name, int connection_status)
+    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name, int connection_status, boolean self)
     {
         try
         {
@@ -1910,6 +1924,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                                                         return true;
                                                     }
                                                 });
+
+                                        if (self)
+                                        {
+                                            new_item.withTextColor(Color.parseColor("#FF5733"));
+                                        }
                                     }
                                     catch (Exception e)
                                     {
