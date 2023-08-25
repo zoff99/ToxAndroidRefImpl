@@ -31,6 +31,8 @@ import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_founder_set_peer_limit;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peer_limit;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_reconnect;
@@ -46,6 +48,7 @@ public class GroupInfoActivity extends AppCompatActivity
     TextView this_group_id = null;
     EditText this_title = null;
     EditText group_myname_text = null;
+    EditText peer_limit_text = null;
     TextView this_privacy_status_text = null;
     TextView group_connection_status_text = null;
     TextView group_myrole_text = null;
@@ -66,6 +69,7 @@ public class GroupInfoActivity extends AppCompatActivity
         group_mypubkey_text = (TextView) findViewById(R.id.group_mypubkey_text);
         this_title = (EditText) findViewById(R.id.group_name_text);
         group_myname_text = (EditText) findViewById(R.id.group_myname_text);
+        peer_limit_text = (EditText) findViewById(R.id.peer_limit_text);
         this_privacy_status_text = (TextView) findViewById(R.id.group_privacy_status_text);
         group_connection_status_text = (TextView) findViewById(R.id.group_connection_status_text);
         group_myrole_text = (TextView) findViewById(R.id.group_myrole_text);
@@ -97,6 +101,15 @@ public class GroupInfoActivity extends AppCompatActivity
         try
         {
             group_num = tox_group_by_groupid__wrapper(group_id);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            peer_limit_text.setText("" + tox_group_get_peer_limit(group_num));
         }
         catch (Exception e)
         {
@@ -224,10 +237,24 @@ public class GroupInfoActivity extends AppCompatActivity
                     int res = tox_group_self_set_name(tox_group_by_groupid__wrapper(group_id),
                                                       my_new_name);
                     update_savedata_file_wrapper();
-                    if (res == 1)
-                    {
-                        update_savedata_file_wrapper(); // after changing conference title
-                    }
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+
+        try
+        {
+            String new_peer_limit = peer_limit_text.getText().toString();
+            if (new_peer_limit != null)
+            {
+                if (new_peer_limit.length() > 0)
+                {
+
+                    int res = tox_group_founder_set_peer_limit(tox_group_by_groupid__wrapper(group_id),
+                                                      Integer.parseInt(new_peer_limit));
+                    update_savedata_file_wrapper();
                 }
             }
         }

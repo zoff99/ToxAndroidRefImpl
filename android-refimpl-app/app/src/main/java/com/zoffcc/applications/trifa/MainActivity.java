@@ -3343,6 +3343,10 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_group_peer_count(long group_number);
 
+    public static native int tox_group_get_peer_limit(long group_number);
+
+    public static native int tox_group_founder_set_peer_limit(long group_number, int max_peers);
+
     public static native long tox_group_offline_peer_count(long group_number);
 
     public static native long[] tox_group_get_peerlist(long group_number);

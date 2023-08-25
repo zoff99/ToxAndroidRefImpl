@@ -909,7 +909,6 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                                 }
                                 else
                                 {
-                                    update_savedata_file_wrapper();
                                     add_conference_wrapper(friend_num_temp_safety2, res_conf_av_new, "",
                                                            TOX_CONFERENCE_TYPE_AV.value, false);
                                     HelperGeneric.update_savedata_file_wrapper();
