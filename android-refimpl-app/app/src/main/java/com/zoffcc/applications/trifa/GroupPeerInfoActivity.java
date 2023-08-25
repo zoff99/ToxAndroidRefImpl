@@ -98,7 +98,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
         group_peerrole_set_button = findViewById(R.id.group_peerrole_set_button);
         peer_first_join_text = findViewById(R.id.peer_first_join_text);
 
-        this.tox_ngc_group_role_items = new String[]{"---", "TOX_GROUP_ROLE_MODERATOR", "TOX_GROUP_ROLE_USER", "TOX_GROUP_ROLE_OBSERVER"};
+        this.tox_ngc_group_role_items = new String[]{"---", "MODERATOR", "USER", "OBSERVER"};
         ArrayAdapter<CharSequence> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,
                                                                 tox_ngc_group_role_items);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -128,15 +128,15 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                 {
                     String role_str = (String) group_peerrole_select.getSelectedItem();
                     int new_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_USER.value;
-                    if (role_str.equals("TOX_GROUP_ROLE_MODERATOR"))
+                    if (role_str.equals("MODERATOR"))
                     {
                         new_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_MODERATOR.value;
                     }
-                    else if (role_str.equals("TOX_GROUP_ROLE_USER"))
+                    else if (role_str.equals("USER"))
                     {
                         new_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_USER.value;
                     }
-                    else if (role_str.equals("TOX_GROUP_ROLE_OBSERVER"))
+                    else if (role_str.equals("OBSERVER"))
                     {
                         new_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value;
                     }
