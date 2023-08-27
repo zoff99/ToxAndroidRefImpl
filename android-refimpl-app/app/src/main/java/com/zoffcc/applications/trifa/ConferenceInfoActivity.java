@@ -29,7 +29,9 @@ import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_set_title;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class ConferenceInfoActivity extends AppCompatActivity
@@ -38,6 +40,8 @@ public class ConferenceInfoActivity extends AppCompatActivity
     TextView this_conf_id = null;
     EditText this_title = null;
     String conf_id = "-1";
+    TextView conf_num_msgs_text = null;
+    TextView conf_num_system_msgs_text = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -50,6 +54,8 @@ public class ConferenceInfoActivity extends AppCompatActivity
 
         this_conf_id = (TextView) findViewById(R.id.conf_id_text);
         this_title = (EditText) findViewById(R.id.conf_name_text);
+        conf_num_msgs_text = (TextView) findViewById(R.id.conf_num_msgs_text);
+        conf_num_system_msgs_text = (TextView) findViewById(R.id.conf_num_system_msgs_text);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -75,6 +81,69 @@ public class ConferenceInfoActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                String num_str1 = "*ERROR*";
+                String num_str2 = "*ERROR*";
+                try
+                {
+                    num_str1 = "" + orma.selectFromConferenceMessage().
+                            conference_identifierEq(conf_id.toLowerCase()).
+                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).count();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                try
+                {
+                    num_str2 = "" + orma.selectFromConferenceMessage().
+                            conference_identifierEq(conf_id.toLowerCase()).
+                            tox_peerpubkeyEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).count();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                final String num_str_1 = num_str1;
+                final String num_str_2 = num_str2;
+
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            conf_num_msgs_text.setText("Non System Messages: " + num_str_1);
+                            conf_num_system_msgs_text.setText("System Messages: " + num_str_2);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+        };
+        t.start();
     }
 
     @Override

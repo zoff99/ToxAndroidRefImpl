@@ -19,27 +19,40 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
+import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_FILES_EXPORT_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_founder_set_peer_limit;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peer_limit;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_offline_peer_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_reconnect;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_set_name;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class GroupInfoActivity extends AppCompatActivity
@@ -53,7 +66,10 @@ public class GroupInfoActivity extends AppCompatActivity
     TextView group_connection_status_text = null;
     TextView group_myrole_text = null;
     TextView group_mypubkey_text = null;
+    static TextView group_num_msgs_text = null;
+    static TextView group_num_system_msgs_text = null;
     Button group_reconnect_button = null;
+    Button group_del_sysmsgs_button = null;
     String group_id = "-1";
 
     @Override
@@ -73,7 +89,10 @@ public class GroupInfoActivity extends AppCompatActivity
         this_privacy_status_text = (TextView) findViewById(R.id.group_privacy_status_text);
         group_connection_status_text = (TextView) findViewById(R.id.group_connection_status_text);
         group_myrole_text = (TextView) findViewById(R.id.group_myrole_text);
+        group_num_msgs_text = (TextView) findViewById(R.id.group_num_msgs_text);
+        group_num_system_msgs_text = (TextView) findViewById(R.id.group_num_system_msgs_text);
         group_reconnect_button = (Button) findViewById(R.id.group_reconnect_button);
+        group_del_sysmsgs_button = (Button) findViewById(R.id.group_del_sysmsgs_button);
 
         try
         {
@@ -190,6 +209,68 @@ public class GroupInfoActivity extends AppCompatActivity
             }
         });
 
+        group_del_sysmsgs_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                    builder.setTitle("Delete System Messages");
+                    builder.setMessage(
+                            "Do you want to delete ALL system generated messages (like join/leave/exit messages) in this group permanently?");
+
+                    builder.setPositiveButton("Yes, I want to delete them!", new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            try
+                            {
+                                final Thread t2 = new Thread()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            Log.i(TAG, "del_group_system_messages:START:");
+                                            display_toast("starting to delete, please wait ...", true, 0);
+                                            orma.deleteFromGroupMessage().
+                                                    group_identifierEq(group_id).
+                                                    tox_group_peer_pubkeyEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                                                    execute();
+                                            Log.i(TAG, "del_group_system_messages:DONE:");
+                                            display_toast("System Messages deleted", true, 0);
+                                            reload_message_counts(group_id);
+                                        }
+                                        catch (Exception e2)
+                                        {
+                                            e2.printStackTrace();
+                                            Log.i(TAG, "del_group_system_messages:EE:" + e2.getMessage());
+                                        }
+                                    }
+                                };
+                                t2.start();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", null);
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         try
         {
             final int myrole = tox_group_self_get_role(group_num);
@@ -219,6 +300,77 @@ public class GroupInfoActivity extends AppCompatActivity
         catch(Exception ignored)
         {
         }
+    }
+
+    static void reload_message_counts(final String group_id)
+    {
+        try
+        {
+            Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    String num_str1 = "*ERROR*";
+                    String num_str2 = "*ERROR*";
+                    try
+                    {
+                        num_str1 = "" + orma.selectFromGroupMessage().group_identifierEq(group_id).tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).count();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    try
+                    {
+                        num_str2 = "" + orma.selectFromGroupMessage().group_identifierEq(group_id).tox_group_peer_pubkeyEq(
+                                TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).count();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    final String num_str_1 = num_str1;
+                    final String num_str_2 = num_str2;
+
+                    Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                group_num_msgs_text.setText("Non System Messages: " + num_str_1);
+                                group_num_system_msgs_text.setText("System Messages: " + num_str_2);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
+                    if (main_handler_s != null)
+                    {
+                        main_handler_s.post(myRunnable);
+                    }
+                }
+            };
+            t.start();
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void onResume()
+    {
+        super.onResume();
+        reload_message_counts(group_id);
     }
 
     @Override

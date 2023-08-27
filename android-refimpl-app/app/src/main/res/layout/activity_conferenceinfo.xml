@@ -88,6 +88,56 @@
 
             </LinearLayout>
 
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginLeft="20dp"
+                android:layout_weight="0"
+                android:paddingLeft="4dp"
+                android:paddingRight="2dp"
+                android:paddingBottom="15dp"
+                android:text="@string/layout___conf_message_stats"
+                android:textAlignment="textStart"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/conf_num_msgs_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:fontFamily="monospace"
+                android:gravity="center_horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="15dp"
+                android:text="Non System Messages: ..."
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/conf_num_system_msgs_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:layout_marginRight="20dp"
+                android:fontFamily="monospace"
+                android:gravity="center_horizontal"
+                android:paddingTop="12dp"
+                android:paddingBottom="15dp"
+                android:text="System Messages: ..."
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="20dp" />
+
         </LinearLayout>
 
     </ScrollView>

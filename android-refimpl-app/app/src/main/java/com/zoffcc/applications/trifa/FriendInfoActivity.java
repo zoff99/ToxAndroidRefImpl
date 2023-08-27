@@ -55,6 +55,7 @@ import static com.zoffcc.applications.trifa.HelperRelay.remove_friend_relay_in_d
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE_TO_STRING;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -70,10 +71,12 @@ public class FriendInfoActivity extends AppCompatActivity
     TextView fi_relay_pubkey_textview = null;
     TextView fi_toxcapabilities_textview = null;
     TextView fi_relay_text = null;
+    TextView friend_num_msgs_text = null;
     Button remove_friend_relay_button = null;
     TextView fi_pushurl_textview = null;
     TextView fi_pushurl_text = null;
     Button remove_friend_pushurl_button = null;
+    String friend_pubkey = null;
 
     long friendnum = -1;
 
@@ -85,6 +88,7 @@ public class FriendInfoActivity extends AppCompatActivity
 
         Intent intent = getIntent();
         friendnum = intent.getLongExtra("friendnum", -1);
+        friend_pubkey = tox_friend_get_public_key__wrapper(friendnum);
 
         profile_icon = (de.hdodenhof.circleimageview.CircleImageView) findViewById(R.id.fi_profile_icon);
         mytoxid = (TextView) findViewById(R.id.fi_toxprvkey_textview);
@@ -98,6 +102,7 @@ public class FriendInfoActivity extends AppCompatActivity
         fi_pushurl_text = (TextView) findViewById(R.id.fi_pushurl_text);
         remove_friend_pushurl_button = (Button) findViewById(R.id.remove_friend_pushurl_button);
         fi_toxcapabilities_textview = (TextView) findViewById(R.id.fi_toxcapabilities_textview);
+        friend_num_msgs_text = (TextView) findViewById(R.id.friend_num_msgs_text);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -111,7 +116,7 @@ public class FriendInfoActivity extends AppCompatActivity
         try
         {
             alias_text.setText(orma.selectFromFriendList().
-                    tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                    tox_public_key_stringEq(friend_pubkey).
                     toList().get(0).alias_name);
         }
         catch (Exception e)
@@ -124,7 +129,7 @@ public class FriendInfoActivity extends AppCompatActivity
         try
         {
             final FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
-                    tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
+                    friend_pubkey).toList().get(0);
 
             if (f.msgv3_capability == 1)
             {
@@ -136,10 +141,10 @@ public class FriendInfoActivity extends AppCompatActivity
         }
 
         fi_toxcapabilities_textview.setText(TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(
-                get_friend_capabilities_from_pubkey(tox_friend_get_public_key__wrapper(friendnum)))) +
+                get_friend_capabilities_from_pubkey(friend_pubkey))) +
                                             msgv3_single_cap);
 
-        String friend_relay_pubkey = get_relay_for_friend(tox_friend_get_public_key__wrapper(friendnum));
+        String friend_relay_pubkey = get_relay_for_friend(friend_pubkey);
 
         fi_relay_pubkey_textview.setText("");
 
@@ -165,7 +170,7 @@ public class FriendInfoActivity extends AppCompatActivity
                     {
                         try
                         {
-                            remove_friend_relay_in_db(tox_friend_get_public_key__wrapper(friendnum));
+                            remove_friend_relay_in_db(friend_pubkey);
                             remove_friend_relay_button.setVisibility(View.GONE);
                             fi_relay_text.setVisibility(View.GONE);
                             fi_relay_pubkey_textview.setVisibility(View.GONE);
@@ -195,7 +200,7 @@ public class FriendInfoActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        String pushurl_for_friend = get_pushurl_for_friend(tox_friend_get_public_key__wrapper(friendnum));
+        String pushurl_for_friend = get_pushurl_for_friend(friend_pubkey);
 
         fi_pushurl_textview.setText("");
 
@@ -247,7 +252,7 @@ public class FriendInfoActivity extends AppCompatActivity
                     {
                         try
                         {
-                            remove_friend_pushurl_in_db(tox_friend_get_public_key__wrapper(friendnum));
+                            remove_friend_pushurl_in_db(friend_pubkey);
                             remove_friend_pushurl_button.setVisibility(View.GONE);
                             fi_pushurl_text.setVisibility(View.GONE);
                             fi_pushurl_textview.setVisibility(View.GONE);
@@ -340,11 +345,11 @@ public class FriendInfoActivity extends AppCompatActivity
                 // Log.i(TAG, "indenticon:001");
 
                 final FriendList f = orma.selectFromFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        tox_public_key_stringEq(friend_pubkey).
                         toList().get(0);
 
                 create_avatar_identicon_for_pubkey(f.tox_public_key_string);
-                set_friend_avatar_update(tox_friend_get_public_key__wrapper(friendnum), true);
+                set_friend_avatar_update(friend_pubkey, true);
 
                 String fname3 = get_vfs_image_filename_friend_avatar(friendnum);
                 if (fname3 != null)
@@ -362,6 +367,54 @@ public class FriendInfoActivity extends AppCompatActivity
     }
 
     @Override
+    protected void onResume()
+    {
+        super.onResume();
+
+        Thread t = new Thread()
+        {
+            @Override
+            public void run()
+            {
+                String num_str1 = "*ERROR*";
+                try
+                {
+                    num_str1 = "" + orma.selectFromMessage().
+                    tox_friendpubkeyEq(friend_pubkey).count();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+
+                final String num_str_1 = num_str1;
+
+                Runnable myRunnable = new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        try
+                        {
+                            friend_num_msgs_text.setText("Messages: " + num_str_1);
+                        }
+                        catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+                    }
+                };
+
+                if (main_handler_s != null)
+                {
+                    main_handler_s.post(myRunnable);
+                }
+            }
+        };
+        t.start();
+    }
+
+    @Override
     protected void onPause()
     {
         super.onPause();
@@ -375,20 +428,20 @@ public class FriendInfoActivity extends AppCompatActivity
                 if (alias_name.length() > 0)
                 {
                     orma.updateFriendList().
-                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                            tox_public_key_stringEq(friend_pubkey).
                             alias_name(alias_name).execute();
                 }
                 else
                 {
                     orma.updateFriendList().
-                            tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                            tox_public_key_stringEq(friend_pubkey).
                             alias_name("").execute();
                 }
             }
             else
             {
                 orma.updateFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        tox_public_key_stringEq(friend_pubkey).
                         alias_name("").execute();
             }
         }
@@ -402,7 +455,7 @@ public class FriendInfoActivity extends AppCompatActivity
             {
                 e1.printStackTrace();
                 orma.updateFriendList().
-                        tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
+                        tox_public_key_stringEq(friend_pubkey).
                         alias_name("").execute();
             }
         }

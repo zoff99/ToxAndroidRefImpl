@@ -456,6 +456,9 @@
     <string name="layout___group_peerlimit">Peer Limit</string>
     <string name="layout___group_myname2">my Name in the Group:</string>
     <string name="layout___group_mypubjkey2">My Pubkey:</string>
+    <string name="layout___group_message_stats">Messages in Group:</string>
+    <string name="layout___friend_message_stats">Messages:</string>
+    <string name="layout___conf_message_stats">Messages in Conference:</string>
     <string name="layout___group_peerlimit2">Peer Limit:</string>
     <string name="layout___pubkey">Pubkey:</string>
     <string name="layout___capabilities">Capabilities:</string>
@@ -482,6 +485,7 @@
     <string name="layout___export_tox_encrypted_files_unsecure">export encrypted files *unsecure*</string>
     <string name="layout___export_tox_encrypted_chats_unsecure">export encrypted chats *unsecure*</string>
     <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA *UNSECURE*</string>
+    <string name="layout___delete_group_system_msgs">Delete System Messages</string>
     <string name="layout___click_image_to_change_your_avatar">click Image to change your Avatar</string>
     <string name="layout___remove_own_relay">remove own Relay</string>
     <string name="layout___load_network_connections">load network connections</string>
