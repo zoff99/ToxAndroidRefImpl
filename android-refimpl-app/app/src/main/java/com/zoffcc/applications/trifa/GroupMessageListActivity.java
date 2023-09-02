@@ -20,6 +20,8 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +37,7 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
+import android.media.AudioManager;
 import android.media.Image;
 import android.media.ImageReader;
 import android.net.Uri;
@@ -43,6 +46,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
+import android.os.SystemClock;
 import android.provider.DocumentsContract;
 import android.util.Log;
 import android.util.Size;
@@ -75,6 +79,7 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
+import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -84,6 +89,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import androidx.annotation.Px;
 import androidx.annotation.RequiresApi;
@@ -100,6 +107,8 @@ import androidx.renderscript.RenderScript;
 import androidx.renderscript.ScriptIntrinsicYuvToRGB;
 import androidx.renderscript.Type;
 
+import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
+import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
@@ -109,6 +118,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstrin
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
@@ -133,12 +143,16 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_max_qua
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
+import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_read_length;
+import static com.zoffcc.applications.trifa.MainActivity.audio_out_buffer_mult;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
+import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer2;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
@@ -155,6 +169,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_publ
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
+import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_audio_decode;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_decode;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_ngc_video_encode;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK;
@@ -193,11 +208,17 @@ public class GroupMessageListActivity extends AppCompatActivity
     //
     private static Thread NGC_Group_video_check_incoming_thread = null;
     private static boolean NGC_Group_video_check_incoming_thread_running = false;
-    private static Thread NGC_Group_video_play_thread = null;
+    static Thread NGC_Group_video_play_thread = null;
     private static boolean NGC_Group_video_play_thread_running = false;
     static Map<String, Long> lookup_ngc_incoming_video_peer_list = new HashMap<String, Long>();
     static int ngc_incoming_video_peer_toggle_current_index = 0;
     static int flush_decoder = 0;
+    //
+    static GroupGroupAudioService ngc_group_audio_service = null;
+    public static String ngc_channelId = "";
+    static NotificationChannel ngc_notification_channel_group_audio_play_service = null;
+    static NotificationManager ngc_nmn3 = null;
+    static BlockingQueue<byte[]> ngc_audio_in_queue = new LinkedBlockingQueue<byte[]>(3 * 5);
     //
     ImageView ml_icon = null;
     ImageView ml_status_icon = null;
@@ -221,6 +242,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     static String ngc_video_showing_video_from_peer_pubkey = "-1";
     static long ngc_video_frame_last_incoming_ts = -1L;
     static long ngc_video_packet_last_incoming_ts = -1L;
+    static long ngc_audio_packet_last_incoming_ts = -1L;
     static Bitmap ngc_video_frame_image = null;
     static Bitmap ngc_own_video_frame_image = null;
     static Allocation ngc_alloc_in = null;
@@ -430,6 +452,20 @@ public class GroupMessageListActivity extends AppCompatActivity
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
 
         ngc_camera_info_text.setText("");
+
+        ngc_nmn3 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
+        {
+            String channelName = "Tox NGC Group Audio Play";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            ngc_channelId = "trifa_ngc_audio_play";
+            ngc_notification_channel_group_audio_play_service = new NotificationChannel(ngc_channelId, channelName, importance);
+            ngc_notification_channel_group_audio_play_service.setDescription(ngc_channelId);
+            ngc_notification_channel_group_audio_play_service.setSound(null, null);
+            ngc_notification_channel_group_audio_play_service.enableVibration(false);
+            ngc_nmn3.createNotificationChannel(ngc_notification_channel_group_audio_play_service);
+        }
 
         final Drawable d9 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_rotate_right).backgroundColor(
                 Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
@@ -2327,12 +2363,91 @@ public class GroupMessageListActivity extends AppCompatActivity
         Log.i(TAG,"NGC_Group_video_play_thread_running:false:001");
         ngc_video_view_container.setVisibility(View.GONE);
         sending_video_to_group = false;
+
+        // ---- stop audio stuff
+        try
+        {
+            GroupGroupAudioService.stop_me(true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        // ---- stop audio stuff
+
         ngc_set_video_call_icon(NGC_VIDEO_ICON_STATE_INACTIVE);
+    }
+
+    public static void play_ngc_incoming_audio_frame(final long group_number,
+                                                     final long peer_id,
+                                                     final byte[] encoded_audio_and_header,
+                                                     long length)
+    {
+        if (MainActivity.group_message_list_activity == null)
+        {
+            // NGC group activity not open
+            return;
+        }
+
+        final long conference_num = tox_group_by_groupid__wrapper(group_id);
+        if (conference_num != group_number)
+        {
+            // wrong NGC group
+            return;
+        }
+
+        // Log.i(TAG, "play_ngc_incoming_audio_frame:delta=" + (System.currentTimeMillis() - ngc_audio_packet_last_incoming_ts));
+        ngc_audio_packet_last_incoming_ts = System.currentTimeMillis();
+
+        if ((ngc_video_frame_image != null) && (!ngc_video_frame_image.isRecycled()))
+        {
+            if (sending_video_to_group == true)
+            {
+                final String ngc_incoming_audio_from_peer = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+                if (ngc_video_showing_video_from_peer_pubkey.equals("-1"))
+                {
+                    // not showing any video currently
+                    return;
+                }
+                else if (!ngc_video_showing_video_from_peer_pubkey.equalsIgnoreCase(ngc_incoming_audio_from_peer))
+                {
+                    // we are already showing the video of a different peer in the group
+                    return;
+                }
+                // remove header from data (10 bytes)
+                final int pcm_encoded_length = (int) (length - 10);
+                final byte[] pcm_encoded_buf = new byte[pcm_encoded_length];
+                final byte[] pcm_decoded_buf = new byte[20000];
+                final int bytes_in_40ms = 1920;
+                final byte[] pcm_decoded_buf_delta_1 = new byte[bytes_in_40ms * 2];
+                final byte[] pcm_decoded_buf_delta_2 = new byte[bytes_in_40ms * 2];
+                final byte[] pcm_decoded_buf_delta_3 = new byte[bytes_in_40ms * 2];
+                try
+                {
+                    System.arraycopy(encoded_audio_and_header, 10, pcm_encoded_buf, 0, pcm_encoded_length);
+                    //
+                    int decoded_samples = toxav_ngc_audio_decode(pcm_encoded_buf, pcm_encoded_length, pcm_decoded_buf);
+                    // Log.i(TAG, "play_ngc_incoming_audio_frame:toxav_ngc_audio_decode:decoded_samples=" + decoded_samples);
+
+                    // put pcm data into a FIFO
+                    System.arraycopy(pcm_decoded_buf, 0, pcm_decoded_buf_delta_1, 0, (bytes_in_40ms*2));
+                    ngc_audio_in_queue.offer(pcm_decoded_buf_delta_1);
+                    System.arraycopy(pcm_decoded_buf, (bytes_in_40ms*2), pcm_decoded_buf_delta_2, 0, (bytes_in_40ms*2));
+                    ngc_audio_in_queue.offer(pcm_decoded_buf_delta_2);
+                    System.arraycopy(pcm_decoded_buf, ((bytes_in_40ms*2)*2), pcm_decoded_buf_delta_3, 0, (bytes_in_40ms*2));
+                    ngc_audio_in_queue.offer(pcm_decoded_buf_delta_3);
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public static void show_ngc_incoming_video_frame(final long group_number,
                                                      final long peer_id,
-                                                     final byte[] yuv_frame_and_header,
+                                                     final byte[] encoded_video_and_header,
                                                      long length)
     {
         if (MainActivity.group_message_list_activity == null)
@@ -2368,11 +2483,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
 
                 // remove header from data (11 bytes)
-                final int yuv_bytes = (int) (length - 11);
-                if ((yuv_bytes > 0) && (yuv_bytes < 40000))
+                final int yuv_frame_encoded_bytes = (int) (length - 11);
+                if ((yuv_frame_encoded_bytes > 0) && (yuv_frame_encoded_bytes < 40000))
                 {
                     // TODO: make faster and better. this is not optimized.
-                    final byte[] yuv_frame = new byte[yuv_bytes];
+                    final byte[] yuv_frame_encoded_buf = new byte[yuv_frame_encoded_bytes];
                     int w2 = 480 + 32; // 240 + 16; // encoder stride added
                     int h2 = 640; // 320;
                     final int y_bytes2 = w2 * h2;
@@ -2384,9 +2499,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                     int ystride = -1;
                     try
                     {
-                        System.arraycopy(yuv_frame_and_header, 11, yuv_frame, 0, yuv_bytes);
+                        System.arraycopy(encoded_video_and_header, 11, yuv_frame_encoded_buf, 0, yuv_frame_encoded_bytes);
                         //
-                        ystride = toxav_ngc_video_decode(yuv_frame, yuv_bytes, w2, h2, y_buf2, u_buf2, v_buf2, flush_decoder);
+                        ystride = toxav_ngc_video_decode(yuv_frame_encoded_buf, yuv_frame_encoded_bytes,
+                                                         w2, h2, y_buf2, u_buf2, v_buf2, flush_decoder);
                         //if (ystride != -1)
                         //{
                         //    Log.i(TAG, "toxav_ngc_video_decode:ystride=" + ystride);
@@ -2463,6 +2579,30 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_video_view_container.setVisibility(View.VISIBLE);
         sending_video_to_group = true;
         ngc_set_video_call_icon(NGC_VIDEO_ICON_STATE_ACTIVE);
+
+        // init audio stuff ------
+        try
+        {
+            set_calling_audio_mode();
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
+
+        Log.i(TAG, "group_audio_service:start");
+        try
+        {
+            Intent i = new Intent(c, GroupGroupAudioService.class);
+            i.putExtra("group_id", group_id);
+            c.startService(i);
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "group_audio_service:EE01:" + e.getMessage());
+            e.printStackTrace();
+        }
+        // init audio stuff ------
 
         NGC_Group_video_play_thread = new Thread()
         {
@@ -2830,5 +2970,44 @@ public class GroupMessageListActivity extends AppCompatActivity
         catch (Exception ignored)
         {
         }
+    }
+
+    static void init_native_audio_stuff()
+    {
+        final int sampling_rate = 48000;
+        final int channels = 1;
+        final int sample_count = 5760;
+
+        if (Callstate.call_first_audio_frame_received == -1)
+        {
+            Callstate.call_first_audio_frame_received = System.currentTimeMillis();
+            // HINT: PCM_16 needs 2 bytes per sample per channel
+            AudioReceiver.buffer_size = ((int) ((48000 * 2) * 2)) * audio_out_buffer_mult; // TODO: this is really bad
+            AudioReceiver.sleep_millis = (int) (((float) sample_count / (float) sampling_rate) * 1000.0f *
+                                                0.9f); // TODO: this is bad also
+            Log.i(TAG, "init_native_audio_stuff:read:init buffer_size=" + AudioReceiver.buffer_size);
+            Log.i(TAG, "init_native_audio_stuff:read:init sleep_millis=" + AudioReceiver.sleep_millis);
+        }
+
+        if (sampling_rate_ != sampling_rate)
+        {
+            sampling_rate_ = sampling_rate;
+        }
+
+        if (channels_ != channels)
+        {
+            channels_ = channels;
+        }
+
+        if ((NativeAudio.sampling_rate != (int) sampling_rate_) || (NativeAudio.channel_count != channels_))
+        {
+            Log.i(TAG, "init_native_audio_stuff:values_changed");
+            NativeAudio.sampling_rate = (int) sampling_rate_;
+            NativeAudio.channel_count = channels_;
+            Log.i(TAG, "init_native_audio_stuff:NativeAudio restart Engine");
+            // TODO: locking? or something like that
+            NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
+        }
+        NativeAudio.n_cur_buf = 0;
     }
 }

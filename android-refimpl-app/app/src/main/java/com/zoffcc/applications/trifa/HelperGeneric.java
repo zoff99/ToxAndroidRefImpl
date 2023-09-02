@@ -4685,6 +4685,43 @@ public class HelperGeneric
         Log.i(TAG, "start_audio_system:DONE");
     }
 
+    static void stop_ngc_audio_system()
+    {
+        get_caller_method();
+        Log.i(TAG, "stop_ngc_audio_system:enter");
+        synchronized (audio_system_start_stop_lock)
+        {
+            try
+            {
+                if (!AudioRecording.stopped)
+                {
+                    AudioRecording.close();
+                    GroupMessageListActivity.NGC_Group_video_play_thread.join();
+                    GroupMessageListActivity.NGC_Group_video_play_thread = null;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                if (!AudioReceiver.stopped)
+                {
+                    AudioReceiver.close();
+                    GroupMessageListActivity.NGC_Group_video_play_thread.join();
+                    GroupMessageListActivity.NGC_Group_video_play_thread = null;
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        Log.i(TAG, "stop_ngc_audio_system:DONE");
+    }
+
     static void stop_audio_system()
     {
         get_caller_method();

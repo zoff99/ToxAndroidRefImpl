@@ -141,6 +141,8 @@ public class TRIFAGlobals
     final static int HIGHER_NGC_VIDEO_BITRATE = 400;
     final static int LOWER_NGC_VIDEO_BITRATE = 90;
 
+    final static int NGC_AUDIO_BITRATE = 8000;
+
     final static int HIGHER_NGC_VIDEO_QUANTIZER = 38; // higher here means "higer video quality" which is a lower q value!
     final static int LOWER_NGC_VIDEO_QUANTIZER = 51;
 

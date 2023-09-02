@@ -323,6 +323,12 @@
         </service>
 
         <service
+            android:name=".GroupGroupAudioService"
+            android:enabled="true"
+            android:exported="false">
+        </service>
+
+        <service
             android:name=".CallAudioService"
             android:enabled="true"
             android:exported="false">

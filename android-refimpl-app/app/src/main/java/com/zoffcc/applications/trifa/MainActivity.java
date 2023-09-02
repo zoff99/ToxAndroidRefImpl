@@ -136,6 +136,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.update_calling_frien
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.ConfGroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.play_ngc_incoming_audio_frame;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
@@ -215,6 +216,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_BITRATE
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_QUANTIZER;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_GROUP_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_SYNC_DOUBLE_INTERVAL_SECS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
@@ -504,6 +506,9 @@ public class MainActivity extends AppCompatActivity
     static int PREF__ngc_video_bitrate = LOWER_NGC_VIDEO_BITRATE; // ~600 kbits/s -> ~60 kbytes/s
     static int PREF__ngc_video_frame_delta_ms = 120; // 120 ms -> 8.3 fps
     static int PREF__ngc_video_max_quantizer = LOWER_NGC_VIDEO_QUANTIZER; // 47 -> default, 51 -> lowest quality, 30 -> very high quality and lots of bandwidth!
+    static int PREF__ngc_audio_bitrate = NGC_AUDIO_BITRATE;
+    static int PREF__ngc_audio_samplerate = 48000;
+    static int PREF__ngc_audio_channels = 1;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -2061,7 +2066,8 @@ public class MainActivity extends AppCompatActivity
                                  TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
                                          TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))),
                                  PREF__ipv6_enabled_to_int, PREF__force_udp_only_to_int, PREF__ngc_video_bitrate,
-                                 PREF__ngc_video_max_quantizer);
+                                 PREF__ngc_video_max_quantizer,
+                                 PREF__ngc_audio_bitrate, PREF__ngc_audio_samplerate, PREF__ngc_audio_channels);
                         }
 
                         Log.i(TAG, "set_all_conferences_inactive:002");
@@ -2200,7 +2206,8 @@ public class MainActivity extends AppCompatActivity
                      PREF__orbot_enabled_to_int, ORBOT_PROXY_HOST, ORBOT_PROXY_PORT,
                      TrifaSetPatternActivity.bytesToString(TrifaSetPatternActivity.sha256(
                              TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))), PREF__ipv6_enabled_to_int,
-                     PREF__force_udp_only_to_int, PREF__ngc_video_bitrate, PREF__ngc_video_max_quantizer);
+                     PREF__force_udp_only_to_int, PREF__ngc_video_bitrate, PREF__ngc_video_max_quantizer,
+                     PREF__ngc_audio_bitrate, PREF__ngc_audio_samplerate, PREF__ngc_audio_channels);
 
                 Log.i(TAG, "set_all_conferences_inactive:001");
                 HelperConference.set_all_conferences_inactive();
@@ -3069,7 +3076,7 @@ public class MainActivity extends AppCompatActivity
     // -------- native methods --------
     // -------- native methods --------
     // -------- native methods --------
-    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase_hash, int enable_ipv6, int force_udp_only_mode, int ngc_video_bitrate, int max_quantizer);
+    public native void init(@NonNull String data_dir, int udp_enabled, int local_discovery_enabled, int orbot_enabled, String orbot_host, long orbot_port, String tox_encrypt_passphrase_hash, int enable_ipv6, int force_udp_only_mode, int ngc_video_bitrate, int max_quantizer, int ngc_audio_bitrate, int ngc_audio_sampling_rate, int ngc_audio_channel_count);
 
     public native String getNativeLibAPI();
 
@@ -3452,6 +3459,8 @@ public class MainActivity extends AppCompatActivity
     public static native int toxav_ngc_video_encode(int vbitrate, int max_quantizer, int width, int height, byte[] y, int y_bytes, byte[] u, int u_bytes, byte[] v, int v_bytes, byte[] encoded_frame_bytes);
 
     public static native int toxav_ngc_video_decode(byte[] encoded_frame_bytes, int encoded_frame_size_bytes, int width, int height, byte[] y, byte[] u, byte[] v, int flush_decoder);
+
+    public static native int toxav_ngc_audio_decode(byte[] encoded_frame_bytes, int encoded_frame_size_bytes, byte[] pcm_decoded);
     // --------------- new Groups -------------
     // --------------- new Groups -------------
     // --------------- new Groups -------------
@@ -7349,6 +7358,7 @@ public class MainActivity extends AppCompatActivity
                 // Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
             }
         }
+
         if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video + 1)))
         {
             // @formatter:off
@@ -7380,9 +7390,37 @@ public class MainActivity extends AppCompatActivity
                 // Log.i(TAG, "group_custom_packet_cb:wrong signature 1");
             }
         }
-        else
+
+        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video + 1)))
         {
-            Log.i(TAG, "group_custom_packet_cb: no valid packet size received, size:" + length);
+            // @formatter:off
+                /*
+                | what          | Length in bytes| Contents                                           |
+                |------         |--------        |------------------                                  |
+                | magic         |       6        |  0x667788113435                                    |
+                | version       |       1        |  0x01                                              |
+                | pkt id        |       1        |  0x31                                              |
+                | audio channels|       1        |  uint8_t always 1 (for MONO)                       |
+                | sampling freq |       1        |  uint8_t always 48 (for 48kHz)                     |
+                | data          |[1, 1363]       |  *uint8_t  bytes, zero not allowed!                |
+                 */
+            // @formatter:on
+
+            if ((data[0] == (byte) 0x66) && (data[1] == (byte) 0x77) && (data[2] == (byte) 0x88) &&
+                (data[3] == (byte) 0x11) && (data[4] == (byte) 0x34) && (data[5] == (byte) 0x35))
+            {
+                if ((data[6] == (byte) 0x01) && (data[7] == (byte) 0x31)
+                    && (data[8] == (byte) 1) && (data[9] == (byte) 48))
+                {
+                    play_ngc_incoming_audio_frame(group_number, peer_id, data, length);
+                }
+                else
+                {
+                }
+            }
+            else
+            {
+            }
         }
     }
 
