@@ -37,7 +37,6 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
-import android.media.AudioManager;
 import android.media.Image;
 import android.media.ImageReader;
 import android.net.Uri;
@@ -46,7 +45,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
-import android.os.SystemClock;
 import android.provider.DocumentsContract;
 import android.util.Log;
 import android.util.Size;
@@ -143,8 +141,6 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_max_qua
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
-import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2;
-import static com.zoffcc.applications.trifa.MainActivity.audio_buffer_2_read_length;
 import static com.zoffcc.applications.trifa.MainActivity.audio_out_buffer_mult;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
@@ -152,7 +148,6 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
-import static com.zoffcc.applications.trifa.MainActivity.set_JNI_audio_buffer2;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
@@ -213,6 +208,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     static Map<String, Long> lookup_ngc_incoming_video_peer_list = new HashMap<String, Long>();
     static int ngc_incoming_video_peer_toggle_current_index = 0;
     static int flush_decoder = 0;
+    static long last_video_seq_num = -1;
     //
     static GroupGroupAudioService ngc_group_audio_service = null;
     public static String ngc_channelId = "";
@@ -2445,10 +2441,10 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
     }
 
-    public static void show_ngc_incoming_video_frame(final long group_number,
-                                                     final long peer_id,
-                                                     final byte[] encoded_video_and_header,
-                                                     long length)
+    public static void show_ngc_incoming_video_frame_v1(final long group_number,
+                                                        final long peer_id,
+                                                        final byte[] encoded_video_and_header,
+                                                        long length)
     {
         if (MainActivity.group_message_list_activity == null)
         {
@@ -2570,6 +2566,169 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
     }
 
+    public static void show_ngc_incoming_video_frame_v2(final long group_number,
+                                                        final long peer_id,
+                                                        final byte[] encoded_video_and_header,
+                                                        long length)
+    {
+        if (MainActivity.group_message_list_activity == null)
+        {
+            // NGC group activity not open
+            return;
+        }
+
+        final long conference_num = tox_group_by_groupid__wrapper(group_id);
+        if (conference_num != group_number)
+        {
+            // wrong NGC group
+            return;
+        }
+
+        ngc_video_packet_last_incoming_ts = System.currentTimeMillis();
+
+        if ((ngc_video_frame_image != null) && (!ngc_video_frame_image.isRecycled()))
+        {
+            if (sending_video_to_group == true)
+            {
+                final String ngc_incoming_video_from_peer = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+                ngc_update_video_incoming_peer_list(ngc_incoming_video_from_peer);
+
+                if (ngc_video_showing_video_from_peer_pubkey.equals("-1"))
+                {
+                    ngc_video_showing_video_from_peer_pubkey = ngc_incoming_video_from_peer;
+                }
+                else if (!ngc_video_showing_video_from_peer_pubkey.equalsIgnoreCase(ngc_incoming_video_from_peer))
+                {
+                    // we are already showing the video of a different peer in the group
+                    return;
+                }
+
+                // remove header from data (14 bytes)
+                final int yuv_frame_encoded_bytes = (int) (length - 14);
+                if ((yuv_frame_encoded_bytes > 0) && (yuv_frame_encoded_bytes < 40000))
+                {
+                    // TODO: make faster and better. this is not optimized.
+                    final byte[] yuv_frame_encoded_buf = new byte[yuv_frame_encoded_bytes];
+                    int w2 = 480 + 32; // 240 + 16; // encoder stride added
+                    int h2 = 640; // 320;
+                    final int y_bytes2 = w2 * h2;
+                    final int u_bytes2 = (w2 * h2) / 4;
+                    final int v_bytes2 = (w2 * h2) / 4;
+                    final byte[] y_buf2 = new byte[y_bytes2];
+                    final byte[] u_buf2 = new byte[u_bytes2];
+                    final byte[] v_buf2 = new byte[v_bytes2];
+                    int ystride = -1;
+                    final byte[] chkskum = new byte[1];
+                    final byte[] low_seqnum = new byte[1];
+                    final byte[] high_seqnum = new byte[1];
+                    try
+                    {
+                        System.arraycopy(encoded_video_and_header, 14, yuv_frame_encoded_buf, 0, yuv_frame_encoded_bytes);
+
+                        System.arraycopy(encoded_video_and_header, 11, low_seqnum, 0, 1);
+                        System.arraycopy(encoded_video_and_header, 12, high_seqnum, 0, 1);
+                        System.arraycopy(encoded_video_and_header, 13, chkskum, 0, 1);
+                        long seqnum = Byte.toUnsignedInt(low_seqnum[0]) + Integer.toUnsignedLong((high_seqnum[0] << 8));
+                        if (seqnum != (last_video_seq_num + 1))
+                        {
+                            Log.i(TAG, "!!!!!!!seqnumber_missing!!!!! " + seqnum + " -> " + (last_video_seq_num + 1));
+                        }
+                        last_video_seq_num = seqnum;
+                        final long crc_8 = Integer.toUnsignedLong(calc_crc_8(yuv_frame_encoded_buf));
+                        if (Byte.toUnsignedInt(chkskum[0]) != crc_8)
+                        {
+                            Log.i(TAG, "checksum=" + Byte.toUnsignedInt(chkskum[0])
+                                   + " crc8=" + crc_8 + " seqnum=" + seqnum
+                                   + " yuv_frame_encoded_bytes=" + (yuv_frame_encoded_bytes + 14));
+                        }
+                        //
+                        ystride = toxav_ngc_video_decode(yuv_frame_encoded_buf, yuv_frame_encoded_bytes,
+                                                         w2, h2, y_buf2, u_buf2, v_buf2, flush_decoder);
+                        //if (ystride != -1)
+                        //{
+                        //    Log.i(TAG, "toxav_ngc_video_decode:ystride=" + ystride);
+                        //}
+                        flush_decoder = 0;
+                    }
+                    catch(Exception e)
+                    {
+                        e.printStackTrace();
+                        return;
+                    }
+                    final int ystride_ = ystride;
+                    //
+                    Runnable myRunnable = new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                if (ystride_ == -1)
+                                {
+                                    ngc_video_view.setImageResource(R.drawable.round_loading_animation);
+                                }
+                                else
+                                {
+                                    int w2_decoder = ystride_; // encoder stride
+                                    int w2_decoder_uv = ystride_ / 2; // encoder stride
+                                    int h2_decoder = 640; // 320;
+                                    int h2_decoder_uv = h2_decoder / 2;
+                                    final int y_bytes2_decoder = h2_decoder * w2_decoder;
+                                    final int u_bytes2_decoder = (h2_decoder_uv * w2_decoder_uv);
+                                    final int v_bytes2_decoder = (h2_decoder_uv * w2_decoder_uv);
+
+                                    ByteBuffer yuv_frame_data_buf = ByteBuffer.allocateDirect(
+                                            y_bytes2_decoder + u_bytes2_decoder + v_bytes2_decoder);
+                                    yuv_frame_data_buf.rewind();
+                                    //
+                                    yuv_frame_data_buf.put(y_buf2, 0, y_bytes2_decoder);
+                                    yuv_frame_data_buf.put(u_buf2, 0, u_bytes2_decoder);
+                                    yuv_frame_data_buf.put(v_buf2, 0, v_bytes2_decoder);
+                                    //
+                                    yuv_frame_data_buf.rewind();
+                                    ngc_alloc_in.copyFrom(yuv_frame_data_buf.array());
+                                    ngc_yuvToRgb.setInput(ngc_alloc_in);
+                                    ngc_yuvToRgb.forEach(ngc_alloc_out);
+                                    ngc_alloc_out.copyTo(ngc_video_frame_image);
+                                    ngc_video_view.setBitmap(ngc_video_frame_image);
+                                }
+                                ngc_video_frame_last_incoming_ts = System.currentTimeMillis();
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+                        }
+                    };
+
+                    if (main_handler_s != null)
+                    {
+                        main_handler_s.post(myRunnable);
+                    }
+                }
+            }
+        }
+    }
+
+    private static int calc_crc_8(byte[] yuv_frame_encoded_buf)
+    {
+        final int CRC_POLYNOM = 0x9c;
+        final int CRC_PRESET = 0xFF;
+        int crc_U = CRC_PRESET;
+        for(int i = 0; i < yuv_frame_encoded_buf.length; i++){
+            crc_U ^= Byte.toUnsignedInt(yuv_frame_encoded_buf[i]);
+            for(int j = 0; j < 8; j++) {
+                if((crc_U & 0x01) != 0) {
+                    crc_U = (crc_U >>> 1) ^ CRC_POLYNOM;
+                } else {
+                    crc_U = (crc_U >>> 1);
+                }
+            }
+        }
+        return crc_U;
+    }
+
     synchronized public static void start_group_video(final Context c)
     {
         // just in case there is a thread still running
@@ -2663,7 +2822,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                         }
                         else
                         {
-                            final int header_length = 6 + 1 + 1 + 1 + 1 + 1;
+                            final int header_length = 6 + 1 + 1 + 1 + 1 + 1 + 2 + 1;
                             long data_length_ = header_length + encoded_bytes;
                             final int data_length = (int) data_length_;
                             //
@@ -2679,7 +2838,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 data_buf.put((byte) 0x34);
                                 data_buf.put((byte) 0x35);
                                 //
-                                data_buf.put((byte) 0x01);
+                                data_buf.put((byte) 0x02);
                                 //
                                 data_buf.put((byte) 0x21);
                                 //

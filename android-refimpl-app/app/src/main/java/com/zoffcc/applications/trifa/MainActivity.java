@@ -137,7 +137,8 @@ import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBIN
 import static com.zoffcc.applications.trifa.ConfGroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.play_ngc_incoming_audio_frame;
-import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame_v1;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame_v2;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
@@ -7327,7 +7328,8 @@ public class MainActivity extends AppCompatActivity
         // check for muted or kicked peers
 
         // check for correct signature of packets
-        final long header_ngc_video = 6 + 1 + 1 + 1 + 1 + 1;
+        final long header_ngc_video_v1 = 6 + 1 + 1 + 1 + 1 + 1;
+        final long header_ngc_video_v2 = 6 + 1 + 1 + 1 + 1 + 1 + 2 + 1;
         final long header_ngc_histsync_and_files = 6 + 1 + 1 + 32 + 4 + 255;
         if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_histsync_and_files + 1)))
         {
@@ -7359,7 +7361,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video + 1)))
+        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video_v1 + 1)))
         {
             // @formatter:off
                 /*
@@ -7378,7 +7380,13 @@ public class MainActivity extends AppCompatActivity
                 if ((data[6] == (byte) 0x01) && (data[7] == (byte) 0x21)
                     && (data[8] == (byte) 480) && (data[9] == (byte) 640) && (data[10] == (byte) 1))
                 {
-                    show_ngc_incoming_video_frame(group_number, peer_id, data, length);
+                    show_ngc_incoming_video_frame_v1(group_number, peer_id, data, length);
+                }
+                else if ((data[6] == (byte) 0x02) && (data[7] == (byte) 0x21)
+                         && (data[8] == (byte) 480) && (data[9] == (byte) 640) && (data[10] == (byte) 1)
+                         && (length >= (header_ngc_video_v2 + 1)))
+                {
+                    show_ngc_incoming_video_frame_v2(group_number, peer_id, data, length);
                 }
                 else
                 {
@@ -7391,7 +7399,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video + 1)))
+        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video_v1 + 1)))
         {
             // @formatter:off
                 /*
