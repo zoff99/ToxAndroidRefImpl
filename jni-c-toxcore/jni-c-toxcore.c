@@ -167,7 +167,8 @@ static int toxav_iterate_thread_stop = 0;
 TOX_CONNECTION my_connection_status = TOX_CONNECTION_NONE;
 Tox *tox_global = NULL;
 ToxAV *tox_av_global = NULL;
-void *tox_av_ngc_coders_global = NULL;
+void *tox_av_ngc_vcoders_global = NULL;
+void *tox_av_ngc_acoders_global = NULL;
 bool global_toxav_valid = false;
 CallControl mytox_CC;
 pthread_t tid[3]; // 0 -> toxav_iterate thread, 1 -> video iterate thread, 2 -> audio iterate thread
@@ -2676,7 +2677,8 @@ void *thread_audio_av(void *data)
 
 void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, jobject thiz, jobject datadir,
         jint udp_enabled, jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port,
-        jstring passphrase_j, jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate, jint max_quantizer)
+        jstring passphrase_j, jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate, jint max_quantizer,
+        jint ngc_audio_bitrate, jint ngc_audio_sampling_rate, jint ngc_audio_channel_count)
 {
     const char *s = NULL;
     // SET GLOBAL JNIENV here, this is bad!!
@@ -2910,7 +2912,8 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
     dbg(9, "linking AV callbacks ... READY");
     // init AV callbacks -------------------------------
 
-    tox_av_ngc_coders_global = toxav_ngc_video_init(ngc_video_bitrate, max_quantizer);
+    tox_av_ngc_vcoders_global = toxav_ngc_video_init(ngc_video_bitrate, max_quantizer);
+    tox_av_ngc_acoders_global = toxav_ngc_audio_init(ngc_audio_bitrate, ngc_audio_sampling_rate, ngc_audio_channel_count);
 
     // start toxav thread ------------------------------
     toxav_iterate_thread_stop = 0;
@@ -2957,10 +2960,14 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, jobject datadir, jint udp_enabled,
         jint local_discovery_enabled, jint orbot_enabled, jstring proxy_host, jlong proxy_port, jstring passphrase_j,
-        jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate, jint max_quantizer)
+        jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate, jint max_quantizer,
+        jint ngc_audio_bitrate, jint ngc_audio_sampling_rate, jint ngc_audio_channel_count)
 {
     Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled,
-                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j, enable_ipv6, force_udp_mode, ngc_video_bitrate, max_quantizer);
+                   local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j,
+                   enable_ipv6, force_udp_mode,
+                   ngc_video_bitrate, max_quantizer,
+                   ngc_audio_bitrate, ngc_audio_sampling_rate, ngc_audio_channel_count);
 }
 
 
@@ -3416,8 +3423,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     pthread_join(tid[1], NULL); // wait for toxav video thread to end
     toxav_audio_thread_stop = 1;
     pthread_join(tid[2], NULL); // wait for toxav audio thread to end
-    toxav_ngc_video_kill(tox_av_ngc_coders_global);
-    tox_av_ngc_coders_global = NULL;
+    toxav_ngc_video_kill(tox_av_ngc_vcoders_global);
+    tox_av_ngc_vcoders_global = NULL;
+    toxav_ngc_audio_kill(tox_av_ngc_acoders_global);
+    tox_av_ngc_acoders_global = NULL;
     toxav_kill(tox_av_global);
     tox_av_global = NULL;
 #ifdef TOX_HAVE_TOXUTIL
@@ -7261,7 +7270,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
         return (jint)-99;
     }
 
-    if (tox_av_ngc_coders_global == NULL)
+    if (tox_av_ngc_vcoders_global == NULL)
     {
         return (jint)-99;
     }
@@ -7279,7 +7288,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
     int32_t y_stride;
     int32_t u_stride;
     int32_t v_stride;
-    bool res = toxav_ngc_video_decode(tox_av_ngc_coders_global,
+    bool res = toxav_ngc_video_decode(tox_av_ngc_vcoders_global,
                                       enc_c, encoded_frame_size_bytes,
                                       width, height,
                                       (uint8_t *)y_c, (uint8_t *)u_c, (uint8_t *)v_c,
@@ -7324,7 +7333,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv
         return (jint)-99;
     }
 
-    if (tox_av_ngc_coders_global == NULL)
+    if (tox_av_ngc_vcoders_global == NULL)
     {
         return (jint)-99;
     }
@@ -7340,7 +7349,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv
     jbyte *enc_c = (*env)->GetByteArrayElements(env, encoded_frame_bytes, 0);
 
     uint32_t encoded_frame_size_bytes = 0;
-    bool res = toxav_ngc_video_encode(tox_av_ngc_coders_global,
+    bool res = toxav_ngc_video_encode(tox_av_ngc_vcoders_global,
                                       vbitrate,
                                       max_quantizer,
                                       width, height,
@@ -7354,6 +7363,57 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv
     if(res == true)
     {
         return (jint)encoded_frame_size_bytes;
+    }
+    else
+    {
+        return (jint)-1;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1audio_1decode(JNIEnv *env, jobject thiz,
+        jbyteArray encoded_frame_bytes,
+        jint encoded_frame_size_bytes,
+        jbyteArray pcm_decoded
+        )
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if(global_toxav_valid != true)
+    {
+        return (jint)-99;
+    }
+
+    if (tox_av_ngc_acoders_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if ((pcm_decoded == NULL) || (encoded_frame_bytes == NULL))
+    {
+        return (jint)-21;
+    }
+
+    jbyte *pcm_decoded_c = (*env)->GetByteArrayElements(env, pcm_decoded, 0);
+    jbyte *enc_c = (*env)->GetByteArrayElements(env, encoded_frame_bytes, 0);
+
+    int samples_decoded = toxav_ngc_audio_decode(tox_av_ngc_acoders_global,
+                                                enc_c, encoded_frame_size_bytes,
+                                                (int16_t *)pcm_decoded_c);
+
+    (*env)->ReleaseByteArrayElements(env, pcm_decoded, pcm_decoded_c, JNI_COMMIT); /* DO copy back contents */
+    (*env)->ReleaseByteArrayElements(env, encoded_frame_bytes, enc_c, JNI_ABORT); /* abort to not copy back contents */
+
+    if(samples_decoded > 0)
+    {
+        return (jint)samples_decoded;
     }
     else
     {
