@@ -1641,6 +1641,14 @@ public class HelperGeneric
         return null;
     }
 
+    public static byte[] bytebuffer_to_bytearray(ByteBuffer in)
+    {
+        byte[] out = new byte[in.limit()];
+        in.rewind();
+        in.get(out);
+        return out;
+    }
+
     public static int two_hex_bytes_to_dec_int(byte b1, byte b2)
     {
         int res = 0;

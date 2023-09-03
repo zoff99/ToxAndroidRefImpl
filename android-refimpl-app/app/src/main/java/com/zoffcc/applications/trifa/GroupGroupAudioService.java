@@ -235,25 +235,6 @@ public class GroupGroupAudioService extends Service
                     Log.i(TAG, "onReceive:headset:setImageDrawable:null2");
                 }
 
-                // HINT: stop audio recording, we do not need it in this mode -------------
-                try
-                {
-                    if (!AudioRecording.stopped)
-                    {
-                        AudioRecording.close();
-                        audio_thread.join();
-                        audio_thread = null;
-                        NativeAudio.StopREC();
-                        Log.i(TAG, "stop_audio_recording:DONE");
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "stop_audio_recording:EE01" + e.getMessage());
-                }
-                // HINT: stop audio recording, we do not need it in this mode -------------
-
                 try
                 {
                     Log.i(TAG, "NGCGAThread:starting ...");

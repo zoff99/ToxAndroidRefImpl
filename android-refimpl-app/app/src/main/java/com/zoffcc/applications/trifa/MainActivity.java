@@ -3461,6 +3461,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native int toxav_ngc_video_decode(byte[] encoded_frame_bytes, int encoded_frame_size_bytes, int width, int height, byte[] y, byte[] u, byte[] v, int flush_decoder);
 
+    public static native int toxav_ngc_audio_encode(byte[] pcm, int sample_count_per_frame, byte[] encoded_frame_bytes);
+
     public static native int toxav_ngc_audio_decode(byte[] encoded_frame_bytes, int encoded_frame_size_bytes, byte[] pcm_decoded);
     // --------------- new Groups -------------
     // --------------- new Groups -------------
@@ -7380,12 +7382,15 @@ public class MainActivity extends AppCompatActivity
                 if ((data[6] == (byte) 0x01) && (data[7] == (byte) 0x21)
                     && (data[8] == (byte) 480) && (data[9] == (byte) 640) && (data[10] == (byte) 1))
                 {
-                    show_ngc_incoming_video_frame_v1(group_number, peer_id, data, length);
+                    // disable ngc video version 1 -----------
+                    // show_ngc_incoming_video_frame_v1(group_number, peer_id, data, length);
+                    // disable ngc video version 1 -----------
                 }
                 else if ((data[6] == (byte) 0x02) && (data[7] == (byte) 0x21)
                          && (data[8] == (byte) 480) && (data[9] == (byte) 640) && (data[10] == (byte) 1)
                          && (length >= (header_ngc_video_v2 + 1)))
                 {
+                    // Log.i(TAG, "group_custom_packet_cb:video_v2");
                     show_ngc_incoming_video_frame_v2(group_number, peer_id, data, length);
                 }
                 else

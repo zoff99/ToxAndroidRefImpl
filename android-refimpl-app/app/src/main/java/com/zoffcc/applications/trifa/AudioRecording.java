@@ -41,8 +41,10 @@ import static com.zoffcc.applications.trifa.AudioRoundtripActivity.measured_audi
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk_active;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group_audio_send_icon;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.ngc_audio_out_queue;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_bytearray;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
@@ -282,37 +284,14 @@ public class AudioRecording extends Thread
             {
                 if (native_audio_engine_down == false)
                 {
-                    _recBuffer.rewind();
-                    NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
-                    _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
-
-                    if (DEBUG_MIC_DATA_LOGGING)
-                    {
-                        Log.i(TAG, "send_audio_frame_to_toxcore_from_native:1:" +
-                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(0) + " " +
-                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(1) + " " +
-                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(2) + " " +
-                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(3) + " " +
-                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(4) + " " +
-                                   NativeAudio.n_rec_audio_buffer[bufnum_].get(5) + " ");
-
-
-                        Log.i(TAG, "send_audio_frame_to_toxcore_from_native:2:" + _recBuffer.get(0) + " " +
-                                   _recBuffer.get(1) + " " + _recBuffer.get(2) + " " + _recBuffer.get(3) + " " +
-                                   _recBuffer.get(4) + " " + _recBuffer.get(5) + " ");
-                    }
-
-                    /*
-                    Log.i(TAG, "send_audio_frame_to_toxcore_from_native:CHANNELS_TOX=" + CHANNELS_TOX +
-                               " SMAPLINGRATE_TOX=" + SMAPLINGRATE_TOX + " Callstate.audio_group_active=" +
-                               Callstate.audio_group_active + " push_to_talk_active=" + push_to_talk_active +
-                               " ConferenceAudioActivity.conf_id=" + ConferenceAudioActivity.conf_id);
-                     */
-
                     if (Callstate.audio_group_active)
                     {
                         if (push_to_talk_active)
                         {
+                            _recBuffer.rewind();
+                            NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                            _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
+
                             int audio_group_send_res = toxav_group_send_audio(
                                     tox_conference_by_confid__wrapper(ConferenceAudioActivity.conf_id),
                                     (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX);
@@ -364,7 +343,19 @@ public class AudioRecording extends Thread
                     }
                     else if (Callstate.audio_ngc_group_active)
                     {
+                        // (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX
 
+                        if ((CHANNELS_TOX == 1) && (SMAPLINGRATE_TOX == 48000))
+                        {
+                            NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                            //Log.i(TAG, "audio_ngc_group_active:--recording--:1: "
+                            //           + NativeAudio.n_rec_audio_buffer[bufnum_].arrayOffset() + " "
+                            //           + NativeAudio.n_rec_audio_buffer[bufnum_].limit() + " "
+                            //           + NativeAudio.n_rec_audio_buffer[bufnum_].array().length);
+                            final byte[] buf = bytebuffer_to_bytearray(NativeAudio.n_rec_audio_buffer[bufnum_]);
+                            Log.i(TAG, "audio_ngc_group_active:--recording--:2: " + buf.length);
+                            ngc_audio_out_queue.offer(buf);
+                        }
                     }
                     else if (LatencyTestActive)
                     {
@@ -392,6 +383,10 @@ public class AudioRecording extends Thread
                     }
                     else // audio or video call
                     {
+                        _recBuffer.rewind();
+                        NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                        _recBuffer.put(NativeAudio.n_rec_audio_buffer[bufnum_]);
+
                         // Log.i(TAG,
                         //       "toxav_audio_send_frame:002:native:Callstate.friend_pubkey=" + Callstate.friend_pubkey +
                         //       " fnum=" + tox_friend_by_public_key__wrapper(Callstate.friend_pubkey));
