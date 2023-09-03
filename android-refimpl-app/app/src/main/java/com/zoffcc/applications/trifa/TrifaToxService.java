@@ -1568,9 +1568,9 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "toxav_ngc_video_decode:ystride=" + ystride);
                     */
 
-                    if ((Callstate.state != 0) || (Callstate.audio_group_active))
+                    if ((Callstate.state != 0) || (Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
                     {
-                        if (Callstate.audio_group_active)
+                        if ((Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
                         {
                             tox_iteration_interval_ms = 5; // if we are in a group audio call iterate more often
                             // Log.i(TAG, "(tox_iteration_interval_ms):001");

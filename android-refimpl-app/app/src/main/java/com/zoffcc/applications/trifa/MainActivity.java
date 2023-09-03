@@ -4339,7 +4339,7 @@ public class MainActivity extends AppCompatActivity
 
     static void android_toxav_callback_group_audio_receive_frame_cb_method(long conference_number, long peer_number, long sample_count, int channels, long sampling_rate)
     {
-        if (!Callstate.audio_group_active)
+        if (!Callstate.audio_ngc_group_active)
         {
             return;
         }

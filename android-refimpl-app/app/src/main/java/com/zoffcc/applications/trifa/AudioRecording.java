@@ -362,6 +362,10 @@ public class AudioRecording extends Thread
                             }
                         }
                     }
+                    else if (Callstate.audio_ngc_group_active)
+                    {
+
+                    }
                     else if (LatencyTestActive)
                     {
                         //  --------------- we are testing audio Latency ---------------

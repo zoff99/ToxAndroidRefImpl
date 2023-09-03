@@ -131,7 +131,7 @@ public class GroupGroupAudioService extends Service
                 // ------------- START Audio playing -------------
                 // ------------- START Audio playing -------------
                 // ------------- START Audio playing -------------
-                Callstate.audio_group_active = true;
+                Callstate.audio_ngc_group_active = true;
 
                 try
                 {
@@ -497,7 +497,7 @@ public class GroupGroupAudioService extends Service
             e.printStackTrace();
         }
 
-        Callstate.audio_group_active = false;
+        Callstate.audio_ngc_group_active = false;
         if (stop_full)
         {
             Callstate.reset_values();

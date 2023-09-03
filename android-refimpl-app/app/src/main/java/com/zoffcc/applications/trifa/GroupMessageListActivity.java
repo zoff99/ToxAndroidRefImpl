@@ -2631,15 +2631,15 @@ public class GroupMessageListActivity extends AppCompatActivity
                         long seqnum = Byte.toUnsignedInt(low_seqnum[0]) + Integer.toUnsignedLong((high_seqnum[0] << 8));
                         if (seqnum != (last_video_seq_num + 1))
                         {
-                            Log.i(TAG, "!!!!!!!seqnumber_missing!!!!! " + seqnum + " -> " + (last_video_seq_num + 1));
+                            // Log.i(TAG, "!!!!!!!seqnumber_missing!!!!! " + seqnum + " -> " + (last_video_seq_num + 1));
                         }
                         last_video_seq_num = seqnum;
                         final long crc_8 = Integer.toUnsignedLong(calc_crc_8(yuv_frame_encoded_buf));
                         if (Byte.toUnsignedInt(chkskum[0]) != crc_8)
                         {
-                            Log.i(TAG, "checksum=" + Byte.toUnsignedInt(chkskum[0])
-                                   + " crc8=" + crc_8 + " seqnum=" + seqnum
-                                   + " yuv_frame_encoded_bytes=" + (yuv_frame_encoded_bytes + 14));
+                            //Log.i(TAG, "checksum=" + Byte.toUnsignedInt(chkskum[0])
+                            //       + " crc8=" + crc_8 + " seqnum=" + seqnum
+                            //       + " yuv_frame_encoded_bytes=" + (yuv_frame_encoded_bytes + 14));
                         }
                         //
                         ystride = toxav_ngc_video_decode(yuv_frame_encoded_buf, yuv_frame_encoded_bytes,
@@ -2851,7 +2851,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 byte[] data = new byte[data_length];
                                 data_buf.rewind();
                                 data_buf.get(data);
-                                if (data_length < MAX_GC_PACKET_CHUNK_SIZE) // HINT: mabye use MAX_GC_PACKET_CHUNK_SIZE ?
+                                if (data_length < MAX_GC_PACKET_CHUNK_SIZE)
                                 {
                                     int result = tox_group_send_custom_packet(tox_group_by_groupid__wrapper(group_id), 0,
                                                                               data, data_length);

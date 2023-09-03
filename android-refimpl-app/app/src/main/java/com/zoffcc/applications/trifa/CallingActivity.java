@@ -1844,9 +1844,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
         }
 
-        if ((Callstate.state != 0) || (Callstate.audio_group_active))
+        if ((Callstate.state != 0) || (Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
         {
             if (Callstate.audio_group_active)
+            {
+
+            }
+            else if (Callstate.audio_ngc_group_active)
             {
 
             }

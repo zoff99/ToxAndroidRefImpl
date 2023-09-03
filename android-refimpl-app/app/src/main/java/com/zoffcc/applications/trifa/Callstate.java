@@ -20,6 +20,9 @@
 package com.zoffcc.applications.trifa;
 
 
+import android.provider.CallLog;
+import android.telecom.Call;
+
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
@@ -64,6 +67,7 @@ public class Callstate
     static long round_trip_time = 0;
     static int play_buffer_entries = 0;
     static boolean audio_group_active = false;
+    static boolean audio_ngc_group_active = false;
 
     static void reset_values()
     {
@@ -98,6 +102,7 @@ public class Callstate
         Callstate.round_trip_time = 0;
         Callstate.play_buffer_entries = 0;
         Callstate.audio_group_active = false;
+        Callstate.audio_ngc_group_active = false;
         MainActivity.set_av_call_status(Callstate.state);
     }
 
