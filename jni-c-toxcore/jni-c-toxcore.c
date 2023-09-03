@@ -7372,6 +7372,57 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv
 }
 
 JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1audio_1encode(JNIEnv *env, jobject thiz,
+        jbyteArray pcm,
+        jint sample_count_per_frame,
+        jbyteArray encoded_frame_bytes)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if(global_toxav_valid != true)
+    {
+        return (jint)-99;
+    }
+
+    if (tox_av_ngc_acoders_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    if ((pcm == NULL) || (encoded_frame_bytes == NULL))
+    {
+        return (jint)-21;
+    }
+
+    jbyte *pcm_c = (*env)->GetByteArrayElements(env, pcm, 0);
+    jbyte *enc_c = (*env)->GetByteArrayElements(env, encoded_frame_bytes, 0);
+
+    uint32_t encoded_frame_size_bytes = 0;
+    bool res = toxav_ngc_audio_encode(tox_av_ngc_acoders_global,
+                                      (const int16_t *)pcm_c,
+                                      (const int32_t)sample_count_per_frame,
+                                      (uint8_t *)enc_c, &encoded_frame_size_bytes);
+    (*env)->ReleaseByteArrayElements(env, pcm, pcm_c, JNI_ABORT); /* abort to not copy back contents */
+    (*env)->ReleaseByteArrayElements(env, encoded_frame_bytes, enc_c, JNI_COMMIT); /* DO copy back contents */
+
+    if(res == true)
+    {
+        return (jint)encoded_frame_size_bytes;
+    }
+    else
+    {
+        return (jint)-1;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1audio_1decode(JNIEnv *env, jobject thiz,
         jbyteArray encoded_frame_bytes,
         jint encoded_frame_size_bytes,
