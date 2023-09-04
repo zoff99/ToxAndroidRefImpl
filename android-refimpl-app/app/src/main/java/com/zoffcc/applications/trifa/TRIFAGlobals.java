@@ -164,6 +164,9 @@ public class TRIFAGlobals
     static long last_video_frame_received = -1;
     static int count_video_frame_received = 0;
 
+    final static int NGC_AUDIO_PCM_BUFFER_BYTES = 3840;
+    final static int NGC_AUDIO_PCM_BUFFER_SAMPLES = 5760;
+
     final static int VIDEO_DECODER_BUFFER_DELAY = 0; // 50; // delay video and audio playback this many milliseconds
     final static int DECODER_VIDEO_ADD_DELAY_MS = 0; // -80; // additionally delay audio playback this many milliseconds
 

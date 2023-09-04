@@ -60,6 +60,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.speech.levelmeter.BarLevelDrawable;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -107,6 +108,8 @@ import androidx.renderscript.RenderScript;
 import androidx.renderscript.ScriptIntrinsicYuvToRGB;
 import androidx.renderscript.Type;
 
+import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
@@ -115,6 +118,7 @@ import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_searc
 import static com.zoffcc.applications.trifa.HelperFiletransfer.copy_outgoing_file_to_sdcard_dir;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
@@ -176,6 +180,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_NGC_VIDEO_BITRAT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_NGC_VIDEO_QUANTIZER;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_QUANTIZER;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_AUDIO_PCM_BUFFER_BYTES;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_AUDIO_PCM_BUFFER_SAMPLES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_NEW_PEERS_TIMEDELTA_IN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
@@ -214,6 +220,8 @@ public class GroupMessageListActivity extends AppCompatActivity
     static int ngc_incoming_video_peer_toggle_current_index = 0;
     static int flush_decoder = 0;
     static long last_video_seq_num = -1;
+    static BarLevelDrawable ngc_audio_bar_in_v = null;
+    static BarLevelDrawable ngc_audio_bar_out_v = null;
     //
     static GroupGroupAudioService ngc_group_audio_service = null;
     public static String ngc_channelId = "";
@@ -452,6 +460,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_video_quality_toggle_button = (ImageButton) findViewById(R.id.ngc_video_quality_toggle_button);
         ngc_camera_info_text = findViewById(R.id.ngc_camera_info_text);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
+        ngc_audio_bar_in_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_in_v);
+        ngc_audio_bar_out_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_out_v);
 
         ngc_camera_info_text.setText("");
 
@@ -2955,23 +2965,31 @@ public class GroupMessageListActivity extends AppCompatActivity
                             if (buffers_in_queue > 2)
                             {
                                 final byte[] buf_out_1 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
+                                // Log.i(TAG, "NGC_Group_audio_record_thread:buf1=" + bytes_to_hex(buf_out_1));
                                 final byte[] buf_out_2 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
+                                // Log.i(TAG, "NGC_Group_audio_record_thread:buf2=" + bytes_to_hex(buf_out_2));
                                 final byte[] buf_out_3 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
+                                // Log.i(TAG, "NGC_Group_audio_record_thread:buf3=" + bytes_to_hex(buf_out_3));
                                 if ((buf_out_1 == null) || (buf_out_2 == null) || (buf_out_3 == null))
                                 {
                                     Log.i(TAG, "NGC_Group_audio_record_thread:no data in buffers");
                                 }
-                                else if ((buf_out_1.length != 3840) || (buf_out_2.length != 3840) || (buf_out_3.length != 3840))
+                                else if ((buf_out_1.length != NGC_AUDIO_PCM_BUFFER_BYTES) || (buf_out_2.length != NGC_AUDIO_PCM_BUFFER_BYTES) || (buf_out_3.length != NGC_AUDIO_PCM_BUFFER_BYTES))
                                 {
                                     Log.i(TAG, "NGC_Group_audio_record_thread:wrong buffer sizes");
                                 }
                                 else
                                 {
                                     // send ngc audio packet
-                                    final byte[] pcm_audio_buffer = new byte[3 * 3840]; // 3 x 3840 bytes pcm data
-                                    final int max_encoded_bytes = 2000;
+                                    final byte[] pcm_audio_buffer = new byte[3 * NGC_AUDIO_PCM_BUFFER_BYTES]; // 3 x 3840 bytes pcm data
+                                    final int max_encoded_bytes = (MAX_GC_PACKET_CHUNK_SIZE - 10);
                                     final byte[] encoded_aframe = new byte[max_encoded_bytes];
-                                    final int samples_per_120ms = 5760;
+                                    final int samples_per_120ms = NGC_AUDIO_PCM_BUFFER_SAMPLES;
+                                    // copy the 3 pcm buffers into new buffer ---------
+                                    System.arraycopy(buf_out_1, 0, pcm_audio_buffer, 0 * NGC_AUDIO_PCM_BUFFER_BYTES, NGC_AUDIO_PCM_BUFFER_BYTES);
+                                    System.arraycopy(buf_out_2, 0, pcm_audio_buffer, 1 * NGC_AUDIO_PCM_BUFFER_BYTES, NGC_AUDIO_PCM_BUFFER_BYTES);
+                                    System.arraycopy(buf_out_3, 0, pcm_audio_buffer, 2 * NGC_AUDIO_PCM_BUFFER_BYTES, NGC_AUDIO_PCM_BUFFER_BYTES);
+                                    // copy the 3 pcm buffers into new buffer ---------
                                     int encoded_bytes = toxav_ngc_audio_encode(pcm_audio_buffer,
                                                                                samples_per_120ms,
                                                                                encoded_aframe);
@@ -3051,6 +3069,30 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         };
         NGC_Group_audio_record_thread.start();
+
+        // update every x times per second -----------
+        final int update_per_sec = 8;
+        final Handler ha2 = new Handler();
+        ha2.postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    // Log.i(TAG, "update_call_time -> call");
+                    update_call_ngc_audio_bars();
+                    if (NGC_Group_audio_record_thread_running)
+                    {
+                        ha2.postDelayed(this, 1000 / update_per_sec);
+                    }
+                }
+                catch(Exception e)
+                {
+                }
+            }
+        }, 1000);
+        // update every x times per second -----------
     }
 
     public void toggle_group_video(View view)
@@ -3273,7 +3315,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         final int sampling_rate = 48000;
         final int channels = 1;
-        final int sample_count = 5760; // bytes = sample_count * 2
+        final int sample_count = NGC_AUDIO_PCM_BUFFER_SAMPLES; // bytes = sample_count * 2
 
         if (Callstate.call_first_audio_frame_received == -1)
         {
@@ -3306,5 +3348,36 @@ public class GroupMessageListActivity extends AppCompatActivity
             NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
         }
         NativeAudio.n_cur_buf = 0;
+    }
+
+    static void update_call_ngc_audio_bars()
+    {
+        try
+        {
+            Runnable myRunnable = new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        ngc_audio_bar_in_v.setLevel(get_vu_in() / 90.0f);
+                        ngc_audio_bar_out_v.setLevel(get_vu_out() / 140.0f);
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+            };
+            if (main_handler_s != null)
+            {
+                main_handler_s.post(myRunnable);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

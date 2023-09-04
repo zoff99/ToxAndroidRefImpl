@@ -46,6 +46,7 @@ import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_c
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_bytearray;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytesToHex;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_audio_recording_frame_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__min_audio_samplingrate_out;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__mic_gain_factor_toggle;
@@ -353,7 +354,8 @@ public class AudioRecording extends Thread
                             //           + NativeAudio.n_rec_audio_buffer[bufnum_].limit() + " "
                             //           + NativeAudio.n_rec_audio_buffer[bufnum_].array().length);
                             final byte[] buf = bytebuffer_to_bytearray(NativeAudio.n_rec_audio_buffer[bufnum_]);
-                            Log.i(TAG, "audio_ngc_group_active:--recording--:2: " + buf.length);
+                            // Log.i(TAG, "audio_ngc_group_active:--recording--:2: " + buf.length);
+                            // Log.i(TAG, "audio_ngc_group_active:--recording--:buf=" + bytes_to_hex(buf));
                             ngc_audio_out_queue.offer(buf);
                         }
                     }

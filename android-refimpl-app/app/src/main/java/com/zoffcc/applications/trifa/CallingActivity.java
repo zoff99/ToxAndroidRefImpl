@@ -1690,7 +1690,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         // update every x times per second -----------
         final int update_per_sec = 8;
         final Handler ha2 = new Handler();
-        ha.postDelayed(new Runnable()
+        ha2.postDelayed(new Runnable()
         {
 
             @Override
