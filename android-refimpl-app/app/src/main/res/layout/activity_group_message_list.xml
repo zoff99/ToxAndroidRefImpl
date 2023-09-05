@@ -134,10 +134,10 @@
                 android:visibility="visible">
 
                 <LinearLayout
-                    android:layout_width="5dp"
+                    android:layout_width="8dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="left"
-                    android:layout_marginRight="0dp"
+                    android:layout_marginRight="1dp"
                     android:layout_marginLeft="2dp"
                     android:orientation="vertical">
 
@@ -145,12 +145,12 @@
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:gravity="center_horizontal|bottom"
-                        android:text="I"
+                        android:text="O"
                         android:textColor="@color/md_white_1000"
-                        android:textSize="5sp" />
+                        android:textSize="11sp" />
 
                     <com.google.speech.levelmeter.BarLevelDrawable
-                        android:id="@+id/ngc_audio_bar_out_v"
+                        android:id="@+id/ngc_audio_bar_in_v"
                         android:layout_width="5dp"
                         android:layout_height="match_parent"
                         android:layout_marginTop="10dp"
@@ -167,21 +167,21 @@
                     android:background="@color/md_always_black_1000" />
 
                 <LinearLayout
-                    android:layout_width="5dp"
+                    android:layout_width="8dp"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="0dp"
+                    android:layout_marginLeft="1dp"
                     android:orientation="vertical">
 
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="30dp"
                         android:gravity="center_horizontal|bottom"
-                        android:text="O"
+                        android:text="I"
                         android:textColor="@color/md_white_1000"
-                        android:textSize="5sp" />
+                        android:textSize="11sp" />
 
                     <com.google.speech.levelmeter.BarLevelDrawable
-                        android:id="@+id/ngc_audio_bar_in_v"
+                        android:id="@+id/ngc_audio_bar_out_v"
                         android:layout_width="5dp"
                         android:layout_height="match_parent"
                         android:layout_marginTop="10dp"
