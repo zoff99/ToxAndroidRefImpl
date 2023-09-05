@@ -24,6 +24,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -95,6 +96,7 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.Px;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
@@ -115,6 +117,9 @@ import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
+import static com.zoffcc.applications.trifa.HelperConference.delete_conference;
+import static com.zoffcc.applications.trifa.HelperConference.delete_conference_all_messages;
+import static com.zoffcc.applications.trifa.HelperConference.set_conference_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.copy_outgoing_file_to_sdcard_dir;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
@@ -148,12 +153,14 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_key
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.audio_out_buffer_mult;
+import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
+import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
@@ -3095,7 +3102,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         // update every x times per second -----------
     }
 
-    public void toggle_group_video(View view)
+    public void toggle_group_video(final View view)
     {
         if (sending_video_to_group)
         {
@@ -3104,10 +3111,25 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
         else
         {
-            ngc_incoming_video_peer_toggle_current_index = 0;
-            flush_decoder = 1;
-            openCamera();
-            start_group_video(view.getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+            builder.setTitle("Join Group Video?");
+            builder.setMessage("Do you want really want to send your Video and Audio to everybody in this group?");
+
+            builder.setNegativeButton("NO!", null);
+            builder.setPositiveButton("Yes, I want", new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    ngc_incoming_video_peer_toggle_current_index = 0;
+                    flush_decoder = 1;
+                    openCamera();
+                    start_group_video(view.getContext());
+                }
+            });
+
+            AlertDialog dialog = builder.create();
+            dialog.show();
         }
     }
 
