@@ -329,6 +329,9 @@ public class FriendListFragment extends Fragment
 
         Log.i(TAG, "onResume");
 
+        // reset friend update trigger timestamp
+        add_all_friends_clear_last_trigger_ts = 0;
+
         try
         {
             FriendListHolder.remove_progress_dialog();
