@@ -41,6 +41,7 @@ import static com.zoffcc.applications.trifa.AudioRoundtripActivity.measured_audi
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk_active;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.update_group_audio_send_icon;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.ngc_audio_mute;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.ngc_audio_out_queue;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
@@ -344,19 +345,20 @@ public class AudioRecording extends Thread
                     }
                     else if (Callstate.audio_ngc_group_active)
                     {
-                        // (long) ((NativeAudio.n_rec_buf_size_in_bytes) / 2), CHANNELS_TOX, SMAPLINGRATE_TOX
-
                         if ((CHANNELS_TOX == 1) && (SMAPLINGRATE_TOX == 48000))
                         {
-                            NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
-                            //Log.i(TAG, "audio_ngc_group_active:--recording--:1: "
-                            //           + NativeAudio.n_rec_audio_buffer[bufnum_].arrayOffset() + " "
-                            //           + NativeAudio.n_rec_audio_buffer[bufnum_].limit() + " "
-                            //           + NativeAudio.n_rec_audio_buffer[bufnum_].array().length);
-                            final byte[] buf = bytebuffer_to_bytearray(NativeAudio.n_rec_audio_buffer[bufnum_]);
-                            // Log.i(TAG, "audio_ngc_group_active:--recording--:2: " + buf.length);
-                            // Log.i(TAG, "audio_ngc_group_active:--recording--:buf=" + bytes_to_hex(buf));
-                            ngc_audio_out_queue.offer(buf);
+                            if (ngc_audio_mute == false)
+                            {
+                                NativeAudio.n_rec_audio_buffer[bufnum_].rewind();
+                                //Log.i(TAG, "audio_ngc_group_active:--recording--:1: "
+                                //           + NativeAudio.n_rec_audio_buffer[bufnum_].arrayOffset() + " "
+                                //           + NativeAudio.n_rec_audio_buffer[bufnum_].limit() + " "
+                                //           + NativeAudio.n_rec_audio_buffer[bufnum_].array().length);
+                                final byte[] buf = bytebuffer_to_bytearray(NativeAudio.n_rec_audio_buffer[bufnum_]);
+                                // Log.i(TAG, "audio_ngc_group_active:--recording--:2: " + buf.length);
+                                // Log.i(TAG, "audio_ngc_group_active:--recording--:buf=" + bytes_to_hex(buf));
+                                ngc_audio_out_queue.offer(buf);
+                            }
                         }
                     }
                     else if (LatencyTestActive)

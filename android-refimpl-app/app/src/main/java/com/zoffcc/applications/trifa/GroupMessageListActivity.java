@@ -245,10 +245,12 @@ public class GroupMessageListActivity extends AppCompatActivity
     ImageButton ngc_camera_toggle_button = null;
     ImageButton ngc_camera_next_button = null;
     ImageButton ngc_video_quality_toggle_button = null;
+    ImageButton ngc_mute_button = null;
     static TextView ngc_camera_info_text = null;
     static final int NGC_FRONT_CAMERA_USED = 1;
     static final int NGC_BACK_CAMERA_USED = 2;
     static int ngc_active_camera_type = NGC_BACK_CAMERA_USED;
+    static boolean ngc_audio_mute = true;
     static final int NGC_VIDEO_ICON_STATE_INACTIVE = 0;
     static final int NGC_VIDEO_ICON_STATE_INCOMING = 1;
     static final int NGC_VIDEO_ICON_STATE_ACTIVE = 2;
@@ -465,6 +467,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_camera_toggle_button = (ImageButton) findViewById(R.id.ngc_camera_toggle_button);
         ngc_camera_next_button = (ImageButton) findViewById(R.id.ngc_camera_next_button);
         ngc_video_quality_toggle_button = (ImageButton) findViewById(R.id.ngc_video_quality_toggle_button);
+        ngc_mute_button = (ImageButton) findViewById(R.id.ngc_mute_button);
         ngc_camera_info_text = findViewById(R.id.ngc_camera_info_text);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
         ngc_audio_bar_in_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_in_v);
@@ -626,6 +629,84 @@ public class GroupMessageListActivity extends AppCompatActivity
                         flush_decoder = 1;
                         ngc_video_showing_video_from_peer_pubkey = ngc_get_index_video_incoming_peer_list(ngc_incoming_video_peer_toggle_current_index);
                         ngc_video_frame_last_incoming_ts = System.currentTimeMillis();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                return true;
+            }
+        });
+
+        // on startup always mute mic
+        ngc_audio_mute = true;
+        ngc_audio_bar_in_v.setLevel(0);
+
+        if (ngc_audio_mute == true)
+        {
+            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            ngc_mute_button.setImageDrawable(d5);
+        }
+        else
+        {
+            final Drawable d6 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            ngc_mute_button.setImageDrawable(d6);
+        }
+
+        ngc_mute_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                {
+                    if (ngc_audio_mute == true)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        ngc_mute_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        ngc_mute_button.setImageDrawable(d2a);
+                    }
+                }
+                else
+                {
+                    if (ngc_audio_mute == true)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_mic).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        ngc_mute_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        ngc_mute_button.setImageDrawable(d2a);
+                    }
+
+                    try
+                    {
+                        if (ngc_audio_mute == true)
+                        {
+                            ngc_audio_mute = false;
+                        }
+                        else
+                        {
+                            ngc_audio_mute = true;
+                            ngc_audio_bar_in_v.setLevel(0);
+                        }
                     }
                     catch (Exception e)
                     {
@@ -2967,99 +3048,120 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         try
                         {
-                            final int buffers_in_queue = ngc_audio_out_queue.size();
-                            // Log.i(TAG, "NGC_Group_audio_record_thread:buffers_in_queue=" + buffers_in_queue);
-                            if (buffers_in_queue > 2)
+                            if (ngc_audio_mute == true)
                             {
-                                final byte[] buf_out_1 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
-                                // Log.i(TAG, "NGC_Group_audio_record_thread:buf1=" + bytes_to_hex(buf_out_1));
-                                final byte[] buf_out_2 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
-                                // Log.i(TAG, "NGC_Group_audio_record_thread:buf2=" + bytes_to_hex(buf_out_2));
-                                final byte[] buf_out_3 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
-                                // Log.i(TAG, "NGC_Group_audio_record_thread:buf3=" + bytes_to_hex(buf_out_3));
-                                if ((buf_out_1 == null) || (buf_out_2 == null) || (buf_out_3 == null))
+                                try
                                 {
-                                    Log.i(TAG, "NGC_Group_audio_record_thread:no data in buffers");
+                                    ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
+                                    ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
+                                    ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
                                 }
-                                else if ((buf_out_1.length != NGC_AUDIO_PCM_BUFFER_BYTES) || (buf_out_2.length != NGC_AUDIO_PCM_BUFFER_BYTES) || (buf_out_3.length != NGC_AUDIO_PCM_BUFFER_BYTES))
+                                catch(Exception e)
                                 {
-                                    Log.i(TAG, "NGC_Group_audio_record_thread:wrong buffer sizes");
                                 }
-                                else
-                                {
-                                    // send ngc audio packet
-                                    final byte[] pcm_audio_buffer = new byte[3 * NGC_AUDIO_PCM_BUFFER_BYTES]; // 3 x 3840 bytes pcm data
-                                    final int max_encoded_bytes = (MAX_GC_PACKET_CHUNK_SIZE - 10);
-                                    final byte[] encoded_aframe = new byte[max_encoded_bytes];
-                                    final int samples_per_120ms = NGC_AUDIO_PCM_BUFFER_SAMPLES;
-                                    // copy the 3 pcm buffers into new buffer ---------
-                                    System.arraycopy(buf_out_1, 0, pcm_audio_buffer, 0 * NGC_AUDIO_PCM_BUFFER_BYTES, NGC_AUDIO_PCM_BUFFER_BYTES);
-                                    System.arraycopy(buf_out_2, 0, pcm_audio_buffer, 1 * NGC_AUDIO_PCM_BUFFER_BYTES, NGC_AUDIO_PCM_BUFFER_BYTES);
-                                    System.arraycopy(buf_out_3, 0, pcm_audio_buffer, 2 * NGC_AUDIO_PCM_BUFFER_BYTES, NGC_AUDIO_PCM_BUFFER_BYTES);
-                                    // copy the 3 pcm buffers into new buffer ---------
-                                    int encoded_bytes = toxav_ngc_audio_encode(pcm_audio_buffer,
-                                                                               samples_per_120ms,
-                                                                               encoded_aframe);
-                                    if ((encoded_bytes < 1)||(encoded_bytes > max_encoded_bytes))
-                                    {
-                                        // some error with encoding
-                                    }
-                                    else
-                                    {
-                                        // Log.i(TAG, "NGC_Group_audio_record_thread:encoded bytes=" + encoded_bytes);
-                                        final int header_length = 6 + 1 + 1 + 1 + 1;
-                                        long data_length_ = header_length + encoded_bytes;
-                                        final int data_length = (int) data_length_;
-                                        //
-                                        try
-                                        {
-                                            ByteBuffer data_buf = ByteBuffer.allocateDirect(data_length);
-                                            data_buf.rewind();
-                                            //
-                                            data_buf.put((byte) 0x66);
-                                            data_buf.put((byte) 0x77);
-                                            data_buf.put((byte) 0x88);
-                                            data_buf.put((byte) 0x11);
-                                            data_buf.put((byte) 0x34);
-                                            data_buf.put((byte) 0x35);
-                                            //
-                                            data_buf.put((byte) 0x01);
-                                            //
-                                            data_buf.put((byte) 0x31);
-                                            //
-                                            data_buf.put((byte) 1); // always 1 (for MONO)
-                                            data_buf.put((byte) 48); // always 48 (for 48kHz)
-                                            //
-                                            data_buf.put(encoded_aframe, 0, encoded_bytes); // put encoded audio frame into buffer
-                                            //
-                                            byte[] data = new byte[data_length];
-                                            data_buf.rewind();
-                                            data_buf.get(data);
-                                            if (data_length < MAX_GC_PACKET_CHUNK_SIZE)
-                                            {
-                                                int result = tox_group_send_custom_packet(tox_group_by_groupid__wrapper(group_id), 0,
-                                                                                          data, data_length);
-                                                // Log.i(TAG, "NGC_Group_audio_record_thread:ls:tox_group_send_custom_packet:result=" + result + " bytes=" + encoded_bytes);
-                                            }
-                                            else
-                                            {
-                                                int result = tox_group_send_custom_packet(tox_group_by_groupid__wrapper(group_id), 1,
-                                                                                          data, data_length);
-                                                // Log.i(TAG, "NGC_Group_audio_record_thread:LL:tox_group_send_custom_packet:result=" + result + " bytes=" + encoded_bytes);
-                                            }
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            e.printStackTrace();
-                                        }
-                                        //
-                                    }
-
-                                }
+                                Thread.sleep(120);
                             }
                             else
                             {
-                                Thread.sleep(60);
+                                final int buffers_in_queue = ngc_audio_out_queue.size();
+                                // Log.i(TAG, "NGC_Group_audio_record_thread:buffers_in_queue=" + buffers_in_queue);
+                                if (buffers_in_queue > 2)
+                                {
+                                    final byte[] buf_out_1 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
+                                    // Log.i(TAG, "NGC_Group_audio_record_thread:buf1=" + bytes_to_hex(buf_out_1));
+                                    final byte[] buf_out_2 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
+                                    // Log.i(TAG, "NGC_Group_audio_record_thread:buf2=" + bytes_to_hex(buf_out_2));
+                                    final byte[] buf_out_3 = ngc_audio_out_queue.poll(1, TimeUnit.MILLISECONDS);
+                                    // Log.i(TAG, "NGC_Group_audio_record_thread:buf3=" + bytes_to_hex(buf_out_3));
+                                    if ((buf_out_1 == null) || (buf_out_2 == null) || (buf_out_3 == null))
+                                    {
+                                        Log.i(TAG, "NGC_Group_audio_record_thread:no data in buffers");
+                                    }
+                                    else if ((buf_out_1.length != NGC_AUDIO_PCM_BUFFER_BYTES) || (buf_out_2.length != NGC_AUDIO_PCM_BUFFER_BYTES) ||
+                                             (buf_out_3.length != NGC_AUDIO_PCM_BUFFER_BYTES))
+                                    {
+                                        Log.i(TAG, "NGC_Group_audio_record_thread:wrong buffer sizes");
+                                    }
+                                    else
+                                    {
+                                        // send ngc audio packet
+                                        final byte[] pcm_audio_buffer = new byte[3 * NGC_AUDIO_PCM_BUFFER_BYTES]; // 3 x 3840 bytes pcm data
+                                        final int max_encoded_bytes = (MAX_GC_PACKET_CHUNK_SIZE - 10);
+                                        final byte[] encoded_aframe = new byte[max_encoded_bytes];
+                                        final int samples_per_120ms = NGC_AUDIO_PCM_BUFFER_SAMPLES;
+                                        // copy the 3 pcm buffers into new buffer ---------
+                                        System.arraycopy(buf_out_1, 0, pcm_audio_buffer, 0 * NGC_AUDIO_PCM_BUFFER_BYTES,
+                                                         NGC_AUDIO_PCM_BUFFER_BYTES);
+                                        System.arraycopy(buf_out_2, 0, pcm_audio_buffer, 1 * NGC_AUDIO_PCM_BUFFER_BYTES,
+                                                         NGC_AUDIO_PCM_BUFFER_BYTES);
+                                        System.arraycopy(buf_out_3, 0, pcm_audio_buffer, 2 * NGC_AUDIO_PCM_BUFFER_BYTES,
+                                                         NGC_AUDIO_PCM_BUFFER_BYTES);
+                                        // copy the 3 pcm buffers into new buffer ---------
+                                        int encoded_bytes = toxav_ngc_audio_encode(pcm_audio_buffer, samples_per_120ms,
+                                                                                   encoded_aframe);
+                                        if ((encoded_bytes < 1) || (encoded_bytes > max_encoded_bytes))
+                                        {
+                                            // some error with encoding
+                                        }
+                                        else
+                                        {
+                                            // Log.i(TAG, "NGC_Group_audio_record_thread:encoded bytes=" + encoded_bytes);
+                                            final int header_length = 6 + 1 + 1 + 1 + 1;
+                                            long data_length_ = header_length + encoded_bytes;
+                                            final int data_length = (int) data_length_;
+                                            //
+                                            try
+                                            {
+                                                ByteBuffer data_buf = ByteBuffer.allocateDirect(data_length);
+                                                data_buf.rewind();
+                                                //
+                                                data_buf.put((byte) 0x66);
+                                                data_buf.put((byte) 0x77);
+                                                data_buf.put((byte) 0x88);
+                                                data_buf.put((byte) 0x11);
+                                                data_buf.put((byte) 0x34);
+                                                data_buf.put((byte) 0x35);
+                                                //
+                                                data_buf.put((byte) 0x01);
+                                                //
+                                                data_buf.put((byte) 0x31);
+                                                //
+                                                data_buf.put((byte) 1); // always 1 (for MONO)
+                                                data_buf.put((byte) 48); // always 48 (for 48kHz)
+                                                //
+                                                data_buf.put(encoded_aframe, 0, encoded_bytes); // put encoded audio frame into buffer
+                                                //
+                                                byte[] data = new byte[data_length];
+                                                data_buf.rewind();
+                                                data_buf.get(data);
+                                                if (data_length < MAX_GC_PACKET_CHUNK_SIZE)
+                                                {
+                                                    int result = tox_group_send_custom_packet(
+                                                            tox_group_by_groupid__wrapper(group_id), 0, data,
+                                                            data_length);
+                                                    // Log.i(TAG, "NGC_Group_audio_record_thread:ls:tox_group_send_custom_packet:result=" + result + " bytes=" + encoded_bytes);
+                                                }
+                                                else
+                                                {
+                                                    int result = tox_group_send_custom_packet(
+                                                            tox_group_by_groupid__wrapper(group_id), 1, data,
+                                                            data_length);
+                                                    // Log.i(TAG, "NGC_Group_audio_record_thread:LL:tox_group_send_custom_packet:result=" + result + " bytes=" + encoded_bytes);
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                e.printStackTrace();
+                                            }
+                                            //
+                                        }
+
+                                    }
+                                }
+                                else
+                                {
+                                    Thread.sleep(60);
+                                }
                             }
                         }
                         catch(Exception e)
@@ -3383,7 +3485,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                     try
                     {
-                        ngc_audio_bar_in_v.setLevel(get_vu_in() / 90.0f);
+                        if (ngc_audio_mute == false)
+                        {
+                            ngc_audio_bar_in_v.setLevel(get_vu_in() / 90.0f);
+                        }
                         ngc_audio_bar_out_v.setLevel(get_vu_out() / 140.0f);
                     }
                     catch (Exception e)

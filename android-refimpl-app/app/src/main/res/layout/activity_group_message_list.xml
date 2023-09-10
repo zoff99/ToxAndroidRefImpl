@@ -137,8 +137,8 @@
                     android:layout_width="8dp"
                     android:layout_height="match_parent"
                     android:layout_gravity="left"
-                    android:layout_marginRight="1dp"
                     android:layout_marginLeft="2dp"
+                    android:layout_marginRight="1dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -201,8 +201,9 @@
                         android:id="@+id/ngc_video_own_view"
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="42"
-                        android:background="@color/md_always_black_1000" />
+                        android:layout_weight="40"
+                        android:background="@color/md_always_black_1000"
+                        tools:ignore="NestedWeights" />
 
                     <TextView
                         android:id="@+id/ngc_camera_info_text"
@@ -228,7 +229,26 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="8"
+                        android:layout_weight="4"
+                        android:background="@android:color/transparent"
+                        android:text="" />
+
+                    <ImageButton
+                        android:id="@+id/ngc_mute_button"
+                        android:layout_width="@dimen/calling_activity_bottom_buttons_small_height"
+                        android:layout_height="@dimen/calling_activity_bottom_buttons_small_height"
+                        android:layout_gravity="center"
+                        android:background="@android:color/transparent"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:keepScreenOn="true"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/circle_green" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="4"
                         android:background="@android:color/transparent"
                         android:text="" />
 
@@ -247,7 +267,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="0dp"
-                        android:layout_weight="8"
+                        android:layout_weight="4"
                         android:background="@android:color/transparent"
                         android:text="" />
 
