@@ -9009,7 +9009,7 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
 
     const size_t buf_size = (size_t)(num_samples * 2);
 
-    float damping_factor = (float)num_bufs_ready * 1.5f;
+    float damping_factor = 1; // (float)num_bufs_ready * 1.5f;
     if (damping_factor < 1)
     {
         damping_factor = 1;
