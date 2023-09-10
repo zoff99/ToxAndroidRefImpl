@@ -1097,6 +1097,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                     GoogleMaterial.Icon.gmd_mic_off).backgroundColor(Color.TRANSPARENT).color(
                                     getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
                             mute_button.setImageDrawable(d2a);
+                            audio_bar_in_v.setLevel(0);
                         }
                     }
                     catch (Exception e)
@@ -1390,7 +1391,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         try
         {
-            audio_bar_in_v.setLevel(get_vu_in() / 90.0f);
+            if (trifa_is_MicrophoneMute == false)
+            {
+                audio_bar_in_v.setLevel(get_vu_in() / 90.0f);
+            }
             audio_bar_out_v.setLevel(get_vu_out() / 140.0f);
         }
         catch (Exception e)
