@@ -7289,7 +7289,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
     int32_t u_stride;
     int32_t v_stride;
     bool res = toxav_ngc_video_decode(tox_av_ngc_vcoders_global,
-                                      enc_c, encoded_frame_size_bytes,
+                                      (uint8_t *)enc_c, encoded_frame_size_bytes,
                                       width, height,
                                       (uint8_t *)y_c, (uint8_t *)u_c, (uint8_t *)v_c,
                                       &y_stride, &u_stride, &v_stride,
@@ -7456,7 +7456,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1audio_1decode(JNIEnv
     jbyte *enc_c = (*env)->GetByteArrayElements(env, encoded_frame_bytes, 0);
 
     int samples_decoded = toxav_ngc_audio_decode(tox_av_ngc_acoders_global,
-                                                enc_c, encoded_frame_size_bytes,
+                                                (const uint8_t *)enc_c, encoded_frame_size_bytes,
                                                 (int16_t *)pcm_decoded_c);
 
     (*env)->ReleaseByteArrayElements(env, pcm_decoded, pcm_decoded_c, JNI_COMMIT); /* DO copy back contents */
@@ -9009,7 +9009,7 @@ int16_t *group_audio_get_mixed_output_buffer(uint32_t num_samples)
 
     const size_t buf_size = (size_t)(num_samples * 2);
 
-    float damping_factor = (float)num_bufs_ready * 1.5f;
+    float damping_factor = 1; // (float)num_bufs_ready * 1.5f;
     if (damping_factor < 1)
     {
         damping_factor = 1;
