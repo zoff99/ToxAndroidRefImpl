@@ -443,4 +443,10 @@
     <string name="pref_description_mic_gain_factor_toggle">如果你的麦克风录音灵敏度太高，启用这个设置，麦克风增益因子会降低麦克风的音量</string>
     <string name="MainActivity_join_trifa_groupchat">加入消息群</string>
     <string name="layout___peer_first_join_date">首次加入日期：</string>
+    <string name="layout___conf_message_stats">会议中的消息：</string>
+    <string name="layout___group_peerlimit2">Peer 限制：</string>
+    <string name="layout___group_peerlimit">Peer 限制</string>
+    <string name="layout___friend_message_stats">消息：</string>
+    <string name="layout___delete_group_system_msgs">删除系统消息</string>
+    <string name="layout___group_message_stats">群组中的消息：</string>
 </resources>
