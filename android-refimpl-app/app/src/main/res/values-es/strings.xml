@@ -415,4 +415,10 @@
     <string name="pref_description_mic_gain_factor_toggle">Si su micrófono graba con demasiada sensibilidad, habilite esta configuración y el factor de ganancia del micrófono reducirá el volumen del micrófono</string>
     <string name="MainActivity_join_trifa_groupchat">Únete al Grupo de Información</string>
     <string name="layout___peer_first_join_date">Fecha del primer ingreso:</string>
+    <string name="layout___conf_message_stats">Mensajes en Conferencia:</string>
+    <string name="layout___group_peerlimit2">Límite de pares:</string>
+    <string name="layout___group_peerlimit">Límite de pares</string>
+    <string name="layout___friend_message_stats">Mensajes:</string>
+    <string name="layout___delete_group_system_msgs">Borrar Mensajes de Sistema</string>
+    <string name="layout___group_message_stats">Mensajes en Grupo:</string>
 </resources>
