@@ -30,6 +30,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ImageFormat;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
@@ -246,11 +247,13 @@ public class GroupMessageListActivity extends AppCompatActivity
     ImageButton ngc_camera_next_button = null;
     ImageButton ngc_video_quality_toggle_button = null;
     ImageButton ngc_mute_button = null;
+    ImageButton ngc_video_off_button = null;
     static TextView ngc_camera_info_text = null;
     static final int NGC_FRONT_CAMERA_USED = 1;
     static final int NGC_BACK_CAMERA_USED = 2;
     static int ngc_active_camera_type = NGC_BACK_CAMERA_USED;
     static boolean ngc_audio_mute = true;
+    static boolean ngc_video_off = true;
     static final int NGC_VIDEO_ICON_STATE_INACTIVE = 0;
     static final int NGC_VIDEO_ICON_STATE_INCOMING = 1;
     static final int NGC_VIDEO_ICON_STATE_ACTIVE = 2;
@@ -468,6 +471,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_camera_next_button = (ImageButton) findViewById(R.id.ngc_camera_next_button);
         ngc_video_quality_toggle_button = (ImageButton) findViewById(R.id.ngc_video_quality_toggle_button);
         ngc_mute_button = (ImageButton) findViewById(R.id.ngc_mute_button);
+        ngc_video_off_button = (ImageButton) findViewById(R.id.ngc_video_off_button);
         ngc_camera_info_text = findViewById(R.id.ngc_camera_info_text);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
         ngc_audio_bar_in_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_in_v);
@@ -706,6 +710,98 @@ public class GroupMessageListActivity extends AppCompatActivity
                         {
                             ngc_audio_mute = true;
                             ngc_audio_bar_in_v.setLevel(0);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                }
+                return true;
+            }
+        });
+
+        ngc_video_off = true;
+        if (ngc_video_off == true)
+        {
+            final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_videocam_off).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            ngc_video_off_button.setImageDrawable(d5);
+        }
+        else
+        {
+            final Drawable d6 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_videocam).backgroundColor(
+                    Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
+            ngc_video_off_button.setImageDrawable(d6);
+        }
+
+        ngc_video_off_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() != MotionEvent.ACTION_UP)
+                {
+                    if (ngc_video_off == true)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_videocam_off).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        ngc_video_off_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_videocam).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.md_green_600)).sizeDp(7);
+                        ngc_video_off_button.setImageDrawable(d2a);
+                    }
+                }
+                else
+                {
+                    if (ngc_video_off == true)
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_videocam).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        ngc_video_off_button.setImageDrawable(d2a);
+                    }
+                    else
+                    {
+                        Drawable d2a = new IconicsDrawable(v.getContext()).icon(
+                                GoogleMaterial.Icon.gmd_videocam_off).backgroundColor(Color.TRANSPARENT).color(
+                                getResources().getColor(R.color.colorPrimaryDark)).sizeDp(7);
+                        ngc_video_off_button.setImageDrawable(d2a);
+                    }
+
+                    try
+                    {
+                        if (ngc_video_off == true)
+                        {
+                            ngc_video_off = false;
+                            try
+                            {
+                                openCamera();
+                            }
+                            catch(Exception e)
+                            {
+                            }
+                        }
+                        else
+                        {
+                            ngc_video_off = true;
+                            try
+                            {
+                                closeCamera();
+                                // clear preview View
+                                final Bitmap empty_bitmap = Bitmap.createBitmap(16, 16, Bitmap.Config.ARGB_8888);
+                                ngc_video_own_view.setBitmap(empty_bitmap);
+                            }
+                            catch(Exception e)
+                            {
+                                e.printStackTrace();
+                            }
                         }
                     }
                     catch (Exception e)
@@ -2243,6 +2339,11 @@ public class GroupMessageListActivity extends AppCompatActivity
         public void onImageAvailable(ImageReader reader) {
             try
             {
+                if (ngc_video_off)
+                {
+                    return;
+                }
+
                 Image image = reader.acquireLatestImage();
                 if (image == null)
                 {
