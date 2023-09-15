@@ -407,4 +407,8 @@
     <string name="incoming_filetransfer_size_too_large">Eingehende Dateien zu groß. Es können nur Dateien bis zu 2 GBytes empfangen werden.</string>
     <string name="MainActivity_join_trifa_groupchat">Info-Gruppe beitreten</string>
     <string name="layout___peer_first_join_date">Datum des ersten Beitritts:</string>
+    <string name="layout___conf_message_stats">Nachrichten in der Konferenz:</string>
+    <string name="layout___friend_message_stats">Nachrichten:</string>
+    <string name="layout___delete_group_system_msgs">Systemnachrichten löschen</string>
+    <string name="layout___group_message_stats">Nachrichten in der Gruppe:</string>
 </resources>
