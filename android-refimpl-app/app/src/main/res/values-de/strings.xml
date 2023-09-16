@@ -411,4 +411,6 @@
     <string name="layout___friend_message_stats">Nachrichten:</string>
     <string name="layout___delete_group_system_msgs">Systemnachrichten löschen</string>
     <string name="layout___group_message_stats">Nachrichten in der Gruppe:</string>
+    <string name="layout___group_peerlimit2">Gegenstellenbeschränkungen:</string>
+    <string name="layout___group_peerlimit">Gegenstellenbeschränkungen</string>
 </resources>
