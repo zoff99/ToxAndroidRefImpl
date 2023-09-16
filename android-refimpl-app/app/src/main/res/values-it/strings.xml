@@ -415,4 +415,10 @@
     <string name="layout___group_id2">ID di gruppo:</string>
     <string name="MainActivity_join_trifa_groupchat">Iscriviti al Gruppo Info</string>
     <string name="layout___peer_first_join_date">Data della prima iscrizione:</string>
+    <string name="layout___conf_message_stats">Messaggi in Conferenza:</string>
+    <string name="layout___group_peerlimit2">Limite di nodi:</string>
+    <string name="layout___group_peerlimit">Limite di nodi</string>
+    <string name="layout___friend_message_stats">Messaggi:</string>
+    <string name="layout___delete_group_system_msgs">Eliminare i messaggi di sistema</string>
+    <string name="layout___group_message_stats">Messaggi in Gruppo:</string>
 </resources>
