@@ -117,9 +117,6 @@ import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
 import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
-import static com.zoffcc.applications.trifa.HelperConference.delete_conference;
-import static com.zoffcc.applications.trifa.HelperConference.delete_conference_all_messages;
-import static com.zoffcc.applications.trifa.HelperConference.set_conference_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.copy_outgoing_file_to_sdcard_dir;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
@@ -153,14 +150,12 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_key
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.audio_out_buffer_mult;
-import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
-import static com.zoffcc.applications.trifa.MainActivity.tox_conference_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
@@ -185,6 +180,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_BY
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_NGC_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_NGC_VIDEO_QUANTIZER;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_UPDATE_NGC_GROUP_ALL_USERS_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_QUANTIZER;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_AUDIO_PCM_BUFFER_BYTES;
@@ -278,6 +274,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     static MenuItem amode_info_menu_item = null;
     static boolean oncreate_finished = false;
     SearchView messageSearchView = null;
+    private static long update_group_all_users_last_trigger_ts = 0;
     //
     static long last_processed_camera_frame = -1;
 
@@ -1322,6 +1319,10 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+
+        // reset update trigger timestamp
+        update_group_all_users_last_trigger_ts = 0;
+
         stop_group_video(this);
         closeCamera();
         ngc_video_packet_last_incoming_ts = -1;
@@ -2042,6 +2043,40 @@ public class GroupMessageListActivity extends AppCompatActivity
     }
 
     synchronized void update_group_all_users()
+    {
+        // Log.i(TAG, "update_group_all_users:** CALL");
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - update_group_all_users_last_trigger_ts >= INTERVAL_UPDATE_NGC_GROUP_ALL_USERS_MS)
+        {
+            update_group_all_users_last_trigger_ts = currentTime;
+            // Log.i(TAG, "update_group_all_users:-> REAL");
+            update_group_all_users_real();
+        }
+        else
+        {
+            long delta_t_ms = currentTime - update_group_all_users_last_trigger_ts;
+            // Log.i(TAG, "update_group_all_users:  TRIG delta ms=" + delta_t_ms);
+            long trigger_in_ms_again = INTERVAL_UPDATE_NGC_GROUP_ALL_USERS_MS - delta_t_ms;
+            if ((trigger_in_ms_again < 1) || (trigger_in_ms_again > (INTERVAL_UPDATE_NGC_GROUP_ALL_USERS_MS + 1)))
+            {
+                trigger_in_ms_again = INTERVAL_UPDATE_NGC_GROUP_ALL_USERS_MS;
+            }
+            final long trigger_in_ms_again_ = trigger_in_ms_again + 2;
+            final Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(trigger_in_ms_again_);
+                    // Log.i(TAG, "update_group_all_users:__ CALL from Trigger");
+                    update_group_all_users();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            thread.start();
+        }
+    }
+
+    void update_group_all_users_real()
     {
         try
         {
