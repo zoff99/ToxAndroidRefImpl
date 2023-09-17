@@ -48,13 +48,10 @@ import static com.zoffcc.applications.trifa.ConferenceAudioActivity.push_to_talk
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.init_native_audio_stuff;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.ngc_audio_in_queue;
 import static com.zoffcc.applications.trifa.HeadsetStateReceiver.isBluetoothConnected;
-import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
 import static com.zoffcc.applications.trifa.HelperGeneric.reset_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_audio_to_headset;
-import static com.zoffcc.applications.trifa.HelperGeneric.stop_audio_system;
 import static com.zoffcc.applications.trifa.HelperGeneric.stop_ngc_audio_system;
-import static com.zoffcc.applications.trifa.MainActivity.toxav_groupchat_disable_av;
 
 public class GroupGroupAudioService extends Service
 {
@@ -173,6 +170,7 @@ public class GroupGroupAudioService extends Service
                     e.printStackTrace();
                 }
 
+                /* --------- do not start audorecording yet
                 try
                 {
                     if (AudioRecording.stopped)
@@ -184,6 +182,7 @@ public class GroupGroupAudioService extends Service
                 {
                     e.printStackTrace();
                 }
+                */
                 // ------------- START Audio playing -------------
                 // ------------- START Audio playing -------------
                 // ------------- START Audio playing -------------
