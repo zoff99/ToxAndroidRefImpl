@@ -90,7 +90,7 @@ dependencyVerification {
         'androidx.viewpager2:viewpager2:1.1.0-beta02:viewpager2-1.1.0-beta02.aar:bafac3ca991ed68a2c7ca6ff352966d200b12e66a342d10f497cb8168f59054a',
         'androidx.viewpager:viewpager:1.0.0:viewpager-1.0.0.aar:147af4e14a1984010d8f155e5e19d781f03c1d70dfed02a8e0d18428b8fc8682',
         'androidx.window:window:1.0.0:window-1.0.0.aar:3212985be4127373ca4d0ea7f8b81a250ae2105e924f7940105d067a0f9ac130',
-        'build-tools:30.0.3:renderscript:androidx-rs.jar:174eb53df52a9cca7bf9c396ba93bf4ac0262a48f2a1375f626efddf405d4666',
+        'build-tools:34.0.0:renderscript:androidx-rs.jar:174eb53df52a9cca7bf9c396ba93bf4ac0262a48f2a1375f626efddf405d4666',
         'com.almworks.sqlite4java:sqlite4java:1.0.392:sqlite4java-1.0.392.jar:243a64470fda0e86a6fddeb0af4c7aa9426ce84e68cbfe18d75ee5da4b7e0b92',
         'com.android.tools.ddms:ddmlib:30.3.1:ddmlib-30.3.1.jar:58c4db5a94a5f8c933409335f6657a92ff9c87488a271b260315fbd020c07fe0',
         'com.android.tools.emulator:proto:30.3.1:proto-30.3.1.jar:a0f464cbd7f528aa15846611626c7afcd08649804ca72782c6e3f291a065a0c1',
