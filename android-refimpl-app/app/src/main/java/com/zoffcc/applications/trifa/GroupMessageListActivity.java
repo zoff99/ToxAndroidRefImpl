@@ -588,7 +588,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                             Log.i(TAG, "ngc_active_camera_type(8b)=" + ngc_active_camera_type);
                         }
                         closeCamera();
-                        openCamera();
+
+                        if (ngc_video_off == false)
+                        {
+                            openCamera();
+                        }
                     }
                     catch (Exception e)
                     {
@@ -3326,7 +3330,6 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                     ngc_incoming_video_peer_toggle_current_index = 0;
                     flush_decoder = 1;
-                    openCamera();
                     start_group_video(view.getContext());
                 }
             });
