@@ -58,7 +58,6 @@ public class FriendListFragment extends Fragment
     FriendlistAdapter adapter = null;
     public static Semaphore semaphore_friendlist_ui_01 = new Semaphore(1);
     private static long add_all_friends_clear_last_trigger_ts = 0;
-    private static boolean add_all_friends_clear_trigger = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
@@ -878,14 +877,12 @@ public class FriendListFragment extends Fragment
         long currentTime = System.currentTimeMillis();
         if (currentTime - add_all_friends_clear_last_trigger_ts >= INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS)
         {
-            add_all_friends_clear_trigger = false;
             // Log.i(TAG, "add_all_friends_clear:-> REAL");
             add_all_friends_clear_real(delay);
             add_all_friends_clear_last_trigger_ts = currentTime;
         }
         else
         {
-            add_all_friends_clear_trigger = true;
             long delta_t_ms = currentTime - add_all_friends_clear_last_trigger_ts;
             // Log.i(TAG, "add_all_friends_clear:  TRIG delta ms=" + delta_t_ms);
             long trigger_in_ms_again = INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS - delta_t_ms;
