@@ -82,8 +82,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 92
-static const char global_version_string[] = "0.99.92";
+#define VERSION_PATCH 93
+static const char global_version_string[] = "0.99.93";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -836,7 +836,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     FILE *f = fopen(full_path_filename_tmp, "wb");
     fwrite((const void *)savedata_enc, size_enc, 1, f);
     fclose(f);
-    dbg(9, "update_savedata_file:rename src=%s dst=%s", full_path_filename_tmp, full_path_filename);
+    // dbg(9, "update_savedata_file:rename src=%s dst=%s", full_path_filename_tmp, full_path_filename);
 
 #ifdef __MINGW32__
     // HINT: rename() will refuse to overwrite existing files with WIN32 mingw
@@ -844,7 +844,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 #endif
 
     int res_rename = rename(full_path_filename_tmp, full_path_filename);
-    dbg(9, "update_savedata_file:rename src=%s dst=%s res=%d", full_path_filename_tmp, full_path_filename, res_rename);
+    // dbg(9, "update_savedata_file:rename src=%s dst=%s res=%d", full_path_filename_tmp, full_path_filename, res_rename);
     free(full_path_filename);
     free(full_path_filename_tmp);
 
