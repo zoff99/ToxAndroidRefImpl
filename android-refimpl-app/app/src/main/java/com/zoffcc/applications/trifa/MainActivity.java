@@ -166,6 +166,8 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffe
 import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper_throttled;
+import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper_throttled_last_trigger_ts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperGroup.add_group_peer_to_db;
 import static com.zoffcc.applications.trifa.HelperGroup.add_system_message_to_group_chat;
@@ -2301,6 +2303,9 @@ public class MainActivity extends AppCompatActivity
         PREF__window_security = settings.getBoolean("window_security", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
         PREF__tox_set_do_not_sync_av = settings.getBoolean("X_tox_set_do_not_sync_av", false);
+
+        // reset trigger for throttled saving
+        update_savedata_file_wrapper_throttled_last_trigger_ts = 0;
 
         try
         {
@@ -7149,7 +7154,7 @@ public class MainActivity extends AppCompatActivity
         {
             send_ngch_request(temp_group_identifier, tox_group_peer_get_public_key__wrapper(group_number, peer_id));
         }
-        update_savedata_file_wrapper();
+        update_savedata_file_wrapper_throttled();
     }
 
     static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a_Tox_Group_Exit_Type)

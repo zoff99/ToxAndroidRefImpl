@@ -85,7 +85,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.exifinterface.media.ExifInterface;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static android.content.Context.MODE_PRIVATE;
 import static android.graphics.Color.blue;
 import static android.graphics.Color.green;
 import static android.graphics.Color.red;
@@ -107,8 +106,6 @@ import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_m
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
-import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
-import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
@@ -161,15 +158,16 @@ import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 public class HelperGeneric
 {
-    static final Object audio_system_start_stop_lock = new Object();
+    private static final String TAG = "trifa.Hlp.Generic";
+
     /*
      all stuff here should be moved somewhere else at some point
      */
-
-    private static final String TAG = "trifa.Hlp.Generic";
+    static final Object audio_system_start_stop_lock = new Object();
 
     private static final Pattern PATTERN_IPV4 = Pattern.compile(
             "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
+    private static final int INTERVAL_UPDATE_SAVE_FILE_WRAPPER_THROTTLED_MS = 200;
 
     static long video_frame_age_mean = 0;
     static int video_frame_age_values_cur_index = 0;
@@ -177,6 +175,8 @@ public class HelperGeneric
     static long[] video_frame_age_values = new long[video_frame_age_values_cur_index_count];
     static byte[] buf_video_send_frame = null;
     static long last_log_battery_savings_criteria_ts = -1;
+    static long update_savedata_file_wrapper_throttled_last_trigger_ts = 0;
+    static long update_savedata_file_wrapper_last_ts = 0;
 
     public static void clearCache_s()
     {
@@ -2519,10 +2519,48 @@ public class HelperGeneric
         // Log.i(TAG, "new NOSPAM=" + MainActivity.tox_self_get_nospam());
     }
 
+    static void update_savedata_file_wrapper_throttled()
+    {
+        // Log.i(TAG, "update_savedata_file_wrapper_throttled:** CALL");
+        long currentTime = System.currentTimeMillis();
+
+        if (currentTime - update_savedata_file_wrapper_throttled_last_trigger_ts >=
+            INTERVAL_UPDATE_SAVE_FILE_WRAPPER_THROTTLED_MS)
+        {
+            update_savedata_file_wrapper_throttled_last_trigger_ts = currentTime;
+            // Log.i(TAG, "update_savedata_file_wrapper_throttled:-> REAL");
+            update_savedata_file_wrapper();
+        }
+        else
+        {
+            long delta_t_ms = currentTime - update_savedata_file_wrapper_throttled_last_trigger_ts;
+            // Log.i(TAG, "update_savedata_file_wrapper_throttled:  TRIG delta ms=" + delta_t_ms);
+            long trigger_in_ms_again = INTERVAL_UPDATE_SAVE_FILE_WRAPPER_THROTTLED_MS - delta_t_ms;
+            if ((trigger_in_ms_again < 1) || (trigger_in_ms_again > (INTERVAL_UPDATE_SAVE_FILE_WRAPPER_THROTTLED_MS + 1)))
+            {
+                trigger_in_ms_again = INTERVAL_UPDATE_SAVE_FILE_WRAPPER_THROTTLED_MS;
+            }
+            final long trigger_in_ms_again_ = trigger_in_ms_again + 2;
+            final Thread thread = new Thread(() -> {
+                try {
+                    Thread.sleep(trigger_in_ms_again_);
+                    // Log.i(TAG, "update_savedata_file_wrapper_throttled:__ CALL from Trigger");
+                    update_savedata_file_wrapper_throttled();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            });
+            thread.start();
+        }
+    }
+
     static void update_savedata_file_wrapper()
     {
         if (is_tox_started == true)
         {
+            //Log.i(TAG, "update_savedata_file:delta_ms="
+            //           + (System.currentTimeMillis() - update_savedata_file_wrapper_last_ts));
+            //update_savedata_file_wrapper_last_ts = System.currentTimeMillis();
             try
             {
                 MainActivity.semaphore_tox_savedata.acquire();
@@ -2531,8 +2569,8 @@ public class HelperGeneric
                         TrifaSetPatternActivity.sha256(TrifaSetPatternActivity.StringToBytes2(PREF__DB_secrect_key))));
                 long end_timestamp = System.currentTimeMillis();
                 MainActivity.semaphore_tox_savedata.release();
-                Log.i(TAG,
-                      "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
+                // Log.i(TAG,
+                //      "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
             }
             catch (InterruptedException e)
             {
