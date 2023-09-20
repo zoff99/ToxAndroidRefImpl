@@ -630,6 +630,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 {
     if (pthread_mutex_init(&group_audio___mutex, NULL) != 0)
     {
+        return NULL;
     }
 
     Tox *tox = NULL;
@@ -685,7 +686,12 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     options.log_callback = tox_log_cb__custom;
     // ------------------------------------------------------------
     dbg(9, "1007");
-    char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
+    char *full_path_filename = calloc(1, MAX_FULL_PATH_LENGTH);
+    if (full_path_filename == NULL)
+    {
+        pthread_mutex_destroy(&group_audio___mutex);
+        return NULL;
+    }
     dbg(9, "1008");
 
 #ifdef __MINGW32__
@@ -702,10 +708,18 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
         fseek(f, 0, SEEK_END);
         long fsize = ftell(f);
         fseek(f, 0, SEEK_SET);
-        uint8_t *savedata_enc = malloc(fsize);
+        uint8_t *savedata_enc = calloc(1, fsize);
+        if (savedata_enc == NULL)
+        {
+            fclose(f);
+            free(full_path_filename);
+            pthread_mutex_destroy(&group_audio___mutex);
+            return NULL;
+        }
+
         size_t dummy = fread(savedata_enc, fsize, 1, f);
 
-        if(dummy < 1)
+        if(dummy != 1)
         {
             dbg(0, "reading savedata_enc failed");
         }
