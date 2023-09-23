@@ -27,6 +27,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -428,7 +429,7 @@ public class GroupGroupAudioService extends Service
         b.setStyle(new androidx.media.app.NotificationCompat.MediaStyle());
         b.setColor(getResources().getColor(R.color.colorPrimary));
         b.setSmallIcon(R.mipmap.ic_launcher);
-        b.setLargeIcon(null);
+        b.setLargeIcon((Bitmap) null);
         b.setContentText("Tox:" + "GroupAudio playing ...");
         b.setVisibility(NotificationCompat.VISIBILITY_PUBLIC);
         b.setAutoCancel(false);
