@@ -214,6 +214,8 @@ public class NativeAudio
 
     public static native int get_audio_aec_delay();
 
+    public static native void na_set_audio_play_volume_percent(int volume_percent);
+
     // ---------------------
 
     public static native void createBufferQueueAudioPlayer(int sampleRate, int channels, int num_bufs, int eac_delay_ms);

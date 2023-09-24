@@ -111,6 +111,7 @@ import androidx.renderscript.Type;
 
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.na_set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.CallingActivity.audio_thread;
@@ -142,6 +143,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name_
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_bitrate;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_frame_delta_ms;
@@ -156,6 +158,7 @@ import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
+import static com.zoffcc.applications.trifa.MainActivity.set_audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
@@ -1307,6 +1310,15 @@ public class GroupMessageListActivity extends AppCompatActivity
     @Override
     protected void onStop()
     {
+        try
+        {
+            na_set_audio_play_volume_percent(100);
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
+
         if (emojiPopup != null)
         {
             emojiPopup.dismiss();
@@ -1329,6 +1341,16 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_incoming_video_peer_toggle_current_index = 0;
         flush_decoder = 1;
         ngc_purge_video_incoming_peer_list();
+
+        try
+        {
+            na_set_audio_play_volume_percent(PREF__audio_play_volume_percent);
+            Log.i(TAG,"NGC:PREF__audio_play_volume_percent=" + PREF__audio_play_volume_percent);
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
 
         // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
