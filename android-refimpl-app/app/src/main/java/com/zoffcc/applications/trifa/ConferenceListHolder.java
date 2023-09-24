@@ -39,6 +39,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.FriendListFragment.fl_loading_progressbar;
 import static com.zoffcc.applications.trifa.HelperConference.conference_identifier_short;
 import static com.zoffcc.applications.trifa.HelperConference.delete_conference;
 import static com.zoffcc.applications.trifa.HelperConference.delete_conference_all_messages;
@@ -73,21 +74,12 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
     private ImageView imageView2;
     private ImageView f_notification;
     private ViewGroup f_conf_container_parent;
-    static ProgressDialog conference_progressDialog = null;
 
     synchronized static void remove_progress_dialog()
     {
         try
         {
-            if (conference_progressDialog != null)
-            {
-                if (ConferenceListHolder.conference_progressDialog.isShowing())
-                {
-                    conference_progressDialog.dismiss();
-                }
-            }
-
-            conference_progressDialog = null;
+            fl_loading_progressbar.setVisibility(View.GONE);
         }
         catch (Exception e)
         {
@@ -298,14 +290,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             {
                 try
                 {
-                    if (conference_progressDialog == null)
-                    {
-                        conference_progressDialog = new ProgressDialog(this.context);
-                        conference_progressDialog.setIndeterminate(true);
-                        conference_progressDialog.setMessage("");
-                        conference_progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    }
-                    conference_progressDialog.show();
+                    fl_loading_progressbar.setVisibility(View.VISIBLE);
                 }
                 catch (Exception e)
                 {

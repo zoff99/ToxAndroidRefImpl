@@ -136,6 +136,7 @@ import static com.zoffcc.applications.trifa.CallingActivity.update_calling_frien
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.ConfGroupAudioService.do_update_group_title;
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
+import static com.zoffcc.applications.trifa.FriendListFragment.fl_loading_progressbar;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.play_ngc_incoming_audio_frame;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame_v1;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame_v2;
@@ -1776,79 +1777,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            if (FriendListHolder.friend_progressDialog != null)
-            {
-                if (FriendListHolder.friend_progressDialog.isShowing())
-                {
-                    FriendListHolder.friend_progressDialog.dismiss();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (FriendListHolder.friend_progressDialog != null)
-            {
-                FriendListHolder.friend_progressDialog = null;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (ConferenceListHolder.conference_progressDialog != null)
-            {
-                if (ConferenceListHolder.conference_progressDialog.isShowing())
-                {
-                    ConferenceListHolder.conference_progressDialog.dismiss();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (ConferenceListHolder.conference_progressDialog != null)
-            {
-                ConferenceListHolder.conference_progressDialog = null;
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (GroupListHolder.group_progressDialog != null)
-            {
-                if (GroupListHolder.group_progressDialog.isShowing())
-                {
-                    GroupListHolder.group_progressDialog.dismiss();
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        try
-        {
-            if (GroupListHolder.group_progressDialog != null)
-            {
-                GroupListHolder.group_progressDialog = null;
-            }
+            fl_loading_progressbar.setVisibility(View.GONE);
         }
         catch (Exception e)
         {
@@ -2306,6 +2235,8 @@ public class MainActivity extends AppCompatActivity
 
         // reset trigger for throttled saving
         update_savedata_file_wrapper_throttled_last_trigger_ts = 0;
+
+        remove_all_progressDialogs();
 
         try
         {

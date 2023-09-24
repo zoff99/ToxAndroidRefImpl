@@ -26,10 +26,14 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -39,6 +43,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.FriendListFragment.fl_loading_progressbar;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_files;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.delete_group;
@@ -47,6 +52,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.delete_group_all_message
 import static com.zoffcc.applications.trifa.HelperGroup.group_identifier_short;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__dark_mode_pref;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
@@ -74,21 +80,12 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
     private ImageView imageView2;
     private ImageView f_notification;
     private ViewGroup f_conf_container_parent;
-    static ProgressDialog group_progressDialog = null;
 
     synchronized static void remove_progress_dialog()
     {
         try
         {
-            if (group_progressDialog != null)
-            {
-                if (GroupListHolder.group_progressDialog.isShowing())
-                {
-                    group_progressDialog.dismiss();
-                }
-            }
-
-            group_progressDialog = null;
+            fl_loading_progressbar.setVisibility(View.GONE);
         }
         catch (Exception e)
         {
@@ -305,14 +302,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             {
                 try
                 {
-                    if (group_progressDialog == null)
-                    {
-                        group_progressDialog = new ProgressDialog(this.context);
-                        group_progressDialog.setIndeterminate(true);
-                        group_progressDialog.setMessage("");
-                        group_progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                    }
-                    group_progressDialog.show();
+                    fl_loading_progressbar.setVisibility(View.VISIBLE);
                 }
                 catch (Exception e)
                 {

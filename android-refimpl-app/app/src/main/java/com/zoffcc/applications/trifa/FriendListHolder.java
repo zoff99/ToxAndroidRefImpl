@@ -44,6 +44,7 @@ import androidx.appcompat.widget.PopupMenu;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
+import static com.zoffcc.applications.trifa.FriendListFragment.fl_loading_progressbar;
 import static com.zoffcc.applications.trifa.HelperConference.add_conference_wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.delete_friend_all_files;
@@ -108,21 +109,12 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     private ImageView f_relay_icon;
     private TextView f_last_online_timestamp;
     private ViewGroup friend_line_container;
-    static ProgressDialog friend_progressDialog = null;
 
     synchronized static void remove_progress_dialog()
     {
         try
         {
-            if (friend_progressDialog != null)
-            {
-                if (FriendListHolder.friend_progressDialog.isShowing())
-                {
-                    friend_progressDialog.dismiss();
-                }
-            }
-
-            friend_progressDialog = null;
+            fl_loading_progressbar.setVisibility(View.GONE);
         }
         catch (Exception e)
         {
@@ -954,14 +946,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
     {
         try
         {
-            if (friend_progressDialog == null)
-            {
-                friend_progressDialog = new ProgressDialog(c);
-                friend_progressDialog.setIndeterminate(true);
-                friend_progressDialog.setMessage("");
-                friend_progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            }
-            friend_progressDialog.show();
+            fl_loading_progressbar.setVisibility(View.VISIBLE);
         }
         catch (Exception e)
         {

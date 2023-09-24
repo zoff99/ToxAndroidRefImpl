@@ -55,6 +55,7 @@ public class FriendListFragment extends Fragment
     static final Boolean in_update_data_lock = false;
     //  View view1 = null;
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
+    static View fl_loading_progressbar = null;
     FriendlistAdapter adapter = null;
     public static Semaphore semaphore_friendlist_ui_01 = new Semaphore(1);
     private static long add_all_friends_clear_last_trigger_ts = 0;
@@ -73,6 +74,9 @@ public class FriendListFragment extends Fragment
         // -------------------------------------------
         List<CombinedFriendsAndConferences> data_values = new ArrayList<CombinedFriendsAndConferences>();
         data_values.clear();
+
+        fl_loading_progressbar = view1.findViewById(R.id.fl_loading_progressbar);
+        fl_loading_progressbar.setVisibility(View.GONE);
 
         listingsView = (com.l4digital.fastscroll.FastScrollRecyclerView) view1.findViewById(R.id.rv_list);
         listingsView.getRecycledViewPool().clear();
