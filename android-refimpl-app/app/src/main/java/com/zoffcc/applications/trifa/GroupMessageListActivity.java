@@ -1353,7 +1353,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                     try
                     {
-                        // Log.i(TAG, "NGC_Group_video_check_incoming_thread:running --=>");
+                        // Log.i(TAG, "NGC_Group_video_check_incoming_thread:running --=> " + (ngc_video_packet_last_incoming_ts + (2 * 1000)) + " " + System.currentTimeMillis());
                         ngc_update_video_incoming_peer_list_ts();
                         if ((ngc_video_packet_last_incoming_ts + (2 * 1000)) < System.currentTimeMillis())
                         {
@@ -2649,20 +2649,21 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         // Log.i(TAG, "play_ngc_incoming_audio_frame:delta=" + (System.currentTimeMillis() - ngc_audio_packet_last_incoming_ts));
         ngc_audio_packet_last_incoming_ts = System.currentTimeMillis();
+        ngc_video_packet_last_incoming_ts = System.currentTimeMillis();
 
         if ((ngc_video_frame_image != null) && (!ngc_video_frame_image.isRecycled()))
         {
             if (sending_video_to_group == true)
             {
                 final String ngc_incoming_audio_from_peer = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+                ngc_update_video_incoming_peer_list(ngc_incoming_audio_from_peer);
                 if (ngc_video_showing_video_from_peer_pubkey.equals("-1"))
                 {
-                    // not showing any video currently
-                    return;
+                    ngc_video_showing_video_from_peer_pubkey = ngc_incoming_audio_from_peer;
                 }
                 else if (!ngc_video_showing_video_from_peer_pubkey.equalsIgnoreCase(ngc_incoming_audio_from_peer))
                 {
-                    // we are already showing the video of a different peer in the group
+                    // we are already playing the video/audio of a different peer in the group
                     return;
                 }
                 // remove header from data (10 bytes)
@@ -2687,6 +2688,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     ngc_audio_in_queue.offer(pcm_decoded_buf_delta_2);
                     System.arraycopy(pcm_decoded_buf, ((bytes_in_40ms*2)*2), pcm_decoded_buf_delta_3, 0, (bytes_in_40ms*2));
                     ngc_audio_in_queue.offer(pcm_decoded_buf_delta_3);
+                    ngc_video_frame_last_incoming_ts = System.currentTimeMillis();
                 }
                 catch(Exception e)
                 {

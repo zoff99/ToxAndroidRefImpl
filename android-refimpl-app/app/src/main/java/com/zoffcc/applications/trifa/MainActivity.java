@@ -7250,7 +7250,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            //Log.i(TAG,
+            // Log.i(TAG,
             //      "group_custom_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
             //      " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
         }
@@ -7266,6 +7266,7 @@ public class MainActivity extends AppCompatActivity
         // check for muted or kicked peers
 
         // check for correct signature of packets
+        final long header_ngc_audio_v1 = 6 + 1 + 1 + 1 + 1;
         final long header_ngc_video_v1 = 6 + 1 + 1 + 1 + 1 + 1;
         final long header_ngc_video_v2 = 6 + 1 + 1 + 1 + 1 + 1 + 2 + 1;
         final long header_ngc_histsync_and_files = 6 + 1 + 1 + 32 + 4 + 255;
@@ -7340,7 +7341,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_video_v1 + 1)))
+        if ((length <= TOX_MAX_NGC_FILE_AND_HEADER_SIZE) && (length >= (header_ngc_audio_v1 + 1)))
         {
             // @formatter:off
                 /*
