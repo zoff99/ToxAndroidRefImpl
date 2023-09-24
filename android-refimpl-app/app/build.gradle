@@ -280,6 +280,8 @@ dependencies {
     annotationProcessor project(':orma_processor')
     //
     //
+    // HINT: can't update to latest version: just too many useless changes and also kotlin again :-(
+    //noinspection GradleDependency
     implementation('com.mikepenz:materialdrawer:6.0.9@aar') {
         transitive = true
         exclude group: 'com.android.support'
@@ -289,7 +291,7 @@ dependencies {
     implementation('com.mikepenz:google-material-typeface:3.0.1.3.original@aar') {
         exclude group: 'com.android.support'
     }
-    implementation('com.mikepenz:fontawesome-typeface:5.0.13.0@aar') {
+    implementation('com.mikepenz:fontawesome-typeface:5.3.1.1@aar') {
         exclude group: 'com.android.support'
     }
     implementation('com.mikepenz:material-design-iconic-typeface:2.2.0.5@aar') {
@@ -308,9 +310,6 @@ dependencies {
     implementation('androidx.sqlite:sqlite:2.3.1') {
         transitive = true
     }
-    //implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.1') {
-    //    transitive = true
-    //}
     implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.104') {
         transitive = true
     }
@@ -352,7 +351,8 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-    // HINT: can't update to latest version:
+    // HINT: can't update to latest version: kotlin shitshow only :-(
+    //noinspection GradleDependency
     implementation('com.vanniktech:emoji-google:0.9.0') {
         exclude group: 'com.android.support'
     }
@@ -368,9 +368,12 @@ dependencies {
     //
     //
     //
+    //noinspection KtxExtensionAvailable
     implementation 'androidx.collection:collection:1.2.0'
+    //noinspection KtxExtensionAvailable
     implementation 'androidx.core:core:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
+    //noinspection KtxExtensionAvailable
     implementation 'androidx.fragment:fragment:1.6.1'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.9.0'
@@ -378,6 +381,7 @@ dependencies {
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.multidex:multidex:2.0.1'
+    //noinspection KtxExtensionAvailable
     implementation 'androidx.preference:preference:1.2.1'
     androidTestImplementation 'androidx.multidex:multidex:2.0.1'
     androidTestImplementation 'androidx.multidex:multidex-instrumentation:2.0.0'
