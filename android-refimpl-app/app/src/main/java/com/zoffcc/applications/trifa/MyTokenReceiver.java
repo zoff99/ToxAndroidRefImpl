@@ -35,6 +35,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_NTFY_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY_NEED_ACK;
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 
@@ -173,6 +174,18 @@ public class MyTokenReceiver extends BroadcastReceiver
                         tokenReceived = extras.getString("token");
                         if (tokenReceived != null)
                         {
+                            if (tokenReceived.length() > NOTIFICATION_NTFY_PUSH_URL_PREFIX.length())
+                            {
+                                if (tokenReceived.startsWith(NOTIFICATION_NTFY_PUSH_URL_PREFIX))
+                                {
+                                    if (tokenReceived.endsWith("?up=1"))
+                                    {
+                                        // HINT: remove old "?up=1" from ntfy.sh token
+                                        tokenReceived = tokenReceived.substring(0, tokenReceived.length() - ("?up=1").length());
+                                    }
+                                }
+                            }
+
                             Log.i(TAG, "token received: " + "xxxxxxxxxxxxx");
                         }
                     }
