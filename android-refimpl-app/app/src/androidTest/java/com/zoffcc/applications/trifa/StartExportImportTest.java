@@ -69,7 +69,8 @@ public class StartExportImportTest
             StartMainActivityWrapper.class);
     //
     @Rule
-    public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA,
+    public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.POST_NOTIFICATIONS,
+                                                                               Manifest.permission.CAMERA,
                                                                                Manifest.permission.RECORD_AUDIO,
                                                                                Manifest.permission.WRITE_EXTERNAL_STORAGE);
     private Activity currentActivity = null;
