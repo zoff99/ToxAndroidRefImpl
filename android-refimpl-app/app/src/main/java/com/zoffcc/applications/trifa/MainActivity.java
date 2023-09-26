@@ -123,6 +123,7 @@ import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 
 import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_max_count;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.na_set_audio_play_volume_percent;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_audio_aec_delay;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
@@ -792,6 +793,15 @@ public class MainActivity extends AppCompatActivity
         audio_manager_s = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         Log.i(TAG, "java.library.path:" + System.getProperty("java.library.path"));
         nmn3 = (NotificationManager) context_s.getSystemService(NOTIFICATION_SERVICE);
+
+        try
+        {
+            na_set_audio_play_volume_percent(100);
+        }
+        catch (Exception ee)
+        {
+            ee.printStackTrace();
+        }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
