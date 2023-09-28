@@ -7097,7 +7097,8 @@ public class MainActivity extends AppCompatActivity
         {
             send_ngch_request(temp_group_identifier, tox_group_peer_get_public_key__wrapper(group_number, peer_id));
         }
-        update_savedata_file_wrapper_throttled();
+        // update_savedata_file_wrapper_throttled();
+        update_savedata_file_wrapper();
     }
 
     static void android_tox_callback_group_peer_exit_cb_method(long group_number, long peer_id, int a_Tox_Group_Exit_Type)
