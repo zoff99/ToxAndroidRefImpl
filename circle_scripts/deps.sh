@@ -18,9 +18,9 @@ build_yasm="1"
 FORTIFY_FLAGS="-D_FORTIFY_SOURCE=2"
 _FFMPEG_VERSION_="n6.0"
 _OPUS_VERSION_="v1.3.1"
-_VPX_VERSION_="v1.13.0"
-_LIBSODIUM_VERSION_="1.0.18"
-_X264_VERSION_="5db6aa6cab1b146e07b60cc1736a01f21da01154"
+_VPX_VERSION_="v1.13.1"
+_LIBSODIUM_VERSION_="1.0.19"
+_X264_VERSION_="baee400fa9ced6f5481a728138fed6e867b0ff7f"
 _ANDROID_SDK_FILE_="sdk-tools-linux-4333796.zip"
 _ANDROID_SDK_HASH_="92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9"
 
@@ -955,7 +955,7 @@ if [ "$full""x" == "1x" ]; then
 
     # --- LIBVPX ---
     cd $_s_;git clone --depth=1 --branch="$_VPX_VERSION_" https://github.com/webmproject/libvpx.git
-    cd $_s_;wget 'https://raw.githubusercontent.com/cmeng-git/vpx-android/de613e367ea86190955a836c3c0f2bc0f260562f/patches/10.libvpx_configure.sh.patch' -O aa.patch
+    # cd $_s_;wget 'https://raw.githubusercontent.com/cmeng-git/vpx-android/de613e367ea86190955a836c3c0f2bc0f260562f/patches/10.libvpx_configure.sh.patch' -O aa.patch
     # cd $_s_; patch -p1 < aa.patch
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
