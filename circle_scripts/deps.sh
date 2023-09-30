@@ -15,7 +15,7 @@ build_yasm="1"
 ## ----------------------
 
 ## ----------------------
-FORTIFY_FLAGS="-D_FORTIFY_SOURCE=2"
+FORTIFY_FLAGS="" # "-D_FORTIFY_SOURCE=2"
 _FFMPEG_VERSION_="n6.0"
 _OPUS_VERSION_="v1.4"
 _VPX_VERSION_="v1.13.1"
