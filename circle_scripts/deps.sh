@@ -702,9 +702,9 @@ ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 mkdir -p $CIRCLE_ARTIFACTS/android/libs/armeabi/
 cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/armeabi/
 
-$READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
-$READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
-$READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 file $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
@@ -1284,9 +1284,9 @@ ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 mkdir -p $CIRCLE_ARTIFACTS/android/libs/arm64-v8a/
 cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/arm64-v8a/
 
-$READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
-$READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
-$READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 file $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
@@ -1718,9 +1718,9 @@ ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86/
 cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/x86/
 
-$READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
-$READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
-$READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 # --> /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so
 
@@ -2151,9 +2151,9 @@ ls -hal $_s_/jni-c-toxcore/libjni-c-toxcore.so
 mkdir -p $CIRCLE_ARTIFACTS/android/libs/x86_64/
 cp -av $_s_/jni-c-toxcore/libjni-c-toxcore.so $CIRCLE_ARTIFACTS/android/libs/x86_64/
 
-$READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
-$READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
-$READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -d $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -a $_s_/jni-c-toxcore/libjni-c-toxcore.so
+# $READELF -A $_s_/jni-c-toxcore/libjni-c-toxcore.so
 
 # --> /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so
 
