@@ -165,6 +165,7 @@ public class TrifaSetPatternActivity extends SetPatternActivity
         }
     }
 
+    /* it's unused. and md5 should never be used for cryptographic purposes
     public static byte[] md5(byte[] input)
     {
         try
@@ -176,4 +177,5 @@ public class TrifaSetPatternActivity extends SetPatternActivity
             throw new RuntimeException(e);
         }
     }
+    */
 }
