@@ -3085,6 +3085,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native String libopus_version();
 
+    public static native String libvpx_version();
+
     public static native String libsodium_version();
 
     public static native long tox_max_filename_length();

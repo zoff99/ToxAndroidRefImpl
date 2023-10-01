@@ -93,6 +93,7 @@ import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_un
 import static com.zoffcc.applications.trifa.MainActivity.libavutil_version;
 import static com.zoffcc.applications.trifa.MainActivity.libopus_version;
 import static com.zoffcc.applications.trifa.MainActivity.libsodium_version;
+import static com.zoffcc.applications.trifa.MainActivity.libvpx_version;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_TOR_USERAGENT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
@@ -691,6 +692,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         debug_output_append("cipher_provider_version=" + debug__cipher_provider_version);
         debug_output_append("libavutil_version=" + libavutil_version());
         debug_output_append("libopus_version=" + libopus_version());
+        debug_output_append("libvpx_version=" + libvpx_version());
         debug_output_append("libsodium_version=" + libsodium_version());
         debug_output_append("audio_pkt_incoming=" + debug__audio_pkt_incoming);
         debug_output_append("audio_frame_played=" + debug__audio_frame_played);
