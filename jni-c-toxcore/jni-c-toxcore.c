@@ -51,6 +51,7 @@
 #include <pthread.h>
 
 #include <vpx/vpx_image.h>
+#include <vpx/vpx_codec.h>
 
 #define AV_MEDIACODEC 1
 
@@ -3548,6 +3549,12 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_libsodium_1version(JNIEnv *env, jobject thiz)
 {
     return (*env)->NewStringUTF(env, sodium_version_string());
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_libvpx_1version(JNIEnv *env, jobject thiz)
+{
+    return (*env)->NewStringUTF(env, vpx_codec_version_str());
 }
 
 JNIEXPORT jint JNICALL
