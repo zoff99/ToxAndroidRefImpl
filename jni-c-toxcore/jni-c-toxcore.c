@@ -83,8 +83,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 93
-static const char global_version_string[] = "0.99.93";
+#define VERSION_PATCH 94
+static const char global_version_string[] = "0.99.94";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -3313,6 +3313,29 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1capabilities(J
     }
 
     return (jlong)(tox_friend_get_capabilities(tox_global, (uint32_t)friend_number));
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1name(JNIEnv *env, jobject thiz, jlong friend_number)
+{
+    Tox_Err_Friend_Query error;
+    size_t length = tox_friend_get_name_size(tox_global, (uint32_t)friend_number, &error);
+    if (error != 0)
+    {
+        return NULL;
+    }
+
+    char name[length + 1];
+    CLEAR(name);
+
+    tox_friend_get_name(tox_global, friend_number, (uint8_t *)name, &error);
+    if (error != 0)
+    {
+        return NULL;
+    }
+
+    jstring js1 = c_safe_string_from_java((char *)name, length);
+    return js1;
 }
 
 JNIEXPORT jstring JNICALL
