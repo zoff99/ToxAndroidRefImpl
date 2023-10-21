@@ -3318,6 +3318,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1capabilities(J
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1name(JNIEnv *env, jobject thiz, jlong friend_number)
 {
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
     Tox_Err_Friend_Query error;
     size_t length = tox_friend_get_name_size(tox_global, (uint32_t)friend_number, &error);
     if (error != 0)
@@ -3419,6 +3424,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNI
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNIEnv *env, jobject thiz)
 {
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
     size_t numfriends = tox_self_get_friend_list_size(tox_global);
     size_t memsize = (numfriends * sizeof(uint32_t));
     uint32_t *friend_list = malloc(memsize);
