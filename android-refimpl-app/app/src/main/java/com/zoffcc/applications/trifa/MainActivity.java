@@ -3107,6 +3107,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native long tox_friend_by_public_key(@NonNull String friend_public_key_string);
 
+    public static native String tox_friend_get_name(long friend_number);
+
     public static native String tox_friend_get_public_key(long friend_number);
 
     public static native long tox_friend_get_capabilities(long friend_number);
