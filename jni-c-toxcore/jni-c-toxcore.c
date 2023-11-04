@@ -83,8 +83,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 93
-static const char global_version_string[] = "0.99.93";
+#define VERSION_PATCH 94
+static const char global_version_string[] = "0.99.94";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -3316,6 +3316,34 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1capabilities(J
 }
 
 JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1name(JNIEnv *env, jobject thiz, jlong friend_number)
+{
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
+    Tox_Err_Friend_Query error;
+    size_t length = tox_friend_get_name_size(tox_global, (uint32_t)friend_number, &error);
+    if (error != 0)
+    {
+        return NULL;
+    }
+
+    char name[length + 1];
+    CLEAR(name);
+
+    tox_friend_get_name(tox_global, friend_number, (uint8_t *)name, &error);
+    if (error != 0)
+    {
+        return NULL;
+    }
+
+    jstring js1 = c_safe_string_from_java((char *)name, length);
+    return js1;
+}
+
+JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong friend_number)
 {
@@ -3396,6 +3424,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNI
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNIEnv *env, jobject thiz)
 {
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
     size_t numfriends = tox_self_get_friend_list_size(tox_global);
     size_t memsize = (numfriends * sizeof(uint32_t));
     uint32_t *friend_list = malloc(memsize);
