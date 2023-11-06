@@ -421,4 +421,10 @@
     <string name="pref_description_mic_gain_factor_toggle">Mikrofonunuz çok fazla hassasiyetle kayıt yapıyorsa, bu ayarı etkinleştirin ve mikrofon kazanç çarpanı mikrofonun ses seviyesini düşürsün</string>
     <string name="MainActivity_join_trifa_groupchat">Bilgi Grubuna Katıl</string>
     <string name="layout___peer_first_join_date">İlk Katılım Tarihi:</string>
+    <string name="layout___conf_message_stats">Konferanstaki Mesajlar:</string>
+    <string name="layout___group_peerlimit2">Eş Sınırı:</string>
+    <string name="layout___group_peerlimit">Eş Sınırı</string>
+    <string name="layout___friend_message_stats">Mesajlar:</string>
+    <string name="layout___delete_group_system_msgs">Sistem Mesajlarını Sil</string>
+    <string name="layout___group_message_stats">Gruptaki Mesajlar:</string>
 </resources>
