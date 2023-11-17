@@ -289,7 +289,7 @@
     <string name="layout___peer_name">nazwa peer\'a</string>
     <string name="layout___relay_pubkey">Klucz Publiczny Węzła:</string>
     <string name="join_public_group_activity_warning">Ostrzeżenie:
-\ndołączanie do Grupy Publicznej poprzez ID Grupy jeszcze nie działa!!</string>
+\ndołączanie do Grupy Publicznej poprzez ID Grupy nie działa jeszcze w pełni poprawnie!!</string>
     <string name="invite_friend_success">Zaproszenie od Kontaktu potwierdzone</string>
     <string name="invite_join_group_success">Zostałeś zaproszony do Grupy</string>
     <string name="layout___add_friend">Dodaj Znajomych</string>
@@ -314,4 +314,9 @@
 \nWybierając \"pomiń\" hasło zostanie
 \nwygenerowane automatycznie
 \nNIE MA możliwości odzyskania hasła!</string>
+    <string name="layout___conf_message_stats">Wiadomości w konferencji:</string>
+    <string name="layout___peer_first_join_date">Data pierwszego dołączenia:</string>
+    <string name="layout___friend_message_stats">Wiadomości:</string>
+    <string name="layout___delete_group_system_msgs">Usuń wiadomości systemowe</string>
+    <string name="layout___group_message_stats">Wiadomości w grupie:</string>
 </resources>
