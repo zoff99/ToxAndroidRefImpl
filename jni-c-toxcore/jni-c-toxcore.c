@@ -638,7 +638,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     TOX_ERR_NEW error;
     struct Tox_Options options;
     CLEAR(options);
-    dbg(9, "1006");
+    dbg(9, "create_tox:1006");
     tox_options_default(&options);
     // uint16_t tcp_port = 33776;
     if (enable_ipv6 == 1)
@@ -686,14 +686,14 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     // set our own handler for c-toxcore logging messages!!
     options.log_callback = tox_log_cb__custom;
     // ------------------------------------------------------------
-    dbg(9, "1007");
+    dbg(9, "create_tox:1007");
     char *full_path_filename = calloc(1, MAX_FULL_PATH_LENGTH);
     if (full_path_filename == NULL)
     {
         pthread_mutex_destroy(&group_audio___mutex);
         return NULL;
     }
-    dbg(9, "1008");
+    dbg(9, "create_tox:1008");
 
 #ifdef __MINGW32__
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_filename);
@@ -701,13 +701,14 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
 #endif
 
-    dbg(9, "1009");
+    dbg(9, "create_tox:1009");
     FILE *f = fopen(full_path_filename, "rb");
 
     if(f)
     {
         fseek(f, 0, SEEK_END);
         long fsize = ftell(f);
+        dbg(0, "create_tox:1009:1:ftell:savedata size=%ld", fsize);
         fseek(f, 0, SEEK_SET);
         uint8_t *savedata_enc = calloc(1, fsize);
         if (savedata_enc == NULL)
@@ -722,7 +723,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 
         if(dummy != 1)
         {
-            dbg(0, "reading savedata_enc failed");
+            dbg(0, "create_tox:ERROR:reading savedata_enc failed");
         }
 
         fclose(f);
@@ -744,7 +745,8 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
             size_t savedata_len = (size_t)(fsize - TOX_PASS_ENCRYPTION_EXTRA_LENGTH);
             savedata = malloc(savedata_len);
             TOX_ERR_DECRYPTION error2;
-            tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
+            bool res_decrypt = tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
+            dbg(9, "create_tox:tox_pass_decrypt:res=%d", (int)res_decrypt);
 
             if(savedata_enc)
             {
@@ -760,13 +762,13 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
         options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
         options.savedata_data = savedata;
         options.savedata_length = fsize;
-        dbg(9, "1008");
+        dbg(9, "create_tox:1009:2");
 #ifdef TOX_HAVE_TOXUTIL
         tox = tox_utils_new(&options, &error);
 #else
         tox = tox_new(&options, &error);
 #endif
-        dbg(9, "1009 tox=%p error=%d", tox, error);
+        dbg(9, "create_tox:1009:3 tox=%p error=%d", tox, error);
         int j = 0;
 
         while(error != 0)
@@ -785,24 +787,24 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 #else
             tox = tox_new(&options, &error);
 #endif
-            dbg(9, "1009 tox=%p error=%d", tox, error);
+            dbg(9, "create_tox:1009:4 tox=%p error=%d", tox, error);
         }
 
         free((void *)savedata);
     }
     else
     {
-        dbg(9, "1010");
+        dbg(9, "create_tox:1010");
 #ifdef TOX_HAVE_TOXUTIL
         tox = tox_utils_new(&options, NULL);
 #else
         tox = tox_new(&options, NULL);
 #endif
-        dbg(9, "1011 tox=%p", tox);
+        dbg(9, "create_tox:1011 tox=%p", tox);
     }
 
     bool local_discovery_enabled = tox_options_get_local_discovery_enabled(&options);
-    dbg(9, "local discovery enabled = %d", (int)local_discovery_enabled);
+    dbg(9, "create_tox:local discovery enabled = %d", (int)local_discovery_enabled);
     free(full_path_filename);
     return tox;
 }
@@ -810,11 +812,18 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len)
 {
     size_t size = tox_get_savedata_size(tox);
-    // dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
-    char *savedata = malloc(size);
+    dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
+
+    if (size < 1)
+    {
+        dbg(9, "update_savedata_file:ERROR:save file zero bytes size!");
+        return;
+    }
+
+    char *savedata = calloc(1, size);
     // dbg(9, "update_savedata_file:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
-    char *full_path_filename = malloc(MAX_FULL_PATH_LENGTH);
+    char *full_path_filename = calloc(1, MAX_FULL_PATH_LENGTH);
 
 #ifdef __MINGW32__
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_filename);
@@ -831,16 +840,26 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 #endif
 
     size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
-    // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
-    uint8_t *savedata_enc = malloc(size_enc);
+    dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
+    uint8_t *savedata_enc = calloc(1, size_enc);
     // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
     TOX_ERR_ENCRYPTION error;
     tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
-    // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
+    dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
     bool res = false;
 
     if(size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
     {
+        dbg(9, "update_savedata_file:ERROR:size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH");
+        if(savedata)
+        {
+            free(savedata);
+        }
+        if(savedata_enc)
+        {
+            free(savedata_enc);
+        }
+        return;
     }
     else
     {
@@ -850,7 +869,26 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     // dbg(9, "update_savedata_file:tox_is_data_encrypted=%d", (int)res);
     FILE *f = fopen(full_path_filename_tmp, "wb");
     fwrite((const void *)savedata_enc, size_enc, 1, f);
+    fseek(f, 0, SEEK_END);
+    long fsize = ftell(f);
+    dbg(0, "update_savedata_file:ftell:savedata size=%ld", fsize);
+    fseek(f, 0, SEEK_SET);
     fclose(f);
+
+    if (fsize < 1)
+    {
+        dbg(9, "update_savedata_file:ERROR:fsize < 1");
+        if(savedata)
+        {
+            free(savedata);
+        }
+        if(savedata_enc)
+        {
+            free(savedata_enc);
+        }
+        return;
+    }
+
     // dbg(9, "update_savedata_file:rename src=%s dst=%s", full_path_filename_tmp, full_path_filename);
 
 #ifdef __MINGW32__
