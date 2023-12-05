@@ -307,7 +307,7 @@ dependencies {
         transitive = true
     }
     //noinspection KtxExtensionAvailable
-    implementation('androidx.sqlite:sqlite:2.3.1') {
+    implementation('androidx.sqlite:sqlite:2.4.0') {
         transitive = true
     }
     implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.104') {

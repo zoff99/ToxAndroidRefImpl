@@ -67,7 +67,7 @@ dependencyVerification {
         'androidx.savedstate:savedstate-ktx:1.2.1:savedstate-ktx-1.2.1.aar:8553f87e7136c24ec5243560f48f1c32cba56daa77722f89589a5cafcb8f7894',
         'androidx.savedstate:savedstate:1.2.1:savedstate-1.2.1.aar:21a7d4bcf6bdb94ad7b9283801529300b4fbb8808ca4f191e0cdce6fd8e4705a',
         'androidx.slidingpanelayout:slidingpanelayout:1.2.0:slidingpanelayout-1.2.0.aar:5f53339be2a4f90a9abea3571dd59e70a8a49e7f15dd82974a3898b4652e8714',
-        'androidx.sqlite:sqlite:2.3.1:sqlite-2.3.1.aar:e4b0c580b676bd3dfbed21bfc15d4780326c545cc14fda46a5a9247e59ec8b8a',
+        'androidx.sqlite:sqlite:2.4.0:sqlite-2.4.0.aar:bb7fa113112f7e4857496e222e3051d73a910add74bf40761e1bdae55b0216af',
         'androidx.startup:startup-runtime:1.1.1:startup-runtime-1.1.1.aar:e0a6329a371262fe4c450372b70fdaf33b769ef6917094723787cfce896b1dd3',
         'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0:swiperefreshlayout-1.0.0.aar:9761b3a809c9b093fd06a3c4bbc645756dec0e95b5c9da419bc9f2a3f3026e8d',
         'androidx.test.espresso:espresso-core:3.5.1:espresso-core-3.5.1.aar:34b0493f4e002f205d961e562add0c0c31bb0acc657e89d89d4b188ac13f242c',
