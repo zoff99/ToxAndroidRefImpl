@@ -60,6 +60,7 @@
 #endif
 
 #include <libavutil/avutil.h>
+#include <x264.h>
 #include <opus/opus.h>
 #include <sodium.h>
 
@@ -3609,6 +3610,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_libavutil_1version(JNIEnv *env, 
     return (*env)->NewStringUTF(env, libavutil_version_str);
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_x264_1version(JNIEnv *env, jobject thiz)
+{
+    return (*env)->NewStringUTF(env, X264_VERSION);
+}
 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_libopus_1version(JNIEnv *env, jobject thiz)
