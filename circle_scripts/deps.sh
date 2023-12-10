@@ -1461,7 +1461,7 @@ if [ "$full""x" == "1x" ]; then
     # --- NASM ---
 #    cd $_s_
 #    rm -Rf nasm
-#    git clone http://repo.or.cz/nasm.git
+#    git clone https://github.com/netwide-assembler/nasm
 #    cd $_s_/nasm
 #    git checkout nasm-2.13.03
 #    ./autogen.sh
@@ -1894,7 +1894,7 @@ if [ "$full""x" == "1x" ]; then
     # --- NASM ---
 #    cd $_s_
 #    rm -Rf nasm
-#    git clone http://repo.or.cz/nasm.git
+#    git clone https://github.com/netwide-assembler/nasm
 #    cd $_s_/nasm
 #    git checkout nasm-2.13.03
 #    ./autogen.sh
