@@ -2656,7 +2656,7 @@ void *thread_video_av(void *data)
         //usleep((av_iterate_interval / 2) * 1000);
         if(global_av_call_active == 1)
         {
-            usleep(20 * 1000);
+            usleep(10 * 1000);
         }
         else
         {
@@ -2690,7 +2690,7 @@ void *thread_audio_av(void *data)
 #endif
 
     int delta = 0;
-    int want_iterate_ms = 10;
+    int want_iterate_ms = 5;
     int will_sleep_ms = want_iterate_ms;
     int64_t start_time = current_time_monotonic_default();
     while(toxav_audio_thread_stop != 1)
