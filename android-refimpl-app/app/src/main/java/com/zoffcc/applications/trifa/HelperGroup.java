@@ -1109,6 +1109,7 @@ public class HelperGroup
         m.TRIFA_SYNC_TYPE = sync_type;
         Log.i(TAG, "add TRIFA_SYNC_TYPE=" + sync_type + " syncer_pubkey_01:" + syncer_pubkey);
         m.tox_group_peer_pubkey_syncer_01 = syncer_pubkey;
+        m.tox_group_peer_pubkey_syncer_01_sent_timestamp = sent_timestamp_in_ms;
 
         if (m.tox_group_peername == null)
         {
@@ -2300,6 +2301,7 @@ public class HelperGroup
                                                 original_sender_peerpubkey).message_id_toxEq(message_id_tox).textEq(
                                                 message_str).sync_confirmations(gmsg.sync_confirmations + 1).
                                                 tox_group_peer_pubkey_syncer_02(syncer_pubkey).
+                                                tox_group_peer_pubkey_syncer_02_sent_timestamp(timestamp*1000).
                                                 execute();
                                         // Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=1, syncer=" + syncer_pubkey);
                                         gmsg.sync_confirmations++;
@@ -2317,6 +2319,7 @@ public class HelperGroup
                                                 original_sender_peerpubkey).message_id_toxEq(message_id_tox).textEq(
                                                 message_str).sync_confirmations(gmsg.sync_confirmations + 1).
                                                 tox_group_peer_pubkey_syncer_03(syncer_pubkey).
+                                                tox_group_peer_pubkey_syncer_03_sent_timestamp(timestamp*1000).
                                                 execute();
                                         // Log.i(TAG,"handle_incoming_sync_group_message:syn_conf=2, syncer=" + syncer_pubkey);
                                         gmsg.sync_confirmations++;

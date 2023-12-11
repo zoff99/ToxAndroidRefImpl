@@ -275,7 +275,7 @@ public class TRIFAGlobals
 
     static int MESSAGE_SYNC_DOUBLE_INTERVAL_SECS = 20;
     static int MESSAGE_GROUP_SYNC_DOUBLE_INTERVAL_SECS = 300;
-    static int MESSAGE_GROUP_HISTORY_SYNC_DOUBLE_INTERVAL_SECS = 60 * 24 * 1; // 1 day
+    static int MESSAGE_GROUP_HISTORY_SYNC_DOUBLE_INTERVAL_SECS = 60 * 60 * 24 * 1; // 1 day
     static long MESSAGE_V2_MSG_SENT_OK = (Long.MAX_VALUE - 1);
 
     public static enum TRIFA_FT_DIRECTION

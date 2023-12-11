@@ -980,6 +980,37 @@ public class TrifaToxService extends Service
                 }
                 // ----- convert old NULL's into 0 -----
 
+                // ----- convert old NULL's into 0 -----
+                try
+                {
+                    orma.getConnection().execSQL("update GroupMessage set tox_group_peer_pubkey_syncer_01_sent_timestamp='0' where tox_group_peer_pubkey_syncer_01_sent_timestamp is NULL");
+                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_01_sent_timestamp");
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_01_sent_timestamp:EE01");
+                }
+                try
+                {
+                    orma.getConnection().execSQL("update GroupMessage set tox_group_peer_pubkey_syncer_02_sent_timestamp='0' where tox_group_peer_pubkey_syncer_02_sent_timestamp is NULL");
+                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_02_sent_timestamp");
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_02_sent_timestamp:EE01");
+                }
+                try
+                {
+                    orma.getConnection().execSQL("update GroupMessage set tox_group_peer_pubkey_syncer_03_sent_timestamp='0' where tox_group_peer_pubkey_syncer_03_sent_timestamp is NULL");
+                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_03_sent_timestamp");
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_03_sent_timestamp:EE01");
+                }
+                // ----- convert old NULL's into 0 -----
+
+
                 // TODO --------
                 String my_tox_id_local = get_my_toxid();
                 global_my_toxid = my_tox_id_local;

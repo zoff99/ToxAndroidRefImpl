@@ -39,6 +39,7 @@ import androidx.appcompat.app.AlertDialog;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffer;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev;
@@ -885,6 +886,30 @@ public class HelperMessage
                     {
                         final GroupMessage m = orma.selectFromGroupMessage().idEq((Long) i.next()).get(0);
 
+                        String group_peer_pubkey_name_txt = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey);
+                        if ((group_peer_pubkey_name_txt == null) || (group_peer_pubkey_name_txt.equals("")) || (group_peer_pubkey_name_txt.equals("-1")))
+                        {
+                            group_peer_pubkey_name_txt = m.tox_group_peer_pubkey;
+                        }
+
+                        String tox_group_peer_pubkey_syncer_01_name_txt = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey_syncer_01);
+                        if ((tox_group_peer_pubkey_syncer_01_name_txt == null) || (tox_group_peer_pubkey_syncer_01_name_txt.equals("")) || (tox_group_peer_pubkey_syncer_01_name_txt.equals("-1")))
+                        {
+                            tox_group_peer_pubkey_syncer_01_name_txt = m.tox_group_peer_pubkey_syncer_01;
+                        }
+
+                        String tox_group_peer_pubkey_syncer_02_name_txt = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey_syncer_02);
+                        if ((tox_group_peer_pubkey_syncer_02_name_txt == null) || (tox_group_peer_pubkey_syncer_02_name_txt.equals("")) || (tox_group_peer_pubkey_syncer_02_name_txt.equals("-1")))
+                        {
+                            tox_group_peer_pubkey_syncer_02_name_txt = m.tox_group_peer_pubkey_syncer_02;
+                        }
+
+                        String tox_group_peer_pubkey_syncer_03_name_txt = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey_syncer_03);
+                        if ((tox_group_peer_pubkey_syncer_03_name_txt == null) || (tox_group_peer_pubkey_syncer_03_name_txt.equals("")) || (tox_group_peer_pubkey_syncer_03_name_txt.equals("-1")))
+                        {
+                            tox_group_peer_pubkey_syncer_03_name_txt = m.tox_group_peer_pubkey_syncer_03;
+                        }
+
                         // @formatter:off
                         final AlertDialog.Builder builder = new AlertDialog.Builder(c);
                         builder.
@@ -896,11 +921,17 @@ public class HelperMessage
                                         "was_synced:"+m.was_synced+"\n"+
                                         "TRIFA_SYNC_TYPE:"+m.TRIFA_SYNC_TYPE+"\n"+
                                         "sync_confirmations:"+m.sync_confirmations+"\n"+
-                                        "sync_1:"+m.tox_group_peer_pubkey_syncer_01+"\n"+
-                                        "sync_2:"+m.tox_group_peer_pubkey_syncer_02+"\n"+
-                                        "sync_3:"+m.tox_group_peer_pubkey_syncer_03+"\n"+
+                                        "sync_1:"+tox_group_peer_pubkey_syncer_01_name_txt+"\n"+
+                                        "sync_1_sent_timestamp:"+m.tox_group_peer_pubkey_syncer_01_sent_timestamp+"\n"+
+                                        "sync_1_sent_timestamp:"+long_date_time_format_or_empty(m.tox_group_peer_pubkey_syncer_01_sent_timestamp)+"\n"+
+                                        "sync_2:"+tox_group_peer_pubkey_syncer_02_name_txt+"\n"+
+                                        "sync_2_sent_timestamp:"+m.tox_group_peer_pubkey_syncer_02_sent_timestamp+"\n"+
+                                        "sync_2_sent_timestamp:"+long_date_time_format_or_empty(m.tox_group_peer_pubkey_syncer_02_sent_timestamp)+"\n"+
+                                        "sync_3:"+tox_group_peer_pubkey_syncer_03_name_txt+"\n"+
+                                        "sync_3_sent_timestamp:"+m.tox_group_peer_pubkey_syncer_03_sent_timestamp+"\n"+
+                                        "sync_3_sent_timestamp:"+long_date_time_format_or_empty(m.tox_group_peer_pubkey_syncer_03_sent_timestamp)+"\n"+
                                         "read:"+m.read+"\n"+
-                                        "tox_group_peer_pubkey:"+m.tox_group_peer_pubkey+"\n"+
+                                        "tox_group_peer_pubkey:"+group_peer_pubkey_name_txt+"\n"+
                                         "group_identifier:"+m.group_identifier+"\n"+
                                         "is_new:"+m.is_new+"\n"+
                                         "msg_id_hash:"+m.msg_id_hash+"\n"+

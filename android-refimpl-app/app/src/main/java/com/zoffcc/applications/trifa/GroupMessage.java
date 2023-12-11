@@ -101,6 +101,18 @@ public class GroupMessage
     @Nullable
     String tox_group_peer_pubkey_syncer_03;
 
+    @Column(indexed = true)
+    @Nullable
+    long tox_group_peer_pubkey_syncer_01_sent_timestamp = 0L;
+
+    @Column(indexed = true)
+    @Nullable
+    long tox_group_peer_pubkey_syncer_02_sent_timestamp = 0L;
+
+    @Column(indexed = true)
+    @Nullable
+    long tox_group_peer_pubkey_syncer_03_sent_timestamp = 0L;
+
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
     String msg_id_hash = null; // 32 byte hash
