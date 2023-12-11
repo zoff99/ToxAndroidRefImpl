@@ -60,6 +60,7 @@
 #endif
 
 #include <libavutil/avutil.h>
+#include <x264.h>
 #include <opus/opus.h>
 #include <sodium.h>
 
@@ -83,8 +84,8 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 94
-static const char global_version_string[] = "0.99.94";
+#define VERSION_PATCH 95
+static const char global_version_string[] = "0.99.95";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -812,7 +813,7 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len)
 {
     size_t size = tox_get_savedata_size(tox);
-    dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
+    // dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
 
     if (size < 1)
     {
@@ -840,12 +841,12 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 #endif
 
     size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
-    dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
+    // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
     uint8_t *savedata_enc = calloc(1, size_enc);
     // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
     TOX_ERR_ENCRYPTION error;
     tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
-    dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
+    // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
     bool res = false;
 
     if(size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
@@ -871,7 +872,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     fwrite((const void *)savedata_enc, size_enc, 1, f);
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
-    dbg(0, "update_savedata_file:ftell:savedata size=%ld", fsize);
+    // dbg(0, "update_savedata_file:ftell:savedata size=%ld", fsize);
     fseek(f, 0, SEEK_SET);
     fclose(f);
 
@@ -2655,7 +2656,7 @@ void *thread_video_av(void *data)
         //usleep((av_iterate_interval / 2) * 1000);
         if(global_av_call_active == 1)
         {
-            usleep(20 * 1000);
+            usleep(10 * 1000);
         }
         else
         {
@@ -2689,7 +2690,7 @@ void *thread_audio_av(void *data)
 #endif
 
     int delta = 0;
-    int want_iterate_ms = 10;
+    int want_iterate_ms = 5;
     int will_sleep_ms = want_iterate_ms;
     int64_t start_time = current_time_monotonic_default();
     while(toxav_audio_thread_stop != 1)
@@ -3609,6 +3610,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_libavutil_1version(JNIEnv *env, 
     return (*env)->NewStringUTF(env, libavutil_version_str);
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_x264_1version(JNIEnv *env, jobject thiz)
+{
+    return (*env)->NewStringUTF(env, X264_VERSION);
+}
 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_libopus_1version(JNIEnv *env, jobject thiz)
