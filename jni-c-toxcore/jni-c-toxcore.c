@@ -86,6 +86,7 @@
 #define VERSION_MINOR 99
 #define VERSION_PATCH 95
 static const char global_version_string[] = "0.99.95";
+static const char global_version_asan_string[] = "0.99.95-ASAN";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -3598,7 +3599,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1patch(JNIEnv *env,
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_jnictoxcore_1version(JNIEnv *env, jobject thiz)
 {
+#if defined(__SANITIZE_ADDRESS__)
+    return (*env)->NewStringUTF(env, global_version_asan_string);
+#else
     return (*env)->NewStringUTF(env, global_version_string);
+#endif
 }
 
 JNIEXPORT jstring JNICALL
