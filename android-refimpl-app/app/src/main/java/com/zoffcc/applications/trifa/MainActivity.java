@@ -8265,6 +8265,60 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    static class save_selected_group_message_custom_asynchtask extends AsyncTask<Void, Void, String>
+    {
+        private final WeakReference<Context> weakContext;
+        private final String export_directory = "";
+        private final String saved_path;
+        private final String saved_file;
+        private final String fname;
+        private final View v;
+
+        save_selected_group_message_custom_asynchtask(Context c, String saved_path, String saved_file,
+                                                      String export_dst_pathname, View v)
+        {
+            this.weakContext = new WeakReference<>(c);
+            this.saved_path = saved_path;
+            this.saved_file = saved_file;
+            this.fname = export_dst_pathname;
+            this.v = v;
+        }
+
+        @Override
+        protected String doInBackground(Void... voids)
+        {
+            try
+            {
+                HelperGeneric.export_vfs_file_to_real_file(saved_path, saved_file, fname, saved_file);
+            }
+            catch (Exception e)
+            {
+            }
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result)
+        {
+            try
+            {
+                Context c = weakContext.get();
+                display_toast_with_context_custom_duration(c, "File exported to:" + "\n" + fname + saved_file, 400, 0);
+            }
+            catch (Exception e4)
+            {
+                e4.printStackTrace();
+                Log.i(TAG, "save_selected_group_message_custom_asynchtask:EE3:" + e4.getMessage());
+            }
+        }
+
+        @Override
+        protected void onPreExecute()
+        {
+        }
+    }
+
     static class delete_selected_conference_messages_asynchtask extends AsyncTask<Void, Void, String>
     {
         ProgressDialog progressDialog2;

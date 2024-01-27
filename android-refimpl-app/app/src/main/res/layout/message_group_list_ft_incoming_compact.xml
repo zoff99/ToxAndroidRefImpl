@@ -2,6 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
     android:padding="@dimen/message_entry_padding">
 
     <LinearLayout
@@ -183,6 +184,60 @@
                     android:text=""
                     android:visibility="visible" />
 
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="0dp"
+            android:orientation="horizontal"
+            android:padding="0dp">
+
+            <LinearLayout
+                android:id="@+id/ft_export_button_container"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="0dp"
+                android:orientation="horizontal"
+                android:visibility="visible">
+
+                <ImageButton
+                    android:id="@+id/ft_export_button"
+                    android:layout_width="40dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="25dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="export"
+                    android:elevation="4dp"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
+                    android:src="@android:drawable/ic_menu_save"
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText" />
+
+                <ImageButton
+                    android:id="@+id/ft_share_button"
+                    android:layout_width="40dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="left"
+                    android:layout_marginLeft="15dp"
+                    android:layout_marginRight="0dp"
+                    android:layout_marginBottom="1dp"
+                    android:layout_weight="1"
+                    android:background="@android:color/transparent"
+                    android:contentDescription="share"
+                    android:elevation="4dp"
+                    android:padding="0dp"
+                    android:scaleType="fitCenter"
+                    android:src="@android:drawable/ic_menu_share"
+                    android:visibility="gone"
+                    tools:ignore="HardcodedText" />
             </LinearLayout>
 
         </LinearLayout>

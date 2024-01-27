@@ -48,6 +48,7 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
+import java.io.File;
 import java.net.URLConnection;
 
 import androidx.appcompat.app.AlertDialog;
@@ -71,6 +72,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_OUTGOING_WRAPPER_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
@@ -111,6 +113,9 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
     ImageView img_corner;
     ViewGroup ft_preview_container;
     ImageButton ft_preview_image;
+    ViewGroup ft_export_button_container;
+    ImageButton ft_export_button;
+    ImageButton ft_share_button;
 
     public GroupMessageListHolder_file_incoming_state_cancel(View itemView, Context c)
     {
@@ -129,6 +134,19 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
         ft_preview_container = (ViewGroup) itemView.findViewById(R.id.ft_preview_container);
         ft_preview_image = (ImageButton) itemView.findViewById(R.id.ft_preview_image);
+
+        try
+        {
+            ft_export_button_container = (ViewGroup) itemView.findViewById(R.id.ft_export_button_container);
+            ft_export_button = (ImageButton) itemView.findViewById(R.id.ft_export_button);
+            ft_share_button = (ImageButton) itemView.findViewById(R.id.ft_share_button);
+        }
+        catch(Exception e)
+        {
+            ft_export_button_container = null;
+            ft_export_button = null;
+            ft_share_button = null;
+        }
     }
 
     public void bindMessageList(GroupMessage m)
@@ -599,6 +617,16 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         // --------- timestamp (show only if different from previous message) ---------
 
         textView.setVisibility(View.GONE);
+        try
+        {
+            ft_export_button_container.setVisibility(View.VISIBLE);
+            ft_export_button.setVisibility(View.VISIBLE);
+            ft_share_button.setVisibility(View.GONE);
+            ft_export_button.setImageResource(android.R.drawable.ic_menu_save);
+        }
+        catch(Exception e)
+        {
+        }
 
         boolean is_image = false;
         boolean is_video = false;
@@ -728,6 +756,65 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
             ft_preview_image.setImageDrawable(d3);
         }
 
+        try
+        {
+            ft_export_button.setOnTouchListener(new View.OnTouchListener()
+            {
+                @Override
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    if (event.getAction() == MotionEvent.ACTION_UP)
+                    {
+                        try
+                        {
+                            new android.app.AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).setTitle(
+                                    "Export File to unencrypted Storage?").setCancelable(true).setNeutralButton("Export", new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which)
+                                {
+                                    try
+                                    {
+                                        final String export_dst_pathname =
+                                                SD_CARD_FILES_EXPORT_DIR + "/" + m.group_identifier + "/";
+                                        try
+                                        {
+                                            File dir = new File(export_dst_pathname);
+                                            dir.mkdirs();
+                                        }
+                                        catch(Exception e)
+                                        {
+                                        }
+
+                                        new MainActivity.save_selected_group_message_custom_asynchtask(v.getContext(),
+                                                                                                       m.path_name,
+                                                                                                       m.file_name,
+                                                                                                       export_dst_pathname,
+                                                                                                       v).execute();
+                                    }
+                                    catch (Exception e)
+                                    {
+                                    }
+                                }
+                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                            {
+                                public void onClick(DialogInterface dialog, int id)
+                                {
+                                }
+                            }).show();
+                        }
+                        catch (Exception e)
+                        {
+                        }
+                    }
+                    return true;
+                }
+            });
+        }
+        catch (Exception e)
+        {
+
+        }
 
         imageView.setVisibility(View.VISIBLE);
 
