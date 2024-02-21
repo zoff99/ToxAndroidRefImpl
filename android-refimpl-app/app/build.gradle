@@ -291,7 +291,7 @@ dependencies {
     implementation('com.mikepenz:google-material-typeface:3.0.1.3.original@aar') {
         exclude group: 'com.android.support'
     }
-    implementation('com.mikepenz:fontawesome-typeface:5.3.1.1@aar') {
+    implementation('com.mikepenz:fontawesome-typeface:5.13.3.0-kotlin@aar') {
         exclude group: 'com.android.support'
     }
     implementation('com.mikepenz:material-design-iconic-typeface:2.2.0.5@aar') {
