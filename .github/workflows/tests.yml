@@ -111,7 +111,7 @@ jobs:
           cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.StartMainActivityWrapperTest || echo "NOERR"
 
     - name: upload screenshots
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: macscreen
         path: |
@@ -119,7 +119,7 @@ jobs:
 
     - name: upload logcat output
       continue-on-error: true
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: logcat
         path: |
