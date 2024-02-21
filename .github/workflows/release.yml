@@ -39,7 +39,7 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
     - uses: actions/checkout@v4
-    - uses: gradle/wrapper-validation-action@v1
+    - uses: gradle/wrapper-validation-action@v2
  
   android-test:
     runs-on: macos-latest
