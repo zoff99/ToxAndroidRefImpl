@@ -22,7 +22,7 @@ jobs:
     permissions:
         contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Move nightly tag to head for nightly release
         run: git tag -f nightly && git push origin nightly -f
 
@@ -31,7 +31,7 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: actions/setup-java@v3
       with:
         distribution: 'temurin'
@@ -101,6 +101,6 @@ jobs:
   gradle-wrapper-validation:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: gradle/wrapper-validation-action@v1.0.6
 
