@@ -74,7 +74,7 @@ jobs:
         apksigner sign --ks debug.keystore --ks-pass "pass:android" --ks-key-alias androiddebugkey --out /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk --verbose /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug-aligned.apk
 
     - name: upload apk
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: trifa
         path: /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/build/outputs/apk/debug/app-debug.apk
