@@ -2,7 +2,7 @@
 <resources>
     <string name="add_friend_activity_name">添加好友</string>
     <string name="message_list_activity_name">聊天</string>
-    <string name="conference_message_list_activity_name">文字会议</string>
+    <string name="conference_message_list_activity_name">仅文本群聊</string>
     <string name="conference_audio_activity_name">音频会议</string>
     <string name="conference_audio_activity_player_name">音频会议播放器</string>
     <string name="set_password_message_empty">密码为空</string>
@@ -13,7 +13,7 @@
     <string name="title_activity_settings">设置</string>
     <string name="title_activity_crash">崩溃</string>
     <string name="title_activity_friendinfo">好友信息</string>
-    <string name="title_activity_conferencepeerinfo">对等客户端信息</string>
+    <string name="title_activity_conferencepeerinfo">好友信息</string>
     <string name="title_activity_aboutpage">关于</string>
     <string name="title_activity_set_password">设置密码</string>
     <string name="title_activity_check_password">输入密码</string>
@@ -370,7 +370,7 @@
     <string name="pref_title_download_push_msg_app">下载推送消息应用</string>
     <string name="layout___conf_title">标题：</string>
     <string name="layout___conf_id">会议 ID：</string>
-    <string name="title_activity_conferenceinfo">会议信息</string>
+    <string name="title_activity_conferenceinfo">群聊信息</string>
     <string name="pref_title_speakerphone_tweak">修复通话扬声器</string>
     <string name="pref_description_speakerphone_tweak">如果应用程序在通话中没有切换到扬声器，那么尝试激活这个修复。</string>
     <string name="pref_title_use_camera_x">背景删除</string>
