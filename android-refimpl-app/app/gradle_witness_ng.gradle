@@ -192,7 +192,12 @@ project.task('calculateChecksums').doLast {
     def dependencies = calculateHashes project
     println "dependencyVerification {"
     println "    verify = ["
-    dependencies.each { dep -> println "        '${dep.key.all}:${dep.value}'," }
+    dependencies.each {dep ->
+        // HINT: exclude deps that change for different architcures
+        if ((!dep.key.all.startsWith("and:sdk:platforms:android.jar")) && ((!dep.key.all.startsWith("and:sdk:platforms:core-for-system-modules.jar")))) {
+            println "        '${dep.key.all}:${dep.value}',"
+        }
+    }
     println "    ]"
     println "}"
 }

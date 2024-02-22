@@ -276,5 +276,5 @@ dependencyVerification {
         'org.robolectric:shadows-framework:4.7.3:shadows-framework-4.7.3.jar:a7a45e1d130f6b5d668a12c3e241407944fe213566f3d7c749ac20f73ecc463c',
         'org.robolectric:utils-reflector:4.7.3:utils-reflector-4.7.3.jar:76fd942173330db54da8356d2d7d4751a67b2c2cbc60edcd62f60d81b6537231',
         'org.robolectric:utils:4.7.3:utils-4.7.3.jar:454258010fe07723630255c30e9d588a8c3d8fbe96184ae659868f03669aba75',
-       ]
+    ]
 }
