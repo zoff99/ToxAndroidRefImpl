@@ -9,7 +9,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath "com.gradle:build-scan-plugin:1.13.4"
+        classpath "com.gradle:build-scan-plugin:2.4.2"
         classpath 'com.getkeepsafe.dexcount:dexcount-gradle-plugin:0.8.4'
 
         classpath 'com.android.tools.build:gradle:7.3.1'
