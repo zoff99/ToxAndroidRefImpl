@@ -439,6 +439,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__UV_reversed = true; // TODO: on older phones this needs to be "false"
     static boolean PREF__notification_sound = true;
     static boolean PREF__notification_vibrate = false;
+    static boolean PREF__notification_show_content = false;
     static boolean PREF__notification = true;
     static final int MIN_AUDIO_SAMPLINGRATE_OUT = 48000;
     static final int SAMPLE_RATE_FIXED = 48000;
@@ -6073,7 +6074,7 @@ public class MainActivity extends AppCompatActivity
             // --- notification ---
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
             }
             // --- notification ---
             // --- notification ---
@@ -6220,7 +6221,7 @@ public class MainActivity extends AppCompatActivity
             // --- notification ---
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
             }
             // --- notification ---
             // --- notification ---
@@ -6716,7 +6717,7 @@ public class MainActivity extends AppCompatActivity
 
         if (do_notification)
         {
-            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier);
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier, m.text);
         }
     }
 

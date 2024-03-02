@@ -482,7 +482,7 @@ public class HelperGeneric
 
         if (do_notification)
         {
-            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier);
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier, m.text);
         }
     }
 
@@ -2742,7 +2742,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
             }
 
             if (msgV3hash_hex_string != null)
@@ -2872,7 +2872,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
             }
         }
         else if (msg_type == 2)
@@ -3004,7 +3004,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
             }
         }
     }

@@ -37,6 +37,7 @@ import static com.zoffcc.applications.trifa.MainActivity.Notification_new_messag
 import static com.zoffcc.applications.trifa.MainActivity.Notification_new_message_every_millis;
 import static com.zoffcc.applications.trifa.MainActivity.Notification_new_message_last_shown_timestamp;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__notification;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__notification_show_content;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__notification_sound;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__notification_vibrate;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
@@ -56,7 +57,7 @@ public class HelperMsgNotification
      * action: NOTIFICATION_EDIT_ACTION
      * key: either a friend pubkey or a conference id or a group id, both as hex string representation
      */
-    static synchronized void change_msg_notification(int action, String key)
+    static synchronized void change_msg_notification(final int action, final String key, final String notification_text)
     {
         if (action == NOTIFICATION_EDIT_ACTION_CLEAR.value)
         {
@@ -81,7 +82,7 @@ public class HelperMsgNotification
                     global_active_notifications.add(key);
                 }
             }
-            show_msg_notification();
+            show_msg_notification(notification_text);
         }
         else if (action == NOTIFICATION_EDIT_ACTION_REMOVE.value)
         {
@@ -134,7 +135,7 @@ public class HelperMsgNotification
         }
     }
 
-    static void show_msg_notification()
+    static void show_msg_notification(final String nf_text)
     {
         Log.i(TAG, "noti_and_badge:show_notification:");
         Runnable myRunnable = new Runnable()
@@ -209,7 +210,21 @@ public class HelperMsgNotification
 
                             b.setContentTitle("TRIfA");
                             b.setAutoCancel(true);
-                            b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
+                            if (PREF__notification_show_content)
+                            {
+                                if ((nf_text != null) && (!nf_text.isEmpty()))
+                                {
+                                    b.setContentText(nf_text);
+                                }
+                                else
+                                {
+                                    b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
+                                }
+                            }
+                            else
+                            {
+                                b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
+                            }
                             Notification notification3 = b.build();
                             MainActivity.nmn3.notify(Notification_new_message_ID, notification3);
                             // -- notification ------------------

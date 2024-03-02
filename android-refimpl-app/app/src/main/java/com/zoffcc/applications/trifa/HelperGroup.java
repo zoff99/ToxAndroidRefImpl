@@ -979,7 +979,7 @@ public class HelperGroup
 
         if (do_notification)
         {
-            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, m.text);
         }
     }
 
@@ -1144,7 +1144,7 @@ public class HelperGroup
 
         if (do_notification)
         {
-            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, m.text);
         }
     }
 
@@ -1675,7 +1675,7 @@ public class HelperGroup
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, m.text);
             }
         }
         catch (Exception e)
@@ -2675,7 +2675,7 @@ public class HelperGroup
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, m.text);
             }
         }
         catch (Exception e)

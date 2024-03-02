@@ -1360,7 +1360,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
         }
 
-        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, group_id);
+        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, group_id, null);
 
         MainActivity.group_message_list_activity = this;
         wakeup_tox_thread();

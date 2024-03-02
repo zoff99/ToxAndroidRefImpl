@@ -563,7 +563,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
         }
 
-        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, conf_id);
+        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, conf_id, null);
 
         MainActivity.conference_message_list_activity = this;
         wakeup_tox_thread();

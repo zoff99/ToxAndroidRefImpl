@@ -61,7 +61,7 @@ public class StartMainActivityWrapper extends AppCompatActivity
             {
                 if (should_clear_notification_list.equalsIgnoreCase("1"))
                 {
-                    change_msg_notification(NOTIFICATION_EDIT_ACTION_EMPTY_THE_LIST.value, "");
+                    change_msg_notification(NOTIFICATION_EDIT_ACTION_EMPTY_THE_LIST.value, "", null);
                 }
             }
         }
