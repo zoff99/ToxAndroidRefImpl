@@ -6050,7 +6050,18 @@ public class MainActivity extends AppCompatActivity
                     do_notification = false;
                 }
 
-                friendname = f2.alias_name;
+                if (f2.alias_name == null)
+                {
+                    friendname = f2.name;
+                }
+                else if (f2.alias_name.length() < 1)
+                {
+                    friendname = f2.name;
+                }
+                else
+                {
+                    friendname = f2.alias_name;
+                }
             }
             catch (Exception e)
             {
@@ -6200,7 +6211,18 @@ public class MainActivity extends AppCompatActivity
                     do_notification = false;
                 }
 
-                friendname = f2.alias_name;
+                if (f2.alias_name == null)
+                {
+                    friendname = f2.name;
+                }
+                else if (f2.alias_name.length() < 1)
+                {
+                    friendname = f2.name;
+                }
+                else
+                {
+                    friendname = f2.alias_name;
+                }
             }
             catch (Exception e)
             {

@@ -2724,7 +2724,7 @@ public class HelperGeneric
                 return;
             }
 
-            String friend_name = null;
+            String friendname = null;
             try
             {
                 // update "new" status on friendlist fragment
@@ -2737,7 +2737,18 @@ public class HelperGeneric
                     do_notification = false;
                 }
 
-                friend_name = f.alias_name;
+                if (f.alias_name == null)
+                {
+                    friendname = f.name;
+                }
+                else if (f.alias_name.length() < 1)
+                {
+                    friendname = f.name;
+                }
+                else
+                {
+                    friendname = f.alias_name;
+                }
             }
             catch (Exception e)
             {
@@ -2747,7 +2758,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, friend_name, m.text);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, friendname, m.text);
             }
 
             if (msgV3hash_hex_string != null)
@@ -2869,7 +2880,18 @@ public class HelperGeneric
                     do_notification = false;
                 }
 
-                friendname = f.alias_name;
+                if (f.alias_name == null)
+                {
+                    friendname = f.name;
+                }
+                else if (f.alias_name.length() < 1)
+                {
+                    friendname = f.name;
+                }
+                else
+                {
+                    friendname = f.alias_name;
+                }
             }
             catch (Exception e)
             {
@@ -3004,7 +3026,18 @@ public class HelperGeneric
                     do_notification = false;
                 }
 
-                friendname = f.alias_name;
+                if (f.alias_name == null)
+                {
+                    friendname = f.name;
+                }
+                else if (f.alias_name.length() < 1)
+                {
+                    friendname = f.name;
+                }
+                else
+                {
+                    friendname = f.alias_name;
+                }
             }
             catch (Exception e)
             {
