@@ -173,6 +173,9 @@
     <string name="pref_title_compact_chatlist">Compact Chatlist</string>
     <string name="pref_description_compact_chatlist">Display Chatmessage more compact saving space</string>
 
+    <string name="pref_title_notification_show_content">Show Notification Content</string>
+    <string name="pref_description_notification_show_content">Display the Messagetext and Sender in Notifications</string>
+
     <string name="pref_title_use_push_service">Use Push Service</string>
     <string name="pref_description_use_push_service">WARNING: This will use Google FCM or Unified Push to save Battery and Bandwidth.\nThe app will make HTTPS: connections to some PUSH servers directly (not via Tox).\nOnly activate this if you accept that.\nThis feature needs the Tox Push Message App installed.</string>
 

@@ -57,7 +57,8 @@ public class HelperMsgNotification
      * action: NOTIFICATION_EDIT_ACTION
      * key: either a friend pubkey or a conference id or a group id, both as hex string representation
      */
-    static synchronized void change_msg_notification(final int action, final String key, final String notification_text)
+    static synchronized void change_msg_notification(final int action, final String key,
+                                                     final String notification_title, final String notification_text)
     {
         if (action == NOTIFICATION_EDIT_ACTION_CLEAR.value)
         {
@@ -82,7 +83,7 @@ public class HelperMsgNotification
                     global_active_notifications.add(key);
                 }
             }
-            show_msg_notification(notification_text);
+            show_msg_notification(notification_title, notification_text);
         }
         else if (action == NOTIFICATION_EDIT_ACTION_REMOVE.value)
         {
@@ -135,7 +136,7 @@ public class HelperMsgNotification
         }
     }
 
-    static void show_msg_notification(final String nf_text)
+    static void show_msg_notification(final String nf_title, final String nf_text)
     {
         Log.i(TAG, "noti_and_badge:show_notification:");
         Runnable myRunnable = new Runnable()
@@ -208,8 +209,24 @@ public class HelperMsgNotification
                                 b.setVibrate(vibrate_pattern);
                             }
 
-                            b.setContentTitle("TRIfA");
+                            if (PREF__notification_show_content)
+                            {
+                                if ((nf_title != null) && (!nf_title.isEmpty()))
+                                {
+                                    b.setContentTitle(nf_title);
+                                }
+                                else
+                                {
+                                    b.setContentTitle("TRIfA");
+                                }
+                            }
+                            else
+                            {
+                                b.setContentTitle("TRIfA");
+                            }
+
                             b.setAutoCancel(true);
+
                             if (PREF__notification_show_content)
                             {
                                 if ((nf_text != null) && (!nf_text.isEmpty()))

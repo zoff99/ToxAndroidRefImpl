@@ -394,6 +394,7 @@ public class HelperGeneric
         boolean do_badge_update = true;
         String conf_id = "-1";
         ConferenceDB conf_temp = null;
+        String conference_name = null;
 
         try
         {
@@ -402,6 +403,7 @@ public class HelperGeneric
                     conference_number).and().conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
             // Log.i(TAG, "conference_message_add_from_sync:conf_id=" + conf_id);
+            conference_name = conf_temp.name;
         }
         catch (Exception e)
         {
@@ -482,7 +484,7 @@ public class HelperGeneric
 
         if (do_notification)
         {
-            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier, m.text);
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier, conference_name, m.text);
         }
     }
 
@@ -2722,6 +2724,7 @@ public class HelperGeneric
                 return;
             }
 
+            String friend_name = null;
             try
             {
                 // update "new" status on friendlist fragment
@@ -2733,6 +2736,8 @@ public class HelperGeneric
                 {
                     do_notification = false;
                 }
+
+                friend_name = f.alias_name;
             }
             catch (Exception e)
             {
@@ -2742,7 +2747,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, friend_name, m.text);
             }
 
             if (msgV3hash_hex_string != null)
@@ -2851,7 +2856,7 @@ public class HelperGeneric
 
             HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number, msg_type, msg_id_buffer,
                                                             (pin_timestamp / 1000));
-
+            String friendname = null;
             try
             {
                 // update "new" status on friendlist fragment
@@ -2863,6 +2868,8 @@ public class HelperGeneric
                 {
                     do_notification = false;
                 }
+
+                friendname = f.alias_name;
             }
             catch (Exception e)
             {
@@ -2872,7 +2879,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, friendname, m.text);
             }
         }
         else if (msg_type == 2)
@@ -2984,6 +2991,7 @@ public class HelperGeneric
             HelperFriend.send_friend_msg_receipt_v2_wrapper(friend_number_real_sender, msg_type, msg_id_buffer,
                                                             (pin_timestamp / 1000));
 
+            String friendname = null;
             try
             {
                 // update "new" status on friendlist fragment
@@ -2995,6 +3003,8 @@ public class HelperGeneric
                 {
                     do_notification = false;
                 }
+
+                friendname = f.alias_name;
             }
             catch (Exception e)
             {
@@ -3004,7 +3014,7 @@ public class HelperGeneric
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, friendname, m.text);
             }
         }
     }

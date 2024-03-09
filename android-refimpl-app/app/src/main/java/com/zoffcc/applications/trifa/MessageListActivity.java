@@ -670,7 +670,7 @@ public class MessageListActivity extends AppCompatActivity
             // Log.i(TAG, "onResume:001:friendnum(-->friendnum_prev)=" + friendnum);
         }
 
-        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, tox_friend_get_public_key__wrapper(friendnum), null);
+        change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, tox_friend_get_public_key__wrapper(friendnum), null, null);
 
         // ----- convert old messages which did not contain a sent timestamp -----
         try

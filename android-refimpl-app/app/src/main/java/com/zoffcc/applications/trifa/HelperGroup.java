@@ -896,12 +896,14 @@ public class HelperGroup
             return;
         }
 
+        String groupname = null;
         try
         {
             if (group_temp.notification_silent)
             {
                 do_notification = false;
             }
+            groupname = group_temp.name;
         }
         catch (Exception e)
         {
@@ -979,7 +981,7 @@ public class HelperGroup
 
         if (do_notification)
         {
-            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, m.text);
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, groupname, m.text);
         }
     }
 
@@ -1067,12 +1069,14 @@ public class HelperGroup
             return;
         }
 
+        String groupname = null;
         try
         {
             if (group_temp.notification_silent)
             {
                 do_notification = false;
             }
+            groupname = group_temp.name;
         }
         catch (Exception e)
         {
@@ -1144,7 +1148,7 @@ public class HelperGroup
 
         if (do_notification)
         {
-            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, m.text);
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, groupname, m.text);
         }
     }
 
@@ -1517,12 +1521,14 @@ public class HelperGroup
                 return;
             }
 
+            String groupname = null;
             try
             {
                 if (group_temp.notification_silent)
                 {
                     do_notification = false;
                 }
+                groupname = group_temp.name;
             }
             catch (Exception e)
             {
@@ -1675,7 +1681,7 @@ public class HelperGroup
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, m.text);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, groupname, m.text);
             }
         }
         catch (Exception e)
@@ -2596,13 +2602,15 @@ public class HelperGroup
                 return;
             }
 
-
+            String groupname = null;
             try
             {
                 if (group_temp.notification_silent)
                 {
                     do_notification = false;
                 }
+
+                groupname = group_temp.name;
             }
             catch (Exception e)
             {
@@ -2675,7 +2683,7 @@ public class HelperGroup
 
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, m.text);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, groupname, m.text);
             }
         }
         catch (Exception e)

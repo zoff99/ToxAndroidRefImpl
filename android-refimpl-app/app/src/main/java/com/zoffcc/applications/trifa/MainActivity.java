@@ -862,6 +862,7 @@ public class MainActivity extends AppCompatActivity
         PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
         PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", false);
+        PREF__notification_show_content = settings.getBoolean("notification_show_content", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         PREF__fps_half = settings.getBoolean("fps_half", false);
@@ -2228,6 +2229,7 @@ public class MainActivity extends AppCompatActivity
         PREF__UV_reversed = settings.getBoolean("video_uv_reversed", true);
         PREF__notification_sound = settings.getBoolean("notifications_new_message_sound", true);
         PREF__notification_vibrate = settings.getBoolean("notifications_new_message_vibrate", true);
+        PREF__notification_show_content = settings.getBoolean("notification_show_content", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
         PREF__fps_half = settings.getBoolean("fps_half", false);
@@ -6051,6 +6053,7 @@ public class MainActivity extends AppCompatActivity
             f.message_id = new_msg_id;
             HelperFiletransfer.update_filetransfer_db_full(f);
 
+            String friendname = null;
             try
             {
                 // update "new" status on friendlist fragment
@@ -6062,6 +6065,8 @@ public class MainActivity extends AppCompatActivity
                 {
                     do_notification = false;
                 }
+
+                friendname = f2.alias_name;
             }
             catch (Exception e)
             {
@@ -6074,7 +6079,7 @@ public class MainActivity extends AppCompatActivity
             // --- notification ---
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, friendname, "incoming file");
             }
             // --- notification ---
             // --- notification ---
@@ -6198,6 +6203,7 @@ public class MainActivity extends AppCompatActivity
             f.message_id = new_msg_id;
             HelperFiletransfer.update_filetransfer_db_full(f);
 
+            String friendname = null;
             try
             {
                 // update "new" status on friendlist fragment
@@ -6209,6 +6215,8 @@ public class MainActivity extends AppCompatActivity
                 {
                     do_notification = false;
                 }
+
+                friendname = f2.alias_name;
             }
             catch (Exception e)
             {
@@ -6221,7 +6229,7 @@ public class MainActivity extends AppCompatActivity
             // --- notification ---
             if (do_notification)
             {
-                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, m.text);
+                change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.tox_friendpubkey, friendname, "incoming file");
             }
             // --- notification ---
             // --- notification ---
@@ -6629,12 +6637,14 @@ public class MainActivity extends AppCompatActivity
             // e.printStackTrace();
         }
 
+        String conferencename = null;
         try
         {
             if (conf_temp.notification_silent)
             {
                 do_notification = false;
             }
+            conferencename = conf_temp.name;
         }
         catch (Exception e)
         {
@@ -6717,7 +6727,7 @@ public class MainActivity extends AppCompatActivity
 
         if (do_notification)
         {
-            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier, m.text);
+            change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.conference_identifier, conferencename, m.text);
         }
     }
 
