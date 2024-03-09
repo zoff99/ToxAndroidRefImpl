@@ -1225,15 +1225,7 @@ public class MainActivity extends AppCompatActivity
             PREF__allow_open_encrypted_file_via_intent = false;
         }
 
-        try
-        {
-            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", true);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__compact_chatlist = true;
-        }
+        PREF__compact_chatlist = true;
 
         try
         {
@@ -2671,15 +2663,7 @@ public class MainActivity extends AppCompatActivity
             PREF__allow_open_encrypted_file_via_intent = false;
         }
 
-        try
-        {
-            PREF__compact_chatlist = settings.getBoolean("compact_chatlist", true);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__compact_chatlist = true;
-        }
+        PREF__compact_chatlist = true;
 
         try
         {

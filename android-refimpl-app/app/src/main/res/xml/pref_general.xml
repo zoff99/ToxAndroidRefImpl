@@ -40,12 +40,6 @@
 
         <SwitchPreference
             android:defaultValue="true"
-            android:key="compact_chatlist"
-            android:summary="@string/pref_description_compact_chatlist"
-            android:title="@string/pref_title_compact_chatlist" />
-
-        <SwitchPreference
-            android:defaultValue="true"
             android:key="use_incognito_keyboard"
             android:summary="@string/pref_description_use_incognito_keyboard2"
             android:title="@string/pref_title_use_incognito_keyboard2" />
