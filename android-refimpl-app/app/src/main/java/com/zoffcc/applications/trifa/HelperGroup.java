@@ -809,6 +809,11 @@ public class HelperGroup
 
     static void add_system_message_to_group_chat(final String group_identifier, final String system_message)
     {
+        if (PREF__conference_show_system_messages == false)
+        {
+            return;
+        }
+
         GroupMessage m = new GroupMessage();
         m.is_new = false;
         m.tox_group_peer_pubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
