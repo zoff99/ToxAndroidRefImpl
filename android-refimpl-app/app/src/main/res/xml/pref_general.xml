@@ -56,12 +56,6 @@
             android:summary="@string/pref_description_window_security"
             android:title="@string/pref_title_window_security" />
 
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="notification_show_content"
-            android:summary="@string/pref_description_notification_show_content"
-            android:title="@string/pref_title_notification_show_content" />
-
         <EditTextPreference
             android:defaultValue="50"
             android:inputType="number"
