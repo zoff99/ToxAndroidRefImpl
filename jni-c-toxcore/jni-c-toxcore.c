@@ -4395,6 +4395,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1delete(JNIEnv *env,
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv *env, jobject thiz)
 {
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
     size_t length = tox_self_get_name_size(tox_global);
     char name[length + 1];
     CLEAR(name);
@@ -4409,6 +4414,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv *env
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name_1size(JNIEnv *env, jobject thiz)
 {
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
     long long l = (long long)tox_self_get_name_size(tox_global);
     return (jlong)(unsigned long long)l;
 }
