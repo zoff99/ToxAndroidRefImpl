@@ -4374,6 +4374,23 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1connection_1st
     return (jint)res;
 }
 
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1connection_1ip(JNIEnv *env, jobject thiz,
+        jlong friend_number)
+{
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
+    const int max_length = 600;
+    char ip_str[max_length + 1];
+    CLEAR(ip_str);
+    tox_friend_get_connection_ip(tox_global, (uint32_t)friend_number, (uint8_t *)ip_str);
+    jstring js1 = c_safe_string_from_java((char *)ip_str, max_length);
+    return js1;
+}
+
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1delete(JNIEnv *env, jobject thiz, jlong friend_number)
 {
