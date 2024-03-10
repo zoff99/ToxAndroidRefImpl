@@ -16,8 +16,8 @@ build_yasm="1"
 
 ## ----------------------
 FORTIFY_FLAGS="" # "-D_FORTIFY_SOURCE=2"
-_FFMPEG_VERSION_="n6.1"
-_OPUS_VERSION_="v1.4"
+_FFMPEG_VERSION_="n6.1.1"
+_OPUS_VERSION_="v1.5.1"
 _VPX_VERSION_="v1.13.1"
 _LIBSODIUM_VERSION_="1.0.19"
 _X264_VERSION_="baee400fa9ced6f5481a728138fed6e867b0ff7f"
@@ -426,7 +426,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
     # --- OPUS ---
-       
+
 
 
     # --- LIBSODIUM ---
@@ -1002,7 +1002,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
     # --- OPUS ---
-       
+
 
 
     # --- LIBSODIUM ---
@@ -1592,7 +1592,7 @@ if [ "$full""x" == "1x" ]; then
     cd "$_BLD_";make -j $_CPUS_ || exit 1
     cd "$_BLD_";make install
     # --- OPUS ---
-       
+
 
 
     # --- LIBSODIUM ---
