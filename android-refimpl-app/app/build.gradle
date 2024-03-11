@@ -282,7 +282,7 @@ dependencies {
     //
     // HINT: can't update to latest version: just too many useless changes and also kotlin again :-(
     //noinspection GradleDependency
-    implementation('com.mikepenz:materialdrawer:6.0.9@aar') {
+    implementation('com.mikepenz:materialdrawer:9.0.2@aar') {
         transitive = true
         exclude group: 'com.android.support'
         exclude group: 'com.github.bumptech.glide'
