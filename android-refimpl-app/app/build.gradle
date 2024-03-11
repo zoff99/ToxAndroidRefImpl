@@ -353,7 +353,7 @@ dependencies {
 
     // HINT: can't update to latest version: kotlin shitshow only :-(
     //noinspection GradleDependency
-    implementation('com.vanniktech:emoji-google:0.9.0') {
+    implementation('com.vanniktech:emoji-google:0.18.0') {
         exclude group: 'com.android.support'
     }
     //
