@@ -103,6 +103,10 @@ public class FriendList
     @Nullable
     String push_url;
 
+    @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
+    @Nullable
+    String ip_addr_str;
+
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     long capabilities = 0;
 
@@ -135,6 +139,7 @@ public class FriendList
         out.capabilities = in.capabilities;
         out.msgv3_capability = in.msgv3_capability;
         out.avatar_ftid_hex = in.avatar_ftid_hex;
+        out.ip_addr_str = in.ip_addr_str;
 
         return out;
     }

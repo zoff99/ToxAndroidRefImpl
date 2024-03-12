@@ -159,6 +159,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.send_pushurl_to_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_capabilities;
+import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_ip_addr_str;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
@@ -3112,6 +3113,8 @@ public class MainActivity extends AppCompatActivity
 
     public static native int tox_friend_get_connection_status(long friend_number);
 
+    public static native String tox_friend_get_connection_ip(long friend_number);
+
     public static native int tox_friend_delete(long friend_number);
 
     public static native String tox_self_get_name();
@@ -4688,6 +4691,26 @@ public class MainActivity extends AppCompatActivity
                     {
                     }
                 }
+            }
+
+            if (a_TOX_CONNECTION != TOX_CONNECTION_NONE.value)
+            {
+                try
+                {
+                    final String ip_str = tox_friend_get_connection_ip(tox_friend_by_public_key__wrapper(f.tox_public_key_string));
+                    f.ip_addr_str = ip_str.replaceAll("\0", "");
+                    update_friend_in_db_ip_addr_str(f);
+                }
+                catch(Exception e)
+                {
+                    f.ip_addr_str = "";
+                    update_friend_in_db_ip_addr_str(f);
+                }
+            }
+            else
+            {
+                f.ip_addr_str = "";
+                update_friend_in_db_ip_addr_str(f);
             }
 
             if (f.TOX_CONNECTION_real != a_TOX_CONNECTION)

@@ -114,6 +114,45 @@
 
             </LinearLayout>
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/fi_ipaddr_text_header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:layout_marginLeft="20dp"
+                    android:layout_weight="0"
+                    android:paddingLeft="4dp"
+                    android:paddingRight="2dp"
+                    android:paddingBottom="15dp"
+                    android:text="@string/layout___ipaddress"
+                    android:textAlignment="textStart"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/fi_ipaddr_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginLeft="20dp"
+                    android:layout_marginRight="20dp"
+                    android:layout_weight="800"
+                    android:fontFamily="monospace"
+                    android:paddingLeft="4dp"
+                    android:paddingBottom="15dp"
+                    android:text="0.0.0.0 00000"
+                    android:textIsSelectable="true"
+                    android:textSize="16sp"
+                    android:typeface="monospace" />
+
+            </LinearLayout>
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

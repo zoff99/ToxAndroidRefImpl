@@ -483,6 +483,7 @@ public class TrifaToxService extends Service
 
     void load_and_add_all_friends()
     {
+
         // --- load and update all friends ---
         long[] friends = MainActivity.tox_self_get_friend_list();
         Log.i(TAG, "loading_friend:number_of_friends=" + friends.length);
@@ -872,6 +873,14 @@ public class TrifaToxService extends Service
                 cache_pubkey_fnum.clear();
                 cache_fnum_pubkey.clear();
                 cache_confid_confnum.clear();
+
+                try
+                {
+                    orma.updateFriendList().ip_addr_str("").execute();
+                }
+                catch(Exception e)
+                {
+                }
 
                 tox_self_capabilites = tox_self_get_capabilities();
                 //Log.i(TAG, "tox_self_capabilites:" + tox_self_capabilites + " decoded:" +

@@ -72,9 +72,11 @@ import static com.zoffcc.applications.trifa.MainActivity.cache_confid_confnum;
 import static com.zoffcc.applications.trifa.MainActivity.cache_fnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.cache_pubkey_fnum;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
+import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_new;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_delete;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_ip;
 import static com.zoffcc.applications.trifa.MainActivity.toxav_add_av_groupchat;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_SELECTED;
@@ -101,6 +103,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
     private TextView textView;
     private TextView statusText;
+    private TextView ip_addr_text;
     private TextView unread_count;
     private de.hdodenhof.circleimageview.CircleImageView avatar;
     private ImageView f_status_icon;
@@ -132,6 +135,8 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         textView = (TextView) itemView.findViewById(R.id.f_name);
         statusText = (TextView) itemView.findViewById(R.id.f_status_message);
+        ip_addr_text = (TextView) itemView.findViewById(R.id.f_ip_addr_text);
+
         unread_count = (TextView) itemView.findViewById(R.id.f_unread_count);
         avatar = (de.hdodenhof.circleimageview.CircleImageView) itemView.findViewById(R.id.f_avatar_icon);
         f_status_icon = (ImageView) itemView.findViewById(R.id.f_status_icon);
@@ -158,6 +163,14 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         itemView.setOnClickListener(this);
         itemView.setOnLongClickListener(this);
+
+        try
+        {
+            ip_addr_text.setText(fl.ip_addr_str);
+        }
+        catch(Exception ignored)
+        {
+        }
 
         friend_line_container.setBackground(null);
         if (fl.last_online_timestamp == LAST_ONLINE_TIMSTAMP_ONLINE_OFFLINE)

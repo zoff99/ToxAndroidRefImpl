@@ -338,11 +338,33 @@ public class HelperFriend
 
     synchronized static void update_friend_in_db_connection_status(FriendList f)
     {
-        orma.updateFriendList().
-                tox_public_key_stringEq(f.tox_public_key_string).
-                TOX_CONNECTION(f.TOX_CONNECTION).
-                TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
-                execute();
+        try
+        {
+            orma.updateFriendList().
+                    tox_public_key_stringEq(f.tox_public_key_string).
+                    TOX_CONNECTION(f.TOX_CONNECTION).
+                    TOX_CONNECTION_on_off(f.TOX_CONNECTION_on_off).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static void update_friend_in_db_ip_addr_str(FriendList f)
+    {
+        try
+        {
+            orma.updateFriendList().
+                    tox_public_key_stringEq(f.tox_public_key_string).
+                    ip_addr_str(f.ip_addr_str).
+                    execute();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 
     synchronized static void update_friend_in_db_connection_status_real(FriendList f)

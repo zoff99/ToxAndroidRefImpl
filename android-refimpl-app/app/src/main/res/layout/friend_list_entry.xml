@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/outside_friend_info_container"
     android:layout_width="fill_parent"
-    android:layout_height="87dp"
+    android:layout_height="90dp"
     android:layout_margin="0dp"
     android:background="@null"
     android:elevation="0dp"
@@ -12,7 +12,7 @@
     <RelativeLayout
         android:id="@+id/friend_line_container"
         android:layout_width="fill_parent"
-        android:layout_height="85dp"
+        android:layout_height="88dp"
         android:layout_marginLeft="0dp"
         android:layout_marginTop="0dp"
         android:layout_marginRight="0dp"
@@ -110,10 +110,27 @@
                 android:typeface="monospace" />
 
             <TextView
-                android:id="@+id/f_last_online_timestamp"
+                android:id="@+id/f_ip_addr_text"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/f_status_message"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentRight="true"
+                android:ellipsize="marquee"
+                android:fontFamily="monospace"
+                android:gravity="left"
+                android:maxLines="1"
+                android:paddingRight="6dp"
+                android:text="0.0.0.0"
+                android:textColor="@color/friend_list_text_color"
+                android:textSize="11sp"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/f_last_online_timestamp"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/f_ip_addr_text"
                 android:layout_alignParentEnd="true"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentBottom="true"

@@ -42,6 +42,7 @@ import androidx.appcompat.widget.Toolbar;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_capabilities_from_pubkey;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.set_friend_avatar_update;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_friend_avatar;
@@ -55,6 +56,7 @@ import static com.zoffcc.applications.trifa.HelperRelay.remove_friend_relay_in_d
 import static com.zoffcc.applications.trifa.Identicon.create_avatar_identicon_for_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_ip;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_DECODE_TO_STRING;
@@ -71,6 +73,7 @@ public class FriendInfoActivity extends AppCompatActivity
     TextView fi_relay_pubkey_textview = null;
     TextView fi_toxcapabilities_textview = null;
     TextView fi_relay_text = null;
+    TextView fi_ipaddr_text = null;
     TextView friend_num_msgs_text = null;
     Button remove_friend_relay_button = null;
     TextView fi_pushurl_textview = null;
@@ -97,6 +100,7 @@ public class FriendInfoActivity extends AppCompatActivity
         alias_text = (EditText) findViewById(R.id.fi_alias_text);
         fi_relay_pubkey_textview = (TextView) findViewById(R.id.fi_relay_pubkey_textview);
         fi_relay_text = (TextView) findViewById(R.id.fi_relay_text);
+        fi_ipaddr_text = (TextView) findViewById(R.id.fi_ipaddr_text);
         remove_friend_relay_button = (Button) findViewById(R.id.remove_friend_relay_button);
         fi_pushurl_textview = (TextView) findViewById(R.id.fi_pushurl_textview);
         fi_pushurl_text = (TextView) findViewById(R.id.fi_pushurl_text);
@@ -112,6 +116,17 @@ public class FriendInfoActivity extends AppCompatActivity
         mystatus_message.setText("*error*");
 
         alias_text.setText("");
+
+        fi_ipaddr_text.setText("");
+        try
+        {
+            final String ip_str = tox_friend_get_connection_ip(tox_friend_by_public_key__wrapper(friend_pubkey));
+            final String f_ip_str = ip_str.replaceAll("\0", "");
+            fi_ipaddr_text.setText(f_ip_str);
+        }
+        catch(Exception ignored)
+        {
+        }
 
         try
         {
