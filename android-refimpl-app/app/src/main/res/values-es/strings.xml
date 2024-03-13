@@ -421,4 +421,7 @@
     <string name="layout___friend_message_stats">Mensajes:</string>
     <string name="layout___delete_group_system_msgs">Borrar Mensajes de Sistema</string>
     <string name="layout___group_message_stats">Mensajes en Grupo:</string>
+    <string name="pref_title_notification_show_content">Mostrar contenido de la notificación</string>
+    <string name="pref_description_notification_show_content">Mostrar el texto del mensaje y el remitente en las notificaciones</string>
+    <string name="layout___ipaddress">IP:</string>
 </resources>
