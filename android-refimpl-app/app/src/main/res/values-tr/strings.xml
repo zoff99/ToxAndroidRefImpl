@@ -427,4 +427,7 @@
     <string name="layout___friend_message_stats">Mesajlar:</string>
     <string name="layout___delete_group_system_msgs">Sistem Mesajlarını Sil</string>
     <string name="layout___group_message_stats">Gruptaki Mesajlar:</string>
+    <string name="layout___ipaddress">IP:</string>
+    <string name="pref_description_notification_show_content">Bildirimlerde Mesaj Metnini ve Göndereni Göster</string>
+    <string name="pref_title_notification_show_content">Bildirim İçeriğini Göster</string>
 </resources>
