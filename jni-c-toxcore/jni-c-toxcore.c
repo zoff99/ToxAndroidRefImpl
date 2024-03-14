@@ -7764,7 +7764,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1connection_1ip(
 #define IP_STR_MAX_STR_LEN (((39 + 1 + 5 + 2) * 6) + 10)
     char ip_str[IP_STR_MAX_STR_LEN + 1];
     CLEAR(ip_str);
-    tox_group_get_connection_ip(tox_global, (uint32_t)group_number, (uint32_t)peer_id, uint8_t *ip_str);
+    tox_group_get_connection_ip(tox_global, (uint32_t)group_number, (uint32_t)peer_id, (uint8_t *)ip_str);
     jstring js1 = c_safe_string_from_java((char *)ip_str, IP_STR_MAX_STR_LEN);
     return js1;
 }
