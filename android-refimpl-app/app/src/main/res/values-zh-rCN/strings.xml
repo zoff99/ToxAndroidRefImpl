@@ -449,4 +449,7 @@
     <string name="layout___friend_message_stats">消息：</string>
     <string name="layout___delete_group_system_msgs">删除系统消息</string>
     <string name="layout___group_message_stats">群组中的消息：</string>
+    <string name="pref_title_notification_show_content">显示通知内容</string>
+    <string name="pref_description_notification_show_content">在通知中展示消息文本和发送人</string>
+    <string name="layout___ipaddress">IP：</string>
 </resources>
