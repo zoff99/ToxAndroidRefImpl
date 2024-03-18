@@ -62,6 +62,10 @@ jobs:
         sed -i -e 's#android:label="TRIfA"#android:label="DEBUG TRIfA '"$datestr"'"#' android-refimpl-app/app/src/main/AndroidManifest.xml
         cat android-refimpl-app/app/src/main/AndroidManifest.xml|grep 'android:label='
 
+    - name: update witness checksums for pull requests
+      if: github.event_name == 'pull_request'
+      run: ./gradlew -q calculateChecksums > app/witness.gradle
+
     - name: Build with Gradle
       run: cd android-refimpl-app ; ./gradlew assemble ; find . -name '*.apk'
 
