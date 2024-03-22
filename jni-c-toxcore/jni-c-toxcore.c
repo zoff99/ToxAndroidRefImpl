@@ -4441,7 +4441,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name_1size(JNIEn
 {
     if(tox_global == NULL)
     {
-        return NULL;
+        return (jlong)0;
     }
 
     long long l = (long long)tox_self_get_name_size(tox_global);
