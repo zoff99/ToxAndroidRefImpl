@@ -102,7 +102,7 @@
                 android:ellipsize="marquee"
                 android:fontFamily="monospace"
                 android:gravity="center_vertical"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:paddingRight="6dp"
                 android:text="this is my status message long line this is my status message long line this is my status message long line"
                 android:textColor="@color/friend_list_text_color"

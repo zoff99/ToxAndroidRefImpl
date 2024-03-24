@@ -102,7 +102,7 @@
                 android:ellipsize="marquee"
                 android:fontFamily="monospace"
                 android:gravity="center_vertical"
-                android:maxLines="2"
+                android:maxLines="1"
                 android:paddingRight="6dp"
                 android:text="this is my status message long line this is my status message long line this is my status message long line"
                 android:textColor="@android:color/black"
@@ -125,6 +125,7 @@
                 android:text="0.0.0.0"
                 android:textColor="@color/friend_list_text_color"
                 android:textSize="11sp"
+                android:visibility="gone"
                 android:typeface="monospace" />
 
             <TextView
