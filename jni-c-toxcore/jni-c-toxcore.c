@@ -4441,7 +4441,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name_1size(JNIEn
 {
     if(tox_global == NULL)
     {
-        return NULL;
+        return (jlong)0;
     }
 
     long long l = (long long)tox_self_get_name_size(tox_global);
@@ -7742,6 +7742,31 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1invite_1friend(JNIEn
         return (jint)res;
     }
 #endif
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peer_1connection_1ip(JNIEnv *env, jobject thiz,
+        jlong group_number, jlong peer_id)
+{
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
+/*
+    const int ipv6_strlen_max = 39;
+    const int port_strlen_max = 5;
+    const int space_char_strlen_max = 1;
+    const int max_tcp_relays_per_friend = 6;
+    const int max_length = ((ipv6_strlen_max + space_char_strlen_max + port_strlen_max + 2) * max_tcp_relays_per_friend) + 10;
+*/
+// compiler hates humanity, so its a define now. silly.
+#define IP_STR_MAX_STR_LEN (((39 + 1 + 5 + 2) * 6) + 10)
+    char ip_str[IP_STR_MAX_STR_LEN + 1];
+    CLEAR(ip_str);
+    tox_group_get_peer_connection_ip(tox_global, (uint32_t)group_number, (uint32_t)peer_id, (uint8_t *)ip_str);
+    jstring js1 = c_safe_string_from_java((char *)ip_str, IP_STR_MAX_STR_LEN);
+    return js1;
 }
 
 JNIEXPORT jlong JNICALL
