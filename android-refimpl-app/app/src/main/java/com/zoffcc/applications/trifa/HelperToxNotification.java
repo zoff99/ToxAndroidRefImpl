@@ -36,8 +36,10 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.nmn3;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONNECTION_STATUS_MANUAL_LOGOUT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_SERVICE_NOTIFICATION_TEXT_COLOR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
+import static com.zoffcc.applications.trifa.TrifaToxService.manually_logged_out;
 
 public class HelperToxNotification
 {
@@ -190,158 +192,189 @@ public class HelperToxNotification
         }
         PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
-        if (bootstrapping)
+        if ((manually_logged_out) || (a_TOXCONNECTION == CONNECTION_STATUS_MANUAL_LOGOUT))
         {
-            Log.i(TrifaToxService.TAG, "change_notification_fg:bootstrapping=true");
-            notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
+            // HINT: manually logged out
+            notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
             {
-                b_new.setSmallIcon(R.drawable.circle_orange_notification);
+                b_new.setSmallIcon(R.drawable.circle_manuallyoffline_notification);
             }
             else
             {
-                b.setSmallIcon(R.drawable.circle_orange_notification);
+                b.setSmallIcon(R.drawable.circle_manuallyoffline_notification);
             }
-
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
             {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 {
-                    b_new.setColor(Color.parseColor("#ffce00"));
+                    b_new.setColor(Color.parseColor("#ff0000"));
                 }
                 else
                 {
-                    b.setColor(Color.parseColor("#ffce00"));
+                    b.setColor(Color.parseColor("#ff0000"));
                 }
             }
-            if (PREF__orbot_enabled)
-            {
-                notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping [Tor Proxy]" + " " + message);
-            }
-            else
-            {
-                notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping" + " " + message);
-            }
+            notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE manually");
         }
         else
         {
-            Log.i(TrifaToxService.TAG, "change_notification_fg:bootstrapping=FALSE");
-
-            if (a_TOXCONNECTION == 0)
+            if (bootstrapping)
             {
-                notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+                Log.i(TrifaToxService.TAG, "change_notification_fg:bootstrapping=true");
+                notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 {
-                    b_new.setSmallIcon(R.drawable.circle_red_notification);
+                    b_new.setSmallIcon(R.drawable.circle_orange_notification);
                 }
                 else
                 {
-                    b.setSmallIcon(R.drawable.circle_red_notification);
+                    b.setSmallIcon(R.drawable.circle_orange_notification);
                 }
 
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                 {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                     {
-                        b_new.setColor(Color.parseColor("#ff0000"));
+                        b_new.setColor(Color.parseColor("#ffce00"));
                     }
                     else
                     {
-                        b.setColor(Color.parseColor("#ff0000"));
+                        b.setColor(Color.parseColor("#ffce00"));
                     }
                 }
                 if (PREF__orbot_enabled)
                 {
                     notification_view.setTextViewText(R.id.title,
-                                                      "Tox Service: " + "OFFLINE [Tor Proxy]" + " " + message);
+                                                      "Tox Service: " + "Bootstrapping [Tor Proxy]" + " " + message);
                 }
                 else
                 {
-                    notification_view.setTextViewText(R.id.title,
-                                                      "Tox Service: " + "OFFLINE" + " " + message);
+                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping" + " " + message);
                 }
             }
             else
             {
-                if (PREF__orbot_enabled)
+                Log.i(TrifaToxService.TAG, "change_notification_fg:bootstrapping=FALSE");
+                if (a_TOXCONNECTION == 0)
                 {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_torproxy);
+                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                     {
-                        b_new.setSmallIcon(R.drawable.circle_torproxy_notification);
+                        b_new.setSmallIcon(R.drawable.circle_red_notification);
                     }
                     else
                     {
-                        b.setSmallIcon(R.drawable.circle_torproxy_notification);
+                        b.setSmallIcon(R.drawable.circle_red_notification);
                     }
+
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         {
-                            b_new.setColor(Color.parseColor("#7c16ae"));
+                            b_new.setColor(Color.parseColor("#ff0000"));
                         }
                         else
                         {
-                            b.setColor(Color.parseColor("#7c16ae"));
+                            b.setColor(Color.parseColor("#ff0000"));
                         }
                     }
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [Tor Proxy]" + " " + message);
+                    if (PREF__orbot_enabled)
+                    {
+                        notification_view.setTextViewText(R.id.title,
+                                                          "Tox Service: " + "OFFLINE [Tor Proxy]" + " " + message);
+                    }
+                    else
+                    {
+                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE" + " " + message);
+                    }
                 }
                 else
                 {
-                    if (a_TOXCONNECTION == 1)
+                    if (PREF__orbot_enabled)
                     {
-                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_torproxy);
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                         {
-                            b_new.setSmallIcon(R.drawable.circle_green_notification);
+                            b_new.setSmallIcon(R.drawable.circle_torproxy_notification);
                         }
                         else
                         {
-                            b.setSmallIcon(R.drawable.circle_green_notification);
+                            b.setSmallIcon(R.drawable.circle_torproxy_notification);
                         }
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                         {
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                             {
-                                b_new.setColor(Color.parseColor("#04b431"));
+                                b_new.setColor(Color.parseColor("#7c16ae"));
                             }
                             else
                             {
-                                b.setColor(Color.parseColor("#04b431"));
+                                b.setColor(Color.parseColor("#7c16ae"));
                             }
                         }
-                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [TCP]" + " " + message);
-                        // get_network_connections();
+                        notification_view.setTextViewText(R.id.title,
+                                                          "Tox Service: " + "ONLINE [Tor Proxy]" + " " + message);
                     }
-                    else // if (a_TOXCONNECTION__f == 2)
+                    else
                     {
-                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                        if (a_TOXCONNECTION == 1)
                         {
-                            b_new.setSmallIcon(R.drawable.circle_green_notification);
-                        }
-                        else
-                        {
-                            b.setSmallIcon(R.drawable.circle_green_notification);
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                        {
+                            notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                             {
-                                b_new.setColor(Color.parseColor("#04b431"));
+                                b_new.setSmallIcon(R.drawable.circle_green_notification);
                             }
                             else
                             {
-                                b.setColor(Color.parseColor("#04b431"));
+                                b.setSmallIcon(R.drawable.circle_green_notification);
                             }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                            {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                                {
+                                    b_new.setColor(Color.parseColor("#04b431"));
+                                }
+                                else
+                                {
+                                    b.setColor(Color.parseColor("#04b431"));
+                                }
+                            }
+                            notification_view.setTextViewText(R.id.title,
+                                                              "Tox Service: " + "ONLINE [TCP]" + " " + message);
+                            // get_network_connections();
                         }
-                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "ONLINE [UDP]" + " " + message);
-                        // get_network_connections();
+                        else // if (a_TOXCONNECTION__f == 2)
+                        {
+                            notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                            {
+                                b_new.setSmallIcon(R.drawable.circle_green_notification);
+                            }
+                            else
+                            {
+                                b.setSmallIcon(R.drawable.circle_green_notification);
+                            }
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                            {
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+                                {
+                                    b_new.setColor(Color.parseColor("#04b431"));
+                                }
+                                else
+                                {
+                                    b.setColor(Color.parseColor("#04b431"));
+                                }
+                            }
+                            notification_view.setTextViewText(R.id.title,
+                                                              "Tox Service: " + "ONLINE [UDP]" + " " + message);
+                            // get_network_connections();
+                        }
                     }
                 }
             }
         }
+
         notification_view.setTextViewText(R.id.text, "");
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)

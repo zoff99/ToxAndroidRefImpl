@@ -380,6 +380,8 @@
     <string name="MainActivity_profile">Profile</string>
     <string name="MainActivity_settings">Settings</string>
     <string name="MainActivity_logout_login">Logout/Login</string>
+    <string name="MainActivity_manually_logged_out_true">activate</string>
+    <string name="MainActivity_manually_logged_out_false">log out</string>
     <string name="MainActivity_join_trifa_groupchat">Join Info Group</string>
     <string name="MainActivity_maint">Maintenance</string>
     <string name="MainActivity_about">About</string>

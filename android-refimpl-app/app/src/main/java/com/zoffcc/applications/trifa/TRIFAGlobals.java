@@ -157,6 +157,8 @@ public class TRIFAGlobals
     static final String MESSAGE_PAGING_SHOW_OLDER_HASH = "00000000000000001";
     static final String MESSAGE_PAGING_SHOW_NEWER_HASH = "00000000000000002";
 
+    static final int CONNECTION_STATUS_MANUAL_LOGOUT = 99;
+
     static int VIDEO_FRAME_RATE_OUTGOING = 0;
     static long last_video_frame_sent = -1;
     static int count_video_frame_sent = 0;

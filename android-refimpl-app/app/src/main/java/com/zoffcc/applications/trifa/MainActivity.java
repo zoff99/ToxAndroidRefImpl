@@ -203,9 +203,11 @@ import static com.zoffcc.applications.trifa.HelperRelay.invite_to_group_own_rela
 import static com.zoffcc.applications.trifa.HelperRelay.is_any_relay;
 import static com.zoffcc.applications.trifa.HelperRelay.own_push_token_load;
 import static com.zoffcc.applications.trifa.HelperRelay.send_pushtoken_to_relay;
+import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change_wrapper;
 import static com.zoffcc.applications.trifa.MessageListActivity.ml_friend_typing;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.AVATAR_INCOMING_MAX_BYTE_SIZE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.CONNECTION_STATUS_MANUAL_LOGOUT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.DELETE_SQL_AND_VFS_ON_ERROR;
@@ -297,6 +299,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STA
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE;
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
+import static com.zoffcc.applications.trifa.TrifaToxService.manually_logged_out;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.resend_old_messages;
 import static com.zoffcc.applications.trifa.TrifaToxService.resend_v3_messages;
@@ -1378,7 +1381,7 @@ public class MainActivity extends AppCompatActivity
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(
                 R.string.MainActivity_settings).withIcon(GoogleMaterial.Icon.gmd_settings);
         PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(
-                R.string.MainActivity_logout_login).withIcon(GoogleMaterial.Icon.gmd_refresh);
+                R.string.MainActivity_manually_logged_out_false).withIcon(GoogleMaterial.Icon.gmd_refresh);
         PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(
                 R.string.MainActivity_maint).withIcon(GoogleMaterial.Icon.gmd_build);
         PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(
@@ -1461,10 +1464,79 @@ public class MainActivity extends AppCompatActivity
                                 if (is_tox_started)
                                 {
                                     global_stop_tox();
+                                    manually_logged_out = true;
+                                    try
+                                    {
+                                        final Thread t = new Thread()
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                try
+                                                {
+                                                    Thread.sleep(50);
+                                                    Log.i(TAG, "connection_status: manual logout");
+                                                    tox_notification_change_wrapper(CONNECTION_STATUS_MANUAL_LOGOUT, "");
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                }
+                                            }
+                                        };
+                                        t.start();
+                                    }
+                                    catch(Exception e)
+                                    {
+                                    }
+
+                                    try
+                                    {
+                                        PrimaryDrawerItem manual_logout_item = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.MainActivity_manually_logged_out_true).withIcon(
+                                                GoogleMaterial.Icon.gmd_refresh);
+                                        main_drawer.updateItemAtPosition(manual_logout_item, 4);
+                                    }
+                                    catch(Exception e)
+                                    {
+                                    }
                                 }
                                 else
                                 {
                                     global_start_tox();
+                                    manually_logged_out = false;
+                                    try
+                                    {
+                                        final Thread t = new Thread()
+                                        {
+                                            @Override
+                                            public void run()
+                                            {
+                                                try
+                                                {
+                                                    Thread.sleep(50);
+                                                    Log.i(TAG, "connection_status: manual activate");
+                                                    tox_notification_change_wrapper(tox_self_get_connection_status(), "");
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                }
+                                            }
+                                        };
+                                        t.start();
+                                    }
+                                    catch(Exception e)
+                                    {
+                                    }
+
+                                    try
+                                    {
+                                        PrimaryDrawerItem manual_logout_item = new PrimaryDrawerItem().withIdentifier(3).
+                                                withName(R.string.MainActivity_manually_logged_out_false).
+                                                withIcon(GoogleMaterial.Icon.gmd_refresh);
+                                        main_drawer.updateItemAtPosition(manual_logout_item, 4);
+                                    }
+                                        catch(Exception e)
+                                    {
+                                    }
                                 }
                             }
                             catch (Exception e)
@@ -1568,6 +1640,7 @@ public class MainActivity extends AppCompatActivity
                         return true;
                     }
                 }).build();
+
         //        DrawerLayout drawer_layout = (DrawerLayout) findViewById(R.id.material_drawer_layout);
         //        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawer_layout, toolbar, R.string.faw_envelope_open, R.string.faw_envelope_open);
         //
@@ -4518,7 +4591,7 @@ public class MainActivity extends AppCompatActivity
 
         // -- notification ------------------
         // -- notification ------------------
-        HelperToxNotification.tox_notification_change_wrapper(a_TOX_CONNECTION, "");
+        tox_notification_change_wrapper(a_TOX_CONNECTION, "");
         // -- notification ------------------
         // -- notification ------------------
     }

@@ -186,6 +186,7 @@ public class TrifaToxService extends Service
     static OrmaDatabase orma = null;
     static VirtualFileSystem vfs = null;
     static boolean is_tox_started = false;
+    static boolean manually_logged_out = false;
     static boolean global_toxid_text_set = false;
     static boolean TOX_SERVICE_STARTED = false;
     static Thread trifa_service_thread = null;
