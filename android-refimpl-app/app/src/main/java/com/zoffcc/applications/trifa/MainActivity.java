@@ -1380,8 +1380,15 @@ public class MainActivity extends AppCompatActivity
                 R.string.MainActivity_profile).withIcon(GoogleMaterial.Icon.gmd_face);
         PrimaryDrawerItem item2 = new PrimaryDrawerItem().withIdentifier(2).withName(
                 R.string.MainActivity_settings).withIcon(GoogleMaterial.Icon.gmd_settings);
-        PrimaryDrawerItem item3 = new PrimaryDrawerItem().withIdentifier(3).withName(
-                R.string.MainActivity_manually_logged_out_false).withIcon(GoogleMaterial.Icon.gmd_refresh);
+        PrimaryDrawerItem item3;
+        if (manually_logged_out)
+        {
+            item3 = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.MainActivity_manually_logged_out_true).withIcon(GoogleMaterial.Icon.gmd_refresh);
+        }
+        else
+        {
+            item3 = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.MainActivity_manually_logged_out_false).withIcon(GoogleMaterial.Icon.gmd_refresh);
+        }
         PrimaryDrawerItem item4 = new PrimaryDrawerItem().withIdentifier(4).withName(
                 R.string.MainActivity_maint).withIcon(GoogleMaterial.Icon.gmd_build);
         PrimaryDrawerItem item5 = new PrimaryDrawerItem().withIdentifier(5).withName(
