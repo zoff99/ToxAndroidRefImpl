@@ -297,7 +297,7 @@ dependencies {
     implementation('com.mikepenz:material-design-iconic-typeface:2.2.0.5@aar') {
         exclude group: 'com.android.support'
     }
-    implementation('com.google.zxing:core:3.5.2') {
+    implementation('com.google.zxing:core:3.5.3') {
         exclude group: 'com.android.support'
     }
     //
