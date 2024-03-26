@@ -176,6 +176,7 @@ NsxHandle *nsxInst = NULL;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 #pragma GCC diagnostic ignored "-Watomic-implicit-seq-cst"
+#pragma GCC diagnostic ignored "-Watomic-alignment"
 #pragma GCC diagnostic ignored "-Wbad-function-cast"
 #pragma GCC diagnostic ignored "-Wswitch-enum"
 #pragma GCC diagnostic ignored "-Wvector-conversion"
