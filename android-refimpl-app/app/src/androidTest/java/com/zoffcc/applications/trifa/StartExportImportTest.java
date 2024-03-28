@@ -306,7 +306,7 @@ public class StartExportImportTest
         wait_(1, "for tox save file to export");
 
         export_tox_save();
-
+        wait_(2);
         import_tox_save();
 
         wait_(120);
@@ -337,7 +337,7 @@ public class StartExportImportTest
         }
 
         wait_(1);
-        Log.i(TAG, "Pressing \"YES\" button to export");
+        Log.i(TAG, "Pressing \"YES\" button to import");
         dialog_press_positive(7);
         wait_(5);
         Log.i(TAG, "Pressing \"YES\" button to restart TRIfA");
