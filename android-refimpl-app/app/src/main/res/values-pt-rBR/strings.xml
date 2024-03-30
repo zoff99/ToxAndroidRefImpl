@@ -322,4 +322,7 @@
     <string name="layout___friend_message_stats">Mensagens:</string>
     <string name="layout___delete_group_system_msgs">Excluir mensagens do sistema</string>
     <string name="layout___group_message_stats">Mensagens em Grupo:</string>
+    <string name="pref_title_notification_show_content">Mostrar conteúdo da notificação</string>
+    <string name="pref_description_notification_show_content">Exibir o texto da mensagem e o remetente nas notificações</string>
+    <string name="layout___ipaddress">IP:</string>
 </resources>
