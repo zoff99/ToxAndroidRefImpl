@@ -417,4 +417,5 @@
     <string name="layout___remove_friends_pushurl">إزالة الأصدقاء دفع URL</string>
     <string name="layout___peer_first_join_date">تاريخ التسجيل الأول:</string>
     <string name="MainActivity_join_trifa_groupchat">الانضمام إلى مجموعة المعلومات</string>
+    <string name="pref_title_notification_show_content">وحدة الإخطار</string>
 </resources>
