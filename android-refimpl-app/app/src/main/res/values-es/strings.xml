@@ -424,4 +424,6 @@
     <string name="pref_title_notification_show_content">Mostrar contenido de la notificación</string>
     <string name="pref_description_notification_show_content">Mostrar el texto del mensaje y el remitente en las notificaciones</string>
     <string name="layout___ipaddress">IP:</string>
+    <string name="MainActivity_manually_logged_out_false">cerrar sesión</string>
+    <string name="MainActivity_manually_logged_out_true">activar</string>
 </resources>
