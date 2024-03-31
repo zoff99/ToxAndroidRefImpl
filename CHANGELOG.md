@@ -1,5 +1,198 @@
 # Changelog
 
+## [1.0.229](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.229) (2024-03-30)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.228...1.0.229)
+
+## [1.0.228](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.228) (2024-03-27)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.227...1.0.228)
+
+**Merged pull requests:**
+
+- Bump com.squareup:javapoet from 1.11.1 to 1.13.0 in /android-refimpl-app [\#454](https://github.com/zoff99/ToxAndroidRefImpl/pull/454) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.collection:collection from 1.3.0 to 1.4.0 in /android-refimpl-app [\#453](https://github.com/zoff99/ToxAndroidRefImpl/pull/453) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.google.zxing:core from 3.5.2 to 3.5.3 in /android-refimpl-app [\#450](https://github.com/zoff99/ToxAndroidRefImpl/pull/450) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.227](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.227) (2024-03-21)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.226...1.0.227)
+
+**Merged pull requests:**
+
+- Bump androidx.camera:camera-extensions from 1.3.1 to 1.3.2 in /android-refimpl-app [\#449](https://github.com/zoff99/ToxAndroidRefImpl/pull/449) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.mikepenz:material-design-iconic-typeface from 2.2.0.5 to 2.2.0.8-kotlin in /android-refimpl-app [\#448](https://github.com/zoff99/ToxAndroidRefImpl/pull/448) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-lifecycle from 1.3.0 to 1.3.2 in /android-refimpl-app [\#447](https://github.com/zoff99/ToxAndroidRefImpl/pull/447) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.squareup.okhttp3:okhttp from 4.9.3 to 4.12.0 in /android-refimpl-app [\#446](https://github.com/zoff99/ToxAndroidRefImpl/pull/446) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Translations update from Hosted Weblate [\#444](https://github.com/zoff99/ToxAndroidRefImpl/pull/444) ([weblate](https://github.com/weblate))
+- Bump androidx.camera:camera-view from 1.3.0 to 1.3.2 in /android-refimpl-app [\#442](https://github.com/zoff99/ToxAndroidRefImpl/pull/442) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump org.jetbrains.kotlin.android from 1.8.0 to 1.9.23 in /android-refimpl-app [\#440](https://github.com/zoff99/ToxAndroidRefImpl/pull/440) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.226](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.226) (2024-03-09)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.225...1.0.226)
+
+## [1.0.225](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.225) (2024-03-09)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.224...1.0.225)
+
+**Implemented enhancements:**
+
+- add "delete file" on chat [\#411](https://github.com/zoff99/ToxAndroidRefImpl/issues/411)
+
+**Merged pull requests:**
+
+- Bump androidx.camera:camera-extensions from 1.3.0 to 1.3.1 in /android-refimpl-app [\#438](https://github.com/zoff99/ToxAndroidRefImpl/pull/438) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump org.robolectric:robolectric from 4.7.3 to 4.11.1 in /android-refimpl-app [\#437](https://github.com/zoff99/ToxAndroidRefImpl/pull/437) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.getkeepsafe.dexcount:dexcount-gradle-plugin from 0.8.4 to 4.0.0 in /android-refimpl-app [\#436](https://github.com/zoff99/ToxAndroidRefImpl/pull/436) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.gradle:build-scan-plugin from 1.13.4 to 2.4.2 in /android-refimpl-app [\#434](https://github.com/zoff99/ToxAndroidRefImpl/pull/434) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Translations update from Hosted Weblate [\#433](https://github.com/zoff99/ToxAndroidRefImpl/pull/433) ([weblate](https://github.com/weblate))
+- Bump androidx.camera:camera-camera2 from 1.3.0 to 1.3.1 in /android-refimpl-app [\#432](https://github.com/zoff99/ToxAndroidRefImpl/pull/432) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump gradle/wrapper-validation-action from 1 to 2 [\#431](https://github.com/zoff99/ToxAndroidRefImpl/pull/431) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 3 to 4 [\#429](https://github.com/zoff99/ToxAndroidRefImpl/pull/429) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.mikepenz:fontawesome-typeface from 5.3.1.1 to 5.13.3.0-kotlin in /android-refimpl-app [\#428](https://github.com/zoff99/ToxAndroidRefImpl/pull/428) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/checkout from 3 to 4 [\#427](https://github.com/zoff99/ToxAndroidRefImpl/pull/427) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-java from 3 to 4 [\#426](https://github.com/zoff99/ToxAndroidRefImpl/pull/426) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.mikepenz:material-design-iconic-typeface from 2.2.0.5 to 2.2.0.8-kotlin in /android-refimpl-app [\#425](https://github.com/zoff99/ToxAndroidRefImpl/pull/425) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump github/codeql-action from 2 to 3 [\#424](https://github.com/zoff99/ToxAndroidRefImpl/pull/424) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.annotation:annotation from 1.1.0 to 1.7.1 in /android-refimpl-app [\#423](https://github.com/zoff99/ToxAndroidRefImpl/pull/423) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Translations update from Hosted Weblate [\#422](https://github.com/zoff99/ToxAndroidRefImpl/pull/422) ([weblate](https://github.com/weblate))
+
+## [1.0.224](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.224) (2023-12-24)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.223...1.0.224)
+
+## [1.0.223](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.223) (2023-12-21)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.222...1.0.223)
+
+**Implemented enhancements:**
+
+- 中文 [\#421](https://github.com/zoff99/ToxAndroidRefImpl/issues/421)
+
+## [1.0.222](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.222) (2023-12-11)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.221...1.0.222)
+
+## [1.0.221](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.221) (2023-12-04)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.220...1.0.221)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#420](https://github.com/zoff99/ToxAndroidRefImpl/pull/420) ([weblate](https://github.com/weblate))
+- Fixed typo in README [\#419](https://github.com/zoff99/ToxAndroidRefImpl/pull/419) ([rdbo](https://github.com/rdbo))
+- Translations update from Hosted Weblate [\#418](https://github.com/zoff99/ToxAndroidRefImpl/pull/418) ([weblate](https://github.com/weblate))
+
+## [1.0.220](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.220) (2023-10-19)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.219...1.0.220)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#417](https://github.com/zoff99/ToxAndroidRefImpl/pull/417) ([weblate](https://github.com/weblate))
+
+## [1.0.219](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.219) (2023-10-02)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.218...1.0.219)
+
+## [1.0.218](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.218) (2023-09-28)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.217...1.0.218)
+
+## [1.0.217](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.217) (2023-09-26)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.216...1.0.217)
+
+## [1.0.216](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.216) (2023-09-26)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.215...1.0.216)
+
+## [1.0.215](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.215) (2023-09-26)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.214...1.0.215)
+
+## [1.0.214](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.214) (2023-09-26)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.213...1.0.214)
+
+## [1.0.213](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.213) (2023-09-26)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.212...1.0.213)
+
+## [1.0.212](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.212) (2023-09-26)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.211...1.0.212)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#416](https://github.com/zoff99/ToxAndroidRefImpl/pull/416) ([weblate](https://github.com/weblate))
+
+## [1.0.211](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.211) (2023-09-17)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.210...1.0.211)
+
+## [1.0.210](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.210) (2023-09-15)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.209...1.0.210)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#414](https://github.com/zoff99/ToxAndroidRefImpl/pull/414) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#413](https://github.com/zoff99/ToxAndroidRefImpl/pull/413) ([weblate](https://github.com/weblate))
+
+## [1.0.209](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.209) (2023-09-12)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.208...1.0.209)
+
+## [1.0.208](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.208) (2023-09-07)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.207...1.0.208)
+
+## [1.0.207](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.207) (2023-08-15)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.206...1.0.207)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#412](https://github.com/zoff99/ToxAndroidRefImpl/pull/412) ([weblate](https://github.com/weblate))
+
+## [1.0.206](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.206) (2023-07-29)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.205...1.0.206)
+
+**Fixed bugs:**
+
+- No unsecure\_export\_savedata.tox file in vfs\_export [\#407](https://github.com/zoff99/ToxAndroidRefImpl/issues/407)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#410](https://github.com/zoff99/ToxAndroidRefImpl/pull/410) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#409](https://github.com/zoff99/ToxAndroidRefImpl/pull/409) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#408](https://github.com/zoff99/ToxAndroidRefImpl/pull/408) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#406](https://github.com/zoff99/ToxAndroidRefImpl/pull/406) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#405](https://github.com/zoff99/ToxAndroidRefImpl/pull/405) ([weblate](https://github.com/weblate))
+
+## [1.0.205](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.205) (2023-05-13)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.204...1.0.205)
+
+## [1.0.204](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.204) (2023-05-08)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.203...1.0.204)
+
+## [1.0.203](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.203) (2023-04-25)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.202...1.0.203)
+
+## [1.0.202](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.202) (2023-04-14)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.201...1.0.202)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#404](https://github.com/zoff99/ToxAndroidRefImpl/pull/404) ([weblate](https://github.com/weblate))
+
 ## [1.0.201](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.201) (2023-04-10)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.200...1.0.201)
@@ -99,10 +292,6 @@
 ## [1.0.186](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.186) (2022-12-24)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.185...1.0.186)
-
-**Fixed bugs:**
-
-- No google-services.json file [\#380](https://github.com/zoff99/ToxAndroidRefImpl/issues/380)
 
 **Closed issues:**
 
@@ -467,7 +656,7 @@
 
 **Merged pull requests:**
 
-- Add Import/Export section to README.md [\#316](https://github.com/zoff99/ToxAndroidRefImpl/pull/316) ([xliiv](https://github.com/xliiv))
+- Add Import/Export section to README.md [\#316](https://github.com/zoff99/ToxAndroidRefImpl/pull/316) ([ghost](https://github.com/ghost))
 
 ## [1.0.133](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.133) (2022-01-12)
 
@@ -562,7 +751,7 @@
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.118...1.0.119)
 
-**Fixed bugs:**
+**Closed issues:**
 
 - wrong preview displayed for photo filetransfer [\#162](https://github.com/zoff99/ToxAndroidRefImpl/issues/162)
 
@@ -882,10 +1071,10 @@
 
 - F-Droid can't build [\#173](https://github.com/zoff99/ToxAndroidRefImpl/issues/173)
 - nospam BUG [\#161](https://github.com/zoff99/ToxAndroidRefImpl/issues/161)
+- crashes on startup [\#150](https://github.com/zoff99/ToxAndroidRefImpl/issues/150)
 
 **Closed issues:**
 
-- crashes on startup [\#150](https://github.com/zoff99/ToxAndroidRefImpl/issues/150)
 - Bundled iOS \(Apple\) emoji artwork is proprietary and probably a legal trouble [\#139](https://github.com/zoff99/ToxAndroidRefImpl/issues/139)
 
 ## [1.0.80](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.80) (2020-12-03)
