@@ -12,7 +12,7 @@ This is now also a Tox Client for Android.
 <a href="https://github.com/zoff99/ToxAndroidRefImpl/releases/latest/download/play.trifa.apk"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/on_github.png" width="200"></a>
 <a href="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/TRIfA-nightly.apk"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/on_github_nightly.png" width="200"></a>
 
-&nbsp;&nbsp;&nbsp;&nbsp;Looking for TRIfA Desktop? [follow me](https://github.com/zoff99/java_toxclient_example)
+&nbsp;&nbsp;&nbsp;&nbsp;Looking for TRIfA Desktop version? [follow me](https://github.com/Zoxcore/trifa_material/tree/master)
 
 Status
 =
