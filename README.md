@@ -5,6 +5,8 @@
 ~~This is not a Reference Client, it's c-toxcore for Android.~~<br>
 This is now also a Tox Client for Android.
 
+### Important Notice: Since Google has changed their <a href="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/google_play_dev_verify_02.png">Playstore policy</a> in a way that is unacceptable soon future Versions can not be published on the Playstore anymore
+
 <a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/f-droid.png" width="200"></a>
 <a href="https://play.google.com/store/apps/details?id=com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/playstore.png" width="200"></a>
 <a href="https://github.com/zoff99/ToxAndroidRefImpl/releases/latest/download/play.trifa.apk"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/on_github.png" width="200"></a>
@@ -40,12 +42,11 @@ See [OFFLINE_MESSAGES.md](./OFFLINE_MESSAGES.md)
 
 Does TRIfA connect to any third party servers?
 =
-TRIfA (exlcuding toxcore) uses the Google Firebase service and a third party server to deliver push notifications to other tox mobile users when they are offline. This makes it possible for Mobile devices to go into sleep mode and save battery and network bandwidth when there is no activity. Rest assured that the push notification does not contain any data, the request that comes from TRIfA includes only the FCM token of your contact(s). No ToxID, name or message data is transfered in the process.
+TRIfA (excluding toxcore) uses the Google Firebase service and a third party server to deliver push notifications to other tox mobile users when they are offline. This makes it possible for Mobile devices to go into sleep mode and save battery and network bandwidth when there is no activity. Rest assured that the push notification does not contain any data, the request that comes from TRIfA includes only the FCM token of your contact(s). No ToxID, name or message data is transfered in the process.
 
 Get in touch
 =
 * Join the TRIfA Tox Groupchat: <a href="https://trifagrp.tox.zoff.cc/">154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762</a><br>
-* <a href="https://kiwiirc.com/nextclient/irc.libera.chat/toktok">Join Tox IRC Channel</a><br>
 
 Import/Export
 =
