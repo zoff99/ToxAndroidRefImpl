@@ -6,7 +6,6 @@
 * #### 2) Make sure you have [Google Play Services](https://play.google.com/store/apps/details?id=com.google.android.gms) installed and working
 * #### 3) Install the Tox Push Message App:
 
-<a href="https://play.google.com/store/apps/details?id=com.zoffcc.applications.pushmsg"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/playstore.png" width="200"></a>
 <a href="https://github.com/zoff99/tox_push_msg_app/releases/latest/download/play.pushmsg.apk"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/on_github.png" width="200"></a>
 
 * #### 4) Activate *"Use Push Service"* in TRIfA Settings
@@ -30,5 +29,4 @@
 
 ### Push Messages work with:
 * TRIfA (Android)<br>
-* <a href="https://github.com/Zoxcore/Antidote">Antidote (iPhone)</a><br>
-* qTox(*) (Linux, Windows, MacOS currently only with a <a href="https://github.com/Zoxcore/qTox_enhanced/releases">patched Version of qTox</a>. <b>Use at your own risk!!</b>)<br>
+* <a href="https://github.com/Zoxcore/trifa_material">TRIfA Material (for Desktop)</a><br>
