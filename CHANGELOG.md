@@ -1,5 +1,18 @@
 # Changelog
 
+## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.229...HEAD)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#463](https://github.com/zoff99/ToxAndroidRefImpl/pull/463) ([weblate](https://github.com/weblate))
+- Bump org.jetbrains.kotlin:kotlin-gradle-plugin from 1.7.21 to 1.9.23 in /android-refimpl-app [\#462](https://github.com/zoff99/ToxAndroidRefImpl/pull/462) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.mikepenz:material-design-iconic-typeface from 2.2.0.5 to 2.2.0.8-kotlin in /android-refimpl-app [\#461](https://github.com/zoff99/ToxAndroidRefImpl/pull/461) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump org.robolectric:robolectric from 4.11.1 to 4.12 in /android-refimpl-app [\#459](https://github.com/zoff99/ToxAndroidRefImpl/pull/459) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-camera2 from 1.3.1 to 1.3.2 in /android-refimpl-app [\#458](https://github.com/zoff99/ToxAndroidRefImpl/pull/458) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Translations update from Hosted Weblate [\#457](https://github.com/zoff99/ToxAndroidRefImpl/pull/457) ([weblate](https://github.com/weblate))
+
 ## [1.0.229](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.229) (2024-03-30)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.228...1.0.229)
