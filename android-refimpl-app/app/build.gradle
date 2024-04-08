@@ -388,7 +388,7 @@ dependencies {
     implementation 'info.guardianproject.netcipher:netcipher:2.1.0'
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'com.github.medyo:android-about-page:1.2.4'
-    implementation 'de.hdodenhof:circleimageview:2.2.0'
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'me.zhanghai.android.patternlock:library:2.1.2'
     implementation 'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0'
     implementation 'com.github.chrisbanes:PhotoView:2.3.0'
