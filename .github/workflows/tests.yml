@@ -109,6 +109,11 @@ jobs:
           chmod u+rx /Users/runner/a.sh
           bash /Users/runner/a.sh &
           cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.StartMainActivityWrapperTest || echo "NOERR"
+          pwd
+          adb pull /sdcard/googletest/test_outputfiles .
+          ls -al test_outputfiles/
+          echo "---------------"
+          ls -al test_outputfiles/*.png
 
     - name: upload screenshots
       uses: actions/upload-artifact@v4
@@ -116,6 +121,7 @@ jobs:
         name: macscreen
         path: |
           /Users/runner/screen*.png
+          /Users/runner/test_outputfiles/*.png
 
     - name: upload logcat output
       continue-on-error: true
