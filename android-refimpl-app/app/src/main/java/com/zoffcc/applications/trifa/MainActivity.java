@@ -6382,9 +6382,9 @@ public class MainActivity extends AppCompatActivity
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_outgoung_ft_ts = System.currentTimeMillis();
 
-        // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
-        // Log.i(TAG, "file_recv_chunk:--START--");
-        // Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":" + position + ":" + length);
+        Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
+        Log.i(TAG, "file_recv_chunk:--START--");
+        Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":" + position + ":" + length);
         Filetransfer f = null;
 
         try
