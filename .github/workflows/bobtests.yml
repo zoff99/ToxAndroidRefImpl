@@ -91,7 +91,7 @@ jobs:
           ls -al /Users/runner/a.sh
           chmod u+rx /Users/runner/a.sh
           bash /Users/runner/a.sh &
-          cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.StartMainActivityWrapperTest || echo "NOERR"
+          cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.JavaFriendTester || echo "NOERR"
           pwd
           adb pull /sdcard/googletest/test_outputfiles .
           ls -al test_outputfiles/
