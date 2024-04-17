@@ -23,9 +23,9 @@ Status
 [![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![Liberapay](https://img.shields.io/liberapay/goal/zoff.svg?logo=liberapay)](https://liberapay.com/zoff/donate)
 
-Latest Automated Screenshot
+Latest Automated Screenshots
 =
-<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android.png" width="200">
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_02.png" width="200"><img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_03.png" width="200">
 
 Help Translate the App in your Language
 =
