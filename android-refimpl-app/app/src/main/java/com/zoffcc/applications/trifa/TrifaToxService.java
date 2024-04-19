@@ -1254,7 +1254,23 @@ public class TrifaToxService extends Service
                                     Log.i(TAG, "get BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS:" +
                                                BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS);
 
-
+                                    try
+                                    {
+                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+                                        {
+                                            if (alarmManager.canScheduleExactAlarms())
+                                            {
+                                                Log.i(TAG, "canScheduleExactAlarms:true");
+                                            }
+                                            else
+                                            {
+                                                Log.i(TAG, "canScheduleExactAlarms:**FALSE**");
+                                            }
+                                        }
+                                    }
+                                    catch(Exception e)
+                                    {
+                                    }
                                     alarmManager.setExactAndAllowWhileIdle(AlarmManager.RTC_WAKEUP,
                                                                            System.currentTimeMillis() +
                                                                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS +
