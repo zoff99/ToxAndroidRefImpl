@@ -93,6 +93,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          profile: Nexus 6
           ndk: 21.0.6113669
           cmake: 3.10.2.4988404
           force-avd-creation: false
@@ -106,6 +107,7 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
+          profile: Nexus 6
           ndk: 21.0.6113669
           cmake: 3.10.2.4988404
           force-avd-creation: false
