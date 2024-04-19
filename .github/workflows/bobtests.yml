@@ -104,11 +104,12 @@ jobs:
     - name: put datetime on screenshots
       run:  |
             cd /Users/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/
+            ls -al
             d="$(date '+%Y-%m-%d %H:%M:%S')"
-            convert screen_shot_android_01.png -gravity SouthEast -pointsize 62 -fill white -annotate +30+30 "$d" screen_shot_android_01_time.png
             convert screen_shot_android_02.png -gravity SouthEast -pointsize 62 -fill white -annotate +30+30 "$d" screen_shot_android_02_time.png
-            mv screen_shot_android_01_time.png screen_shot_android_01.png
-            mv screen_shot_android_02_time.png screen_shot_android_02.png
+            convert screen_shot_android_03.png -gravity SouthEast -pointsize 62 -fill white -annotate +30+30 "$d" screen_shot_android_03_time.png
+            mv screen_shot_android_02_time.png screen_shot_android_01.png
+            mv screen_shot_android_03_time.png screen_shot_android_02.png
 
     - name: upload screenshots
       uses: actions/upload-artifact@v4
