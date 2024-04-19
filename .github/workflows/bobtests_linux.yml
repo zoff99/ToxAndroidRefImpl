@@ -129,7 +129,6 @@ jobs:
             echo 'sleep 10' >> /home/runner/a.sh
             echo 'sleep 10' >> /home/runner/a.sh
             echo 'sleep 10' >> /home/runner/a.sh
-            echo 'adb pull "/storage/emulated/0/screen4.png" /home/runner/screen_adb_04.png' >> /home/runner/a.sh
             cat /home/runner/a.sh
             ls -al /home/runner/a.sh
             chmod u+rx /home/runner/a.sh
