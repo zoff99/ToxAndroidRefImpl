@@ -1,4 +1,4 @@
-name: Bob Tests
+name: Linux Bob Tests
 on:
   push:
     paths-ignore:
