@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        api-level: [30]
+        api-level: [33]
     permissions:
       contents: write
     if: ${{ true }}
