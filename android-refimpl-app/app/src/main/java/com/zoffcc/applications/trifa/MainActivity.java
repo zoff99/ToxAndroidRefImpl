@@ -51,6 +51,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -637,6 +638,29 @@ public class MainActivity extends AppCompatActivity
             finish();
             return;
         }
+
+        /*
+        try
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            {
+                ExactAlarmChagedReceiver ar = new ExactAlarmChagedReceiver();
+                IntentFilter filter = new IntentFilter();
+                filter.addAction("android.intent.action.ACTION_SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED");
+                this.registerReceiver(ar, filter);
+                Log.i(TAG, "ExactAlarmChagedReceiver registered");
+            }
+            else
+            {
+                Log.i(TAG, "ExactAlarmChagedReceiver:below API S");
+            }
+        }
+        catch(Exception e22)
+        {
+            Log.i(TAG, "ExactAlarmChagedReceiver:EE:" + e22.getMessage());
+            e22.printStackTrace();
+        }
+        */
 
         Log.i(TAG, "M:STARTUP:toolbar");
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
