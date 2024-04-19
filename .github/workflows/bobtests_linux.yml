@@ -17,6 +17,9 @@ on:
 jobs:
   android-test_bob:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [29]
     permissions:
       contents: write
     if: ${{ true }}
@@ -76,13 +79,13 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd
+          key: avd-${{ matrix.api-level }}
 
       - name: create AVD and generate snapshot for caching
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
           cmake: 3.10.2.4988404
           force-avd-creation: false
@@ -95,7 +98,7 @@ jobs:
         timeout-minutes: 120
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 29
+          api-level: ${{ matrix.api-level }}
           ndk: 21.0.6113669
           cmake: 3.10.2.4988404
           force-avd-creation: false
@@ -108,7 +111,6 @@ jobs:
             printf 'dependencyVerification {\nverify = [\n]\n}\n' > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
             java -version
             cd android-refimpl-app ; ./gradlew assemble
-            cliclick -m verbose m:12,34
             adb logcat -c || echo "NOERR"
             adb logcat > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt &
             echo 'sleep 100' > /Users/runner/a.sh
