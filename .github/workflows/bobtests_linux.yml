@@ -31,8 +31,14 @@ jobs:
           sudo apt-get update && \
           sudo DEBIAN_FRONTEND=noninteractive \
           apt-get install -y --no-install-recommends \
+          fonts-freefont-otf \
+          ghostscript \
           imagemagick \
           ca-certificates
+
+      - name: check imagemagick
+        run: |
+          convert -list font || echo "NO ERR"
 
       - name: Install Java
         uses: actions/setup-java@v4
