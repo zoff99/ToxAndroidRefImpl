@@ -15,7 +15,7 @@ on:
         default: dummy
 
 jobs:
-  android-test_bob:
+  android-linux-test_bob:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -113,16 +113,16 @@ jobs:
             cd android-refimpl-app ; ./gradlew assemble
             adb logcat -c || echo "NOERR"
             adb logcat > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt &
-            echo 'sleep 100' > /Users/runner/a.sh
-            echo 'sleep 40' >> /Users/runner/a.sh
-            echo 'sleep 10' >> /Users/runner/a.sh
-            echo 'sleep 10' >> /Users/runner/a.sh
-            echo 'sleep 10' >> /Users/runner/a.sh
-            echo 'adb pull "/storage/emulated/0/screen4.png" /Users/runner/screen_adb_04.png' >> /Users/runner/a.sh
-            cat /Users/runner/a.sh
-            ls -al /Users/runner/a.sh
-            chmod u+rx /Users/runner/a.sh
-            bash /Users/runner/a.sh &
+            echo 'sleep 100' > /home/runner/a.sh
+            echo 'sleep 40' >> /home/runner/a.sh
+            echo 'sleep 10' >> /home/runner/a.sh
+            echo 'sleep 10' >> /home/runner/a.sh
+            echo 'sleep 10' >> /home/runner/a.sh
+            echo 'adb pull "/storage/emulated/0/screen4.png" /home/runner/screen_adb_04.png' >> /home/runner/a.sh
+            cat /home/runner/a.sh
+            ls -al /home/runner/a.sh
+            chmod u+rx /home/runner/a.sh
+            bash /home/runner/a.sh &
             cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.JavaFriendTester || echo "NOERR"
             pwd
             adb pull /sdcard/googletest/test_outputfiles .
@@ -146,9 +146,9 @@ jobs:
       - name: upload screenshots
         uses: actions/upload-artifact@v4
         with:
-          name: macscreen
+          name: linuxscreen
           path: |
-            /Users/runner/screen*.png
+            /home/runner/screen*.png
             /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
 
       - name: upload logcat output
