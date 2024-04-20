@@ -253,12 +253,15 @@ public class StartExportImportTest
         }
 
         boolean tox_online = false;
+        /*
         while (!tox_online)
         {
             tox_online = MainActivity.tox_self_get_connection_status() != 0;
             // HINT: wait for tox to get online
             wait_(1, "for tox to get online");
         }
+         */
+        wait_(1);
 
         setSharedPrefs();
         PREF__window_security = false;
@@ -309,7 +312,7 @@ public class StartExportImportTest
 
         export_tox_save();
         screenshot("006");
-        wait_(2);
+        wait_(1);
         import_tox_save();
 
         wait_(120);
@@ -320,11 +323,15 @@ public class StartExportImportTest
     {
         try
         {
-            onView(withId(R.id.button_import_savedata)).check(matches(isDisplayed())).perform(click());
-            Log.i(TAG, "importing tox save file:01");
+            onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
+            Log.i(TAG, "importing tox save file:01a");
+            ViewInteraction vi = onView(withId(R.id.button_import_savedata)).check(matches(isDisplayed()));
+            vi.perform(click());
+            Log.i(TAG, "importing tox save file:01b");
         }
         catch (Exception e)
         {
+            Log.i(TAG, "importing tox save file:01e");
             onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
             try
             {
