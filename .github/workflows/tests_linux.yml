@@ -61,33 +61,6 @@ jobs:
             java -version || exit 0
             echo "===========2========="
 
-    - name: Gradle cache
-      uses: gradle/actions/setup-gradle@v3
-
-    - name: AVD cache
-      uses: actions/cache@v4
-      id: avd-cache
-      with:
-        path: |
-          ~/.android/avd/*
-          ~/.android/adb*
-        key: avd-${{ matrix.api-level }}
-
-    - name: create AVD and generate snapshot for caching
-      if: steps.avd-cache.outputs.cache-hit != 'true'
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: ${{ matrix.api-level }}
-        profile: Nexus 6
-        arch: x86_64
-        ndk: 21.0.6113669
-        cmake: 3.10.2.4988404
-        force-avd-creation: false
-        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-        disable-animations: false
-        disable-spellchecker: true
-        script: echo "Generated AVD snapshot for caching."
-
     - name: android test
       timeout-minutes: 30
       continue-on-error: true
@@ -98,7 +71,7 @@ jobs:
         arch: x86_64
         ndk: 21.0.6113669
         cmake: 3.10.2.4988404
-        force-avd-creation: false
+        force-avd-creation: true
         emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
         disable-animations: true
         disable-spellchecker: true
