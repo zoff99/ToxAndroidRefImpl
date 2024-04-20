@@ -65,7 +65,16 @@ public class StartMainActivityWrapperTest
     private static final String TAG = "TEST001";
     //
     private static final String MOCK_PASSWORD = "öWOIA>C9iq2v<q0230i2q4$&%$/S3p95ig0_92";
-    private static final String MOCK_TEST_MSG = "Hello, test äößß";
+    private static final String MOCK_TEST_MSG_01 = "Hello!\nHow are you doing? Tox is a nice messaging tool.\n\uD83D\uDE01\uD83D\uDE06\uD83D\uDE05\uD83E\uDD23\uD83D\uDE02\uD83D\uDE42\uD83D\uDE43\uD83D\uDE09\uD83D\uDE18";
+    private static final String MOCK_TEST_MSG_02 = "\uD83D\uDE0E☂️";
+    private static final String MOCK_TEST_MSG_03 = "There's a giant doin' cartwheels, a statue wearin' high heels " +
+                                                   "Look at all the happy creatures dancin' on the lawn " +
+                                                   "Dinosaur Victrola, listenin' to Buck Owens " +
+                                                   "Doo, doo, doo, lookin' out my back door";
+    private static final String MOCK_TEST_MSG_04 = "Tambourines and elephants are playin' in the band " +
+                                                   "Won't you take a ride on the flyin' spoon? Dood-n-doo-doo " +
+                                                   "Wonderous apparition provided by magician " +
+                                                   "Doo, doo, doo, lookin' out my back door";
     private static final String TRIFA_PUBLIC_GROUP_ID = "154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762";
     @Rule
     public ActivityScenarioRule<StartMainActivityWrapper> rule = new ActivityScenarioRule<>(
@@ -180,16 +189,17 @@ public class StartMainActivityWrapperTest
         onView(allOf(withId(R.id.f_avatar_icon), withParent(withId(R.id.friend_line_container)))).perform(click());
 
         onView(withId(R.id.ml_new_message)).perform(click());
-        onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG));
+        onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG_01));
         onView(withId(R.id.ml_button_01)).perform(click());
 
         Espresso.closeSoftKeyboard();
 
-        for (int i = 0; i < 3; i++)
-        {
-            onView(withId(R.id.ml_new_message)).perform(replaceText("test:" + i));
-            onView(withId(R.id.ml_button_01)).perform(click());
-        }
+        onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG_02));
+        onView(withId(R.id.ml_button_01)).perform(click());
+        onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG_03));
+        onView(withId(R.id.ml_button_01)).perform(click());
+        onView(withId(R.id.ml_new_message)).perform(replaceText(MOCK_TEST_MSG_04));
+        onView(withId(R.id.ml_button_01)).perform(click());
 
         Espresso.closeSoftKeyboard();
         wait_(1);
