@@ -71,6 +71,7 @@ public class JavaFriendTester
     @Rule
     public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA,
                                                                                Manifest.permission.RECORD_AUDIO,
+                                                                               Manifest.permission.POST_NOTIFICATIONS,
                                                                                Manifest.permission.WRITE_EXTERNAL_STORAGE);
     private static Activity currentActivity = null;
 
@@ -358,6 +359,7 @@ public class JavaFriendTester
         ArrayList<String> permissions = new ArrayList<>();
         permissions.add(Manifest.permission.CAMERA);
         permissions.add(Manifest.permission.RECORD_AUDIO);
+        permissions.add(Manifest.permission.POST_NOTIFICATIONS);
         permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         for (int i = 0; i < permissions.size(); i++)
         {
