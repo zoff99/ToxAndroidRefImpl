@@ -302,11 +302,13 @@ public class StartExportImportTest
             }
         }
 
+        screenshot("005");
         dialog_press_positive(3);
 
         wait_(1, "for tox save file to export");
 
         export_tox_save();
+        screenshot("006");
         wait_(2);
         import_tox_save();
 
@@ -338,9 +340,11 @@ public class StartExportImportTest
         }
 
         wait_(1);
+        screenshot("007");
         Log.i(TAG, "Pressing \"YES\" button to import");
         dialog_press_positive(7);
         wait_(5);
+        screenshot("008");
         Log.i(TAG, "Pressing \"YES\" button to restart TRIfA");
         dialog_press_positive(8);
     }
