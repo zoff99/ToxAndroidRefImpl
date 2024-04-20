@@ -3,6 +3,7 @@ package com.zoffcc.applications.trifa;
 import android.Manifest;
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -449,7 +450,16 @@ public class StartExportImportTest
         ArrayList<String> permissions = new ArrayList<>();
         permissions.add(Manifest.permission.CAMERA);
         permissions.add(Manifest.permission.RECORD_AUDIO);
-        permissions.add(Manifest.permission.POST_NOTIFICATIONS);
+        try
+        {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
+            {
+                permissions.add(Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
+        catch(Exception e)
+        {
+        }
         permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         for (int i = 0; i < permissions.size(); i++)
         {
