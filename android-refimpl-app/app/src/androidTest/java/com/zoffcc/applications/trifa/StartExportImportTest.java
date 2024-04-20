@@ -46,6 +46,7 @@ import static androidx.test.espresso.action.ViewActions.replaceText;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isCompletelyDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.isRoot;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -323,10 +324,9 @@ public class StartExportImportTest
     {
         try
         {
-            onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
+            // onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
             Log.i(TAG, "importing tox save file:01a");
-            ViewInteraction vi = onView(withId(R.id.button_import_savedata)).check(matches(isDisplayed()));
-            vi.perform(click());
+            onView(withId(R.id.button_import_savedata)).check(matches(isCompletelyDisplayed())).perform(click());
             Log.i(TAG, "importing tox save file:01b");
         }
         catch (Exception e)
@@ -335,13 +335,13 @@ public class StartExportImportTest
             onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
             try
             {
-                onView(withId(R.id.button_import_savedata)).check(matches(isDisplayed())).perform(click());
+                onView(withId(R.id.button_import_savedata)).check(matches(isCompletelyDisplayed())).perform(click());
                 Log.i(TAG, "importing tox save file:02");
             }
             catch (Exception e2)
             {
                 onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
-                onView(withId(R.id.button_import_savedata)).check(matches(isDisplayed())).perform(click());
+                onView(withId(R.id.button_import_savedata)).check(matches(isCompletelyDisplayed())).perform(click());
                 Log.i(TAG, "importing tox save file:03");
             }
         }
