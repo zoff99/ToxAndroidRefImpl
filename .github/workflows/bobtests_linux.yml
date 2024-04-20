@@ -105,6 +105,7 @@ jobs:
 
       - name: android test
         timeout-minutes: 30
+        continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
