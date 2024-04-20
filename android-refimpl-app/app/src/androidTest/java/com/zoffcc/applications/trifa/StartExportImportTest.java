@@ -324,7 +324,8 @@ public class StartExportImportTest
     {
         try
         {
-            // onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
+            onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
+            onView(withId(R.id.buttons_scroll_view)).perform(custom_swipeUp());
             Log.i(TAG, "importing tox save file:01a");
             onView(withId(R.id.button_import_savedata)).check(matches(isCompletelyDisplayed())).perform(click());
             Log.i(TAG, "importing tox save file:01b");
