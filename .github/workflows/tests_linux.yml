@@ -1,0 +1,143 @@
+name: Linux App Tests Generic
+on:
+  push:
+    paths-ignore:
+     - 'README.md'
+     - '.github/workflows/android.yml'
+  pull_request:
+    paths-ignore:
+     - 'README.md'
+     - '.github/workflows/android.yml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  android-linux-test_generic:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [29]
+    permissions:
+      contents: write
+    if: ${{ true }}
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: install deps
+      run: |
+        sudo apt-get update && \
+        sudo DEBIAN_FRONTEND=noninteractive \
+        apt-get install -y --no-install-recommends \
+        fonts-freefont-otf \
+        adb \
+        ghostscript \
+        imagemagick \
+        ca-certificates
+
+    - name: check imagemagick
+      run: |
+        convert -list font || echo "NO ERR"
+
+    - name: Install Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: |
+          11
+
+    - name: Enable KVM group perms
+      run: |
+        echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+        sudo udevadm control --reload-rules
+        sudo udevadm trigger --name-match=kvm
+
+    - name: test java1
+      run:  |
+            type java
+            echo "===========1========="
+            java -version || exit 0
+            echo "===========2========="
+
+    - name: Gradle cache
+      uses: gradle/actions/setup-gradle@v3
+
+    - name: AVD cache
+      uses: actions/cache@v4
+      id: avd-cache
+      with:
+        path: |
+          ~/.android/avd/*
+          ~/.android/adb*
+        key: avd-${{ matrix.api-level }}
+
+    - name: create AVD and generate snapshot for caching
+      if: steps.avd-cache.outputs.cache-hit != 'true'
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ matrix.api-level }}
+        profile: Nexus 6
+        arch: x86_64
+        ndk: 21.0.6113669
+        cmake: 3.10.2.4988404
+        force-avd-creation: false
+        emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: false
+        disable-spellchecker: true
+        script: echo "Generated AVD snapshot for caching."
+
+    - name: android test
+      timeout-minutes: 120
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ matrix.api-level }}
+        profile: Nexus 6
+        arch: x86_64
+        ndk: 21.0.6113669
+        cmake: 3.10.2.4988404
+        force-avd-creation: false
+        emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+        disable-animations: true
+        disable-spellchecker: true
+        script: |
+          rm -f /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+          sed -i -e 's#a.getWindow().addFlags#//a.getWindow().addFlagsXXYY#' /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/CallingActivity.java
+          printf 'dependencyVerification {\nverify = [\n]\n}\n' > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+          java -version
+          cd android-refimpl-app ; ./gradlew assemble
+          adb logcat -c || echo "NOERR"
+          adb logcat > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt &
+          echo 'sleep 100' > /home/runner/a.sh
+          echo 'sleep 40' >> /home/runner/a.sh
+          echo 'sleep 10' >> /home/runner/a.sh
+          echo 'sleep 10' >> /home/runner/a.sh
+          echo 'sleep 10' >> /home/runner/a.sh
+          cat /home/runner/a.sh
+          ls -al /home/runner/a.sh
+          chmod u+rx /home/runner/a.sh
+          bash /home/runner/a.sh &
+          cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.StartMainActivityWrapperTest || echo "NOERR"
+          pwd
+          adb pull /sdcard/googletest/test_outputfiles .
+          ls -al /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/
+          echo "---------------"
+          ls -al /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
+
+
+    - name: upload screenshots
+      uses: actions/upload-artifact@v4
+      with:
+        name: linuxscreen
+        path: |
+          /home/runner/screen*.png
+          /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
+
+    - name: upload logcat output
+      continue-on-error: true
+      uses: actions/upload-artifact@v4
+      with:
+        name: logcat
+        path: |
+          /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
