@@ -2,6 +2,7 @@ package com.zoffcc.applications.trifa;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.UiAutomation;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -71,10 +72,11 @@ public class StartMainActivityWrapperTest
             StartMainActivityWrapper.class);
     //
     @Rule
-    public GrantPermissionRule grantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA,
-                                                                               Manifest.permission.RECORD_AUDIO,
-                                                                               Manifest.permission.POST_NOTIFICATIONS,
-                                                                               Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    public GrantPermissionRule grantPermissionRule =
+            GrantPermissionRule.grant(Manifest.permission.CAMERA,
+                                      Manifest.permission.RECORD_AUDIO,
+                                      Manifest.permission.WRITE_EXTERNAL_STORAGE
+            );
     private Activity currentActivity = null;
 
     @Test
@@ -441,16 +443,6 @@ public class StartMainActivityWrapperTest
         ArrayList<String> permissions = new ArrayList<>();
         permissions.add(Manifest.permission.CAMERA);
         permissions.add(Manifest.permission.RECORD_AUDIO);
-        try
-        {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            {
-                permissions.add(Manifest.permission.POST_NOTIFICATIONS);
-            }
-        }
-        catch(Exception e)
-        {
-        }
         permissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         for (int i = 0; i < permissions.size(); i++)
         {
