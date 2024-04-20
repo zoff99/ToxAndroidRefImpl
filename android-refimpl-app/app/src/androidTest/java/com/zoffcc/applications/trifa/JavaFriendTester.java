@@ -176,7 +176,7 @@ public class JavaFriendTester
         testwrite("001", mytoxid);
 
         long loops = 0;
-        final long max_loops = 80;
+        final long max_loops = 120;
         int count_friends = orma.selectFromFriendList().count();
         while (count_friends < 2)
         {
