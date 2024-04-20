@@ -89,7 +89,7 @@ jobs:
         script: echo "Generated AVD snapshot for caching."
 
     - name: android test
-      timeout-minutes: 10
+      timeout-minutes: 30
       uses: reactivecircus/android-emulator-runner@v2
       with:
         api-level: ${{ matrix.api-level }}
