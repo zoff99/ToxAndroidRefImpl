@@ -371,7 +371,7 @@ dependencies {
     //noinspection KtxExtensionAvailable
     implementation 'androidx.collection:collection:1.4.0'
     //noinspection KtxExtensionAvailable
-    implementation 'androidx.core:core:1.12.0'
+    implementation 'androidx.core:core:1.13.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     //noinspection KtxExtensionAvailable
     implementation 'androidx.fragment:fragment:1.6.2'
