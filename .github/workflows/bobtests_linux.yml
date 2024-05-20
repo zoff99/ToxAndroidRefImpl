@@ -118,6 +118,7 @@ jobs:
           disable-animations: true
           disable-spellchecker: true
           script: |
+            df -h
             rm -f /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
             sed -i -e 's#a.getWindow().addFlags#//a.getWindow().addFlagsXXYY#' /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/CallingActivity.java
             printf 'dependencyVerification {\nverify = [\n]\n}\n' > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
