@@ -81,7 +81,7 @@
     <string name="pref_title_display_name">Показать имя</string>
     <string name="pref_default_display_name">Джон Смит</string>
     <string name="pref_title_conference_show_system_messages">Системные сообщения</string>
-    <string name="pref_description_conference_show_system_messages">показать системные сообщения в конференциях</string>
+    <string name="pref_description_conference_show_system_messages">Показывать системные сообщения в конференциях</string>
     <string name="pref_title_local_discovery_enabled">Обнаружение в локальной сети</string>
     <string name="pref_description_local_discovery_enabled">использовать начальные узлы из локальной сети</string>
     <string name="pref_title_U_keep_nospam">сохранить NoSpam</string>
@@ -369,7 +369,7 @@
     <string name="title_activity_conferenceinfo">Информация о конференции</string>
     <string name="add_public_group_activity_name">Создать открытую группу</string>
     <string name="join_public_activity_name">Присоединиться к открытой группе</string>
-    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">добавляет возможность отправить файлы в TRIfA.</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">добавляет возможность отправить файлы в TRIfA через функцию Android \"Поделиться\".</string>
     <string name="pref_title_use_camera_x">Удаление фона</string>
     <string name="pref_description_use_camera_x">!! Экспериментальная функция !!
 \nИспользовать CameraX и Remove background в видеозвонках
@@ -400,4 +400,12 @@
     <string name="pref_description_allow_open_encrypted_file_via_intent">Открыть файл прямо с шифрованного хранилища через Интернет. Это может быть потенциально опасно, вредоносное приложение может открыть другие файлы внутри хранилища TRIfA.</string>
     <string name="layout___own_pushurl">PUSH ссылка:</string>
     <string name="layout___friends_pushurl">Дружественная PUSH ссылка:</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Установить отображаемое число сообщений на странице. 0 отключает постраничное отображение</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Постраничное отображение сообщений</string>
+    <string name="pref_title_allow_push_server_ntfy">Дать доступ серверу ntfy.sh</string>
+    <string name="pref_title_notification_show_content">Показывать содержимое уведомлений</string>
+    <string name="pref_description_notification_show_content">Отображать текст и отправителя сообщения в уведомлениях</string>
+    <string name="pref_description_allow_push_server_ntfy">Внимание: Дача ntfy.sh серверу доступа к пуш уведомлениям может привести к утечке ваших метаданных о временных метках при получении пуш уведомлений, если ваш друг подпишется к серверу с вашим пуш токеном. У ntfy.sh нет НИКАКОЙ аутентификации. Вы были предупреждены.</string>
+    <string name="pref_title_custom_bootstrap_nodes">Использовать пользовательские начальные узлы</string>
+    <string name="pref_description_mic_gain_factor_toggle">Если ваш микрофон слишком чувствительный, включите эту настройку, чтобы отрегулировать коэффициент усиления микрофона</string>
 </resources>
