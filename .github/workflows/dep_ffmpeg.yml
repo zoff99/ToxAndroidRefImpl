@@ -27,3 +27,6 @@ jobs:
 
     - name: check for changes
       run:  git diff || echo "no changes"
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
