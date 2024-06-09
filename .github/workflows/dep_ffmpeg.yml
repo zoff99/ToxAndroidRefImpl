@@ -23,8 +23,4 @@ jobs:
       uses: actions/checkout@v4
 
     - name: Run auto dependency update
-      uses: romoh/dependencies-autoupdate@main
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-        update-command: "'./check_ffmpeg.sh'"
-        on-changes-command: "./done.sh"
+      run: ./check_ffmpeg.sh
