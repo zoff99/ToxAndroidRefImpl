@@ -24,3 +24,6 @@ jobs:
 
     - name: Run auto dependency update
       run: ./check_ffmpeg.sh
+
+    - name: check for changes
+      run:  git diff || echo "no changes"
