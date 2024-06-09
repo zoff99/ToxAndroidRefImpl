@@ -32,6 +32,7 @@ jobs:
       uses: peter-evans/create-pull-request@v6
       with:
         commit-message: update opus
+        create-pull-request/opus
         signoff: false
         delete-branch: true
         title: 'update opus'
