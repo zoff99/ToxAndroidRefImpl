@@ -32,8 +32,7 @@ jobs:
       uses: peter-evans/create-pull-request@v6
       with:
         commit-message: update ffmpeg
-        create-pull-request/ffmpeg
-        signoff: false
+        branch: 'create-pull-request/ffmpeg'
         delete-branch: true
         title: 'update ffmpeg'
 
