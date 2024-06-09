@@ -10,4 +10,4 @@ d='./circle_scripts/'
 f='deps.sh'
 
 cd "$d"
-grep -ril '_FFMPEG_VERSION_='|xargs -L1 sed -i -e 's#_FFMPEG_VERSION_=".*"#_FFMPEG_VERSION_="'"$ver"'"#'
+grep -ril '_LIBSODIUM_VERSION_='|xargs -L1 sed -i -e 's#_LIBSODIUM_VERSION_=".*"#_LIBSODIUM_VERSION_="'"$ver"'"#'

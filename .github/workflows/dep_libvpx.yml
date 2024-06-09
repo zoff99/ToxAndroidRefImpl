@@ -1,4 +1,4 @@
-name: Auto update dependencies
+name: Auto update libvpx
 
 on:
   schedule:
