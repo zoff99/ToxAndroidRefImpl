@@ -1,5 +1,0 @@
-
-dependencies {
-    implementation('com.google.zxing:core:3.5.0') {
-        exclude group: 'com.android.support'
-    }
