@@ -1,11 +1,7 @@
 version: 2
 updates:
-  - package-ecosystem: "gradle"
-    directory: "/android-refimpl-app/"
-    schedule:
-      interval: "weekly"
-
-  - package-ecosystem: "github-actions"
+  - package-ecosystem: "gitsubmodule"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
+    target-branch: "checkgitdeps"
