@@ -1,0 +1,37 @@
+name: Auto update dependencies
+
+on:
+  schedule:
+    # runs daily at 12:00 am
+    - cron: '0 0 * * *'
+  push:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+
+jobs:
+  auto-update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Run auto dependency update
+      run: ./tools/check_opus.sh
+
+    - name: check for changes
+      run:  git diff || echo "no changes"
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        commit-message: update opus
+        signoff: false
+        delete-branch: true
+        title: 'update opus'
