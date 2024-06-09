@@ -1,0 +1,37 @@
+name: Auto update x264
+
+on:
+  schedule:
+    # runs daily at 12:00 am
+    - cron: '0 0 * * *'
+  push:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+
+jobs:
+  auto-update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Run auto dependency update
+      run: ./tools/check_x264.sh
+
+    - name: check for changes
+      run:  git diff || echo "no changes"
+
+    - name: Create Pull Request
+      uses: peter-evans/create-pull-request@v6
+      with:
+        commit-message: update x264
+        branch: create-pull-request/x264
+        delete-branch: true
+        title: 'update x264'
