@@ -6,6 +6,8 @@ ver=$(git ls-remote --refs --sort='v:refname' --tags "$r1" \
 
 echo "$ver"
 
-f='./circle_scripts/deps.sh'
+d='./circle_scripts/'
+f='deps.sh'
 
-grep -ril '_FFMPEG_VERSION_='|xargs -L1 sed -i -e 's#_FFMPEG_VERSION_="n7.0.1"#'
+cd "$d"
+grep -ril '_FFMPEG_VERSION_='|xargs -L1 sed -i -e 's#_FFMPEG_VERSION_=".*"#_FFMPEG_VERSION_="'"$ver"'"#'
