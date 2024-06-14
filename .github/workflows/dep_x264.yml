@@ -2,8 +2,8 @@ name: Auto update x264
 
 on:
   schedule:
-    # runs daily at 12:00 am
-    - cron: '0 0 * * *'
+    # runs Tue at 12:00 am
+    - cron: '0 0 * * 2'
   push:
   workflow_dispatch:
     inputs:
