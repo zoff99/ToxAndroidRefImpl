@@ -65,6 +65,9 @@ set(SOURCE ${SOURCE}
         webrtc/common_audio/signal_processing/division_operations.c
         webrtc/common_audio/signal_processing/vector_scaling_operations.c
         webrtc/common_audio/signal_processing/get_scaling_square.c
+        webrtc/common_audio/signal_processing/resample_by_2.c
+        webrtc/common_audio/signal_processing/dot_product_with_scale.c
+        webrtc/common_audio/signal_processing/spl_sqrt.c
         webrtc/common_audio/signal_processing/spl_init.c
         webrtc/common_audio/signal_processing/real_fft.c
         webrtc/common_audio/signal_processing/complex_fft.c
@@ -95,6 +98,13 @@ set(SOURCE ${SOURCE}
         webrtc/modules/audio_processing/ns/nsx_core.h
         webrtc/modules/audio_processing/ns/nsx_defines.h
         webrtc/modules/audio_processing/ns/windows_private.h
+        )
+
+set(SOURCE ${SOURCE}
+        webrtc/modules/audio_processing/agc/legacy/digital_agc.c
+        webrtc/modules/audio_processing/agc/legacy/digital_agc.h
+        webrtc/modules/audio_processing/agc/legacy/analog_agc.c
+        webrtc/modules/audio_processing/agc/legacy/analog_agc.h
         )
 
 add_library(
