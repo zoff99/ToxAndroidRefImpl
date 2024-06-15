@@ -92,6 +92,8 @@ bool filteraudio_used = false;
 // webrtc lib for software AEC and NS
 #include "webrtc6/webrtc/modules/audio_processing/ns/noise_suppression_x.h"
 #include "webrtc6/webrtc/modules/audio_processing/aecm/echo_control_mobile.h"
+#include "webrtc6/webrtc/modules/audio_processing/agc/legacy/digital_agc.h"
+#include "webrtc6/webrtc/modules/audio_processing/agc/legacy/gain_control.h"
 
 int16_t *pcm_buf_resampled;
 int16_t *pcm_buf_out_resampled;
@@ -171,6 +173,8 @@ const int samples_per_frame_for_48000_40ms = 1920;
 #ifdef WEBRTC_AEC
 void *webrtc_aecmInst = NULL;
 NsxHandle *nsxInst = NULL;
+// -----------------------
+void *agcInst = NULL;
 // -----------------------
 #define MINIAUDIO_IMPLEMENTATION
 #pragma GCC diagnostic push
@@ -929,6 +933,48 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcAecm_Init:res=%d sampleRate=%d",
                             res2, sampleRate);
+
+        // Automatic Gain Control
+        agcInst = WebRtcAgc_Create();
+        if (agcInst == NULL)
+        {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "ERROR:WebRtcAgc_Create");
+        }
+        else
+        {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "OK:WebRtcAgc_Create");
+        }
+        int minLevel = 0;
+        int maxLevel = 255;
+        int status = WebRtcAgc_Init(agcInst, minLevel, maxLevel, kAgcModeAdaptiveDigital, sampleRate);
+        if (status != 0)
+        {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "ERROR:WebRtcAgc_Init:res=%d", status);
+        }
+        else
+        {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "OK:WebRtcAgc_Init");
+        }
+        WebRtcAgcConfig agcConfig;
+        agcConfig.compressionGaindB = 9; // default 9 dB
+        agcConfig.limiterEnable = 1; // default kAgcTrue (on)
+        agcConfig.targetLevelDbfs = 3; // default 3 (-3 dBOv)
+        status = WebRtcAgc_set_config(agcInst, agcConfig);
+        if (status != 0)
+        {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "ERROR:WebRtcAgc_set_config:res=%d", status);
+        }
+        else
+        {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "OK:WebRtcAgc_set_config");
+        }
+
         //
         // ----------------------------------------------------------
 #endif
@@ -1115,9 +1161,10 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
     }
 #endif
 
-#if 0
+#if 1
     /* Enable AGC if requested */
-    if (agc)
+    const int want_agc = 0;
+    if (want_agc)
     {
         SLAndroidAutomaticGainControlItf agcItf;
         result = (*recorderObject)->GetInterface(
@@ -1134,7 +1181,8 @@ Java_com_zoffcc_applications_nativeaudio_NativeAudio_createAudioRecorder(JNIEnv 
         }
     }
     /* Enable NS if requested */
-    if (ns)
+    const int want_ns = 0;
+    if (want_ns)
     {
         SLAndroidNoiseSuppressionItf nsItf;
         result = (*recorderObject)->GetInterface(
@@ -1632,6 +1680,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         WebRtcAecm_Free(webrtc_aecmInst);
         webrtc_aecmInst = NULL;
         WebRtcNsx_Free(nsxInst);
+        WebRtcAgc_Free(agcInst);
         nsxInst = NULL;
         free(pcm_buf_resampled);
         pcm_buf_resampled = NULL;
