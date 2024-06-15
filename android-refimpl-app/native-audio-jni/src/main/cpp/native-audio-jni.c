@@ -493,43 +493,102 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             int16_t *this_buffer_pcm16 = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
             int this_buffer_size_pcm16 = audio_rec_buffer_size[rec_buf_pointer_start] / 2;
 
+#if 1
             // TODO: make this better? faster?
             // --------------------------------------------------
             // increase GAIN manually and rather slow:
-            if ((!wanted_mic_gain_lower_volume) && (wanted_mic_gain == 1.0f))
+            const int gain_manually = 2;
+            int loop = 0;
+            int32_t temp = 0;
+            for (loop = 0; loop < this_buffer_size_pcm16; loop++)
             {
-                // gain == 1.0, so do nothing
-            }
-            else
-            {
-                int loop = 0;
-                int32_t temp = 0;
-                for (loop = 0; loop < this_buffer_size_pcm16; loop++)
+                temp = (int16_t) ((int32_t)(*this_buffer_pcm16) * (int32_t)gain_manually);
+                if (temp > INT16_MAX)
                 {
-                    if (wanted_mic_gain_lower_volume)
-                    {
-                        temp = (int16_t) ((float) (*this_buffer_pcm16) * wanted_mic_gain_lower);
-                    }
-                    else
-                    {
-                        temp = (int16_t) ((int32_t)(*this_buffer_pcm16) * (int32_t)wanted_mic_gain);
-                    }
-                    if (temp > INT16_MAX)
-                    {
-                        temp = INT16_MAX;
-                    }
-                    else if (temp < INT16_MIN)
-                    {
-                        temp = INT16_MIN;
-                    }
-
-                    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "gain:old=%d new=%d",
-                    //                     (*this_buffer_pcm16), (int16_t) temp);
-                    *this_buffer_pcm16 = (int16_t) temp;
-                    this_buffer_pcm16++;
+                    temp = INT16_MAX;
                 }
+                else if (temp < INT16_MIN)
+                {
+                    temp = INT16_MIN;
+                }
+
+                // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "gain:old=%d new=%d",
+                //                     (*this_buffer_pcm16), (int16_t) temp);
+                *this_buffer_pcm16 = (int16_t) temp;
+                this_buffer_pcm16++;
             }
             // --------------------------------------------------
+#endif
+
+            // Automatic Gain Control --------------
+#ifdef WEBRTC_AEC
+#define USE_AGC 1
+#ifdef USE_AGC
+            size_t samplesCount = audio_rec_buffer_size[rec_buf_pointer_start] / 2;
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "AGC:do:mic_samples=%d", (int32_t) samplesCount);
+            const int sampleRate = 48000;
+
+#ifndef MIN__DEF
+#define  MIN__DEF(A, B)        ((A) < (B) ? (A) : (B))
+#endif
+            size_t samples = MIN__DEF(160, sampleRate / 100);
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "AGC:do:samples=%d", (int32_t) samples);
+            size_t nTotal = (samplesCount / samples);
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "AGC:do:nTotal=%d", (int32_t) nTotal);
+
+            int16_t *input = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
+            size_t num_bands = 1;
+            const int maxSamples = samples * 2;
+            int inMicLevel = -1;
+            int outMicLevel = -1;
+            int16_t out_buffer[maxSamples];
+            int16_t *out16 = out_buffer;
+            uint8_t saturationWarning = 1;
+            int16_t echo = 0;
+
+            // ---------- loop over samples with AGC ----------
+            // ---------- loop over samples with AGC ----------
+            // ---------- loop over samples with AGC ----------
+            for (int i = 0; i < nTotal; i++) {
+                inMicLevel = 0;
+                int nAgcRet = WebRtcAgc_Process(agcInst, (const int16_t *const *) &input, num_bands, samples,
+                                                (int16_t *const *) &out16, inMicLevel, &outMicLevel, echo,
+                                                &saturationWarning);
+
+                if (nAgcRet != 0) {
+                    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "AGC:do:failed in WebRtcAgc_Process");
+                } else {
+                    // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "AGC:do:outMicLevel:1: in=%d out=%d w=%d", inMicLevel, outMicLevel, saturationWarning);
+                    memcpy(input, out_buffer, samples * 2);
+                }
+                input += samples;
+            }
+
+            const size_t remainedSamples = samplesCount - nTotal * samples;
+            if (remainedSamples > 0) {
+                if (nTotal > 0) {
+                    input = input - samples + remainedSamples;
+                }
+
+                inMicLevel = 0;
+                int nAgcRet = WebRtcAgc_Process(agcInst, (const int16_t *const *) &input, num_bands, samples,
+                                                (int16_t *const *) &out16, inMicLevel, &outMicLevel, echo,
+                                                &saturationWarning);
+                // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "AGC:do:outMicLevel:2=%d %d", inMicLevel, outMicLevel);
+
+                if (nAgcRet != 0) {
+                    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "AGC:do:failed in WebRtcAgc_Process during filtering the last chunk");
+                } else {
+                    memcpy(&input[samples-remainedSamples], &out_buffer[samples-remainedSamples], remainedSamples * 2);
+                }
+                input += samples;
+            }
+            // ---------- loop over samples with AGC ----------
+            // ---------- loop over samples with AGC ----------
+            // ---------- loop over samples with AGC ----------
+#endif
+#endif
+            // Automatic Gain Control --------------
 
             this_buffer_pcm16 = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
             audio_in_vu_value = audio_vu(this_buffer_pcm16,
@@ -962,7 +1021,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         WebRtcAgcConfig agcConfig;
         agcConfig.compressionGaindB = 9; // default 9 dB
         agcConfig.limiterEnable = 1; // default kAgcTrue (on)
-        agcConfig.targetLevelDbfs = 3; // default 3 (-3 dBOv)
+        agcConfig.targetLevelDbfs = 3; // default 3 (-3 dBOv) [0 - 31]
         status = WebRtcAgc_set_config(agcInst, agcConfig);
         if (status != 0)
         {
