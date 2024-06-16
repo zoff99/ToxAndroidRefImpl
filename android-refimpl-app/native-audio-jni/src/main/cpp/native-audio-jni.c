@@ -1083,7 +1083,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         // RNNoise - Noise Reduction
         //
         RNNModel *model = NULL;
-        float RNNoise_att = 50; // HINT: not sure what the allowed and useful values are for this
+        model = rnnoise_get_model("cb"); // values are: "orig", "cb", "mp", "bd", "lq", "sh", NULL
+        float RNNoise_att = 40; // HINT: not sure what the allowed and useful values are for this
         float RNNoise_max_attenuation = pow(10, -RNNoise_att / 10);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "RNNoise:RNNoise_max_attenuation=%f", RNNoise_max_attenuation);
         RNNoise_sts = rnnoise_create(model);
