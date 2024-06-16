@@ -178,6 +178,8 @@ NsxHandle *nsxInst = NULL;
 // -----------------------
 void *agcInst = NULL;
 // -----------------------
+DenoiseState *RNNoise_sts = NULL;
+// -----------------------
 #define MINIAUDIO_IMPLEMENTATION
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
@@ -321,8 +323,7 @@ int android_find_class_global(char *name, jclass *ret)
 // --------------------------
 
 
-// gives a counter value that increaes every millisecond
-#ifdef DEBUG_NATIVE_AUDIO_DEEP
+// gives a counter value that increases every millisecond
 static uint64_t current_time_monotonic_default(void);
 
 static uint64_t current_time_monotonic_default()
@@ -333,7 +334,6 @@ static uint64_t current_time_monotonic_default()
     time = 1000ULL * clock_mono.tv_sec + (clock_mono.tv_nsec / 1000000ULL);
     return time;
 }
-#endif
 // --------------------------
 
 // this callback handler is called every time a buffer finishes recording
@@ -591,6 +591,46 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 #endif
 #endif
             // Automatic Gain Control --------------
+
+
+            // RNNoise - Noise Reduction -----------
+
+            // uint64_t rn_t1 = current_time_monotonic_default();
+            int samples_count_rnnoise = audio_rec_buffer_size[rec_buf_pointer_start] / 2;
+#define RNNOISE_FRAME_SIZE 480
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "RNNoise:samples_count_rnnoise=%d", (int)samples_count_rnnoise);
+            if (samples_count_rnnoise == (RNNOISE_FRAME_SIZE) * 4)
+            {
+                float x[RNNOISE_FRAME_SIZE];
+                int16_t *input_rnnoise = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
+
+                // first 480 samples
+                for (int i=0;i<RNNOISE_FRAME_SIZE;i++) x[i] = input_rnnoise[i];
+                rnnoise_process_frame(RNNoise_sts, x, x);
+                for (int i=0;i<RNNOISE_FRAME_SIZE;i++) input_rnnoise[i] = x[i];
+
+                // second 480 samples
+                for (int i=0;i<RNNOISE_FRAME_SIZE;i++) x[i] = input_rnnoise[i + (RNNOISE_FRAME_SIZE)];
+                rnnoise_process_frame(RNNoise_sts, x, x);
+                for (int i=0;i<RNNOISE_FRAME_SIZE;i++) input_rnnoise[i + (RNNOISE_FRAME_SIZE)] = x[i];
+
+                // third 480 samples
+                for (int i=0;i<RNNOISE_FRAME_SIZE;i++) x[i] = input_rnnoise[i + (2 * RNNOISE_FRAME_SIZE)];
+                rnnoise_process_frame(RNNoise_sts, x, x);
+                for (int i=0;i<RNNOISE_FRAME_SIZE;i++) input_rnnoise[i + (2 * RNNOISE_FRAME_SIZE)] = x[i];
+
+                // fourth 480 samples
+                for (int i=0;i<RNNOISE_FRAME_SIZE;i++) x[i] = input_rnnoise[i + (3 * RNNOISE_FRAME_SIZE)];
+                rnnoise_process_frame(RNNoise_sts, x, x);
+                for (int i=0;i<RNNOISE_FRAME_SIZE;i++) input_rnnoise[i + (3 * RNNOISE_FRAME_SIZE)] = x[i];
+            }
+            // uint64_t rn_t2 = current_time_monotonic_default();
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "RNNoise:delta=%d", (int)(rn_t2-rn_t1));
+
+            // RNNoise - Noise Reduction -----------
+
+
+
 
             this_buffer_pcm16 = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
             audio_in_vu_value = audio_vu(this_buffer_pcm16,
@@ -1043,14 +1083,22 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         // RNNoise - Noise Reduction
         //
         RNNModel *model = NULL;
-        int att = 10;
-        float max_attenuation = pow(10, -atof(att)/10);
-        DenoiseState *sts = rnnoise_create(model);
-        rnnoise_set_param(sts, RNNOISE_PARAM_MAX_ATTENUATION, max_attenuation);
-        rnnoise_set_param(sts, RNNOISE_PARAM_SAMPLE_RATE, sampleRate);
+        float RNNoise_att = 50; // HINT: not sure what the allowed and useful values are for this
+        float RNNoise_max_attenuation = pow(10, -RNNoise_att / 10);
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "RNNoise:RNNoise_max_attenuation=%f", RNNoise_max_attenuation);
+        RNNoise_sts = rnnoise_create(model);
+        if (RNNoise_sts == NULL)
+        {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "ERROR:RNNoise:rnnoise_create");
+        }
+        else
+        {
+            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "OK:RNNoise:rnnoise_create");
+        }
+        rnnoise_set_param(RNNoise_sts, RNNOISE_PARAM_MAX_ATTENUATION, RNNoise_max_attenuation);
+        rnnoise_set_param(RNNoise_sts, RNNOISE_PARAM_SAMPLE_RATE, sampleRate);
         //
         // ----------------------------------------------------------
-
 
         filteraudio_used = true;
     }
@@ -1763,6 +1811,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         ma_resampler_uninit(&miniaudio_downsample_resampler, NULL);
         ma_resampler_uninit(&miniaudio_upsample_resampler, NULL);
 #endif
+        rnnoise_destroy(RNNoise_sts);
     }
 
     playing_state = _SHUTDOWN;
