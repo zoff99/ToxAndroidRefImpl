@@ -1019,9 +1019,9 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                             "OK:WebRtcAgc_Init");
         }
         WebRtcAgcConfig agcConfig;
-        agcConfig.compressionGaindB = 9; // default 9 dB
+        agcConfig.compressionGaindB = 80; // 9; // default 9 dB
         agcConfig.limiterEnable = 1; // default kAgcTrue (on)
-        agcConfig.targetLevelDbfs = 3; // default 3 (-3 dBOv) [0 - 31]
+        agcConfig.targetLevelDbfs = 2; // 3; // default 3 (-3 dBOv) [0 - 31]
         status = WebRtcAgc_set_config(agcInst, agcConfig);
         if (status != 0)
         {
