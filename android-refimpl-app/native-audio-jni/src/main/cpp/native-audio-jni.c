@@ -499,7 +499,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             // TODO: make this better? faster?
             // --------------------------------------------------
             // increase GAIN manually and rather slow:
-            const int gain_manually = 2;
+            const int gain_manually = 3;
             int loop = 0;
             int32_t temp = 0;
             for (loop = 0; loop < this_buffer_size_pcm16; loop++)
