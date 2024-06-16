@@ -4,6 +4,9 @@ project("native-audio-jni")
 add_subdirectory(webrtc6)
 include_directories(./webrtc6)
 
+add_subdirectory(rnnoise1)
+include_directories(./rnnoise1)
+
 set(CMAKE_C_FLAGS1 "${CMAKE_C_FLAGS} -Wall \
 -Wextra \
 -Weverything \
@@ -36,7 +39,7 @@ set(CMAKE_C_FLAGS1 "${CMAKE_C_FLAGS} -Wall \
 -Werror \
 ")
 
-set(CMAKE_C_FLAGS2 "${CMAKE_C_FLAGS} -Wall -Iwebrtc6/webrtc")
+set(CMAKE_C_FLAGS2 "${CMAKE_C_FLAGS} -Wall -Iwebrtc6/webrtc -Irnnoise1/include")
 
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS1} -std=c99 -fPIC -g -fstack-protector-all")
 
@@ -48,5 +51,6 @@ add_library(native-audio-jni SHARED
 target_link_libraries(native-audio-jni
         android
         aec2
+        rnnoiselib1
         log
         OpenSLES)

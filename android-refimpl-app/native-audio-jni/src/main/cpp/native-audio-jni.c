@@ -99,6 +99,8 @@ int16_t *pcm_buf_resampled;
 int16_t *pcm_buf_out_resampled;
 #endif
 
+#include "rnnoise1/include/rnnoise-nu.h"
+
 int aec_active = 0;
 int audio_aec_delay = 80;
 
@@ -973,7 +975,6 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         //
         // ----------------------------------------------------------
 
-
         // ----------------------------------------------------------
         // Acoustic Echo Cancellation
         //
@@ -1037,6 +1038,20 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         //
         // ----------------------------------------------------------
 #endif
+
+        // ----------------------------------------------------------
+        // RNNoise - Noise Reduction
+        //
+        RNNModel *model = NULL;
+        int att = 10;
+        float max_attenuation = pow(10, -atof(att)/10);
+        DenoiseState *sts = rnnoise_create(model);
+        rnnoise_set_param(sts, RNNOISE_PARAM_MAX_ATTENUATION, max_attenuation);
+        rnnoise_set_param(sts, RNNOISE_PARAM_SAMPLE_RATE, sampleRate);
+        //
+        // ----------------------------------------------------------
+
+
         filteraudio_used = true;
     }
     else
