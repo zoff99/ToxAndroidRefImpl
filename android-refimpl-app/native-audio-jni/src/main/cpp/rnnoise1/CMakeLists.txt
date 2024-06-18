@@ -20,23 +20,17 @@ include_directories(./include)
 include_directories(./src)
 
 set(SOURCE
-        src/models/sh.c
-        src/models/mp.c
-        src/models/lq.c
-        src/models/cb.c
-        src/models/bd.c
-        )
-
-set(SOURCE ${SOURCE}
-        src/celt_lpc.c
         src/denoise.c
-        src/kiss_fft.c
-        src/models.c
-        src/pitch.c
         src/rnn.c
-        src/rnn_data.c
-        src/rnn_reader.c
-        )
+        src/pitch.c
+        src/kiss_fft.c
+        src/celt_lpc.c
+        src/nnet.c
+        src/nnet_default.c
+        src/parse_lpcnet_weights.c
+        src/rnnoise_data.c
+        src/rnnoise_tables.c
+   )
 
 add_library(
         rnnoiselib1

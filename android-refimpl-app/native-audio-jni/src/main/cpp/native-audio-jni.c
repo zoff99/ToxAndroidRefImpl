@@ -99,7 +99,7 @@ int16_t *pcm_buf_resampled;
 int16_t *pcm_buf_out_resampled;
 #endif
 
-#include "rnnoise1/include/rnnoise-nu.h"
+#include "rnnoise1/include/rnnoise.h"
 
 int aec_active = 0;
 int audio_aec_delay = 80;
@@ -179,6 +179,7 @@ NsxHandle *nsxInst = NULL;
 void *agcInst = NULL;
 // -----------------------
 DenoiseState *RNNoise_sts = NULL;
+RNNModel *RNNoise_model = NULL;
 // -----------------------
 #define MINIAUDIO_IMPLEMENTATION
 #pragma GCC diagnostic push
@@ -1082,12 +1083,12 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         // ----------------------------------------------------------
         // RNNoise - Noise Reduction
         //
-        RNNModel *model = NULL;
-        model = rnnoise_get_model("cb"); // values are: "orig", "cb", "mp", "bd", "lq", "sh", NULL
-        float RNNoise_att = 40; // HINT: not sure what the allowed and useful values are for this
-        float RNNoise_max_attenuation = pow(10, -RNNoise_att / 10);
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "RNNoise:RNNoise_max_attenuation=%f", RNNoise_max_attenuation);
-        RNNoise_sts = rnnoise_create(model);
+        RNNoise_model = NULL;
+#ifdef USE_WEIGHTS_FILE
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "RNNoise:rnnoise_model_from_filename ...");
+        RNNModel *RNNoise_model = rnnoise_model_from_filename("weights_blob.bin");
+#endif
+        RNNoise_sts = rnnoise_create(RNNoise_model);
         if (RNNoise_sts == NULL)
         {
             __android_log_print(ANDROID_LOG_INFO, LOGTAG, "ERROR:RNNoise:rnnoise_create");
@@ -1096,8 +1097,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         {
             __android_log_print(ANDROID_LOG_INFO, LOGTAG, "OK:RNNoise:rnnoise_create");
         }
-        rnnoise_set_param(RNNoise_sts, RNNOISE_PARAM_MAX_ATTENUATION, RNNoise_max_attenuation);
-        rnnoise_set_param(RNNoise_sts, RNNOISE_PARAM_SAMPLE_RATE, sampleRate);
+        // rnnoise_set_param(RNNoise_sts, RNNOISE_PARAM_MAX_ATTENUATION, RNNoise_max_attenuation);
+        // rnnoise_set_param(RNNoise_sts, RNNOISE_PARAM_SAMPLE_RATE, sampleRate);
         //
         // ----------------------------------------------------------
 
@@ -1813,6 +1814,14 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         ma_resampler_uninit(&miniaudio_upsample_resampler, NULL);
 #endif
         rnnoise_destroy(RNNoise_sts);
+
+#ifdef USE_WEIGHTS_FILE
+        if (RNNoise_model != NULL)
+        {
+            rnnoise_model_free(RNNoise_model);
+            RNNoise_model = NULL;
+        }
+#endif
     }
 
     playing_state = _SHUTDOWN;
