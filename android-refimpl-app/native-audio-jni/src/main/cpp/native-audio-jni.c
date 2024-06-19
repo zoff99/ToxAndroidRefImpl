@@ -425,6 +425,9 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         // signal Java code that a new record data is available in buffer #cur_rec_buf
         if ((NativeAudio_class) && (rec_buffer_ready_method) && (rec_state == _RECORDING))
         {
+
+            // uint64_t recording_overall_t1 = current_time_monotonic_default();
+
             if (filteraudio_used)
             {
 #ifdef WEBRTC_AEC
@@ -573,8 +576,9 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
             // Automatic Gain Control --------------
 #ifdef WEBRTC_AEC
-// #define USE_AGC 1
+#define USE_AGC 1
 #ifdef USE_AGC
+
             size_t samplesCount = audio_rec_buffer_size[rec_buf_pointer_start] / 2;
             // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "AGC:do:mic_samples=%d", (int32_t) samplesCount);
             const int sampleRate = 48000;
@@ -637,6 +641,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             // ---------- loop over samples with AGC ----------
             // ---------- loop over samples with AGC ----------
             // ---------- loop over samples with AGC ----------
+
 #endif
 #endif
             // Automatic Gain Control --------------
@@ -646,6 +651,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             this_buffer_pcm16 = (int16_t *) audio_rec_buffer[rec_buf_pointer_start];
             audio_in_vu_value = audio_vu(this_buffer_pcm16,
                                          (uint32_t) (this_buffer_size_pcm16 / 2));
+
 
             // TODO: rewerite this, so that it does not need to call "AttachCurrentThread" and "DetachCurrentThread"
             //       every time!
@@ -677,6 +683,11 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                     (*cachedJVM)->DetachCurrentThread(cachedJVM);
                 }
             }
+
+            // uint64_t recording_overall_t2 = current_time_monotonic_default();
+            // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "bqRecorderCallback:delta_overall=%d",
+            //         (int)(recording_overall_t2-recording_overall_t1));
+
         }
 
         rec_buf_pointer_start++;
@@ -687,7 +698,6 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
         // __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A003:ENQU-CB_PR:max_num_bufs=%d,bs=%d,bn=%d",
         //                    (int)num_rec_bufs, (int)rec_buf_pointer_start, (int)rec_buf_pointer_next);
-
     }
 }
 
@@ -1071,9 +1081,9 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
                             "OK:WebRtcAgc_Init");
         }
         WebRtcAgcConfig agcConfig;
-        agcConfig.compressionGaindB = 60; // 9; // default 9 dB
+        agcConfig.compressionGaindB = 10; // 9; // default 9 dB
         agcConfig.limiterEnable = 1; // default kAgcTrue (on)
-        agcConfig.targetLevelDbfs = 2; // 3; // default 3 (-3 dBOv) [0 - 31]
+        agcConfig.targetLevelDbfs = 3; // 3; // default 3 (-3 dBOv) [0 - 31]
         status = WebRtcAgc_set_config(agcInst, agcConfig);
         if (status != 0)
         {
