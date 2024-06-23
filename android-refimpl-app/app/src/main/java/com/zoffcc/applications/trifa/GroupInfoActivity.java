@@ -29,6 +29,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -48,11 +53,14 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_offline_peer_
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_reconnect;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_savedpeer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_set_name;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_NEW_PEERS_TIMEDELTA_IN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+import static com.zoffcc.applications.trifa.ToxVars.GC_MAX_SAVED_PEERS;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class GroupInfoActivity extends AppCompatActivity
@@ -69,6 +77,7 @@ public class GroupInfoActivity extends AppCompatActivity
     static TextView group_num_msgs_text = null;
     static TextView group_num_system_msgs_text = null;
     Button group_reconnect_button = null;
+    Button group_dumpofflinepeers_button = null;
     Button group_del_sysmsgs_button = null;
     String group_id = "-1";
 
@@ -92,6 +101,7 @@ public class GroupInfoActivity extends AppCompatActivity
         group_num_msgs_text = (TextView) findViewById(R.id.group_num_msgs_text);
         group_num_system_msgs_text = (TextView) findViewById(R.id.group_num_system_msgs_text);
         group_reconnect_button = (Button) findViewById(R.id.group_reconnect_button);
+        group_dumpofflinepeers_button = (Button) findViewById(R.id.group_dumpofflinepeers_button);
         group_del_sysmsgs_button = (Button) findViewById(R.id.group_del_sysmsgs_button);
 
         try
@@ -201,6 +211,98 @@ public class GroupInfoActivity extends AppCompatActivity
                     tox_group_reconnect(group_num_);
                     group_update_connected_status_on_groupinfo(group_num_);
                     update_savedata_file_wrapper();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
+        group_dumpofflinepeers_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    long offline_num_peers = tox_group_offline_peer_count(group_num_);
+
+                    if (offline_num_peers > 0)
+                    {
+                        List<GroupMessageListActivity.group_list_peer> group_peers_offline = new ArrayList<>();
+                        long i = 0;
+                        for (i = 0; i < GC_MAX_SAVED_PEERS; i++)
+                        {
+                            try
+                            {
+                                String peer_pubkey_temp = tox_group_savedpeer_get_public_key(group_num_, i);
+                                String peer_name = "zzzzzoffline " + i;
+                                GroupPeerDB peer_from_db = null;
+                                try
+                                {
+                                    peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(
+                                            group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                                }
+                                catch (Exception e)
+                                {
+                                }
+
+                                String peerrole = "";
+
+                                if (peer_from_db != null)
+                                {
+                                    peer_name = peer_from_db.peer_name;
+                                    if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) >
+                                        System.currentTimeMillis())
+                                    {
+                                        peer_name = "_NEW_ " + peer_name;
+                                    }
+                                    peerrole = ToxVars.Tox_Group_Role.value_char(peer_from_db.Tox_Group_Role) + " ";
+                                }
+
+                                // Log.i(TAG, "groupnum=" + conference_num + " peernum=" + offline_peers[(int) i] + " peer_name=" +
+                                //           peer_name);
+                                String peer_name_temp =  peerrole + peer_name + " :" + i + ": " + peer_pubkey_temp.substring(0, 6);
+
+                                GroupMessageListActivity.group_list_peer glp3 = new GroupMessageListActivity.group_list_peer();
+                                glp3.peer_pubkey = peer_pubkey_temp;
+                                glp3.peer_num = i;
+                                glp3.peer_name = peer_name_temp;
+                                glp3.peer_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                                group_peers_offline.add(glp3);
+                            }
+                            catch (Exception ignored)
+                            {
+                            }
+                        }
+
+                        try
+                        {
+                            Collections.sort(group_peers_offline, new Comparator<GroupMessageListActivity.group_list_peer>()
+                            {
+                                @Override
+                                public int compare(GroupMessageListActivity.group_list_peer p1, GroupMessageListActivity.group_list_peer p2)
+                                {
+                                    String name1 = p1.peer_pubkey;
+                                    String name2 = p2.peer_pubkey;
+                                    return name1.compareToIgnoreCase(name2);
+                                }
+                            });
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
+
+                        StringBuilder logstr = new StringBuilder();
+                        for (GroupMessageListActivity.group_list_peer peerloffline : group_peers_offline)
+                        {
+                            logstr.append(peerloffline.peer_pubkey).append(":").append(peerloffline.peer_num).append("\n");
+                        }
+                        Log.i(TAG, "\n\nNGC_GROUP_OFFLINE_PEERLIST:\n" + logstr + "\n\n");
+
+                    }
                 }
                 catch (Exception e)
                 {
