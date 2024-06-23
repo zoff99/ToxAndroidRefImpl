@@ -238,6 +238,10 @@ public class GroupInfoActivity extends AppCompatActivity
                             try
                             {
                                 String peer_pubkey_temp = tox_group_savedpeer_get_public_key(group_num_, i);
+                                if (peer_pubkey_temp.compareToIgnoreCase("-1") == 0)
+                                {
+                                    continue;
+                                }
                                 String peer_name = "zzzzzoffline " + i;
                                 GroupPeerDB peer_from_db = null;
                                 try
