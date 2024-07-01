@@ -414,7 +414,7 @@ dependencies {
     testImplementation 'org.robolectric:robolectric:4.12.2'
     testImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     testImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
-    testImplementation 'androidx.test.ext:truth:1.5.0'
+    testImplementation 'androidx.test.ext:truth:1.6.0'
     androidTestUtil "androidx.test.services:test-services:1.4.2"
     // ---------------------
     // --------- background blur ------------
