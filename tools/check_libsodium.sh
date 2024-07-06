@@ -4,7 +4,7 @@ r1='https://github.com/jedisct1/libsodium'
 ver=$(git ls-remote --refs --sort='v:refname' --tags "$r1" \
     | cut --delimiter='/' --fields=3 | grep '\-RELEASE' | tail --lines=1)
 
-echo "$ver"
+echo "__VERSIONUPDATE__:""$ver"
 
 d='./circle_scripts/'
 f='deps.sh'
