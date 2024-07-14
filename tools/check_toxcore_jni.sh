@@ -42,6 +42,7 @@ sed -i -e 's#implementation '"'"'com.github.zoff99:pkgs_ToxAndroidRefImpl:.*#imp
 
 ./gradlew -q calculateChecksums | \
 grep -v 'and:sdk:platforms:android.jar' | \
+grep -v 'android:sdk:platforms:android.jar' | \
 grep -v 'android:sdk:platforms:core-for-system-modules.jar' | \
 grep -v '^\(Skipping\|Verifying\|Welcome to Gradle\)' \
 > ./app/witness.gradle
