@@ -519,6 +519,22 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
 
             img_avatar.setImageDrawable(smiley_face);
 
+            img_avatar.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(final View v)
+                {
+                    if (!is_selected)
+                    {
+                        Intent intent = new Intent(v.getContext(),
+                                                   GroupPeerInfoActivity.class);
+                        intent.putExtra("peer_pubkey", m.tox_group_peer_pubkey);
+                        intent.putExtra("group_id", m.group_identifier);
+                        v.getContext().startActivity(intent);
+                    }
+                }
+            });
+
             if (m.was_synced)
             {
                 try
