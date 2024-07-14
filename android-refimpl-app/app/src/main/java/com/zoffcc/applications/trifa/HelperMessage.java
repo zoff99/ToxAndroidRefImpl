@@ -39,6 +39,7 @@ import androidx.appcompat.app.AlertDialog;
 import static com.zoffcc.applications.trifa.HelperFriend.send_friend_msg_receipt_v2_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffer;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_or_empty;
+import static com.zoffcc.applications.trifa.HelperGeneric.trfia_sync_type_to_str;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after;
@@ -919,7 +920,7 @@ public class HelperMessage
                                         "direction:"+m.direction+"\n"+
                                         "private_message:"+m.private_message+"\n"+
                                         "was_synced:"+m.was_synced+"\n"+
-                                        "TRIFA_SYNC_TYPE:"+m.TRIFA_SYNC_TYPE+"\n"+
+                                        "TRIFA_SYNC_TYPE:"+trfia_sync_type_to_str(m.TRIFA_SYNC_TYPE)+"\n"+
                                         "sync_confirmations:"+m.sync_confirmations+"\n"+
                                         "sync_1:"+tox_group_peer_pubkey_syncer_01_name_txt+"\n"+
                                         "sync_1_sent_timestamp:"+m.tox_group_peer_pubkey_syncer_01_sent_timestamp+"\n"+

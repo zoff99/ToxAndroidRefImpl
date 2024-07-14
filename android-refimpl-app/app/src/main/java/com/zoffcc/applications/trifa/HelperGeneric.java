@@ -127,6 +127,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTIO
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_OWN_AVATAR_DIR_FILENAME_WITH_EXTENSION;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
@@ -4888,6 +4890,26 @@ public class HelperGeneric
         catch (Exception e)
         {
             return null;
+        }
+    }
+
+    static public String trfia_sync_type_to_str(int sync_type)
+    {
+        if (sync_type == TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_TOXPROXY.value)
+        {
+            return "TRIFA_SYNC_TYPE_TOXPROXY";
+        }
+        else if (sync_type == TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value)
+        {
+            return "TRIFA_SYNC_TYPE_NGC_PEERS";
+        }
+        else if (sync_type == TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value)
+        {
+            return "TRIFA_SYNC_TYPE_NONE";
+        }
+        else
+        {
+            return "TRIFA_SYNC_TYPE UNKNOWN";
         }
     }
 }
