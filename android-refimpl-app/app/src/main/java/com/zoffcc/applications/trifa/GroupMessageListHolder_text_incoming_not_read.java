@@ -526,23 +526,38 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
                     if (m.TRIFA_SYNC_TYPE == TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NGC_PEERS.value)
                     {
                         imageView.setImageResource(R.drawable.circle_pink);
+
+                        if (m.sync_confirmations > 0)
+                        {
+                            String confirmations_text = "" + m.sync_confirmations;
+                            if (m.sync_confirmations > 9)
+                            {
+                                confirmations_text = "+";
+                            }
+
+                            final TextDrawable drawable2 = TextDrawable.builder().beginConfig().textColor(Color.WHITE).
+                                    bold().width(60).height(60).fontSize(58).endConfig().
+                                    buildRound(confirmations_text, Color.GRAY);
+                            imageView.setImageDrawable(drawable2);
+                        }
                     }
                     else
                     {
                         imageView.setImageResource(R.drawable.circle_orange);
-                    }
 
-                    if (m.sync_confirmations > 0)
-                    {
-                        String confirmations_text = "" + m.sync_confirmations;
-                        if (m.sync_confirmations > 9)
+                        if (m.sync_confirmations > 0)
                         {
-                            confirmations_text = "+";
-                        }
+                            String confirmations_text = "" + m.sync_confirmations;
+                            if (m.sync_confirmations > 9)
+                            {
+                                confirmations_text = "+";
+                            }
 
-                        final TextDrawable drawable2 = TextDrawable.builder().beginConfig().textColor(Color.WHITE).bold().width(60).height(60).fontSize(58).endConfig().buildRound(
-                                confirmations_text, Color.GRAY);
-                        imageView.setImageDrawable(drawable2);
+                            final TextDrawable drawable2 = TextDrawable.builder().beginConfig().textColor(Color.BLACK).
+                                    bold().width(60).height(60).fontSize(58).endConfig().
+                                    buildRound(confirmations_text, Color.parseColor("#ffce00"));
+                            imageView.setImageDrawable(drawable2);
+                        }
                     }
                 }
                 catch(Exception e3)
