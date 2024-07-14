@@ -9,6 +9,9 @@ basedir="$_HOME_""/../android-refimpl-app/"
 cd "$basedir"
 
 r1='https://github.com/zoff99/ToxAndroidRefImpl'
+u1='https://jitpack.io/com/github/zoff99/pkgs_ToxAndroidRefImpl/'
+u2='/pkgs_ToxAndroidRefImpl-'
+u3='.aar'
 f1='app/build.gradle'
 
 tagspec=''
@@ -17,6 +20,19 @@ ver=$(git ls-remote --refs --sort='v:refname' --tags "$r1" 2>/dev/null \
     | grep '^trifajni-' \
     | tail -1 2>/dev/null \
     | sed -e 's#^trifajni-##')
+
+
+url="$u1""$ver""$u2""$ver""$u3"
+
+tf='./tmpfile.aar'
+
+wget "$url" -O "$tf" >/dev/null 2>/dev/null
+if [ ! -s "$tf" ]; then
+  echo "new version trifajni-""$ver"" not yet uploaded to jitpack"
+  rm -f "$tf"
+  exit 0
+fi
+rm -f "$tf"
 
 echo "__VERSIONUPDATE__:""$ver"
 
