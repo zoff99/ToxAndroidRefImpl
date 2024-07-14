@@ -37,5 +37,6 @@ rm -f "$tf"
 echo "__VERSIONUPDATE__:""$ver"
 
 sed -i -e 's#implementation '"'"'com.github.zoff99:pkgs_ToxAndroidRefImpl:.*#implementation '"'"'com.github.zoff99:pkgs_ToxAndroidRefImpl:'"$ver"''"'"'#' "$f1"
+./gradlew -q calculateChecksums > app/witness.gradle # first run add some checking for license text. silly crap!
 ./gradlew -q calculateChecksums > app/witness.gradle
 
