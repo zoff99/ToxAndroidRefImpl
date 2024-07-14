@@ -1,5 +1,21 @@
+Checking the license for package NDK (Side by side) 23.2.8568313 in /usr/local/lib/android/sdk/licenses
+License for package NDK (Side by side) 23.2.8568313 accepted.
+Preparing "Install NDK (Side by side) 23.2.8568313 (revision: 23.2.8568313)".
+"Install NDK (Side by side) 23.2.8568313 (revision: 23.2.8568313)" ready.
+Installing NDK (Side by side) 23.2.8568313 in /usr/local/lib/android/sdk/ndk/23.2.8568313
+"Install NDK (Side by side) 23.2.8568313 (revision: 23.2.8568313)" complete.
+"Install NDK (Side by side) 23.2.8568313 (revision: 23.2.8568313)" finished.
+Checking the license for package Android SDK Platform-Tools in /usr/local/lib/android/sdk/licenses
+License for package Android SDK Platform-Tools accepted.
+Preparing "Install Android SDK Platform-Tools (revision: 35.0.1)".
+"Install Android SDK Platform-Tools (revision: 35.0.1)" ready.
+Installing Android SDK Platform-Tools in /usr/local/lib/android/sdk/platform-tools
+"Install Android SDK Platform-Tools (revision: 35.0.1)" complete.
+"Install Android SDK Platform-Tools (revision: 35.0.1)" finished.
 dependencyVerification {
     verify = [
+        'android:sdk:platforms:android.jar:6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad',
+        'android:sdk:platforms:core-for-system-modules.jar:15e3da4bd1c24b0dcd1e8465d2ad4912879cab6653588bd92a5725074db8d1bf',
         'androidx.activity:activity-ktx:1.8.1:activity-ktx-1.8.1.aar:9f77caa2bbec7ceefa5c931e2f223c2b386a594ee0442d168dfeaf1c850aeb9d',
         'androidx.activity:activity:1.8.1:activity-1.8.1.aar:66bc2c13bd91fb8ea09e445b21f784d3e5d3a9ec9b180cd07e0e9208c2f939c6',
         'androidx.annotation:annotation-experimental:1.1.0:annotation-experimental-1.1.0.aar:0157de61a2064047896a058080f3fd67ba57ad9a94857b3f7a363660243e3f90',
@@ -126,7 +142,7 @@ dependencyVerification {
         'com.github.medyo:android-about-page:1.2.4:android-about-page-1.2.4.aar:15108c8bdedf5975d2aa60604107017109a4ad3640e0e95fa97fd438d347eb5c',
         'com.github.zoff99:pkgs_TensorflowLiteAndroidMediapipeCPU:2.6.0:pkgs_TensorflowLiteAndroidMediapipeCPU-2.6.0.aar:b80831506ba64f7391a38c6ad34c1359d4953f20528665054ca7e995cd60a380',
         'com.github.zoff99:pkgs_TensorflowLiteAndroidMediapipeGPU:2.6.0:pkgs_TensorflowLiteAndroidMediapipeGPU-2.6.0.aar:08ddc31d4f7061c99a79f6757d59e35621ec8a0fcae48536c920a174dc147dd4',
-        'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.140:pkgs_ToxAndroidRefImpl-1.0.140.aar:65072f28cae8792818e1826c4ebc5ee1599e4f9c73780c5ed2ee0c9e44b9f1b4',
+        'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.142:pkgs_ToxAndroidRefImpl-1.0.142.aar:7d54cf528af3aec899cb2662ffdfa09258cba52fc651ffc675f2d8f6e954b092',
         'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0:pkgs_armchaAutoLinkTextView-0.3.0.aar:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
         'com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.104:pkgs_guardianprojectIOCipher-0.4.2.104.aar:6e5dc320b633682e0201c316994da5423a4ab236f0ac575d9c1a6d90c60d01f8',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0:pkgs_hotchemiPermissionsdispatcher-processor-3.2.0.jar:f7374192b263a94f63186dee91cb954c9369122519e4f08e055b72969699b52d',
