@@ -37,6 +37,11 @@ rm -f "$tf"
 echo "__VERSIONUPDATE__:""$ver"
 
 sed -i -e 's#implementation '"'"'com.github.zoff99:pkgs_ToxAndroidRefImpl:.*#implementation '"'"'com.github.zoff99:pkgs_ToxAndroidRefImpl:'"$ver"''"'"'#' "$f1"
-./gradlew -q calculateChecksums # first run add some checking for license text. silly crap!
-./update_gwitness_deps.sh
 
+./gradlew -q calculateChecksums >/dev/null 2>/dev/null # first run add some checking for license text. silly crap!
+
+./gradlew -q calculateChecksums | \
+grep -v 'and:sdk:platforms:android.jar' | \
+grep -v 'android:sdk:platforms:core-for-system-modules.jar' | \
+grep -v '^\(Skipping\|Verifying\|Welcome to Gradle\)' \
+> ./app/witness.gradle
