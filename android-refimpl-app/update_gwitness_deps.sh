@@ -26,6 +26,7 @@ do
     echo "Calculating new checksums for ${project} ..."
     ./gradlew -q --configure-on-demand ${project}:calculateChecksums | \
     grep -v 'and:sdk:platforms:android.jar' | \
+    grep -v 'android:sdk:platforms:core-for-system-modules.jar' | \
     grep -v 'com.android.tools.' | \
     grep -v 'org.ow2.asm.' | \
     grep -v '^\(Skipping\|Verifying\|Welcome to Gradle\)' \
