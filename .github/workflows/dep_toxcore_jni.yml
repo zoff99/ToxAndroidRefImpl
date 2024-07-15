@@ -36,7 +36,7 @@ jobs:
     - name: check if toxcore update or witness checksums only
       id: titletext_str
       run: |
-        (git status 2>/dev/null|grep '^\+' 2>/dev/null|grep 'com.github.zoff99:pkgs_ToxAndroidRefImpl' 2>/dev/null;echo "jni version update";release_tag=$(cat output.txt|grep '__VERSIONUPDATE__'|cut -d':' -f2);echo "titletext=update toxcore JNI to $release_tag" >> $GITHUB_OUTPUT) || \
+        (git status 2>/dev/null|grep '^\+' 2>/dev/null|grep 'com.github.zoff99:pkgs_ToxAndroidRefImpl' 2>/dev/null && echo "jni version update" && release_tag=$(cat output.txt|grep '__VERSIONUPDATE__'|cut -d':' -f2) && echo "titletext=update toxcore JNI to $release_tag" >> $GITHUB_OUTPUT) || \
         (echo "gradle witness checksums update";echo "titletext=update gradle witness checksums" >> $GITHUB_OUTPUT;echo "release_tag=" >> $GITHUB_OUTPUT)
 
     - name: cleanup
