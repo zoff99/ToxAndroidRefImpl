@@ -28,10 +28,25 @@ jobs:
     - name: check for changes
       run:  git diff || echo "no changes"
 
-    - name: get version info string
-      id: version_info_str
+#    - name: get version info string
+#      id: version_info_str
+#      run: |
+#        (release_tag=$(cat output.txt|grep '__VERSIONUPDATE__'|cut -d':' -f2) ; echo "release_tag=$release_tag" >> $GITHUB_OUTPUT)|| echo "release_tag=" >> $GITHUB_OUTPUT
+
+    - name: check if toxcore update or witness checksums only
+      id: titletext_str
       run: |
-        (release_tag=$(cat output.txt|grep '__VERSIONUPDATE__'|cut -d':' -f2) ; echo "release_tag=$release_tag" >> $GITHUB_OUTPUT)|| echo "release_tag=" >> $GITHUB_OUTPUT
+        git status 2>/dev/null|grep '^\+' 2>/dev/null|grep 'com.github.zoff99:pkgs_ToxAndroidRefImpl' 2>/dev/null
+        res=$?
+        if [ "$res""x" == "0x" ]; then
+          echo "jni version update"
+          release_tag=$(cat output.txt|grep '__VERSIONUPDATE__'|cut -d':' -f2)
+          echo "titletext=update toxcore JNI to $release_tag" >> $GITHUB_OUTPUT
+        else
+          echo "gradle witness checksums update"
+          echo "titletext=update gradle witness checksums" >> $GITHUB_OUTPUT
+          echo "release_tag=" >> $GITHUB_OUTPUT
+        fi
 
     - name: cleanup
       run: rm -f output.txt
@@ -39,7 +54,7 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
       with:
-        commit-message: update toxcore JNI to ${{ steps.version_info_str.outputs.release_tag }} or just gradle witness checksums
+        commit-message: ${{ steps.titletext_str.outputs.titletext }}
         branch: create-pull-request/toxcorejni
         delete-branch: true
-        title: update toxcore JNI to ${{ steps.version_info_str.outputs.release_tag }} or just gradle witness checksums
+        title: ${{ steps.titletext_str.outputs.titletext }}
