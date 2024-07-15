@@ -39,7 +39,7 @@ jobs:
     - name: Create Pull Request
       uses: peter-evans/create-pull-request@v6
       with:
-        commit-message: update toxcore JNI to ${{ steps.version_info_str.outputs.release_tag }}
+        commit-message: update toxcore JNI to ${{ steps.version_info_str.outputs.release_tag }} or just gradle witness checksums
         branch: create-pull-request/toxcorejni
         delete-branch: true
-        title: update toxcore JNI to ${{ steps.version_info_str.outputs.release_tag }}
+        title: update toxcore JNI to ${{ steps.version_info_str.outputs.release_tag }} or just gradle witness checksums
