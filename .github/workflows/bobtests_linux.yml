@@ -103,6 +103,15 @@ jobs:
           disable-spellchecker: true
           script: echo "Generated AVD snapshot for caching."
 
+      - name: check disk space
+        shell: bash
+        run: |
+             curl -L https://github.com/zoff99/java_tox_tester/archive/refs/heads/master.zip -o master.zip
+             df -h
+             du -hs /home/runner/work
+             cd /home/runner/work
+             du -s *|sort -n
+
       - name: android test
         timeout-minutes: 30
         continue-on-error: true
