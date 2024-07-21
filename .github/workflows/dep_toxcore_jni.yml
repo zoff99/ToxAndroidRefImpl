@@ -43,6 +43,7 @@ jobs:
       run: rm -f output.txt
 
     - name: Create Pull Request
+      if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
       uses: peter-evans/create-pull-request@v6
       with:
         commit-message: ${{ steps.titletext_str.outputs.titletext }}
