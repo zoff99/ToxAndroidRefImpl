@@ -123,6 +123,32 @@ jobs:
             echo "---------------"
             ls -al /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
 
+      - name: make promo screenshots
+        run:  |
+              cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/
+              git clone https://github.com/zoff99/android_promo_screens
+              cd ./android_promo_screens/
+              ./test.sh "TRIfA" "Message your Friends and Family securely and with ease." ../test_004b.png
+              cp -av output.png promo_02.png
+              mv -v promo_02.png ../
+              ./test.sh "TRIfA" "Send Messages and Files or just Call your Friends."
+              cp -av output.png promo_03.png
+              mv -v promo_03.png ../
+
+      - name: Upload to nightly release
+        uses: ncipollo/release-action@v1
+        if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "promo_02.png,promo_03.png"
+
+
       - name: put datetime on screenshots
         run:  |
               cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/
