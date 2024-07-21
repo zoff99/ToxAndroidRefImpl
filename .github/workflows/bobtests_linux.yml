@@ -125,13 +125,13 @@ jobs:
 
       - name: make promo screenshots
         run:  |
-              cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/
+              pwd
               git clone https://github.com/zoff99/android_promo_screens
               cd ./android_promo_screens/
-              ./test.sh "TRIfA" "Message your Friends and Family securely and with ease." ../test_004b.png
+              ./test.sh "TRIfA" "Message your Friends and Family securely and with ease." /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_004b.png
               cp -av output.png promo_02.png
               mv -v promo_02.png ../
-              ./test.sh "TRIfA" "Send Messages and Files or just Call your Friends."
+              ./test.sh "TRIfA" "Send Messages and Files or just Call your Friends." /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_099.png
               cp -av output.png promo_03.png
               mv -v promo_03.png ../
 
