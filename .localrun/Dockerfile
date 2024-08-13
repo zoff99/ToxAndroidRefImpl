@@ -17,7 +17,6 @@ RUN apt-get update && \
                 ssh gzip tar \
                 coreutils \
                 curl \
-                python \
                 libncurses5
 
 ENV _ANDROID_SDK_FILE_XX="sdk-tools-linux-4333796.zip"
@@ -47,3 +46,7 @@ RUN apt-get update && \
             openjdk-8-jdk
 
 RUN touch /installing_more_system_packages_done
+
+RUN apt-get update && \
+        apt-get -y --force-yes install \
+            python
