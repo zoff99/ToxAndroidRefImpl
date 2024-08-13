@@ -52,7 +52,6 @@ jobs:
            git bc wget rsync cmake make pkg-config libtool \
            ssh gzip tar \
            coreutils \
-           python \
            libncurses5
 
     - name: move_source
