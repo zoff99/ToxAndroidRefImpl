@@ -1,0 +1,83 @@
+name: Maven Package CI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+
+    - name: Install NDK
+      run: |
+           echo "y" | sudo /usr/local/lib/android/sdk/tools/bin/sdkmanager --install "ndk;21.0.6113669" --sdk_root=${ANDROID_SDK_ROOT} >/dev/null 2>/dev/null
+           echo "y" | sudo /usr/local/lib/android/sdk/tools/bin/sdkmanager --install "ndk;20.1.5948944" --sdk_root=${ANDROID_SDK_ROOT} >/dev/null 2>/dev/null
+
+    - name: pkgs
+      run: |
+           sudo apt update && \
+           sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+           clang \
+           cmake \
+           libconfig-dev \
+           libgtest-dev \
+           ninja-build \
+           pkg-config \
+           zip grep file ca-certificates autotools-dev autoconf automake \
+           git bc wget rsync cmake make pkg-config libtool \
+           ssh gzip tar \
+           coreutils \
+           python \
+           libncurses5
+
+    - name: move_source
+      run: |
+           sudo mkdir -p /root/work/jni-c-toxcore/
+           sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/jni-c-toxcore/* /root/work/jni-c-toxcore/
+           sudo mkdir -p /root/work/android-refimpl-app/
+           sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/* /root/work/android-refimpl-app/
+           # sudo git clone https://github.com/zoff99/ToxAndroidRefImpl /root/work/trifa_master_src
+           # sudo mkdir -p /root/work/android-refimpl-app/app/
+           # sudo cp -av /root/work/trifa_master_src/android-refimpl-app/app/* /root/work/android-refimpl-app/app/
+    - name: build_maven_deps
+      run: |
+           sudo mkdir -p ~/work/deploy
+           sudo mkdir -p ~/.android/
+           sudo touch ~/.android/debug.keystore
+           sudo mkdir -p build_dir
+           sudo mkdir -p /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir
+           pwd
+           ls -al
+           sudo bash -c "cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh"
+
+    - name: build_maven_pkg
+      run: |
+           pwd
+           sudo bash -c "cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
+
+    - name: acls_maven_pkg
+      run: |
+           sudo chmod -R a+rx /root/work/artefacts/
+           sudo chmod a+r /root/work//artefacts//local_maven_trifa_jni_.zip
+           sudo ls -al /root/work/artefacts/
+           sudo cp -av /root/work/artefacts/*.zip /home/runner/work/
+           echo "exit 0 here"
+
+    - name: upload apk
+      uses: actions/upload-artifact@v2
+      with:
+        name: local_maven_trifa_jni_1.x.yy.zip
+        path: /home/runner/work/*.zip
+
