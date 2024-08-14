@@ -16,16 +16,6 @@ on:
 
 jobs:
   update-nightly-tag:
-
-    name: show github event data
-    run: |
-      echo ${{github.event}} || echo "NO ERR"
-      echo ${{github.event_path}} || echo "NO ERR"
-      echo ${{github.event_name}} || echo "NO ERR"
-      echo ${{github.ref}} || echo "NO ERR"
-      echo ${{github.workspace}} || echo "NO ERR"
-      echo ${{github.workflow}} || echo "NO ERR"
-
     name: Update nightly release tag
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
@@ -47,6 +37,14 @@ jobs:
         distribution: 'temurin'
         java-version: '11'
 
+    - name: show github event data
+      run: |
+        echo ${{github.event}} || echo "NO ERR"
+        echo ${{github.event_path}} || echo "NO ERR"
+        echo ${{github.event_name}} || echo "NO ERR"
+        echo ${{github.ref}} || echo "NO ERR"
+        echo ${{github.workspace}} || echo "NO ERR"
+        echo ${{github.workflow}} || echo "NO ERR"
 
     - name: Install system packages
       run: |
