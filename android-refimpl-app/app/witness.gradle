@@ -1,5 +1,7 @@
 dependencyVerification {
     verify = [
+        'android:sdk:platforms:android.jar:6cea1df3efb77103ac3e2beb9bf4718964b0e0869ab16d39d29d5cbae1c147ad',
+        'android:sdk:platforms:core-for-system-modules.jar:15e3da4bd1c24b0dcd1e8465d2ad4912879cab6653588bd92a5725074db8d1bf',
         'androidx.activity:activity-ktx:1.8.1:activity-ktx-1.8.1.aar:9f77caa2bbec7ceefa5c931e2f223c2b386a594ee0442d168dfeaf1c850aeb9d',
         'androidx.activity:activity:1.8.1:activity-1.8.1.aar:66bc2c13bd91fb8ea09e445b21f784d3e5d3a9ec9b180cd07e0e9208c2f939c6',
         'androidx.annotation:annotation-experimental:1.1.0:annotation-experimental-1.1.0.aar:0157de61a2064047896a058080f3fd67ba57ad9a94857b3f7a363660243e3f90',
@@ -19,8 +21,8 @@ dependencyVerification {
         'androidx.camera:camera-video:1.3.4:camera-video-1.3.4.aar:feb77e9ca4c8a14736f4b1adc6e4f50aded98655800101b981115b0b64e8026f',
         'androidx.camera:camera-view:1.3.4:camera-view-1.3.4.aar:99b169603e2ff54f1172eb6459285118f7bba430cb6893d223c1929ec5602b15',
         'androidx.cardview:cardview:1.0.0:cardview-1.0.0.aar:1193c04c22a3d6b5946dae9f4e8c59d6adde6a71b6bd5d87fb99d82dda1afec7',
-        'androidx.collection:collection-jvm:1.4.2:collection-jvm-1.4.2.jar:984ce9bd780055eafb8a105aca3f514686bf7b1b6272ec7c645a98ce40fc7db4',
-        'androidx.collection:collection-ktx:1.4.2:collection-ktx-1.4.2.jar:c6deada2fac53b8ea6523dbda77597b128006674616f140f04df23264c6d1aa3',
+        'androidx.collection:collection-jvm:1.4.3:collection-jvm-1.4.3.jar:15db51f82c65c4fa3223f27d5acb9531fc4fa536e04e4f13bc5ad4787faac139',
+        'androidx.collection:collection-ktx:1.4.3:collection-ktx-1.4.3.jar:c6deada2fac53b8ea6523dbda77597b128006674616f140f04df23264c6d1aa3',
         'androidx.concurrent:concurrent-futures:1.1.0:concurrent-futures-1.1.0.jar:0ce067c514a0d1049d1bebdf709e344ed3266fe9744275682937cdcb13334e9e',
         'androidx.constraintlayout:constraintlayout-core:1.0.4:constraintlayout-core-1.0.4.jar:3e477f4de231e58b25f5a992f3be45e97d332c34a39a9e3e7d4b78ae0ac2256f',
         'androidx.constraintlayout:constraintlayout:2.1.4:constraintlayout-2.1.4.aar:0df714c0b51e54710ebf746eb469d333176bbb3cb29f80775dc3ca4eb3162512',
