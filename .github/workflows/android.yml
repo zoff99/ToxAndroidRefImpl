@@ -121,6 +121,7 @@ jobs:
       if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
       run: |
         git checkout .
+        rm -f debug.keystore
         echo "========= git diff before witness update  "========= "
         git diff
         echo "========= git diff before witness update  "========= "
