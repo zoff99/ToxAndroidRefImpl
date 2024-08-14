@@ -16,6 +16,16 @@ on:
 
 jobs:
   update-nightly-tag:
+
+    name: show github event data
+    run: |
+      echo ${{github.event}} || echo "NO ERR"
+      echo ${{github.event_path}} || echo "NO ERR"
+      echo ${{github.event_name}} || echo "NO ERR"
+      echo ${{github.ref}} || echo "NO ERR"
+      echo ${{github.workspace}} || echo "NO ERR"
+      echo ${{github.workflow}} || echo "NO ERR"
+
     name: Update nightly release tag
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
@@ -63,15 +73,15 @@ jobs:
         cat android-refimpl-app/app/src/main/AndroidManifest.xml|grep 'android:label='
 
     - name: show witness checksums updates
-      if: github.event_name == 'pull_request'
+      if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request' }}
       run: cd android-refimpl-app ; ./gradlew -q calculateChecksums 2>/dev/null
 
     - name: update witness checksums for pull requests
-      if: github.event_name == 'pull_request'
+      if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request' }}
       run: cd android-refimpl-app ; ./gradlew -q calculateChecksums 2>/dev/null| grep -v 'Checking the license for' > app/witness.gradle 2>/dev/null
 
     - name: show witness checksums updates for pull requests
-      if: github.event_name == 'pull_request'
+      if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request' }}
       run: cd android-refimpl-app ; git diff app/witness.gradle
 
     - name: Build with Gradle
