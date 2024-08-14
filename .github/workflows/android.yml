@@ -134,7 +134,7 @@ jobs:
       uses: peter-evans/create-pull-request@v6
       with:
         commit-message: update witness checksums
-        branch: 'create-pull-request/ffmpeg'
+        branch: 'create-pull-request/witness_checksums'
         delete-branch: true
         title: update witness checksums
 
