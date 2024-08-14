@@ -71,15 +71,15 @@ jobs:
         cat android-refimpl-app/app/src/main/AndroidManifest.xml|grep 'android:label='
 
     - name: show witness checksums updates
-      if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request' }}
+      if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
       run: cd android-refimpl-app ; ./gradlew -q calculateChecksums 2>/dev/null
 
     - name: update witness checksums for pull requests
-      if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request' }}
+      if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
       run: cd android-refimpl-app ; ./gradlew -q calculateChecksums 2>/dev/null| grep -v 'Checking the license for' > app/witness.gradle 2>/dev/null
 
     - name: show witness checksums updates for pull requests
-      if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request' }}
+      if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
       run: cd android-refimpl-app ; git diff app/witness.gradle
 
     - name: Build with Gradle
