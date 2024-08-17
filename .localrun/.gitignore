@@ -1,3 +1,5 @@
 artefacts
 script
 workspace
+__temp__deps.sh
+__temp__src/

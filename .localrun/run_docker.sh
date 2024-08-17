@@ -15,7 +15,13 @@ mkdir -p $_HOME_/script
 mkdir -p $_HOME_/workspace
 
 if [ "$1""x" == "buildx" ]; then
+
+    echo "make a local copy ..."
+    cp -v ../circle_scripts/deps.sh ./__temp__deps.sh
+    rsync -avz --exclude=".localrun" --exclude="local.properties" ../ ./__temp__src/
     docker build -f Dockerfile -t trifa_maven_a_001 .
+    rm -Rf ./__temp__src/
+    rm -f ./__temp__deps.sh
     exit 0
 fi
 
@@ -62,14 +68,18 @@ mkdir -p /root/work/
 mkdir -p /root/work/deploy/
 mkdir -p /root/.android/
 
-echo "make a local copy ..."
-redirect_cmd rsync -avz --exclude=".localrun" --exclude="local.properties" ./ /root/work/
+## done in Dockerfile now ## echo "make a local copy ..."
+## done in Dockerfile now ## redirect_cmd rsync -avz --exclude=".localrun" --exclude="local.properties" ./ /root/work/
+
+rsync -avz --exclude=".localrun" --exclude="local.properties" ./circle_scripts/trifa.sh /root/work/circle_scripts/trifa.sh
+redirect_cmd rsync -az --exclude=".localrun" --exclude="local.properties" ./stub /root/work/
+redirect_cmd rsync -az --exclude=".localrun" --exclude="local.properties" ./stubaar /root/work/
 
 cd /root/work/
 mkdir -p build_dir
 
-cd /root/work/build_dir/
-bash ../circle_scripts/deps.sh || exit 1
+## done in Dockerfile now ## cd /root/work/build_dir/
+## done in Dockerfile now ## bash ../circle_scripts/deps.sh || exit 1
 
 cd /root/work/build_dir/
 bash ../circle_scripts/trifa.sh || exit 1
@@ -94,5 +104,5 @@ docker run -ti --rm \
   -v $_HOME_/workspace:/workspace \
   -e DISPLAY=$DISPLAY \
   "$system_to_build_for" \
-  /bin/bash # /script/do_it___external.sh
+  /bin/bash /script/do_it___external.sh
 

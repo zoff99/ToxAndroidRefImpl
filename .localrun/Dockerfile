@@ -50,3 +50,18 @@ RUN touch /installing_more_system_packages_done
 RUN apt-get update && \
         apt-get -y --force-yes install \
             python
+RUN mkdir -p /root/work/ \
+    mkdir -p /root/work/deploy/ \
+    mkdir -p /root/.android/
+
+RUN mkdir -p /root/work/build_dir/
+RUN mkdir -p /root/work/circle_scripts/
+
+COPY __temp__deps.sh /root/work/circle_scripts/deps.sh
+RUN chmod a+rx /root/work/circle_scripts/deps.sh
+
+COPY ./__temp__src/ /root/work/
+
+RUN id -a; pwd; ls -al /root/work/; cd /root/work/build_dir/ && bash ../circle_scripts/deps.sh || exit 1
+
+

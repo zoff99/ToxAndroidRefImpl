@@ -1,7 +1,5 @@
 #! /bin/bash
 
-
-
 echo "starting ..."
 
 START_TIME=$SECONDS
@@ -39,24 +37,6 @@ redirect_cmd() {
     fi
 }
 
-
-
-echo "installing system packages ..."
-
-redirect_cmd apt-get update $qqq
-
-redirect_cmd apt-get install $qqq -y --force-yes lsb-release
-system__=$(lsb_release -i|cut -d ':' -f2|sed -e 's#\s##g')
-version__=$(lsb_release -r|cut -d ':' -f2|sed -e 's#\s##g')
-echo "compiling on: $system__ $version__"
-
-echo "installing more system packages ..."
-
-redirect_cmd apt-get install $qqq -y --force-yes qrencode
-redirect_cmd apt-get install $qqq -y --force-yes p7zip-full
-redirect_cmd apt-get install $qqq -y --force-yes astyle
-redirect_cmd apt-get install $qqq -y --force-yes pax-utils
-
 echo $_HOME_
 
 export _SRC_=$_HOME_/trifa_build/
@@ -75,249 +55,78 @@ mkdir -p $_INST_
 export ORIG_PATH_=$PATH
 
 
-export _SDK_="$_INST_/sdk"
-export _NDK_="$_INST_/ndk/"
 export _BLD_="$_SRC_/build/"
 export _CPUS_=$numcpus_
 
-export _toolchain_="$_INST_/toolchains/"
 export _s_="$_SRC_/"
-
-export AND_TOOLCHAIN_ARCH="arm"
-export AND_TOOLCHAIN_ARCH2="arm-linux-androideabi"
-export AND_PATH="$_toolchain_/arm-linux-androideabi/bin:$ORIG_PATH_"
-export AND_PKG_CONFIG_PATH="$_toolchain_/arm-linux-androideabi/sysroot/usr/lib/pkgconfig"
-export AND_CC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang"
-export AND_GCC="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-gcc"
-export AND_CXX="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-clang++"
-export AND_READELF="$_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-readelf"
-
-export PATH="$_SDK_"/tools/bin:$ORIG_PATH_
-
-export ANDROID_NDK_HOME="$_NDK_"
-export ANDROID_HOME="$_SDK_"
-
-export CLASS_P="com.zoffcc.applications.trifa"
-export START_INTENT_P="com.zoffcc.applications.trifa.StartMainActivityWrapper"
-
-
-mkdir -p $_toolchain_
-mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
-
-if [ "$download_full""x" == "1x" ]; then
-    cd $WRKSPACEDIR
-    redirect_cmd curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip -o sdk.zip
-
-    cd $WRKSPACEDIR
-    redirect_cmd curl http://dl.google.com/android/repository/android-ndk-r13b-linux-x86_64.zip -o android-ndk-r13b-linux-x86_64.zip
-fi
-
-cd $WRKSPACEDIR
-# --- verfiy SDK package ---
-echo '92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9  sdk.zip' \
-    > sdk.zip.sha256
-sha256sum -c sdk.zip.sha256 || exit 1
-# --- verfiy SDK package ---
-redirect_cmd unzip sdk.zip
-
-# -- clean SDK dir --
-rm -Rf "$_SDK_"
-# -- clean SDK dir --
-
-mkdir -p "$_SDK_"
-mv -v tools "$_SDK_"/
-yes | "$_SDK_"/tools/bin/sdkmanager --licenses > /dev/null 2>&1
-
-# Install Android Build Tool and Libraries ------------------------------
-# Install Android Build Tool and Libraries ------------------------------
-# Install Android Build Tool and Libraries ------------------------------
-$ANDROID_HOME/tools/bin/sdkmanager --update
-ANDROID_VERSION=26
-ANDROID_BUILD_TOOLS_VERSION=26.0.2
-redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" \
-    "platforms;android-${ANDROID_VERSION}" \
-    "platform-tools"
-ANDROID_VERSION=25
-redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-${ANDROID_VERSION}"
-ANDROID_BUILD_TOOLS_VERSION=23.0.3
-redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
-ANDROID_BUILD_TOOLS_VERSION=25.0.0
-redirect_cmd $ANDROID_HOME/tools/bin/sdkmanager "build-tools;${ANDROID_BUILD_TOOLS_VERSION}"
-
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout;1.0.2"
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "extras;m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2"
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "build-tools;27.0.3"
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-27"
-# -- why is this not just called "cmake" ? --
-# cmake_pkg_name=$($ANDROID_HOME/tools/bin/sdkmanager --list --verbose|grep -i cmake| tail -n 1 | cut -d \| -f 1 |tr -d " ");
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "cmake;3.6.4111459"
-# -- why is this not just called "cmake" ? --
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "ndk;21.0.6113669"
-echo y | $ANDROID_HOME/tools/bin/sdkmanager "ndk;20.1.5948944"
-# Install Android Build Tool and Libraries ------------------------------
-# Install Android Build Tool and Libraries ------------------------------
-# Install Android Build Tool and Libraries
-
-
-
-cd $WRKSPACEDIR
-# --- verfiy NDK package ---
-echo '3524d7f8fca6dc0d8e7073a7ab7f76888780a22841a6641927123146c3ffd29c  android-ndk-r13b-linux-x86_64.zip' \
-    > android-ndk-r13b-linux-x86_64.zip.sha256
-sha256sum -c android-ndk-r13b-linux-x86_64.zip.sha256 || exit 1
-# --- verfiy NDK package ---
-redirect_cmd unzip android-ndk-r13b-linux-x86_64.zip
-rm -Rf "$_NDK_"
-mv -v android-ndk-r13b "$_NDK_"
-
-
-
-echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
-chmod u+x $_HOME_/pp
 rm -Rf "$_s_"
 mkdir -p "$_s_"
 
+# get current artefact version number
+cur_version=$(cat /root/work/android-refimpl-app/jnilib/build.gradle|grep 'def maven_artefact_version'|cut -d "'" -f 2)
 
-## ------- init vars ------- ##
-## ------- init vars ------- ##
-## ------- init vars ------- ##
-. $_HOME_/pp
-## ------- init vars ------- ##
-## ------- init vars ------- ##
-## ------- init vars ------- ##
-
-
-
-
-# ----- get the source -----
-rm -Rf $_s_/jni-c-toxcore
-rm -Rf $_s_/trifa_src
-mkdir -p $_s_/jni-c-toxcore
-mkdir -p $_s_/trifa_src
-
-cd /root/work/
-git describe
-git describe --tags --exact-match
-current_git_tag=$(git describe --tags --exact-match 2> /dev/null)
-echo "##########################################"
-echo "##########################################"
-echo "##########################################"
-echo "current_git_tag: $current_git_tag"
-echo "##########################################"
-echo "##########################################"
-echo "##########################################"
-latest_git_tag=$(git describe --tags --abbrev=0|sed -e 's#trifajni-##')
-echo "##########################################"
-echo "##########################################"
-echo "##########################################"
-echo "latest_git_tag: $latest_git_tag"
-echo "##########################################"
-echo "##########################################"
-echo "##########################################"
-
-
-# copy the source ----------
-cp -av /root/work/android-refimpl-app $_s_/trifa_src/
-cp -av /root/work/jni-c-toxcore $_s_/trifa_src/
+if [ "$cur_version""x" == "x" ]; then
+    echo "ERROR: can not determine current verion"
+    exit 1
+fi
 
 ls -hal /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so || exit 1
 ls -hal /root/work//artefacts//android/libs/arm64-v8a/libjni-c-toxcore.so || exit 1
 ls -hal /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so || exit 1
 ls -hal /root/work//artefacts//android/libs/x86_64/libjni-c-toxcore.so || exit 1
 
-#echo "###### ---------- ARM --------------------"
-#scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/armeabi-v7a//libjni-c-toxcore.so
-#echo "###### ---------- ARM64 --------------------"
-#scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/arm64-v8a//libjni-c-toxcore.so
-#echo "###### ---------- X86 --------------------"
-#scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86//libjni-c-toxcore.so
-#echo "###### ---------- X86_64 --------------------"
-#scanelf -qT $_s_/trifa_src/android-refimpl-app/app/nativelibs/x86_64//libjni-c-toxcore.so
-#echo "###### ------------------------------"
+mkdir -p $_s_/trifa_src/jni-c-toxcore/
 
-# ----- get the source -----
+# --------- JNI libs -------------
+#cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
+#cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
+#cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/arm64-v8a/
+#cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/arm64-v8a/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/arm64-v8a/
+#cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
+#cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
+#cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/x86_64/
+#cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/x86_64/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/x86_64/
 
-
-
-# ----- debug signing key -----
-cd ~/
-
-# use keystore in circleCI Environment Variables -----------------------
-# HINT: create content of env var with: "cat debug.keystore | base64 --wrap=0"
-echo $seckeystore |base64 -d > ~/.android/debug.keystore
-# use keystore in circleCI Environment Variables -----------------------
-
-ls -al ~/.android/debug.keystore
-if [ ! -s ~/.android/debug.keystore ]; then echo "*** generating new signer key ***"
-    echo "*** generating new signer key ***"
-    echo "*** generating new signer key ***"
-    rm -f ~/.android/debug.keystore
-    keytool -genkey -v -keystore ~/.android/debug.keystore -storepass android -keyalg RSA -keysize 2048 -validity 10000 -alias androiddebugkey -keypass android -dname "CN=Android Debug,O=Android,C=US"
-fi
-# ----- debug signing key -----
+echo "----- stubs -----"
+ls -al /root/work/stubaar/jni/*/libjni-c-toxcore.so
+echo "----- stubs -----"
+rm -fv /root/work/stubaar/jni/*/libjni-c-toxcore.so
+cp -av /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so /root/work/stubaar/jni/armeabi-v7a/
+cp -av /root/work//artefacts//android/libs/arm64-v8a/libjni-c-toxcore.so /root/work/stubaar/jni/arm64-v8a/
+cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so /root/work/stubaar/jni//x86/
+cp -av /root/work//artefacts//android/libs/x86_64/libjni-c-toxcore.so /root/work/stubaar/jni/x86_64/
+echo "----- real -----"
+ls -al /root/work/stubaar/jni/*/libjni-c-toxcore.so
+echo "----- real -----"
+# --------- JNI libs -------------
 
 
-
-# --------- GRADLE - build app -------------
-cd $_s_/trifa_src/android-refimpl-app/
+# --------- generate maven repo file -----------
 pwd
+
+
+cd /root/work/stubaar/
+zip -r /root/work/stub/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.142/trifa-jni-lib-"$cur_version".aar .
+cd /root/work/stub/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib
+sed -i -e 's#1.0.142#'"$cur_version"'#' maven-metadata-local.xml
+mv -v 1.0.142 "$cur_version"
+cd /root/work/stub/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/"$cur_version"/
+mv -v trifa-jni-lib-1.0.142.pom trifa-jni-lib-"$cur_version".pom
+sed -i -e 's#1.0.142#'"$cur_version"'#' trifa-jni-lib-"$cur_version".pom
+
 ls -al
-chmod a+rx ./gradlew
-# --------- GRADLE - build app -------------
 
+cd /root/work/stub/
+zip -r $CIRCLE_ARTIFACTS/local_maven.zip ./.m2
+zip -r $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$cur_version".zip ./.m2
+# --------- generate maven repo file -----------
 
-# --------- bintray artefact -------------
-cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
-cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/armeabi/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/armeabi-v7a/
+# cp $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$cur_version".zip /artefacts/
+# chmod a+rw /artefacts/*
 
-cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/arm64-v8a/
-cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/arm64-v8a/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/arm64-v8a/
-
-cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
-cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/x86/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/x86/
-
-cd $_s_/trifa_src/jni-c-toxcore/; mkdir -p ../android-refimpl-app/jnilib/src/main/jniLibs/x86_64/
-cd $_s_/trifa_src/jni-c-toxcore/; cp -av /root/work//artefacts//android/libs/x86_64/libjni-c-toxcore.so ../android-refimpl-app/jnilib/src/main/jniLibs/x86_64/
-
-cd $_s_/trifa_src/android-refimpl-app/ ; ./gradlew :jnilib:dependencies
-cd $_s_/trifa_src/android-refimpl-app/ ; ./gradlew :jnilib:build --max-workers=1 --stacktrace --no-daemon || ./gradlew :jnilib:build --stacktrace --no-daemon # first build may FAIL
-cd $_s_/trifa_src/android-refimpl-app/ ; ./gradlew :jnilib:install --info
-cd $_s_/trifa_src/android-refimpl-app/
-ls -al ./gradlew
-
-find ~/.m2/repository -type f -exec ls -al {} \;
-# --------- bintray artefact -------------
-
-# --------- show generated aar file -----------
-cd $_s_/trifa_src/android-refimpl-app/ ; ls -al jnilib/build/outputs/aar/
-cd ~ ; find ./ -name '*.aar' | grep 'trifa-jni'
-
-unzip -t ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar
-sha256sum ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar
-cat ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.pom
-cat ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/maven-metadata-local.xml
-
-zip -r $CIRCLE_ARTIFACTS/local_maven.zip ~/.m2
-zip -r $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$latest_git_tag".zip ~/.m2
-
-cd $_s_/trifa_src/android-refimpl-app/ ; unzip -t ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar
-cd $_s_/trifa_src/android-refimpl-app/ ; sha256sum ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar
-cd $_s_/trifa_src/android-refimpl-app/ ; cp -av ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar $CIRCLE_ARTIFACTS/
-cd $_s_/trifa_src/android-refimpl-app/ ; ls -hal ./jnilib/build/outputs/aar/trifa-jni-lib-release.aar || exit 1
-
-# cp -av ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar $CIRCLE_ARTIFACTS/
-# ls -hal ~/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.*/trifa-jni-lib-1.*.aar || exit 1
-
-echo $CIRCLE_ARTIFACTS/
 ls -al $CIRCLE_ARTIFACTS/
-echo $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$latest_git_tag".zip
-ls -al $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$latest_git_tag".zip
-
-# --------- show generated aar file -----------
-
-
 
 pwd
 

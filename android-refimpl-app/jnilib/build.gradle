@@ -65,7 +65,7 @@ bintray {
     pkg {
         repo = 'maven'
         name = 'trifajni'
-        licenses = ['GPL-2.0']
+        licenses = ['GPL-3.0']
         vcsUrl = 'https://github.com/zoff99/ToxAndroidRefImpl'
         version {
             name = "${maven_artefact_version}"
