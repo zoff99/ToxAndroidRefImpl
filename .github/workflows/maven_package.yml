@@ -126,13 +126,13 @@ jobs:
            sudo mkdir -p /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir
            pwd
            ls -al
-           sudo bash -c "cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh"
+           sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh"
 
     - name: build_maven_pkg
       run: |
            pwd
            export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64
-           sudo bash -c "cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
+           sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
 
     - name: acls_maven_pkg
       run: |
