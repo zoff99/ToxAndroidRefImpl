@@ -102,7 +102,6 @@ jobs:
            echo $JAVA_HOME||echo "NO ERR"
            sudo rm -Rf /usr/lib/jvm/temurin-11-jdk-amd64
            sudo rm -Rf /usr/bin/java /bin/java
-           type -a java
            dpkg -l|grep -i jdk
            dpkg -l|grep -i java
 
