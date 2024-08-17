@@ -108,19 +108,19 @@ pwd
 
 
 cd /root/work/stubaar/
-zip -r /root/work/stub/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.142/trifa-jni-lib-"$cur_version".aar .
-cd /root/work/stub/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib
+zip -r /root/work/stub/root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.142/trifa-jni-lib-"$cur_version".aar .
+cd /root/work/stub/root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib
 sed -i -e 's#1.0.142#'"$cur_version"'#' maven-metadata-local.xml
 mv -v 1.0.142 "$cur_version"
-cd /root/work/stub/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/"$cur_version"/
+cd /root/work/stub/root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/"$cur_version"/
 mv -v trifa-jni-lib-1.0.142.pom trifa-jni-lib-"$cur_version".pom
 sed -i -e 's#1.0.142#'"$cur_version"'#' trifa-jni-lib-"$cur_version".pom
 
 ls -al
 
 cd /root/work/stub/
-zip -r $CIRCLE_ARTIFACTS/local_maven.zip ./.m2
-zip -r $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$cur_version".zip ./.m2
+zip -r $CIRCLE_ARTIFACTS/local_maven.zip ./root
+zip -r $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$cur_version".zip ./root
 # --------- generate maven repo file -----------
 
 # cp $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$cur_version".zip /artefacts/
