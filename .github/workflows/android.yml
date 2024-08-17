@@ -125,8 +125,10 @@ jobs:
         echo "========= git diff before witness update  "========= "
         git diff
         echo "========= git diff before witness update  "========= "
+        cd android-refimpl-app ; ./gradlew -q calculateChecksums
         cd android-refimpl-app ; ./gradlew -q calculateChecksums 2>/dev/null| grep -v 'Checking the license for' > app/witness.gradle 2>/dev/null
         echo "========= git diff AFTER witness update  "========= "
+        git status
         git diff
         echo "========= git diff AFTER witness update  "========= "
 
