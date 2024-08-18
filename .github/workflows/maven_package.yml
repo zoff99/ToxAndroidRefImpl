@@ -17,7 +17,24 @@ jobs:
     runs-on: ubuntu-20.04
 
     steps:
-    - uses: actions/checkout@v3
+
+    - name: freespace_1
+      run: |
+        df -h
+
+    - name: Maximize build space
+      uses: easimon/maximize-build-space@master
+      with:
+        root-reserve-mb: 512
+        swap-size-mb: 1024
+        remove-dotnet: 'true'
+
+    - name: freespace_2
+      run: |
+        df -h
+
+    - name: Checkout
+      uses: actions/checkout@v3
 
     - name: install basic android SDK
       run: |
@@ -54,11 +71,6 @@ jobs:
            libfontconfig1-dev \
            pkg-config \
            openjdk-8-jdk
-
-#    - name: set up JDK 1.8
-#      uses: actions/setup-java@v1
-#      with:
-#        java-version: 1.8
 
     - name: Install NDK
       run: |
@@ -114,6 +126,10 @@ jobs:
       run: |
            echo $JAVA_HOME||echo "NO ERR"
            type -a java
+
+    - name: freespace_3
+      run: |
+        df -h
 
     - name: build_maven_deps
       run: |
