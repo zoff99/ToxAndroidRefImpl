@@ -102,6 +102,7 @@ jobs:
 
     - name: use mnt dir
       run: |
+           sudo mkdir -p /root/work/
            sudo mv -v /root/work /mnt/
            sudo ls -al /mnt
            sudo bash -c "cd /root/ ; ln -s /mnt/work; ls -al"
