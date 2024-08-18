@@ -169,6 +169,5 @@ jobs:
     - name: upload apk
       uses: actions/upload-artifact@v2
       with:
-        name: local_maven_trifa_jni_1.x.yy.zip
         path: /home/runner/work/*.zip
 
