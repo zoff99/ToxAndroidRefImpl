@@ -155,6 +155,7 @@ jobs:
       run: |
            pwd
            export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64
+           sudo bash -c "cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/stub* /root/work/"
            sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
 
     - name: acls_maven_pkg
