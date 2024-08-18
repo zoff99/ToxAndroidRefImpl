@@ -128,6 +128,8 @@ zip -r $CIRCLE_ARTIFACTS/local_maven_trifa_jni_"$cur_version".zip ./root
 
 ls -al $CIRCLE_ARTIFACTS/
 
+echo "CIRCLE_ARTIFACTS=""$CIRCLE_ARTIFACTS"
+
 pwd
 
 ELAPSED_TIME=$(($SECONDS - $START_TIME))

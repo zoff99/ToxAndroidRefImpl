@@ -162,7 +162,7 @@ jobs:
       run: |
            sudo chmod -R a+rx /root/work/artefacts/
            sudo ls -al /root/work/artefacts/
-           sudo cp -av /root/work/artefacts/*.zip /home/runner/work/
+           # sudo cp -av /root/work/artefacts/*.zip /home/runner/work/
 
     - name: upload apk
       uses: actions/upload-artifact@v2
