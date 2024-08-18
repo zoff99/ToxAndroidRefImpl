@@ -100,9 +100,9 @@ jobs:
            coreutils \
            libncurses5
 
-    - name: move_source
+    - name: use mnt dir
       run: |
-           sudo mv -s /root/work /mnt/
+           sudo mv -v /root/work /mnt/
            sudo ls -al /mnt
            sudo bash -c "cd /root/ ; ln -s /mnt/work; ls -al"
 
