@@ -160,12 +160,9 @@ jobs:
 
     - name: acls_maven_pkg
       run: |
-           export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64
            sudo chmod -R a+rx /root/work/artefacts/
-           sudo chmod a+r /root/work//artefacts//local_maven_trifa_jni_.zip
            sudo ls -al /root/work/artefacts/
            sudo cp -av /root/work/artefacts/*.zip /home/runner/work/
-           echo "exit 0 here"
 
     - name: upload apk
       uses: actions/upload-artifact@v2
