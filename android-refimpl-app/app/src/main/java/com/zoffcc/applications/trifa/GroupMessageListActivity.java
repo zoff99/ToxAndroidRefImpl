@@ -257,6 +257,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     static final int NGC_VIDEO_ICON_STATE_ACTIVE = 2;
     ImageButton ml_phone_icon = null;
     ImageButton ml_button_01 = null;
+    ImageButton ml_button_recaudio = null;
     static ImageButton ml_video_icon = null;
     static boolean sending_video_to_group = false;
     static String ngc_video_showing_video_from_peer_pubkey = "-1";
@@ -473,6 +474,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_video_off_button = (ImageButton) findViewById(R.id.ngc_video_off_button);
         ngc_camera_info_text = findViewById(R.id.ngc_camera_info_text);
         ml_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
+        ml_button_recaudio = (ImageButton) findViewById(R.id.ml_button_recaudio);
         ngc_audio_bar_in_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_in_v);
         ngc_audio_bar_out_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_out_v);
 
@@ -1022,6 +1024,15 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         set_peer_count_header();
         set_peer_names_and_avatars();
+
+        ml_button_recaudio.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                Log.i(TAG, "onCreate:record_audio:start");
+            }
+        });
 
         Log.i(TAG, "onCreate:099");
         oncreate_finished = true;

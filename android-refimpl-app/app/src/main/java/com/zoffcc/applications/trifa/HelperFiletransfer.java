@@ -1049,6 +1049,7 @@ public class HelperFiletransfer
 
         if (filename_sd_card == null)
         {
+            Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:003");
             return null;
         }
 
@@ -1080,6 +1081,7 @@ public class HelperFiletransfer
 
                 if (filename2 == null)
                 {
+                    Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:004");
                     return null;
                 }
 
@@ -1090,6 +1092,7 @@ public class HelperFiletransfer
 
                 if (counter > 5000)
                 {
+                    Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:005");
                     return null;
                 }
             }
@@ -1098,7 +1101,17 @@ public class HelperFiletransfer
             ret.filename_wrapped = filename2;
 
             // now write that contents of the virtual file to the actual file on SD card ----------------
-            InputStream in = context_s.getContentResolver().openInputStream(Uri.parse(filepath));
+            // Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:filepath=" + filepath);
+            InputStream in = null;
+            try
+            {
+                 in = context_s.getContentResolver().openInputStream(Uri.parse(filepath));
+            }
+            catch(Exception e)
+            {
+                File fin_regular_file = new File(filepath + "/" +  filename);
+                in = new java.io.FileInputStream(fin_regular_file);
+            }
             BufferedOutputStream out = new BufferedOutputStream(
                     new FileOutputStream(SD_CARD_FILES_OUTGOING_WRAPPER_DIR + "/" + filename2));
 
@@ -1120,6 +1133,7 @@ public class HelperFiletransfer
             if (ret.file_size_wrapped < 1)
             {
                 file2.delete();
+                Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:006");
                 return null;
             }
 
@@ -1127,6 +1141,8 @@ public class HelperFiletransfer
         }
         catch (Exception e)
         {
+            Log.i(TAG, "copy_outgoing_file_to_sdcard_dir:007:" + e.getMessage());
+            e.printStackTrace();
             return null;
         }
     }
