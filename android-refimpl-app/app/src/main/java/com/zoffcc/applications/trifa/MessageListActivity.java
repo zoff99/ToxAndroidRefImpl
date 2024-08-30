@@ -337,6 +337,8 @@ public class MessageListActivity extends AppCompatActivity
         ml_video_icon = (ImageButton) findViewById(R.id.ml_video_icon);
         ml_attach_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
         ml_button_recaudio = (ImageButton) findViewById(R.id.ml_button_recaudio);
+        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+
         ml_is_recording = false;
         ml_is_rec_ok = false;
         final ImageButton button01_ = ml_attach_button_01;
@@ -659,6 +661,7 @@ public class MessageListActivity extends AppCompatActivity
                         ml_is_recording = true;
                         ml_is_rec_ok = false;
                         ((ImageButton) v).setImageResource(R.drawable.baseline_stop_circle_24);
+                        v.setBackgroundColor(Color.parseColor("#FF0000"));
 
                         try
                         {
@@ -677,6 +680,7 @@ public class MessageListActivity extends AppCompatActivity
                             catch(Exception e)
                             {
                                 ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                v.setBackgroundColor(Color.TRANSPARENT);
                                 ml_is_recording = false;
                                 ml_is_rec_ok = false;
                                 return;
@@ -696,6 +700,7 @@ public class MessageListActivity extends AppCompatActivity
                                 catch(Exception e)
                                 {
                                     ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                    v.setBackgroundColor(Color.TRANSPARENT);
                                     ml_is_recording = false;
                                     ml_is_rec_ok = false;
                                     return;
@@ -714,6 +719,7 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     // HINT: just in case of an endless loop, we return here
                                     ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                    v.setBackgroundColor(Color.TRANSPARENT);
                                     ml_is_recording = false;
                                     ml_is_rec_ok = false;
                                     return;
@@ -729,6 +735,7 @@ public class MessageListActivity extends AppCompatActivity
                             {
                                 // HINT: some problem on starting the recording
                                 ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                v.setBackgroundColor(Color.TRANSPARENT);
                                 ml_is_recording = false;
                                 ml_is_rec_ok = false;
                                 return;
@@ -753,6 +760,7 @@ public class MessageListActivity extends AppCompatActivity
                                 }
                             }
                             ((ImageButton) v).setImageResource(R.drawable.baseline_pending_24);
+                            v.setBackgroundColor(Color.TRANSPARENT);
                             int rec_result = mAudioRecorder.stopRecord();
                             Log.i(TAG, "onCreate:record_audio:finished:res=" + rec_result);
                             if (rec_result == -1)
@@ -766,6 +774,7 @@ public class MessageListActivity extends AppCompatActivity
                             e.printStackTrace();
                         }
                         ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                        v.setBackgroundColor(Color.TRANSPARENT);
 
                         if (ml_is_rec_ok)
                         {
@@ -820,6 +829,7 @@ public class MessageListActivity extends AppCompatActivity
         super.onPause();
 
         ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
+        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
         ml_is_recording = false;
         ml_is_rec_ok = false;
 
@@ -842,6 +852,7 @@ public class MessageListActivity extends AppCompatActivity
     {
         super.onStop();
         ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
+        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
         ml_is_recording = false;
         ml_is_rec_ok = false;
     }
