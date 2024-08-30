@@ -111,6 +111,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
 import static com.zoffcc.applications.trifa.HelperGeneric.clear_audio_play_buffers;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_OUTGOING_WRAPPER_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.bootstrap_single;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -723,7 +724,15 @@ public class MessageListActivity extends AppCompatActivity
                             // Log.i(TAG, "onCreate:record_audio:file=" + audio_rec_filename_final);
                             mAudioRecorder.prepareRecord(MediaRecorder.AudioSource.MIC, MediaRecorder.OutputFormat.MPEG_4,
                                                          MediaRecorder.AudioEncoder.AAC, mAudioFile);
-                            mAudioRecorder.startRecord();
+                            boolean rec_start_result = mAudioRecorder.startRecord();
+                            if (!rec_start_result)
+                            {
+                                // HINT: some problem on starting the recording
+                                ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                ml_is_recording = false;
+                                ml_is_rec_ok = false;
+                                return;
+                            }
 
                             while (ml_is_recording)
                             {
@@ -735,7 +744,7 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                 }
 
-                                if (mAudioRecorder.progress() > 5)
+                                if (mAudioRecorder.progress() > 50)
                                 {
                                     // HINT: stop after x seconds of recording so it does not record endless
                                     Log.i(TAG, "onCreate:record_audio:auto_stop");
@@ -744,8 +753,12 @@ public class MessageListActivity extends AppCompatActivity
                                 }
                             }
                             ((ImageButton) v).setImageResource(R.drawable.baseline_pending_24);
-                            mAudioRecorder.stopRecord();
-                            Log.i(TAG, "onCreate:record_audio:finished");
+                            int rec_result = mAudioRecorder.stopRecord();
+                            Log.i(TAG, "onCreate:record_audio:finished:res=" + rec_result);
+                            if (rec_result == -1)
+                            {
+                                ml_is_rec_ok = false;
+                            }
                         }
                         catch(Exception e)
                         {
