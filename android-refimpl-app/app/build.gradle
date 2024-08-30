@@ -302,7 +302,6 @@ dependencies {
     }
     //
     implementation 'com.github.piasy:rxandroidaudio:1.7.0'
-    implementation 'com.github.piasy:AudioProcessor:1.7.0'
     //
     implementation("com.daimajia.swipelayout:library:1.2.0@aar")
     //
