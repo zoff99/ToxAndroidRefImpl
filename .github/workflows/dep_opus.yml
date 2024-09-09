@@ -36,7 +36,7 @@ jobs:
       run: rm -f output.txt
 
     - name: Create Pull Request
-      uses: peter-evans/create-pull-request@v6
+      uses: peter-evans/create-pull-request@v7
       with:
         commit-message: update opus to ${{ steps.version_info_str.outputs.release_tag }}
         branch: create-pull-request/opus
