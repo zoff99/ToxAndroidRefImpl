@@ -120,6 +120,11 @@
 
     </LinearLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_weight="1"
+        android:layout_height="0dp">
+
     <fragment
         android:id="@+id/ml_fragment"
         android:name="com.zoffcc.applications.trifa.MessageListFragment"
@@ -127,6 +132,38 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         tools:layout="@layout/message_list_layout" />
+
+        <LinearLayout
+            android:id="@+id/audio_rec_popup_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center_vertical"
+            android:layout_margin="10dp"
+            android:background="@drawable/rounded_red_dark_bg"
+            android:visibility="gone"
+            android:orientation="vertical">
+            <ImageButton
+                android:id="@+id/audio_rec_popup_button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="100dp"
+                android:background="@drawable/rounded_red_dark_bg"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/baseline_keyboard_voice_24"
+                tools:ignore="ContentDescription" />
+            <TextView
+                android:id="@+id/audio_rec_popup_time"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="30dp"
+                android:gravity="center"
+                android:textSize="35sp"
+                android:text="1:20"
+                android:textColor="#E0E0E0"/>
+        </LinearLayout>
+
+    </FrameLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

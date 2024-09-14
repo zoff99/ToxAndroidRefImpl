@@ -1914,6 +1914,19 @@ public class HelperGeneric
         }
     }
 
+    static String seconds_time_format_or_empty(long time_in_seconds)
+    {
+        try
+        {
+            return MainActivity.df_seconds_time.format(new Date(time_in_seconds * 1000));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
     static void waiting_for_orbot_info(final boolean enable)
     {
         if (enable)

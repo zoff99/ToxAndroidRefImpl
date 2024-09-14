@@ -75,6 +75,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 
@@ -96,6 +97,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_uniq_tmp_filename;
+import static com.zoffcc.applications.trifa.HelperGeneric.seconds_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.tox_friend_send_message_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.trim_to_utf8_length_bytes;
@@ -127,6 +129,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_FR
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_FRIEND_AUDIO_RECORDING_MSG_SECONDS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_REMOVE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
@@ -168,6 +171,9 @@ public class MessageListActivity extends AppCompatActivity
     ImageButton ml_video_icon = null;
     ImageButton ml_attach_button_01 = null;
     ImageButton ml_button_recaudio = null;
+    ImageButton audio_rec_popup_button = null;
+    static TextView audio_rec_popup_time = null;
+    static ViewGroup audio_rec_popup_container = null;
     static boolean ml_is_recording = false;
     static boolean ml_is_rec_ok = false;
     static int global_typing = 0;
@@ -338,6 +344,11 @@ public class MessageListActivity extends AppCompatActivity
         ml_attach_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
         ml_button_recaudio = (ImageButton) findViewById(R.id.ml_button_recaudio);
         ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        audio_rec_popup_button = findViewById(R.id.audio_rec_popup_button);
+        audio_rec_popup_time = findViewById(R.id.audio_rec_popup_time);
+        audio_rec_popup_container = findViewById(R.id.audio_rec_popup_container);
+
+        audio_rec_popup_container.setVisibility(View.GONE);
 
         ml_is_recording = false;
         ml_is_rec_ok = false;
@@ -635,23 +646,21 @@ public class MessageListActivity extends AppCompatActivity
         };
         t.start();
 
-        ml_button_recaudio.setOnClickListener(new View.OnClickListener()
-        {
+        ml_button_recaudio.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
-            public void onClick(final View v)
-            {
+            public boolean onLongClick(View v) {
+
                 if (ml_is_rec_ok)
                 {
-                    return;
+                    return false;
                 }
 
                 if (ml_is_recording)
                 {
-                    ml_is_rec_ok = true;
-                    ml_is_recording = false;
-                    return;
+                    return false;
                 }
 
+                // display_toast("LONG", false, 0);
                 final Thread ml_rec_audio_thread = new Thread()
                 {
                     @Override
@@ -662,6 +671,9 @@ public class MessageListActivity extends AppCompatActivity
                         ml_is_rec_ok = false;
                         ((ImageButton) v).setImageResource(R.drawable.baseline_stop_circle_24);
                         v.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                        set_recording_pop_text_s("0:00");
+                        set_recording_pop_visibilty_s(true);
 
                         try
                         {
@@ -681,6 +693,7 @@ public class MessageListActivity extends AppCompatActivity
                             {
                                 ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
                                 v.setBackgroundColor(Color.TRANSPARENT);
+                                set_recording_pop_visibilty_s(false);
                                 ml_is_recording = false;
                                 ml_is_rec_ok = false;
                                 return;
@@ -701,6 +714,7 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
                                     v.setBackgroundColor(Color.TRANSPARENT);
+                                    set_recording_pop_visibilty_s(false);
                                     ml_is_recording = false;
                                     ml_is_rec_ok = false;
                                     return;
@@ -720,6 +734,7 @@ public class MessageListActivity extends AppCompatActivity
                                     // HINT: just in case of an endless loop, we return here
                                     ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
                                     v.setBackgroundColor(Color.TRANSPARENT);
+                                    set_recording_pop_visibilty_s(false);
                                     ml_is_recording = false;
                                     ml_is_rec_ok = false;
                                     return;
@@ -736,6 +751,7 @@ public class MessageListActivity extends AppCompatActivity
                                 // HINT: some problem on starting the recording
                                 ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
                                 v.setBackgroundColor(Color.TRANSPARENT);
+                                set_recording_pop_visibilty_s(false);
                                 ml_is_recording = false;
                                 ml_is_rec_ok = false;
                                 return;
@@ -745,13 +761,15 @@ public class MessageListActivity extends AppCompatActivity
                             {
                                 try
                                 {
-                                    Thread.sleep(100);
+                                    Thread.sleep(200);
                                 }
                                 catch (Exception ignored)
                                 {
                                 }
 
-                                if (mAudioRecorder.progress() > 50)
+                                set_recording_pop_text_s(seconds_time_format_or_empty(mAudioRecorder.progress()));
+
+                                if (mAudioRecorder.progress() > MAX_FRIEND_AUDIO_RECORDING_MSG_SECONDS)
                                 {
                                     // HINT: stop after x seconds of recording so it does not record endless
                                     Log.i(TAG, "onCreate:record_audio:auto_stop");
@@ -761,6 +779,7 @@ public class MessageListActivity extends AppCompatActivity
                             }
                             ((ImageButton) v).setImageResource(R.drawable.baseline_pending_24);
                             v.setBackgroundColor(Color.TRANSPARENT);
+                            set_recording_pop_visibilty_s(false);
                             int rec_result = mAudioRecorder.stopRecord();
                             Log.i(TAG, "onCreate:record_audio:finished:res=" + rec_result);
                             if (rec_result == -1)
@@ -775,6 +794,7 @@ public class MessageListActivity extends AppCompatActivity
                         }
                         ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
                         v.setBackgroundColor(Color.TRANSPARENT);
+                        set_recording_pop_visibilty_s(false);
 
                         if (ml_is_rec_ok)
                         {
@@ -807,6 +827,86 @@ public class MessageListActivity extends AppCompatActivity
                     }
                 };
                 ml_rec_audio_thread.start();
+
+                return true;
+            }
+        });
+
+        audio_rec_popup_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                if (ml_is_rec_ok)
+                {
+                    return;
+                }
+
+                if (ml_is_recording)
+                {
+                    ml_is_rec_ok = true;
+                    ml_is_recording = false;
+                    return;
+                }
+            }
+        });
+
+        audio_rec_popup_time.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                if (ml_is_rec_ok)
+                {
+                    return;
+                }
+
+                if (ml_is_recording)
+                {
+                    ml_is_rec_ok = true;
+                    ml_is_recording = false;
+                    return;
+                }
+            }
+        });
+
+        audio_rec_popup_container.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                if (ml_is_rec_ok)
+                {
+                    return;
+                }
+
+                if (ml_is_recording)
+                {
+                    ml_is_rec_ok = true;
+                    ml_is_recording = false;
+                    return;
+                }
+            }
+        });
+
+        ml_button_recaudio.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                if (ml_is_rec_ok)
+                {
+                    return;
+                }
+
+                if (ml_is_recording)
+                {
+                    ml_is_rec_ok = true;
+                    ml_is_recording = false;
+                    return;
+                }
+
+                display_toast(v.getContext().getString(R.string.MessageListActivity_longpress_to_record_audiomsg), false, 0);
             }
         });
 
@@ -830,6 +930,7 @@ public class MessageListActivity extends AppCompatActivity
 
         ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
         ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        set_recording_pop_visibilty_s(false);
         ml_is_recording = false;
         ml_is_rec_ok = false;
 
@@ -948,6 +1049,65 @@ public class MessageListActivity extends AppCompatActivity
 
         message_list_activity = this;
         wakeup_tox_thread();
+    }
+
+    static void set_recording_pop_text_s(final String t)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (audio_rec_popup_time != null)
+                    {
+                         audio_rec_popup_time.setText(t);
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+
+        if (mla_handler_s != null)
+        {
+            mla_handler_s.post(myRunnable);
+        }
+    }
+
+    static void set_recording_pop_visibilty_s(final boolean visible)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (audio_rec_popup_container != null)
+                    {
+                        if (visible)
+                        {
+                            audio_rec_popup_container.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            audio_rec_popup_container.setVisibility(View.GONE);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+
+        if (mla_handler_s != null)
+        {
+            mla_handler_s.post(myRunnable);
+        }
     }
 
     static void stop_friend_typing_indicator_s()

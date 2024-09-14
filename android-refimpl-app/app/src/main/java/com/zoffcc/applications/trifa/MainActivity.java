@@ -434,6 +434,7 @@ public class MainActivity extends AppCompatActivity
     static TrifaToxService tox_service_fg = null;
     static long update_all_messages_global_timestamp = -1;
     final static SimpleDateFormat df_date_time_long = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    final static SimpleDateFormat df_seconds_time = new SimpleDateFormat("mm:ss");
     final static SimpleDateFormat df_date_time_long_for_filename = new SimpleDateFormat("yyyy-MM-dd_HH_mm_ss");
     final static SimpleDateFormat df_date_only = new SimpleDateFormat("yyyy-MM-dd");
     static long last_updated_fps = -1;

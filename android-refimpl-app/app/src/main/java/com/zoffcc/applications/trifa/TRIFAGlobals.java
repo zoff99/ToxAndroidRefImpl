@@ -159,6 +159,8 @@ public class TRIFAGlobals
 
     static final int CONNECTION_STATUS_MANUAL_LOGOUT = 99;
 
+    static final int MAX_FRIEND_AUDIO_RECORDING_MSG_SECONDS = 10 * 60; // 10 minutes
+
     static int VIDEO_FRAME_RATE_OUTGOING = 0;
     static long last_video_frame_sent = -1;
     static int count_video_frame_sent = 0;
