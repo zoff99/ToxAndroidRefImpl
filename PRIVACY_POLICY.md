@@ -1,6 +1,6 @@
 ## Privacy policy
 
-* TRIfA stores all data on your device. There are no servers.
+* TRIfA stores all data on your device. There are **NO** servers.
 
 * If you skip the password prompt on first start:
      * There is basically **NO** encryption for stored messages and stored outgoing messages.
