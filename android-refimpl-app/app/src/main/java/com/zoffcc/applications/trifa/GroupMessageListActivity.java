@@ -40,6 +40,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -61,6 +62,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.github.piasy.rxandroidaudio.AudioRecorder;
 import com.google.speech.levelmeter.BarLevelDrawable;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -81,6 +83,7 @@ import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,11 +123,14 @@ import static com.zoffcc.applications.trifa.CameraWrapper.YUV420rotate90;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.copy_outgoing_file_to_sdcard_dir;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
+import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_uniq_tmp_filename;
+import static com.zoffcc.applications.trifa.HelperGeneric.seconds_time_format_or_empty;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_calling_audio_mode;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
@@ -150,6 +156,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_frame_d
 import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_max_quantizer;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_incognito_keyboard;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__window_security;
+import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_TMP_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActivity_ID;
 import static com.zoffcc.applications.trifa.MainActivity.audio_out_buffer_mult;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
@@ -186,6 +193,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_NGC_VIDEO_QUANTI
 import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_UPDATE_NGC_GROUP_ALL_USERS_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_QUANTIZER;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_NGC_AUDIO_RECORDING_MSG_SECONDS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_AUDIO_PCM_BUFFER_BYTES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_AUDIO_PCM_BUFFER_SAMPLES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_NEW_PEERS_TIMEDELTA_IN_MS;
@@ -258,6 +266,11 @@ public class GroupMessageListActivity extends AppCompatActivity
     ImageButton ml_phone_icon = null;
     ImageButton ml_button_01 = null;
     ImageButton ml_button_recaudio = null;
+    ImageButton audio_rec_popup_button = null;
+    static TextView audio_rec_popup_time = null;
+    static ViewGroup audio_rec_popup_container = null;
+    static boolean ml_is_recording = false;
+    static boolean ml_is_rec_ok = false;
     static ImageButton ml_video_icon = null;
     static boolean sending_video_to_group = false;
     static String ngc_video_showing_video_from_peer_pubkey = "-1";
@@ -477,6 +490,15 @@ public class GroupMessageListActivity extends AppCompatActivity
         ml_button_recaudio = (ImageButton) findViewById(R.id.ml_button_recaudio);
         ngc_audio_bar_in_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_in_v);
         ngc_audio_bar_out_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_out_v);
+        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        audio_rec_popup_button = findViewById(R.id.audio_rec_popup_button);
+        audio_rec_popup_time = findViewById(R.id.audio_rec_popup_time);
+        audio_rec_popup_container = findViewById(R.id.audio_rec_popup_container);
+
+        audio_rec_popup_container.setVisibility(View.GONE);
+
+        ml_is_recording = false;
+        ml_is_rec_ok = false;
 
         ngc_camera_info_text.setText("");
 
@@ -1025,15 +1047,273 @@ public class GroupMessageListActivity extends AppCompatActivity
         set_peer_count_header();
         set_peer_names_and_avatars();
 
+        ml_button_recaudio.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                if (ml_is_rec_ok)
+                {
+                    return false;
+                }
+
+                if (ml_is_recording)
+                {
+                    return false;
+                }
+
+                // display_toast("LONG", false, 0);
+                final Thread ml_rec_audio_thread = new Thread()
+                {
+                    @Override
+                    public void run()
+                    {
+                        String audio_rec_filename_final = null;
+                        ml_is_recording = true;
+                        ml_is_rec_ok = false;
+                        ((ImageButton) v).setImageResource(R.drawable.baseline_stop_circle_24);
+                        v.setBackgroundColor(Color.parseColor("#FF0000"));
+
+                        set_recording_pop_text_s("0:00");
+                        set_recording_pop_visibilty_s(true);
+
+                        try
+                        {
+                            Log.i(TAG, "onCreate:record_audio:start");
+                            AudioRecorder mAudioRecorder = AudioRecorder.getInstance();
+                            String audio_rec_filename = SD_CARD_TMP_DIR + "/" + group_id + "_" + System.nanoTime();
+                            String audio_rec_filename_uniq_part  = get_uniq_tmp_filename(audio_rec_filename ,1000);
+                            audio_rec_filename_final = audio_rec_filename + "_" + audio_rec_filename_uniq_part + ".file.m4a";
+                            File f = new File(audio_rec_filename_final);
+                            boolean file_exists = true;
+                            try
+                            {
+                                file_exists = f.exists();
+                            }
+                            catch(Exception e)
+                            {
+                                ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                v.setBackgroundColor(Color.TRANSPARENT);
+                                set_recording_pop_visibilty_s(false);
+                                ml_is_recording = false;
+                                ml_is_rec_ok = false;
+                                return;
+                            }
+
+                            long count = 0;
+                            while(file_exists)
+                            {
+                                audio_rec_filename = SD_CARD_TMP_DIR + "/" + group_id + "_" + System.nanoTime();
+                                audio_rec_filename_uniq_part  = get_uniq_tmp_filename(audio_rec_filename ,1000);
+                                audio_rec_filename_final = audio_rec_filename + "_" + audio_rec_filename_uniq_part + ".file.m4a";
+                                f = new File(audio_rec_filename_final);
+                                try
+                                {
+                                    file_exists = f.exists();
+                                }
+                                catch(Exception e)
+                                {
+                                    ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                    v.setBackgroundColor(Color.TRANSPARENT);
+                                    set_recording_pop_visibilty_s(false);
+                                    ml_is_recording = false;
+                                    ml_is_rec_ok = false;
+                                    return;
+                                }
+
+                                try
+                                {
+                                    Thread.sleep(50);
+                                }
+                                catch(Exception e)
+                                {
+                                }
+                                count++;
+
+                                if (count > 50)
+                                {
+                                    // HINT: just in case of an endless loop, we return here
+                                    ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                    v.setBackgroundColor(Color.TRANSPARENT);
+                                    set_recording_pop_visibilty_s(false);
+                                    ml_is_recording = false;
+                                    ml_is_rec_ok = false;
+                                    return;
+                                }
+                            }
+
+                            File mAudioFile = new File(audio_rec_filename_final);
+                            // Log.i(TAG, "onCreate:record_audio:file=" + audio_rec_filename_final);
+                            mAudioRecorder.prepareRecord(MediaRecorder.AudioSource.MIC,
+                                                         MediaRecorder.OutputFormat.MPEG_4,
+                                                         MediaRecorder.AudioEncoder.AAC,
+                                                         44100,
+                                                         20000, // HINT: do NOT use higher bitrate. or the file will be too large for NGC FT
+                                                         mAudioFile);
+                            boolean rec_start_result = mAudioRecorder.startRecord();
+                            if (!rec_start_result)
+                            {
+                                // HINT: some problem on starting the recording
+                                ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                                v.setBackgroundColor(Color.TRANSPARENT);
+                                set_recording_pop_visibilty_s(false);
+                                ml_is_recording = false;
+                                ml_is_rec_ok = false;
+                                return;
+                            }
+
+                            while (ml_is_recording)
+                            {
+                                try
+                                {
+                                    Thread.sleep(200);
+                                }
+                                catch (Exception ignored)
+                                {
+                                }
+
+                                set_recording_pop_text_s(seconds_time_format_or_empty(mAudioRecorder.progress()));
+
+                                if (mAudioRecorder.progress() > MAX_NGC_AUDIO_RECORDING_MSG_SECONDS)
+                                {
+                                    // HINT: stop after x seconds of recording so it does not record endless
+                                    Log.i(TAG, "onCreate:record_audio:auto_stop");
+                                    ml_is_rec_ok = true;
+                                    ml_is_recording = false;
+                                }
+                            }
+                            ((ImageButton) v).setImageResource(R.drawable.baseline_pending_24);
+                            v.setBackgroundColor(Color.TRANSPARENT);
+                            set_recording_pop_visibilty_s(false);
+                            int rec_result = mAudioRecorder.stopRecord();
+                            Log.i(TAG, "onCreate:record_audio:finished:res=" + rec_result);
+                            if (rec_result == -1)
+                            {
+                                ml_is_rec_ok = false;
+                            }
+                        }
+                        catch(Exception e)
+                        {
+                            Log.i(TAG, "onCreate:record_audio:EE:" + e.getMessage());
+                            e.printStackTrace();
+                        }
+                        ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
+                        v.setBackgroundColor(Color.TRANSPARENT);
+                        set_recording_pop_visibilty_s(false);
+
+                        if (ml_is_rec_ok)
+                        {
+                            Log.i(TAG, "onCreate:record_audio:------ OK ------");
+                            Log.i(TAG, "onCreate:record_audio:------ OK ------");
+                            Log.i(TAG, "onCreate:record_audio:------ OK ------");
+
+                            if (audio_rec_filename_final != null)
+                            {
+                                Log.i(TAG, "onCreate:record_audio:add to FT queue ...");
+                                File f2 = new File(audio_rec_filename_final);
+                                Log.i(TAG, "onCreate:record_audio:file_size_in_bytes=" + f2.length());
+                                add_outgoing_file(v.getContext(), MainActivity.group_message_list_activity.get_current_group_id(),
+                                                  f2.getParent(), f2.getName(), null, f2.length(),
+                                                  false, true, true);
+                            }
+                        }
+
+                        try
+                        {
+                            if ((audio_rec_filename_final != null) && (audio_rec_filename_final.length() > 10))
+                            {
+                                new File(audio_rec_filename_final).delete();
+                            }
+                        }
+                        catch (Exception ignored)
+                        {
+                        }
+                        ml_is_rec_ok = false;
+                        ml_is_recording = false;
+                    }
+                };
+                ml_rec_audio_thread.start();
+
+                return true;
+            }
+        });
+
+        audio_rec_popup_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                if (ml_is_rec_ok)
+                {
+                    return;
+                }
+
+                if (ml_is_recording)
+                {
+                    ml_is_rec_ok = true;
+                    ml_is_recording = false;
+                    return;
+                }
+            }
+        });
+
+        audio_rec_popup_time.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                if (ml_is_rec_ok)
+                {
+                    return;
+                }
+
+                if (ml_is_recording)
+                {
+                    ml_is_rec_ok = true;
+                    ml_is_recording = false;
+                    return;
+                }
+            }
+        });
+
+        audio_rec_popup_container.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(final View v)
+            {
+                if (ml_is_rec_ok)
+                {
+                    return;
+                }
+
+                if (ml_is_recording)
+                {
+                    ml_is_rec_ok = true;
+                    ml_is_recording = false;
+                    return;
+                }
+            }
+        });
+
         ml_button_recaudio.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(final View v)
             {
-                Log.i(TAG, "onCreate:record_audio:start");
+                if (ml_is_rec_ok)
+                {
+                    return;
+                }
+
+                if (ml_is_recording)
+                {
+                    ml_is_rec_ok = true;
+                    ml_is_recording = false;
+                    return;
+                }
+
+                display_toast(v.getContext().getString(R.string.MessageListActivity_longpress_to_record_audiomsg), false, 0);
             }
         });
-
         Log.i(TAG, "onCreate:099");
         oncreate_finished = true;
     }
@@ -1297,6 +1577,12 @@ public class GroupMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onPause");
         super.onPause();
 
+        ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
+        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        set_recording_pop_visibilty_s(false);
+        ml_is_recording = false;
+        ml_is_rec_ok = false;
+
         stop_group_video(this);
         closeCamera();
         MainActivity.group_message_list_fragment = null;
@@ -1335,6 +1621,10 @@ public class GroupMessageListActivity extends AppCompatActivity
             emojiPopup.dismiss();
         }
         super.onStop();
+        ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
+        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        ml_is_recording = false;
+        ml_is_rec_ok = false;
     }
 
     @Override
@@ -1450,6 +1740,65 @@ public class GroupMessageListActivity extends AppCompatActivity
         };
         NGC_Group_video_check_incoming_thread_running = true;
         NGC_Group_video_check_incoming_thread.start();
+    }
+
+    static void set_recording_pop_text_s(final String t)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (audio_rec_popup_time != null)
+                    {
+                        audio_rec_popup_time.setText(t);
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+
+        if (group_handler_s != null)
+        {
+            group_handler_s.post(myRunnable);
+        }
+    }
+
+    static void set_recording_pop_visibilty_s(final boolean visible)
+    {
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                try
+                {
+                    if (audio_rec_popup_container != null)
+                    {
+                        if (visible)
+                        {
+                            audio_rec_popup_container.setVisibility(View.VISIBLE);
+                        }
+                        else
+                        {
+                            audio_rec_popup_container.setVisibility(View.GONE);
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                }
+            }
+        };
+
+        if (group_handler_s != null)
+        {
+            group_handler_s.post(myRunnable);
+        }
     }
 
     private void setUpEmojiPopup()
@@ -1809,8 +2158,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                             }
                             Log.i(TAG, "add_outgoing_file:add_outgoing_file:thread_01");
                             add_outgoing_file(c, MainActivity.group_message_list_activity.get_current_group_id(),
-                                              data.getData().toString(), fileName_, data.getData(), false,
-                                              activity_group_num);
+                                              data.getData().toString(), fileName_, data.getData(), 0,
+                                              false,
+                                              activity_group_num,
+                                              false);
                         }
                     };
                     t.start();
@@ -1869,7 +2220,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 }
                             }
                             add_outgoing_file(c, groupid_local, data.getData().toString(), fileName_, data.getData(),
-                                              false, activity_group_num);
+                                              0,
+                                              false,
+                                              activity_group_num,
+                                              false);
                         }
                     };
                     t2.start();
@@ -3478,27 +3832,36 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
     }
 
-    static void add_outgoing_file(Context c, String groupid, String filepath, String filename, Uri uri, boolean real_file_path, boolean update_message_view)
+    static void add_outgoing_file(Context c, String groupid, String filepath, String filename, Uri uri, long file_size_manual, boolean real_file_path, boolean update_message_view, boolean use_file_size_manual)
     {
         long file_size = -1;
         try
         {
-            DocumentFile documentFile = DocumentFile.fromSingleUri(c, uri);
-            String fileName = documentFile.getName();
-            Log.i(TAG, "add_outgoing_file:documentFile:fileName=" + fileName);
-            Log.i(TAG, "add_outgoing_file:documentFile:fileLength=" + documentFile.length());
-
-            file_size = documentFile.length();
+            if (use_file_size_manual)
+            {
+                file_size = file_size_manual;
+                // Log.i(TAG, "add_outgoing_file:documentFile:file_size=" + file_size);
+            }
+            else
+            {
+                DocumentFile documentFile = DocumentFile.fromSingleUri(c, uri);
+                String fileName = documentFile.getName();
+                // Log.i(TAG, "add_outgoing_file:documentFile:fileName=" + fileName);
+                // Log.i(TAG, "add_outgoing_file:documentFile:fileLength=" + documentFile.length());
+                file_size = documentFile.length();
+            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
+            Log.i(TAG, "add_outgoing_file:documentFile:EE003:" + e.getMessage());
             // file length unknown?
             return;
         }
 
         if (file_size < 1)
         {
+            Log.i(TAG, "file length 0 ?");
             // file length "zero"?
             return;
         }
@@ -3506,6 +3869,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         if (file_size > FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL)
         {
             display_toast("File too large", true, 100);
+            Log.i(TAG, "add_outgoing_file:documentFile:file_size=File too large");
             return;
         }
 
