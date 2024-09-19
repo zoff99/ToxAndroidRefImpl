@@ -1,3 +1,5 @@
+gradle_witness_ng_error:EEE-0001:Could not resolve all files for configuration ':app:debugAnnotationProcessorClasspath'.
+gradle_witness_ng_error:EEE-0001:Could not resolve all files for configuration ':app:releaseAnnotationProcessorClasspath'.
 dependencyVerification {
     verify = [
         'androidx.activity:activity-ktx:1.8.1:activity-ktx-1.8.1.aar:9f77caa2bbec7ceefa5c931e2f223c2b386a594ee0442d168dfeaf1c850aeb9d',
@@ -117,7 +119,6 @@ dependencyVerification {
         'com.github.YarikSOffice:lingver:1.3.0:lingver-1.3.0.aar:5924f804790c7ab523db14fa86692543f4bc8eb43f05b427048e0a856791499f',
         'com.github.angads25:filepicker:1.1.1:filepicker-1.1.1.aar:8582d3a57d590945c05a00af265f63258da85523a61bd14556f545ad54da228b',
         'com.github.bumptech.glide:annotations:5.0.0-rc01:annotations-5.0.0-rc01.jar:460e19ce4b44d93688672eb74f22de3c2073891e9cdf148e3a7cc22047d6b8ab',
-        'com.github.bumptech.glide:compiler:5.0.0-rc01:compiler-5.0.0-rc01.jar:cd47bab494632f79a65147ef26e939ffe9f2b6b6362cdf320b166c9702d5b12a',
         'com.github.bumptech.glide:disklrucache:5.0.0-rc01:disklrucache-5.0.0-rc01.jar:ec2074bcec3601a91f08e7146d1b95aee12f86b866a4dcea103977d7603cac1a',
         'com.github.bumptech.glide:gifdecoder:5.0.0-rc01:gifdecoder-5.0.0-rc01.aar:df9e4620e87b68b719ef8af3d100324a144bfc88f43518af9a013674109fe078',
         'com.github.bumptech.glide:glide:5.0.0-rc01:glide-5.0.0-rc01.aar:5f4be0ad9a7a7d74c0bb672df0eb901c1d70a975067edeb34f52ff0dc51b5402',
@@ -130,7 +131,6 @@ dependencyVerification {
         'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.144:pkgs_ToxAndroidRefImpl-1.0.144.aar:2de3afb98842086b5a5ea05672bd179588688a68dad7e82ca50555c699a4d784',
         'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0:pkgs_armchaAutoLinkTextView-0.3.0.aar:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
         'com.github.zoff99:pkgs_guardianprojectIOCipher:0.4.2.104:pkgs_guardianprojectIOCipher-0.4.2.104.aar:6e5dc320b633682e0201c316994da5423a4ab236f0ac575d9c1a6d90c60d01f8',
-        'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0:pkgs_hotchemiPermissionsdispatcher-processor-3.2.0.jar:f7374192b263a94f63186dee91cb954c9369122519e4f08e055b72969699b52d',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0:pkgs_hotchemiPermissionsdispatcher-3.2.0.aar:40191c8c726445dcab4fa2a4ef7a7e76186ef154dc385fe07520944fe4720089',
         'com.github.zoff99:pkgs_maskaradeOrma-annotations:6.0.2:pkgs_maskaradeOrma-annotations-6.0.2.jar:55915c1ca7e2f45ee11b4ab8abd73727b993a2ec0b79f5ed3c92c29771abbd39',
         'com.github.zoff99:pkgs_maskaradeOrma-core:6.0.2:pkgs_maskaradeOrma-core-6.0.2.aar:9687930da0c0ea38cc203e17e5cfb26f9e74b2b89f4f83deb71da937b59b57a0',
@@ -177,9 +177,7 @@ dependencyVerification {
         'com.mikepenz:materialize:1.1.2:materialize-1.1.2.aar:2834b735fefcb2e1ab356e926a652396a4ece0dffc05184ea755366c3d2ee79f',
         'com.squareup.okhttp3:okhttp:4.12.0:okhttp-4.12.0.jar:b1050081b14bb7a3a7e55a4d3ef01b5dcfabc453b4573a4fc019767191d5f4e0',
         'com.squareup.okio:okio-jvm:3.6.0:okio-jvm-3.6.0.jar:67543f0736fc422ae927ed0e504b98bc5e269fda0d3500579337cb713da28412',
-        'com.squareup:javapoet:1.13.0:javapoet-1.13.0.jar:4c7517e848a71b36d069d12bb3bf46a70fd4cda3105d822b0ed2e19c00b69291',
         'com.squareup:javawriter:2.1.1:javawriter-2.1.1.jar:f699823d0081f69cbb676c1845ea222e0ada79bc88a53e5d22d8bd02d328f57e',
-        'com.squareup:kotlinpoet:0.6.0:kotlinpoet-0.6.0.jar:ac45ceddd280a7b97228bfaad63fc5d14a1ed6cbce870e00b063f44be714f16b',
         'com.vanniktech:emoji-google:0.9.0:emoji-google-0.9.0-debug.aar:76dea2a1ec386dc497bee3c4e9ee531d3d7b88ebcb2132f285667687a08bd763',
         'com.vanniktech:emoji-google:0.9.0:emoji-google-0.9.0-release.aar:ac66a411160f8032a7c037d23bcb0a4ae1ca5d416b77a2528783125eb23b3b2e',
         'com.vanniktech:emoji:0.9.0:emoji-0.9.0-debug.aar:c09fd4f40bd364ddfc223fef216707e33003afab723d0dc738830b4fe31f8d45',
@@ -238,7 +236,6 @@ dependencyVerification {
         'org.jetbrains.kotlin:kotlin-daemon-client:1.9.23:kotlin-daemon-client-1.9.23.jar:e63154254919fd706fe9937c48db937ea9068a631f86de655a514bc1620f988d',
         'org.jetbrains.kotlin:kotlin-daemon-embeddable:1.9.23:kotlin-daemon-embeddable-1.9.23.jar:6f3b661b98267ad24e2f8fb7ad5d06be7d2ed61a5d05c267f4e4caa78df783d9',
         'org.jetbrains.kotlin:kotlin-klib-commonizer-embeddable:1.9.23:kotlin-klib-commonizer-embeddable-1.9.23.jar:b80a38b4bb81fb03d0f307473d032d73b2778fa76b0346387e5a10dd833d728e',
-        'org.jetbrains.kotlin:kotlin-reflect:1.1.51:kotlin-reflect-1.1.51.jar:dc71ed5acbc67b803917de69dbfb6858cad7e8951f9bc598dc7228ac9015931d',
         'org.jetbrains.kotlin:kotlin-reflect:1.6.10:kotlin-reflect-1.6.10.jar:3277ac102ae17aad10a55abec75ff5696c8d109790396434b496e75087854203',
         'org.jetbrains.kotlin:kotlin-script-runtime:1.9.23:kotlin-script-runtime-1.9.23.jar:75137e414a1a5b4b4d090f812d0e35eb30b4f0c923a53d69585456bb24fc1df8',
         'org.jetbrains.kotlin:kotlin-stdlib-common:1.5.31:kotlin-stdlib-common-1.5.31.jar:dfa2a18e26b028388ee1968d199bf6f166f737ab7049c25a5e2da614404e22ad',
@@ -247,8 +244,6 @@ dependencyVerification {
         'org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.9.10:kotlin-stdlib-jdk7-1.9.10.jar:ac6361bf9ad1ed382c2103d9712c47cdec166232b4903ed596e8876b0681c9b7',
         'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31:kotlin-stdlib-jdk8-1.5.31.jar:b548f7767aacf029d2417e47440742bd6d3ebede19b60386e23554ce5c4c5fdc',
         'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.10:kotlin-stdlib-jdk8-1.9.10.jar:a4c74d94d64ce1abe53760fe0389dd941f6fc558d0dab35e47c085a11ec80f28',
-        'org.jetbrains.kotlin:kotlin-stdlib-jre7:1.1.51:kotlin-stdlib-jre7-1.1.51.jar:7062f55a80cf67d4977c9ed8f0c766633e04cf2c9cc24fdc926dcf706612959a',
-        'org.jetbrains.kotlin:kotlin-stdlib:1.2.0:kotlin-stdlib-1.2.0.jar:05cfd9f5ac0b41910703a8925f7211a495909b27a2ffdd1c5106f1689aeafcd4',
         'org.jetbrains.kotlin:kotlin-stdlib:1.5.31:kotlin-stdlib-1.5.31.jar:4800ceacb2ec0bb9959a087154b8e35318ead1ea4eba32d4bb1b9734222a7e68',
         'org.jetbrains.kotlin:kotlin-stdlib:1.7.10:kotlin-stdlib-1.7.10.jar:e771fe74250a943e8f6346713201ff1d8cb95c3a5d1a91a22b65a9e04f6a8901',
         'org.jetbrains.kotlin:kotlin-stdlib:1.9.23:kotlin-stdlib-1.9.23-all.jar:cec38bc3302e72a8aaf9cde436b5a9071ee0331e2ad05e84d8bb897334d7e9d4',
