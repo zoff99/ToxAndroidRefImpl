@@ -125,13 +125,13 @@
         android:layout_weight="1"
         android:layout_height="0dp">
 
-    <fragment
-        android:id="@+id/ml_fragment"
-        android:name="com.zoffcc.applications.trifa.MessageListFragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="1"
-        tools:layout="@layout/message_list_layout" />
+        <fragment
+            android:id="@+id/ml_fragment"
+            android:name="com.zoffcc.applications.trifa.MessageListFragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            tools:layout="@layout/message_list_layout" />
 
         <LinearLayout
             android:id="@+id/audio_rec_popup_container"
