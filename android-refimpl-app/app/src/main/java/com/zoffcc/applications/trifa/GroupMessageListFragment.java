@@ -408,6 +408,30 @@ public class GroupMessageListFragment extends Fragment
     {
         super.onPause();
 
+        // HINT: super ugly hack to find all audioplay recylerviews and stop any audio playing
+        // you have a better solution? let me hear it.
+        try
+        {
+            View child;
+            Log.i(TAG, "onPause:getChildCount=" + listingsView.getChildCount());
+            for (int i = 0; i < listingsView.getChildCount(); i++)
+            {
+                child = listingsView.getChildAt(i);
+                try
+                {
+                    RecyclerView.ViewHolder vh = listingsView.getChildViewHolder(child);
+                    ((GroupMessageListHolder_file_outgoing_state_cancel) vh).DetachedFromWindow();
+                }
+                catch(Exception e1)
+                {
+                }
+            }
+        }
+        catch(Exception e2)
+        {
+        }
+        // HINT: super ugly hack to find all audioplay recylerviews and stop any audio playing
+
         global_showing_anygroupview = false;
         MainActivity.group_message_list_fragment = null;
     }

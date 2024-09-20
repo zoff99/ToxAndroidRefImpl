@@ -30,6 +30,7 @@ import com.l4digital.fastscroll.FastScroller;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
@@ -326,6 +327,16 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     @Override
     public void onViewDetachedFromWindow(RecyclerView.ViewHolder holder)
     {
+        Log.i(TAG, "onViewDetachedFromWindow:M");
+        try
+        {
+            ((MessageListHolder_file_outgoing_state_cancel) holder).DetachedFromWindow();
+        }
+        catch(Exception e)
+        {
+            Log.i(TAG, "onViewDetachedFromWindow:M:activity_stop()");
+        }
+
         /*
         try
         {
@@ -335,6 +346,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         {
         }
         */
+        super.onViewDetachedFromWindow(holder);
     }
 
     @Override

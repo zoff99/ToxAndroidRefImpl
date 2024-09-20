@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.ContentResolver;
@@ -1206,29 +1207,81 @@ public class GroupMessageListActivity extends AppCompatActivity
                             Log.i(TAG, "onCreate:record_audio:------ OK ------");
                             Log.i(TAG, "onCreate:record_audio:------ OK ------");
 
-                            if (audio_rec_filename_final != null)
+                            String audio_rec_filename_final_s = audio_rec_filename_final;
+                            try
                             {
-                                Log.i(TAG, "onCreate:record_audio:add to FT queue ...");
-                                File f2 = new File(audio_rec_filename_final);
-                                Log.i(TAG, "onCreate:record_audio:file_size_in_bytes=" + f2.length());
-                                add_outgoing_file(v.getContext(), MainActivity.group_message_list_activity.get_current_group_id(),
-                                                  f2.getParent(), f2.getName(), null, f2.length(),
-                                                  false, true, true);
-                            }
-                        }
+                                ((Activity) v.getContext()).runOnUiThread(new Runnable()
+                                {
+                                    @Override
+                                    public void run()
+                                    {
+                                        try
+                                        {
+                                            final AlertDialog.Builder builder = new AlertDialog.Builder(v.getContext());
+                                            builder.setMessage("Do you want to send this Audio Message to the Group?").setTitle("Send Audio?").
+                                                    setCancelable(false).
+                                                    setPositiveButton("OK", new DialogInterface.OnClickListener()
+                                            {
+                                                public void onClick(DialogInterface dialog, int id)
+                                                {
+                                                    try
+                                                    {
+                                                        if (audio_rec_filename_final_s != null)
+                                                        {
+                                                            Log.i(TAG, "onCreate:record_audio:add to FT queue ...");
+                                                            File f2 = new File(audio_rec_filename_final_s);
+                                                            Log.i(TAG, "onCreate:record_audio:file_size_in_bytes=" + f2.length());
+                                                            add_outgoing_file(v.getContext(), MainActivity.group_message_list_activity.get_current_group_id(),
+                                                                              f2.getParent(), f2.getName(), null, f2.length(),
+                                                                              false, true, true);
 
-                        try
-                        {
-                            if ((audio_rec_filename_final != null) && (audio_rec_filename_final.length() > 10))
+                                                            try
+                                                            {
+                                                                new File(audio_rec_filename_final_s).delete();
+                                                            }
+                                                            catch (Exception ignored)
+                                                            {
+                                                            }
+                                                            ml_is_rec_ok = false;
+                                                            ml_is_recording = false;
+                                                        }
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        e.printStackTrace();
+                                                    }
+                                                    dialog.dismiss();
+                                                }
+                                            }).setNegativeButton("Cancel", new DialogInterface.OnClickListener()
+                                            {
+                                                public void onClick(DialogInterface dialog, int id)
+                                                {
+                                                    try
+                                                    {
+                                                        new File(audio_rec_filename_final_s).delete();
+                                                    }
+                                                    catch (Exception ignored)
+                                                    {
+                                                    }
+                                                    ml_is_rec_ok = false;
+                                                    ml_is_recording = false;
+                                                }
+                                            });
+
+                                            final AlertDialog alert = builder.create();
+                                            alert.show();
+                                        }
+                                        catch(Exception ee2)
+                                        {
+
+                                        }
+                                    }
+                                });
+                            }
+                            catch(Exception ee1)
                             {
-                                new File(audio_rec_filename_final).delete();
                             }
                         }
-                        catch (Exception ignored)
-                        {
-                        }
-                        ml_is_rec_ok = false;
-                        ml_is_recording = false;
                     }
                 };
                 ml_rec_audio_thread.start();

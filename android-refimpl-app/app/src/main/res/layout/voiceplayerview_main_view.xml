@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@color/md_amber_600"
+    android:gravity="center_horizontal"
+    android:orientation="horizontal"
+    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:id="@+id/collectorLinearLayout">
+        <LinearLayout
+            android:id="@+id/paddedLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="5dp">
+            <ImageView
+                android:clickable="true"
+                android:id="@+id/imgPlay"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="@drawable/play_pause_bg"
+                android:src="@drawable/ic_play_arrow_white_24dp"
+                android:focusable="true" />
+            <ProgressBar
+                android:visibility="gone"
+                android:clickable="true"
+                android:id="@+id/pb_play"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:focusable="true" />
+            <ImageView
+                android:clickable="true"
+                android:id="@+id/imgPause"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:background="@drawable/play_pause_bg"
+                android:src="@drawable/ic_pause_white_24dp"
+                android:visibility="gone"
+                android:focusable="true" />
+            <LinearLayout
+                android:id="@+id/containerLinearLayout"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/txtTime"
+                    android:padding="1dp"
+                    android:layout_gravity="end"
+                    android:layout_marginEnd="16dp"
+                    android:textSize="10sp"
+                    android:text="00:00:00 / 00:00:00"
+                    android:layout_marginRight="16dp" />
+                <SeekBar
+                    android:id="@+id/seekBar"
+                    android:layout_width="fill_parent"
+                    android:layout_marginStart="0dp"
+                    android:layout_marginEnd="4dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginLeft="0dp" />
+                <me.jagar.chatvoiceplayerlibrary.PlayerVisualizerSeekbar
+                    android:id="@+id/seekBarV"
+                    android:visibility="gone"
+                    android:layout_gravity="center"
+                    android:layout_width="225dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:layout_marginLeft="8dp" />
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/imgShare"
+                android:layout_width="1dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/play_pause_bg"
+                android:src="@drawable/ic_share_white_24dp"
+                android:textColor="@color/md_white_1000"
+                android:clickable="true"
+                android:textStyle="bold"
+                android:focusable="true" />
+            <ProgressBar
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_gravity="center_horizontal"
+                android:id="@+id/progressBar"
+                android:visibility="gone"/>
+        </LinearLayout>
+</LinearLayout>

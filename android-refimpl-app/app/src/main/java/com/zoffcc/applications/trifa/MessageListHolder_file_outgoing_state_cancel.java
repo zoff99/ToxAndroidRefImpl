@@ -40,7 +40,6 @@ import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.request.RequestOptions;
 import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
-import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
@@ -52,11 +51,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.open_local_outgoing_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_vfs_image_filename_own_avatar;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
-import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
 import static com.zoffcc.applications.trifa.MainActivity.selected_messages;
 import static com.zoffcc.applications.trifa.MessageListActivity.onClick_message_helper;
 import static com.zoffcc.applications.trifa.MessageListActivity.onLongClick_message_helper;
@@ -90,6 +87,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
     boolean is_selected = false;
     TextView message_text_date_string;
     ViewGroup message_text_date;
+    me.jagar.chatvoiceplayerlibrary.VoicePlayerView ft_audio_player;
 
     public MessageListHolder_file_outgoing_state_cancel(View itemView, Context c)
     {
@@ -113,6 +111,7 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
         message_text_date_string = (TextView) itemView.findViewById(R.id.message_text_date_string);
         message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
+        ft_audio_player = itemView.findViewById(R.id.ft_audio_player);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -128,6 +127,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
         }
 
         message_ = m;
+
+        ft_audio_player.setVisibility(View.GONE);
 
         int drawable_id = R.drawable.rounded_blue_bg_with_border;
         try
@@ -250,6 +251,8 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
             textView.setAutoLinkText("" + message.text + "\n OK");
 
             boolean is_image = false;
+            boolean is_audio = false;
+
             try
             {
                 String mimeType = null;
@@ -268,6 +271,11 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                 if (mimeType.startsWith("image/"))
                 {
                     is_image = true;
+                }
+
+                if (mimeType.startsWith("audio/"))
+                {
+                    is_audio = true;
                 }
             }
             catch (Exception e)
@@ -374,6 +382,14 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                     }
                 }
             }
+            else if (is_audio) // ---- an audio file ----
+            {
+                ft_preview_container.setVisibility(View.VISIBLE);
+                ft_preview_image.setVisibility(View.GONE);
+                ft_audio_player.setVisibility(View.VISIBLE);
+                ft_audio_player.refreshPlayer(message.filename_fullpath);
+                ft_audio_player.refreshVisualizer();
+            }
             else
             {
                 final Drawable d3 = new IconicsDrawable(this.context).
@@ -427,6 +443,11 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
     public void onClick(View v)
     {
         // Log.i(TAG, "onClick");
+    }
+
+    void DetachedFromWindow()
+    {
+        ft_audio_player.onPause();
     }
 
     @Override

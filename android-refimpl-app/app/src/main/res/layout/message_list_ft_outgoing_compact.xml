@@ -71,8 +71,6 @@
                     android:layout_marginRight="0dp"
                     android:orientation="horizontal">
 
-                    // style="?android:attr/progressBarStyleHorizontal"
-
                     <com.daimajia.numberprogressbar.NumberProgressBar
                         android:id="@+id/ft_progressbar"
                         android:layout_width="fill_parent"
@@ -108,6 +106,29 @@
                         android:layout_width="0dp"
                         android:layout_height="3dp"
                         android:layout_weight="1"
+                        android:visibility="gone" />
+
+                    <me.jagar.chatvoiceplayerlibrary.VoicePlayerView
+                        android:id="@+id/ft_audio_player"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        app:enableVisualizer="true"
+                        app:visualizationPlayedColor="#ff7700"
+                        app:visualizationNotPlayedColor="#727171"
+                        app:playPauseBackgroundColor="#ff7700"
+                        app:timingBackgroundColor="#6AFF7700"
+                        app:seekBarProgressColor="#000"
+                        app:showShareButton="false"
+                        app:shareCornerRadius="100"
+                        app:playPauseCornerRadius="100"
+                        app:showTiming="true"
+                        app:viewCornerRadius="100"
+                        app:viewBackground="#C6C4CF"
+                        app:progressTimeColor="#000"
+                        app:seekBarThumbColor="#FFC107"
+                        app:shareBackgroundColor="#ff7700"
+                        app:playProgressbarColor="#ff7700"
+                        app:shareText="SHARE ME"
                         android:visibility="gone" />
 
                     <ImageButton

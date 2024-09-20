@@ -30,6 +30,7 @@ import com.l4digital.fastscroll.FastScroller;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
@@ -56,6 +57,19 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
 
         this.messagelistitems = items;
         this.context = context;
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull RecyclerView.ViewHolder holder) {
+        try
+        {
+            ((GroupMessageListHolder_file_outgoing_state_cancel) holder).DetachedFromWindow();
+        }
+        catch(Exception e)
+        {
+            Log.i(TAG, "onViewDetachedFromWindow:G:activity_stop()");
+        }
+        super.onViewDetachedFromWindow(holder);
     }
 
     @Override

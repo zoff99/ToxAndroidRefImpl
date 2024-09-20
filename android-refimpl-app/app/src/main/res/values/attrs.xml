@@ -21,4 +21,24 @@
     <attr name="cardUseCompatPadding" format="boolean"></attr>
     <!-- for emoji 0.5.1 ?? -->
 
+    <declare-styleable name="VoicePlayerView">
+        <attr name="viewBackground" format="color" />
+        <attr name="playPauseBackgroundColor" format="color" />
+        <attr name="shareBackgroundColor" format="color" />
+        <attr name="seekBarProgressColor" format="color" />
+        <attr name="seekBarThumbColor" format="color" />
+        <attr name="progressTimeColor" format="color" />
+        <attr name="showShareButton" format="boolean" />
+        <attr name="showTiming" format="boolean" />
+        <attr name="viewCornerRadius" format="float" />
+        <attr name="playPauseCornerRadius" format="float" />
+        <attr name="shareCornerRadius" format="float" />
+        <attr name="shareText" format="string" />
+        <attr name="enableVisualizer" format="boolean" />
+        <attr name="timingBackgroundColor" format="color" />
+        <attr name="visualizationPlayedColor" format="color" />
+        <attr name="visualizationNotPlayedColor" format="color" />
+        <attr name="playProgressbarColor" format="color" />
+
+    </declare-styleable>
 </resources>
