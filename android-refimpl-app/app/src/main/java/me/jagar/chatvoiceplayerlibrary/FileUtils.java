@@ -13,6 +13,8 @@ import java.io.IOException;
 
 public class FileUtils {
 
+    public static final int MAX_FILE_SIZE_BYTES = 500000; // ~500 kByte
+
     public static void updateVisualizer(final Context context, final File file, final PlayerVisualizerSeekbar playerVisualizerSeekbar){
         Log.e(" BYTES", "CALLED");
         new AsyncTask<Void, Void, byte[]>() {
@@ -24,8 +26,6 @@ public class FileUtils {
             @Override
             protected void onPostExecute(final byte[] bytes) {
                 super.onPostExecute(bytes);
-                Log.e("BYTES", String.valueOf(bytes.length));
-
                 ((Activity) context).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -37,6 +37,10 @@ public class FileUtils {
         }.execute();
     }
     public static byte[] fileToBytes(File file) {
+        if (file.length() > MAX_FILE_SIZE_BYTES)
+        {
+            return null;
+        }
         int size = (int) file.length();
         byte[] bytes = new byte[size];
         try {

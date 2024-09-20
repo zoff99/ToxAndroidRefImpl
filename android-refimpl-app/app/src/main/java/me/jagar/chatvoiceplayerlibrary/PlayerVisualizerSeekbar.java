@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.zoffcc.applications.trifa.R;
 
@@ -104,9 +105,21 @@ public class PlayerVisualizerSeekbar extends androidx.appcompat.widget.AppCompat
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (bytes == null || width == 0) {
+        if (width == 0) {
             return;
         }
+
+        if (bytes == null) {
+            float left = 0;
+            float middle_vertical_top = (height / 2) - 1;
+            float middle_vertical_bottom = (height / 2) + 1;
+            float right = width;
+            canvas.drawRect(left, middle_vertical_top, right, middle_vertical_bottom, playedStatePainting);
+            canvas.drawRect(left, middle_vertical_top, denseness, middle_vertical_bottom, notPlayedStatePainting);
+            canvas.drawCircle(denseness, (height / 2), dp(6), notPlayedStatePainting);
+            return;
+        }
+
         float totalBarsCount = width / dp(3);
         if (totalBarsCount <= 0.1f) {
             return;
@@ -117,7 +130,7 @@ public class PlayerVisualizerSeekbar extends androidx.appcompat.widget.AppCompat
         float barCounter = 0;
         int nextBarNum = 0;
 
-        int y = (height - dp(VISUALIZER_HEIGHT)) ;
+        int y = (height - dp(VISUALIZER_HEIGHT));
         int barNum = 0;
         int lastBarNum;
         int drawBarCount;
