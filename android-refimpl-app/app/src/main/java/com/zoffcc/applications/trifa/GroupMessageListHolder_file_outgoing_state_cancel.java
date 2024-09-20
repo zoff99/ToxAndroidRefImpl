@@ -100,6 +100,7 @@ public class GroupMessageListHolder_file_outgoing_state_cancel extends RecyclerV
         message_ = m;
 
         ft_audio_player.setVisibility(View.GONE);
+        ft_preview_image.getLayoutParams().height = (int)dp2px(150);
 
         int drawable_id = R.drawable.rounded_blue_bg;
         try
@@ -317,8 +318,21 @@ public class GroupMessageListHolder_file_outgoing_state_cancel extends RecyclerV
         }
         else if (is_audio) // ---- an audio file ----
         {
+            if (PREF__compact_chatlist)
+            {
+                textView.setVisibility(View.GONE);
+                imageView.setVisibility(View.GONE);
+            }
+
+            ft_progressbar.setVisibility(View.GONE);
+            ft_buttons_container.setVisibility(View.GONE);
+            button_ok.setVisibility(View.GONE);
+            button_cancel.setVisibility(View.GONE);
+
             ft_preview_container.setVisibility(View.VISIBLE);
             ft_preview_image.setVisibility(View.GONE);
+            ft_preview_image.getLayoutParams().height = 2;
+
             ft_audio_player.setVisibility(View.VISIBLE);
             ft_audio_player.refreshPlayer(message.filename_fullpath);
             ft_audio_player.refreshVisualizer();
@@ -357,9 +371,13 @@ public class GroupMessageListHolder_file_outgoing_state_cancel extends RecyclerV
         // Log.i(TAG, "onClick");
     }
 
-    void DetachedFromWindow()
+    void DetachedFromWindow(boolean release)
     {
         ft_audio_player.onPause();
+        if (release)
+        {
+            ft_audio_player.onStop();
+        }
     }
 
     @Override

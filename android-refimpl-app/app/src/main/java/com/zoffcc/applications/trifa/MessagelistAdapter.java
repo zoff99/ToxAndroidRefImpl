@@ -330,7 +330,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         Log.i(TAG, "onViewDetachedFromWindow:M");
         try
         {
-            ((MessageListHolder_file_outgoing_state_cancel) holder).DetachedFromWindow();
+            ((MessageListHolder_file_outgoing_state_cancel) holder).DetachedFromWindow(false);
         }
         catch(Exception e)
         {

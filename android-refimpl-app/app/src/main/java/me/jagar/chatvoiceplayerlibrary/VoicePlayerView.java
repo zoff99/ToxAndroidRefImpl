@@ -411,11 +411,11 @@ import java.net.URLConnection;
                                     try {
                                         update(mediaPlayer, time, seekBar, context);
                                     } catch (Exception e) {
-                                        e.printStackTrace();
+                                        // e.printStackTrace();
                                     }
                                 }
                             }catch (Exception e){
-                                e.printStackTrace();
+                                // e.printStackTrace();
                             }
                         }
                     };
@@ -439,15 +439,39 @@ import java.net.URLConnection;
 
     //These both functions to avoid mediaplayer errors
 
-    public void onStop(){
-        try{
+    public void onStop()
+    {
+        try
+        {
             mediaPlayer.stop();
-            mediaPlayer.reset();
-            mediaPlayer.release();
-        }catch (Exception e){
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
             Log.i("VoicePlayerView", "VoicePlayerView:onStop:EE01:" + e.getMessage());
         }
+
+        try
+        {
+            mediaPlayer.reset();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i("VoicePlayerView", "VoicePlayerView:onStop:EE02:" + e.getMessage());
+        }
+
+        try
+        {
+            mediaPlayer.release();
+            Log.i("VoicePlayerView", "VoicePlayerView:mediaPlayer.release()");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i("VoicePlayerView", "VoicePlayerView:onStop:EE03:" + e.getMessage());
+        }
+
         mediaPlayer = null;
     }
 

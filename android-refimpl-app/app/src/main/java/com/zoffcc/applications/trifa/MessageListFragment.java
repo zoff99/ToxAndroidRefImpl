@@ -463,7 +463,7 @@ public class MessageListFragment extends Fragment
                 try
                 {
                     RecyclerView.ViewHolder vh = listingsView.getChildViewHolder(child);
-                    ((MessageListHolder_file_outgoing_state_cancel) vh).DetachedFromWindow();
+                    ((MessageListHolder_file_outgoing_state_cancel) vh).DetachedFromWindow(true);
                 }
                 catch(Exception e1)
                 {
