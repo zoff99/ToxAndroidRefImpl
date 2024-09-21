@@ -28,6 +28,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -116,6 +117,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
     ViewGroup ft_export_button_container;
     ImageButton ft_export_button;
     ImageButton ft_share_button;
+    me.jagar.chatvoiceplayerlibrary.vVoicePlayerView ft_audio_player;
 
     public GroupMessageListHolder_file_incoming_state_cancel(View itemView, Context c)
     {
@@ -147,11 +149,16 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
             ft_export_button = null;
             ft_share_button = null;
         }
+
+        ft_audio_player = itemView.findViewById(R.id.ft_audio_player);
     }
 
     public void bindMessageList(GroupMessage m)
     {
         message_ = m;
+
+        ft_audio_player.setVisibility(View.GONE);
+        ft_preview_image.getLayoutParams().height = (int)dp2px(150);
 
         String message__text = m.text;
 
@@ -630,6 +637,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
         boolean is_image = false;
         boolean is_video = false;
+        boolean is_audio = false;
         try
         {
             String mimeType = URLConnection.guessContentTypeFromName(message_.filename_fullpath.toLowerCase());
@@ -652,6 +660,15 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
                 if (mimeType.startsWith("video/"))
                 {
                     is_video = true;
+                }
+
+                if (mimeType.startsWith("audio/"))
+                {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                    {
+                        // since we need MediaDataSource which is only available on Android M and higher
+                        is_audio = true;
+                    }
                 }
             }
             catch (Exception e)
@@ -746,6 +763,31 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
             ft_preview_image.setImageDrawable(d4);
         }
+        else if (is_audio) // ---- an audio file ----
+        {
+            if (PREF__compact_chatlist)
+            {
+                textView.setVisibility(View.GONE);
+                imageView.setVisibility(View.GONE);
+                textView.setVisibility(View.GONE);
+            }
+
+            ft_preview_container.setVisibility(View.VISIBLE);
+            ft_preview_image.setVisibility(View.GONE);
+
+            ft_audio_player.setVisibility(View.VISIBLE);
+
+            ft_preview_image.getLayoutParams().height = (int)dp2px(55);
+
+            if (VFS_ENCRYPT)
+            {
+                ft_audio_player.refreshPlayer(message_.filename_fullpath);
+                ft_audio_player.refreshVisualizer();
+            }
+
+            // ft_audio_player.setViewBackgroundColor(peer_color_bg);
+            // ft_audio_player.setBackgroundColor(peer_color_bg);
+        }
         else // ---- not an image or a video ----
         {
             final Drawable d3 = new IconicsDrawable(this.context).
@@ -829,13 +871,15 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
     void DetachedFromWindow(boolean release)
     {
-        /*
-        ft_audio_player.onPause();
-        if (release)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
-            ft_audio_player.onStop();
+            // since we need MediaDataSource which is only available on Android M and higher
+            ft_audio_player.onPause();
+            if (release)
+            {
+                ft_audio_player.onStop();
+            }
         }
-        */
     }
 
     @Override

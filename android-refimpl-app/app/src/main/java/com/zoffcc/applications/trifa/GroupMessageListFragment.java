@@ -424,6 +424,14 @@ public class GroupMessageListFragment extends Fragment
                 catch(Exception e1)
                 {
                 }
+                try
+                {
+                    RecyclerView.ViewHolder vh = listingsView.getChildViewHolder(child);
+                    ((GroupMessageListHolder_file_incoming_state_cancel) vh).DetachedFromWindow(true);
+                }
+                catch(Exception e1)
+                {
+                }
             }
         }
         catch(Exception e2)

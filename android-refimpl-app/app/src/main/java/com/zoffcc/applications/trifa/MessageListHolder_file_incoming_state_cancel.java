@@ -29,6 +29,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -313,7 +314,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
                     if (mimeType.startsWith("audio/"))
                     {
-                        is_audio = true;
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                        {
+                            // since we need MediaDataSource which is only available on Android M and higher
+                            is_audio = true;
+                        }
                     }
                 }
                 catch (Exception e)
@@ -716,10 +721,14 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
     void DetachedFromWindow(boolean release)
     {
-        ft_audio_player.onPause();
-        if (release)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
-            ft_audio_player.onStop();
+            // since we need MediaDataSource which is only available on Android M and higher
+            ft_audio_player.onPause();
+            if (release)
+            {
+                ft_audio_player.onStop();
+            }
         }
     }
 
