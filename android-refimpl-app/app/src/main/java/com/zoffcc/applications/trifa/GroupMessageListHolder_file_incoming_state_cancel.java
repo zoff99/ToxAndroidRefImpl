@@ -158,6 +158,9 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         message_ = m;
 
         ft_audio_player.setVisibility(View.GONE);
+        ft_preview_container.setVisibility(View.VISIBLE);
+        ft_preview_image.setVisibility(View.VISIBLE);
+        textView.setVisibility(View.VISIBLE);
         ft_preview_image.getLayoutParams().height = (int)dp2px(150);
 
         String message__text = m.text;
@@ -767,7 +770,6 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         {
             if (PREF__compact_chatlist)
             {
-                textView.setVisibility(View.GONE);
                 imageView.setVisibility(View.GONE);
                 textView.setVisibility(View.GONE);
             }
