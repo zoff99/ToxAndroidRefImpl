@@ -13,7 +13,7 @@ import java.io.IOException;
 
 public class FileUtils {
 
-    public static final int MAX_FILE_SIZE_BYTES = 500000; // ~500 kByte
+    public static final int MAX_FILE_SIZE_BYTES = 100000; // ~100 kByte
 
     public static void updateVisualizer(final Context context, final File file, final PlayerVisualizerSeekbar playerVisualizerSeekbar){
         Log.e(" BYTES", "CALLED");
