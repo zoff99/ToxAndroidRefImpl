@@ -456,7 +456,6 @@ public class MessageListFragment extends Fragment
         try
         {
             View child;
-            Log.i(TAG, "onPause:getChildCount=" + listingsView.getChildCount());
             for (int i = 0; i < listingsView.getChildCount(); i++)
             {
                 child = listingsView.getChildAt(i);
@@ -464,6 +463,14 @@ public class MessageListFragment extends Fragment
                 {
                     RecyclerView.ViewHolder vh = listingsView.getChildViewHolder(child);
                     ((MessageListHolder_file_outgoing_state_cancel) vh).DetachedFromWindow(true);
+                }
+                catch(Exception e1)
+                {
+                }
+                try
+                {
+                    RecyclerView.ViewHolder vh = listingsView.getChildViewHolder(child);
+                    ((MessageListHolder_file_incoming_state_cancel) vh).DetachedFromWindow(true);
                 }
                 catch(Exception e1)
                 {

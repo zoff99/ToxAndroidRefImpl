@@ -67,7 +67,13 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
         }
         catch(Exception e)
         {
-            Log.i(TAG, "onViewDetachedFromWindow:G:activity_stop()");
+        }
+        try
+        {
+            ((GroupMessageListHolder_file_incoming_state_cancel) holder).DetachedFromWindow(false);
+        }
+        catch(Exception e)
+        {
         }
         super.onViewDetachedFromWindow(holder);
     }

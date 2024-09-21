@@ -91,8 +91,6 @@
                     android:layout_marginRight="0dp"
                     android:orientation="horizontal">
 
-                    // style="?android:attr/progressBarStyleHorizontal"
-
                     <com.daimajia.numberprogressbar.NumberProgressBar
                         android:id="@+id/ft_progressbar"
                         android:layout_width="fill_parent"

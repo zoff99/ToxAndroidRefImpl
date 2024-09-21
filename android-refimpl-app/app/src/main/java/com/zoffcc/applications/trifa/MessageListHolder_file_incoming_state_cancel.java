@@ -98,6 +98,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     boolean is_selected = false;
     TextView message_text_date_string;
     ViewGroup message_text_date;
+    me.jagar.chatvoiceplayerlibrary.vVoicePlayerView ft_audio_player;
 
     public MessageListHolder_file_incoming_state_cancel(View itemView, Context c)
     {
@@ -124,6 +125,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         ft_export_button_container = (ViewGroup) itemView.findViewById(R.id.ft_export_button_container);
         ft_export_button = (ImageButton) itemView.findViewById(R.id.ft_export_button);
         ft_share_button = (ImageButton) itemView.findViewById(R.id.ft_share_button);
+        ft_audio_player = itemView.findViewById(R.id.ft_audio_player);
     }
 
     @SuppressLint("ClickableViewAccessibility")
@@ -139,6 +141,9 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
         }
 
         message_ = m;
+
+        ft_audio_player.setVisibility(View.GONE);
+        ft_preview_image.getLayoutParams().height = (int)dp2px(150);
 
         int drawable_id = R.drawable.rounded_orange_bg_with_border;
         try
@@ -282,6 +287,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
             boolean is_image = false;
             boolean is_video = false;
+            boolean is_audio = false;
             try
             {
                 String mimeType = URLConnection.guessContentTypeFromName(message.filename_fullpath.toLowerCase());
@@ -303,6 +309,11 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     if (mimeType.startsWith("video/"))
                     {
                         is_video = true;
+                    }
+
+                    if (mimeType.startsWith("audio/"))
+                    {
+                        is_audio = true;
                     }
                 }
                 catch (Exception e)
@@ -437,6 +448,33 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                }
+            }
+            else if (is_audio) // ---- an audio file ----
+            {
+                if (PREF__compact_chatlist)
+                {
+                    textView.setVisibility(View.GONE);
+                    imageView.setVisibility(View.GONE);
+                }
+
+                ft_progressbar.setVisibility(View.GONE);
+                ft_buttons_container.setVisibility(View.GONE);
+                button_ok.setVisibility(View.GONE);
+                button_cancel.setVisibility(View.GONE);
+
+                ft_preview_container.setVisibility(View.VISIBLE);
+                ft_preview_image.setVisibility(View.GONE);
+
+                ft_audio_player.setVisibility(View.VISIBLE);
+
+                resize_viewgroup(ft_preview_container, 55);
+                resize_view(ft_preview_image, 1);
+
+                if (VFS_ENCRYPT)
+                {
+                    ft_audio_player.refreshPlayer(message2.filename_fullpath);
+                    ft_audio_player.refreshVisualizer();
                 }
             }
             else // ---- not an image or a video ----
@@ -674,6 +712,15 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
     public void onClick(View v)
     {
         //  Log.i(TAG, "onClick");
+    }
+
+    void DetachedFromWindow(boolean release)
+    {
+        ft_audio_player.onPause();
+        if (release)
+        {
+            ft_audio_player.onStop();
+        }
     }
 
     @Override

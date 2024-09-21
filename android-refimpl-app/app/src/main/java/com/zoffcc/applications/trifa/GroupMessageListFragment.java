@@ -413,7 +413,6 @@ public class GroupMessageListFragment extends Fragment
         try
         {
             View child;
-            Log.i(TAG, "onPause:getChildCount=" + listingsView.getChildCount());
             for (int i = 0; i < listingsView.getChildCount(); i++)
             {
                 child = listingsView.getChildAt(i);

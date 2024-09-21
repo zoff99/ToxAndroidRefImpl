@@ -77,6 +77,11 @@ public class PlayerVisualizerSeekbar extends androidx.appcompat.widget.AppCompat
         FileUtils.updateVisualizer(getContext(), file, this);
     }
 
+    public void vupdateVisualizer(info.guardianproject.iocipher.File vfile) {
+
+        FileUtils.vupdateVisualizer(getContext(), vfile, this);
+    }
+
     public void setBytes(byte[] bytes){
         this.bytes = bytes;
     }

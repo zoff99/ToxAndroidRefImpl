@@ -827,6 +827,17 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         // Log.i(TAG, "onClick");
     }
 
+    void DetachedFromWindow(boolean release)
+    {
+        /*
+        ft_audio_player.onPause();
+        if (release)
+        {
+            ft_audio_player.onStop();
+        }
+        */
+    }
+
     @Override
     public boolean onLongClick(final View v)
     {

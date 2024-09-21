@@ -7,7 +7,6 @@
 package me.jagar.chatvoiceplayerlibrary;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -17,7 +16,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.os.StrictMode;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,13 +27,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.zoffcc.applications.trifa.R;
+import com.zoffcc.applications.trifa.VFileMediaDataSource;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URLConnection;
+
+import info.guardianproject.iocipher.File;
+import info.guardianproject.iocipher.RandomAccessFile;
 
 
-public class VoicePlayerView extends LinearLayout {
+    public class vVoicePlayerView extends LinearLayout {
 
     private int playPaueseBackgroundColor, shareBackgroundColor, viewBackgroundColor,
             seekBarProgressColor, seekBarThumbColor, progressTimeColor, timingBackgroundColor,
@@ -44,7 +44,7 @@ public class VoicePlayerView extends LinearLayout {
     private boolean showShareButton, showTiming, enableVirtualizer;
     private GradientDrawable playPauseShape, shareShape, viewShape;
     private Context context;
-    private String path;
+    private String vaudiopath;
     private String shareTitle = "Share Voice";
 
     private LinearLayout main_layout, padded_layout, container_layout;
@@ -58,19 +58,19 @@ public class VoicePlayerView extends LinearLayout {
     private PlayerVisualizerSeekbar seekbarV;
     private Uri contentUri = null;
 
-    public VoicePlayerView(Context context) {
+    public vVoicePlayerView(Context context) {
         super(context);
         LayoutInflater.from(context).inflate(R.layout.voiceplayerview_main_view, this);
         this.context = context;
     }
 
-    public VoicePlayerView(Context context,  AttributeSet attrs) {
+    public vVoicePlayerView(Context context,  AttributeSet attrs) {
         super(context, attrs);
         initViews(context, attrs);
         this.context = context;
     }
 
-    public VoicePlayerView(Context context,  AttributeSet attrs, int defStyleAttr) {
+    public vVoicePlayerView(Context context,  AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initViews(context, attrs);
         this.context = context;
@@ -171,13 +171,16 @@ public class VoicePlayerView extends LinearLayout {
 
     //Set the audio source and prepare mediaplayer
 
-    public void setAudio(String audioPath){
-        path = audioPath;
+    public void setAudio(String vpath){
+        vaudiopath = vpath;
         mediaPlayer = new MediaPlayer();
-        Log.i("VoicePlayerView", "VoicePlayerView:setAudio:new MediaPlayer()");
-        if (path != null) {
+        Log.i("vVoicePlayerView", "vVoicePlayerView:setAudio:new MediaPlayer()");
+        if (vaudiopath != null) {
             try {
-                mediaPlayer.setDataSource(path);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                {
+                    mediaPlayer.setDataSource(new VFileMediaDataSource(new info.guardianproject.iocipher.RandomAccessFile(vpath, "r")));
+                }
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mediaPlayer.prepare();
                 mediaPlayer.setVolume(10, 10);
@@ -210,10 +213,11 @@ public class VoicePlayerView extends LinearLayout {
         imgPause.setOnClickListener(imgPauseClickListener);
         imgShare.setOnClickListener(imgShareClickListener);
         if (seekbarV.getVisibility() == VISIBLE){
-            seekbarV.updateVisualizer(new File(path));
+            seekbarV.vupdateVisualizer(new info.guardianproject.iocipher.File(vpath));
         }
+
         seekbarV.setOnSeekBarChangeListener(seekBarListener);
-        // seekbarV.updateVisualizer(new File(path));
+        // seekbarV.vupdateVisualizer(new File(path));
     }
 
 
@@ -321,52 +325,6 @@ public class VoicePlayerView extends LinearLayout {
     OnClickListener imgShareClickListener = new OnClickListener() {
         @Override
         public void onClick(View view) {
-            ((Activity) context).runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    imgShare.setVisibility(GONE);
-                    progressBar.setVisibility(VISIBLE);
-                }
-            });
-            if (contentUri == null){
-                    File file = new File(path);
-                    if (file.exists()){
-                        Intent intentShareFile = new Intent(Intent.ACTION_SEND);
-                        intentShareFile.setType(URLConnection.guessContentTypeFromName(file.getName()));
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
-                            StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-                            StrictMode.setVmPolicy(builder.build());
-                        }
-                            intentShareFile.putExtra(Intent.EXTRA_STREAM,
-                                    Uri.parse("file://"+file.getAbsolutePath()));
-
-                        context.startActivity(Intent.createChooser(intentShareFile, shareTitle));
-                    }
-
-            }else  {
-                Intent shareIntent = new Intent();
-                shareIntent.setAction(Intent.ACTION_SEND);
-                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION); // temp permission for receiving app to read this file
-                shareIntent.setDataAndType(contentUri, context.getContentResolver().getType(contentUri));
-                shareIntent.putExtra(Intent.EXTRA_STREAM, contentUri);
-                ((Activity) context).startActivity(Intent.createChooser(shareIntent, shareTitle));
-            }
-
-            Handler handler = new Handler();
-            handler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    ((Activity) context).runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressBar.setVisibility(GONE);
-                            imgShare.setVisibility(VISIBLE);
-                        }
-                    });
-
-                }
-            }, 500);
-
         }
     };
 
@@ -381,7 +339,7 @@ public class VoicePlayerView extends LinearLayout {
                 }
                 catch(Exception e)
                 {
-                    Log.i("VoicePlayerView", "VoicePlayerView:update:EE01:" + e.getMessage() + " mediaPlayer=" + mediaPlayer);
+                    Log.i("vVoicePlayerView", "vVoicePlayerView:update:EE01:" + e.getMessage() + " mediaPlayer=" + mediaPlayer);
                 }
                 if (seekbarV.getVisibility() == VISIBLE){
                     seekbarV.setProgress(mediaPlayer.getCurrentPosition());
@@ -448,7 +406,7 @@ public class VoicePlayerView extends LinearLayout {
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i("VoicePlayerView", "VoicePlayerView:onStop:EE01:" + e.getMessage());
+            Log.i("vVoicePlayerView", "vVoicePlayerView:onStop:EE01:" + e.getMessage());
         }
 
         try
@@ -458,33 +416,33 @@ public class VoicePlayerView extends LinearLayout {
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i("VoicePlayerView", "VoicePlayerView:onStop:EE02:" + e.getMessage());
+            Log.i("vVoicePlayerView", "vVoicePlayerView:onStop:EE02:" + e.getMessage());
         }
 
         try
         {
             mediaPlayer.release();
-            Log.i("VoicePlayerView", "VoicePlayerView:mediaPlayer.release()");
+            Log.i("vVoicePlayerView", "vVoicePlayerView:mediaPlayer.release()");
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i("VoicePlayerView", "VoicePlayerView:onStop:EE03:" + e.getMessage());
+            Log.i("vVoicePlayerView", "vVoicePlayerView:onStop:EE03:" + e.getMessage());
         }
 
         mediaPlayer = null;
     }
 
     public void onPause(){
-        Log.i("VoicePlayerView", "VoicePlayerView:onPause():mediaPlayer=" + mediaPlayer);
+        Log.i("vVoicePlayerView", "vVoicePlayerView:onPause():mediaPlayer=" + mediaPlayer);
         try{
             if (mediaPlayer != null)
             {
-                Log.i("VoicePlayerView", "VoicePlayerView:onPause():mediaPlayer.isPlaying()=" + mediaPlayer.isPlaying());
+                Log.i("vVoicePlayerView", "vVoicePlayerView:onPause():mediaPlayer.isPlaying()=" + mediaPlayer.isPlaying());
                 if (mediaPlayer.isPlaying())
                 {
                     mediaPlayer.pause();
-                    Log.i("VoicePlayerView", "VoicePlayerView:onPause():DONE ***");
+                    Log.i("vVoicePlayerView", "vVoicePlayerView:onPause():DONE ***");
                     mediaPlayer.stop();
                 }
             }
@@ -492,7 +450,7 @@ public class VoicePlayerView extends LinearLayout {
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i("VoicePlayerView", "VoicePlayerView:onPause:EE01:" + e.getMessage());
+            Log.i("vVoicePlayerView", "vVoicePlayerView:onPause:EE01:" + e.getMessage());
         }
 
         ((Activity) context).runOnUiThread(new Runnable() {
@@ -556,8 +514,8 @@ public class VoicePlayerView extends LinearLayout {
         imgPlay.setVisibility(VISIBLE);
     }
 
-    public void refreshPlayer(String audioPath){
-        path = audioPath;
+    public void refreshPlayer(String vpath){
+        vaudiopath = vpath;
         if (mediaPlayer != null){
             try{
                 if (mediaPlayer.isPlaying()){
@@ -574,11 +532,14 @@ public class VoicePlayerView extends LinearLayout {
             mediaPlayer = new MediaPlayer();
         }
         mediaPlayer.reset();
-        Log.i("VoicePlayerView", "VoicePlayerView:refreshPlayer:new MediaPlayer()");
-        if (path != null) {
+        Log.i("vVoicePlayerView", "vVoicePlayerView:refreshPlayer:new MediaPlayer()");
+        if (vpath != null) {
             try {
-                Log.i("VoicePlayerView", "VoicePlayerView:refreshPlayer:setDataSource");
-                mediaPlayer.setDataSource(path);
+                Log.i("vVoicePlayerView", "vVoicePlayerView:refreshPlayer:setDataSource");
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+                {
+                    mediaPlayer.setDataSource(new VFileMediaDataSource(new RandomAccessFile(vpath, "r")));
+                }
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 mediaPlayer.prepare();
                 mediaPlayer.setVolume(10, 10);
@@ -600,7 +561,7 @@ public class VoicePlayerView extends LinearLayout {
                                     imgPause.setVisibility(View.GONE);
                                     imgPlay.setVisibility(View.VISIBLE);
                                 }
-                                Log.i("VoicePlayerView", "VoicePlayerView:refreshPlayer:setOnPreparedListener");
+                                Log.i("vVoicePlayerView", "vVoicePlayerView:refreshPlayer:setOnPreparedListener");
                                 txtProcess.setText("00:00:00/"+convertSecondsToHMmSs(mp.getDuration() / 1000));
                             }
                         });
@@ -621,7 +582,7 @@ public class VoicePlayerView extends LinearLayout {
 
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.i("VoicePlayerView", "VoicePlayerView:refreshPlayer:EE01:" + e.getMessage());
+                Log.i("vVoicePlayerView", "vVoicePlayerView:refreshPlayer:EE01:" + e.getMessage());
             }
         }
 
@@ -634,10 +595,13 @@ public class VoicePlayerView extends LinearLayout {
                 imgPause.setOnClickListener(imgPauseClickListener);
                 imgShare.setOnClickListener(imgShareClickListener);
                 if (seekbarV.getVisibility() == VISIBLE){
-                    // seekbarV.updateVisualizer(new File(path));
+                    // seekbarV.vupdateVisualizer(new File(path));
                     seekbarV.setOnSeekBarChangeListener(seekBarListener);
-                    seekbarV.updateVisualizer(new File(path));
-                    Log.i("VoicePlayerView", "VoicePlayerView:refreshPlayer:updateVisualizer");
+                    if (vpath != null)
+                    {
+                        seekbarV.vupdateVisualizer(new File(vpath));
+                    }
+                    Log.i("vVoicePlayerView", "vVoicePlayerView:refreshPlayer:vupdateVisualizer");
                 }
             }
         });
@@ -650,7 +614,7 @@ public class VoicePlayerView extends LinearLayout {
 
     public void refreshVisualizer() {
         if (seekbarV.getVisibility() == VISIBLE){
-            seekbarV.updateVisualizer(new File(path));
+            seekbarV.vupdateVisualizer(new info.guardianproject.iocipher.File(vaudiopath));
         }
     }
 
@@ -815,11 +779,11 @@ public class VoicePlayerView extends LinearLayout {
         }
 
         public String getPath() {
-            return path;
+            return vaudiopath;
         }
 
-        public void setPath(String path) {
-            this.path = path;
+        public void setPath(String vpath) {
+            this.vaudiopath = vpath;
         }
 
         public String getShareTitle() {

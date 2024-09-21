@@ -93,8 +93,6 @@
                     android:layout_marginRight="0dp"
                     android:orientation="horizontal">
 
-                    // style="?android:attr/progressBarStyleHorizontal"
-
                     <com.daimajia.numberprogressbar.NumberProgressBar
                         android:id="@+id/ft_progressbar"
                         android:layout_width="fill_parent"
@@ -120,7 +118,7 @@
                 <LinearLayout
                     android:id="@+id/ft_preview_container"
                     android:layout_width="fill_parent"
-                    android:layout_height="150dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginRight="0dp"
                     android:gravity="center_horizontal"
                     android:orientation="horizontal"
@@ -132,10 +130,33 @@
                         android:layout_weight="1"
                         android:visibility="gone" />
 
+                    <me.jagar.chatvoiceplayerlibrary.vVoicePlayerView
+                        android:id="@+id/ft_audio_player"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        app:enableVisualizer="true"
+                        app:visualizationPlayedColor="#ff7700"
+                        app:visualizationNotPlayedColor="#000"
+                        app:playPauseBackgroundColor="#ff7700"
+                        app:seekBarProgressColor="#000000"
+                        app:showShareButton="false"
+                        app:shareCornerRadius="100"
+                        app:playPauseCornerRadius="100"
+                        app:showTiming="true"
+                        app:viewCornerRadius="10"
+                        app:viewBackground="@android:color/holo_orange_light"
+                        app:progressTimeColor="#000000"
+                        app:timingBackgroundColor="#b0b0b0"
+                        app:seekBarThumbColor="#FFC107"
+                        app:shareBackgroundColor="#ff7700"
+                        app:playProgressbarColor="#ff7700"
+                        app:shareText="SHARE ME"
+                        android:visibility="gone" />
+
                     <ImageButton
                         android:id="@+id/ft_preview_image"
                         android:layout_width="fill_parent"
-                        android:layout_height="150dp"
+                        android:layout_height="wrap_content"
                         android:layout_marginLeft="0dp"
                         android:layout_marginRight="0dp"
                         android:layout_weight="300"
