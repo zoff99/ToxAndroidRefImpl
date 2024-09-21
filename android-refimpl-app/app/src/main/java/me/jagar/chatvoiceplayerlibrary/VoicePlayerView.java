@@ -213,7 +213,7 @@ import java.net.URLConnection;
             seekbarV.updateVisualizer(new File(path));
         }
         seekbarV.setOnSeekBarChangeListener(seekBarListener);
-        seekbarV.updateVisualizer(new File(path));
+        // seekbarV.updateVisualizer(new File(path));
     }
 
 
@@ -634,10 +634,10 @@ import java.net.URLConnection;
                 imgPause.setOnClickListener(imgPauseClickListener);
                 imgShare.setOnClickListener(imgShareClickListener);
                 if (seekbarV.getVisibility() == VISIBLE){
-                    seekbarV.updateVisualizer(new File(path));
-                    Log.i("VoicePlayerView", "VoicePlayerView:refreshPlayer:updateVisualizer");
+                    // seekbarV.updateVisualizer(new File(path));
                     seekbarV.setOnSeekBarChangeListener(seekBarListener);
                     seekbarV.updateVisualizer(new File(path));
+                    Log.i("VoicePlayerView", "VoicePlayerView:refreshPlayer:updateVisualizer");
                 }
             }
         });

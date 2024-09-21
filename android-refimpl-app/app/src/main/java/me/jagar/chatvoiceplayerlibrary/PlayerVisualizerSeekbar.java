@@ -34,11 +34,11 @@ public class PlayerVisualizerSeekbar extends androidx.appcompat.widget.AppCompat
     /**
      * Canvas painting for sample scale, filling played part of audio sample
      */
-    private Paint playedStatePainting = new Paint();
+    private final Paint playedStatePainting = new Paint();
     /**
      * Canvas painting for sample scale, filling not played part of audio sample
      */
-    private Paint notPlayedStatePainting = new Paint();
+    private final Paint notPlayedStatePainting = new Paint();
 
     private int width;
     private int height;
@@ -76,6 +76,7 @@ public class PlayerVisualizerSeekbar extends androidx.appcompat.widget.AppCompat
 
         FileUtils.updateVisualizer(getContext(), file, this);
     }
+
     public void setBytes(byte[] bytes){
         this.bytes = bytes;
     }

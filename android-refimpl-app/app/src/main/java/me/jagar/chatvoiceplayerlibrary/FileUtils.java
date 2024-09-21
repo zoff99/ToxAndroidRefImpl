@@ -16,8 +16,8 @@ public class FileUtils {
     public static final int MAX_FILE_SIZE_BYTES = 100000; // ~100 kByte
 
     public static void updateVisualizer(final Context context, final File file, final PlayerVisualizerSeekbar playerVisualizerSeekbar){
-        Log.e(" BYTES", "CALLED");
-        new AsyncTask<Void, Void, byte[]>() {
+        new AsyncTask<Void, Void, byte[]>()
+        {
             @Override
             protected byte[] doInBackground(Void... voids) {
                 return fileToBytes(file);
@@ -28,7 +28,8 @@ public class FileUtils {
                 super.onPostExecute(bytes);
                 ((Activity) context).runOnUiThread(new Runnable() {
                     @Override
-                    public void run() {
+                    public void run()
+                    {
                         playerVisualizerSeekbar.setBytes(bytes);
                         playerVisualizerSeekbar.invalidate();
                     }
@@ -36,21 +37,26 @@ public class FileUtils {
             }
         }.execute();
     }
-    public static byte[] fileToBytes(File file) {
+
+    public static byte[] fileToBytes(File file)
+    {
         if (file.length() > MAX_FILE_SIZE_BYTES)
         {
             return null;
         }
-        int size = (int) file.length();
-        byte[] bytes = new byte[size];
-        try {
+        byte[] bytes = null;
+        try
+        {
+            int size = (int) file.length();
+            bytes = new byte[size];
             BufferedInputStream buf = new BufferedInputStream(new FileInputStream(file));
             buf.read(bytes, 0, bytes.length);
             buf.close();
-        } catch (FileNotFoundException e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         }
         return bytes;
     }
