@@ -432,4 +432,5 @@
     <string name="pref_title_notification_show_content">Bildirim İçeriğini Göster</string>
     <string name="MainActivity_manually_logged_out_true">etkinleştir</string>
     <string name="MainActivity_manually_logged_out_false">oturumu kapat</string>
+    <string name="MessageListActivity_longpress_to_record_audiomsg">Sesli mesaj kaydetmek için uzun basın</string>
 </resources>
