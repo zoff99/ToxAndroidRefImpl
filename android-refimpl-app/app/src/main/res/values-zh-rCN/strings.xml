@@ -454,4 +454,5 @@
     <string name="layout___ipaddress">IP：</string>
     <string name="MainActivity_manually_logged_out_true">激活</string>
     <string name="MainActivity_manually_logged_out_false">退出登录</string>
+    <string name="MessageListActivity_longpress_to_record_audiomsg">长按录制音频消息</string>
 </resources>
