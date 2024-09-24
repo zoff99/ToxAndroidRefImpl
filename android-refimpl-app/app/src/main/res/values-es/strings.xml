@@ -426,4 +426,5 @@
     <string name="layout___ipaddress">IP:</string>
     <string name="MainActivity_manually_logged_out_false">cerrar sesión</string>
     <string name="MainActivity_manually_logged_out_true">activar</string>
+    <string name="MessageListActivity_longpress_to_record_audiomsg">Mantener pulsado para grabar un mensaje de audio</string>
 </resources>
