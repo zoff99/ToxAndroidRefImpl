@@ -14,6 +14,16 @@ mkdir -p $_HOME_/artefacts
 mkdir -p $_HOME_/script
 
 echo '#! /bin/bash
+
+
+echo "checking for android debug key: \"/script/debug.keystore\" ..."
+if [ ! -e "/script/debug.keystore" ]; then
+    echo "android debug key file NOT found"
+    exit 1
+fi
+
+echo "android debug key file found"
+
 # --------------------------------
 echo "installing system packages ..."
 export DEBIAN_FRONTEND=noninteractive
