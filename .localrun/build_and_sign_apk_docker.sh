@@ -49,7 +49,7 @@ echo "2--------"
 ls -al ./app/build/outputs/apk/release/app-release-unsigned.apk
 
 
-echo "generate debug key ..."
+# echo "generate debug key ..."
 # keytool -genkey -v -keystore /script/debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname CN=appauth
 
 echo "align and sign apk ..."
