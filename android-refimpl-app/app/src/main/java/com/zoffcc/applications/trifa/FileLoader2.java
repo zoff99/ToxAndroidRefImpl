@@ -83,17 +83,17 @@ public class FileLoader2 implements ModelLoader<info.guardianproject.iocipher.Fi
             try
             {
 
-                if (priority == Priority.LOW)
-                {
+                //if (priority == Priority.LOW)
+                //{
                     // Log.i(TAG, "loadData:Priority.LOW");
-                    try
-                    {
-                        Thread.sleep(20); // sleep 0.02s
-                    }
-                    catch (Exception e)
-                    {
-                    }
-                }
+                    //try
+                    //{
+                    //    Thread.sleep(20); // sleep 0.02s
+                    //}
+                    //catch (Exception e)
+                    //{
+                    //}
+                //}
                 //                else if (priority == Priority.NORMAL)
                 //                {
                 //                    // Log.i(TAG, "loadData:Priority.NORMAL");
