@@ -99,6 +99,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaSetPatternActivity.filter_out_specials_from_filepath_stricter;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 public class MaintenanceActivity extends AppCompatActivity implements StrongBuilder.Callback<OkHttpClient>
 {
@@ -694,6 +695,9 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         debug_output_append("libopus_version=" + libopus_version());
         debug_output_append("libvpx_version=" + libvpx_version());
         debug_output_append("libsodium_version=" + libsodium_version());
+        debug_output_append("sqlfs_version=" + vfs.sqlfsVersion());
+        debug_output_append("iocipher_version=" + vfs.iocipherVersion());
+        debug_output_append("iocipherjni_version=" + vfs.iocipherJNIVersion());
         debug_output_append("audio_pkt_incoming=" + debug__audio_pkt_incoming);
         debug_output_append("audio_frame_played=" + debug__audio_frame_played);
         debug_output_append("audio_play_buf_count_max=" + debug__audio_play_buf_count_max);
