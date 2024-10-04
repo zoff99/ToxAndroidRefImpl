@@ -91,6 +91,8 @@ import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -118,6 +120,8 @@ import androidx.renderscript.Element;
 import androidx.renderscript.RenderScript;
 import androidx.renderscript.ScriptIntrinsicYuvToRGB;
 import androidx.renderscript.Type;
+import info.guardianproject.iocipher.FileInputStream;
+import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
 import info.guardianproject.netcipher.proxy.OrbotHelper;
 import info.guardianproject.netcipher.proxy.StatusCallback;
@@ -2321,6 +2325,16 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+
+        /*
+         // **************************************
+         // **************************************
+         // **************************************
+        VFS_Append_test_001();
+         // **************************************
+         // **************************************
+         // **************************************
+         */
 
         // prefs ----------
         SharedPreferences settings = PreferenceManager.getDefaultSharedPreferences(this);
@@ -8925,6 +8939,67 @@ public class MainActivity extends AppCompatActivity
     {
         View v = null;
         v.bringToFront();
+    }
+
+    static byte[] cipherWriteRandomByteReturnBuf(int bytes, String filename) {
+        byte[] random_buf;
+        try {
+            info.guardianproject.iocipher.File f = new info.guardianproject.iocipher.File(filename);
+            info.guardianproject.iocipher.FileOutputStream out = new info.guardianproject.iocipher.FileOutputStream(f);
+
+            Random prng = new Random();
+            random_buf = new byte[bytes];
+            prng.nextBytes(random_buf);
+
+            out.write(random_buf);
+            out.close();
+
+        } catch (IOException e) {
+            Log.e(TAG, e.getCause().toString());
+            return null;
+        }
+        return random_buf;
+    }
+
+    public static void VFS_Append_test_001()
+    {
+        try {
+            for(int i=0;i<3;i++)
+            {
+                String name = "/testFileManySizes_" + i;
+                info.guardianproject.iocipher.File f = new info.guardianproject.iocipher.File(name);
+                byte[] bufrandom = cipherWriteRandomByteReturnBuf(i, name);
+                Log.v(TAG, "write: bytes=" + i);
+
+                f = new info.guardianproject.iocipher.File(name);
+                FileOutputStream out = new FileOutputStream(f, true);
+                Log.v(TAG, "append: length:before=" + f.length());
+                for(int k=0;k<2;k++)
+                {
+                    out.write(19);
+                    Log.v(TAG, "append: length:+k=" + f.length());
+                }
+                out.close();
+
+                f = new info.guardianproject.iocipher.File(name);
+                byte[] orig_in = new byte[i];
+                FileInputStream in = new FileInputStream(f);
+                in.read(orig_in, 0, i);
+                //*****//assertEquals(i + 2, f.length());
+                for(int j=0;j<i;j++)
+                {
+                    //*****//assertEquals(bufrandom[j], orig_in[j]);
+                }
+                Log.v(TAG, "CMP: " + bytes_to_hex(bufrandom) + " <--> " + bytes_to_hex(orig_in));
+                Log.v(TAG, "read: bytes=" + i + " OK");
+                in.close();
+
+                f = new info.guardianproject.iocipher.File(name);
+                f.delete();
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getCause().toString());
+        }
     }
 
     public static void stackOverflow()
