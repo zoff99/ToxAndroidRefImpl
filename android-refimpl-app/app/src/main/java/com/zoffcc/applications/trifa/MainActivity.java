@@ -1880,12 +1880,20 @@ public class MainActivity extends AppCompatActivity
         // --
         MainActivity.set_av_call_status(Callstate.state);
 
+        /*
+        ////// WATCHDOG //////
+        ////// WATCHDOG //////
+        ////// WATCHDOG //////
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
         {
             Context context_fg1 = getApplicationContext();
             Intent intent_fg1 = new Intent(this, WatchdogService.class);
             context_fg1.startForegroundService(intent_fg1);
         }
+        ////// WATCHDOG //////
+        ////// WATCHDOG //////
+        ////// WATCHDOG //////
+        */
 
         Log.i(TAG, "M:STARTUP:-- DONE --");
     }
