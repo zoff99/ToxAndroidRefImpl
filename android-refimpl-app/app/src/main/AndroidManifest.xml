@@ -325,6 +325,12 @@
         </service>
 
         <service
+            android:name=".WatchdogService"
+            android:foregroundServiceType="specialUse"
+            android:exported="false">
+        </service>
+
+        <service
             android:name=".ConfGroupAudioService"
             android:enabled="true"
             android:exported="false">

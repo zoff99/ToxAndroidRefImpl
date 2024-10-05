@@ -377,6 +377,7 @@ public class MainActivity extends AppCompatActivity
     static String channelId_newmessage_vibrate = null;
     static String channelId_newmessage_silent = null;
     static int NOTIFICATION_ID = 293821038;
+    static int WATCHDOG_NOTIFICATION_ID = 696935351;
     static RemoteViews notification_view = null;
     static FriendListFragment friend_list_fragment = null;
     static MessageListFragment message_list_fragment = null;
@@ -410,6 +411,7 @@ public class MainActivity extends AppCompatActivity
     final static int AddPublicGroupActivity_ID = 10013;
     final static int JoinPublicGroupActivity_ID = 10014;
     final static int Notification_new_message_ID = 10023;
+    final static int Notification_watchdog_trifa_stopped_ID = 10099;
     static long Notification_new_message_last_shown_timestamp = -1;
     final static long Notification_new_message_every_millis = 2000; // ~2 seconds between notifications
     final static long UPDATE_MESSAGES_WHILE_FT_ACTIVE_MILLIS = 30000; // ~30 seconds
@@ -1877,6 +1879,13 @@ public class MainActivity extends AppCompatActivity
         registerReceiver(receiver4, receiverFilter4);
         // --
         MainActivity.set_av_call_status(Callstate.state);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            Context context_fg1 = getApplicationContext();
+            Intent intent_fg1 = new Intent(this, WatchdogService.class);
+            context_fg1.startForegroundService(intent_fg1);
+        }
 
         Log.i(TAG, "M:STARTUP:-- DONE --");
     }
