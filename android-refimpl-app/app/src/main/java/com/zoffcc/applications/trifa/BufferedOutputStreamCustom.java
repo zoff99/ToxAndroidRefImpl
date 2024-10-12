@@ -30,7 +30,7 @@ public class BufferedOutputStreamCustom extends info.guardianproject.iocipher.Fi
     protected byte[] buf;
     protected int count;
     protected long cur_pos;
-    final protected int PAGE_SIZE = 8192 * 10; // in bytes (must be a multiple of 8192)
+    final protected int PAGE_SIZE = 8192 * 20; // in bytes (must be a multiple of 8192)
 
     public BufferedOutputStreamCustom(String path) throws FileNotFoundException
     {
