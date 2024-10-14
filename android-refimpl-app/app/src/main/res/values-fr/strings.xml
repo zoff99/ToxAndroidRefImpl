@@ -441,4 +441,5 @@
     <string name="layout___ipaddress">IP :</string>
     <string name="MainActivity_manually_logged_out_true">activer</string>
     <string name="MainActivity_manually_logged_out_false">déconnexion</string>
+    <string name="MessageListActivity_longpress_to_record_audiomsg">Maintenir la touche appuyée pour enregistrer un message audio</string>
 </resources>
