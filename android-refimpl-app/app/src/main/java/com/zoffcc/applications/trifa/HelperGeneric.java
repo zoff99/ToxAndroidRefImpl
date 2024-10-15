@@ -65,6 +65,7 @@ import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
@@ -1985,7 +1986,7 @@ public class HelperGeneric
 
     static byte[] read_chunk_from_SD_file(String file_name_with_path, long position, long file_chunk_length, boolean real_file_path)
     {
-        byte[] out = new byte[(int) file_chunk_length];
+        final byte[] out = new byte[(int) file_chunk_length];
 
         if (real_file_path)
         {
@@ -1996,11 +1997,7 @@ public class HelperGeneric
                 MappedByteBuffer buffer = inChannel.map(FileChannel.MapMode.READ_ONLY, position, file_chunk_length);
 
                 // Log.i(TAG, "read_chunk_from_SD_file:" + buffer.limit() + " <-> " + file_chunk_length);
-
-                for (int i = 0; i < buffer.limit(); i++)
-                {
-                    out[i] = buffer.get();
-                }
+                buffer.get(out);
 
                 try
                 {
