@@ -413,4 +413,10 @@
     <string name="layout___group_message_stats">Nachrichten in der Gruppe:</string>
     <string name="layout___group_peerlimit2">Teilnehmerlimit:</string>
     <string name="layout___group_peerlimit">Teilnehmerlimit</string>
+    <string name="pref_title_notification_show_content">Inhalt der Benachrichtigung anzeigen</string>
+    <string name="MessageListActivity_longpress_to_record_audiomsg">langes Drücken, um eine Audio-Nachricht aufzunehmen</string>
+    <string name="pref_description_notification_show_content">Anzeige des Nachrichtentextes und des Absenders in Benachrichtigungen</string>
+    <string name="layout___ipaddress">IP:</string>
+    <string name="MainActivity_manually_logged_out_true">aktivieren</string>
+    <string name="MainActivity_manually_logged_out_false">Ausloggen</string>
 </resources>
