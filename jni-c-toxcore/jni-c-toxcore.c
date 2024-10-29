@@ -7007,6 +7007,56 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peer_1limit(JNI
 #endif
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1voice_1state(JNIEnv *env, jobject thiz, jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_State_Queries error;
+    uint16_t res = tox_group_get_voice_state(tox_global, (uint32_t)group_number, &error);
+
+    if (error != TOX_ERR_GROUP_STATE_QUERIES_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
+
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1founder_1set_1voice_1state(JNIEnv *env, jobject thiz, jlong group_number, jint voice_state)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Founder_Set_Voice_State error;
+    bool res = tox_group_founder_set_voice_state(tox_global, (uint32_t)group_number, (Tox_Group_Voice_State)voice_state, &error);
+
+    if (error != TOX_ERR_GROUP_FOUNDER_SET_VOICE_STATE_OK)
+    {
+        return (jint)(-(error));
+    }
+    else
+    {
+        return (jint)res;
+    }
+#endif
+}
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1founder_1set_1peer_1limit(JNIEnv *env, jobject thiz, jlong group_number,
