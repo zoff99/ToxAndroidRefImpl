@@ -6462,6 +6462,32 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1leave(JNIEnv *env, j
 }
 
 JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1disconnect(JNIEnv *env, jobject thiz,
+        jlong group_number)
+{
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    Tox_Err_Group_Disconnect error;
+    bool res = tox_group_disconnect(tox_global, (uint32_t)group_number, &error);
+
+    if(res == false)
+    {
+        return (jint)-1;
+    }
+    else
+    {
+        return (jint)0;
+    }
+#endif
+}
+
+JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1set_1name(JNIEnv *env, jobject thiz,
         jlong group_number, jstring name)
 {
