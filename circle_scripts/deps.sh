@@ -334,7 +334,7 @@ if [ "$full""x" == "1x" ]; then
                 export CFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
             CC=$AND_CC \
             CXX=$AND_CXX \
-            AR=ar \
+            AR="$_toolchain_"/arm-linux-androideabi/bin/arm-linux-androideabi-ar \
             LD=$AND_CC \
             AS=$AND_AS \
             STRIP=strip \
@@ -974,7 +974,7 @@ if [ "$full""x" == "1x" ]; then
                 export CFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
             CC=$AND_CC \
             CXX=$AND_CXX \
-            AR=ar \
+            AR="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/bin/aarch64-linux-android-ar \
             LD=$AND_CC \
             AS=$AND_AS \
             STRIP=strip \
@@ -1565,7 +1565,7 @@ if [ "$full""x" == "1x" ]; then
                 export CFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
             CC=$AND_CC \
             CXX=$AND_CXX \
-            AR=ar \
+            AR="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/bin/i686-linux-android-ar \
             LD=$AND_CC \
             AS=$AND_AS \
             STRIP=strip \
@@ -2001,7 +2001,7 @@ if [ "$full""x" == "1x" ]; then
                 export CFLAGS=" -g -O3 -fPIC $CF2 $CF3 -I${_NDK_}/sources/android/cpufeatures ";
             CC=$AND_CC \
             CXX=$AND_CXX \
-            AR=ar \
+            AR="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/bin/x86_64-linux-android-ar \
             LD=$AND_CC \
             AS=$AND_AS \
             STRIP=strip \
