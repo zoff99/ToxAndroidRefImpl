@@ -304,8 +304,7 @@ if [ "$full""x" == "1x" ]; then
     ln -sf $(which ranlib) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-ranlib
     ln -sf $(which llvm-strip) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-strip
 
-    type llvm-strip
-    exit 1
+    type -a llvm-strip
 
     type -a ranlib
     ls -al /usr/bin/ranlib /bin/ranlib
