@@ -302,6 +302,7 @@ if [ "$full""x" == "1x" ]; then
     ls -al $_toolchain_/arm-linux-androideabi/bin/
     ln -sf $(which ar) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-ar
     ln -sf $(which ranlib) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-ranlib
+    ln -sf $(which strip) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-strip
 
     type -a ranlib
     ls -al /usr/bin/ranlib /bin/ranlib
@@ -877,6 +878,7 @@ if [ "$full""x" == "1x" ]; then
 
     ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-ar
     ln -sf $(which ranlib) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-androideabi-ranlib
+    ln -sf $(which strip) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-androideabi-strip
 
     if [ "$build_yasm""x" == "1x" ]; then
     # --- YASM ---
@@ -1454,6 +1456,7 @@ if [ "$full""x" == "1x" ]; then
 
     ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/i686-linux-android-ar
     ln -sf $(which ranlib) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/i686-linux-androideabi-ranlib
+    ln -sf $(which strip) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/i686-linux-androideabi-strip
 
     if [ "$build_yasm""x" == "1x" ]; then
         # --- YASM ---
@@ -1889,6 +1892,7 @@ if [ "$full""x" == "1x" ]; then
 
     ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-ar
     ln -sf $(which ranlib) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-androideabi-ranlib
+    ln -sf $(which strip) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-androideabi-strip
 
     if [ "$build_yasm""x" == "1x" ]; then
         # --- YASM ---
