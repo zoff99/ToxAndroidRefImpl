@@ -420,6 +420,7 @@ if [ "$full""x" == "1x" ]; then
     rm -Rf "$_BLD_"
     mkdir -p "$_BLD_"
     cd "$_BLD_";
+    export CXXFLAGS=" -D_LARGEFILE_SOURCE $CF2 ";export CFLAGS=" -D_LARGEFILE_SOURCE $CF2 "
     $_s_/x264/configure --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
         --disable-opencl --enable-static \
         --disable-avs --disable-cli --enable-pic \
