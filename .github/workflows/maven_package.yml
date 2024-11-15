@@ -49,6 +49,7 @@ jobs:
            ninja-build \
            pkg-config \
            zip grep file ca-certificates autotools-dev autoconf automake \
+           binutils \
            git bc wget rsync cmake make pkg-config libtool \
            ssh gzip tar \
            coreutils \
