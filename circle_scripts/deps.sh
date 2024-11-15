@@ -204,6 +204,9 @@ mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
+ln -sf $(which ar) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-ar
+
+
 if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
@@ -778,6 +781,8 @@ export ANDROID_HOME="$_SDK_"
 mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
+
+ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-ar
 
 
 if [ "$full""x" == "1x" ]; then
@@ -1355,6 +1360,9 @@ mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
+ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/i686-linux-android-ar
+
+
 if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
@@ -1787,6 +1795,9 @@ export ANDROID_HOME="$_SDK_"
 mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
+
+ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-ar
+
 
 if [ "$full""x" == "1x" ]; then
 
