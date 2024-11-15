@@ -204,9 +204,6 @@ mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
-ln -sf $(which ar) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-ar
-
-
 if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
@@ -298,6 +295,12 @@ if [ "$full""x" == "1x" ]; then
     mkdir -p "$PKG_CONFIG_PATH"
     redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
         --install-dir "$_toolchain_"/arm-linux-androideabi --api 21 --force
+
+
+    type -a ar
+    ls -al $(which ar)
+    ls -al $_toolchain_/arm-linux-androideabi/bin/
+    ln -sf $(which ar) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-ar
 
 
     if [ "$build_yasm""x" == "1x" ]; then
@@ -782,9 +785,6 @@ mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
-ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-ar
-
-
 if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
@@ -852,8 +852,6 @@ if [ "$full""x" == "1x" ]; then
     rm -Rf "$_NDK_"
     mv -v "$_ANDROID_NDK_UNPACKDIR_" "$_NDK_"
 
-
-
     echo 'export ARTEFACT_DIR="$AND_ARTEFACT_DIR";export PATH="$AND_PATH";export PKG_CONFIG_PATH="$AND_PKG_CONFIG_PATH";export READELF="$AND_READELF";export GCC="$AND_GCC";export CC="$AND_CC";export CXX="$AND_CXX";export CPPFLAGS="";export LDFLAGS="";export TOOLCHAIN_ARCH="$AND_TOOLCHAIN_ARCH";export TOOLCHAIN_ARCH2="$AND_TOOLCHAIN_ARCH2"' > $_HOME_/pp
     chmod u+x $_HOME_/pp
     rm -Rf "$_s_"
@@ -873,6 +871,7 @@ if [ "$full""x" == "1x" ]; then
     redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
         --install-dir "$_toolchain_"/arm64 --api 21 --force
 
+    ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/aarch64-linux-android-ar
 
     if [ "$build_yasm""x" == "1x" ]; then
     # --- YASM ---
@@ -1360,9 +1359,6 @@ mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
-ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/i686-linux-android-ar
-
-
 if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
@@ -1451,6 +1447,7 @@ if [ "$full""x" == "1x" ]; then
     redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
         --install-dir "$_toolchain_"/x86 --api 21 --force
 
+    ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/i686-linux-android-ar
 
     if [ "$build_yasm""x" == "1x" ]; then
         # --- YASM ---
@@ -1796,9 +1793,6 @@ mkdir -p $_toolchain_
 mkdir -p $AND_PKG_CONFIG_PATH
 mkdir -p $WRKSPACEDIR
 
-ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-ar
-
-
 if [ "$full""x" == "1x" ]; then
 
     if [ "$download_full""x" == "1x" ]; then
@@ -1887,6 +1881,7 @@ if [ "$full""x" == "1x" ]; then
     redirect_cmd $_NDK_/build/tools/make_standalone_toolchain.py --arch "$TOOLCHAIN_ARCH" \
         --install-dir "$_toolchain_"/x86_64 --api 21 --force
 
+    ln -sf $(which ar) $_toolchain_/$AND_TOOLCHAIN_ARCH/bin/x86_64-linux-android-ar
 
     if [ "$build_yasm""x" == "1x" ]; then
         # --- YASM ---
