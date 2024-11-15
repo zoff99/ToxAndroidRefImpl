@@ -303,6 +303,10 @@ if [ "$full""x" == "1x" ]; then
     ln -sf $(which ar) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-ar
     ln -sf $(wich ranlib) $_toolchain_/arm-linux-androideabi/bin/arm-linux-androideabi-ranlib
 
+    type -a ranlib
+    type -a arm-linux-androideabi-ranlib
+    exit 1
+
     if [ "$build_yasm""x" == "1x" ]; then
     # --- YASM ---
     cd $_s_
