@@ -34,9 +34,14 @@ _ANDROID_SDK_HASH_="92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106
 #_ANDROID_NDK_HASH_="8381c440fe61fcbb01e209211ac01b519cd6adf51ab1c2281d5daad6ca4c8c8c"
 #_ANDROID_NDK_UNPACKDIR_="android-ndk-r20b"
 
-_ANDROID_NDK_FILE_="android-ndk-r21e-linux-x86_64.zip"
-_ANDROID_NDK_HASH_="ad7ce5467e18d40050dc51b8e7affc3e635c85bd8c59be62de32352328ed467e"
-_ANDROID_NDK_UNPACKDIR_="android-ndk-r21e"
+## _ANDROID_NDK_FILE_="android-ndk-r21e-linux-x86_64.zip"
+## _ANDROID_NDK_HASH_="ad7ce5467e18d40050dc51b8e7affc3e635c85bd8c59be62de32352328ed467e"
+## _ANDROID_NDK_UNPACKDIR_="android-ndk-r21e"
+
+_ANDROID_NDK_FILE_="android-ndk-r26d-linux.zip"
+_ANDROID_NDK_HASH_="eefeafe7ccf177de7cc57158da585e7af119bb7504a63604ad719e4b2a328b54"
+_ANDROID_NDK_UNPACKDIR_="android-ndk-r26d"
+
 
 _ANDOIRD_CMAKE_VER_="3.10.2.4988404"
 ## ----------------------
