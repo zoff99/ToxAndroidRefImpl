@@ -382,6 +382,8 @@ if [ "$full""x" == "1x" ]; then
         --disable-libxcb-shm \
         --disable-libxcb-xfixes \
         --enable-ffmpeg --enable-ffprobe \
+        --enable-parser=hevc \
+        --enable-decoder=hevc \
         --enable-parser=h264 \
         --enable-runtime-cpudetect \
         --enable-jni \
@@ -915,6 +917,8 @@ if [ "$full""x" == "1x" ]; then
         --disable-libxcb-shm \
         --disable-libxcb-xfixes \
         --enable-ffmpeg --enable-ffprobe \
+        --enable-parser=hevc \
+        --enable-decoder=hevc \
         --enable-parser=h264 \
         --enable-runtime-cpudetect \
         --enable-jni \
