@@ -253,6 +253,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_TMP_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H264;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H265;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_VP8;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
@@ -272,6 +273,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.orbot_is_really_running;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_DECODER_CURRENT_BITRATE;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_DECODER_IN_USE_H264;
+import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_DECODER_IN_USE_H265;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_DECODER_IN_USE_VP8;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_CURRENT_BITRATE;
 import static com.zoffcc.applications.trifa.ToxVars.TOXAV_CALL_COMM_INFO.TOXAV_CALL_COMM_ENCODER_IN_USE_H264;
@@ -4081,6 +4083,11 @@ public class MainActivity extends AppCompatActivity
         {
             // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:4:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
             Callstate.video_in_codec = VIDEO_CODEC_H264;
+        }
+        else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_DECODER_IN_USE_H265.value)
+        {
+            // Log.i(TAG, "android_toxav_callback_call_comm_cb_method:4:" + a_TOXAV_CALL_COMM_INFO + ":" + comm_number);
+            Callstate.video_in_codec = VIDEO_CODEC_H265;
         }
         else if (a_TOXAV_CALL_COMM_INFO == TOXAV_CALL_COMM_ENCODER_IN_USE_VP8.value)
         {

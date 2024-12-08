@@ -26,6 +26,7 @@ import android.telecom.Call;
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_H265;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_VP8;
 
 public class Callstate
@@ -111,6 +112,10 @@ public class Callstate
         if (v == VIDEO_CODEC_VP8)
         {
             return "VP8";
+        }
+        else if (v == VIDEO_CODEC_H265)
+        {
+            return "HEVC";
         }
         else
         {
