@@ -21,7 +21,7 @@ _OPUS_VERSION_="v1.5.2"
 _VPX_VERSION_="v1.15.0"
 _LIBSODIUM_VERSION_="1.0.20-RELEASE"
 _X264_VERSION_="31e19f92f00c7003fa115047ce50978bc98c3a0d"
-_X265_VERSION_="1d117bed4747758b51bd2c124d738527e30392cb"
+##_X265_VERSION_="1d117bed4747758b51bd2c124d738527e30392cb"
 _ANDROID_SDK_FILE_="sdk-tools-linux-4333796.zip"
 _ANDROID_SDK_HASH_="92ffee5a1d98d856634e8b71132e8a95d96c83a63fde1099be3d86df3106def9"
 
@@ -931,17 +931,17 @@ if [ "$full""x" == "1x" ]; then
     # --- LIBAV ---
 
     # --- X265 ---
-    cd $_s_;git clone https://bitbucket.org/multicoreware/x265_git.git
-    cd $_s_/x265_git/; git checkout "$_X265_VERSION_"
-    rm -Rf "$_BLD_"
-    mkdir -p "$_BLD_"
-    cd "$_BLD_";
-    cmake $_s_/x265_git/source/ \
-        -DCMAKE_INSTALL_PREFIX="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
-        -DCMAKE_C_FLAGS="--sysroot=${_toolchain_}/${AND_TOOLCHAIN_ARCH}/sysroot" \
-        -DENABLE_PIC=ON -DENABLE_ASSEMBLY=ON -DCMAKE_VERBOSE_MAKEFILE=ON
-    cd "$_BLD_";make V=1 -j $_CPUS_ || exit 1
-    cd "$_BLD_";make install
+    #cd $_s_;git clone https://bitbucket.org/multicoreware/x265_git.git
+    #cd $_s_/x265_git/; git checkout "$_X265_VERSION_"
+    #rm -Rf "$_BLD_"
+    #mkdir -p "$_BLD_"
+    #cd "$_BLD_";
+    #cmake $_s_/x265_git/source/ \
+    #    -DCMAKE_INSTALL_PREFIX="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
+    #    -DCMAKE_C_FLAGS="--sysroot=${_toolchain_}/${AND_TOOLCHAIN_ARCH}/sysroot" \
+    #    -DENABLE_PIC=ON -DENABLE_ASSEMBLY=ON -DCMAKE_VERBOSE_MAKEFILE=ON
+    #cd "$_BLD_";make V=1 -j $_CPUS_ || exit 1
+    #cd "$_BLD_";make install
     # --- X265 ---
 
     # --- X264 ---
