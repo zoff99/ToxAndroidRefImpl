@@ -1,11 +1,125 @@
 # Changelog
 
-## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
+## [1.0.240](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.240) (2024-11-23)
 
-[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.229...HEAD)
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.239...1.0.240)
 
 **Merged pull requests:**
 
+- update toxcore JNI to 1.0.153 [\#561](https://github.com/zoff99/ToxAndroidRefImpl/pull/561) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update toxcore JNI to 1.0.152 [\#560](https://github.com/zoff99/ToxAndroidRefImpl/pull/560) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update iocipher JNI to 1.0.4 [\#559](https://github.com/zoff99/ToxAndroidRefImpl/pull/559) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.239](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.239) (2024-11-11)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.238...1.0.239)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#550](https://github.com/zoff99/ToxAndroidRefImpl/pull/550) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#548](https://github.com/zoff99/ToxAndroidRefImpl/pull/548) ([weblate](https://github.com/weblate))
+
+## [1.0.238](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.238) (2024-10-15)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.237...1.0.238)
+
+## [1.0.237](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.237) (2024-10-11)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.236...1.0.237)
+
+## [1.0.236](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.236) (2024-10-05)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.235...1.0.236)
+
+**Merged pull requests:**
+
+- update gradle witness checksums [\#543](https://github.com/zoff99/ToxAndroidRefImpl/pull/543) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Translations update from Hosted Weblate [\#542](https://github.com/zoff99/ToxAndroidRefImpl/pull/542) ([weblate](https://github.com/weblate))
+
+## [1.0.235](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.235) (2024-09-14)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.234...1.0.235)
+
+**Merged pull requests:**
+
+- Bump peter-evans/create-pull-request from 6 to 7 [\#539](https://github.com/zoff99/ToxAndroidRefImpl/pull/539) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update toxcore JNI [\#538](https://github.com/zoff99/ToxAndroidRefImpl/pull/538) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump actions/checkout from 3 to 4 [\#536](https://github.com/zoff99/ToxAndroidRefImpl/pull/536) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-java from 1 to 4 [\#535](https://github.com/zoff99/ToxAndroidRefImpl/pull/535) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 2 to 4 [\#534](https://github.com/zoff99/ToxAndroidRefImpl/pull/534) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.collection:collection from 1.4.2 to 1.4.3 in /android-refimpl-app [\#533](https://github.com/zoff99/ToxAndroidRefImpl/pull/533) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.annotation:annotation from 1.8.1 to 1.8.2 in /android-refimpl-app [\#532](https://github.com/zoff99/ToxAndroidRefImpl/pull/532) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update gradle witness checksums [\#530](https://github.com/zoff99/ToxAndroidRefImpl/pull/530) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump androidx.collection:collection from 1.4.1 to 1.4.2 in /android-refimpl-app [\#529](https://github.com/zoff99/ToxAndroidRefImpl/pull/529) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.annotation:annotation from 1.8.0 to 1.8.1 in /android-refimpl-app [\#528](https://github.com/zoff99/ToxAndroidRefImpl/pull/528) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update gradle witness checksums [\#527](https://github.com/zoff99/ToxAndroidRefImpl/pull/527) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump androidx.collection:collection from 1.4.0 to 1.4.1 in /android-refimpl-app [\#522](https://github.com/zoff99/ToxAndroidRefImpl/pull/522) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.234](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.234) (2024-07-21)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.233...1.0.234)
+
+## [1.0.233](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.233) (2024-07-18)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.232...1.0.233)
+
+**Merged pull requests:**
+
+- update gradle witness checksums [\#521](https://github.com/zoff99/ToxAndroidRefImpl/pull/521) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump androidx.test.espresso:espresso-intents from 3.5.1 to 3.6.1 in /android-refimpl-app [\#517](https://github.com/zoff99/ToxAndroidRefImpl/pull/517) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.test.ext:junit from 1.1.5 to 1.2.0 in /android-refimpl-app [\#516](https://github.com/zoff99/ToxAndroidRefImpl/pull/516) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump org.robolectric:robolectric from 4.12.2 to 4.13 in /android-refimpl-app [\#515](https://github.com/zoff99/ToxAndroidRefImpl/pull/515) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.test:core from 1.5.0 to 1.6.0 in /android-refimpl-app [\#514](https://github.com/zoff99/ToxAndroidRefImpl/pull/514) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.collection:collection from 1.4.0 to 1.4.1 in /android-refimpl-app [\#513](https://github.com/zoff99/ToxAndroidRefImpl/pull/513) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update toxcore JNI to 1.0.142 [\#512](https://github.com/zoff99/ToxAndroidRefImpl/pull/512) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump androidx.test:core from 1.5.0 to 1.6.0 in /android-refimpl-app [\#505](https://github.com/zoff99/ToxAndroidRefImpl/pull/505) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.test:rules from 1.5.0 to 1.6.0 in /android-refimpl-app [\#504](https://github.com/zoff99/ToxAndroidRefImpl/pull/504) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.test.ext:junit from 1.1.5 to 1.2.0 in /android-refimpl-app [\#503](https://github.com/zoff99/ToxAndroidRefImpl/pull/503) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.test:runner from 1.5.2 to 1.6.0 in /android-refimpl-app [\#502](https://github.com/zoff99/ToxAndroidRefImpl/pull/502) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.test.espresso:espresso-core from 3.5.1 to 3.6.0 in /android-refimpl-app [\#501](https://github.com/zoff99/ToxAndroidRefImpl/pull/501) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-lifecycle from 1.3.3 to 1.3.4 in /android-refimpl-app [\#500](https://github.com/zoff99/ToxAndroidRefImpl/pull/500) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-view from 1.3.3 to 1.3.4 in /android-refimpl-app [\#498](https://github.com/zoff99/ToxAndroidRefImpl/pull/498) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-extensions from 1.3.3 to 1.3.4 in /android-refimpl-app [\#497](https://github.com/zoff99/ToxAndroidRefImpl/pull/497) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-camera2 from 1.3.3 to 1.3.4 in /android-refimpl-app [\#496](https://github.com/zoff99/ToxAndroidRefImpl/pull/496) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.232](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.232) (2024-06-07)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.231...1.0.232)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#484](https://github.com/zoff99/ToxAndroidRefImpl/pull/484) ([weblate](https://github.com/weblate))
+- Bump com.google.code.gson:gson from 2.10.1 to 2.11.0 in /android-refimpl-app [\#483](https://github.com/zoff99/ToxAndroidRefImpl/pull/483) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.fragment:fragment from 1.7.0 to 1.7.1 in /android-refimpl-app [\#482](https://github.com/zoff99/ToxAndroidRefImpl/pull/482) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.annotation:annotation from 1.7.1 to 1.8.0 in /android-refimpl-app [\#481](https://github.com/zoff99/ToxAndroidRefImpl/pull/481) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump org.robolectric:robolectric from 4.12.1 to 4.12.2 in /android-refimpl-app [\#479](https://github.com/zoff99/ToxAndroidRefImpl/pull/479) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump org.jetbrains.kotlin.android from 1.9.23 to 1.9.24 in /android-refimpl-app [\#478](https://github.com/zoff99/ToxAndroidRefImpl/pull/478) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump org.jetbrains.kotlin:kotlin-gradle-plugin from 1.9.23 to 1.9.24 in /android-refimpl-app [\#477](https://github.com/zoff99/ToxAndroidRefImpl/pull/477) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.231](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.231) (2024-05-10)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.230...1.0.231)
+
+**Merged pull requests:**
+
+- Bump androidx.core:core from 1.13.0 to 1.13.1 in /android-refimpl-app [\#476](https://github.com/zoff99/ToxAndroidRefImpl/pull/476) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.fragment:fragment from 1.6.2 to 1.7.0 in /android-refimpl-app [\#475](https://github.com/zoff99/ToxAndroidRefImpl/pull/475) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.google.android.material:material from 1.11.0 to 1.12.0 in /android-refimpl-app [\#474](https://github.com/zoff99/ToxAndroidRefImpl/pull/474) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.230](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.230) (2024-05-06)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.229...1.0.230)
+
+**Merged pull requests:**
+
+- Bump androidx.camera:camera-camera2 from 1.3.2 to 1.3.3 in /android-refimpl-app [\#473](https://github.com/zoff99/ToxAndroidRefImpl/pull/473) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-view from 1.3.2 to 1.3.3 in /android-refimpl-app [\#472](https://github.com/zoff99/ToxAndroidRefImpl/pull/472) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-lifecycle from 1.3.2 to 1.3.3 in /android-refimpl-app [\#471](https://github.com/zoff99/ToxAndroidRefImpl/pull/471) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.core:core from 1.12.0 to 1.13.0 in /android-refimpl-app [\#470](https://github.com/zoff99/ToxAndroidRefImpl/pull/470) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump androidx.camera:camera-extensions from 1.3.2 to 1.3.3 in /android-refimpl-app [\#469](https://github.com/zoff99/ToxAndroidRefImpl/pull/469) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Translations update from Hosted Weblate [\#468](https://github.com/zoff99/ToxAndroidRefImpl/pull/468) ([weblate](https://github.com/weblate))
+- Bump gradle/wrapper-validation-action from 2 to 3 [\#467](https://github.com/zoff99/ToxAndroidRefImpl/pull/467) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump org.robolectric:robolectric from 4.12 to 4.12.1 in /android-refimpl-app [\#466](https://github.com/zoff99/ToxAndroidRefImpl/pull/466) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Translations update from Hosted Weblate [\#463](https://github.com/zoff99/ToxAndroidRefImpl/pull/463) ([weblate](https://github.com/weblate))
 - Bump org.jetbrains.kotlin:kotlin-gradle-plugin from 1.7.21 to 1.9.23 in /android-refimpl-app [\#462](https://github.com/zoff99/ToxAndroidRefImpl/pull/462) ([dependabot[bot]](https://github.com/apps/dependabot))
 - Bump com.mikepenz:material-design-iconic-typeface from 2.2.0.5 to 2.2.0.8-kotlin in /android-refimpl-app [\#461](https://github.com/zoff99/ToxAndroidRefImpl/pull/461) ([dependabot[bot]](https://github.com/apps/dependabot))
