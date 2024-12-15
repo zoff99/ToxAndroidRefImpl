@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.241](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.241) (2024-12-09)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.240...1.0.241)
+
+**Merged pull requests:**
+
+- update toxcore JNI to 1.0.154 [\#567](https://github.com/zoff99/ToxAndroidRefImpl/pull/567) ([github-actions[bot]](https://github.com/apps/github-actions))
+
 ## [1.0.240](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.240) (2024-11-23)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.239...1.0.240)
