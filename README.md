@@ -5,14 +5,14 @@
 ~~This is not a Reference Client, it's c-toxcore for Android.~~<br>
 This is now also a Tox Client for Android.
 
-### Important Notice: Since Google has changed their <a href="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/google_play_dev_verify_02.png">Playstore policy</a> in a way that is unacceptable soon future Versions can not be published on the Playstore anymore. Github Releases are signed with the same key as the Playstore version.
+### Important Notice: Since Google has changed their <a href="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/google_play_dev_verify_02.png">Playstore policy</a> in a way that is unacceptable, soon future Versions can not be published on the Playstore anymore. Github Releases are signed with the same key as the Playstore version.
 
 <a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/f-droid.png" width="200"></a>
 <a href="https://play.google.com/store/apps/details?id=com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/playstore.png" width="200"></a>
 <a href="https://github.com/zoff99/ToxAndroidRefImpl/releases/latest/download/play.trifa.apk"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/on_github.png" width="200"></a>
 <a href="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/TRIfA-nightly.apk"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/on_github_nightly.png" width="200"></a>
 
-&nbsp;&nbsp;&nbsp;&nbsp;Looking for TRIfA Desktop version? [follow me](https://github.com/Zoxcore/trifa_material/tree/master)
+&nbsp;&nbsp;&nbsp;&nbsp;Looking for TRIfA Desktop version? [follow me](https://github.com/Zoxcore/trifa_material)
 
 Status
 =
@@ -25,7 +25,11 @@ Status
 
 Latest Automated Screenshots
 =
-<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_02.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_03.png" width="200">
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_02.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_03.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_04.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_05.png" width="200">
+
+Automated Promotion Screenshots
+=
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/promo_02.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/promo_03.png" width="200">
 
 Help Translate the App in your Language
 =
@@ -78,6 +82,10 @@ Translations are under the terms of GNU General Public License (version 2 or lat
 See https://hosted.weblate.org/projects/trifa-a-tox-client-for-android/android-application/#information
 and https://hosted.weblate.org/projects/trifa-a-tox-client-for-android/f-droid-texts/#information
 
+<br>
 Any use of this project's code by GitHub Copilot, past or present, is done
 without our permission.  We do not consent to GitHub's use of this project's
 code in Copilot.
+<br>
+No part of this work may be used or reproduced in any manner for the purpose of training artificial intelligence technologies or systems.
+
