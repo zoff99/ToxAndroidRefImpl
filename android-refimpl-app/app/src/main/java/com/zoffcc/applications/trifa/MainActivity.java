@@ -51,7 +51,6 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
@@ -91,7 +90,6 @@ import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -113,7 +111,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.renderscript.Allocation;
 import androidx.renderscript.Element;
@@ -145,7 +142,6 @@ import static com.zoffcc.applications.trifa.ConfGroupAudioService.do_update_grou
 import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.FriendListFragment.fl_loading_progressbar;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.play_ngc_incoming_audio_frame;
-import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame_v1;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame_v2;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
@@ -175,7 +171,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hexstring_to_bytebuffe
 import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
-import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper_throttled;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper_throttled_last_trigger_ts;
 import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_file;
 import static com.zoffcc.applications.trifa.HelperGroup.add_group_peer_to_db;
@@ -198,6 +193,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_priva
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_db_topic;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_friendlist;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_groupmessagelist;
+import static com.zoffcc.applications.trifa.HelperGroup.update_group_messages_peer_role;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_peer_in_db;
 import static com.zoffcc.applications.trifa.HelperMessage.set_message_msg_at_relay_from_id;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
@@ -7282,6 +7278,7 @@ public class MainActivity extends AppCompatActivity
         {
             peer_role = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value;
         }
+        update_group_messages_peer_role(temp_group_identifier, group_peer_pubkey, peer_role);
         add_group_peer_to_db(group_number, temp_group_identifier, peer_id, group_peer_pubkey, peer_role);
         add_system_message_to_group_chat(temp_group_identifier, "peer " + peer_id + " joined the group");
         update_group_in_groupmessagelist(temp_group_identifier);

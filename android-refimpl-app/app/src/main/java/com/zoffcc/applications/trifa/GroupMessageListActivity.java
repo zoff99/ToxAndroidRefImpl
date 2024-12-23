@@ -181,6 +181,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_savedpeer_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_max_message_length;
@@ -2042,6 +2043,21 @@ public class GroupMessageListActivity extends AppCompatActivity
                 m.text = msg;
                 m.was_synced = false;
                 m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
+
+                m.tox_group_peer_role = -1;
+                try
+                {
+                    int peer_role_get = tox_group_self_get_role(tox_group_by_groupid__wrapper(group_id));
+                    if (peer_role_get >= 0)
+                    {
+                        m.tox_group_peer_role = peer_role_get;
+                    }
+
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
 
                 if ((msg != null) && (!msg.equalsIgnoreCase("")))
                 {

@@ -28,9 +28,7 @@ import android.util.Log;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
-import com.zoffcc.applications.nativeaudio.NativeAudio;
 
-import java.io.FileNotFoundException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
@@ -45,13 +43,10 @@ import id.zelory.compressor.Compressor;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.NGC_VIDEO_ICON_STATE_ACTIVE;
-import static com.zoffcc.applications.trifa.GroupMessageListActivity.NGC_VIDEO_ICON_STATE_INACTIVE;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.NGC_VIDEO_ICON_STATE_INCOMING;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.lookup_ngc_incoming_video_peer_list;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.ml_video_icon;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.ngc_camera_info_text;
-import static com.zoffcc.applications.trifa.HelperConference.delete_selected_group_messages;
-import static com.zoffcc.applications.trifa.HelperConference.insert_into_conference_message_db;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_incoming_filetransfer_local_filename;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.save_group_incoming_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
@@ -64,28 +59,25 @@ import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_w
 import static com.zoffcc.applications.trifa.HelperGeneric.utf8_string_from_bytes_with_padding;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
-import static com.zoffcc.applications.trifa.MainActivity.android_tox_callback_conference_title_cb_method;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_text_only;
-import static com.zoffcc.applications.trifa.MainActivity.tox_conference_offline_peer_count;
-import static com.zoffcc.applications.trifa.MainActivity.tox_conference_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_by_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_peer_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_self_get_public_key;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_send_custom_private_packet;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_GROUP_HISTORY_SYNC_DOUBLE_INTERVAL_SECS;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NGC_HISTORY_SYNC_MAX_FILENAME_BYTES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES;
@@ -752,6 +744,24 @@ public class HelperGroup
         }
     }
 
+    static void update_group_messages_peer_role(String group_identifier, String group_peer_pubkey, int aTox_Group_Role)
+    {
+        try
+        {
+            if ((group_identifier != null) && (group_peer_pubkey != null))
+            {
+                orma.updateGroupMessage()
+                        .group_identifierEq(group_identifier)
+                        .tox_group_peer_pubkeyEq(group_peer_pubkey)
+                        .tox_group_peer_roleEq(-1)
+                        .tox_group_peer_role(aTox_Group_Role);
+            }
+        }
+        catch (Exception e)
+        {
+        }
+    }
+
     static void add_group_peer_to_db(final long group_number, final String group_identifier,
                                      final long peerid, final String group_peer_pubkey, int aTox_Group_Role)
     {
@@ -1004,6 +1014,21 @@ public class HelperGroup
         m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
         // Log.i(TAG, "message_id_tox=" + message_id_ + " message_id=" + message_id);
 
+        m.tox_group_peer_role = -1;
+        try
+        {
+            int peer_role_get = tox_group_peer_get_role(group_number, peer_id);
+            if (peer_role_get >= 0)
+            {
+                m.tox_group_peer_role = peer_role_get;
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
         try
         {
             m.tox_group_peername = HelperGroup.tox_group_peer_get_name__wrapper(m.group_identifier,
@@ -1168,6 +1193,23 @@ public class HelperGroup
         Log.i(TAG, "add TRIFA_SYNC_TYPE=" + sync_type + " syncer_pubkey_01:" + syncer_pubkey);
         m.tox_group_peer_pubkey_syncer_01 = syncer_pubkey;
         m.tox_group_peer_pubkey_syncer_01_sent_timestamp = sent_timestamp_in_ms;
+
+        m.tox_group_peer_role = -1;
+        try
+        {
+            int peer_role_get = tox_group_peer_get_role(tox_group_by_groupid__wrapper(group_identifier),
+                                                        get_group_peernum_from_peer_pubkey(group_identifier, peer_pubkey));
+            if (peer_role_get >= 0)
+            {
+                m.tox_group_peer_role = peer_role_get;
+            }
+
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
 
         if (m.tox_group_peername == null)
         {
@@ -2636,6 +2678,21 @@ public class HelperGroup
             m.filesize = file_byte_buf.length;
             m.tox_group_peer_pubkey_syncer_01 = syncer_pubkey;
 
+            m.tox_group_peer_role = -1;
+            try
+            {
+                int peer_role_get = tox_group_peer_get_role(tox_group_by_groupid__wrapper(group_identifier),
+                                                            get_group_peernum_from_peer_pubkey(group_identifier, original_sender_peerpubkey));
+                if (peer_role_get >= 0)
+                {
+                    m.tox_group_peer_role = peer_role_get;
+                }
+
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
 
             info.guardianproject.iocipher.File f1 = new info.guardianproject.iocipher.File(
                     m.path_name + "/" + m.file_name);
