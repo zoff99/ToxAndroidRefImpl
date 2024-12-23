@@ -131,6 +131,15 @@ public class GroupMessageListHolder_text_incoming_not_read extends RecyclerView.
             message__text = "Private Message:\n" + m.text;
         }
 
+        if (m.tox_group_peer_role == ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_FOUNDER.value)
+        {
+            // TODO: make something nice looking here // message__text = "*Founder Message*\n" + message__text;
+        }
+        else if (m.tox_group_peer_role == ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_MODERATOR.value)
+        {
+            // TODO: make something nice looking here // message__text = "+Moderator Message+\n" + message__text;
+        }
+
         String message__tox_peername = m.tox_group_peername;
         String message__tox_peerpubkey = m.tox_group_peer_pubkey;
 

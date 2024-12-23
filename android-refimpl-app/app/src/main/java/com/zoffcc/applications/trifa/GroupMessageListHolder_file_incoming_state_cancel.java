@@ -170,6 +170,15 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
             message__text = "Private Message:\n" + m.text;
         }
 
+        if (m.tox_group_peer_role == ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_FOUNDER.value)
+        {
+            // TODO: make something nice looking here // message__text = "*Founder Message*\n" + message__text;
+        }
+        else if (m.tox_group_peer_role == ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_MODERATOR.value)
+        {
+            // TODO: make something nice looking here // message__text = "+Moderator Message+\n" + message__text;
+        }
+
         String message__tox_peername = m.tox_group_peername;
         String message__tox_peerpubkey = m.tox_group_peer_pubkey;
 
