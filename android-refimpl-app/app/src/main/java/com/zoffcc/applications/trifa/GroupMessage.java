@@ -26,6 +26,7 @@ import com.github.gfx.android.orma.annotation.Table;
 import androidx.annotation.Nullable;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_USER;
 
 @Table
 public class GroupMessage
@@ -42,6 +43,9 @@ public class GroupMessage
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String tox_group_peer_pubkey;
+
+    @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
+    public int tox_group_peer_role = -1;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
@@ -146,6 +150,7 @@ public class GroupMessage
         out.message_id_tox = in.message_id_tox;
         out.group_identifier = in.group_identifier;
         out.tox_group_peer_pubkey = in.tox_group_peer_pubkey;
+        out.tox_group_peer_role = in.tox_group_peer_role;
         out.private_message = in.private_message;
         out.direction = in.direction;
         out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
@@ -180,6 +185,7 @@ public class GroupMessage
                ", tox_peerpubkey=" + "*tox_peerpubkey*" + ", private_message=" + private_message + ", direction=" +
                direction + ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE +
                ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
-               ", text=" + "xxxxxx" + ", is_new=" + is_new + ", was_synced=" + was_synced + " TRIFA_SYNC_TYPE=" + TRIFA_SYNC_TYPE;
+               ", text=" + "xxxxxx" + ", is_new=" + is_new + ", was_synced=" + was_synced + " TRIFA_SYNC_TYPE=" + TRIFA_SYNC_TYPE +
+               ", tox_group_peer_role=" + tox_group_peer_role;
     }
 }
