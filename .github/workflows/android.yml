@@ -70,6 +70,11 @@ jobs:
         sed -i -e 's#android:label="TRIfA"#android:label="DEBUG TRIfA '"$datestr"'"#' android-refimpl-app/app/src/main/AndroidManifest.xml
         cat android-refimpl-app/app/src/main/AndroidManifest.xml|grep 'android:label='
 
+    - name: turn on more debug logging
+      run: |
+        sed -i -e 's#final static boolean NDK_STDOUT_LOGGING =.*#final static boolean NDK_STDOUT_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
+        sed -i -e 's#final static boolean CTOXCORE_NATIVE_LOGGING =.*#final static boolean CTOXCORE_NATIVE_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
+
     - name: show witness checksums updates
       if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
       run: cd android-refimpl-app ; ./gradlew -q calculateChecksums 2>/dev/null
