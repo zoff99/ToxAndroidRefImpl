@@ -3515,14 +3515,19 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     tox_av_ngc_vcoders_global = NULL;
     toxav_ngc_audio_kill(tox_av_ngc_acoders_global);
     tox_av_ngc_acoders_global = NULL;
-    toxav_kill(tox_av_global);
+
+    // HINT: set pointers to NULL, and then really kill tox and toxav after that
+    Tox *tox_global_copy = tox_global;
+    ToxAV *tox_av_global_copy = tox_av_global;
     tox_av_global = NULL;
-#ifdef TOX_HAVE_TOXUTIL
-    tox_utils_kill(tox_global);
-#else
-    tox_kill(tox_global);
-#endif
     tox_global = NULL;
+
+    toxav_kill(tox_av_global_copy);
+#ifdef TOX_HAVE_TOXUTIL
+    tox_utils_kill(tox_global_copy);
+#else
+    tox_kill(tox_global_copy);
+#endif
 
     pthread_mutex_destroy(&group_audio___mutex);
 
