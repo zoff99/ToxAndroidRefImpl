@@ -4777,6 +4777,11 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1nospam(JNIEnv *e
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1nospam(JNIEnv *env, jobject thiz)
 {
+    if(tox_global == NULL)
+    {
+        return -1;
+    }
+
     uint32_t nospam = tox_self_get_nospam(tox_global);
     return (jlong)nospam;
 }
