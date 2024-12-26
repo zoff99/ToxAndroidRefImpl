@@ -1,0 +1,193 @@
+name: Maven DEBUG Package CI
+
+on:
+  push:
+  pull_request:
+  release:
+    types: [published, edited]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  build-debug:
+    runs-on: ubuntu-20.04
+    permissions:
+      contents: write
+    steps:
+    - name: freespace_1
+      run: |
+        df -h
+
+#    - name: Maximize build space
+#      uses: easimon/maximize-build-space@master
+#      with:
+#        root-reserve-mb: 512
+#        swap-size-mb: 1024
+#        remove-dotnet: 'true'
+
+    - name: freespace_2
+      run: |
+        df -h
+
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: install basic android SDK
+      run: |
+           sudo apt update && \
+           sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+           android-sdk \
+           lsb-release \
+           clang \
+           cmake \
+           libconfig-dev \
+           libgtest-dev \
+           ninja-build \
+           pkg-config \
+           zip grep file ca-certificates autotools-dev autoconf automake \
+           git bc wget rsync cmake make pkg-config libtool \
+           ssh gzip tar \
+           coreutils \
+           curl \
+           libncurses5 \
+           wget \
+           git \
+           curl \
+           software-properties-common \
+           unzip \
+           zip \
+           automake \
+           autotools-dev \
+           build-essential \
+           check \
+           checkinstall \
+           libtool \
+           libfreetype6-dev \
+           fontconfig-config \
+           libfontconfig1-dev \
+           pkg-config \
+           openjdk-8-jdk
+
+    - name: Install NDK
+      run: |
+           echo ${ANDROID_SDK_ROOT}
+           # find / -name sdkmanager 2>/dev/null
+           ls -al /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager
+           echo "y" | sudo /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "ndk;21.0.6113669" --sdk_root=${ANDROID_SDK_ROOT}
+           echo "y" | sudo /usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager --install "ndk;20.1.5948944" --sdk_root=${ANDROID_SDK_ROOT}
+           # sdkmanager --update
+           # sdkmanager 'cmdline-tools;latest'
+           # sdkmanager --uninstall 'cmdline-tools;1.0'
+
+    - name: pkgs
+      run: |
+           sudo apt update && \
+           sudo DEBIAN_FRONTEND=noninteractive apt install -y --no-install-recommends \
+           clang \
+           cmake \
+           libconfig-dev \
+           libgtest-dev \
+           ninja-build \
+           pkg-config \
+           zip grep file ca-certificates autotools-dev autoconf automake \
+           git bc wget rsync cmake make pkg-config libtool \
+           ssh gzip tar \
+           coreutils \
+           libncurses5
+
+    - name: use mnt dir
+      run: |
+           sudo mkdir -p /root/work/
+           sudo mv -v /root/work /mnt/
+           sudo ls -al /mnt
+           sudo bash -c "cd /root/ ; ln -s /mnt/work; ls -al"
+
+    - name: move_source
+      run: |
+           sudo mkdir -p /root/work/jni-c-toxcore/
+           sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/jni-c-toxcore/* /root/work/jni-c-toxcore/
+           sudo mkdir -p /root/work/android-refimpl-app/
+           sudo cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/* /root/work/android-refimpl-app/
+           # sudo git clone https://github.com/zoff99/ToxAndroidRefImpl /root/work/trifa_master_src
+           # sudo mkdir -p /root/work/android-refimpl-app/app/
+           # sudo cp -av /root/work/trifa_master_src/android-refimpl-app/app/* /root/work/android-refimpl-app/app/
+
+    - name: check java versions installed
+      run: |
+           echo $JAVA_HOME||echo "NO ERR"
+           sudo rm -Rf /usr/lib/jvm/temurin-11-jdk-amd64
+           sudo rm -Rf /usr/bin/java /bin/java
+           dpkg -l|grep -i jdk
+           dpkg -l|grep -i java
+
+    - name: set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+#        distribution: 'temurin'
+
+    - name: check java versions installed
+      run: |
+           echo $JAVA_HOME||echo "NO ERR"
+           type -a java
+
+    - name: freespace_3
+      run: |
+        df -h
+
+    - name: build_maven_deps
+      run: |
+           export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64
+           java -version
+           sudo mkdir -p ~/work/deploy
+           sudo mkdir -p ~/.android/
+           sudo touch ~/.android/debug.keystore
+           sudo mkdir -p build_dir
+           sudo mkdir -p /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir
+           pwd
+           ls -al
+           sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh debugbuild"
+
+    - name: build_maven_pkg
+      run: |
+           pwd
+           export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64
+           sudo bash -c "cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/stub* /root/work/"
+           sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
+
+    - name: acls_maven_pkg
+      run: |
+           sudo chmod -R a+rx /root/work/artefacts/
+           sudo ls -al /root/work/artefacts/
+           sudo bash -c 'cp -av /root/work/artefacts/*.zip /home/runner/work/'
+
+    - name: get arm64 lib only
+      run: |
+           mkdir unpack
+           cd unpack/
+           unzip ../local_maven_trifa_debug_jni.zip
+           unzip local_maven.zip
+           unzip root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.156/trifa-jni-lib-*.aar
+           ls -hal jni/arm64-v8a/libjni-c-toxcore.so
+           cp -v jni/arm64-v8a/libjni-c-toxcore.so ../libjni-c-toxcore.so___arm64_debug
+
+    - name: rename file to debug
+      run: |
+           mv -v local_maven_trifa_jni.zip local_maven_trifa_debug_jni.zip
+
+    - name: Upload to nightly release
+      uses: ncipollo/release-action@v1
+      if: github.ref == 'refs/heads/zoff99/maven_artefact'
+      with:
+        allowUpdates: true
+        tag: nightly
+        omitBodyDuringUpdate: true
+        omitNameDuringUpdate: true
+        prerelease: true
+        replacesArtifacts: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: "local_maven_trifa_debug_jni.zip, libjni-c-toxcore.so___arm64_debug"
+

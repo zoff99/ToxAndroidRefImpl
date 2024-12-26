@@ -48,6 +48,10 @@ export ASAN_CLANG_FLAGS=" "
 ## set this to make c-toxcore log more verbose -------------
 ## keep this empty for release maven artifact
 export DEBUG_TOXCORE_LOGGING=" "
+
+if [ "$1""x" == "debugbuildx" ]; then
+    export DEBUG_TOXCORE_LOGGING=" -DMIN_LOGGER_LEVEL=LOGGER_LEVEL_TRACE "
+fi
 ## set this to make c-toxcore log more verbose -------------
 
 
