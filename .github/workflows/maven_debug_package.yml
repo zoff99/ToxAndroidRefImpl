@@ -168,15 +168,14 @@ jobs:
       run: |
            mkdir unpack
            cd unpack/
-           unzip ../local_maven_trifa_debug_jni.zip
-           unzip local_maven.zip
+           unzip ../local_maven.zip
            unzip root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.156/trifa-jni-lib-*.aar
            ls -hal jni/arm64-v8a/libjni-c-toxcore.so
            cp -v jni/arm64-v8a/libjni-c-toxcore.so ../libjni-c-toxcore.so___arm64_debug
 
     - name: rename file to debug
       run: |
-           mv -v local_maven_trifa_jni.zip local_maven_trifa_debug_jni.zip
+           mv -v local_maven.zip local_maven_debug.zip
 
     - name: Upload to nightly release
       uses: ncipollo/release-action@v1
@@ -189,5 +188,5 @@ jobs:
         prerelease: true
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: "local_maven_trifa_debug_jni.zip, libjni-c-toxcore.so___arm64_debug"
+        artifacts: "local_maven_debug.zip,libjni-c-toxcore.so___arm64_debug"
 
