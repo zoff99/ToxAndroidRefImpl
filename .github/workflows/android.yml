@@ -84,7 +84,7 @@ jobs:
 
     - name: show changes
       run: |
-        get diff || echo "NO ERR"
+        git diff || echo "NO ERR"
 
     - name: show witness checksums updates
       if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
@@ -141,9 +141,11 @@ jobs:
         echo "========= git diff before witness update  "========= "
         git diff
         echo "========= git diff before witness update  "========= "
-        cd android-refimpl-app ; ./gradlew -q calculateChecksums
-        cd android-refimpl-app ; ./gradlew -q calculateChecksums 2>/dev/null| grep -v 'Checking the license for' > app/witness.gradle 2>/dev/null
+        cd android-refimpl-app/
+        ./gradlew -q calculateChecksums
+        ./gradlew -q calculateChecksums 2>/dev/null| grep -v 'Checking the license for' > app/witness.gradle 2>/dev/null
         echo "========= git diff AFTER witness update  "========= "
+        cd ../
         git status
         git diff
         echo "========= git diff AFTER witness update  "========= "
