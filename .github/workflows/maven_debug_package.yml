@@ -168,6 +168,7 @@ jobs:
       run: |
            ls -al
            pwd
+           cp -v /home/runner/work/local_maven.zip .
            mkdir unpack
            cd unpack/
            pwd
