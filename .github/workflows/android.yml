@@ -75,6 +75,17 @@ jobs:
         sed -i -e 's#final static boolean NDK_STDOUT_LOGGING =.*#final static boolean NDK_STDOUT_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
         sed -i -e 's#final static boolean CTOXCORE_NATIVE_LOGGING =.*#final static boolean CTOXCORE_NATIVE_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
 
+    - name: download the latest JNI debug lib
+      run: |
+        # HINT: ingore any errors and build with release artefact if debug version not here for some reason
+        wget 'https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/libjni-c-toxcore.so___arm64_debug' -O __libjni-c-toxcore.so || echo "NO ERR"
+        cp -v __libjni-c-toxcore.so ./android-refimpl-app/app/nativelibs/arm64-v8a/libjni-c-toxcore.so || echo "NO ERR"
+        chmod a+r ./android-refimpl-app/app/nativelibs/arm64-v8a/libjni-c-toxcore.so || echo "NO ERR"
+
+    - name: show changes
+      run: |
+        get diff || echo "NO ERR"
+
     - name: show witness checksums updates
       if: ${{ github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch' }}
       run: cd android-refimpl-app ; ./gradlew -q calculateChecksums 2>/dev/null
