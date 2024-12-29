@@ -262,4 +262,6 @@
     <string name="group_message_list_activity_name">Група</string>
     <string name="add_public_group_activity_name">Създаване на публична група</string>
     <string name="join_public_activity_name">Присъединете се към публична група</string>
+    <string name="title_activity_groupinfo">Информация за групата</string>
+    <string name="title_activity_settings">Настройки</string>
 </resources>
