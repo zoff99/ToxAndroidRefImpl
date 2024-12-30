@@ -313,25 +313,9 @@ dependencies {
     //
     implementation("com.daimajia.swipelayout:library:1.2.0@aar")
     //
-    //
-    //
-    //
-    //
-    //
-    //implementation('net.zetetic:android-database-sqlcipher:4.5.4@aar') {
-    //    transitive = true
-    //}
-    //
-    implementation('net.zetetic:sqlcipher-android:4.5.7@aar') {
+    implementation('net.zetetic:android-database-sqlcipher:4.5.4@aar') {
         transitive = true
     }
-    implementation 'androidx.sqlite:sqlite:2.2.0'
-    //
-    //
-    //
-    //
-    //
-    //
     //noinspection KtxExtensionAvailable
     implementation('androidx.sqlite:sqlite:2.5.0') {
         transitive = true
