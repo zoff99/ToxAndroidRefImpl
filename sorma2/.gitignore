@@ -1,0 +1,7 @@
+main.db
+com/zoffcc/applications/sorm/*.class
+org/example/*.class
+test/org/example/
+test/com/
+gen/com
+sorma_generated.jar

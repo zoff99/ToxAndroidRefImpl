@@ -1,0 +1,100 @@
+    public __@@@TABLE@@@__ get(int i)
+    {
+        this.sql_limit = " limit " + i + ",1 ";
+        return this.toList().get(0);
+    }
+
+    public void execute()
+    {
+        try
+        {
+            final String sql = this.sql_start + " " + this.sql_set + " " + this.sql_where;
+            log_bindvars_where_and_set(sql, bind_where_count, bind_where_vars, bind_set_count, bind_set_vars);
+            PreparedStatement statement = sqldb.prepareStatement(sql);
+            if (!set_bindvars_where_and_set(statement, bind_where_count, bind_where_vars, bind_set_count, bind_set_vars))
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (Exception ignored)
+                {
+                }
+                return;
+            }
+            statement.executeUpdate();
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+            Log.i(TAG, "EE1:" + e2.getMessage());
+        }
+    }
+
+    public int count()
+    {
+        int ret = 0;
+
+        try
+        {
+            this.sql_start = "SELECT count(*) as count FROM " + this.getClass().getSimpleName();
+
+            final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
+            log_bindvars_where(sql, bind_where_count, bind_where_vars);
+            PreparedStatement statement = sqldb.prepareStatement(sql);
+            if (!set_bindvars_where(statement, bind_where_count, bind_where_vars))
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (Exception ignored)
+                {
+                }
+                return 0;
+            }
+            ResultSet rs = statement.executeQuery();
+            if (rs.next())
+            {
+                ret = rs.getInt("count");
+            }
+
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        return ret;
+    }
+
+    public __@@@TABLE@@@__ limit(int rowcount)
+    {
+        this.sql_limit = " limit " + rowcount + " ";
+        return this;
+    }
+
+    public __@@@TABLE@@@__ limit(int rowcount, int offset)
+    {
+        this.sql_limit = " limit " + offset + " , " + rowcount;
+        return this;
+    }
+
+    // ----------------------------------- //
+    // ----------------------------------- //
+    // ----------------------------------- //
+

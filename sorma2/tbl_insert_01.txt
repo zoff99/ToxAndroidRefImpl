@@ -1,0 +1,13 @@
+
+    public long insert()
+    {
+        long ret = -1;
+
+        try
+        {
+            String insert_pstmt_sql = null;
+            PreparedStatement insert_pstmt = null;
+
+            // @formatter:off
+            insert_pstmt_sql ="insert into " + this.getClass().getSimpleName() +
+                    "("
