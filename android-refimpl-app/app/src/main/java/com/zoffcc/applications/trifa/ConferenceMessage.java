@@ -81,6 +81,8 @@ public class ConferenceMessage
     @Nullable
     boolean was_synced = false;
 
+    // ______@@SORMA_END@@______
+
     static ConferenceMessage deep_copy(ConferenceMessage in)
     {
         ConferenceMessage out = new ConferenceMessage();

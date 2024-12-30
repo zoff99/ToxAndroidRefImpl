@@ -43,6 +43,7 @@ public class ConferencePeerCacheDB
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     long last_update_timestamp = -1L;
 
+    // ______@@SORMA_END@@______
 
     static ConferencePeerCacheDB deep_copy(ConferencePeerCacheDB in)
     {

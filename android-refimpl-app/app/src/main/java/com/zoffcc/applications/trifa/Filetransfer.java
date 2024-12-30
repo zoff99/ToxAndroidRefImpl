@@ -81,6 +81,8 @@ public class Filetransfer
     @Nullable
     String tox_file_id_hex = "";
 
+    // ______@@SORMA_END@@______
+
     static Filetransfer deep_copy(Filetransfer in)
     {
         Filetransfer out = new Filetransfer();

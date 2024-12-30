@@ -113,6 +113,8 @@ public class FriendList
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     long msgv3_capability = 0;
 
+    // ______@@SORMA_END@@______
+
     static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();

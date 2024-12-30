@@ -47,6 +47,8 @@ public class RelayListDB
     @Nullable
     String tox_public_key_string_of_owner = "";
 
+    // ______@@SORMA_END@@______
+
     static RelayListDB deep_copy(RelayListDB in)
     {
         RelayListDB out = new RelayListDB();

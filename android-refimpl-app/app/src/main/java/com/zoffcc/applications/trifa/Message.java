@@ -134,6 +134,8 @@ public class Message
     @Nullable
     int filetransfer_kind = TOX_FILE_KIND_DATA.value;
 
+    // ______@@SORMA_END@@______
+
     static Message deep_copy(Message in)
     {
         Message out = new Message();

@@ -68,6 +68,8 @@ public class GroupDB
     @Nullable
     boolean notification_silent = false; // show notifications for this conference?
 
+    // ______@@SORMA_END@@______
+
     static GroupDB deep_copy(GroupDB in)
     {
         GroupDB out = new GroupDB();

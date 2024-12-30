@@ -31,4 +31,6 @@ public class TRIFADatabaseGlobalsNew
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String value;
+
+    // ______@@SORMA_END@@______
 }

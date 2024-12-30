@@ -55,6 +55,8 @@ public class GroupPeerDB
     @Nullable
     boolean notification_silent = false; // show notifications for this peer?
 
+    // ______@@SORMA_END@@______
+
     static GroupPeerDB deep_copy(GroupPeerDB in)
     {
         GroupPeerDB out = new GroupPeerDB();

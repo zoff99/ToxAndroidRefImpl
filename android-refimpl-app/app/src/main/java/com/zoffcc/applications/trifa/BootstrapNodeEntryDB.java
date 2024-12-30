@@ -63,6 +63,8 @@ public class BootstrapNodeEntryDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     String key_hex;
 
+    // ______@@SORMA_END@@______
+
     @Override
     public String toString()
     {

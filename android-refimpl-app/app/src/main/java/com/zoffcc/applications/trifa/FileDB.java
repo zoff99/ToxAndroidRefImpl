@@ -53,6 +53,8 @@ public class FileDB
     @Column(indexed = true, defaultExpr = "true", helpers = Column.Helpers.ALL)
     boolean is_in_VFS = true;
 
+    // ______@@SORMA_END@@______
+
     static FileDB deep_copy(FileDB in)
     {
         FileDB out = new FileDB();

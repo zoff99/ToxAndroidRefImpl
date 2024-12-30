@@ -143,6 +143,8 @@ public class GroupMessage
     @Column(indexed = true, defaultExpr = "false")
     boolean storage_frame_work = false;
 
+    // ______@@SORMA_END@@______
+
     static GroupMessage deep_copy(GroupMessage in)
     {
         GroupMessage out = new GroupMessage();

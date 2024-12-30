@@ -61,6 +61,8 @@ public class ConferenceDB
     @Nullable
     boolean notification_silent = false; // show notifications for this conference?
 
+    // ______@@SORMA_END@@______
+
     static ConferenceDB deep_copy(ConferenceDB in)
     {
         ConferenceDB out = new ConferenceDB();
