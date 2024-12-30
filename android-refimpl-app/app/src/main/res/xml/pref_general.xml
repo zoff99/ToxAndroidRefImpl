@@ -182,6 +182,18 @@
             android:summary="@string/pref_description_mic_gain_factor_toggle"
             android:title="@string/pref_title_mic_gain_factor_toggle" />
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="gainprocessing_active"
+            android:summary="@string/pref_description_gainprocessing_active"
+            android:title="@string/pref_title_gainprocessing_active" />
+
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="rnnoise_active"
+            android:summary="@string/pref_description_rnnoise_active"
+            android:title="@string/pref_title_rnnoise_active" />
+
         <ListPreference
             android:defaultValue="1"
             android:entries="@array/pref_higher_audio_quality_titles"

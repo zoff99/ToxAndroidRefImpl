@@ -129,6 +129,8 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.n_audio_in_buffer_
 import static com.zoffcc.applications.nativeaudio.NativeAudio.na_set_audio_play_volume_percent;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_audio_aec_delay;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_gainprocessing_active;
+import static com.zoffcc.applications.nativeaudio.NativeAudio.set_rnnoise_active;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
@@ -526,6 +528,8 @@ public class MainActivity extends AppCompatActivity
     static int PREF__ngc_audio_bitrate = NGC_AUDIO_BITRATE;
     static int PREF__ngc_audio_samplerate = 48000;
     static int PREF__ngc_audio_channels = 1;
+    static boolean PREF__gainprocessing_active = true;
+    static boolean PREF__rnnoise_active = false;
 
     static String versionName = "";
     static int versionCode = -1;
@@ -1278,6 +1282,26 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__use_push_service = true;
+        }
+
+        try
+        {
+            PREF__gainprocessing_active = settings.getBoolean("gainprocessing_active", true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__gainprocessing_active = true;
+        }
+
+        try
+        {
+            PREF__rnnoise_active = settings.getBoolean("rnnoise_active", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__rnnoise_active = false;
         }
 
         //if (MainActivity.IS_GPLAY_VERSION)
@@ -2818,6 +2842,42 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
             PREF__use_push_service = true;
+        }
+
+        try
+        {
+            PREF__gainprocessing_active = settings.getBoolean("gainprocessing_active", true);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__gainprocessing_active = true;
+        }
+        if (PREF__gainprocessing_active)
+        {
+            set_gainprocessing_active(1);
+        }
+        else
+        {
+            set_gainprocessing_active(0);
+        }
+
+        try
+        {
+            PREF__rnnoise_active = settings.getBoolean("rnnoise_active", false);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            PREF__rnnoise_active = false;
+        }
+        if (PREF__rnnoise_active)
+        {
+            set_rnnoise_active(1);
+        }
+        else
+        {
+            set_rnnoise_active(0);
         }
 
         //if (MainActivity.IS_GPLAY_VERSION)
