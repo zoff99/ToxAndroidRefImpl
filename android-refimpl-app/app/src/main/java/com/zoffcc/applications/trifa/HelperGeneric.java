@@ -4660,7 +4660,7 @@ public class HelperGeneric
             else
             {
                 print_stack_trace();
-                manager.setMode(AudioManager.MODE_IN_CALL);
+                manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 manager.setWiredHeadsetOn(false);
                 manager.setBluetoothScoOn(false);
                 manager.setSpeakerphoneOn(true);
@@ -4706,7 +4706,7 @@ public class HelperGeneric
             else
             {
                 print_stack_trace();
-                manager.setMode(AudioManager.MODE_IN_CALL);
+                manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 manager.setWiredHeadsetOn(false);
                 manager.setBluetoothScoOn(false);
                 manager.setSpeakerphoneOn(false);
@@ -4765,7 +4765,7 @@ public class HelperGeneric
             else
             {
                 print_stack_trace();
-                manager.setMode(AudioManager.MODE_IN_CALL);
+                manager.setMode(AudioManager.MODE_IN_COMMUNICATION);
                 manager.setBluetoothScoOn(false);
                 manager.setSpeakerphoneOn(false);
                 manager.setWiredHeadsetOn(true);
