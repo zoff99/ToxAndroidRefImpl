@@ -1655,7 +1655,10 @@ public class GroupMessageListActivity extends AppCompatActivity
         ml_is_recording = false;
         ml_is_rec_ok = false;
 
-        stop_group_video(this);
+        // HINT: here we leave the GroupMessageListActivity
+        //       but it could be that we are starting the CallingActivity because there is an icoming call
+        //       then this would reset the values for the incoming call :-(
+        stop_group_video(this, !Callstate.incoming_one_on_one_call);
         closeCamera();
         MainActivity.group_message_list_fragment = null;
         MainActivity.group_message_list_activity = null;
@@ -1708,7 +1711,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         // reset update trigger timestamp
         update_group_all_users_last_trigger_ts = 0;
 
-        stop_group_video(this);
+        stop_group_video(this, true);
         closeCamera();
         ngc_video_packet_last_incoming_ts = -1;
         ngc_incoming_video_peer_toggle_current_index = 0;
@@ -3097,7 +3100,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
     }
 
-    synchronized public static void stop_group_video(final Context c)
+    synchronized public static void stop_group_video(final Context c, boolean reset_call_values)
     {
         ngc_video_showing_video_from_peer_pubkey = "-1";
         NGC_Group_video_play_thread_running = false;
@@ -3109,7 +3112,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         // ---- stop audio stuff
         try
         {
-            GroupGroupAudioService.stop_me(true);
+            GroupGroupAudioService.stop_me(true, reset_call_values);
         }
         catch (Exception e)
         {
@@ -3851,7 +3854,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         if (sending_video_to_group)
         {
-            stop_group_video(view.getContext());
+            stop_group_video(view.getContext(), true);
             closeCamera();
         }
         else

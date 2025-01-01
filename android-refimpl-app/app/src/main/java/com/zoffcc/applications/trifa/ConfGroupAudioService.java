@@ -538,6 +538,7 @@ public class ConfGroupAudioService extends Service
         Callstate.audio_group_active = false;
         if (stop_full)
         {
+            Log.i(TAG, "reset_values:003");
             Callstate.reset_values();
         }
         ConferenceAudioActivity.conf_id = "-1";

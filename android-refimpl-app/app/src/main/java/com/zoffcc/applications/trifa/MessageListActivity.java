@@ -2023,6 +2023,7 @@ public class MessageListActivity extends AppCompatActivity
                         Callstate.accepted_call = 1; // we started the call, so it's already accepted on our side
                         Callstate.call_first_video_frame_received = -1;
                         Callstate.call_start_timestamp = -1;
+                        Log.i(TAG, "friend_pubkey:set:004");
                         Callstate.friend_pubkey = tox_friend_get_public_key__wrapper(fn);
                         Callstate.camera_opened = false;
                         Callstate.audio_speaker = true;

@@ -22,6 +22,7 @@ package com.zoffcc.applications.trifa;
 
 import android.provider.CallLog;
 import android.telecom.Call;
+import android.util.Log;
 
 import static com.zoffcc.applications.trifa.CallingActivity.set_debug_text;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_AUDIO_BITRATE;
@@ -31,10 +32,13 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_CODEC_VP8;
 
 public class Callstate
 {
+    private static final String TAG = "trifa.Callstate";
+
     static int state = 0; // 0 -> not in a call, 1 -> ringing/calling
     static int tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_NONE.value;
     static boolean audio_call = false;
     static String friend_pubkey = "-1";
+    static boolean incoming_one_on_one_call = false;
     static String friend_alias_name = "";
     static int other_audio_enabled = 1;
     static int other_video_enabled = 1;
@@ -79,7 +83,9 @@ public class Callstate
         Callstate.call_first_audio_frame_received = -1;
         Callstate.call_start_timestamp = -1;
         Callstate.call_init_timestamp = -1;
+        Log.i(TAG, "friend_pubkey:set:001");
         Callstate.friend_pubkey = "-1";
+        Callstate.incoming_one_on_one_call = false;
         Callstate.friend_alias_name = "";
         Callstate.other_audio_enabled = 1;
         Callstate.other_video_enabled = 1;

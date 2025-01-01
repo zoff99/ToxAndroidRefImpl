@@ -474,7 +474,7 @@ public class GroupGroupAudioService extends Service
         }
     }
 
-    public static void stop_me(boolean stop_full)
+    public static void stop_me(boolean stop_full, boolean reset_call_values)
     {
         ngc_running = false;
         try
@@ -493,7 +493,11 @@ public class GroupGroupAudioService extends Service
         Callstate.audio_ngc_group_active = false;
         if (stop_full)
         {
-            Callstate.reset_values();
+            if (reset_call_values)
+            {
+                Log.i(TAG, "reset_values:004");
+                Callstate.reset_values();
+            }
         }
         GroupGroupAudioService.group_id = "-1";
         AudioRecording.global_audio_group_send_res = -999;

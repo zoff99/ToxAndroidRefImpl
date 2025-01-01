@@ -1729,6 +1729,7 @@ public class MainActivity extends AppCompatActivity
         last_video_frame_received = -1;
         count_video_frame_received = 0;
         count_video_frame_sent = 0;
+        Log.i(TAG, "friend_pubkey:set:002");
         Callstate.friend_pubkey = "-1";
         Callstate.audio_speaker = true;
         Callstate.other_audio_enabled = 1;
@@ -3750,6 +3751,7 @@ public class MainActivity extends AppCompatActivity
                         }
 
                         Callstate.state = 1;
+                        Callstate.incoming_one_on_one_call = true;
                         Callstate.accepted_call = 0;
                         Callstate.call_first_video_frame_received = -1;
                         Callstate.call_first_audio_frame_received = -1;
@@ -3775,6 +3777,7 @@ public class MainActivity extends AppCompatActivity
                         {
                         }
                         Intent intent = new Intent(context_s.getApplicationContext(), CallingActivity.class);
+                        Log.i(TAG, "friend_pubkey:set:003");
                         Callstate.friend_pubkey = HelperFriend.tox_friend_get_public_key__wrapper(fn);
                         Callstate.friend_alias_name = get_friend_name_from_pubkey(Callstate.friend_pubkey);
                         Callstate.other_audio_enabled = f_audio_enabled;

@@ -1489,6 +1489,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
     public static void close_conference_audio_activity()
     {
+        Log.i(TAG, "reset_values:002");
         Callstate.reset_values();
         conf_id = "-1";
         conf_id_prev = "-1";

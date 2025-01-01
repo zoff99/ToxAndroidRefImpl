@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.KeyguardManager;
@@ -1256,43 +1257,53 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             @Override
             public boolean onTouch(View v, MotionEvent event)
             {
+                Log.i(TAG, "accept_button:onTouch:001");
                 try
                 {
                     if (event.getAction() != MotionEvent.ACTION_UP)
                     {
+                        Log.i(TAG, "accept_button:onTouch:002");
                     }
                     else
                     {
+                        Log.i(TAG, "accept_button:onTouch:003 " + Callstate.accepted_call + " " + Callstate.friend_pubkey);
                         if (Callstate.accepted_call != 1)
                         {
                             Log.i(TAG, "answer button pressed");
+                            Log.i(TAG, "accept_button:onTouch:004 " + Callstate.audio_call);
 
                             if (Callstate.audio_call)
                             {
                                 int res1 = toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                         GLOBAL_AUDIO_BITRATE, 0);
 
+                                Log.i(TAG, "accept_button:onTouch:004:001" + res1);
                                 if (res1 != 1)
                                 {
+                                    Log.i(TAG, "accept_button:onTouch:004:002");
                                     return true;
                                 }
                                 Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
+                                Log.i(TAG, "accept_button:onTouch:004:003");
                             }
                             else
                             {
                                 int res2 = toxav_answer(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
                                                         GLOBAL_AUDIO_BITRATE, GLOBAL_VIDEO_BITRATE);
+                                Log.i(TAG, "accept_button:onTouch:004:011: " + res2);
 
                                 if (res2 != 1)
                                 {
+                                    Log.i(TAG, "accept_button:onTouch:004:012");
                                     return true;
                                 }
 
                                 Callstate.tox_call_state = ToxVars.TOXAV_FRIEND_CALL_STATE.TOXAV_FRIEND_CALL_STATE_SENDING_V.value;
-
+                                Log.i(TAG, "accept_button:onTouch:004:014");
                             }
 
                             Callstate.accepted_call = 1;
+                            Log.i(TAG, "accept_button:onTouch:005");
 
                             caller_avatar_view.setVisibility(View.GONE);
                             accept_button.setVisibility(View.GONE);
@@ -1308,8 +1319,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                             Log.i(TAG, "on_call_started_actions:01");
                             on_call_started_actions();
+                            Log.i(TAG, "accept_button:onTouch:006");
+
                             if (Callstate.audio_call)
                             {
+                                Log.i(TAG, "accept_button:onTouch:006 " + Callstate.audio_call);
+
                                 toggle_osd_view_including_cam_preview(!Callstate.audio_call);
                             }
 
@@ -1319,6 +1334,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                    Log.i(TAG, "accept_button:onTouch:006:EE01:" + e.getMessage());
                 }
                 return true;
             }
@@ -1447,6 +1463,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     public static void close_calling_activity()
     {
+        Log.i(TAG, "reset_values:001");
         Callstate.reset_values();
         // close calling activity --------
         ca.finish();
@@ -1582,6 +1599,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
     }
 
+    @SuppressLint("MissingSuperCall")
     @Override
     public void onBackPressed()
     {
@@ -1602,6 +1620,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onResume();
 
         tox_set_onion_active(0);
+        Callstate.incoming_one_on_one_call = false;
 
         try
         {
