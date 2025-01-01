@@ -1432,6 +1432,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         long peer_num;
         String peer_pubkey;
         int peer_connection_status;
+        boolean notification_silent;
         boolean self;
     }
 
@@ -1512,6 +1513,14 @@ public class GroupMessageListActivity extends AppCompatActivity
                         {
                             glp.self = false;
                         }
+                        if (peer_from_db != null)
+                        {
+                            glp.notification_silent = peer_from_db.notification_silent;
+                        }
+                        else
+                        {
+                            glp.notification_silent = false;
+                        }
                         glp.peer_pubkey = peer_pubkey_temp;
                         glp.peer_num = i;
                         glp.peer_name = peer_name_temp;
@@ -1543,7 +1552,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                 for (group_list_peer peerl : group_peers1)
                 {
-                    add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status, peerl.self);
+                    add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status, peerl.self, peerl.notification_silent);
                 }
             }
         }
@@ -1588,6 +1597,14 @@ public class GroupMessageListActivity extends AppCompatActivity
                     String peer_name_temp =  peerrole + peer_name + " :" + i + ": " + peer_pubkey_temp.substring(0, 6);
 
                     group_list_peer glp3 = new group_list_peer();
+                    if (peer_from_db != null)
+                    {
+                        glp3.notification_silent = peer_from_db.notification_silent;
+                    }
+                    else
+                    {
+                        glp3.notification_silent = false;
+                    }
                     glp3.peer_pubkey = peer_pubkey_temp;
                     glp3.peer_num = i;
                     glp3.peer_name = peer_name_temp;
@@ -1619,7 +1636,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             for (group_list_peer peerloffline : group_peers_offline)
             {
                 add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name,
-                               peerloffline.peer_connection_status, false);
+                               peerloffline.peer_connection_status, false, peerloffline.notification_silent);
             }
 
         }
@@ -1720,6 +1737,13 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         MainActivity.group_message_list_activity = this;
         wakeup_tox_thread();
+        try
+        {
+            update_group_all_users();
+        }
+        catch (Exception e)
+        {
+        }
         NGC_Group_video_check_incoming_thread = new Thread()
         {
             @Override
@@ -2617,7 +2641,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         // TODO: write me
     }
 
-    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name, int connection_status, boolean self)
+    synchronized void add_group_user(final String peer_pubkey, final long peernum, String name, int connection_status, boolean self, boolean notification_silent)
     {
         try
         {
@@ -2672,6 +2696,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                                         if (self)
                                         {
                                             new_item.withTextColor(Color.parseColor("#FF5733"));
+                                        }
+                                        else if (notification_silent)
+                                        {
+                                            new_item.withTextColor(Color.parseColor("#d7b442"));
                                         }
                                     }
                                     catch (Exception e)

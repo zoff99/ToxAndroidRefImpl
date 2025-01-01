@@ -51,6 +51,10 @@ public class GroupPeerDB
     @Column(indexed = true, defaultExpr = "2", helpers = Column.Helpers.ALL)
     int Tox_Group_Role = 2;
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    @Nullable
+    boolean notification_silent = false; // show notifications for this peer?
+
     static GroupPeerDB deep_copy(GroupPeerDB in)
     {
         GroupPeerDB out = new GroupPeerDB();
@@ -60,6 +64,7 @@ public class GroupPeerDB
         out.last_update_timestamp = in.last_update_timestamp;
         out.first_join_timestamp = in.first_join_timestamp;
         out.Tox_Group_Role = in.Tox_Group_Role;
+        out.notification_silent = in.notification_silent;
         return out;
     }
 
@@ -69,6 +74,7 @@ public class GroupPeerDB
         return "id=" + id + ", group_identifier=" + group_identifier + ", tox_group_peer_pubkey=" +
                tox_group_peer_pubkey.substring(0, 4) + ", peer_name=" + peer_name +
                ", last_update_timestamp=" + last_update_timestamp +
-               ", first_join_timestamp=" + first_join_timestamp + ", Tox_Group_Role=" + Tox_Group_Role;
+               ", first_join_timestamp=" + first_join_timestamp + ", Tox_Group_Role=" + Tox_Group_Role +
+               ", notification_silent=" + notification_silent;
     }
 }

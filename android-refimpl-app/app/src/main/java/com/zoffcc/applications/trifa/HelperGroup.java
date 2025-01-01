@@ -744,6 +744,42 @@ public class HelperGroup
         }
     }
 
+    static void group_notification_silent_peer_set(final String group_identifier, final String group_peer_pubkey, boolean silent)
+    {
+        try
+        {
+            if (group_identifier != null)
+            {
+                orma.updateGroupPeerDB().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(group_peer_pubkey).
+                        notification_silent(silent).
+                        last_update_timestamp(System.currentTimeMillis()).
+                        execute();
+                // Log.i(TAG, "group_notification_silent_peer_set: " + silent);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static boolean group_notification_silent_peer_get(final String group_identifier, final String group_peer_pubkey)
+    {
+        boolean ret = false;
+        try
+        {
+            if (group_identifier != null)
+            {
+                ret = orma.selectFromGroupPeerDB().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(group_peer_pubkey).get(0).notification_silent;
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+        // Log.i(TAG, "group_notification_silent_peer_get: " + ret);
+        return ret;
+    }
+
     static void update_group_messages_peer_role(String group_identifier, String group_peer_pubkey, int aTox_Group_Role)
     {
         try
@@ -960,10 +996,16 @@ public class HelperGroup
             return;
         }
 
+        final String peer_pubkey = HelperGroup.tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+
         String groupname = null;
         try
         {
             if (group_temp.notification_silent)
+            {
+                do_notification = false;
+            }
+            if (group_notification_silent_peer_get(group_id, peer_pubkey))
             {
                 do_notification = false;
             }
@@ -974,6 +1016,8 @@ public class HelperGroup
             // e.printStackTrace();
             do_notification = false;
         }
+
+
 
 
         if (group_message_list_activity != null)
@@ -991,7 +1035,7 @@ public class HelperGroup
         GroupMessage m = new GroupMessage();
         m.is_new = do_badge_update;
         // m.tox_friendnum = friend_number;
-        m.tox_group_peer_pubkey = HelperGroup.tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+        m.tox_group_peer_pubkey = peer_pubkey;
         m.direction = 0; // msg received
         m.TOX_MESSAGE_TYPE = 0;
         m.read = false;
@@ -1152,6 +1196,10 @@ public class HelperGroup
         try
         {
             if (group_temp.notification_silent)
+            {
+                do_notification = false;
+            }
+            if (group_notification_silent_peer_get(group_identifier, peer_pubkey))
             {
                 do_notification = false;
             }
@@ -1621,10 +1669,16 @@ public class HelperGroup
                 return;
             }
 
+            final String peer_pubkey = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+
             String groupname = null;
             try
             {
                 if (group_temp.notification_silent)
+                {
+                    do_notification = false;
+                }
+                if (group_notification_silent_peer_get(group_id, peer_pubkey))
                 {
                     do_notification = false;
                 }
@@ -1691,7 +1745,7 @@ public class HelperGroup
 
             GroupMessage m = new GroupMessage();
             m.is_new = do_badge_update;
-            m.tox_group_peer_pubkey = tox_group_peer_get_public_key__wrapper(group_number, peer_id);
+            m.tox_group_peer_pubkey = peer_pubkey;
             m.direction = 0; // msg received
             m.TOX_MESSAGE_TYPE = 0;
             m.read = false;
@@ -2633,7 +2687,10 @@ public class HelperGroup
                 {
                     do_notification = false;
                 }
-
+                if (group_notification_silent_peer_get(group_identifier, original_sender_peerpubkey))
+                {
+                    do_notification = false;
+                }
                 groupname = group_temp.name;
             }
             catch (Exception e)

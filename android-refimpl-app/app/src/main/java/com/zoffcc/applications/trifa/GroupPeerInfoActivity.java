@@ -46,12 +46,15 @@ import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
+import static com.zoffcc.applications.trifa.HelperGroup.group_notification_silent_peer_get;
+import static com.zoffcc.applications.trifa.HelperGroup.group_notification_silent_peer_set;
 import static com.zoffcc.applications.trifa.HelperGroup.insert_into_group_message_db;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_in_groupmessagelist;
 import static com.zoffcc.applications.trifa.HelperGroup.update_group_peer_in_db;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
+import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_mod_kick_peer;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_mod_set_role;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_get_role;
@@ -72,6 +75,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
     TextView group_peerrole_text = null;
     TextView peer_first_join_text = null;
     AppCompatButton group_kickpeer_button = null;
+    AppCompatButton group_notification_silent_button = null;
     AppCompatSpinner group_peerrole_select = null;
     String group_id = null;
     private String[] tox_ngc_group_role_items;
@@ -94,6 +98,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
         group_peerrole_text = (TextView) findViewById(R.id.group_peerrole_text);
         group_send_private_message = (EditText) findViewById(R.id.group_send_private_message);
         group_kickpeer_button = findViewById(R.id.group_kickpeer_button);
+        group_notification_silent_button = findViewById(R.id.group_notification_silent_button);
         group_peerrole_select = findViewById(R.id.group_peerrole_select);
         group_peerrole_set_button = findViewById(R.id.group_peerrole_set_button);
         peer_first_join_text = findViewById(R.id.peer_first_join_text);
@@ -166,6 +171,35 @@ public class GroupPeerInfoActivity extends AppCompatActivity
             }
         });
 
+        boolean notification_silent = group_notification_silent_peer_get(group_id, peer_pubkey);
+        if (notification_silent) {
+            group_notification_silent_button.setText("activate Notifications for Peer");
+        } else {
+            group_notification_silent_button.setText("mute Notifications for Peer");
+        }
+        group_notification_silent_button.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                try
+                {
+                    boolean notification_silent1 = group_notification_silent_peer_get(group_id, peer_pubkey);
+                    group_notification_silent_peer_set(group_id, peer_pubkey, !notification_silent1);
+                    if (!notification_silent1) {
+                        group_notification_silent_button.setText("activate Notifications for Peer");
+                    } else {
+                        group_notification_silent_button.setText("mute Notifications for Peer");
+                    }
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
         group_kickpeer_button.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -184,7 +218,6 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                                                 peer_pubkey, ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value);
                         update_group_in_groupmessagelist(group_id);
                     }
-
                 }
                 catch (Exception ignored)
                 {
