@@ -25,12 +25,18 @@ plugins {
 // apply plugin: 'kotlin-android-extensions'
 
 def getGitHash = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', '--verify', '--short=8', 'HEAD'
-        standardOutput = stdout
+    try {
+        def stdout = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--verify', '--short=8', 'HEAD'
+            standardOutput = stdout
+        }
+        return stdout.toString().trim()
     }
-    return stdout.toString().trim()
+    catch (Exception ignored)
+    {
+        return "????????"
+    }
 }
 
 android {
