@@ -41,7 +41,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
 {
     private static final String TAG = "trifa.GrpMesgelistAdptr";
 
-    private final List<com.zoffcc.applications.sorm.GroupMessage> messagelistitems;
+    private final List<GroupMessage> messagelistitems;
     private Context context;
 
     private GroupMessage getSectionText_message_object = null;
@@ -51,7 +51,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     String getSectionText_message_object_ts_string2 = " ";
 
 
-    public GroupMessagelistAdapter(Context context, List<com.zoffcc.applications.sorm.GroupMessage> items)
+    public GroupMessagelistAdapter(Context context, List<GroupMessage> items)
     {
         // Log.i(TAG, "GroupMessagelistAdapter");
 

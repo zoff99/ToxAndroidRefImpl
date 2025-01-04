@@ -289,7 +289,7 @@ public class HelperFiletransfer
     {
         try
         {
-            Filetransfer ft = orma.selectFromFiletransfer().idEq(filetransfer_id).get(0);
+            Filetransfer ft = (Filetransfer) orma.selectFromFiletransfer().idEq(filetransfer_id).get(0);
 
             if (MainActivity.VFS_ENCRYPT)
             {
@@ -591,7 +591,7 @@ public class HelperFiletransfer
 
         try
         {
-            f = orma.selectFromFiletransfer().
+            f = (Filetransfer) orma.selectFromFiletransfer().
                     file_numberEq(file_number).
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().
@@ -700,11 +700,11 @@ public class HelperFiletransfer
     {
         try
         {
-            List<Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).toList();
-            for (Filetransfer f : fts_active)
+            List<com.zoffcc.applications.sorm.Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).toList();
+            for (com.zoffcc.applications.sorm.Filetransfer f : fts_active)
             {
                 // Log.i(TAG, "set_all_filetransfers_inactive:cancel:id=" + f.tox_file_id_hex + " filename=" + f.file_name);
-                cancel_filetransfer_f(f);
+                cancel_filetransfer_f((Filetransfer) f);
             }
 
             orma.updateFiletransfer().
@@ -928,7 +928,7 @@ public class HelperFiletransfer
             // update message view
             update_single_message_from_messge_id(m.id, true);
 
-            Filetransfer ft = orma.selectFromFiletransfer().
+            Filetransfer ft = (Filetransfer) orma.selectFromFiletransfer().
                     idEq(m.filetransfer_id).
                     orderByIdDesc().get(0);
 
@@ -1147,7 +1147,7 @@ public class HelperFiletransfer
         try
         {
             final String export_filename = SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey + "/";
-            final FileDB file_ = orma.selectFromFileDB().idEq(m.filedb_id).get(0);
+            final FileDB file_ = (FileDB) orma.selectFromFileDB().idEq(m.filedb_id).get(0);
             java.io.File f = new java.io.File(export_filename + file_.file_name);
             if (f.exists() && (f.isFile()) && (f.canRead() && (f.length() > 0)))
             {

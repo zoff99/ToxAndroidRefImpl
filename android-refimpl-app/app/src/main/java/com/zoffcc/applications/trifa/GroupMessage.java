@@ -32,116 +32,116 @@ import static com.zoffcc.applications.trifa.ToxVars.Tox_Group_Role.TOX_GROUP_ROL
 public class GroupMessage extends com.zoffcc.applications.sorm.GroupMessage
 {
     @PrimaryKey(autoincrement = true, auto = true)
-    long id; // uniqe message id!!
+    public long id; // uniqe message id!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL, defaultExpr = "")
     @Nullable
-    String message_id_tox = ""; // Tox Group Message_ID (4 bytes as hex string lowercase)
+    public String message_id_tox = ""; // Tox Group Message_ID (4 bytes as hex string lowercase)
 
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
-    String group_identifier = "-1"; // f_key -> GroupDB.group_identifier
+    public String group_identifier = "-1"; // f_key -> GroupDB.group_identifier
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    String tox_group_peer_pubkey;
+    public String tox_group_peer_pubkey;
 
     @Column(indexed = true, defaultExpr = "-1", helpers = Column.Helpers.ALL)
     public int tox_group_peer_role = -1;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    int private_message = 0; // 0 -> message to group, 1 -> msg privately to/from peer
+    public int private_message = 0; // 0 -> message to group, 1 -> msg privately to/from peer
 
     @Column(indexed = true, defaultExpr = "", helpers = Column.Helpers.ALL)
     @Nullable
-    String tox_group_peername = ""; // saved for backup, when conference is offline!
+    public String tox_group_peername = ""; // saved for backup, when conference is offline!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    int direction = 0; // 0 -> msg received, 1 -> msg sent
+    public int direction = 0; // 0 -> msg received, 1 -> msg sent
 
     @Column(indexed = true)
-    int TOX_MESSAGE_TYPE = 0; // 0 -> normal, 1 -> action
+    public int TOX_MESSAGE_TYPE = 0; // 0 -> normal, 1 -> action
 
     @Column(indexed = true, defaultExpr = "0")
-    int TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+    public int TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
 
     @Column(helpers = Column.Helpers.ALL)
     @Nullable
-    long sent_timestamp = 0L;
+    public long sent_timestamp = 0L;
 
     @Column(indexed = true)
     @Nullable
-    long rcvd_timestamp = 0L;
+    public long rcvd_timestamp = 0L;
 
     @Column(helpers = Column.Helpers.ALL)
-    boolean read = false;
+    public boolean read = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    boolean is_new = true;
+    public boolean is_new = true;
 
     @Column(helpers = Column.Helpers.ALL)
     @Nullable
-    String text = null;
+    public String text = null;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    boolean was_synced = false;
+    public boolean was_synced = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    int TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
+    public int TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
 
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
-    int sync_confirmations = 0;
+    public int sync_confirmations = 0;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String tox_group_peer_pubkey_syncer_01;
+    public String tox_group_peer_pubkey_syncer_01;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String tox_group_peer_pubkey_syncer_02;
+    public String tox_group_peer_pubkey_syncer_02;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String tox_group_peer_pubkey_syncer_03;
+    public String tox_group_peer_pubkey_syncer_03;
 
     @Column(indexed = true)
     @Nullable
-    long tox_group_peer_pubkey_syncer_01_sent_timestamp = 0L;
+    public long tox_group_peer_pubkey_syncer_01_sent_timestamp = 0L;
 
     @Column(indexed = true)
     @Nullable
-    long tox_group_peer_pubkey_syncer_02_sent_timestamp = 0L;
+    public long tox_group_peer_pubkey_syncer_02_sent_timestamp = 0L;
 
     @Column(indexed = true)
     @Nullable
-    long tox_group_peer_pubkey_syncer_03_sent_timestamp = 0L;
+    public long tox_group_peer_pubkey_syncer_03_sent_timestamp = 0L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String msg_id_hash = null; // 32 byte hash
+    public String msg_id_hash = null; // 32 byte hash
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String sent_privately_to_tox_group_peer_pubkey = null;
+    public String sent_privately_to_tox_group_peer_pubkey = null;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String path_name = "";
+    public String path_name = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     @Nullable
-    String file_name = "";
+    public String file_name = "";
 
     @Column(helpers = Column.Helpers.ALL)
     @Nullable
-    String filename_fullpath = null;
+    public String filename_fullpath = null;
 
     @Column(defaultExpr = "-1", indexed = true, helpers = Column.Helpers.ALL)
-    long filesize = -1;
+    public long filesize = -1;
 
     @Column(indexed = true, defaultExpr = "false")
-    boolean storage_frame_work = false;
+    public boolean storage_frame_work = false;
 
     // ______@@SORMA_END@@______
 
