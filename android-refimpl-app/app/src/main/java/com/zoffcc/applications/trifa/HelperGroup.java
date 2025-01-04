@@ -635,7 +635,7 @@ public class HelperGroup
     {
         try
         {
-            Iterator<GroupMessage> i1 = orma.selectFromGroupMessage().group_identifierEq(group_identifier.toLowerCase()).
+            Iterator<com.zoffcc.applications.sorm.GroupMessage> i1 = orma.selectFromGroupMessage().group_identifierEq(group_identifier.toLowerCase()).
                     directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
                     TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                     toList().iterator();
@@ -1916,7 +1916,7 @@ public class HelperGroup
 
                     // Log.i(TAG, "sync_group_message_history:sync_from_ts:" + sync_from_ts);
 
-                    Iterator<GroupMessage> i1 =  orma.selectFromGroupMessage()
+                    Iterator<com.zoffcc.applications.sorm.GroupMessage> i1 =  orma.selectFromGroupMessage()
                             .group_identifierEq(group_identifier)
                             // .TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value)
                             .private_messageEq(0)

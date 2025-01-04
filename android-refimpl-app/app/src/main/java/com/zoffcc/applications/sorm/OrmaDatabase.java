@@ -374,7 +374,7 @@ public class OrmaDatabase
         // create a database connection
         try
         {
-            // Class.forName("org.sqlite.JDBC");
+            Class.forName("org.sqlite.JDBC");
             sqldb = DriverManager.getConnection("jdbc:sqlite:" + database_files_dir + File.separator + database_files_name);
         }
         catch (Exception e)

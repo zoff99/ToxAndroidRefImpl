@@ -16,9 +16,6 @@ public class OrmaDatabase extends com.zoffcc.applications.sorm.OrmaDatabase
         java.io.File db = new java.io.File(db_file_path);
         try
         {
-            String class_sqlite = String.valueOf(Class.forName("org.sqlite.JDBC"));
-            System.out.println(TAG + class_sqlite);
-
             open_db(db_file_path, secrect_key, wal_mode);
             boolean db_open = check_db_open();
             if (!db_open)
@@ -92,6 +89,9 @@ public class OrmaDatabase extends com.zoffcc.applications.sorm.OrmaDatabase
     {
         try
         {
+            System.out.println(TAG + "#########################");
+            String class_sqlite = String.valueOf(Class.forName("org.sqlite.JDBC"));
+            System.out.println(TAG + class_sqlite);
             sqldb = DriverManager.getConnection("jdbc:sqlite:" + db_file_path);
         }
         catch (Exception e)
@@ -101,6 +101,7 @@ public class OrmaDatabase extends com.zoffcc.applications.sorm.OrmaDatabase
 
         // set password
         // TODO: escape password, but we can not use prepared statement here :-(
+        System.out.println(TAG + "password=" + password);
         final String set_key = "PRAGMA key = '" + password + "';";
         run_multi_sql(set_key);
 

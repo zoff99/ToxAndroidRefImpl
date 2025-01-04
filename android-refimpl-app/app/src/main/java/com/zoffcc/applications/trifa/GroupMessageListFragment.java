@@ -52,7 +52,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 public class GroupMessageListFragment extends Fragment
 {
     private static final String TAG = "trifa.GrpMsgListFrgnt";
-    List<GroupMessage> data_values = null;
+    List<com.zoffcc.applications.sorm.GroupMessage> data_values = null;
     String current_group_id = "-1";
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     GroupMessagelistAdapter adapter = null;

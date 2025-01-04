@@ -166,7 +166,7 @@ public class GroupMessage
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
-    public List<com.zoffcc.applications.trifa.GroupMessage> toList()
+    public List<GroupMessage> toList()
     {
         List<GroupMessage> list = new ArrayList<>();
         try
