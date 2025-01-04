@@ -72,7 +72,7 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
         {
             if (have_avatar_for_pubkey)
             {
-                fl_temp = orma.selectFromFriendList().
+                fl_temp = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(peer_pubkey).get(0);
 
                 if (VFS_ENCRYPT)

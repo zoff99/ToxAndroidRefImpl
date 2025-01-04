@@ -5,8 +5,6 @@
 
 package com.zoffcc.applications.sorm;
 
-import com.zoffcc.applications.sorm.Log;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -168,7 +166,7 @@ public class GroupMessage
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
-    public List<GroupMessage> toList()
+    public List<com.zoffcc.applications.trifa.GroupMessage> toList()
     {
         List<GroupMessage> list = new ArrayList<>();
         try

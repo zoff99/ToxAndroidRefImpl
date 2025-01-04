@@ -458,6 +458,7 @@ public class MainActivity extends AppCompatActivity
     static final int SAMPLE_RATE_FIXED = 48000;
     static int PREF__min_audio_samplingrate_out = SAMPLE_RATE_FIXED;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092"; // this is just a dummy, this value is not used!
+    static boolean PREF__DB_wal_mode = false;
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
     static int PREF__higher_video_quality = 0;
@@ -710,16 +711,16 @@ public class MainActivity extends AppCompatActivity
                 // Log.i(TAG, "db:path=" + dbs_path);
                 File database_dir = new File(new File(dbs_path).getParent());
                 database_dir.mkdirs();
-                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
 
                 if (DB_ENCRYPT)
                 {
-                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                    // builder = builder.provider(new OrmaDatabase.EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                    orma = new OrmaDatabase(dbs_path, PREF__DB_secrect_key, PREF__DB_wal_mode);
                 }
-
-                orma = builder.name(dbs_path).readOnMainThread(AccessThreadConstraint.NONE).writeOnMainThread(
-                        AccessThreadConstraint.NONE).trace(ORMA_TRACE).build();
-                // Log.i(TAG, "db:open=OK:path=" + dbs_path);
+                else
+                {
+                    orma = new OrmaDatabase(dbs_path, null, PREF__DB_wal_mode);
+                }
             }
             catch (Exception e)
             {
@@ -743,17 +744,17 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 // Log.i(TAG, "db:path(2)=" + dbs_path);
-                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-
-                if (DB_ENCRYPT)
-                {
-                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-                }
-
                 try
                 {
-                    orma = builder.name(dbs_path).readOnMainThread(AccessThreadConstraint.WARNING).writeOnMainThread(
-                            AccessThreadConstraint.WARNING).trace(ORMA_TRACE).build();
+                    if (DB_ENCRYPT)
+                    {
+                        // builder = builder.provider(new OrmaDatabase.EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                        orma = new OrmaDatabase(dbs_path, PREF__DB_secrect_key, PREF__DB_wal_mode);
+                    }
+                    else
+                    {
+                        orma = new OrmaDatabase(dbs_path, null, PREF__DB_wal_mode);
+                    }
                 }
                 catch (Exception e4)
                 {

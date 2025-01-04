@@ -43,6 +43,9 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.yariksoffice.lingver.Lingver;
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.Message;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 
@@ -1034,9 +1037,9 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
                     List<NodeJS> bootstrap_nodes_list_from_internet = fromJson.getNodes();
 
-                    List<BootstrapNodeEntryDB> BootstrapNodeEntryDB_ids_full = orma.selectFromBootstrapNodeEntryDB().orderByIdAsc().toList();
+                    List<com.zoffcc.applications.sorm.BootstrapNodeEntryDB> BootstrapNodeEntryDB_ids_full = orma.selectFromBootstrapNodeEntryDB().orderByIdAsc().toList();
                     List<Long> BootstrapNodeEntryDB_ids = new ArrayList<Long>();
-                    for (BootstrapNodeEntryDB bn1 : BootstrapNodeEntryDB_ids_full)
+                    for (com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn1 : BootstrapNodeEntryDB_ids_full)
                     {
                         BootstrapNodeEntryDB_ids.add(bn1.id);
                     }
@@ -1323,19 +1326,19 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 File export_dir = new File(export_dir_string);
                 export_dir.mkdirs();
 
-                List<FriendList> fl = orma.selectFromFriendList().
+                List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
                         is_relayEq(false).
                         orderByTox_public_key_stringAsc().
                         toList();
                 // Log.i(TAG, "export_friends:" + fl.size());
-                for (FriendList f : fl)
+                for (com.zoffcc.applications.sorm.FriendList f : fl)
                 {
                     String dirpath = export_dir_string + "/" + f.tox_public_key_string + "_" +
                                      filter_out_specials_from_filepath_stricter(f.name);
                     // Log.i(TAG, "friend:xxx:F:" + dirpath);
                     new File(dirpath).mkdirs();
 
-                    List<Message> ml = orma.selectFromMessage().
+                    List<com.zoffcc.applications.sorm.Message> ml = orma.selectFromMessage().
                             tox_friendpubkeyEq(f.tox_public_key_string).
                             toList();
                     // Log.i(TAG, "export_messages_count:" + ml.size() + " friend=" + f.tox_public_key_string);
@@ -1382,7 +1385,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     }
                 }
 
-                List<ConferenceDB> cl = orma.selectFromConferenceDB().
+                List<com.zoffcc.applications.sorm.ConferenceDB> cl = orma.selectFromConferenceDB().
                         kindEq(TOX_CONFERENCE_TYPE_TEXT.value).
                         orderByConference_identifierAsc().
                         toList();
@@ -1395,7 +1398,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     // Log.i(TAG, "friend:xxx:C:" + dirpath);
                     new File(dirpath).mkdirs();
 
-                    List<ConferenceMessage> cml = orma.selectFromConferenceMessage().
+                    List<com.zoffcc.applications.sorm.ConferenceMessage> cml = orma.selectFromConferenceMessage().
                             conference_identifierEq(conf.conference_identifier).toList();
                     for (ConferenceMessage cm : cml)
                     {

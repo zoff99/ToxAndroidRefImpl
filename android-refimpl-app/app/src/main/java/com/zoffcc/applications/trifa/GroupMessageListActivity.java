@@ -1491,7 +1491,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                         GroupPeerDB peer_from_db = null;
                         try
                         {
-                            peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(
+                            peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(
                                     group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
                         }
                         catch (Exception e)
@@ -1581,7 +1581,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     GroupPeerDB peer_from_db = null;
                     try
                     {
-                        peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(
+                        peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(
                                 group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
                     }
                     catch (Exception e)

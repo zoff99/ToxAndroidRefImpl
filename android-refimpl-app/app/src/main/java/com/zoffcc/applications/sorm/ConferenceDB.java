@@ -46,7 +46,7 @@ public class ConferenceDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public boolean notification_silent;
 
-    static ConferenceDB deep_copy(ConferenceDB in)
+    public static ConferenceDB deep_copy(ConferenceDB in)
     {
         ConferenceDB out = new ConferenceDB();
         out.conference_identifier = in.conference_identifier;

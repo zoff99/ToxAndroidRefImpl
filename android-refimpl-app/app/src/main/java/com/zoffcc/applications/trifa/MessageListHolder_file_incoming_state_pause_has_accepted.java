@@ -247,7 +247,7 @@ public class MessageListHolder_file_incoming_state_pause_has_accepted extends Re
         // Log.i(TAG, "getView:033:STATE:RESUME:ft_id=" + ft_id);
         if (ft_id != -1)
         {
-            final Filetransfer ft_ = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+            final Filetransfer ft_ = (Filetransfer) orma.selectFromFiletransfer().idEq(ft_id).get(0);
             final int percent = (int) (100f * (float) ft_.current_position / (float) ft_.filesize);
             // Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
             ft_progressbar.setProgress(percent);

@@ -403,7 +403,7 @@ public class HelperGeneric
         try
         {
             // TODO: cache me!!
-            conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
+            conf_temp = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
                     conference_number).conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
             // Log.i(TAG, "conference_message_add_from_sync:conf_id=" + conf_id);
@@ -787,7 +787,7 @@ public class HelperGeneric
     {
         try
         {
-            List<FriendList> fl = orma.selectFromFriendList().toList();
+            List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().toList();
 
             if (fl != null)
             {
@@ -796,7 +796,7 @@ public class HelperGeneric
                     int i = 0;
                     for (i = 0; i < fl.size(); i++)
                     {
-                        FriendList n = fl.get(i);
+                        FriendList n = (FriendList) fl.get(i);
                         // iterate over all online friends, and send them our new avatar
                         if (n.TOX_CONNECTION != TOX_CONNECTION_NONE.value)
                         {
@@ -1196,7 +1196,7 @@ public class HelperGeneric
     {
         try
         {
-            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(friend_pubkey).toList().get(0);
+            FriendList f = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(friend_pubkey).toList().get(0);
             return f.avatar_pathname + "/" + f.avatar_filename;
         }
         catch (Exception e)
@@ -1209,7 +1209,7 @@ public class HelperGeneric
     {
         try
         {
-            FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
+            FriendList f = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(
                     HelperFriend.tox_friend_get_public_key__wrapper(friendnum)).toList().get(0);
 
             if (f.avatar_pathname == null)
@@ -1373,7 +1373,7 @@ public class HelperGeneric
         {
             if (orma.selectFromTRIFADatabaseGlobalsNew().keyEq(key).count() == 1)
             {
-                TRIFADatabaseGlobalsNew g_opts = orma.selectFromTRIFADatabaseGlobalsNew().keyEq(key).get(0);
+                TRIFADatabaseGlobalsNew g_opts = (TRIFADatabaseGlobalsNew) orma.selectFromTRIFADatabaseGlobalsNew().keyEq(key).get(0);
                 // Log.i(TAG, "get_g_opts:(SELECT):key=" + key);
                 return g_opts.value;
             }
@@ -2788,7 +2788,7 @@ public class HelperGeneric
             try
             {
                 // update "new" status on friendlist fragment
-                FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                FriendList f = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
                 // HelperFriend.update_single_friend_in_friendlist_view(f);
                 HelperFriend.add_all_friends_clear_wrapper(0);
 
@@ -2931,7 +2931,7 @@ public class HelperGeneric
             try
             {
                 // update "new" status on friendlist fragment
-                FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                FriendList f = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
                 // HelperFriend.update_single_friend_in_friendlist_view(f);
                 HelperFriend.add_all_friends_clear_wrapper(0);
 
@@ -3077,7 +3077,7 @@ public class HelperGeneric
             try
             {
                 // update "new" status on friendlist fragment
-                FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                FriendList f = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
                 // HelperFriend.update_single_friend_in_friendlist_view(f);
                 HelperFriend.add_all_friends_clear_wrapper(0);
 
@@ -4501,7 +4501,7 @@ public class HelperGeneric
         {
             if (VFS_ENCRYPT)
             {
-                FriendList fl = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).get(0);
+                FriendList fl = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).get(0);
 
                 info.guardianproject.iocipher.File f1 = null;
                 try

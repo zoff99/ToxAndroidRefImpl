@@ -424,7 +424,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         {
             // Log.i(TAG, "have_avatar_for_pubkey:00a01x:" + message__tox_peername + ":" + message__tox_peerpubkey);
 
-            fl_temp = orma.selectFromFriendList().
+            fl_temp = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(message__tox_peerpubkey).get(0);
 
             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))

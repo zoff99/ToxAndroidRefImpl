@@ -19,14 +19,14 @@
 
 package com.zoffcc.applications.trifa;
 
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
+
 import androidx.annotation.Nullable;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
-
 @Table
-public class RelayListDB
+public class RelayListDB extends com.zoffcc.applications.sorm.RelayListDB
 {
     @PrimaryKey
     String tox_public_key_string = "";
@@ -48,19 +48,6 @@ public class RelayListDB
     String tox_public_key_string_of_owner = "";
 
     // ______@@SORMA_END@@______
-
-    static RelayListDB deep_copy(RelayListDB in)
-    {
-        RelayListDB out = new RelayListDB();
-        out.tox_public_key_string = in.tox_public_key_string;
-        out.TOX_CONNECTION = in.TOX_CONNECTION;
-        out.TOX_CONNECTION_on_off = in.TOX_CONNECTION_on_off;
-        out.own_relay = in.own_relay;
-        out.last_online_timestamp = in.last_online_timestamp;
-        out.tox_public_key_string_of_owner = in.tox_public_key_string_of_owner;
-
-        return out;
-    }
 
     @Override
     public String toString()

@@ -92,7 +92,7 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
 
             try
             {
-                fl_temp = orma.selectFromFriendList().
+                fl_temp = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(peer_pubkey).toList().get(0);
 
                 if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))

@@ -54,7 +54,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 public class MessageListFragment extends Fragment
 {
     private static final String TAG = "trifa.MsgListFrgnt";
-    List<Message> data_values = null;
+    List<com.zoffcc.applications.sorm.Message> data_values = null;
     // MessagelistArrayAdapter a = null;
     long current_friendnum = -1;
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
@@ -136,7 +136,7 @@ public class MessageListFragment extends Fragment
         {
             if (orma != null)
             {
-                data_values = new ArrayList<Message>();
+                data_values = new ArrayList<>();
                 data_values.clear();
             }
         }
@@ -511,7 +511,7 @@ public class MessageListFragment extends Fragment
             int number_of_items_old = data_values.size();
             data_values.clear();
 
-            List<Message> ml = get_messages();
+            List<com.zoffcc.applications.sorm.Message> ml = get_messages();
             adapter.add_list_clear(ml);
             try
             {
@@ -562,9 +562,9 @@ public class MessageListFragment extends Fragment
 
     }
 
-    private List<Message> get_messages()
+    private List<com.zoffcc.applications.sorm.Message> get_messages()
     {
-        List<Message> ml;
+        List<com.zoffcc.applications.sorm.Message> ml;
         if (show_only_files)
         {
             ml = orma.selectFromMessage().

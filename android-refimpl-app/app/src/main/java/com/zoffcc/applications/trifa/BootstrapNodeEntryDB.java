@@ -21,9 +21,9 @@ package com.zoffcc.applications.trifa;
 
 import android.util.Log;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import java.io.DataInputStream;
 import java.io.InputStreamReader;
@@ -41,7 +41,7 @@ import static com.zoffcc.applications.trifa.TorHelper.TorSocket;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 @Table
-public class BootstrapNodeEntryDB
+public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.BootstrapNodeEntryDB
 {
     static final String TAG = "trifa.BtpNodeEDB";
 

@@ -245,7 +245,7 @@ public class HelperMessage
                         {
                             try
                             {
-                                ConferenceMessage m = orma.selectFromConferenceMessage().idEq(
+                                ConferenceMessage m = (ConferenceMessage) orma.selectFromConferenceMessage().idEq(
                                         message_id).orderByIdDesc().get(0);
 
                                 if (m.id != -1)
@@ -290,7 +290,7 @@ public class HelperMessage
 
                         try
                         {
-                            Message m = orma.selectFromMessage().idEq(message_id).orderByIdDesc().get(0);
+                            Message m = (Message) orma.selectFromMessage().idEq(message_id).orderByIdDesc().get(0);
 
                             if (m.id != -1)
                             {
@@ -369,7 +369,7 @@ public class HelperMessage
                         {
                             try
                             {
-                                Message m = orma.selectFromMessage().idEq(message_id).orderByIdDesc().get(0);
+                                Message m = (Message) orma.selectFromMessage().idEq(message_id).orderByIdDesc().get(0);
 
                                 if (m.id != -1)
                                 {
@@ -410,7 +410,7 @@ public class HelperMessage
                     {
                         try
                         {
-                            Message m = orma.selectFromMessage().filetransfer_idEq(filetransfer_id).orderByIdDesc().get(
+                            Message m = (Message) orma.selectFromMessage().filetransfer_idEq(filetransfer_id).orderByIdDesc().get(
                                     0);
 
                             if (m.id != -1)
@@ -495,7 +495,7 @@ public class HelperMessage
 
             // Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id +
             //            " friend_number=" + friend_number);
-            List<Message> m = orma.selectFromMessage().
+            List<com.zoffcc.applications.sorm.Message> m = orma.selectFromMessage().
                     filetransfer_idEq(filetransfer_id).
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().toList();
@@ -519,7 +519,7 @@ public class HelperMessage
     {
         try
         {
-            List<Message> m = orma.selectFromMessage().
+            List<com.zoffcc.applications.sorm.Message> m = orma.selectFromMessage().
                     filetransfer_idEq(filetransfer_id).
                     orderByIdDesc().toList();
 
@@ -797,7 +797,7 @@ public class HelperMessage
                 {
                     try
                     {
-                        final ConferenceMessage m = orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0);
+                        final ConferenceMessage m = (ConferenceMessage) orma.selectFromConferenceMessage().idEq((Long) i.next()).get(0);
 
                         // @formatter:off
                         final AlertDialog.Builder builder = new AlertDialog.Builder(c);
@@ -885,7 +885,7 @@ public class HelperMessage
                 {
                     try
                     {
-                        final GroupMessage m = orma.selectFromGroupMessage().idEq((Long) i.next()).get(0);
+                        final GroupMessage m = (GroupMessage) orma.selectFromGroupMessage().idEq((Long) i.next()).get(0);
 
                         String group_peer_pubkey_name_txt = tox_group_peer_get_name__wrapper(m.group_identifier, m.tox_group_peer_pubkey);
                         if ((group_peer_pubkey_name_txt == null) || (group_peer_pubkey_name_txt.equals("")) || (group_peer_pubkey_name_txt.equals("-1")))
@@ -1018,7 +1018,7 @@ public class HelperMessage
                 {
                     try
                     {
-                        final Message m = orma.selectFromMessage().idEq(i.next()).get(0);
+                        final Message m = (Message) orma.selectFromMessage().idEq(i.next()).get(0);
 
                         // @formatter:off
                         final AlertDialog.Builder builder = new AlertDialog.Builder(c);
@@ -1103,11 +1103,11 @@ public class HelperMessage
                 {
                     try
                     {
-                        final Message m = orma.selectFromMessage().idEq(i.next()).get(0);
+                        final Message m = (Message) orma.selectFromMessage().idEq(i.next()).get(0);
                         Filetransfer f = null;
                         try
                         {
-                            f = orma.selectFromFiletransfer().idEq(m.filetransfer_id).get(0);
+                            f = (Filetransfer) orma.selectFromFiletransfer().idEq(m.filetransfer_id).get(0);
                         }
                         catch (Exception e)
                         {
@@ -1253,7 +1253,7 @@ public class HelperMessage
         boolean ret = false;
         try
         {
-            Message m = orma.selectFromMessage().
+            Message m = (Message) orma.selectFromMessage().
                     tox_friendpubkeyEq(friend_pubkey).
                     sent_timestampBetween(sent_timestamp - PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev,
                                           sent_timestamp + PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after).
@@ -1275,7 +1275,7 @@ public class HelperMessage
     {
         try
         {
-            Message m = orma.selectFromMessage().
+            Message m = (Message) orma.selectFromMessage().
                     tox_friendpubkeyEq(friend_pubkey).
                     sent_timestampBetween(sent_timestamp - PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev,
                                           sent_timestamp + PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after).
@@ -1319,7 +1319,7 @@ public class HelperMessage
         Message m = null;
         try
         {
-            m = orma.selectFromMessage().
+            m = (Message) orma.selectFromMessage().
                     msg_idv3_hashEq(msgV3hash_hex_string).
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     directionEq(1).
@@ -1380,7 +1380,7 @@ public class HelperMessage
             // Log.i(TAG, "friend_sync_message_v2_cb:message_id_hash_as_hex_string=" + message_id_hash_as_hex_string +
             //            " friendpubkey=" + real_sender_as_hex_string);
 
-            final List<Message> mlist = orma.selectFromMessage().
+            final List<com.zoffcc.applications.sorm.Message> mlist = orma.selectFromMessage().
                     msg_id_hashEq(message_id_hash_as_hex_string).
                     tox_friendpubkeyEq(real_sender_as_hex_string).
                     directionEq(1).
@@ -1389,7 +1389,7 @@ public class HelperMessage
 
             if (mlist.size() > 0)
             {
-                final Message m = mlist.get(0);
+                final Message m = (Message) mlist.get(0);
 
                 if (m != null)
                 {

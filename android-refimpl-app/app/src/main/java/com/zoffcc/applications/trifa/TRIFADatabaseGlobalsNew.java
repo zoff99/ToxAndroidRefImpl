@@ -19,12 +19,12 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 @Table
-public class TRIFADatabaseGlobalsNew
+public class TRIFADatabaseGlobalsNew extends com.zoffcc.applications.sorm.TRIFADatabaseGlobalsNew
 {
     @PrimaryKey
     String key;

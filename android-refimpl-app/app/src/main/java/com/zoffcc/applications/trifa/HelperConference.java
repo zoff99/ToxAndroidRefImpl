@@ -325,7 +325,7 @@ public class HelperConference
     {
         try
         {
-            ConferenceMessage cm = orma.selectFromConferenceMessage().
+            ConferenceMessage cm = (ConferenceMessage) orma.selectFromConferenceMessage().
                     conference_identifierEq(conference_identifier.toLowerCase()).
                     rcvd_timestampGt(System.currentTimeMillis() - (n * 1000)).
                     orderByRcvd_timestampDesc().
@@ -352,7 +352,7 @@ public class HelperConference
 
             final int SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL = 60 * 60 * 2; // 2 hours
 
-            ConferenceMessage cm = orma.selectFromConferenceMessage().
+            ConferenceMessage cm = (ConferenceMessage) orma.selectFromConferenceMessage().
                     conference_identifierEq(conference_identifier.toLowerCase()).
                     tox_peerpubkeyEq(sender_pubkey.toUpperCase()).
                     message_id_toxEq(message_id_tox.toLowerCase()).
@@ -664,7 +664,7 @@ public class HelperConference
         try
         {
             // Log.i(TAG, "new_or_updated_conference:" + "conference_number=" + conference_identifier);
-            final ConferenceDB conf2 = orma.selectFromConferenceDB().
+            final ConferenceDB conf2 = (ConferenceDB) orma.selectFromConferenceDB().
                     conference_identifierEq(conference_identifier).toList().get(0);
             // conference already exists -> update and connect
             orma.updateConferenceDB().
@@ -676,12 +676,12 @@ public class HelperConference
             try
             {
                 Log.i(TAG, "new_or_updated_conference:*update*");
-                final ConferenceDB conf3 = orma.selectFromConferenceDB().
+                final ConferenceDB conf3 = (ConferenceDB) orma.selectFromConferenceDB().
                         conference_identifierEq(conference_identifier).toList().get(0);
                 // update or add to "friendlist"
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = COMBINED_IS_CONFERENCE;
-                cc.conference_item = ConferenceDB.deep_copy(conf3);
+                cc.conference_item = (ConferenceDB) ConferenceDB.deep_copy(conf3);
                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
             catch (Exception e3)
@@ -716,7 +716,7 @@ public class HelperConference
                     // update or add to "friendlist"
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = COMBINED_IS_CONFERENCE;
-                    cc.conference_item = ConferenceDB.deep_copy(conf_new);
+                    cc.conference_item = (ConferenceDB) ConferenceDB.deep_copy(conf_new);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
                 catch (Exception e4)

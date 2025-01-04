@@ -19,15 +19,15 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.Index;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.Index;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import androidx.annotation.Nullable;
 
 @Table(indexes = @Index(value = {"group_identifier", "tox_group_peer_pubkey"}, unique = true))
-public class GroupPeerDB
+public class GroupPeerDB extends com.zoffcc.applications.sorm.GroupPeerDB
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id;
@@ -56,19 +56,6 @@ public class GroupPeerDB
     boolean notification_silent = false; // show notifications for this peer?
 
     // ______@@SORMA_END@@______
-
-    static GroupPeerDB deep_copy(GroupPeerDB in)
-    {
-        GroupPeerDB out = new GroupPeerDB();
-        out.group_identifier = in.group_identifier;
-        out.tox_group_peer_pubkey = in.tox_group_peer_pubkey;
-        out.peer_name = in.peer_name;
-        out.last_update_timestamp = in.last_update_timestamp;
-        out.first_join_timestamp = in.first_join_timestamp;
-        out.Tox_Group_Role = in.Tox_Group_Role;
-        out.notification_silent = in.notification_silent;
-        return out;
-    }
 
     @Override
     public String toString()

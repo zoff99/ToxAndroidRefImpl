@@ -41,7 +41,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
 {
     private static final String TAG = "trifa.GrpMesgelistAdptr";
 
-    private final List<GroupMessage> messagelistitems;
+    private final List<com.zoffcc.applications.sorm.GroupMessage> messagelistitems;
     private Context context;
 
     private GroupMessage getSectionText_message_object = null;
@@ -51,7 +51,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     String getSectionText_message_object_ts_string2 = " ";
 
 
-    public GroupMessagelistAdapter(Context context, List<GroupMessage> items)
+    public GroupMessagelistAdapter(Context context, List<com.zoffcc.applications.sorm.GroupMessage> items)
     {
         // Log.i(TAG, "GroupMessagelistAdapter");
 
@@ -167,7 +167,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     @Override
     public int getItemViewType(int position)
     {
-        GroupMessage my_msg = this.messagelistitems.get(position);
+        GroupMessage my_msg = (GroupMessage) this.messagelistitems.get(position);
         {
             if (my_msg.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
             {
@@ -239,7 +239,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
 
         try
         {
-            GroupMessage m2 = this.messagelistitems.get(position);
+            GroupMessage m2 = (GroupMessage) this.messagelistitems.get(position);
 
             switch (getItemViewType(position))
             {
@@ -413,7 +413,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     {
         try
         {
-            GroupMessage getSectionText_message_object2 = messagelistitems.get(position);
+            GroupMessage getSectionText_message_object2 = (GroupMessage) messagelistitems.get(position);
 
             if (getSectionText_message_object2.direction == 0)
             {
@@ -457,7 +457,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     {
         try
         {
-            return messagelistitems.get(position);
+            return (GroupMessage) messagelistitems.get(position);
         }
         catch (Exception e)
         {
@@ -469,7 +469,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     {
         try
         {
-            GroupMessage getSectionText_message_object2 = messagelistitems.get(position);
+            GroupMessage getSectionText_message_object2 = (GroupMessage) messagelistitems.get(position);
 
             if (getSectionText_message_object2.direction == 0)
             {
@@ -503,7 +503,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
         try
         {
             // direction: 0 -> msg received, 1 -> msg sent
-            GroupMessage getSectionText_message_object2 = messagelistitems.get(position);
+            GroupMessage getSectionText_message_object2 = (GroupMessage) messagelistitems.get(position);
 
             if (getSectionText_message_object2.direction == 0)
             {

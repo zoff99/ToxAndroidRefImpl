@@ -143,7 +143,7 @@ public class FriendInfoActivity extends AppCompatActivity
 
         try
         {
-            final FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
+            final FriendList f = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(
                     friend_pubkey).toList().get(0);
 
             if (f.msgv3_capability == 1)
@@ -300,7 +300,7 @@ public class FriendInfoActivity extends AppCompatActivity
                 {
                     try
                     {
-                        final FriendList f = orma.selectFromFriendList().tox_public_key_stringEq(
+                        final FriendList f = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(
                                 tox_friend_get_public_key__wrapper(friendnum_)).toList().get(0);
 
                         Runnable myRunnable = new Runnable()
@@ -359,7 +359,7 @@ public class FriendInfoActivity extends AppCompatActivity
             {
                 // Log.i(TAG, "indenticon:001");
 
-                final FriendList f = orma.selectFromFriendList().
+                final FriendList f = (FriendList) orma.selectFromFriendList().
                         tox_public_key_stringEq(friend_pubkey).
                         toList().get(0);
 
