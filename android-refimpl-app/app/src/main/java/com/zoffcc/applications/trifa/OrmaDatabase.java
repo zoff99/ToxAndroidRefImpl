@@ -103,6 +103,7 @@ public class OrmaDatabase extends com.zoffcc.applications.sorm.OrmaDatabase
         // TODO: escape password, but we can not use prepared statement here :-(
         System.out.println(TAG + "password=" + password);
         final String set_key = "PRAGMA key = '" + password + "';";
+        System.out.println(TAG + "set_key=" + set_key);
         run_multi_sql(set_key);
 
         if  (wal_mode)
