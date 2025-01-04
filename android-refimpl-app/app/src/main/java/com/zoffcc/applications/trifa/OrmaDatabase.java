@@ -548,19 +548,12 @@ public class OrmaDatabase extends com.zoffcc.applications.sorm.OrmaDatabase
             System.out.println(TAG + "#########################");
             String class_sqlite = String.valueOf(Class.forName("org.sqlite.JDBC"));
             System.out.println(TAG + class_sqlite);
-            sqldb = DriverManager.getConnection("jdbc:sqlite:" + db_file_path);
+            sqldb = DriverManager.getConnection("jdbc:sqlite:" + db_file_path, null, password);
         }
         catch (Exception e)
         {
             throw new RuntimeException(e);
         }
-
-        // set password
-        // TODO: escape password, but we can not use prepared statement here :-(
-        System.out.println(TAG + "password=" + password);
-        final String set_key = "PRAGMA key = '" + password + "';";
-        System.out.println(TAG + "set_key=" + set_key);
-        run_multi_sql(set_key);
 
         if  (wal_mode)
         {

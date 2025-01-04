@@ -368,14 +368,14 @@ public class OrmaDatabase
         Log.i(TAG, "SHUTDOWN:finished");
     }
 
-    public static void init(final String database_files_dir, final String database_files_name)
+    public static void init(final String database_files_dir, final String database_files_name, String password)
     {
         Log.i(TAG, "INIT:start");
         // create a database connection
         try
         {
             Class.forName("org.sqlite.JDBC");
-            sqldb = DriverManager.getConnection("jdbc:sqlite:" + database_files_dir + File.separator + database_files_name);
+            sqldb = DriverManager.getConnection("jdbc:sqlite:" + database_files_dir + File.separator + database_files_name, null, password);
         }
         catch (Exception e)
         {

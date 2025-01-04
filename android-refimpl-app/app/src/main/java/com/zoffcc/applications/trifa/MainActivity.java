@@ -715,7 +715,7 @@ public class MainActivity extends AppCompatActivity
                 if (DB_ENCRYPT)
                 {
                     // builder = builder.provider(new OrmaDatabase.EncryptedDatabase.Provider(PREF__DB_secrect_key));
-                    orma = new OrmaDatabase(dbs_path, "123", PREF__DB_wal_mode);
+                    orma = new OrmaDatabase(dbs_path, PREF__DB_secrect_key, PREF__DB_wal_mode);
                 }
                 else
                 {
@@ -749,7 +749,7 @@ public class MainActivity extends AppCompatActivity
                     if (DB_ENCRYPT)
                     {
                         // builder = builder.provider(new OrmaDatabase.EncryptedDatabase.Provider(PREF__DB_secrect_key));
-                        orma = new OrmaDatabase(dbs_path, "123", PREF__DB_wal_mode);
+                        orma = new OrmaDatabase(dbs_path, PREF__DB_secrect_key, PREF__DB_wal_mode);
                     }
                     else
                     {
