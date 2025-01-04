@@ -189,8 +189,7 @@ public class MessageListFragment extends Fragment
                                     tox_friend_get_public_key__wrapper(current_friendnum)).
                                     orderBySent_timestampAsc().
                                     orderBySent_timestamp_msAsc().
-                                    where(" like('" + get_sqlite_search_string(search_messages_text) +
-                                          "', text, '\\')").
+                                    textLike(get_sqlite_search_string(search_messages_text)).
                                     toList();
                         }
                     }
@@ -599,7 +598,7 @@ public class MessageListFragment extends Fragment
                         tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
                         orderBySent_timestampAsc().
                         orderBySent_timestamp_msAsc().
-                        where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                        textLike(get_sqlite_search_string(search_messages_text)).
                         toList();
             }
         }
@@ -643,7 +642,7 @@ public class MessageListFragment extends Fragment
                         tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
                         orderBySent_timestampAsc().
                         orderBySent_timestamp_msAsc().
-                        where(" like('" + get_sqlite_search_string(search_messages_text) + "', text, '\\')").
+                        textLike(get_sqlite_search_string(search_messages_text)).
                         count();
             }
         }

@@ -526,8 +526,7 @@ public class ConferenceMessageListFragment extends Fragment
                         conference_identifierEq(current_conf_id).
                         tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                         orderBySent_timestampAsc().
-                        offset(offset).
-                        limit(rowcount).
+                        limit(rowcount, offset).
                         toList();
             }
             else
@@ -557,7 +556,7 @@ public class ConferenceMessageListFragment extends Fragment
                             conference_identifierEq(current_conf_id).
                             tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                             orderBySent_timestampAsc().
-                            where(" like('" + get_sqlite_search_string(conf_search_messages_text) + "', text, '\\')").
+                            textLike(get_sqlite_search_string(conf_search_messages_text)).
                             toList();
                 }
             }

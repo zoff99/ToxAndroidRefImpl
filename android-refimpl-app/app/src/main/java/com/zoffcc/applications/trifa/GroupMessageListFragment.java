@@ -144,8 +144,7 @@ public class GroupMessageListFragment extends Fragment
                         data_values = orma.selectFromGroupMessage().
                                 group_identifierEq(current_group_id.toLowerCase()).
                                 orderBySent_timestampAsc().
-                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
-                                      "', text, '\\')").
+                                textLike(get_sqlite_search_string(group_search_messages_text)).
                                 toList();
                     }
                     else
@@ -163,8 +162,7 @@ public class GroupMessageListFragment extends Fragment
                                 group_identifierEq(current_group_id.toLowerCase()).
                                 tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                                 orderBySent_timestampAsc().
-                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
-                                      "', text, '\\')").
+                                textLike(get_sqlite_search_string(group_search_messages_text)).
                                 toList();
                     }
                 }
@@ -571,8 +569,7 @@ public class GroupMessageListFragment extends Fragment
                         adapter.add_list_clear(orma.selectFromGroupMessage().
                                 group_identifierEq(current_group_id.toLowerCase()).
                                 orderBySent_timestampAsc().
-                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
-                                      "', text, '\\')").
+                                textLike(get_sqlite_search_string(group_search_messages_text)).
                                 toList());
                     }
                     else
@@ -590,8 +587,7 @@ public class GroupMessageListFragment extends Fragment
                                 group_identifierEq(current_group_id.toLowerCase()).
                                 tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                                 orderBySent_timestampAsc().
-                                where(" like('" + get_sqlite_search_string(group_search_messages_text) +
-                                      "', text, '\\')").
+                                textLike(get_sqlite_search_string(group_search_messages_text)).
                                 toList());
                     }
                 }
