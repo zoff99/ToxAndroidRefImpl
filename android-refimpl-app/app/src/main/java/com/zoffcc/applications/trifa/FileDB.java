@@ -19,15 +19,15 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 
 @Table
-public class FileDB
+public class FileDB extends com.zoffcc.applications.sorm.FileDB
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id;
@@ -54,23 +54,4 @@ public class FileDB
     boolean is_in_VFS = true;
 
     // ______@@SORMA_END@@______
-
-    static FileDB deep_copy(FileDB in)
-    {
-        FileDB out = new FileDB();
-        out.kind = in.kind;
-        out.direction = in.direction;
-        out.tox_public_key_string = in.tox_public_key_string;
-        out.path_name = in.path_name;
-        out.file_name = in.file_name;
-        out.filesize = in.filesize;
-        out.is_in_VFS = in.is_in_VFS;
-        return out;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "id=" + id + ", kind=" + kind + ", is_in_VFS=" + is_in_VFS + ", path_name=" + path_name + ", file_name" + file_name + ", filesize=" + filesize + ", direction=" + direction;
-    }
 }

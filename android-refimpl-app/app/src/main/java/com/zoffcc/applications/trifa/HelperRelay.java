@@ -215,7 +215,7 @@ public class HelperRelay
         try
         {
             List<ConferenceDB> c = orma.selectFromConferenceDB().conference_activeEq(
-                    true).and().tox_conference_numberNotEq(-1).toList();
+                    true).tox_conference_numberNotEq(-1).toList();
 
             if (c != null)
             {

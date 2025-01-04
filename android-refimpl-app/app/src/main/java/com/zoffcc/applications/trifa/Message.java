@@ -19,9 +19,10 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import androidx.annotation.Nullable;
 
@@ -31,7 +32,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 
 @Table
-public class Message
+public class Message extends com.zoffcc.applications.sorm.Message
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id; // uniqe message id!!
@@ -135,43 +136,6 @@ public class Message
     int filetransfer_kind = TOX_FILE_KIND_DATA.value;
 
     // ______@@SORMA_END@@______
-
-    static Message deep_copy(Message in)
-    {
-        Message out = new Message();
-        out.id = in.id; // TODO: is this a good idea???
-        out.message_id = in.message_id;
-        out.tox_friendpubkey = in.tox_friendpubkey;
-        out.direction = in.direction;
-        out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
-        out.TRIFA_MESSAGE_TYPE = in.TRIFA_MESSAGE_TYPE;
-        out.state = in.state;
-        out.ft_accepted = in.ft_accepted;
-        out.ft_outgoing_started = in.ft_outgoing_started;
-        out.filedb_id = in.filedb_id;
-        out.filetransfer_id = in.filetransfer_id;
-        out.sent_timestamp = in.sent_timestamp;
-        out.sent_timestamp_ms = in.sent_timestamp_ms;
-        out.rcvd_timestamp = in.rcvd_timestamp;
-        out.rcvd_timestamp_ms = in.rcvd_timestamp_ms;
-        out.read = in.read;
-        out.send_retries = in.send_retries;
-        out.is_new = in.is_new;
-        out.text = in.text;
-        out.filename_fullpath = in.filename_fullpath;
-        out.msg_id_hash = in.msg_id_hash;
-        out.msg_version = in.msg_version;
-        out.raw_msgv2_bytes = in.raw_msgv2_bytes;
-        out.resend_count = in.resend_count;
-        out.storage_frame_work = in.storage_frame_work;
-        out.ft_outgoing_queued = in.ft_outgoing_queued;
-        out.msg_at_relay = in.msg_at_relay;
-        out.msg_idv3_hash = in.msg_idv3_hash;
-        out.sent_push = in.sent_push;
-        out.filetransfer_kind = in.filetransfer_kind;
-
-        return out;
-    }
 
     @Override
     public String toString()

@@ -404,7 +404,7 @@ public class HelperGeneric
         {
             // TODO: cache me!!
             conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
-                    conference_number).and().conference_activeEq(true).toList().get(0);
+                    conference_number).conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
             // Log.i(TAG, "conference_message_add_from_sync:conf_id=" + conf_id);
             conference_name = conf_temp.name;
@@ -2860,7 +2860,7 @@ public class HelperGeneric
             // Log.i(TAG, "TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string + " len=" +
             //           msg_id_as_hex_string.length());
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().msg_id_hashEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).msg_id_hashEq(
                     msg_id_as_hex_string).count();
 
             long pin_timestamp = System.currentTimeMillis();
@@ -2999,7 +2999,7 @@ public class HelperGeneric
                                                      msg_id_buffer.limit());
             Log.i(TAG, "receive_incoming_message:TOX_FILE_KIND_MESSAGEV2_SEND:MSGv2HASH:2=" + msg_id_as_hex_string);
             int already_have_message = orma.selectFromMessage().tox_friendpubkeyEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).and().msg_id_hashEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number_real_sender)).msg_id_hashEq(
                     msg_id_as_hex_string).count();
 
             long pin_timestamp = System.currentTimeMillis();

@@ -159,7 +159,6 @@ public class MessageListFragment extends Fragment
                     {
                         data_values = orma.selectFromMessage().tox_friendpubkeyEq(
                                 tox_friend_get_public_key__wrapper(current_friendnum)).
-                                and().
                                 TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                                 orderBySent_timestampAsc().
                                 orderBySent_timestamp_msAsc().
@@ -570,7 +569,6 @@ public class MessageListFragment extends Fragment
         {
             ml = orma.selectFromMessage().
                     tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                    and().
                     TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                     orderBySent_timestampAsc().
                     orderBySent_timestamp_msAsc().
@@ -615,7 +613,6 @@ public class MessageListFragment extends Fragment
         {
             c = orma.selectFromMessage().
                     tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                    and().
                     TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                     orderBySent_timestampAsc().
                     orderBySent_timestamp_msAsc().

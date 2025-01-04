@@ -19,16 +19,16 @@
 
 package com.zoffcc.applications.trifa;
 
-import androidx.annotation.Nullable;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import androidx.annotation.Nullable;
 
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 
 @Table
-public class ConferenceDB
+public class ConferenceDB extends com.zoffcc.applications.sorm.ConferenceDB
 {
     // conference id is always saved as lower case hex string!! -----------------
     @PrimaryKey
@@ -62,26 +62,4 @@ public class ConferenceDB
     boolean notification_silent = false; // show notifications for this conference?
 
     // ______@@SORMA_END@@______
-
-    static ConferenceDB deep_copy(ConferenceDB in)
-    {
-        ConferenceDB out = new ConferenceDB();
-        out.conference_identifier = in.conference_identifier;
-        out.name = in.name;
-        out.peer_count = in.peer_count;
-        out.own_peer_number = in.own_peer_number;
-        out.kind = in.kind;
-        out.who_invited__tox_public_key_string = in.who_invited__tox_public_key_string;
-        out.tox_conference_number = in.tox_conference_number;
-        out.conference_active = in.conference_active;
-        out.notification_silent = in.notification_silent;
-
-        return out;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "tox_conference_number=" + tox_conference_number + ", conference_active=" + conference_active + ", conference_identifier=" + conference_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", kind=" + kind + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number + ", notification_silent=" + notification_silent;
-    }
 }

@@ -185,7 +185,7 @@ public class TrifaToxService extends Service
     static Thread ToxServiceThread = null;
     // static EchoCanceller canceller = null;
     static boolean stop_me = false;
-    static OrmaDatabase orma = null;
+    static com.zoffcc.applications.trifa.OrmaDatabase orma = null;
     static VirtualFileSystem vfs = null;
     static boolean is_tox_started = false;
     static boolean manually_logged_out = false;
@@ -500,14 +500,14 @@ public class TrifaToxService extends Service
             // Log.i(TAG, "loading_friend:" + fc + " pubkey=" + tox_friend_get_public_key__wrapper(MainActivity.friends[fc]));
 
             FriendList f;
-            List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
+            List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
                     tox_friend_get_public_key__wrapper(friends[fc])).toList();
 
             // Log.i(TAG, "loading_friend:" + fc + " db entry size=" + fl);
 
             if (fl.size() > 0)
             {
-                f = fl.get(0);
+                f = (FriendList) fl.get(0);
                 // Log.i(TAG, "loading_friend:" + fc + " db entry=" + f);
             }
             else
@@ -600,12 +600,12 @@ public class TrifaToxService extends Service
         {
             try
             {
-                List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
+                List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(
                         tox_friend_get_public_key__wrapper(friends[fc])).toList();
 
                 if (fl.size() > 0)
                 {
-                    final FriendList f = fl.get(0);
+                    final FriendList f = (FriendList) fl.get(0);
                     if (!is_any_relay(f.tox_public_key_string))
                     {
                         final int status_new = tox_friend_get_connection_status(friends[fc]);
@@ -639,7 +639,7 @@ public class TrifaToxService extends Service
     static void try_update_friend_in_friendlist(long friendnum)
     {
         FriendList f_check;
-        List<FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(
+        List<com.zoffcc.applications.sorm.FriendList> fl_check = orma.selectFromFriendList().tox_public_key_stringEq(
                 tox_friend_get_public_key__wrapper(friendnum)).toList();
         // Log.i(TAG, "loading_friend:check:" + " db entry=" + fl_check);
         try
@@ -653,7 +653,7 @@ public class TrifaToxService extends Service
                     // reload friend in friendlist
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = COMBINED_IS_FRIEND;
-                    cc.friend_item = fl_check.get(0);
+                    cc.friend_item = (FriendList) fl_check.get(0);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
             }
@@ -1804,7 +1804,7 @@ public class TrifaToxService extends Service
 
             try
             {
-                List<Message> m_v1 = orma.selectFromMessage().
+                List<com.zoffcc.applications.sorm.Message> m_v1 = orma.selectFromMessage().
                         directionEq(1).
                         TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                         ft_outgoing_queuedEq(true).
@@ -1818,10 +1818,10 @@ public class TrifaToxService extends Service
                 {
                     // Log.i(TAG, "start_queued_outgoing_FTs:001:" + m_v1.size());
 
-                    Iterator<Message> ii = m_v1.iterator();
+                    Iterator<com.zoffcc.applications.sorm.Message> ii = m_v1.iterator();
                     while (ii.hasNext())
                     {
-                        Message m_resend_ft = ii.next();
+                        Message m_resend_ft = (Message) ii.next();
 
                         if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_ft.tox_friendpubkey)) != 0)
                         {
@@ -2061,7 +2061,7 @@ public class TrifaToxService extends Service
             // HINT: if we have not received a "read receipt" for msgV3 within 10 seconds, then we trigger a push again
             final long cutoff_sent_time = System.currentTimeMillis() - (10 * 1000);
 
-            List<Message> m_push = orma.selectFromMessage().
+            List<com.zoffcc.applications.sorm.Message> m_push = orma.selectFromMessage().
                     directionEq(1).
                     msg_versionEq(0).
                     TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
@@ -2073,10 +2073,10 @@ public class TrifaToxService extends Service
 
             if ((m_push != null) && (m_push.size() > 0))
             {
-                Iterator<Message> ii = m_push.iterator();
+                Iterator<com.zoffcc.applications.sorm.Message> ii = m_push.iterator();
                 while (ii.hasNext())
                 {
-                    Message m_resend_push = ii.next();
+                    Message m_resend_push = (Message) ii.next();
                     if ((m_resend_push.msg_idv3_hash != null) && (m_resend_push.msg_idv3_hash.length() > 3))
                     {
                         friend_call_push_url(m_resend_push.tox_friendpubkey, m_resend_push.sent_timestamp);
@@ -2106,7 +2106,7 @@ public class TrifaToxService extends Service
 
             int cur_resend_count_per_iteration = 0;
 
-            List<Message> m_v1 = null;
+            List<com.zoffcc.applications.sorm.Message> m_v1 = null;
             if (friend_pubkey != null)
             {
                 m_v1 = orma.selectFromMessage().
@@ -2133,10 +2133,10 @@ public class TrifaToxService extends Service
 
             if ((m_v1 != null) && (m_v1.size() > 0))
             {
-                Iterator<Message> ii = m_v1.iterator();
+                Iterator<com.zoffcc.applications.sorm.Message> ii = m_v1.iterator();
                 while (ii.hasNext())
                 {
-                    Message m_resend_v1 = ii.next();
+                    Message m_resend_v1 = (Message) ii.next();
                     if (friend_pubkey == null)
                     {
                         if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)
@@ -2182,7 +2182,7 @@ public class TrifaToxService extends Service
 
             // HINT: cutoff time "now" minus 25 seconds
             final long cutoff_sent_time = System.currentTimeMillis() - (25 * 1000);
-            List<Message> m_v0 = null;
+            List<com.zoffcc.applications.sorm.Message> m_v0 = null;
 
             if (friend_pubkey != null)
             {
@@ -2215,10 +2215,10 @@ public class TrifaToxService extends Service
 
             if ((m_v0 != null) && (m_v0.size() > 0))
             {
-                Iterator<Message> ii = m_v0.iterator();
+                Iterator<com.zoffcc.applications.sorm.Message> ii = m_v0.iterator();
                 while (ii.hasNext())
                 {
-                    Message m_resend_v0 = ii.next();
+                    Message m_resend_v0 = (Message) ii.next();
 
                     if (friend_pubkey == null)
                     {
@@ -2265,7 +2265,7 @@ public class TrifaToxService extends Service
             final int max_resend_count_per_iteration = 10;
             int cur_resend_count_per_iteration = 0;
 
-            List<Message> m_v1 = orma.selectFromMessage().
+            List<com.zoffcc.applications.sorm.Message> m_v1 = orma.selectFromMessage().
                     directionEq(1).
                     TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value).
                     msg_versionEq(1).
@@ -2277,10 +2277,10 @@ public class TrifaToxService extends Service
 
             if ((m_v1 != null) && (m_v1.size() > 0))
             {
-                Iterator<Message> ii = m_v1.iterator();
+                Iterator<com.zoffcc.applications.sorm.Message> ii = m_v1.iterator();
                 while (ii.hasNext())
                 {
-                    Message m_resend_v2 = ii.next();
+                    Message m_resend_v2 = (Message) ii.next();
 
                     if (is_friend_online(tox_friend_by_public_key__wrapper(m_resend_v2.tox_friendpubkey)) == 0)
                     {

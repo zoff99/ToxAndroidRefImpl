@@ -19,16 +19,16 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import androidx.annotation.Nullable;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 
 @Table
-public class ConferenceMessage
+public class ConferenceMessage extends com.zoffcc.applications.sorm.ConferenceMessage
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id; // uniqe message id!!
@@ -82,26 +82,6 @@ public class ConferenceMessage
     boolean was_synced = false;
 
     // ______@@SORMA_END@@______
-
-    static ConferenceMessage deep_copy(ConferenceMessage in)
-    {
-        ConferenceMessage out = new ConferenceMessage();
-        out.id = in.id; // TODO: is this a good idea???
-        out.message_id_tox = in.message_id_tox;
-        out.tox_peerpubkey = in.tox_peerpubkey;
-        out.direction = in.direction;
-        out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
-        out.TRIFA_MESSAGE_TYPE = in.TRIFA_MESSAGE_TYPE;
-        out.sent_timestamp = in.sent_timestamp;
-        out.rcvd_timestamp = in.rcvd_timestamp;
-        out.read = in.read;
-        out.is_new = in.is_new;
-        out.text = in.text;
-        out.tox_peername = in.tox_peername;
-        out.was_synced = in.was_synced;
-
-        return out;
-    }
 
     @Override
     public String toString()

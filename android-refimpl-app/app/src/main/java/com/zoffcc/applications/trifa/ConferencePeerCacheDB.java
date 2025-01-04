@@ -19,13 +19,13 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.Index;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.Index;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 @Table(indexes = @Index(value = {"conference_identifier", "peer_pubkey"}, unique = true))
-public class ConferencePeerCacheDB
+public class ConferencePeerCacheDB extends com.zoffcc.applications.sorm.ConferencePeerCacheDB
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id;
@@ -44,20 +44,4 @@ public class ConferencePeerCacheDB
     long last_update_timestamp = -1L;
 
     // ______@@SORMA_END@@______
-
-    static ConferencePeerCacheDB deep_copy(ConferencePeerCacheDB in)
-    {
-        ConferencePeerCacheDB out = new ConferencePeerCacheDB();
-        out.conference_identifier = in.conference_identifier;
-        out.peer_pubkey = in.peer_pubkey;
-        out.peer_name = in.peer_name;
-        out.last_update_timestamp = in.last_update_timestamp;
-        return out;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "id=" + id + ", conference_identifier=" + conference_identifier + ", peer_pubkey=" + peer_pubkey + ", peer_name=" + peer_name + ", last_update_timestamp=" + last_update_timestamp;
-    }
 }

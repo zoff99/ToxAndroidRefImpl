@@ -536,7 +536,6 @@ public class ConferenceMessageListFragment extends Fragment
                 {
                     ml = orma.selectFromConferenceMessage().
                             conference_identifierEq(current_conf_id).
-                            and().
                             tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                             orderBySent_timestampAsc().
                             toList();
@@ -556,7 +555,6 @@ public class ConferenceMessageListFragment extends Fragment
                      */
                     ml = orma.selectFromConferenceMessage().
                             conference_identifierEq(current_conf_id).
-                            and().
                             tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                             orderBySent_timestampAsc().
                             where(" like('" + get_sqlite_search_string(conf_search_messages_text) + "', text, '\\')").

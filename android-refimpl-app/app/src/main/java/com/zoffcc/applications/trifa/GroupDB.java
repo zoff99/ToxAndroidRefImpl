@@ -19,16 +19,16 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import androidx.annotation.Nullable;
 
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_PRIVACY_STATE;
 
 @Table
-public class GroupDB
+public class GroupDB extends com.zoffcc.applications.sorm.GroupDB
 {
     // group id is always saved as lower case hex string!! -----------------
     @PrimaryKey
@@ -70,31 +70,4 @@ public class GroupDB
 
     // ______@@SORMA_END@@______
 
-    static GroupDB deep_copy(GroupDB in)
-    {
-        GroupDB out = new GroupDB();
-        out.group_identifier = in.group_identifier;
-        out.name = in.name;
-        out.topic = in.topic;
-        out.peer_count = in.peer_count;
-        out.own_peer_number = in.own_peer_number;
-        out.privacy_state = in.privacy_state;
-        out.who_invited__tox_public_key_string = in.who_invited__tox_public_key_string;
-        out.tox_group_number = in.tox_group_number;
-        out.group_active = in.group_active;
-        out.notification_silent = in.notification_silent;
-        out.group_we_left = in.group_we_left;
-
-        return out;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "tox_group_number=" + tox_group_number + ", group_identifier=" + group_identifier +
-               ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name +
-               ", topic=" + topic + ", privacy_state=" + privacy_state + ", peer_count=" + peer_count +
-               ", own_peer_number=" + own_peer_number + ", notification_silent=" + notification_silent +
-               ", group_active=" + group_active + ", group_we_left=" + group_we_left;
-    }
 }

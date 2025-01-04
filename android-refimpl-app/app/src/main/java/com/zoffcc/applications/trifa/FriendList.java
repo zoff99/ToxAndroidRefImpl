@@ -19,14 +19,14 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import androidx.annotation.Nullable;
 
 @Table
-public class FriendList
+public class FriendList extends com.zoffcc.applications.sorm.FriendList
 {
     // pubkey is always saved as UPPER CASE hex string!! -----------------
     @PrimaryKey
@@ -114,37 +114,6 @@ public class FriendList
     long msgv3_capability = 0;
 
     // ______@@SORMA_END@@______
-
-    static FriendList deep_copy(FriendList in)
-    {
-        FriendList out = new FriendList();
-        out.tox_public_key_string = in.tox_public_key_string;
-        out.name = in.name;
-        out.status_message = in.status_message;
-        out.TOX_CONNECTION = in.TOX_CONNECTION;
-        out.TOX_CONNECTION_real = in.TOX_CONNECTION_real;
-        out.TOX_CONNECTION_on_off = in.TOX_CONNECTION_on_off;
-        out.TOX_CONNECTION_on_off_real = in.TOX_CONNECTION_on_off_real;
-        out.TOX_USER_STATUS = in.TOX_USER_STATUS;
-        out.avatar_filename = in.avatar_filename;
-        out.avatar_pathname = in.avatar_pathname;
-        out.avatar_update = in.avatar_update;
-        out.notification_silent = in.notification_silent;
-        out.sort = in.sort;
-        out.last_online_timestamp = in.last_online_timestamp;
-        out.last_online_timestamp_real = in.last_online_timestamp_real;
-        out.alias_name = in.alias_name;
-        out.is_relay = in.is_relay;
-        out.avatar_update_timestamp = in.avatar_update_timestamp;
-        out.added_timestamp = in.added_timestamp;
-        out.push_url = in.push_url;
-        out.capabilities = in.capabilities;
-        out.msgv3_capability = in.msgv3_capability;
-        out.avatar_ftid_hex = in.avatar_ftid_hex;
-        out.ip_addr_str = in.ip_addr_str;
-
-        return out;
-    }
 
     @Override
     public String toString()

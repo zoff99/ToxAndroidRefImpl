@@ -243,7 +243,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
         try
         {
             int new_messages_count = orma.selectFromGroupMessage().
-                    group_identifierEq(fl.group_identifier.toLowerCase()).and().is_newEq(true).count();
+                    group_identifierEq(fl.group_identifier.toLowerCase()).is_newEq(true).count();
 
             if (new_messages_count > 0)
             {

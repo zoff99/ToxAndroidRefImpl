@@ -19,9 +19,9 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import androidx.annotation.Nullable;
 
@@ -29,7 +29,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MS
 import static com.zoffcc.applications.trifa.ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_USER;
 
 @Table
-public class GroupMessage
+public class GroupMessage extends com.zoffcc.applications.sorm.GroupMessage
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id; // uniqe message id!!
@@ -144,41 +144,6 @@ public class GroupMessage
     boolean storage_frame_work = false;
 
     // ______@@SORMA_END@@______
-
-    static GroupMessage deep_copy(GroupMessage in)
-    {
-        GroupMessage out = new GroupMessage();
-        out.id = in.id; // TODO: is this a good idea???
-        out.message_id_tox = in.message_id_tox;
-        out.group_identifier = in.group_identifier;
-        out.tox_group_peer_pubkey = in.tox_group_peer_pubkey;
-        out.tox_group_peer_role = in.tox_group_peer_role;
-        out.private_message = in.private_message;
-        out.direction = in.direction;
-        out.TOX_MESSAGE_TYPE = in.TOX_MESSAGE_TYPE;
-        out.TRIFA_MESSAGE_TYPE = in.TRIFA_MESSAGE_TYPE;
-        out.sent_timestamp = in.sent_timestamp;
-        out.rcvd_timestamp = in.rcvd_timestamp;
-        out.read = in.read;
-        out.is_new = in.is_new;
-        out.text = in.text;
-        out.tox_group_peername = in.tox_group_peername;
-        out.was_synced = in.was_synced;
-        out.msg_id_hash = in.msg_id_hash;
-        out.sent_privately_to_tox_group_peer_pubkey = in.sent_privately_to_tox_group_peer_pubkey;
-        out.path_name = in.path_name;
-        out.file_name = in.file_name;
-        out.filesize = in.filesize;
-        out.filename_fullpath = in.filename_fullpath;
-        out.storage_frame_work = in.storage_frame_work;
-        out.TRIFA_SYNC_TYPE = in.TRIFA_SYNC_TYPE;
-        out.sync_confirmations = in.sync_confirmations;
-        out.tox_group_peer_pubkey_syncer_01 = in.tox_group_peer_pubkey_syncer_01;
-        out.tox_group_peer_pubkey_syncer_02 = in.tox_group_peer_pubkey_syncer_02;
-        out.tox_group_peer_pubkey_syncer_03 = in.tox_group_peer_pubkey_syncer_03;
-
-        return out;
-    }
 
     @Override
     public String toString()

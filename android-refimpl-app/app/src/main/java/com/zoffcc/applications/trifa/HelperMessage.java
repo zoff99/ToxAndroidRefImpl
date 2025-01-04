@@ -113,10 +113,10 @@ public class HelperMessage
         {
             long ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().file_numberEq(file_number).orderByIdDesc().get(0).id;
+                    file_numberEq(file_number).orderByIdDesc().get(0).id;
 
             update_message_in_db_filename_fullpath_from_id(orma.selectFromMessage().
-                    filetransfer_idEq(ft_id).and().
+                    filetransfer_idEq(ft_id).
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     get(0).id, filename_fullpath);
         }
@@ -496,7 +496,7 @@ public class HelperMessage
             // Log.i(TAG, "get_message_id_from_filetransfer_id_and_friendnum:messages:filetransfer_id=" + filetransfer_id +
             //            " friend_number=" + friend_number);
             List<Message> m = orma.selectFromMessage().
-                    filetransfer_idEq(filetransfer_id).and().
+                    filetransfer_idEq(filetransfer_id).
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().toList();
 
@@ -544,12 +544,12 @@ public class HelperMessage
         {
             long ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().file_numberEq(file_number).orderByIdDesc().get(0).id;
+                    file_numberEq(file_number).orderByIdDesc().get(0).id;
             // Log.i(TAG,
             //       "set_message_state_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number +
             //       " file_number=" + file_number);
             set_message_state_from_id(orma.selectFromMessage().
-                    filetransfer_idEq(ft_id).and().
+                    filetransfer_idEq(ft_id).
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     get(0).id, state);
         }
@@ -605,14 +605,14 @@ public class HelperMessage
         {
             long ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().file_numberEq(file_number).
+                    file_numberEq(file_number).
                     orderByIdDesc().
                     get(0).id;
             // Log.i(TAG,
             //       "set_message_filedb_from_friendnum_and_filenum:ft_id=" + ft_id + " friend_number=" + friend_number +
             //       " file_number=" + file_number);
             set_message_filedb_from_id(orma.selectFromMessage().
-                    filetransfer_idEq(ft_id).and().
+                    filetransfer_idEq(ft_id).
                     tox_friendpubkeyEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().
                     get(0).id, filedb_id);

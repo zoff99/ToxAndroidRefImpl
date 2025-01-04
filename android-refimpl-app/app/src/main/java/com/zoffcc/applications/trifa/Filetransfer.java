@@ -19,9 +19,9 @@
 
 package com.zoffcc.applications.trifa;
 
-import com.github.gfx.android.orma.annotation.Column;
-import com.github.gfx.android.orma.annotation.PrimaryKey;
-import com.github.gfx.android.orma.annotation.Table;
+import com.zoffcc.applications.sorm.Column;
+import com.zoffcc.applications.sorm.PrimaryKey;
+import com.zoffcc.applications.sorm.Table;
 
 import androidx.annotation.Nullable;
 
@@ -30,7 +30,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 
 @Table
-public class Filetransfer
+public class Filetransfer extends com.zoffcc.applications.sorm.Filetransfer
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id; // unique ID!!
@@ -82,34 +82,4 @@ public class Filetransfer
     String tox_file_id_hex = "";
 
     // ______@@SORMA_END@@______
-
-    static Filetransfer deep_copy(Filetransfer in)
-    {
-        Filetransfer out = new Filetransfer();
-        out.tox_public_key_string = in.tox_public_key_string;
-        out.direction = in.direction;
-        out.file_number = in.file_number;
-        out.kind = in.kind;
-        out.state = in.state;
-        out.ft_accepted = in.ft_accepted;
-        out.ft_outgoing_started = in.ft_outgoing_started;
-        out.path_name = in.path_name;
-        out.file_name = in.file_name;
-        out.fos_open = in.fos_open;
-        out.filesize = in.filesize;
-        out.current_position = in.current_position;
-        out.message_id = in.message_id;
-        out.storage_frame_work = in.storage_frame_work;
-        out.tox_file_id_hex = in.tox_file_id_hex;
-        return out;
-    }
-
-    @Override
-    public String toString()
-    {
-        return "id=" + id + ", kind=" + kind + ", state=" + state + ", direction=" + direction + ", path_name=" +
-               path_name + ", file_name=" + file_name + ", filesize=" + filesize + ", current_position=" +
-               current_position + ", message_id=" + message_id + ", tox_public_key_string=" + tox_public_key_string +
-               ", storage_frame_work=" + storage_frame_work + ", tox_file_id_hex=" + tox_file_id_hex;
-    }
 }

@@ -629,7 +629,7 @@ public class FriendListFragment extends Fragment
                                             try
                                             {
                                                 int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
-                                                        n.tox_public_key_string).and().is_newEq(true).count();
+                                                        n.tox_public_key_string).is_newEq(true).count();
                                                 if (new_messages_count > 0)
                                                 {
                                                     CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
@@ -665,7 +665,7 @@ public class FriendListFragment extends Fragment
                                             try
                                             {
                                                 int new_messages_count = orma.selectFromConferenceMessage().
-                                                        conference_identifierEq(n.conference_identifier).and().is_newEq(
+                                                        conference_identifierEq(n.conference_identifier).is_newEq(
                                                         true).count();
 
                                                 if (new_messages_count > 0)
@@ -703,7 +703,7 @@ public class FriendListFragment extends Fragment
                                             {
                                                 int new_messages_count = orma.selectFromGroupMessage().
                                                         group_identifierEq(
-                                                        n.group_identifier.toLowerCase()).and().is_newEq(
+                                                        n.group_identifier.toLowerCase()).is_newEq(
                                                         true).count();
 
                                                 if (new_messages_count > 0)
@@ -746,7 +746,7 @@ public class FriendListFragment extends Fragment
                                             try
                                             {
                                                 new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
-                                                        n.tox_public_key_string).and().is_newEq(true).count();
+                                                        n.tox_public_key_string).is_newEq(true).count();
                                             }
                                             catch (Exception e)
                                             {
@@ -784,7 +784,7 @@ public class FriendListFragment extends Fragment
                                             try
                                             {
                                                 new_messages_count = orma.selectFromConferenceMessage().
-                                                        conference_identifierEq(n.conference_identifier).and().is_newEq(
+                                                        conference_identifierEq(n.conference_identifier).is_newEq(
                                                         true).count();
                                             }
                                             catch (Exception e)
@@ -823,7 +823,7 @@ public class FriendListFragment extends Fragment
                                             {
                                                 new_messages_count = orma.selectFromGroupMessage().
                                                         group_identifierEq(
-                                                        n.group_identifier.toLowerCase()).and().is_newEq(
+                                                        n.group_identifier.toLowerCase()).is_newEq(
                                                         true).count();
                                             }
                                             catch (Exception e)

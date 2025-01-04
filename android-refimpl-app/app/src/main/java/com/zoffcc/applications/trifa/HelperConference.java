@@ -327,7 +327,6 @@ public class HelperConference
         {
             ConferenceMessage cm = orma.selectFromConferenceMessage().
                     conference_identifierEq(conference_identifier.toLowerCase()).
-                    and().
                     rcvd_timestampGt(System.currentTimeMillis() - (n * 1000)).
                     orderByRcvd_timestampDesc().
                     limit(1).
@@ -503,7 +502,7 @@ public class HelperConference
         try
         {
             return orma.selectFromConferenceDB().
-                    conference_activeEq(true).and().
+                    conference_activeEq(true).
                     conference_identifierEq(conference_id.toLowerCase()).get(0).tox_conference_number;
         }
         catch (Exception e)
@@ -538,7 +537,7 @@ public class HelperConference
         try
         {
             String name = MainActivity.tox_conference_get_title(orma.selectFromConferenceDB().
-                    conference_activeEq(true).and().
+                    conference_activeEq(true).
                     conference_identifierEq(conference_id).get(0).tox_conference_number);
 
             if ((name == null) || (name.equals("-1")))

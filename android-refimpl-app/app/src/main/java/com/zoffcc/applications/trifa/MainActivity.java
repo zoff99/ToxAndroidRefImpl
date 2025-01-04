@@ -71,8 +71,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.gfx.android.orma.AccessThreadConstraint;
-import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -4833,9 +4831,9 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         // Log.i(TAG, "check_for_stale_ft:001:friend=" + f);
-                        List<Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).kindEq(
+                        List<com.zoffcc.applications.sorm.Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).kindEq(
                                 TOX_FILE_KIND_DATA.value).tox_public_key_stringEq(f.tox_public_key_string).toList();
-                        for (Filetransfer ft : fts_active)
+                        for (com.zoffcc.applications.sorm.Filetransfer ft : fts_active)
                         {
                             // Log.i(TAG, "check_for_stale_ft:002:ft=" + ft);
 
@@ -5099,7 +5097,7 @@ public class MainActivity extends AppCompatActivity
                     if (friend_of_relay != null)
                     {
 
-                        Message m = orma.selectFromMessage().msg_id_hashEq(
+                        Message m = (Message) orma.selectFromMessage().msg_id_hashEq(
                                 message_id_hash_as_hex_string).tox_friendpubkeyEq(
                                 friend_of_relay.tox_public_key_string).directionEq(1).readEq(false).toList().get(0);
 
@@ -5135,7 +5133,7 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            final Message m = orma.selectFromMessage().msg_id_hashEq(message_id_hash_as_hex_string).tox_friendpubkeyEq(
+            final Message m = (Message) orma.selectFromMessage().msg_id_hashEq(message_id_hash_as_hex_string).tox_friendpubkeyEq(
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(1).readEq(
                     false).toList().get(0);
 
@@ -5205,7 +5203,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
-            final Message m = orma.selectFromMessage().message_idEq(message_id).tox_friendpubkeyEq(
+            final Message m = (Message) orma.selectFromMessage().message_idEq(message_id).tox_friendpubkeyEq(
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(
                     1).orderByIdDesc().toList().get(0);
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
@@ -5631,7 +5629,7 @@ public class MainActivity extends AppCompatActivity
             {
                 long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number,
                                                                                                file_number);
-                Filetransfer ft_check = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+                com.zoffcc.applications.sorm.Filetransfer ft_check = orma.selectFromFiletransfer().idEq(ft_id).get(0);
 
                 // -------- DEBUG --------
                 //                List<Filetransfer> ft_res = orma.selectFromFiletransfer().
@@ -5728,9 +5726,9 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            Filetransfer ft = orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).stateNotEq(
+            com.zoffcc.applications.sorm.Filetransfer ft = orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).stateNotEq(
                     TOX_FILE_CONTROL_CANCEL.value).tox_public_key_stringEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).file_numberEq(
+                    tox_friend_get_public_key__wrapper(friend_number)).file_numberEq(
                     file_number).orderByIdDesc().get(0);
 
             if (ft == null)
@@ -5786,7 +5784,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (length == 0)
                 {
-                    remove_ft_from_cache(ft);
+                    remove_ft_from_cache((Filetransfer) ft);
 
                     Log.i(TAG, "file_chunk_request:file fully sent");
                     // transfer finished -----------
@@ -5804,8 +5802,8 @@ public class MainActivity extends AppCompatActivity
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                            ft.tox_public_key_string).and().file_nameEq(ft.file_name).and().path_nameEq(
-                            ft.path_name).and().directionEq(ft.direction).and().filesizeEq(
+                            ft.tox_public_key_string).file_nameEq(ft.file_name).path_nameEq(
+                            ft.path_name).directionEq(ft.direction).filesizeEq(
                             ft.filesize).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
 
@@ -5884,7 +5882,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES) < position)
                         {
                             ft.current_position = position;
-                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position((Filetransfer) ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -5907,7 +5905,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
                         {
                             ft.current_position = position;
-                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position((Filetransfer) ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -5931,7 +5929,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (length == 0)
                 {
-                    remove_ft_from_cache(ft);
+                    remove_ft_from_cache((Filetransfer) ft);
 
                     Log.i(TAG, "file_chunk_request:file fully sent");
                     // transfer finished -----------
@@ -5949,8 +5947,8 @@ public class MainActivity extends AppCompatActivity
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                            ft.tox_public_key_string).and().file_nameEq(ft.file_name).and().path_nameEq(
-                            ft.path_name).and().directionEq(ft.direction).and().filesizeEq(
+                            ft.tox_public_key_string).file_nameEq(ft.file_name).path_nameEq(
+                            ft.path_name).directionEq(ft.direction).filesizeEq(
                             ft.filesize).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
 
@@ -6028,7 +6026,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES) < position)
                         {
                             ft.current_position = position;
-                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position((Filetransfer) ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -6051,7 +6049,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
                         {
                             ft.current_position = position;
-                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position((Filetransfer) ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -6286,7 +6284,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // update "new" status on friendlist fragment
-                FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                FriendList f2 = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
                 // HelperFriend.update_single_friend_in_friendlist_view(f2);
                 HelperFriend.add_all_friends_clear_wrapper(0);
 
@@ -6447,7 +6445,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // update "new" status on friendlist fragment
-                FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                FriendList f2 = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
                 // HelperFriend.update_single_friend_in_friendlist_view(f2);
                 HelperFriend.add_all_friends_clear_wrapper(0);
 
@@ -6531,7 +6529,7 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            f = orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_INCOMING.value).file_numberEq(
+            f = (Filetransfer) orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_INCOMING.value).file_numberEq(
                     file_number).stateNotEq(TOX_FILE_CONTROL_CANCEL.value).tox_public_key_stringEq(
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).orderByIdDesc().get(0);
 
@@ -6594,7 +6592,7 @@ public class MainActivity extends AppCompatActivity
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                            f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
+                            f.tox_public_key_string).file_nameEq(f.file_name).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
                 }
 
@@ -6879,8 +6877,8 @@ public class MainActivity extends AppCompatActivity
         try
         {
             // TODO: cache me!!
-            conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
-                    conference_number).and().conference_activeEq(true).toList().get(0);
+            conf_temp = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
+                    conference_number).conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
         }
         catch (Exception e)
@@ -6996,8 +6994,8 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     // TODO: cache me!!
-                    conf_temp2 = orma.selectFromConferenceDB().tox_conference_numberEq(
-                            conference_number).and().conference_activeEq(true).get(0);
+                    conf_temp2 = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
+                            conference_number).conference_activeEq(true).get(0);
 
                     if (conf_temp2 != null)
                     {
@@ -7052,8 +7050,8 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // TODO: cache me!!
-                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
-                        conference_number).and().conference_activeEq(true).get(0);
+                conf_temp = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
+                        conference_number).conference_activeEq(true).get(0);
             }
             catch (Exception e)
             {
@@ -7185,8 +7183,8 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // TODO: cache me!!
-                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
-                        conference_number).and().conference_activeEq(true).get(0);
+                conf_temp = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
+                        conference_number).conference_activeEq(true).get(0);
             }
             catch (Exception e)
             {
@@ -7910,11 +7908,11 @@ public class MainActivity extends AppCompatActivity
                             }
                             try
                             {
-                                final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                                final GroupDB conf3 = (GroupDB) orma.selectFromGroupDB().group_identifierEq(
                                         group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
-                                cc.group_item = GroupDB.deep_copy(conf3);
+                                cc.group_item = (GroupDB) GroupDB.deep_copy(conf3);
                                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                             }
                             catch (Exception e3)
@@ -7981,11 +7979,11 @@ public class MainActivity extends AppCompatActivity
                             }
                             try
                             {
-                                final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                                final GroupDB conf3 = (GroupDB) orma.selectFromGroupDB().group_identifierEq(
                                         group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
-                                cc.group_item = GroupDB.deep_copy(conf3);
+                                cc.group_item = (GroupDB) GroupDB.deep_copy(conf3);
                                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                             }
                             catch (Exception e3)
@@ -8191,7 +8189,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     long mid = (Long) i.next();
-                    final Message m_to_delete = orma.selectFromMessage().idEq(mid).get(0);
+                    final Message m_to_delete = (Message) orma.selectFromMessage().idEq(mid).get(0);
 
                     // ---------- delete fileDB if this message is an outgoing file ----------
                     if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
@@ -8234,7 +8232,7 @@ public class MainActivity extends AppCompatActivity
                         {
                             try
                             {
-                                FileDB file_ = orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
+                                FileDB file_ = (FileDB) orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
 
                                 try
                                 {
@@ -8406,8 +8404,8 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     long mid = (Long) i.next();
-                    Message m = orma.selectFromMessage().idEq(mid).get(0);
-                    FileDB file_ = orma.selectFromFileDB().idEq(m.filedb_id).get(0);
+                    Message m = (Message) orma.selectFromMessage().idEq(mid).get(0);
+                    FileDB file_ = (FileDB) orma.selectFromFileDB().idEq(m.filedb_id).get(0);
                     HelperGeneric.export_vfs_file_to_real_file(file_.path_name, file_.file_name,
                                                                SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
                                                                "/", file_.file_name);
@@ -8615,7 +8613,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     long mid = (Long) i.next();
-                    final ConferenceMessage m_to_delete = orma.selectFromConferenceMessage().idEq(mid).get(0);
+                    final ConferenceMessage m_to_delete = (ConferenceMessage) orma.selectFromConferenceMessage().idEq(mid).get(0);
 
                     // ---------- delete the message itself ----------
                     try
@@ -8769,7 +8767,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     long mid = (Long) i.next();
-                    final GroupMessage m_to_delete = orma.selectFromGroupMessage().idEq(mid).get(0);
+                    final GroupMessage m_to_delete = (GroupMessage) orma.selectFromGroupMessage().idEq(mid).get(0);
 
                     // ---------- delete file if this message is an outgoing file ----------
                     if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)

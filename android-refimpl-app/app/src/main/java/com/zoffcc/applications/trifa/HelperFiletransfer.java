@@ -241,7 +241,6 @@ public class HelperFiletransfer
             // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:friend_number=" + friend_number + " file_number=" + file_number);
             long ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
                     file_numberEq(file_number).
                     orderByIdDesc().
                     toList().
@@ -277,7 +276,7 @@ public class HelperFiletransfer
         try
         {
             delete_filetransfer_tmpfile(orma.selectFromFiletransfer().tox_public_key_stringEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).file_numberEq(
                     file_number).get(0).id);
         }
         catch (Exception e)
@@ -453,7 +452,6 @@ public class HelperFiletransfer
         {
             set_filetransfer_for_message_from_filetransfer_id(orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
                     file_numberEq(file_number).
                     orderByIdDesc().
                     get(0).id, ft_id);
@@ -482,7 +480,6 @@ public class HelperFiletransfer
         {
             long del_ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
                     file_numberEq(file_number).
                     orderByIdDesc().
                     get(0).id;
@@ -596,7 +593,6 @@ public class HelperFiletransfer
         {
             f = orma.selectFromFiletransfer().
                     file_numberEq(file_number).
-                    and().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().
                     toList().get(0);
@@ -728,7 +724,6 @@ public class HelperFiletransfer
     {
         orma.updateFiletransfer().
                 tox_public_key_stringEq(f.tox_public_key_string).
-                and().
                 file_numberEq(f.file_number).
                 current_position(f.current_position).
                 execute();
