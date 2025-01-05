@@ -2016,7 +2016,11 @@ public class TrifaToxService extends Service
                     while (i2.hasNext())
                     {
                         ee = (BootstrapNodeEntryDB) i2.next();
-                        int bootstrap_result = HelperGeneric.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex);
+                        int bootstrap_result = 1;
+                        if ((ee.ip != null) && (ee.key_hex != null))
+                        {
+                            bootstrap_result = HelperGeneric.add_tcp_relay_single_wrapper(ee.ip, ee.port, ee.key_hex);
+                        }
                         Log.i(TAG, "add_tcp_relay_single:res=" + bootstrap_result);
 
                         if (bootstrap_result == 0)
