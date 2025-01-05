@@ -530,6 +530,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__ngc_audio_channels = 1;
     static boolean PREF__gainprocessing_active = true;
     static boolean PREF__rnnoise_active = false;
+    static boolean PREF__trust_all_webcerts = false; // HINT: !!be careful with this option!!
 
     static String versionName = "";
     static int versionCode = -1;

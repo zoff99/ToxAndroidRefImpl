@@ -29,6 +29,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
+import android.net.SSLCertificateSocketFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -43,14 +44,22 @@ import android.widget.Toast;
 import com.google.gson.Gson;
 import com.yariksoffice.lingver.Lingver;
 
+import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -74,6 +83,7 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_DB_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__orbot_enabled;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__trust_all_webcerts;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_CHATS_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
@@ -372,8 +382,61 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     }
                     else
                     {
+                        /*
+                         *
+                         * this will trust all CERTS
+                         * !!DANGER!! !!DANGER!!
+                         */
+                        TrustManager[] trustAllCerts = new TrustManager[]{
+                                new X509TrustManager() {
+                                    @Override
+                                    public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                                    }
+
+                                    @Override
+                                    public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
+                                    }
+
+                                    @Override
+                                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                                        return new java.security.cert.X509Certificate[]{};
+                                    }
+                                }
+                        };
+                        SSLContext sslContext = SSLContext.getInstance("SSL");
+                        sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+                        /*
+                         *
+                         * this will trust all CERTS
+                         * !!DANGER!! !!DANGER!!
+                         */
+
+                        // this is correct call in all cases -------------
+                        // this is correct call in all cases -------------
+                        OkHttpClient.Builder newBuilder = new OkHttpClient.Builder();
+                        // this is correct call in all cases -------------
+                        // this is correct call in all cases -------------
+
+                        /*
+                         *
+                         * this will trust all CERTS
+                         * !!DANGER!! !!DANGER!!
+                         * to avoid this: java.security.cert.CertPathValidatorException: Trust anchor for certification path not found.
+                         * when your android is just too old
+                         */
+                        if (PREF__trust_all_webcerts)
+                        {
+                            newBuilder.sslSocketFactory(sslContext.getSocketFactory(), (X509TrustManager) trustAllCerts[0]);
+                            newBuilder.hostnameVerifier((hostname, session) -> true);
+                        }
+                        /*
+                         *
+                         * this will trust all CERTS
+                         * !!DANGER!! !!DANGER!!
+                         */
+
                         Log.i(TAG, "StrongOkHttpClientBuilder:002");
-                        onConnected(new OkHttpClient.Builder().
+                        onConnected(newBuilder.
                                 addNetworkInterceptor(new Interceptor()
                                 {
                                     @NonNull
