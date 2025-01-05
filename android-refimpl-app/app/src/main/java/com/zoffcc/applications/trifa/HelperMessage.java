@@ -28,6 +28,11 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.Message;
+
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Comparator;
@@ -245,7 +250,7 @@ public class HelperMessage
                         {
                             try
                             {
-                                ConferenceMessage m = (ConferenceMessage) orma.selectFromConferenceMessage().idEq(
+                                ConferenceMessage m = orma.selectFromConferenceMessage().idEq(
                                         message_id).orderByIdDesc().get(0);
 
                                 if (m.id != -1)

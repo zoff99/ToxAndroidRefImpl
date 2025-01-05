@@ -35,6 +35,8 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.Message;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -2132,10 +2134,10 @@ public class TrifaToxService extends Service
 
             if ((m_v1 != null) && (m_v1.size() > 0))
             {
-                Iterator<com.zoffcc.applications.sorm.Message> ii = m_v1.iterator();
+                Iterator<Message> ii = m_v1.iterator();
                 while (ii.hasNext())
                 {
-                    Message m_resend_v1 = (Message) ii.next();
+                    Message m_resend_v1 = ii.next();
                     if (friend_pubkey == null)
                     {
                         if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_v1.tox_friendpubkey)) == 0)

@@ -26,6 +26,9 @@ import android.database.Cursor;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Comparator;

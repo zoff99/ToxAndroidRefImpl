@@ -53,6 +53,8 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.FriendList;
 
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;

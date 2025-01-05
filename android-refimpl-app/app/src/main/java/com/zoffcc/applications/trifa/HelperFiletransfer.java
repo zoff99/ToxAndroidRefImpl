@@ -29,6 +29,9 @@ import android.os.Build;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import com.zoffcc.applications.sorm.FileDB;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.Message;
 import com.zoffcc.applications.trifa.MessageListActivity.outgoing_file_wrapped;
 
 import java.io.BufferedOutputStream;

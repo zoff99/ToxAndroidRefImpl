@@ -83,6 +83,8 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.GroupPeerDB;
 
 import java.io.File;
 import java.nio.ByteBuffer;

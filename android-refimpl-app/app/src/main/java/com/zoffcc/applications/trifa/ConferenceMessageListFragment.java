@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.l4digital.fastscroll.FastScroller;
+import com.zoffcc.applications.sorm.ConferenceMessage;
 
 import java.util.ArrayList;
 import java.util.List;

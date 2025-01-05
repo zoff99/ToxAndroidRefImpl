@@ -33,6 +33,8 @@ import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.GroupPeerDB;
 
 import java.util.Random;
 

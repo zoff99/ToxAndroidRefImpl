@@ -45,6 +45,7 @@ import com.google.gson.Gson;
 import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.sorm.ConferenceDB;
 import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.FriendList;
 import com.zoffcc.applications.sorm.Message;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;

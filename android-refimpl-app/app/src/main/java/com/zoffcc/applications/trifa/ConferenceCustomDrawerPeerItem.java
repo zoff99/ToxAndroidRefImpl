@@ -33,6 +33,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.model.AbstractBadgeableDrawerItem;
+import com.zoffcc.applications.sorm.FriendList;
 
 import java.util.List;
 

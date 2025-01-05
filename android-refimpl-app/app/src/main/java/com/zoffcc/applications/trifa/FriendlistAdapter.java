@@ -26,6 +26,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.l4digital.fastscroll.FastScroller;
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
 
 import java.util.Iterator;
 import java.util.List;

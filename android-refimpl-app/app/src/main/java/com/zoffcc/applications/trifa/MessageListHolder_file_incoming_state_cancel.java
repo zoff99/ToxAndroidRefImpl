@@ -49,6 +49,8 @@ import com.luseen.autolinklibrary.AutoLinkMode;
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.FileDB;
+import com.zoffcc.applications.sorm.Message;
 
 import java.net.URLConnection;
 

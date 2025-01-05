@@ -27,6 +27,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;

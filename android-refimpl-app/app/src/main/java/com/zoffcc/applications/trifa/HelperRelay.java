@@ -21,6 +21,11 @@ package com.zoffcc.applications.trifa;
 
 import android.util.Log;
 
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
+import com.zoffcc.applications.sorm.RelayListDB;
+
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;

@@ -28,6 +28,9 @@ import android.util.Log;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.GroupDB;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.GroupPeerDB;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

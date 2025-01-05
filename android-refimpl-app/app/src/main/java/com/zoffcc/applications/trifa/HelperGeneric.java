@@ -59,6 +59,12 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.Message;
+import com.zoffcc.applications.sorm.TRIFADatabaseGlobalsNew;
 
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Collector;
 import org.secuso.privacyfriendlynetmonitor.ConnectionAnalysis.Detector;

@@ -86,6 +86,15 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.ConferencePeerCacheDB;
+import com.zoffcc.applications.sorm.FileDB;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.Message;
 
 import java.io.File;
 import java.io.IOException;

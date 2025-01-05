@@ -31,6 +31,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.zoffcc.applications.sorm.GroupPeerDB;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

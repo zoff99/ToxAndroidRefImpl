@@ -33,6 +33,8 @@ import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.Message;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
