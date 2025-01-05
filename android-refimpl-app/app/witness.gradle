@@ -112,6 +112,8 @@ dependencyVerification {
         'com.android.tools.utp:android-test-plugin-result-listener-gradle:30.3.1:android-test-plugin-result-listener-gradle-30.3.1.jar:75ff9083a45ffd502e1e4385e0741b69fd640ef6f72220849dc9c0db0179c58c',
         'com.android.tools:annotations:30.3.1:annotations-30.3.1.jar:77e5196bcafc283c5e987f0944f049eee0e68b532ebeb530d855f6f196db4f2a',
         'com.android.tools:common:30.3.1:common-30.3.1.jar:559f1484222d8947ecf4d18538295be6d12ff2b74dc22c3c85922c7ba33678e9',
+        'com.android.tools:desugar_jdk_libs:1.2.2:desugar_jdk_libs-1.2.2.jar:563069c5ae127e5b3dff27aedd499271871e2eebca9830b18715c6726a6d1602',
+        'com.android.tools:desugar_jdk_libs_configuration:1.2.2:desugar_jdk_libs_configuration-1.2.2.jar:38a4386075f6e7b03dfee1cdcd7f2dd4de8e6d11d68bd4d9fccf44872bd0f4b0',
         'com.daimajia.numberprogressbar:library:1.4:library-1.4.aar:94a81e9134f084a5327261972fc18f3afc457e8290324f7c3cae6dacb4c13ee5',
         'com.daimajia.swipelayout:library:1.2.0:library-1.2.0.aar:95a7a1d75ca6795d5dda5060f9357d4a072415b53034594831eb67e434cb25bd',
         'com.github.YarikSOffice:lingver:1.3.0:lingver-1.3.0.aar:5924f804790c7ab523db14fa86692543f4bc8eb43f05b427048e0a856791499f',
