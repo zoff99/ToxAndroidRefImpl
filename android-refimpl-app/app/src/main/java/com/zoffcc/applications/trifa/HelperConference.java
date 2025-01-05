@@ -381,24 +381,16 @@ public class HelperConference
 
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery(
-                    "SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            //Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_conference_view_flag)
+            if ((row_id != -1) && (update_conference_view_flag))
             {
-                HelperMessage.add_single_conference_message_from_messge_id(msg_id, true);
+                HelperMessage.add_single_conference_message_from_messge_id(row_id, true);
             }
-
-            return msg_id;
+            return row_id;
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            return -1;
+            return row_id;
         }
     }
 

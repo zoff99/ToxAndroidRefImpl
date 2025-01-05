@@ -310,13 +310,7 @@ public class HelperGroup
 
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM GroupMessage where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            //Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_group_view_flag)
+            if ((row_id != -1) && (update_group_view_flag))
             {
                 if ((PREF__conference_show_system_messages == false) &&
                     (m.tox_group_peer_pubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)))
@@ -325,16 +319,16 @@ public class HelperGroup
                 }
                 else
                 {
-                    add_single_group_message_from_messge_id(msg_id, true);
+                    add_single_group_message_from_messge_id(row_id, true);
                 }
             }
 
-            return msg_id;
+            return row_id;
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            return -1;
+            return row_id;
         }
     }
 

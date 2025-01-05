@@ -787,14 +787,7 @@ public class HelperFiletransfer
         try
         {
             long row_id = orma.insertIntoFiletransfer(f);
-            // Log.i(TAG, "insert_into_filetransfer_db:row_id=" + row_id);
-            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Filetransfer where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            // Log.i(TAG, "insert_into_filetransfer_db:id res count=" + cursor.getColumnCount());
-            long ft_id = cursor.getLong(0);
-            cursor.close();
-            // Log.i(TAG, "insert_into_filetransfer_db:ft_id=" + ft_id);
-            return ft_id;
+            return row_id;
         }
         catch (Exception e)
         {

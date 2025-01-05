@@ -676,25 +676,19 @@ public class HelperMessage
 
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Message where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            // Log.i(TAG, "insert_into_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_message_view_flag)
+            if ((row_id != -1) && (update_message_view_flag))
             {
                 // Log.i(TAG, "insert_into_message_db:add_single_message_from_messge_id, force=true");
-                add_single_message_from_messge_id(msg_id, true);
+                add_single_message_from_messge_id(row_id, true);
             }
 
-            return msg_id;
+            return row_id;
         }
         catch (Exception e)
         {
             Log.i(TAG, "insert_into_message_db:EE:" + e.getMessage());
             e.printStackTrace();
-            return -1;
+            return row_id;
         }
 
         //    }
