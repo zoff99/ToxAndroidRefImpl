@@ -366,15 +366,15 @@ public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.Bootstrap
         try
         {
             tcprelay_node_list.addAll(orma.selectFromBootstrapNodeEntryDB().udp_nodeEq(false).orderByNumAsc().toList());
-            Log.i(TAG, "get_tcprelay_nodelist_from_db:tcprelay_node_list.addAll");
+            Log.i(TAG, "get_tcprelay_nodelist_from_db:tcprelay_node_list.addAll " + tcprelay_node_list);
 
             if (PREF__orbot_enabled)
             {
                 Iterator i = bootstrap_node_list.iterator();
-                BootstrapNodeEntryDB e2;
+                com.zoffcc.applications.sorm.BootstrapNodeEntryDB e2;
                 while (i.hasNext())
                 {
-                    e2 = (BootstrapNodeEntryDB) i.next();
+                    e2 = (com.zoffcc.applications.sorm.BootstrapNodeEntryDB) i.next();
                     e2.ip = dns_lookup_via_tor(e2.ip);
 
                 }
@@ -418,10 +418,10 @@ public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.Bootstrap
             if (PREF__orbot_enabled)
             {
                 Iterator i = bootstrap_node_list.iterator();
-                BootstrapNodeEntryDB e2;
+                com.zoffcc.applications.sorm.BootstrapNodeEntryDB e2;
                 while (i.hasNext())
                 {
-                    e2 = (BootstrapNodeEntryDB) i.next();
+                    e2 = (com.zoffcc.applications.sorm.BootstrapNodeEntryDB) i.next();
                     e2.ip = dns_lookup_via_tor(e2.ip);
                 }
             }

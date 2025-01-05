@@ -1,1 +1,1 @@
-/home/zoff/StudioProjects/ToxAndroidRefImpl/android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/Filetransfer.java
+../templates/Filetransfer.java

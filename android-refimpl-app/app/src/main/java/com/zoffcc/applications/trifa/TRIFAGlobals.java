@@ -263,7 +263,7 @@ public class TRIFAGlobals
     static Map<String, PositionInputStream> cache_ft_fis_saf = new HashMap<String, PositionInputStream>();
     // ---- lookup cache ----
 
-    static List<BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<com.zoffcc.applications.sorm.BootstrapNodeEntryDB>();
+    static List<com.zoffcc.applications.sorm.BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<com.zoffcc.applications.sorm.BootstrapNodeEntryDB>();
     public static List<com.zoffcc.applications.sorm.BootstrapNodeEntryDB> tcprelay_node_list = new ArrayList<com.zoffcc.applications.sorm.BootstrapNodeEntryDB>();
 
     static final int[] MESSAGE_TEXT_SIZE = {9, 11, 15, 20,   25, 30, 45}; // values in "sp"

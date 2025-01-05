@@ -18,7 +18,7 @@ import com.zoffcc.applications.sorm.Log;
 public class OrmaDatabase
 {
     private static final String TAG = "sorm.OrmaDatabase";
-    final static boolean ORMA_TRACE = true; // set "false" for release builds
+    final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean ORMA_LONG_RUNNING_TRACE = true; // set "false" for release builds
     final static long ORMA_LONG_RUNNING_MS = 180;
 
