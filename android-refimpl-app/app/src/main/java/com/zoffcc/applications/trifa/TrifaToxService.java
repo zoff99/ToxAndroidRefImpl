@@ -1964,11 +1964,11 @@ public class TrifaToxService extends Service
         try
         {
             Iterator i2 = bootstrap_node_list.iterator();
-            BootstrapNodeEntryDB ee;
+            com.zoffcc.applications.sorm.BootstrapNodeEntryDB ee;
             int used = 0;
             while (i2.hasNext())
             {
-                ee = (BootstrapNodeEntryDB) i2.next();
+                ee = (com.zoffcc.applications.sorm.BootstrapNodeEntryDB) i2.next();
                 int bootstrap_result = bootstrap_single_wrapper(ee.ip, ee.port, ee.key_hex);
                 Log.i(TAG, "bootstrap_single:res=" + bootstrap_result);
 
