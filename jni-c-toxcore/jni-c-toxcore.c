@@ -84,9 +84,9 @@
 // ----------- version -----------
 #define VERSION_MAJOR 0
 #define VERSION_MINOR 99
-#define VERSION_PATCH 95
-static const char global_version_string[] = "0.99.95";
-static const char global_version_asan_string[] = "0.99.95-ASAN";
+#define VERSION_PATCH 96
+static const char global_version_string[] = "0.99.96";
+static const char global_version_asan_string[] = "0.99.96-ASAN";
 // ----------- version -----------
 // ----------- version -----------
 
@@ -3128,6 +3128,21 @@ int add_tcp_relay_single(Tox *tox, const char *ip, uint16_t port, const char *ke
 int Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single__real(JNIEnv *env, jobject thiz, jstring ip,
         jstring key_hex, long port)
 {
+    if (ip == NULL)
+    {
+        return 1;
+    }
+
+    if (key_hex == NULL)
+    {
+        return 1;
+    }
+
+    if (tox_global == NULL)
+    {
+        return 1;
+    }
+
     // dbg(9, "add_tcp_relay_single1");
     const char *key_hex_str = NULL;
     const char *ip_str = NULL;
@@ -3202,6 +3217,21 @@ int Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single__real(JNIE
         jobject key_hex, long port)
 {
     // dbg(9, "bootstrap_single");
+    if (ip == NULL)
+    {
+        return 1;
+    }
+
+    if (key_hex == NULL)
+    {
+        return 1;
+    }
+
+    if (tox_global == NULL)
+    {
+        return 1;
+    }
+
     const char *ip_str = (*env)->GetStringUTFChars(env, ip, NULL);
     const char *key_hex_str = (*env)->GetStringUTFChars(env, key_hex, NULL);
     int res = bootstrap_single(tox_global, ip_str, (uint16_t)port, key_hex_str);
