@@ -2012,7 +2012,7 @@ public class TrifaToxService extends Service
                 if (!PREF__force_udp_only)
                 {
                     Iterator i2 = tcprelay_node_list.iterator();
-                    BootstrapNodeEntryDB ee;
+                    com.zoffcc.applications.sorm.BootstrapNodeEntryDB ee;
                     int used = 0;
                     while (i2.hasNext())
                     {
