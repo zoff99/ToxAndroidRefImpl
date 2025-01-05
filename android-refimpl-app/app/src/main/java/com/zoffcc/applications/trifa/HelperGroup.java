@@ -872,7 +872,7 @@ public class HelperGroup
         }
         catch(Exception e)
         {
-            return true;
+            return false;
         }
     }
 
