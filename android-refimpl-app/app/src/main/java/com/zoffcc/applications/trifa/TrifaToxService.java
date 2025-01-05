@@ -272,6 +272,9 @@ public class TrifaToxService extends Service
                         }
                         Log.i(TAG, "stop_me:006a:tox_thread_starting_up=" + tox_thread_starting_up);
 
+                        Log.i(TAG, "stop_me:unmount sql database");
+                        orma.close_db();
+
                         if (VFS_ENCRYPT)
                         {
                             Log.i(TAG, "stop_me:006b");

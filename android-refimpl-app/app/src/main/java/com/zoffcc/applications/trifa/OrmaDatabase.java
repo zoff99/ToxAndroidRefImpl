@@ -563,7 +563,7 @@ public class OrmaDatabase extends com.zoffcc.applications.sorm.OrmaDatabase
         }
     }
 
-    private void close_db()
+    void close_db()
     {
         shutdown();
     }
