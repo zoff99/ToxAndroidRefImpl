@@ -854,7 +854,7 @@ public class HelperGroup
         }
         catch (Exception ignored)
         {
-            return true;
+            return false;
         }
     }
 
