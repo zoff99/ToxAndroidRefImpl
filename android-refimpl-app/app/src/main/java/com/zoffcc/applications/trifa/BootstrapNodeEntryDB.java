@@ -83,7 +83,7 @@ public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.Bootstrap
         return ip;
     }
 
-    static void insert_node_into_db_real(BootstrapNodeEntryDB n)
+    static void insert_node_into_db_real(com.zoffcc.applications.sorm.BootstrapNodeEntryDB n)
     {
         try
         {
@@ -97,7 +97,7 @@ public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.Bootstrap
 
     public static void insert_default_udp_nodes_into_db()
     {
-        BootstrapNodeEntryDB n;
+        com.zoffcc.applications.sorm.BootstrapNodeEntryDB n;
         int num_ = 0;
         // @formatter:off
         n = BootstrapNodeEntryDB_(true, num_, "144.217.167.73",33445,"7E5668E0EE09E19F320AD47902419331FFEE147BB3606769CFBE921A2A2FD34C");insert_node_into_db_real(n);num_++;
@@ -146,7 +146,7 @@ public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.Bootstrap
 
     public static void insert_default_tcprelay_nodes_into_db()
     {
-        BootstrapNodeEntryDB n;
+        com.zoffcc.applications.sorm.BootstrapNodeEntryDB n;
         int num_ = 0;
         // @formatter:off
         n = BootstrapNodeEntryDB_(false, num_, "144.217.167.73",33445,"7E5668E0EE09E19F320AD47902419331FFEE147BB3606769CFBE921A2A2FD34C");insert_node_into_db_real(n);num_++;
@@ -274,68 +274,6 @@ public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.Bootstrap
             e.printStackTrace();
             Log.i(TAG, "dns_lookup_via_tor:EE1:" + e.getMessage());
             return "127.0.0.1";
-        }
-    }
-
-    public static void update_nodelist_from_internet_https_dummy_XXXX()
-    {
-        // this should be using TOR proxy, if tor is enabled in options!
-        // TODO: TorResolve can NOT resolve IPv6 address like its written now
-        String IP_address = TorResolve(TOX_NODELIST_HOST);
-        Log.i(TAG, "update_nodelist_from_internet:TorResolve:" + TOX_NODELIST_HOST + " -> " + IP_address);
-
-
-        try
-        {
-            Socket s = TorSocket(TOX_NODELIST_HOST, 443);
-            DataInputStream is = new DataInputStream(s.getInputStream());
-            PrintStream out = new java.io.PrintStream(s.getOutputStream());
-
-            //Construct an HTTP request
-            out.print("GET  /" + "json" + " HTTP/1.0\r\n");
-            out.print("Host: " + TOX_NODELIST_HOST + ":" + "443" + "\r\n");
-            out.print("Accept: */*\r\n");
-            out.print("Connection: Keep-Alive\r\n");
-            out.print("Pragma: no-cache\r\n");
-            out.print("\r\n");
-            out.flush();
-
-            // this is from Java Examples In a Nutshell
-            final InputStreamReader from_server = new InputStreamReader(is);
-            char[] buffer = new char[1024];
-            int chars_read;
-
-            StringBuilder response_text = new StringBuilder();
-
-            // read until stream closes
-            while ((chars_read = from_server.read(buffer)) != -1)
-            {
-                // loop through array of chars
-                // change \n to local platform terminator
-                // this is a nieve implementation
-                for (int j = 0; j < chars_read; j++)
-                {
-                    if (buffer[j] == '\n')
-                    {
-                        // System.out.println();
-                        response_text.append("\n");
-                    }
-                    else
-                    {
-                        // System.out.print(buffer[j]);
-                        response_text.append(buffer[j]);
-                    }
-                }
-                // System.out.flush();
-            }
-            s.close();
-
-            Log.i(TAG, "" + response_text);
-
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
         }
     }
 

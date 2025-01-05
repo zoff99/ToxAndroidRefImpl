@@ -752,7 +752,6 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
-                // Log.i(TAG, "db:path(2)=" + dbs_path);
                 try
                 {
                     if (DB_ENCRYPT)

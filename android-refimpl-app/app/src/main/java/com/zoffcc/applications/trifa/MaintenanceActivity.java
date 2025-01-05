@@ -1057,7 +1057,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             {
                                 try
                                 {
-                                    BootstrapNodeEntryDB bn2 = new BootstrapNodeEntryDB();
+                                    com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2 = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                     bn2.ip = nl_entry.getIpv4();
                                     bn2.port = nl_entry.getPort();
                                     bn2.key_hex = nl_entry.getPublicKey().toUpperCase();
@@ -1070,7 +1070,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                         num_udp++;
                                     }
 
-                                    BootstrapNodeEntryDB bn2_ip6 = new BootstrapNodeEntryDB();
+                                    com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2_ip6 = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                     bn2_ip6.ip = nl_entry.getIpv6();
                                     bn2_ip6.port = nl_entry.getPort();
                                     bn2_ip6.key_hex = nl_entry.getPublicKey().toUpperCase();
@@ -1098,7 +1098,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                 {
                                     try
                                     {
-                                        BootstrapNodeEntryDB bn2 = new BootstrapNodeEntryDB();
+                                        com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2 = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                         bn2.ip = nl_entry.getIpv4();
                                         int tcp_ports_count = nl_entry.getTcpPorts().size();
                                         bn2.port = nl_entry.getTcpPorts().get(k);
@@ -1116,7 +1116,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                             }
                                         }
 
-                                        BootstrapNodeEntryDB bn2_ip6 = new BootstrapNodeEntryDB();
+                                        com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2_ip6 = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                         bn2_ip6.ip = nl_entry.getIpv6();
                                         int tcp_ports_count_ip6 = nl_entry.getTcpPorts().size();
                                         bn2_ip6.key_hex = nl_entry.getPublicKey().toUpperCase();
@@ -1126,7 +1126,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                         {
                                             for (int p=0;p<tcp_ports_count_ip6;p++)
                                             {
-                                                BootstrapNodeEntryDB bn2_ip6_ = new BootstrapNodeEntryDB();
+                                                com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2_ip6_ = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                                 bn2_ip6_.ip = nl_entry.getIpv6();
                                                 bn2_ip6_.port = nl_entry.getTcpPorts().get(p);
                                                 bn2_ip6_.key_hex = nl_entry.getPublicKey().toUpperCase();
