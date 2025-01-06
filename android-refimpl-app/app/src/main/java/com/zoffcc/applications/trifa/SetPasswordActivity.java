@@ -124,18 +124,16 @@ public class SetPasswordActivity extends AppCompatActivity
         {
             githash_text.setText("build: ????????");
         }
-        catch(Exception e)
+        catch(Exception ignored)
         {
-
         }
 
         try
         {
-            githash_text.setText("build: " + BuildConfig.GitHash);
+            githash_text.setText("build: " + BuildConfig.GitHash + "\n" + "API: " + Build.VERSION.SDK_INT + "            ");
         }
-        catch(Exception e)
+        catch(Exception ignored)
         {
-
         }
     }
 
