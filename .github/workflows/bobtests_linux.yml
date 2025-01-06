@@ -37,6 +37,10 @@ jobs:
         run: |
           convert -list font || echo "NO ERR"
 
+      - name: make directory
+        run: |
+          mkdir -p /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/
+
       - name: make promo screenshots 1
         run:  |
               pwd
