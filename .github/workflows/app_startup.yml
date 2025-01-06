@@ -105,7 +105,7 @@ jobs:
 
       - name: Upload to nightly release
         uses: ncipollo/release-action@v1
-        if: github.ref == 'refs/heads/android_test'
+        if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/zoff99/dev003'
         with:
           allowUpdates: true
           tag: nightly
