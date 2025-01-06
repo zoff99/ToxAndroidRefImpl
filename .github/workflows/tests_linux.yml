@@ -115,7 +115,7 @@ jobs:
     - name: upload screenshots
       uses: actions/upload-artifact@v4
       with:
-        name: linuxscreen
+        name: linuxscreen_${{ matrix.api-level }}
         path: |
           /home/runner/screen*.png
           /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
@@ -124,7 +124,7 @@ jobs:
       continue-on-error: true
       uses: actions/upload-artifact@v4
       with:
-        name: logcat
+        name: logcat_${{ matrix.api-level }}
         path: |
           /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
 
@@ -132,8 +132,8 @@ jobs:
       if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
       run: |
         pwd
-        cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_099.png screen_shot_android_04.png
-        cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_005.png screen_shot_android_05.png
+        cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_099.png screen_shot_android_${{ matrix.api-level }}_04.png
+        cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_005.png screen_shot_android_${{ matrix.api-level }}_05.png
 
     - name: Upload to nightly release
       uses: ncipollo/release-action@v1
@@ -146,6 +146,6 @@ jobs:
         prerelease: true
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: "screen_shot_android_04.png,screen_shot_android_05.png"
+        artifacts: "screen_shot_android_${{ matrix.api-level }}_04.png,screen_shot_android_${{ matrix.api-level }}_05.png"
 
 
