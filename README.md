@@ -31,7 +31,7 @@ Latest Automated Screenshots
 Startup Test Automated Screenshots
 <br>
 
-<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_21.png" width="100">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_29.png" width="100">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_33.png" width="100">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_35.png" width="100">
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_21.png" width="120">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_29.png" width="120">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_33.png" width="120">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_35.png" width="120">
 
 <br>
 
