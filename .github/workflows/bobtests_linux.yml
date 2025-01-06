@@ -36,24 +36,20 @@ jobs:
           ghostscript \
           imagemagick \
           ca-certificates
-
       - name: check imagemagick
         run: |
           convert -list font || echo "NO ERR"
-
       - name: Install Java
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: |
             11
-
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-
       - name: test java1
         run:  |
               pwd
@@ -61,7 +57,6 @@ jobs:
               echo "===========1========="
               java -version || exit 0
               echo "===========2========="
-
       - name: download tester
         shell: bash
         run: |
@@ -70,12 +65,10 @@ jobs:
              ls -al java_tox_tester-master/
              java -version
              javac -version
-
       - name: start tester
         shell: bash
         run: |
              cd java_tox_tester-master/ ; ls -al ; ./do_wait_for_app.sh &
-
       - name: check disk space
         shell: bash
         run: |
@@ -83,7 +76,6 @@ jobs:
              du -hs /home/runner/work
              cd /home/runner/work
              du -s *|sort -n
-
       - name: android test
         timeout-minutes: 30
         continue-on-error: true
@@ -122,7 +114,6 @@ jobs:
             ls -al /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/
             echo "---------------"
             ls -al /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
-
       - name: make promo screenshots 1
         run:  |
               pwd
@@ -130,21 +121,19 @@ jobs:
               cd ./android_promo_screens/
               ./test.sh "TRIfA" "Message your Friends and Family securely and with ease." /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_004b.png
               cp -av output.png promo_02.png
-              mv -v promo_02.png ../promo_${{ matrix.api-level }}_02.png
+              mv -v promo_02.png ../
               ./test.sh "TRIfA" "Send Messages and Files or just Call your Friends." /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_099.png
               cp -av output.png promo_03.png
-              mv -v promo_03.png ../promo_${{ matrix.api-level }}_03.png
-
+              mv -v promo_03.png ../
       - name: make promo screenshots 2
         run:  |
               cd ./android_promo_screens/
               ./test2.sh "TRIfA" "Message your Friends and Family securely and with ease." /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/images/101.png
               cp -av output.png promo_101.png
-              mv -v promo_101.png ../promo_${{ matrix.api-level }}_101.png
+              mv -v promo_101.png ../
               ./test2.sh "TRIfA" "Send Messages and Files or just Call your Friends." /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/images/102.png
               cp -av output.png promo_102.png
-              mv -v promo_102.png ../promo_${{ matrix.api-level }}_102.png
-
+              mv -v promo_102.png ../
       - name: Upload to nightly release
         uses: ncipollo/release-action@v1
         if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
@@ -156,7 +145,7 @@ jobs:
           prerelease: true
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "promo_${{ matrix.api-level }}_02.png,promo_${{ matrix.api-level }}_03.png,promo_${{ matrix.api-level }}_101.png,promo_${{ matrix.api-level }}_102.png"
+          artifacts: "promo_02.png,promo_03.png,promo_101.png,promo_102.png"
 
 
       - name: put datetime on screenshots
@@ -171,30 +160,26 @@ jobs:
               convert test_099.png -gravity SouthEast -pointsize 62 -fill white -annotate +30+30 "$d ($c)" test_099_time.png
               mv test_004b_time.png test_004b.png
               mv test_099_time.png test_099.png
-
       - name: upload screenshots
         uses: actions/upload-artifact@v4
         with:
-          name: linuxscreen_${{ matrix.api-level }}
+          name: linuxscreen
           path: |
             /home/runner/screen*.png
             /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
-
       - name: upload logcat output
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: logcat_${{ matrix.api-level }}
+          name: logcat
           path: |
             /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
-
       - name: Rename artifact for nightly upload
         if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
         run: |
           pwd
-          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_004b.png screen_shot_android_${{ matrix.api-level }}_02.png
-          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_099.png screen_shot_android_${{ matrix.api-level }}_03.png
-
+          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_004b.png screen_shot_android_02.png
+          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_099.png screen_shot_android_03.png
       - name: Upload to nightly release
         uses: ncipollo/release-action@v1
         if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
@@ -206,5 +191,5 @@ jobs:
           prerelease: true
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "screen_shot_android_${{ matrix.api-level }}_02.png,screen_shot_android_${{ matrix.api-level }}_03.png"
+          artifacts: "screen_shot_android_02.png,screen_shot_android_03.png"
 
