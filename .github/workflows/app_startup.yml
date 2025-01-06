@@ -1,0 +1,118 @@
+name: Android startup
+on:
+  push:
+    paths-ignore:
+     - 'README.md'
+  pull_request:
+    paths-ignore:
+     - 'README.md'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  android-startup-app:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [35, 33, 29, 21]
+    permissions:
+      contents: write
+    if: ${{ true }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install deps
+        run: |
+          sudo apt-get update && \
+          sudo DEBIAN_FRONTEND=noninteractive \
+          apt-get install -y --no-install-recommends \
+          fonts-freefont-otf \
+          adb \
+          ghostscript \
+          imagemagick \
+          ca-certificates
+
+      - name: check imagemagick
+        run: |
+          convert -list font || echo "NO ERR"
+
+      - name: Install Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: |
+            17
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: test java1
+        run:  |
+              pwd
+              type java
+              echo "===========1========="
+              java -version || exit 0
+              echo "===========2========="
+
+      - name: turn on more debug logging
+        run: |
+          sed -i -e 's#final static boolean NDK_STDOUT_LOGGING =.*#final static boolean NDK_STDOUT_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
+          sed -i -e 's#final static boolean CTOXCORE_NATIVE_LOGGING =.*#final static boolean CTOXCORE_NATIVE_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
+
+      - name: android test
+        timeout-minutes: 30
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          profile: Nexus 6
+          arch: x86_64
+          ndk: 21.0.6113669
+          cmake: 3.10.2.4988404
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -skin 1080x2220 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          disable-spellchecker: true
+          script: |
+            cd android-refimpl-app ; ./gradlew build ; ./gradlew installDebug
+            adb shell am start -n com.zoffcc.applications.trifa/com.zoffcc.applications.trifa.StartMainActivityWrapper  &
+            sleep 120
+            adb exec-out screencap -p > ~/android_screen01_${{ matrix.api-level }}.png
+            ls -al ~/android_screen01_${{ matrix.api-level }}.png
+            adb logcat -d |grep -i 'trifa'
+            adb logcat -d > ~/adb_log.txt
+            sleep 2
+
+      - name: upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: android_startup_${{ matrix.api-level }}
+          path: |
+            /home/runner/android_screen*.png
+
+      - name: upload screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: android_startup_adb_log_${{ matrix.api-level }}
+          path: |
+            /home/runner/adb_log.txt
+
+      - name: Upload to nightly release
+        uses: ncipollo/release-action@v1
+        if: github.ref == 'refs/heads/android_test'
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "/home/runner/android_screen01_${{ matrix.api-level }}.png"
+
