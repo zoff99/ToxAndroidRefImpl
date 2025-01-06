@@ -46,7 +46,7 @@ jobs:
       with:
         distribution: 'temurin'
         java-version: |
-          11
+          17
 
     - name: Enable KVM group perms
       run: |
