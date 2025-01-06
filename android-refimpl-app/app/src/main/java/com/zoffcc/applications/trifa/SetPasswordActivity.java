@@ -50,6 +50,7 @@ public class SetPasswordActivity extends AppCompatActivity
     private check_user_password_criteria mAuthTask = null;
 
     // UI references.
+    private TextView githash_text;
     private EditText mPasswordView1;
     private EditText mPasswordView2;
     private View mProgressView;
@@ -67,6 +68,8 @@ public class SetPasswordActivity extends AppCompatActivity
         setContentView(R.layout.activity_set_password);
 
         settings = PreferenceManager.getDefaultSharedPreferences(this);
+
+        githash_text = findViewById(R.id.githash_text);
 
         mPasswordView1 = (EditText) findViewById(R.id.password_1);
         mPasswordView1.setOnEditorActionListener(new TextView.OnEditorActionListener()
@@ -116,6 +119,24 @@ public class SetPasswordActivity extends AppCompatActivity
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        try
+        {
+            githash_text.setText("build: ????????");
+        }
+        catch(Exception e)
+        {
+
+        }
+
+        try
+        {
+            githash_text.setText("build: " + BuildConfig.GitHash);
+        }
+        catch(Exception e)
+        {
+
+        }
     }
 
     void auto_create_password()
