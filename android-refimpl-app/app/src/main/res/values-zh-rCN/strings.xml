@@ -443,4 +443,8 @@
     <string name="MainActivity_manually_logged_out_true">激活</string>
     <string name="MainActivity_manually_logged_out_false">退出登录</string>
     <string name="MessageListActivity_longpress_to_record_audiomsg">长按录制音频消息</string>
+    <string name="pref_description_gainprocessing_active">半自动调整麦克风增益让声音更响亮。\n如果在通话期间遇到问题，请试着关闭此选项</string>
+    <string name="pref_title_gainprocessing_active">麦克风增益</string>
+    <string name="pref_title_rnnoise_active">背景噪音</string>
+    <string name="pref_description_rnnoise_active">用 RNNoise 移除背景噪音</string>
 </resources>
