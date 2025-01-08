@@ -832,10 +832,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     if (tox == NULL)
     {
         dbg(9, "update_savedata_file:ERROR:tox ptr is NULL");
-        if(savedata)
-        {
-            free(savedata);
-        }
+        free(savedata);
         return;
     }
     tox_get_savedata(tox, (uint8_t *)savedata);
