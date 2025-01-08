@@ -813,6 +813,11 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
 
 void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len)
 {
+    if (tox == NULL)
+    {
+        dbg(9, "update_savedata_file:ERROR:tox ptr is NULL");
+        return;
+    }
     size_t size = tox_get_savedata_size(tox);
     // dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
 
@@ -824,6 +829,15 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 
     char *savedata = calloc(1, size);
     // dbg(9, "update_savedata_file:savedata=%p", savedata);
+    if (tox == NULL)
+    {
+        dbg(9, "update_savedata_file:ERROR:tox ptr is NULL");
+        if(savedata)
+        {
+            free(savedata);
+        }
+        return;
+    }
     tox_get_savedata(tox, (uint8_t *)savedata);
     char *full_path_filename = calloc(1, MAX_FULL_PATH_LENGTH);
 
@@ -847,12 +861,12 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
     TOX_ERR_ENCRYPTION error;
     tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
-    // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
+    dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
     bool res = false;
 
-    if(size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH)
+    if ((size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH) || (error != TOX_ERR_ENCRYPTION_OK))
     {
-        dbg(9, "update_savedata_file:ERROR:size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH");
+        dbg(9, "update_savedata_file:ERROR:size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH or error != TOX_ERR_ENCRYPTION_OK");
         if(savedata)
         {
             free(savedata);
