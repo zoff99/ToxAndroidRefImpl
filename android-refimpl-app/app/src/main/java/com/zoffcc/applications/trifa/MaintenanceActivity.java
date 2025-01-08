@@ -1132,8 +1132,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         catch (Exception e)
         {
         }
-        // passphrase is unused for now!
-        export_savedata_file_unsecure("_", SD_CARD_FILES_EXPORT_DIR + "/" + "unsecure_export_savedata.tox");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Export Tox Savedata");
@@ -1141,7 +1139,21 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 "Tox Savedata File will be exported unencrypted to this location:" + "\n\n" + SD_CARD_FILES_EXPORT_DIR +
                 "/" + "unsecure_export_savedata.tox");
 
-        builder.setPositiveButton("OK", null);
+        builder.setPositiveButton("Yes, I want to export", new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int id)
+            {
+                try
+                {
+                    // passphrase is unused for now!
+                    export_savedata_file_unsecure("_", SD_CARD_FILES_EXPORT_DIR + "/" + "unsecure_export_savedata.tox");
+                }
+                catch(Exception ignored)
+                {
+                }
+            }
+        });
+        builder.setNegativeButton("Cancel", null);
 
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
