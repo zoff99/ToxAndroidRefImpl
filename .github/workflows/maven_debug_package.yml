@@ -174,7 +174,7 @@ jobs:
            pwd
            ls -al /home/runner/work/
            unzip /home/runner/work/local_maven.zip
-           unzip root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/1.0.156/trifa-jni-lib-*.aar
+           unzip root/.m2/repository/com/zoffcc/applications/trifajni/trifa-jni-lib/*/trifa-jni-lib-*.aar
            ls -hal jni/arm64-v8a/libjni-c-toxcore.so
            cp -v jni/arm64-v8a/libjni-c-toxcore.so ../libjni-c-toxcore.so___arm64_debug
 
