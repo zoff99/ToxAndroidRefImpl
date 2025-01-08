@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -63,10 +64,28 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                     setImage(R.drawable.web_hi_res_512).
                     addWebsite("https://github.com/zoff99/ToxAndroidRefImpl/blob/zoff99/dev003/README.md");
 
+            String abis = "??";
+            try
+            {
+                abis = Build.SUPPORTED_ABIS[0];
+            }
+            catch(Exception e)
+            {
+                try
+                {
+                    abis = Build.CPU_ABI;
+                }
+                catch(Exception e2)
+                {
+                }
+            }
+
             aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
-                                     MainActivity.versionName + "\n\n" + "TRIfA commit hash:" + BuildConfig.GitHash +
-                                     "\n" + "JNI commit hash:" + MainActivity.getNativeLibGITHASH() + "\n" +
-                                     "c-toxcore commit hash:" + MainActivity.getNativeLibTOXGITHASH());
+                                     MainActivity.versionName + "\n\n" + "TRIfA commit hash: " + BuildConfig.GitHash +
+                                     "\n" + "JNI commit hash: " + MainActivity.getNativeLibGITHASH() + "\n" +
+                                     "c-toxcore commit hash: " + MainActivity.getNativeLibTOXGITHASH() + "\n" +
+                                     "Android API Level: " + Build.VERSION.SDK_INT + "\n" +
+                                     "CPU ABI: " + abis);
 
             Element tox_link = new Element();
             tox_link.setTitle(getString(R.string.Aboutpage_6));
