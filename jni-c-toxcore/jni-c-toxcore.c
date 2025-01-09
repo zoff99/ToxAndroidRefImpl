@@ -858,12 +858,11 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
     TOX_ERR_ENCRYPTION error;
     tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
-    dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
-    bool res = false;
+    // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
 
     if ((size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH) || (error != TOX_ERR_ENCRYPTION_OK))
     {
-        dbg(9, "update_savedata_file:ERROR:size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH or error != TOX_ERR_ENCRYPTION_OK");
+        dbg(9, "update_savedata_file:ERROR:size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH or error != TOX_ERR_ENCRYPTION_OK: error=%d", (int)error);
         if(savedata)
         {
             free(savedata);
@@ -876,10 +875,17 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     }
     else
     {
+        bool res = false;
         res = tox_is_data_encrypted((const uint8_t *)savedata_enc);
+        if (!res)
+        {
+            dbg(9, "update_savedata_file:ERROR:savedata_enc is corrupted");
+            free(savedata);
+            free(savedata_enc);
+            return;
+        }
     }
 
-    // dbg(9, "update_savedata_file:tox_is_data_encrypted=%d", (int)res);
     FILE *f = fopen(full_path_filename_tmp, "wb");
     fwrite((const void *)savedata_enc, size_enc, 1, f);
     fseek(f, 0, SEEK_END);
