@@ -41,6 +41,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import static com.zoffcc.applications.trifa.MainActivity.getRandomString;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LEN_TRIFA_AUTOGEN_PASSWORD;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LEN_TRIFA_MANUAL_PASSWORD_MIN_LEN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
 
 public class SetPasswordActivity extends AppCompatActivity
@@ -223,7 +224,7 @@ public class SetPasswordActivity extends AppCompatActivity
     static boolean isPasswordValid(String password)
     {
         //TODO: Replace this with better criteria
-        return password.length() > 7;
+        return password.length() >= LEN_TRIFA_MANUAL_PASSWORD_MIN_LEN;
     }
 
     /**

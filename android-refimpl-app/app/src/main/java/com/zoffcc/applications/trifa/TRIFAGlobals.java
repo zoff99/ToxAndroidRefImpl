@@ -243,6 +243,7 @@ public class TRIFAGlobals
 
     static final int MAX_LEN_TOXENCRYPTSAVE_PASSPHRASE = 256;
     static final int LEN_TRIFA_AUTOGEN_PASSWORD = 32;
+    static final int LEN_TRIFA_MANUAL_PASSWORD_MIN_LEN = 7;
 
     static final int USE_MAX_NUMBER_OF_BOOTSTRAP_NODES = 8;
     static final int USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS = 8;
