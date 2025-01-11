@@ -131,6 +131,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_export_encrypted_files;
     Button button_export_encrypted_chats;
     Button button_import_savedata;
+    Button reveal_passwords;
 
     Boolean button_test_ringtone_start = true;
     MediaPlayer mMediaPlayer = null;
@@ -174,6 +175,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_export_encrypted_files = (Button) findViewById(R.id.button_export_encrypted_files);
         button_export_encrypted_chats = (Button) findViewById(R.id.button_export_encrypted_chats);
         button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
+        reveal_passwords = (Button) findViewById(R.id.reveal_passwords);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
         debug_output = (TextView) findViewById(R.id.debug_output);
 
@@ -581,6 +583,40 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                                       };
                                                       import_thread.start();
                                                       return;
+                                                  }
+                                              });
+                    builder.setNegativeButton("Cancel", null);
+
+                    // create and show the alert dialog
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        reveal_passwords.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
+                    builder.setTitle("Show Passwords");
+                    builder.setMessage("This will show the Database and Tox passwords");
+
+                    builder.setPositiveButton("Yes, I really want to see the passwords in clear text",
+                                              new DialogInterface.OnClickListener()
+                                              {
+                                                  public void onClick(DialogInterface dialog, int id)
+                                                  {
+                                                      Intent intent = new Intent(v.getContext(), ExportActivity.class);
+                                                      intent.putExtra("act", "MaintenanceActivity");
+                                                      startActivity(intent);
                                                   }
                                               });
                     builder.setNegativeButton("Cancel", null);

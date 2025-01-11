@@ -389,6 +389,8 @@ public class MainActivity extends AppCompatActivity
     static ConferenceAudioActivity conference_audio_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
+    final static String DB_SHM_EXT = "-shm";
+    final static String DB_WAL_EXT = "-wal";
     static String SD_CARD_TMP_DIR = "";
     static String SD_CARD_STATIC_DIR = "";
     static String SD_CARD_FILES_EXPORT_DIR = "";
@@ -396,6 +398,7 @@ public class MainActivity extends AppCompatActivity
     static String SD_CARD_FILES_OUTGOING_WRAPPER_DIR = "";
     static String SD_CARD_ENC_FILES_EXPORT_DIR = "/unenc_files/";
     static String SD_CARD_ENC_CHATS_EXPORT_DIR = "/unenc_chats/";
+    static String SD_CARD_FULL_FILES_EXPORT_DIR = "/fullexport/";
     static String SD_CARD_TMP_DUMMYFILE = null;
     final static int AddFriendActivity_ID = 10001;
     final static int CallingActivity_ID = 10002;
@@ -1524,80 +1527,11 @@ public class MainActivity extends AppCompatActivity
                             {
                                 if (is_tox_started)
                                 {
-                                    global_stop_tox();
-                                    manually_logged_out = true;
-                                    try
-                                    {
-                                        final Thread t = new Thread()
-                                        {
-                                            @Override
-                                            public void run()
-                                            {
-                                                try
-                                                {
-                                                    Thread.sleep(50);
-                                                    Log.i(TAG, "connection_status: manual logout");
-                                                    tox_notification_change_wrapper(CONNECTION_STATUS_MANUAL_LOGOUT, "");
-                                                }
-                                                catch (Exception e)
-                                                {
-                                                }
-                                            }
-                                        };
-                                        t.start();
-                                    }
-                                    catch(Exception e)
-                                    {
-                                    }
-
-                                    try
-                                    {
-                                        PrimaryDrawerItem manual_logout_item = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.MainActivity_manually_logged_out_true).withIcon(
-                                                GoogleMaterial.Icon.gmd_refresh);
-                                        main_drawer.updateItemAtPosition(manual_logout_item, 4);
-                                    }
-                                    catch(Exception e)
-                                    {
-                                    }
+                                    manually_log_out();
                                 }
                                 else
                                 {
-                                    global_start_tox();
-                                    manually_logged_out = false;
-                                    try
-                                    {
-                                        final Thread t = new Thread()
-                                        {
-                                            @Override
-                                            public void run()
-                                            {
-                                                try
-                                                {
-                                                    Thread.sleep(50);
-                                                    Log.i(TAG, "connection_status: manual activate");
-                                                    tox_notification_change_wrapper(tox_self_get_connection_status(), "");
-                                                }
-                                                catch (Exception e)
-                                                {
-                                                }
-                                            }
-                                        };
-                                        t.start();
-                                    }
-                                    catch(Exception e)
-                                    {
-                                    }
-
-                                    try
-                                    {
-                                        PrimaryDrawerItem manual_logout_item = new PrimaryDrawerItem().withIdentifier(3).
-                                                withName(R.string.MainActivity_manually_logged_out_false).
-                                                withIcon(GoogleMaterial.Icon.gmd_refresh);
-                                        main_drawer.updateItemAtPosition(manual_logout_item, 4);
-                                    }
-                                        catch(Exception e)
-                                    {
-                                    }
+                                    manually_log_in();
                                 }
                             }
                             catch (Exception e)
@@ -1920,6 +1854,85 @@ public class MainActivity extends AppCompatActivity
         */
 
         Log.i(TAG, "M:STARTUP:-- DONE --");
+    }
+
+    private void manually_log_in()
+    {
+        global_start_tox();
+        manually_logged_out = false;
+        try
+        {
+            final Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Thread.sleep(50);
+                        Log.i(TAG, "connection_status: manual activate");
+                        tox_notification_change_wrapper(tox_self_get_connection_status(), "");
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            };
+            t.start();
+        }
+        catch(Exception e)
+        {
+        }
+
+        try
+        {
+            PrimaryDrawerItem manual_logout_item = new PrimaryDrawerItem().withIdentifier(3).
+                    withName(R.string.MainActivity_manually_logged_out_false).
+                    withIcon(GoogleMaterial.Icon.gmd_refresh);
+            main_drawer.updateItemAtPosition(manual_logout_item, 4);
+        }
+        catch(Exception e)
+        {
+        }
+    }
+
+    static void manually_log_out()
+    {
+        global_stop_tox();
+        manually_logged_out = true;
+        try
+        {
+            final Thread t = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        Thread.sleep(50);
+                        Log.i(TAG, "connection_status: manual logout");
+                        tox_notification_change_wrapper(CONNECTION_STATUS_MANUAL_LOGOUT, "");
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            };
+            t.start();
+        }
+        catch(Exception e)
+        {
+        }
+
+        try
+        {
+            PrimaryDrawerItem manual_logout_item = new PrimaryDrawerItem().withIdentifier(3).withName(R.string.MainActivity_manually_logged_out_true).withIcon(
+                    GoogleMaterial.Icon.gmd_refresh);
+            main_drawer.updateItemAtPosition(manual_logout_item, 4);
+        }
+        catch(Exception e)
+        {
+        }
     }
 
     @Override

@@ -176,6 +176,34 @@
                 android:textColor="@null"
                 android:textSize="16sp"/>
 
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/reveal_passwords"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="20dp"
+                android:background="@drawable/rounded_red_dark_bg"
+                android:layout_marginRight="20dp"
+                android:layout_marginTop="10dp"
+                android:textColor="@android:color/white"
+                android:textAllCaps="false"
+                android:text="@string/layout___reveal_passwords"
+                android:textSize="14sp"/>
+
+            <TextView
+                android:id="@+id/dummy_0051"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginLeft="25dp"
+                android:layout_marginRight="25dp"
+                android:layout_marginTop="10dp"
+                android:padding="5dp"
+                android:text=""
+                android:background="@null"
+                android:textColor="@null"
+                android:textSize="16sp"/>
+
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/button_export_savedata"
                 android:layout_width="match_parent"

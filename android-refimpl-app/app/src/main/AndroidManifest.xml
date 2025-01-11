@@ -241,6 +241,10 @@
             android:label="@string/title_activity_maintenance">
         </activity>
         <activity
+            android:name=".ExportActivity"
+            android:label="@string/title_activity_export">
+        </activity>
+        <activity
             android:name=".ShareActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:excludeFromRecents="true"

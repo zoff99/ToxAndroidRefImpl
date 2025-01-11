@@ -28,6 +28,7 @@
     <string name="title_activity_check_password">Enter Password</string>
     <string name="title_activity_share">open with TRIfA</string>
     <string name="title_activity_maintenance">Maintenance</string>
+    <string name="title_activity_export">Export</string>
 
 
     <string-array name="spinner_own_status_array">
@@ -49,9 +50,9 @@
         <item>Light</item>
     </string-array>
     <string-array name="pref_dark_mode_values">
-    <item>0</item>
-    <item>1</item>
-    <item>2</item>
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
 
     <string name="pref_title_auto_accept_image">auto accept images</string>
@@ -505,6 +506,7 @@
     <string name="layout___export_tox_encrypted_files_unsecure">export encrypted files *unsecure*</string>
     <string name="layout___export_tox_encrypted_chats_unsecure">export encrypted chats *unsecure*</string>
     <string name="layout___im_port_tox_savadata_unsecure">IM-port TOX SAVADATA *UNSECURE*</string>
+    <string name="layout___reveal_passwords">reveal passwords and export</string>
     <string name="layout___delete_group_system_msgs">Delete System Messages</string>
     <string name="layout___click_image_to_change_your_avatar">click Image to change your Avatar</string>
     <string name="layout___remove_own_relay">remove own Relay</string>
