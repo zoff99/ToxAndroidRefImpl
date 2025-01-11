@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.ExecutionException;
 
+import static com.zoffcc.applications.trifa.CallingActivity.initializeScreenshotSecurity;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.io_file_copy;
 import static com.zoffcc.applications.trifa.MainActivity.DB_SHM_EXT;
@@ -58,6 +59,9 @@ public class ExportActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_export);
+
+        // prevent screenshots and also dont show the window content in recent activity screen
+        initializeScreenshotSecurity(this);
 
         TextView text_toxpass = findViewById(R.id.text_toxpass);
         TextView text_dbpass = findViewById(R.id.text_dbpass);
