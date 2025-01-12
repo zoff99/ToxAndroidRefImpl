@@ -40,6 +40,7 @@ _ANDROID_NDK_HASH_="ad7ce5467e18d40050dc51b8e7affc3e635c85bd8c59be62de32352328ed
 _ANDROID_NDK_UNPACKDIR_="android-ndk-r21e"
 
 _ANDOIRD_CMAKE_VER_="3.10.2.4988404"
+_GITREPO_HOME_="/home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl" # this works only for github CI for now
 ## ----------------------
 
 # export ASAN_CLANG_FLAGS=" -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls "
@@ -665,8 +666,10 @@ echo "-------- compiler version --------"
 echo ""
 echo ""
 
+pushd "$_GITREPO_HOME_"
 git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
+popd
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     $WARNS \
@@ -1256,8 +1259,10 @@ echo "-------- compiler version --------"
 echo ""
 echo ""
 
+pushd "$_GITREPO_HOME_"
 git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
+popd
 
 set -x
 
@@ -1693,8 +1698,10 @@ echo "compiling jni-c-toxcore ..."
 # make certain warnings into errors!
 WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
 
+pushd "$_GITREPO_HOME_"
 git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
+popd
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
@@ -2126,8 +2133,10 @@ echo "compiling jni-c-toxcore ..."
 # make certain warnings into errors!
 WARNS=' -Werror=div-by-zero -Werror=sign-compare -Werror=format=2 -Werror=implicit-function-declaration '
 
+pushd "$_GITREPO_HOME_"
 git_hash_for_jni=$(git rev-parse --verify --short=8 HEAD 2>/dev/null|tr -dc '[A-Fa-f0-9]' 2>/dev/null)
 echo "XX:""$git_hash_for_jni"":YY"
+popd
 
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function \
