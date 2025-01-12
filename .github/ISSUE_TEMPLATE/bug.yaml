@@ -1,4 +1,4 @@
-name: report_bug
+name: automated Issue report
 description: File a bug
 title: "[Bug]: "
 labels: ["bug"]
