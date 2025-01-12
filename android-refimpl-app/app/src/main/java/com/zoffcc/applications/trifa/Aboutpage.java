@@ -45,6 +45,7 @@ import mehdi.sakout.aboutpage.AboutPage;
 import mehdi.sakout.aboutpage.Element;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_trifa_build_str;
 import static com.zoffcc.applications.trifa.MainActivity.main_activity_s;
 
 public class Aboutpage extends AppCompatActivity implements Logging.AsyncResponse
@@ -81,7 +82,9 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             }
 
             aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
-                                     MainActivity.versionName + "\n\n" + "TRIfA commit hash: " + BuildConfig.GitHash +
+                                     MainActivity.versionName + "\n\n" +
+                                     "Build: " + get_trifa_build_str()  + "\n" +
+                                     "TRIfA commit hash: " + BuildConfig.GitHash +
                                      "\n" + "JNI commit hash: " + MainActivity.getNativeLibGITHASH() + "\n" +
                                      "c-toxcore commit hash: " + MainActivity.getNativeLibTOXGITHASH() + "\n" +
                                      "Android API Level: " + Build.VERSION.SDK_INT + "\n" +
@@ -93,6 +96,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             tox_link.setIntent(tox_faq_page);
             aboutPage.addItem(tox_link);
 
+            /*
             mehdi.sakout.aboutpage.Element e001 = new mehdi.sakout.aboutpage.Element();
             e001.setTitle(getString(R.string.Aboutpage_2));
             e001.setOnClickListener(new View.OnClickListener()
@@ -126,6 +130,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
                 }
             });
             aboutPage.addItem(e001);
+            */
 
             Element trifa_commit = new Element();
             trifa_commit.setTitle("TRIfA commit hash link");

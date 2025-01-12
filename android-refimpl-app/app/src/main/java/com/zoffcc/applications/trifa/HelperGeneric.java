@@ -4970,4 +4970,65 @@ public class HelperGeneric
             return "TRIFA_SYNC_TYPE UNKNOWN";
         }
     }
+
+    static public String get_trifa_build_str()
+    {
+        String build_str = "";
+
+        try
+        {
+            build_str = build_str + BuildConfig.GitHash.substring(0, 4);
+        }
+        catch (Exception e)
+        {
+            return "????????";
+        }
+
+        try
+        {
+            build_str = build_str + "-" + MainActivity.getNativeLibTOXGITHASH().substring(0, 3);
+        }
+        catch (Exception e)
+        {
+            return "????????";
+        }
+
+        try
+        {
+            build_str = build_str + "-" + MainActivity.getNativeLibGITHASH().substring(0, 3);
+        }
+        catch (Exception e)
+        {
+            return "????????";
+        }
+
+        try
+        {
+            build_str = build_str + "-" + Build.VERSION.SDK_INT;
+        }
+        catch (Exception e)
+        {
+            return "????????";
+        }
+
+        String abis = "??";
+        try
+        {
+            abis = Build.SUPPORTED_ABIS[0];
+        }
+        catch(Exception e)
+        {
+            try
+            {
+                abis = Build.CPU_ABI;
+            }
+            catch(Exception ignored)
+            {
+            }
+        }
+
+        build_str = build_str + "-" + abis;
+
+        return build_str;
+    }
 }
