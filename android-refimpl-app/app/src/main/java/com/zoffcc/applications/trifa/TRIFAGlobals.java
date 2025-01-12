@@ -55,6 +55,9 @@ public class TRIFAGlobals
     final static String TOX_PUSH_MSG_APP_PLAYSTORE = "https://play.google.com/store/apps/details?id=com.zoffcc.applications.pushmsg";
     final static String TOX_PUSH_SETUP_HOWTO_URL = "https://zoff99.github.io/ToxAndroidRefImpl/PUSH_NOTIFICATION.html";
 
+    final static String TRIFA_GITHUB_REPO_URL = "https://github.com/zoff99/ToxAndroidRefImpl";
+    final static String TRIFA_GITHUB_NEW_ISSUE_URL = TRIFA_GITHUB_REPO_URL + "/issues/new";
+
     static boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =
             1000 * 60 * 2; // bootstrap again after 2 minutes offline

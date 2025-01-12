@@ -49,7 +49,10 @@ import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -65,6 +68,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.camera.core.processing.SurfaceProcessorNode;
 import info.guardianproject.netcipher.client.StrongBuilder;
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder2;
 import okhttp3.Interceptor;
@@ -75,6 +79,7 @@ import okhttp3.Response;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_tcprelay_nodes_into_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_udp_nodes_into_db;
 import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
+import static com.zoffcc.applications.trifa.HelperGeneric.get_trifa_build_str;
 import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_for_filename;
 import static com.zoffcc.applications.trifa.HelperGeneric.touch;
@@ -106,6 +111,7 @@ import static com.zoffcc.applications.trifa.MainActivity.libsodium_version;
 import static com.zoffcc.applications.trifa.MainActivity.libvpx_version;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_TOR_USERAGENT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_GITHUB_NEW_ISSUE_URL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaSetPatternActivity.filter_out_specials_from_filepath_stricter;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -131,6 +137,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_export_encrypted_files;
     Button button_export_encrypted_chats;
     Button button_import_savedata;
+    Button button_report_issue;
     Button reveal_passwords;
 
     Boolean button_test_ringtone_start = true;
@@ -175,6 +182,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_export_encrypted_files = (Button) findViewById(R.id.button_export_encrypted_files);
         button_export_encrypted_chats = (Button) findViewById(R.id.button_export_encrypted_chats);
         button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
+        button_report_issue = (Button) findViewById(R.id.button_report_issue);
         reveal_passwords = (Button) findViewById(R.id.reveal_passwords);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
         debug_output = (TextView) findViewById(R.id.debug_output);
@@ -340,7 +348,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
-
         button_avatar_icons_delete.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -476,6 +483,61 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 try
                 {
                     export_savedata_unsecure(this_context);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        button_report_issue.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
+                    builder.setTitle("Report a bug");
+                    builder.setMessage(
+                            "This will open a webbrowser to github.com and let you report a bug or issue");
+
+                    builder.setPositiveButton("Yes, I want to report a bug", new DialogInterface.OnClickListener()
+                    {
+                        public void onClick(DialogInterface dialog, int id)
+                        {
+                            String url = TRIFA_GITHUB_NEW_ISSUE_URL;
+                            url = url + "?labels=bug";
+                            url = url + "&title=Bug:%20";
+                            url = url + "&template=bug.yaml";
+                            try
+                            {
+                                url = url + "&trifa_version=" + URLEncoder.encode(MainActivity.versionName, "UTF-8");
+                            }
+                            catch (Exception e)
+                            {
+                                url = url + "&trifa_version=" + "unknown";
+                            }
+
+                            try
+                            {
+                                url = url + "&build=" + URLEncoder.encode(get_trifa_build_str(), "UTF-8");
+                            }
+                            catch (Exception e)
+                            {
+                                url = url + "&build=" + "unknown";
+                            }
+
+                            // Log.i(TAG, "GITHUB_NEW_ISSUE_URL:" + url);
+                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                            v.getContext().startActivity(intent);
+                        }
+                    });
+                    builder.setNegativeButton("Cancel", null);
+
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
                 }
                 catch (Exception e)
                 {
