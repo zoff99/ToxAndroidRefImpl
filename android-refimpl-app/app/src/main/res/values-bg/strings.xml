@@ -189,7 +189,7 @@
     <string name="layout___peer_name">име на партньор</string>
     <string name="layout___online">Онлайн</string>
     <string name="layout___copy">Копирай</string>
-    <string name="layout___export">Експорт</string>
+    <string name="layout___export">Изнасяне</string>
     <string name="layout___migdb_text">Мигриране на файловете на базата данни</string>
     <string name="title_activity_wrong_credentials">Грешни идентификационни данни</string>
     <string name="pref_description_X_misc_button_enabled">!! Експериментален !!
@@ -247,7 +247,7 @@
     <string name="layout___run_analyze_on_sql_database">стартирайте ANALYZE на Sql база данни</string>
     <string name="layout___export_tox_encrypted_files_unsecure">експортиране на криптирани файлове *несигурни*</string>
     <string name="layout___export_tox_encrypted_chats_unsecure">експорт на криптирани чатове *несигурен*</string>
-    <string name="layout___click_image_to_change_your_avatar">кликнете върху Изображение, за да промените своя аватар</string>
+    <string name="layout___click_image_to_change_your_avatar">докоснете изображение, за да промените аватара</string>
     <string name="layout___set_password_or_skip">Задайте парола или пропуснете.
 \n
 \nКогато изберете да пропуснете
@@ -264,4 +264,7 @@
     <string name="join_public_activity_name">Присъединете се към публична група</string>
     <string name="title_activity_groupinfo">Информация за групата</string>
     <string name="title_activity_settings">Настройки</string>
+    <string name="layout___delete_group_system_msgs">Премахване на системните съобщения</string>
+    <string name="title_activity_export">Изнасяне</string>
+    <string name="layout___reveal_passwords">показване на паролите и изнасяне</string>
 </resources>
