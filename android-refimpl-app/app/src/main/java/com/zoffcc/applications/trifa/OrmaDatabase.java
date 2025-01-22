@@ -2,7 +2,6 @@ package com.zoffcc.applications.trifa;
 
 import android.database.Cursor;
 
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
