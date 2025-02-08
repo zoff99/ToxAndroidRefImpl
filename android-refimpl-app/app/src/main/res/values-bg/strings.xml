@@ -65,8 +65,8 @@
     <string name="pref_description_set_fps">опитайте се да зададете 15 кадъра в секунда, това може да доведе до срив при някои телефони</string>
     <string name="pref_title_conference_show_system_messages">Системни съобщения</string>
     <string name="pref_description_conference_show_system_messages">показване на системни съобщения в конференциите</string>
-    <string name="pref_title_local_discovery_enabled">LAN откритие</string>
-    <string name="pref_description_local_discovery_enabled">използване на възли в локалната LAN за зареждане</string>
+    <string name="pref_title_local_discovery_enabled">Откриване в местната мрежа</string>
+    <string name="pref_description_local_discovery_enabled">Използване на възли от местната мрежа при първоначално зареждане</string>
     <string name="pref_description_U_keep_nospam">запазване на стойността на NoSpam. Това не е безопасно, активирайте го само ако знаете какво правите!</string>
     <string name="pref_description_allow_file_sharing_to_trifa_via_intent">споделяте файлове към TRIfA чрез share Intent.</string>
     <string name="pref_title_allow_screen_off_in_audio_call">Изключване на екрана</string>
@@ -212,7 +212,7 @@
 \nПриложението ще осъществява HTTPS: връзки към някои PUSH сървъри директно (не чрез Tox).
 \nАктивирайте това само ако приемате това.
 \nТази функция се нуждае от инсталиране на приложението Tox Push Message App.</string>
-    <string name="pref_title_U_keep_nospam">запазване на NoSpam</string>
+    <string name="pref_title_U_keep_nospam">Предпазване на полето АнтиСпам</string>
     <string name="pref_description_use_camera_x">!! Експериментален !!
 \nИзползване на CameraX и премахване на фона при видеоразговори
 \nВъзможно е това все още да не работи напълно, моля, бъдете внимателни и не разчитайте, че това ще работи винаги!</string>
