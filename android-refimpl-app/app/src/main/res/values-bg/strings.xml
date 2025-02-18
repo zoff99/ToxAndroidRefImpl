@@ -20,7 +20,7 @@
     <string name="title_activity_aboutpage">Относно</string>
     <string name="title_activity_set_password">Задаване на парола</string>
     <string name="title_activity_check_password">Въведете парола</string>
-    <string name="title_activity_share">отваряне с TRIfA</string>
+    <string name="title_activity_share">Отваряне с TRIfA</string>
     <string name="title_activity_maintenance">Поддръжка</string>
     <string name="settings_toolbar_title">Настройки</string>
     <string name="pref_header_general">Общи настройки</string>
@@ -34,12 +34,12 @@
     <string name="pref_description_video_uv_reversed">Обръщане реда на равнините UV във видеото от камерата</string>
     <string name="pref_title_software_echo_cancel">Подтискане на ехото</string>
     <string name="pref_description_software_echo_cancel">Използване на софтуерно премахване на ехото</string>
-    <string name="pref_title_higher_video_quality">Видео качество</string>
+    <string name="pref_title_higher_video_quality">Качество на видеото</string>
     <string name="pref_description_higher_video_quality">Използване на по-добро качество на видеото.\nПромяната се нуждае от РЕСТАРТ!</string>
-    <string name="pref_title_video_cam_resolution">Резолюция на камерата</string>
-    <string name="pref_description_video_cam_resolution">Каква разделителна способност да използвате за видеоразговори</string>
+    <string name="pref_title_video_cam_resolution">Разделителна способност на камерата</string>
+    <string name="pref_description_video_cam_resolution">Разделителната способност, която да бъде използвана при видеоразговори</string>
     <string name="pref_title_global_font_size">Размер на шрифта</string>
-    <string name="pref_description_global_font_size">Изберете Размер на шрифта</string>
+    <string name="pref_description_global_font_size">Изберете размер на шрифта</string>
     <string name="pref_title_camera_get_preview_format">Формат за преглед на камерата</string>
     <string name="pref_description_camera_get_preview_format">Форматът за преглед на камерата изглежда е в грешен формат на някои телефони</string>
     <string name="pref_title_mic_gain_factor">Усилване на микрофона</string>
