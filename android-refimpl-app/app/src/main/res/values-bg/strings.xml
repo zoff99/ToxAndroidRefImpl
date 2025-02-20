@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="Aboutpage_8">използвани библиотеки:</string>
-    <string name="pref_title_fps_half">по-ниски стойности на fps</string>
-    <string name="pref_title_start_on_boot">стартиране при зареждане</string>
+    <string name="pref_title_fps_half">Понижаване на кадри/секунда</string>
+    <string name="pref_title_start_on_boot">Стартиране със системата</string>
     <string name="add_friend_activity_name">Добавяне на контакт</string>
     <string name="message_list_activity_name">Разговор</string>
     <string name="conference_message_list_activity_name">Групов разговор – текст</string>
@@ -43,19 +43,17 @@
     <string name="pref_title_camera_get_preview_format">Формат за преглед на камерата</string>
     <string name="pref_description_camera_get_preview_format">Форматът за преглед на камерата изглежда е в грешен формат на някои телефони</string>
     <string name="pref_title_mic_gain_factor">Усилване на микрофона</string>
-    <string name="pref_description_mic_gain_factor">Задаване на по-висока Печалба, ако микрофонът ви записва с нисък обем</string>
+    <string name="pref_description_mic_gain_factor">Задаване на по-голямо усилване, ако микрофонът записва по-тих звук</string>
     <string name="pref_title_higher_audio_quality">Качество на звука</string>
-    <string name="pref_description_higher_audio_quality">Използване на по-добро качество на звука.\nПромяната се нуждае от РЕСТАРТ!</string>
+    <string name="pref_description_higher_audio_quality">Използване на по-добро качество на звука.\nПромяната изисква РЕСТАРТ!</string>
     <string name="pref_title_udp_enabled">Включване на UDP</string>
-    <string name="pref_title_force_udp_only">принудителен режим на UDP</string>
-    <string name="pref_description_orbot_enabled">Трябва да инсталирате Orbot, за да го използвате.
-\nПромяната се нуждае от РЕСТАРТ!</string>
-    <string name="pref_title_window_security">предотврати Снимки от екрана</string>
-    <string name="pref_description_window_security">Активирането на тази настройка добавя FLAG_SECURE към дейностите.
-\nТя предотвратява правенето на скрийншоти и запис на екрана, както и показването на съдържание в преглед на последните</string>
-    <string name="pref_title_compact_friendlist">Компактен списък на приятелите</string>
-    <string name="pref_description_compact_friendlist">Направете списъка с приятели по-компактен, ако имате голям списък с приятели</string>
-    <string name="pref_title_compact_chatlist">Компактен чатлист</string>
+    <string name="pref_title_force_udp_only">Принудителен режим на UDP</string>
+    <string name="pref_description_orbot_enabled">За да използвате настройката инсталирайте Orbot.\nПромяната изисква РЕСТАРТ!</string>
+    <string name="pref_title_window_security">Забраняване на екранни снимки</string>
+    <string name="pref_description_window_security">Когато е отметнато към дейностите бива добавен флаг FLAG_SECURE.\nТой предотвратява правенето на екранни снимки и запис на екрана, както и преглед на съдържанието при превключване на приложенията</string>
+    <string name="pref_title_compact_friendlist">Компактен списък на контактите</string>
+    <string name="pref_description_compact_friendlist">Прави списъка с контакти компактен. Удобно, ако имате много контакти.</string>
+    <string name="pref_title_compact_chatlist">Компактен списък с разговори</string>
     <string name="pref_description_compact_chatlist">Показване на Chatmessage по-компактно спестяване на място</string>
     <string name="pref_title_use_push_service">Използване на услугата Push</string>
     <string name="pref_title_download_push_msg_app">Изтеглете приложението Push Message</string>
@@ -193,19 +191,15 @@
     <string name="pref_description_X_misc_button_enabled">!! Експериментален !!
 \nдобавяне на бутон на екрана за повикване за изпращане на фиксирано съобщение</string>
     <string name="pref_title_ringtone">Мелодия на звънене</string>
-    <string name="pref_title_orbot_enabled">активирайте Tor Proxy</string>
-    <string name="pref_description_start_on_boot">стартиране на приложението след зареждане.
-\nGoogle вече не позволява това, като се започне с Android 10</string>
-    <string name="pref_description_use_incognito_keyboard2">включeте, за да забраните на клавиатурата да се учи от въведените от вас думи</string>
-    <string name="pref_description_udp_enabled">за повечето мобилни устройства UDP ще предизвика много по-голям интернет трафик.
-\nПромяната се нуждае от РЕСТАРТ!
-\nНастройката по подразбиране е OFF</string>
-    <string name="pref_description_force_udp_only">това ще наложи режим само на UDP, някои контакти може да не са достъпни с тази настройка.
-\nПромяната изисква РЕСТАРТ!</string>
-    <string name="pref_description_fps_half">Скорост на кадрите на видеото 1/2 : 12 кадъра в секунда вместо 25 кадъра в секунда</string>
+    <string name="pref_title_orbot_enabled">Включване на прокси на Tor</string>
+    <string name="pref_description_start_on_boot">Стартиране на приложението след зареждане на операционната система. \nОт Андроид 10, Google премахва тази възможност</string>
+    <string name="pref_description_use_incognito_keyboard2">Клавиатурата няма да се обучава от въведеното от вас</string>
+    <string name="pref_description_udp_enabled">За повечето мобилни устройства UDP ще предизвика много по-голям мрежов трафик.\nПромяната изисква РЕСТАРТ!\nНастройката по подразбиране е ИЗКЛЮЧЕНО</string>
+    <string name="pref_description_force_udp_only">Налага режим само на UDP, някои контакти може да не са достъпни когато настройката е включена.\nПромяната изисква РЕСТАРТ!</string>
+    <string name="pref_description_fps_half">Понижена честота на кадрите: 12 кадъра/секунда вместо 25</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">Вътрешно опресняване на H264</string>
-    <string name="pref_description_h264_encoder_use_intra_refresh">H264 енкодерът трябва да използва кадри с вътрешно опресняване</string>
-    <string name="pref_title_use_incognito_keyboard2">инкогнито Клавиатура</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">Кодировката H264 използва кадри с вътрешно опресняване</string>
+    <string name="pref_title_use_incognito_keyboard2">Клавиатура в режим инкогнито</string>
     <string name="pref_description_use_push_service">ПРЕДУПРЕЖДЕНИЕ: При това ще се използва Google FCM или Unified Push, за да се пести батерия и трафик.
 \nПриложението ще осъществява HTTPS: връзки към някои PUSH сървъри директно (не чрез Tox).
 \nАктивирайте това само ако приемате това.
@@ -269,4 +263,10 @@
     <string name="pref_title_rnnoise_active">Фонов шум</string>
     <string name="pref_description_rnnoise_active">Премахване на фоновия шум чрез RNNoise</string>
     <string name="layout___add_friend">Добавяне на контакт</string>
+    <string name="pref_title_mic_gain_factor_toggle">Усилването на микрофона намалява звука</string>
+    <string name="pref_description_mic_gain_factor_toggle">Когато е отметнато, ако микрофонът е твърде чувствителен при запис усилването му всъщност ще намалява силата на звука на микрофона</string>
+    <string name="pref_title_gainprocessing_active">Усилване на микрофона</string>
+    <string name="pref_description_gainprocessing_active">Настройка на усилването на микрофона полуавтоматично, така че да звучи по-силно.\nАко по време на обаждани срещнете проблем пробвайте да изключите настройката.</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Страниране на съобщенията</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Задава броя на съобщенията на страница. 0 – без страниране</string>
 </resources>
