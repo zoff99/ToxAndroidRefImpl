@@ -50,30 +50,29 @@
     <string name="pref_title_force_udp_only">Принудителен режим на UDP</string>
     <string name="pref_description_orbot_enabled">За да използвате настройката инсталирайте Orbot.\nПромяната изисква РЕСТАРТ!</string>
     <string name="pref_title_window_security">Забраняване на екранни снимки</string>
-    <string name="pref_description_window_security">Когато е отметнато към дейностите бива добавен флаг FLAG_SECURE.\nТой предотвратява правенето на екранни снимки и запис на екрана, както и преглед на съдържанието при превключване на приложенията</string>
+    <string name="pref_description_window_security">Когато е отметнато към дейностите бива добавен флаг FLAG_SECURE.\nТой предотвратява правенето на екранни снимки и запис на екрана, както и миниатюрата екрана при превключване на приложенията</string>
     <string name="pref_title_compact_friendlist">Компактен списък на контактите</string>
     <string name="pref_description_compact_friendlist">Прави списъка с контакти компактен. Удобно, ако имате много контакти.</string>
     <string name="pref_title_compact_chatlist">Компактен списък с разговори</string>
-    <string name="pref_description_compact_chatlist">Показване на Chatmessage по-компактно спестяване на място</string>
+    <string name="pref_description_compact_chatlist">Показване на съобщенията в разговорите по-компактно</string>
     <string name="pref_title_use_push_service">Използване на услугата Push</string>
-    <string name="pref_title_download_push_msg_app">Изтеглете приложението Push Message</string>
-    <string name="pref_title_set_fps">задайте fps</string>
-    <string name="pref_description_set_fps">опитайте се да зададете 15 кадъра в секунда, това може да доведе до срив при някои телефони</string>
+    <string name="pref_title_download_push_msg_app">Изтеглете приложението Tox Push Message App</string>
+    <string name="pref_title_set_fps">Задаване на честота на кадрите</string>
+    <string name="pref_description_set_fps">Пробвайте да зададете 15 кадъра/секунда. При някои устройства може да доведе до срив</string>
     <string name="pref_title_conference_show_system_messages">Системни съобщения</string>
-    <string name="pref_description_conference_show_system_messages">показване на системни съобщения в конференциите</string>
+    <string name="pref_description_conference_show_system_messages">Показване на системните съобщения в груповите разговори</string>
     <string name="pref_title_local_discovery_enabled">Откриване в местната мрежа</string>
     <string name="pref_description_local_discovery_enabled">Използване на възли от местната мрежа при първоначално зареждане</string>
-    <string name="pref_description_U_keep_nospam">запазване на стойността на NoSpam. Това не е безопасно, активирайте го само ако знаете какво правите!</string>
-    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">споделяте файлове към TRIfA чрез share Intent.</string>
+    <string name="pref_description_U_keep_nospam">Предпазване на стойността на полето АнтиСпам. Опасно, отметнете само ако знаете какво правите!</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Дава възможност за споделяне на файлове с TRIfA чрез „Споделяне“ от Андроид.</string>
     <string name="pref_title_allow_screen_off_in_audio_call">Изключване на екрана</string>
-    <string name="pref_title_speakerphone_tweak">Корекция на високоговорителя за разговори</string>
-    <string name="pref_description_speakerphone_tweak">Ако приложението не превключва на високоговорител по време на повикване, опитайте да активирате тази поправка.</string>
-    <string name="pref_title_X_zoom_incoming_video">Увеличаване на прозореца за видеоразговори</string>
-    <string name="pref_title_X_use_native_audio_play">Основна аудиосистема</string>
-    <string name="pref_description_X_use_native_audio_play">!! Експериментален!!
-\nИзползване на native аудио за възпроизвеждане на звук</string>
-    <string name="pref_title_X_misc_button_enabled">Разни. Бутони</string>
-    <string name="pref_title_X_tox_set_do_not_sync_av">НЕ синхронизирайте AV</string>
+    <string name="pref_title_speakerphone_tweak">Поправка на високоговорителя при разговори</string>
+    <string name="pref_description_speakerphone_tweak">Ако приложението не превключва на високоговорител по време на обаждане, пробвайте като включите тази настройка.</string>
+    <string name="pref_title_X_zoom_incoming_video">Мащабиране на видеоразговор</string>
+    <string name="pref_title_X_use_native_audio_play">Вградена аудиосистема</string>
+    <string name="pref_description_X_use_native_audio_play">!!! Експериментална възможност !!!\nИзползване на вградената аудиосистема за възпроизвеждане на звук</string>
+    <string name="pref_title_X_misc_button_enabled">Бутон „Разни“</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">Без синхронизиране на звук и картина</string>
     <string name="pref_title_X_eac_delay_ms">AEC забавяне</string>
     <string name="pref_description_X_eac_delay_ms">!! Експериментално!!
 \nAEC забавяне в мс</string>
@@ -188,11 +187,10 @@
     <string name="layout___export">Изнасяне</string>
     <string name="layout___migdb_text">Мигриране на файловете на базата данни</string>
     <string name="title_activity_wrong_credentials">Грешни идентификационни данни</string>
-    <string name="pref_description_X_misc_button_enabled">!! Експериментален !!
-\nдобавяне на бутон на екрана за повикване за изпращане на фиксирано съобщение</string>
+    <string name="pref_description_X_misc_button_enabled">!!! Експериментална възможност !!!\nДобавяне на бутон на екрана за обаждане, който изпраща определено съобщение</string>
     <string name="pref_title_ringtone">Мелодия на звънене</string>
     <string name="pref_title_orbot_enabled">Включване на прокси на Tor</string>
-    <string name="pref_description_start_on_boot">Стартиране на приложението след зареждане на операционната система. \nОт Андроид 10, Google премахва тази възможност</string>
+    <string name="pref_description_start_on_boot">Стартиране на приложението след зареждане на операционната система.\nОт Андроид 10, Google премахва тази възможност</string>
     <string name="pref_description_use_incognito_keyboard2">Клавиатурата няма да се обучава от въведеното от вас</string>
     <string name="pref_description_udp_enabled">За повечето мобилни устройства UDP ще предизвика много по-голям мрежов трафик.\nПромяната изисква РЕСТАРТ!\nНастройката по подразбиране е ИЗКЛЮЧЕНО</string>
     <string name="pref_description_force_udp_only">Налага режим само на UDP, някои контакти може да не са достъпни когато настройката е включена.\nПромяната изисква РЕСТАРТ!</string>
@@ -200,10 +198,7 @@
     <string name="pref_title_h264_encoder_use_intra_refresh">Вътрешно опресняване на H264</string>
     <string name="pref_description_h264_encoder_use_intra_refresh">Кодировката H264 използва кадри с вътрешно опресняване</string>
     <string name="pref_title_use_incognito_keyboard2">Клавиатура в режим инкогнито</string>
-    <string name="pref_description_use_push_service">ПРЕДУПРЕЖДЕНИЕ: При това ще се използва Google FCM или Unified Push, за да се пести батерия и трафик.
-\nПриложението ще осъществява HTTPS: връзки към някои PUSH сървъри директно (не чрез Tox).
-\nАктивирайте това само ако приемате това.
-\nТази функция се нуждае от инсталиране на приложението Tox Push Message App.</string>
+    <string name="pref_description_use_push_service">Внимание: С цел пестене на батерия и трафик ще бъде използвана една от услугите Google FCM или Unified Push.\nПриложението ще осъществява връзки през HTTPS към някои сървъри за Push директно (не чрез Tox).\nОтметнете само ако сте съгласни.\nТази настройка се нуждае от инсталирано приложението Tox Push Message App.</string>
     <string name="pref_title_U_keep_nospam">Предпазване на полето АнтиСпам</string>
     <string name="pref_description_use_camera_x">!! Експериментален !!
 \nИзползване на CameraX и премахване на фона при видеоразговори
@@ -213,17 +208,14 @@
     <string name="pref_title_X_audio_recording_frame_size">Аудиокодиране Размер на кадъра</string>
     <string name="pref_description_X_audio_recording_frame_size">Настройката по подразбиране е 40 ms</string>
     <string name="add_friend_activity_help">Поставете Tox ID на приятел\' в текстовото поле по-горе или докоснете бутона QR код, за да сканирате кода на приятел\' с камера.</string>
-    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">споделяне на файлове</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">Споделяне на файлове</string>
     <string name="pref_description_toxirc_muted_peers_02">Заглушен потребител 1 (оставете празно, ако не се използва)</string>
     <string name="layout___toxid">ToxID</string>
-    <string name="pref_description_allow_screen_off_in_audio_call">Ако имате проблеми с изключването на екрана при обаждане, задайте тази стойност като изключена.</string>
-    <string name="pref_description_X_zoom_incoming_video">да увеличите прозореца за видеоразговори с щипка. Това не работи напълно!</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Изключете ако имате проблеми с изгасянето на екрана при обаждане</string>
+    <string name="pref_description_X_zoom_incoming_video">Дава възможност да мащабирате прозореца за видеоразговори с жест. Не работи напълно!</string>
     <string name="pref_title_X_battery_saving_mode">Режим на пестене на батерията</string>
-    <string name="pref_description_X_battery_saving_mode">!! Експериментален !!
-\nТова ще спести малко повече батерия, но изпращането и получаването на съобщение ще отнеме повече време.
-\nВероятно ще има и други лоши ефекти!</string>
-    <string name="pref_description_X_tox_set_do_not_sync_av">!! Експериментален !!
-\nНе синхронизирайте видео или аудио. Използвайте тази настройка, ако имате проблеми с Videocall, в краен случай.</string>
+    <string name="pref_description_X_battery_saving_mode">!!! Експериментална възможност !!!\nПестене на малко повече батерия за сметка на забавено изпращане и получаване на съобщения.\nВъзможни са и други странични ефекти!</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">!!! Експериментална възможност !!!\nБез синхронизиране на звук и картина. Използвайте само в краен случай ако имате проблеми с видеоразговорите.</string>
     <string name="pref_title_new_message_notifications">Известия за нови съобщения</string>
     <string name="MainActivity_toast_msg_exported">Съобщения, експортирани</string>
     <string name="MainActivity_notification_new_message4">ново Съобщение</string>
@@ -269,4 +261,11 @@
     <string name="pref_description_gainprocessing_active">Настройка на усилването на микрофона полуавтоматично, така че да звучи по-силно.\nАко по време на обаждани срещнете проблем пробвайте да изключите настройката.</string>
     <string name="pref_title_message_paging_num_msgs_per_page">Страниране на съобщенията</string>
     <string name="pref_description_message_paging_num_msgs_per_page">Задава броя на съобщенията на страница. 0 – без страниране</string>
+    <string name="pref_description_allow_push_server_ntfy">Внимание: Достъпът до ntfy.sh с цел доставяне на известия може да носи риска от изтичане на описателна информация за кореспонденцията ви като времена на получаване на известията в случай, че някой се регистрира с вашия код. Ntfy.sh НЯМА никакъв вид удостоверяване. Продължете на ваша отговорност!</string>
+    <string name="pref_title_notification_show_content">Пиказване съдържанието на известията</string>
+    <string name="pref_title_allow_push_server_ntfy">Разрешаване на достъп до сървъра ntfy.sh</string>
+    <string name="pref_title_custom_bootstrap_nodes">Използване на собствени начални възли</string>
+    <string name="pref_description_notification_show_content">Показване на изпращача и съдържанието в известията</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">Отваряне на файлове от шифрованото хранилище</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">Отваряне на файлове директно от шифрованото хранилище чрез „намерение“. Може да бъде опасно, тъй като злонамерени приложения могат да отворят всякакви файлове от шифрованото хранилище на TRIfA.</string>
 </resources>
