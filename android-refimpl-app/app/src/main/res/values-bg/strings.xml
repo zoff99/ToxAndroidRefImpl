@@ -133,16 +133,15 @@
     <string name="CallingActivity_0">Закъснение на видеото:</string>
     <string name="CallingActivity_23">Закъснение на видеото:</string>
     <string name="ConferenceAudioActivity_10">Списък на събеседниците</string>
-    <string name="ConferenceAudioActivity_17">Задръжте, за да ви чуват</string>
+    <string name="ConferenceAudioActivity_17">Докоснете, за да говорите</string>
     <string name="ConferenceAudioActivity_18">Говорене…</string>
-    <string name="GroupActivityOffline">Извън линия:</string>
-    <string name="messages_search_default_text">търсене ...</string>
-    <string name="layout___scan_qr_code">Сканирай QR код</string>
-    <string name="layout___enter_pass_longtext">Въведете паролата
-\nНЯМА опция за възстановяване!</string>
+    <string name="GroupActivityOffline">Без мрежа:</string>
+    <string name="messages_search_default_text">Търсене…</string>
+    <string name="layout___scan_qr_code">Сканиране на QR</string>
+    <string name="layout___enter_pass_longtext">Въведете паролата\nНЯМА възможност за възстановяване!</string>
     <string name="layout___unlock">Отключване</string>
     <string name="layout___name">Име</string>
-    <string name="layout___push_to_talk">Натиснете, за да говорите</string>
+    <string name="layout___push_to_talk">Докоснете, за да говорите</string>
     <string name="layout___nick">Прякор:</string>
     <string name="layout___conf_title">Заглавие:</string>
     <string name="layout___pubkey">Публичен ключ:</string>
@@ -206,7 +205,7 @@
     <string name="add_friend_activity_help">Поставете Tox ID на контакт в текстовото поле по-горе или докоснете бутона за QR, за да сканирате код с камерата.</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">Споделяне на файлове</string>
     <string name="pref_description_toxirc_muted_peers_02">Заглушен потребител 2 (оставете празно, ако не го използвате)</string>
-    <string name="layout___toxid">ToxID</string>
+    <string name="layout___toxid">Tox ID</string>
     <string name="pref_description_allow_screen_off_in_audio_call">Изключете ако имате проблеми с изгасянето на екрана при обаждане</string>
     <string name="pref_description_X_zoom_incoming_video">Дава възможност да мащабирате прозореца за видеоразговори с жест. Не работи напълно!</string>
     <string name="pref_title_X_battery_saving_mode">Режим на пестене на батерията</string>
@@ -215,7 +214,7 @@
     <string name="pref_title_new_message_notifications">Известия за нови съобщения</string>
     <string name="MainActivity_toast_msg_exported">Съобщенията са изнесени</string>
     <string name="MainActivity_notification_new_message4">Ново съобщение</string>
-    <string name="GroupActivityActive">Активен:</string>
+    <string name="GroupActivityActive">Участващ:</string>
     <string name="layout___conf_id">ID на конференцията:</string>
     <string name="layout___friends_relay_pubkey">Friends Relay Рubkey:</string>
     <string name="layout___waiting_for_orbot">чакаме за Orbot ...</string>
@@ -291,4 +290,8 @@
     <string name="MessageListHolder_file_incoming_cancel_ft_title">Отказ от файла</string>
     <string name="MainActivity_join_trifa_groupchat">Присъединяване към информационна група</string>
     <string name="MessageListActivity_longpress_to_record_audiomsg">Задръжте, за да запишете гласово съобщение</string>
+    <string name="incoming_filetransfer_size_too_large">Постъпващият файл е твърде голям. Могат да бъдат получени само файлове до 2 ГБ.</string>
+    <string name="layout___group_name">Име на групов разговор</string>
+    <string name="layout___group_id">Group ID</string>
+    <string name="layout___peer_first_join_date">Дата на първо присъединяване:</string>
 </resources>
