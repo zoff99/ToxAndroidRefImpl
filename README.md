@@ -5,7 +5,7 @@
 ~~This is not a Reference Client, it's c-toxcore for Android.~~<br>
 This is now also a Tox Client for Android.
 
-### Important Notice: Since Google has changed their <a href="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/google_play_dev_verify_02.png">Playstore policy</a> in a way that is unacceptable, soon future Versions can not be published on the Playstore anymore. Github Releases are signed with the same key as the Playstore version.
+### Important Notice: Since Google has changed their <a href="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/google_play_dev_verify_02.png">Playstore policy</a> in a way that is unacceptable, future Versions are not published on the Playstore anymore. Github Releases are signed with the same key as the Playstore version.
 
 <a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/f-droid.png" width="200"></a>
 <a href="https://play.google.com/store/apps/details?id=com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/playstore.png" width="200"></a>
@@ -25,11 +25,19 @@ Status
 
 Latest Automated Screenshots
 =
-<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_02.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_03.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_04.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_05.png" width="200">
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_02.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_03.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_04.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_05.png" width="200">
+
+<br>
+Startup Test Automated Screenshots
+<br>
+
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_21.png" width="120">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_29.png" width="120">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_33.png" width="120">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_35.png" width="120">
+
+<br>
 
 Automated Promotion Screenshots
 =
-<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/promo_02.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/promo_03.png" width="200">
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/promo_29_02.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/promo_29_03.png" width="200">
 
 Help Translate the App in your Language
 =
@@ -88,4 +96,3 @@ without our permission.  We do not consent to GitHub's use of this project's
 code in Copilot.
 <br>
 No part of this work may be used or reproduced in any manner for the purpose of training artificial intelligence technologies or systems.
-
