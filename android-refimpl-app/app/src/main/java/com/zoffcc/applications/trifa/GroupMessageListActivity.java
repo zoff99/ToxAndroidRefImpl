@@ -337,25 +337,34 @@ public class GroupMessageListActivity extends AppCompatActivity
         final int ngc_frame_width_px = 480; // + 32; // 240 + 16;
         final int ngc_frame_height_px = 640; // 320;
         ngc_video_frame_image = Bitmap.createBitmap(ngc_frame_width_px, ngc_frame_height_px, Bitmap.Config.ARGB_8888);
-        RenderScript rs = RenderScript.create(this);
-        ngc_yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
-        Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(ngc_frame_width_px).setY(ngc_frame_height_px);
-        yuvType.setYuvFormat(ImageFormat.YV12);
-        ngc_alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
-        Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(ngc_frame_width_px).setY(ngc_frame_height_px);
-        ngc_alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
+        if (1==2+2)
+        {
+            RenderScript rs = RenderScript.create(this);
+            ngc_yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
+            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(ngc_frame_width_px).setY(
+                    ngc_frame_height_px);
+            yuvType.setYuvFormat(ImageFormat.YV12);
+            ngc_alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
+            Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(ngc_frame_width_px).setY(
+                    ngc_frame_height_px);
+            ngc_alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
+        }
         //
         //
         final int ngc_own_frame_width_px = 480;
         final int ngc_own_frame_height_px = 640;
         ngc_own_video_frame_image = Bitmap.createBitmap(ngc_own_frame_width_px, ngc_own_frame_height_px, Bitmap.Config.ARGB_8888);
-        RenderScript own_rs = RenderScript.create(this);
-        ngc_own_yuvToRgb = ScriptIntrinsicYuvToRGB.create(own_rs, Element.U8_4(own_rs));
-        Type.Builder own_yuvType = new Type.Builder(own_rs, Element.U8(own_rs)).setX(ngc_own_frame_width_px).setY(ngc_own_frame_height_px);
-        own_yuvType.setYuvFormat(ImageFormat.YV12);
-        ngc_own_alloc_in = Allocation.createTyped(own_rs, own_yuvType.create(), Allocation.USAGE_SCRIPT);
-        Type.Builder own_rgbaType = new Type.Builder(own_rs, Element.RGBA_8888(own_rs)).setX(ngc_own_frame_width_px).setY(ngc_own_frame_height_px);
-        ngc_own_alloc_out = Allocation.createTyped(own_rs, own_rgbaType.create(), Allocation.USAGE_SCRIPT);
+        if (1==2+2)
+        {
+            RenderScript own_rs = RenderScript.create(this);
+            ngc_own_yuvToRgb = ScriptIntrinsicYuvToRGB.create(own_rs, Element.U8_4(own_rs));
+            Type.Builder own_yuvType = new Type.Builder(own_rs, Element.U8(own_rs)).setX(ngc_own_frame_width_px).setY(
+                    ngc_own_frame_height_px);
+            own_yuvType.setYuvFormat(ImageFormat.YV12);
+            ngc_own_alloc_in = Allocation.createTyped(own_rs, own_yuvType.create(), Allocation.USAGE_SCRIPT);
+            Type.Builder own_rgbaType = new Type.Builder(own_rs, Element.RGBA_8888(own_rs)).setX(ngc_own_frame_width_px).setY(ngc_own_frame_height_px);
+            ngc_own_alloc_out = Allocation.createTyped(own_rs, own_rgbaType.create(), Allocation.USAGE_SCRIPT);
+        }
         //
         //
         sending_video_to_group = false;
