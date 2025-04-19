@@ -281,6 +281,7 @@ android {
 
 
 dependencies {
+    //noinspection GradleDependency
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
     //
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -323,6 +324,8 @@ dependencies {
     implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.9') {
         transitive = true
     }
+    //
+    implementation 'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.4'
     //
     implementation('com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0') {
         exclude group: 'com.android.support'
