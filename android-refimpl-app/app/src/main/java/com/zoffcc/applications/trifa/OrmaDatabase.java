@@ -496,6 +496,40 @@ public class OrmaDatabase extends com.zoffcc.applications.sorm.OrmaDatabase
         run_multi_sql(s);
     }
 
+    public String rawQuery_firstString(final String s)
+    {
+        String res = null;
+        try
+        {
+            Statement statement = sqldb.createStatement();
+            ResultSet rs = statement.executeQuery(s);
+            if (rs.next())
+            {
+                res = rs.getString(1);
+            }
+            else
+            {
+                throw new RuntimeException();
+            }
+
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+                throw new RuntimeException();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            System.out.println(TAG + "DBERR: database could not be opened!!");
+            throw new RuntimeException(e);
+        }
+        return res;
+    }
+
     public Cursor rawQuery(String s)
     {
         // TODO: !!!!!!!!write me!!!!!!!!
