@@ -718,10 +718,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__sqlite_version = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("SELECT sqlite_version()");
-            cursor.moveToFirst();
-            debug__sqlite_version = cursor.getString(0);
-            cursor.close();
+            debug__sqlite_version = orma.getConnection().rawQuery_firstString("SELECT sqlite_version()");
         }
         catch (Exception e)
         {
@@ -731,10 +728,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_version = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_version");
-            cursor.moveToFirst();
-            debug__cipher_version = cursor.getString(0);
-            cursor.close();
+            debug__cipher_version = orma.getConnection().rawQuery_firstString("PRAGMA cipher_version");
         }
         catch (Exception e)
         {
@@ -744,10 +738,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_provider = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_provider");
-            cursor.moveToFirst();
-            debug__cipher_provider = cursor.getString(0);
-            cursor.close();
+            debug__cipher_provider = orma.getConnection().rawQuery_firstString("PRAGMA cipher_provider");
         }
         catch (Exception e)
         {
@@ -757,10 +748,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_provider_version = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_provider_version");
-            cursor.moveToFirst();
-            debug__cipher_provider_version = cursor.getString(0);
-            cursor.close();
+            debug__cipher_provider_version = orma.getConnection().rawQuery_firstString("PRAGMA cipher_provider_version");
         }
         catch (Exception e)
         {
