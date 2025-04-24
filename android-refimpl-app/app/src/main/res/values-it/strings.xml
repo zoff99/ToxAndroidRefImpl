@@ -427,4 +427,11 @@
     <string name="MainActivity_manually_logged_out_true">attivare</string>
     <string name="MainActivity_manually_logged_out_false">Disconnettersi</string>
     <string name="MessageListActivity_longpress_to_record_audiomsg">Tenere premuto per registrare un messaggio audio</string>
+    <string name="title_activity_export">Esportare</string>
+    <string name="pref_title_gainprocessing_active">Guadagno dal microfono</string>
+    <string name="pref_description_gainprocessing_active">regola automaticamente il guadagno del microfono per rendere il suono più forte.\nSe si verificano problemi durante le chiamate, provare a disattivare questa opzione</string>
+    <string name="pref_title_rnnoise_active">Rumore di sfondo</string>
+    <string name="pref_description_rnnoise_active">Rimuovere il rumore di fondo con RNNoise</string>
+    <string name="layout___report_issue">segnalare un bug o un problema</string>
+    <string name="layout___reveal_passwords">rivelare password ed esportare</string>
 </resources>
