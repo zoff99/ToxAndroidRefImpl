@@ -442,4 +442,11 @@
     <string name="MainActivity_manually_logged_out_true">activer</string>
     <string name="MainActivity_manually_logged_out_false">déconnexion</string>
     <string name="MessageListActivity_longpress_to_record_audiomsg">Maintenir la touche appuyée pour enregistrer un message audio</string>
+    <string name="pref_title_gainprocessing_active">gain du microphone</string>
+    <string name="layout___report_issue">signaler un bogue ou un problème</string>
+    <string name="title_activity_export">Exporter</string>
+    <string name="pref_description_gainprocessing_active">ajuste le gain du microphone de façon semi-automatique pour rendre le son plus fort.\nEn cas de problème lors des appels, essayez de désactiver cette option</string>
+    <string name="pref_title_rnnoise_active">Bruit de fond</string>
+    <string name="pref_description_rnnoise_active">Supprimer le bruit de fond avec RNNoise</string>
+    <string name="layout___reveal_passwords">révéler les mots de passe et les exporter</string>
 </resources>
