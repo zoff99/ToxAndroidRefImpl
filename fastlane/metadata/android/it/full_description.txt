@@ -1,7 +1,7 @@
 <b>TRIfA - Un nuovo tipo di messaggistica istantanea</b><br>
 
 Che si tratti di aziende o governi, la sorveglianza digitale oggi è molto diffusa.<br>
-Tox è un software facile da usare che ti connette con amici e familiari senza che nessun altro ti ascolti.<br>
+Tox è un software facile da usare che ti collega con amici e familiari senza che nessun altro ti ascolti.<br>
 Mentre altri servizi famosi richiedono il pagamento di funzionalità, Tox è completamente gratuito e viene fornito senza pubblicità — per sempre.<br><br>
 
 <b>Crittografato:</b><br>
