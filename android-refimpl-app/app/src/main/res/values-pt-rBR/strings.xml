@@ -328,4 +328,11 @@
     <string name="MainActivity_manually_logged_out_true">ativar</string>
     <string name="MainActivity_manually_logged_out_false">Desconectar</string>
     <string name="MessageListActivity_longpress_to_record_audiomsg">Mantenha pressionado para gravar uma mensagem de áudio</string>
+    <string name="pref_description_gainprocessing_active">ajusta o Ganho de Microfone semi-automaticamente para deixar o som mais alto.\nSe houver um problema durante chamadas tente desativar esta opção</string>
+    <string name="title_activity_export">Exportar</string>
+    <string name="pref_title_gainprocessing_active">Ganho de microfone</string>
+    <string name="pref_title_rnnoise_active">Ruído de fundo</string>
+    <string name="pref_description_rnnoise_active">Remover ruído de fundo com RNNoise</string>
+    <string name="layout___report_issue">relatar um erro ou problema</string>
+    <string name="layout___reveal_passwords">revelar senhas e exportar</string>
 </resources>
