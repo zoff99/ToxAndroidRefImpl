@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.Index;
@@ -27,7 +27,7 @@ import com.zoffcc.applications.sorm.Table;
 import androidx.annotation.Nullable;
 
 @Table(indexes = @Index(value = {"group_identifier", "tox_group_peer_pubkey"}, unique = true))
-public class GroupPeerDB extends com.zoffcc.applications.sorm.GroupPeerDB
+public class GroupPeerDB
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id;

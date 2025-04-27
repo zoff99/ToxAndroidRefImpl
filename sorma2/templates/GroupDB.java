@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.PrimaryKey;
@@ -28,7 +28,7 @@ import androidx.annotation.Nullable;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_PRIVACY_STATE;
 
 @Table
-public class GroupDB extends com.zoffcc.applications.sorm.GroupDB
+public class GroupDB
 {
     // group id is always saved as lower case hex string!! -----------------
     @PrimaryKey

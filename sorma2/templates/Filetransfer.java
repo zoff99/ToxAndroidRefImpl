@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.PrimaryKey;
@@ -30,7 +30,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CO
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_DATA;
 
 @Table
-public class Filetransfer extends com.zoffcc.applications.sorm.Filetransfer
+public class Filetransfer
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id; // unique ID!!

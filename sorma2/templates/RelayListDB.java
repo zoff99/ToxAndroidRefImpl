@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.PrimaryKey;
@@ -26,7 +26,7 @@ import com.zoffcc.applications.sorm.Table;
 import androidx.annotation.Nullable;
 
 @Table
-public class RelayListDB extends com.zoffcc.applications.sorm.RelayListDB
+public class RelayListDB
 {
     @PrimaryKey
     String tox_public_key_string = "";

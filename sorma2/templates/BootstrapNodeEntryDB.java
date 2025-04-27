@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import android.util.Log;
 
@@ -41,7 +41,7 @@ import static com.zoffcc.applications.trifa.TorHelper.TorSocket;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 @Table
-public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.BootstrapNodeEntryDB
+public class BootstrapNodeEntryDB
 {
     static final String TAG = "trifa.BtpNodeEDB";
 

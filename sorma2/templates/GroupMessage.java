@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.PrimaryKey;
@@ -29,7 +29,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MS
 import static com.zoffcc.applications.trifa.ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_USER;
 
 @Table
-public class GroupMessage extends com.zoffcc.applications.sorm.GroupMessage
+public class GroupMessage
 {
     @PrimaryKey(autoincrement = true, auto = true)
     public long id; // uniqe message id!!

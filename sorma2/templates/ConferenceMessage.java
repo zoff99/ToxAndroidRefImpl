@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.PrimaryKey;
@@ -28,7 +28,7 @@ import androidx.annotation.Nullable;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
 
 @Table
-public class ConferenceMessage extends com.zoffcc.applications.sorm.ConferenceMessage
+public class ConferenceMessage
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id; // uniqe message id!!

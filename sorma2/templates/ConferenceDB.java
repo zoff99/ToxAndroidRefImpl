@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.PrimaryKey;
@@ -28,7 +28,7 @@ import androidx.annotation.Nullable;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 
 @Table
-public class ConferenceDB extends com.zoffcc.applications.sorm.ConferenceDB
+public class ConferenceDB
 {
     // conference id is always saved as lower case hex string!! -----------------
     @PrimaryKey

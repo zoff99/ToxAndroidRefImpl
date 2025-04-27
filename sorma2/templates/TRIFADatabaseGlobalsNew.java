@@ -17,14 +17,14 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.PrimaryKey;
 import com.zoffcc.applications.sorm.Table;
 
 @Table
-public class TRIFADatabaseGlobalsNew extends com.zoffcc.applications.sorm.TRIFADatabaseGlobalsNew
+public class TRIFADatabaseGlobalsNew
 {
     @PrimaryKey
     String key;

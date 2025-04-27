@@ -17,7 +17,7 @@
  * Boston, MA  02110-1301, USA.
  */
 
-package com.zoffcc.applications.trifa;
+package com.zoffcc.applications.sorm;
 
 import com.zoffcc.applications.sorm.Column;
 import com.zoffcc.applications.sorm.Index;
@@ -25,7 +25,7 @@ import com.zoffcc.applications.sorm.PrimaryKey;
 import com.zoffcc.applications.sorm.Table;
 
 @Table(indexes = @Index(value = {"conference_identifier", "peer_pubkey"}, unique = true))
-public class ConferencePeerCacheDB extends com.zoffcc.applications.sorm.ConferencePeerCacheDB
+public class ConferencePeerCacheDB
 {
     @PrimaryKey(autoincrement = true, auto = true)
     long id;
