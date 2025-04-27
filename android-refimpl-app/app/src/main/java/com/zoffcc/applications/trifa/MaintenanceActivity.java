@@ -795,6 +795,20 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+        String debug__sqlite_user_version = "unknown";
+        try
+        {
+            Cursor cursor = orma.getConnection().rawQuery("PRAGMA user_version");
+            cursor.moveToFirst();
+            debug__sqlite_user_version = cursor.getString(0);
+            cursor.close();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        Log.i(TAG, "DB:user_version=" + debug__sqlite_user_version);
+
         String debug__sqlite_version = "unknown";
         try
         {
