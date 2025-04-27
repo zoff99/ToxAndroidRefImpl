@@ -991,7 +991,7 @@ public class MessageListActivity extends AppCompatActivity
 
             if (need_migrate_old_msg_date == true)
             {
-                orma.getConnection().execSQL(
+                orma.run_multi_sql(
                         "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
                         " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
                         " and msg_version='0'");
@@ -1024,7 +1024,7 @@ public class MessageListActivity extends AppCompatActivity
 
             if (need_migrate_old_ft_date == true)
             {
-                orma.getConnection().execSQL(
+                orma.run_multi_sql(
                         "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
                         " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
                         " and TRIFA_MESSAGE_TYPE ='1'");

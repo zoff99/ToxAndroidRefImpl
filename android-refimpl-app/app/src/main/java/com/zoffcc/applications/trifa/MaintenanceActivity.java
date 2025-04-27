@@ -267,9 +267,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             try
                             {
                                 Log.i(TAG, "VACUUM:start");
-                                Cursor cursor = orma.getConnection().rawQuery("VACUUM");
-                                cursor.moveToFirst();
-                                cursor.close();
+                                orma.run_multi_sql("VACUUM");
                                 Log.i(TAG, "VACUUM:ready");
                             }
                             catch (Exception e2)
@@ -303,9 +301,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             try
                             {
                                 Log.i(TAG, "ANALYZE:start");
-                                Cursor cursor = orma.getConnection().rawQuery("ANALYZE");
-                                cursor.moveToFirst();
-                                cursor.close();
+                                orma.run_multi_sql("ANALYZE");
                                 Log.i(TAG, "ANALYZE:ready");
                             }
                             catch (Exception e2)
@@ -704,10 +700,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__sqlite_user_version = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("PRAGMA user_version");
-            cursor.moveToFirst();
-            debug__sqlite_user_version = cursor.getString(0);
-            cursor.close();
+            debug__sqlite_user_version = orma.run_query_for_single_result("PRAGMA user_version");
         }
         catch (Exception e)
         {
@@ -718,7 +711,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__sqlite_version = "unknown";
         try
         {
-            debug__sqlite_version = orma.getConnection().rawQuery_firstString("SELECT sqlite_version()");
+            debug__sqlite_version = orma.run_query_for_single_result("SELECT sqlite_version()");
         }
         catch (Exception e)
         {
@@ -728,7 +721,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_version = "unknown";
         try
         {
-            debug__cipher_version = orma.getConnection().rawQuery_firstString("PRAGMA cipher_version");
+            debug__cipher_version = orma.run_query_for_single_result("PRAGMA cipher_version");
         }
         catch (Exception e)
         {
@@ -738,7 +731,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_provider = "unknown";
         try
         {
-            debug__cipher_provider = orma.getConnection().rawQuery_firstString("PRAGMA cipher_provider");
+            debug__cipher_provider = orma.run_query_for_single_result("PRAGMA cipher_provider");
         }
         catch (Exception e)
         {
@@ -748,7 +741,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_provider_version = "unknown";
         try
         {
-            debug__cipher_provider_version = orma.getConnection().rawQuery_firstString("PRAGMA cipher_provider_version");
+            debug__cipher_provider_version = orma.run_query_for_single_result("PRAGMA cipher_provider_version");
         }
         catch (Exception e)
         {

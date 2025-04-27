@@ -37,6 +37,7 @@ import android.util.Log;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 import com.zoffcc.applications.sorm.FriendList;
 import com.zoffcc.applications.sorm.Message;
+import com.zoffcc.applications.sorm.OrmaDatabase;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -186,7 +187,7 @@ public class TrifaToxService extends Service
     static Thread ToxServiceThread = null;
     // static EchoCanceller canceller = null;
     static boolean stop_me = false;
-    static com.zoffcc.applications.trifa.OrmaDatabase orma = null;
+    static OrmaDatabase orma = null;
     static VirtualFileSystem vfs = null;
     static boolean is_tox_started = false;
     static boolean manually_logged_out = false;
@@ -273,7 +274,7 @@ public class TrifaToxService extends Service
                         Log.i(TAG, "stop_me:006a:tox_thread_starting_up=" + tox_thread_starting_up);
 
                         Log.i(TAG, "stop_me:unmount sql database");
-                        orma.close_db();
+                        OrmaDatabase.shutdown();
 
                         if (VFS_ENCRYPT)
                         {
@@ -911,7 +912,7 @@ public class TrifaToxService extends Service
                     {
                         try
                         {
-                            orma.getConnection().execSQL(
+                            orma.run_multi_sql(
                                     "update ConferenceMessage set sent_timestamp=rcvd_timestamp" + " where " +
                                     " sent_timestamp='0'");
                             Log.i(TAG, "onCreate:migrate_old_conf_msg_date");
@@ -934,7 +935,7 @@ public class TrifaToxService extends Service
                 // ----- convert old NULL's into false -----
                 try
                 {
-                    orma.getConnection().execSQL(
+                    orma.run_multi_sql(
                             "update ConferenceMessage set was_synced=false" + " where " + " was_synced is NULL");
                     Log.i(TAG, "onCreate:migrate_was_synced");
                 }
@@ -947,7 +948,7 @@ public class TrifaToxService extends Service
                 // ----- convert old NULL's into false -----
                 try
                 {
-                    orma.getConnection().execSQL(
+                    orma.run_multi_sql(
                             "update GroupDB set group_we_left=false" + " where " + " group_we_left is NULL");
                     Log.i(TAG, "onCreate:migrate_group_we_left");
                 }
@@ -962,7 +963,7 @@ public class TrifaToxService extends Service
                 // ----- convert old NULL's into 0 -----
                 try
                 {
-                    orma.getConnection().execSQL("update Message set sent_push='0' where sent_push is NULL");
+                    orma.run_multi_sql("update Message set sent_push='0' where sent_push is NULL");
                     Log.i(TAG, "onCreate:sent_push");
                 }
                 catch (Exception e)
@@ -974,7 +975,7 @@ public class TrifaToxService extends Service
                 // ----- convert old NULL's into 0 -----
                 try
                 {
-                    orma.getConnection().execSQL(
+                    orma.run_multi_sql(
                             "update FriendList set msgv3_capability='0' where msgv3_capability is NULL");
                     Log.i(TAG, "onCreate:msgv3_capability");
                 }
@@ -987,7 +988,7 @@ public class TrifaToxService extends Service
                 // ----- convert old NULL's into 0 -----
                 try
                 {
-                    orma.getConnection().execSQL(
+                    orma.run_multi_sql(
                             "update Message set filetransfer_kind='0' where filetransfer_kind is NULL");
                     Log.i(TAG, "onCreate:filetransfer_kind");
                 }
@@ -1000,7 +1001,7 @@ public class TrifaToxService extends Service
                 // ----- convert old NULL's into 0 -----
                 try
                 {
-                    orma.getConnection().execSQL(
+                    orma.run_multi_sql(
                             "update GroupMessage set TRIFA_SYNC_TYPE='0' where TRIFA_SYNC_TYPE is NULL");
                     Log.i(TAG, "onCreate:TRIFA_SYNC_TYPE");
                 }
@@ -1013,7 +1014,7 @@ public class TrifaToxService extends Service
                 // ----- convert old NULL's into 0 -----
                 try
                 {
-                    orma.getConnection().execSQL("update GroupMessage set tox_group_peer_pubkey_syncer_01_sent_timestamp='0' where tox_group_peer_pubkey_syncer_01_sent_timestamp is NULL");
+                    orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_01_sent_timestamp='0' where tox_group_peer_pubkey_syncer_01_sent_timestamp is NULL");
                     Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_01_sent_timestamp");
                 }
                 catch (Exception e)
@@ -1022,7 +1023,7 @@ public class TrifaToxService extends Service
                 }
                 try
                 {
-                    orma.getConnection().execSQL("update GroupMessage set tox_group_peer_pubkey_syncer_02_sent_timestamp='0' where tox_group_peer_pubkey_syncer_02_sent_timestamp is NULL");
+                    orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_02_sent_timestamp='0' where tox_group_peer_pubkey_syncer_02_sent_timestamp is NULL");
                     Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_02_sent_timestamp");
                 }
                 catch (Exception e)
@@ -1031,7 +1032,7 @@ public class TrifaToxService extends Service
                 }
                 try
                 {
-                    orma.getConnection().execSQL("update GroupMessage set tox_group_peer_pubkey_syncer_03_sent_timestamp='0' where tox_group_peer_pubkey_syncer_03_sent_timestamp is NULL");
+                    orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_03_sent_timestamp='0' where tox_group_peer_pubkey_syncer_03_sent_timestamp is NULL");
                     Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_03_sent_timestamp");
                 }
                 catch (Exception e)
