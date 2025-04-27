@@ -54,7 +54,19 @@
         catch (Exception e)
         {
             orma_semaphore_lastrowid_on_insert.release();
+            Log.i(TAG, "ERR:insert:001:" + e.getMessage());
             throw new RuntimeException(e);
+        }
+        finally
+        {
+            try
+            {
+                insert_pstmt.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+            orma_global_sqlinsert_lock.unlock();
         }
 
         return ret;

@@ -1,12 +1,14 @@
     public List<__@@@TABLE@@@__> toList()
     {
         List<__@@@TABLE@@@__> list = new ArrayList<>();
+        orma_global_sqltolist_lock.lock();
+        PreparedStatement statement = null;
         try
         {
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
-            PreparedStatement statement = sqldb.prepareStatement(sql);
+            statement = sqldb.prepareStatement(sql);
             if (!set_bindvars_where(statement, bind_where_count, bind_where_vars))
             {
                 try

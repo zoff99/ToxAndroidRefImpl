@@ -49,6 +49,7 @@ public class Generator {
     static String tbl_equalfuncs = "";
     static String tbl_orderbyfuncs = "";
     static String tbl_setfuncs = "";
+    static final String java_quoted = "\\\"";
 
     enum COLTYPE
     {
@@ -574,7 +575,7 @@ public class Generator {
             // -----------
             String comma = "";
             if (column_num > 1) {comma = ",";}
-            tbl_insert_sub01 += "                    + \""+comma+""+column_name+"\"" + "\n";
+            tbl_insert_sub01 += "                    + \""+comma+java_quoted+""+column_name+java_quoted+"\"" + "\n";
             tbl_insert_sub02 += "                    + \""+comma+"?"+column_num+"\"" + "\n";
             // -----------
             tbl_insert_sub03 += "            insert_pstmt.set"+javatype_firstupper+"("+column_num+", this."+column_name+");" + "\n";
@@ -617,7 +618,7 @@ public class Generator {
         // -----------
         String comma = "";
         if (column_num > 1) {comma = ",";}
-        tbl_insert_sub01 += "                    + \""+comma+""+column_name+"\"" + "\n";
+        tbl_insert_sub01 += "                    + \""+comma+java_quoted+""+column_name+java_quoted+"\"" + "\n";
         tbl_insert_sub02 += "                    + \""+comma+"?"+column_num+"\"" + "\n";
         // -----------
         tbl_insert_sub03 += "            insert_pstmt.set"+javatype_firstupper+"("+column_num+", this."+column_name+");" + "\n";
@@ -641,7 +642,7 @@ public class Generator {
         tbl_orderbyfuncs  += "        {" + "\n";
         tbl_orderbyfuncs  += "            this.sql_orderby = this.sql_orderby + \" , \";" + "\n";
         tbl_orderbyfuncs  += "        }" + "\n";
-        tbl_orderbyfuncs  += "        this.sql_orderby = this.sql_orderby + \" "+column_name+" ASC \";" + "\n";
+        tbl_orderbyfuncs  += "        this.sql_orderby = this.sql_orderby + \" \\\""+column_name+"\\\" ASC \";" + "\n";
         tbl_orderbyfuncs  += "        return this;" + "\n";
         tbl_orderbyfuncs  += "    }" + "\n";
         tbl_orderbyfuncs  += "" + "\n";
@@ -656,7 +657,7 @@ public class Generator {
         tbl_orderbyfuncs  += "        {" + "\n";
         tbl_orderbyfuncs  += "            this.sql_orderby = this.sql_orderby + \" , \";" + "\n";
         tbl_orderbyfuncs  += "        }" + "\n";
-        tbl_orderbyfuncs  += "        this.sql_orderby = this.sql_orderby + \" "+column_name+" DESC \";" + "\n";
+        tbl_orderbyfuncs  += "        this.sql_orderby = this.sql_orderby + \" \\\""+column_name+"\\\" DESC \";" + "\n";
         tbl_orderbyfuncs  += "        return this;" + "\n";
         tbl_orderbyfuncs  += "    }" + "\n";
         tbl_orderbyfuncs  += "" + "\n";
@@ -674,7 +675,7 @@ public class Generator {
         tbl_setfuncs  += "        {" + "\n";
         tbl_setfuncs  += "            this.sql_set = this.sql_set + \" , \";" + "\n";
         tbl_setfuncs  += "        }" + "\n";
-        tbl_setfuncs  += "        this.sql_set = this.sql_set + \" "+column_name+"=?\" + (BINDVAR_OFFSET_SET + bind_set_count) + \" \";" + "\n";
+        tbl_setfuncs  += "        this.sql_set = this.sql_set + \" \\\""+column_name+"\\\"=?\" + (BINDVAR_OFFSET_SET + bind_set_count) + \" \";" + "\n";
         tbl_setfuncs  += "        bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
         tbl_setfuncs  += "        bind_set_count++;" + "\n";
         tbl_setfuncs  += "        return this;" + "\n";
@@ -687,7 +688,7 @@ public class Generator {
         // Eq
         tbl_equalfuncs  += "    public "+table_name+" "+column_name+"Eq("+ctype.javatype+" "+column_name+")" + "\n";
         tbl_equalfuncs  += "    {" + "\n";
-        tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+"=?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
+        tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\"=?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
         tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
         tbl_equalfuncs  += "        bind_where_count++;" + "\n";
         tbl_equalfuncs  += "        return this;" + "\n";
@@ -697,7 +698,7 @@ public class Generator {
         // NotEq
         tbl_equalfuncs  += "    public "+table_name+" "+column_name+"NotEq("+ctype.javatype+" "+column_name+")" + "\n";
         tbl_equalfuncs  += "    {" + "\n";
-        tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+"<>?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
+        tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\"<>?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
         tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
         tbl_equalfuncs  += "        bind_where_count++;" + "\n";
         tbl_equalfuncs  += "        return this;" + "\n";
@@ -709,7 +710,7 @@ public class Generator {
             // Lt
             tbl_equalfuncs  += "    public "+table_name+" "+column_name+"Lt("+ctype.javatype+" "+column_name+")" + "\n";
             tbl_equalfuncs  += "    {" + "\n";
-            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+"<?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
+            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\"<?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
             tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
             tbl_equalfuncs  += "        bind_where_count++;" + "\n";
             tbl_equalfuncs  += "        return this;" + "\n";
@@ -719,7 +720,7 @@ public class Generator {
             // Le
             tbl_equalfuncs  += "    public "+table_name+" "+column_name+"Le("+ctype.javatype+" "+column_name+")" + "\n";
             tbl_equalfuncs  += "    {" + "\n";
-            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+"<=?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
+            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\"<=?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
             tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
             tbl_equalfuncs  += "        bind_where_count++;" + "\n";
             tbl_equalfuncs  += "        return this;" + "\n";
@@ -729,7 +730,7 @@ public class Generator {
             // Gt
             tbl_equalfuncs  += "    public "+table_name+" "+column_name+"Gt("+ctype.javatype+" "+column_name+")" + "\n";
             tbl_equalfuncs  += "    {" + "\n";
-            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+">?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
+            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\">?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
             tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
             tbl_equalfuncs  += "        bind_where_count++;" + "\n";
             tbl_equalfuncs  += "        return this;" + "\n";
@@ -739,7 +740,7 @@ public class Generator {
             // Ge
             tbl_equalfuncs  += "    public "+table_name+" "+column_name+"Ge("+ctype.javatype+" "+column_name+")" + "\n";
             tbl_equalfuncs  += "    {" + "\n";
-            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+">=?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
+            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\">=?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" \";" + "\n";
             tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
             tbl_equalfuncs  += "        bind_where_count++;" + "\n";
             tbl_equalfuncs  += "        return this;" + "\n";
@@ -749,7 +750,7 @@ public class Generator {
             // Between
             tbl_equalfuncs  += "    public "+table_name+" "+column_name+"Between("+ctype.javatype+" "+column_name+"1, "+ctype.javatype+" "+column_name+"2)" + "\n";
             tbl_equalfuncs  += "    {" + "\n";
-            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+">?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" and "+column_name+"<?\" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + \" \";" + "\n";
+            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\">?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" and "+column_name+"<?\" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + \" \";" + "\n";
             tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"1));" + "\n";
             tbl_equalfuncs  += "        bind_where_count++;" + "\n";
             tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"2));" + "\n";
@@ -762,7 +763,7 @@ public class Generator {
         // Null
         tbl_equalfuncs  += "    public "+table_name+" "+column_name+"IsNull()" + "\n";
         tbl_equalfuncs  += "    {" + "\n";
-        tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+" IS NULL \";" + "\n";
+        tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\" IS NULL \";" + "\n";
         tbl_equalfuncs  += "        return this;" + "\n";
         tbl_equalfuncs  += "    }" + "\n";
         tbl_equalfuncs  += "" + "\n";
@@ -770,7 +771,7 @@ public class Generator {
         // NotNull
         tbl_equalfuncs  += "    public "+table_name+" "+column_name+"IsNotNull()" + "\n";
         tbl_equalfuncs  += "    {" + "\n";
-        tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+" IS NOT NULL \";" + "\n";
+        tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\" IS NOT NULL \";" + "\n";
         tbl_equalfuncs  += "        return this;" + "\n";
         tbl_equalfuncs  += "    }" + "\n";
         tbl_equalfuncs  += "" + "\n";
@@ -780,7 +781,7 @@ public class Generator {
             // Like
             tbl_equalfuncs  += "    public "+table_name+" "+column_name+"Like("+ctype.javatype+" "+column_name+")" + "\n";
             tbl_equalfuncs  += "    {" + "\n";
-            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+" LIKE ?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" ESCAPE '\\\\' \";" + "\n";
+            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\" LIKE ?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" ESCAPE '\\\\' \";" + "\n";
             tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
             tbl_equalfuncs  += "        bind_where_count++;" + "\n";
             tbl_equalfuncs  += "        return this;" + "\n";
@@ -790,7 +791,7 @@ public class Generator {
             // NotLike
             tbl_equalfuncs  += "    public "+table_name+" "+column_name+"NotLike("+ctype.javatype+" "+column_name+")" + "\n";
             tbl_equalfuncs  += "    {" + "\n";
-            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and "+column_name+" NOT LIKE ?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" ESCAPE '\\\\' \";" + "\n";
+            tbl_equalfuncs  += "        this.sql_where = this.sql_where + \" and \\\""+column_name+"\\\" NOT LIKE ?\" + (BINDVAR_OFFSET_WHERE + bind_where_count) + \" ESCAPE '\\\\' \";" + "\n";
             tbl_equalfuncs  += "        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_"+javatype_firstupper+", "+column_name+"));" + "\n";
             tbl_equalfuncs  += "        bind_where_count++;" + "\n";
             tbl_equalfuncs  += "        return this;" + "\n";

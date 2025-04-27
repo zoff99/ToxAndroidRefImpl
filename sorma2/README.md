@@ -5,7 +5,7 @@ It is based on the wonderful https://github.com/maskarade/Android-Orma by [FUJI 
 <br>
 This is a rewrite in pure java, to generate most stuff you need and then add it to your project
 either as a ```.jar file``` or as ```java source```.<br>
-You still need to add ```sqlite-jdbc-3.46.1.2.jar``` to your project to use it.<br>
+You still need to add ```sqlite-jdbc-3.49.1.0.jar``` to your project to use it.<br>
 <br><br>
 ~~sadly [sqlite-jdbc](https://github.com/xerial/sqlite-jdbc) project decided that it needs ```slf4j-api jar``` (for no good reason).~~
 this was solved by: https://github.com/xerial/sqlite-jdbc/pull/1178

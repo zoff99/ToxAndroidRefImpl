@@ -1,4 +1,39 @@
-package com.zoffcc.applications.sorm;
+/* SPDX-License-Identifier: GPL-3.0-or-later
+ * [sorma2], Java part of sorma2
+ * Copyright (C) 2024 Zoff <zoff@zoff.cc>
+ */
+
+
+/*
+ *
+ *
+ *
+ *
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *  DUMMY needs to be here, but is unused !!!!!!!!!!!
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ */
+
+
+ package com.zoffcc.applications.sorm;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -7,6 +42,8 @@ import java.sql.*;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+
+import com.zoffcc.applications.sorm.Log;
 
 public class OrmaDatabase
 {
@@ -19,8 +56,15 @@ public class OrmaDatabase
     static int current_db_version = 0;
     static Semaphore orma_semaphore_lastrowid_on_insert = new Semaphore(1);
 
-    public OrmaDatabase()
+    private static String db_file_path = null;
+    private static String secrect_key = null;
+    private static boolean wal_mode = false; // default mode is WAL off!
+
+    public OrmaDatabase(final String db_file_path, final String secrect_key, boolean wal_mode)
     {
+        OrmaDatabase.db_file_path = db_file_path;
+        OrmaDatabase.secrect_key = secrect_key;
+        OrmaDatabase.wal_mode = wal_mode;
     }
 
     public static Connection getSqldb()
@@ -358,19 +402,54 @@ public class OrmaDatabase
         Log.i(TAG, "SHUTDOWN:finished");
     }
 
-    public static void init(final String database_files_dir, final String database_files_name)
+    public static void init()
     {
         Log.i(TAG, "INIT:start");
         // create a database connection
         try
         {
             // Class.forName("org.sqlite.JDBC");
-            sqldb = DriverManager.getConnection("jdbc:sqlite:" + database_files_dir + File.separator + database_files_name);
+            sqldb = DriverManager.getConnection("jdbc:sqlite:" + OrmaDatabase.db_file_path);
         }
         catch (Exception e)
         {
             e.printStackTrace();
             Log.i(TAG, "INIT:R_Error:" + e.getMessage());
+        }
+
+        if (OrmaDatabase.wal_mode)
+        {
+            Log.i(TAG, "INIT:journal_mode=" + run_query_for_single_result("PRAGMA journal_mode;"));
+            Log.i(TAG, "INIT:journal_size_limit=" + run_query_for_single_result("PRAGMA journal_size_limit;"));
+
+            // set WAL mode
+            final String set_wal_mode = "PRAGMA journal_mode = WAL;";
+            run_multi_sql(set_wal_mode);
+            Log.i(TAG, "INIT:setting WAL mode");
+
+            Log.i(TAG, "INIT:journal_mode=" + run_query_for_single_result("PRAGMA journal_mode;"));
+            Log.i(TAG, "INIT:journal_size_limit=" + run_query_for_single_result("PRAGMA journal_size_limit;"));
+            Log.i(TAG, "INIT:wal_autocheckpoint=" + run_query_for_single_result("PRAGMA wal_autocheckpoint;"));
+
+            // set journal and wal size limit to 10 MB
+            final String set_journal_size_limit = "PRAGMA journal_size_limit = " + (10 * 1024 * 1024) + ";";
+            run_multi_sql(set_journal_size_limit);
+            Log.i(TAG, "INIT:setting journal_size_limit");
+
+            // set wal_autocheckpoint
+            final String set_wal_autocheckpoint = "PRAGMA wal_autocheckpoint = 1000;";
+            run_multi_sql(set_wal_autocheckpoint);
+            Log.i(TAG, "INIT:setting wal_autocheckpoint");
+
+
+            Log.i(TAG, "INIT:journal_mode=" + run_query_for_single_result("PRAGMA journal_mode;"));
+            Log.i(TAG, "INIT:journal_size_limit=" + run_query_for_single_result("PRAGMA journal_size_limit;"));
+            Log.i(TAG, "INIT:wal_autocheckpoint=" + run_query_for_single_result("PRAGMA wal_autocheckpoint;"));
+        } else {
+            // turn off WAL mode (since this setting will persist inside the database even after a restart)
+            final String set_wal_mode = "PRAGMA journal_mode = DELETE;";
+            run_multi_sql(set_wal_mode);
+            Log.i(TAG, "INIT:turning OFF WAL mode");
         }
 
         Log.i(TAG, "loaded:sqlite:" + get_current_sqlite_version());
@@ -419,6 +498,7 @@ public class OrmaDatabase
             catch (SQLException e)
             {
                 System.err.println(e.getMessage());
+                Log.i(TAG, "ERR:MS:001:" + e.getMessage());
             }
 
             String[] queries = sql_multi.split(";");
@@ -432,6 +512,7 @@ public class OrmaDatabase
                 catch (SQLException e)
                 {
                     System.err.println(e.getMessage());
+                    Log.i(TAG, "ERR:MS:002:" + e.getMessage());
                 }
             }
 
@@ -439,13 +520,70 @@ public class OrmaDatabase
             {
                 statement.close();
             }
-            catch (Exception ignored)
+            catch (Exception e)
             {
+                Log.i(TAG, "ERR:MS:003:" + e.getMessage());
             }
         }
         catch (Exception e)
         {
+            Log.i(TAG, "ERR:MS:004:" + e.getMessage());
         }
+    }
+
+    public static String run_query_for_single_result(String sql_multi)
+    {
+        String text_result = null;
+
+        try
+        {
+            Statement statement = null;
+
+            try
+            {
+                statement = sqldb.createStatement();
+                statement.setQueryTimeout(10);  // set timeout to x sec.
+            }
+            catch (SQLException e)
+            {
+                System.err.println(e.getMessage());
+                Log.i(TAG, "ERR:QSL:001:" + e.getMessage());
+            }
+
+            try
+            {
+                String[] queries = sql_multi.split(";");
+                for (String query : queries)
+                {
+                    // Log.i(TAG, "SQL:" + query);
+                    ResultSet rs = statement.executeQuery(query);
+                    if (rs.next())
+                    {
+                        text_result = rs.getObject(1).toString();
+                    }
+                }
+            }
+            catch (SQLException e)
+            {
+                System.err.println(e.getMessage());
+                Log.i(TAG, "ERR:QSL:002:" + e.getMessage());
+            }
+
+            try
+            {
+                statement.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:QSL:003:" + e.getMessage());
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "ERR:QSL:004:" + e.getMessage());
+        }
+
+        return text_result;
     }
 
     public static boolean set_bindvars_where(final PreparedStatement statement,

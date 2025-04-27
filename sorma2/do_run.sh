@@ -1,26 +1,26 @@
 #! /bin/bash
 
 java \
--classpath ".:sqlite-jdbc-3.46.1.2.jar:sorma2.jar" \
-com/zoffcc/applications/sorm/Generator "gen"
+-classpath ".:sqlite-jdbc-3.49.1.0.jar:sorma2.jar" \
+com/zoffcc/applications/sorm/Generator "gen" || exit 1
 
 cd gen/
-/usr/lib/jvm/temurin-8-jdk-amd64/bin/javac \
--cp "sqlite-jdbc-3.46.1.2.jar" \
+javac \
+-cp "sqlite-jdbc-3.49.1.0.jar" \
 com/zoffcc/applications/sorm/*.java && \
 jar cf sorma_generated.jar com/zoffcc/applications/sorm/*.class && \
 cp sorma_generated.jar ../test/ && \
-cd ../
+cd ../ || exit 1
 
 # use generated custom jar
 cd test/
-/usr/lib/jvm/temurin-8-jdk-amd64/bin/javac \
--classpath ".:sqlite-jdbc-3.46.1.2.jar:sorma_generated.jar" \
-org/example/TestSorma.java
+javac \
+-classpath ".:sqlite-jdbc-3.49.1.0.jar:sorma_generated.jar" \
+org/example/TestSorma.java || exit 1
 
 rm -f main.db
 
-/usr/lib/jvm/temurin-8-jdk-amd64/bin/java \
--classpath ".:sqlite-jdbc-3.46.1.2.jar:sorma_generated.jar" \
-org/example/TestSorma
+java \
+-classpath ".:sqlite-jdbc-3.49.1.0.jar:sorma_generated.jar" \
+org/example/TestSorma || exit 1
 
