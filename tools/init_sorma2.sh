@@ -8,9 +8,9 @@ export _HOME_
 basedir="$_HOME_""/../"
 cd "$basedir"/sorma2/gen/
 
-for i in $(grep -l 'Column.Helpers' /home/zoff/StudioProjects/ToxAndroidRefImpl/android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/*.java); do
-    ln -sf "$i" "_sorm_"$(basename "$i")
-done
+#for i in $(grep -l 'Column.Helpers' /home/zoff/StudioProjects/ToxAndroidRefImpl/android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/*.java); do
+#    ln -sf "$i" "_sorm_"$(basename "$i")
+#done
 
 cd ../
 
