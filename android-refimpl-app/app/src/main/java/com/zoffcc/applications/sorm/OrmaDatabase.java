@@ -5,6 +5,8 @@
 
 package com.zoffcc.applications.sorm;
 
+import android.os.Build;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -12,6 +14,8 @@ import java.sql.*;
 import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.zoffcc.applications.sorm.Log;
 
@@ -23,11 +27,47 @@ public class OrmaDatabase
     final static long ORMA_LONG_RUNNING_MS = 180;
 
     public static Connection sqldb = null;
-    static int current_db_version = 0;
+    static int THIS_DB_SCHEMA_VERSION = 1; // HINT: this is the version the database schema should be upgraded to
+    static int current_db_schema_version = 0; // HINT: this is current database schema version,
+                                              // if its lower than THIS_DB_SCHEMA_VERSION some upgrade steps have to be made
     static Semaphore orma_semaphore_lastrowid_on_insert = new Semaphore(1);
+    //
+    static ReentrantReadWriteLock orma_global_readwritelock = new ReentrantReadWriteLock(true);
+    //
+    static final Lock orma_global_readLock = orma_global_readwritelock.readLock();
+    public static final Lock orma_global_writeLock = orma_global_readwritelock.writeLock();
+    // --- read locks ---
+    static final Lock orma_global_sqlcount_lock = orma_global_readLock;
+    static final Lock orma_global_sqltolist_lock = orma_global_readLock;
+    // static final Lock orma_global_sqlgetlastrowid_lock = orma_global_readLock;
+    static final Lock orma_global_sqlexecute_lock = orma_global_readLock;
+    static final Lock orma_global_sqlinsert_lock = orma_global_readLock;
+    // --- read locks ---
+    //
+    // --- write locks ---
+    static final Lock orma_global_sqlfreehand_lock = orma_global_writeLock;
+    // --- write locks ---
+    //
 
-    public OrmaDatabase()
+    private static String db_file_path = null;
+    private static String secrect_key = null;
+    private static boolean wal_mode = false; // default mode is WAL off!
+
+    public OrmaDatabase(final String db_file_path, final String secrect_key, boolean wal_mode)
     {
+        OrmaDatabase.db_file_path = db_file_path;
+        OrmaDatabase.secrect_key = secrect_key;
+        OrmaDatabase.wal_mode = wal_mode;
+    }
+
+    public static interface schema_upgrade_callback {
+        void upgrade(int old_version, int new_version);
+    }
+    static schema_upgrade_callback schema_upgrade_callback_function = null;
+
+    public static void set_schema_upgrade_callback(schema_upgrade_callback callback)
+    {
+        schema_upgrade_callback_function = callback;
     }
 
     public static Connection getSqldb()
@@ -35,11 +75,17 @@ public class OrmaDatabase
         return sqldb;
     }
 
-    // TODO: fix me for API 21
-    // public static String bytesToString(byte[] bytes)
-    //{
-    //    return Base64.getEncoder().encodeToString(bytes);
-    //}
+    public static String bytesToString(byte[] bytes)
+    {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+        {
+            return Base64.getEncoder().encodeToString(bytes);
+        }
+        else
+        {
+            return null;
+        }
+    }
 
     public static String sha256sum_of_file(String filename_with_path)
     {
@@ -58,9 +104,7 @@ public class OrmaDatabase
             bis.close();
             Log.i(TAG, "sha256sum_of_file:bytes_read_total=" + bytes_read_total);
             byte[] hash = digest.digest();
-            // TODO: fix me for API 21
-            // return (bytesToString(hash));
-            return null;
+            return (bytesToString(hash));
         }
         catch (Exception e)
         {
@@ -126,46 +170,44 @@ public class OrmaDatabase
 
     public static long get_last_rowid_pstmt()
     {
+        // orma_global_sqlgetlastrowid_lock.lock();
         try
         {
             long ret = -1;
             PreparedStatement lastrowid_pstmt = sqldb.prepareStatement("select last_insert_rowid() as lastrowid");
-            ResultSet rs = lastrowid_pstmt.executeQuery();
-            if (rs.next())
+            try
             {
-                ret = rs.getLong("lastrowid");
+                ResultSet rs = lastrowid_pstmt.executeQuery();
+                if (rs.next())
+                {
+                    ret = rs.getLong("lastrowid");
+                }
+                rs.close();
+                lastrowid_pstmt.close();
+                // Log.i(TAG, "get_last_rowid_pstmt:ret=" + ret);
             }
-            rs.close();
-            lastrowid_pstmt.close();
-            // Log.i(TAG, "get_last_rowid_pstmt:ret=" + ret);
+            catch(Exception e3)
+            {
+                Log.i(TAG, "ERR:GLRI:001:" + e3.getMessage());
+                try
+                {
+                    lastrowid_pstmt.close();
+                }
+                catch(Exception e4)
+                {
+                }
+            }
             return ret;
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            Log.i(TAG, "get_last_rowid_pstmt:EE1:" + e.getMessage());
+            Log.i(TAG, "ERR:GLRI:002:" + e.getMessage());
             return -1;
         }
-    }
-
-    public static long get_last_rowid(Statement statement)
-    {
-        try
+        finally
         {
-            long ret = -1;
-            ResultSet rs = statement.executeQuery("select last_insert_rowid() as lastrowid");
-            if (rs.next())
-            {
-                ret = rs.getLong("lastrowid");
-            }
-            // Log.i(TAG, "get_last_rowid:ret=" + ret);
-            return ret;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            Log.i(TAG, "get_last_rowid:EE1:" + e.getMessage());
-            return -1;
+            // orma_global_sqlgetlastrowid_lock.unlock();
         }
     }
 
@@ -238,15 +280,34 @@ public class OrmaDatabase
     {
         String ret = "unknown";
 
+        orma_global_sqlfreehand_lock.lock();
+        Statement statement = null;
         try
         {
-            final Statement statement = sqldb.createStatement();
+            statement = sqldb.createStatement();
             final ResultSet rs = statement.executeQuery("SELECT sqlite_version()");
             if (rs.next())
             {
                 ret = rs.getString(1);
             }
-
+            try
+            {
+                rs.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:CSQLV:001:" + e.getMessage());
+                e.printStackTrace();
+            }
+            return ret;
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "ERR:CSQLV:002:" + e.getMessage());
+            e.printStackTrace();
+        }
+        finally
+        {
             try
             {
                 statement.close();
@@ -255,12 +316,7 @@ public class OrmaDatabase
             {
                 e.printStackTrace();
             }
-
-            return ret;
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            orma_global_sqlfreehand_lock.unlock();
         }
 
         return ret;
@@ -270,28 +326,49 @@ public class OrmaDatabase
     {
         int ret = 0;
 
+        orma_global_sqlfreehand_lock.lock();
+        Statement statement = null;
         try
         {
-            Statement statement = sqldb.createStatement();
+            statement = sqldb.createStatement();
             ResultSet rs = statement.executeQuery(
                     "select db_version from orma_schema order by db_version desc limit 1");
             if (rs.next())
             {
                 ret = rs.getInt("db_version");
             }
+            try
+            {
+                rs.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:CDBV:001:" + e.getMessage());
+                e.printStackTrace();
+            }
 
             try
             {
                 statement.close();
             }
-            catch (Exception ignored)
+            catch (Exception e)
             {
+                Log.i(TAG, "ERR:CDBV:002:" + e.getMessage());
             }
 
             return ret;
         }
         catch (Exception e)
         {
+            try
+            {
+                statement.close();
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+            }
+
             ret = 0;
 
             try
@@ -303,8 +380,89 @@ public class OrmaDatabase
             }
             catch (Exception e2)
             {
+                Log.i(TAG, "ERR:CDBV:003:" + e2.getMessage());
                 e2.printStackTrace();
             }
+        }
+        finally
+        {
+            try
+            {
+                statement.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            orma_global_sqlfreehand_lock.unlock();
+        }
+
+        return ret;
+    }
+
+    public static int get_current_db_legacy_version()
+    {
+        int ret = 0;
+
+        orma_global_sqlfreehand_lock.lock();
+        Statement statement = null;
+        try
+        {
+            statement = sqldb.createStatement();
+            ResultSet rs = statement.executeQuery(
+                    "PRAGMA user_version");
+            if (rs.next())
+            {
+                ret = rs.getInt(1);
+            }
+            try
+            {
+                rs.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:CLDBV:001:" + e.getMessage());
+                e.printStackTrace();
+            }
+
+            try
+            {
+                statement.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:CLDBV:002:" + e.getMessage());
+            }
+
+            try
+            {
+                if (ret > 0)
+                {
+                    set_new_db_version(ret);
+                }
+            }
+            catch (Exception e2)
+            {
+                e2.printStackTrace();
+            }
+
+            return ret;
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                statement.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            orma_global_sqlfreehand_lock.unlock();
         }
 
         return ret;
@@ -312,6 +470,7 @@ public class OrmaDatabase
 
     public static void set_new_db_version(int new_version)
     {
+        orma_global_sqlfreehand_lock.lock();
         try
         {
             final String update_001 = "update orma_schema set db_version='" + new_version + "';";
@@ -319,38 +478,20 @@ public class OrmaDatabase
         }
         catch (Exception e2)
         {
+            Log.i(TAG, "ERR:SNDBV:001:" + e2.getMessage());
             e2.printStackTrace();
+        }
+        finally
+        {
+            orma_global_sqlfreehand_lock.unlock();
         }
     }
 
     public static int update_db(final int current_db_version)
     {
-        if (current_db_version < 1)
-        {
-            // dummy. sadly now it has to stay.
-        }
-
-        /*
-        if (current_db_version < 2)
-        {
-            try
-            {
-                final String update_001 =
-                        "alter table Message add ft_outgoing_queued BOOLEAN NOT NULL DEFAULT false;" + "\n" +
-                                "CREATE INDEX index_ft_outgoing_queued_on_Message ON Message (ft_outgoing_queued);";
-                run_multi_sql(update_001);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        */
-
-        final int new_db_version = 1;
-        set_new_db_version(new_db_version);
+        set_new_db_version(THIS_DB_SCHEMA_VERSION);
         // return the updated DB VERSION
-        return new_db_version;
+        return THIS_DB_SCHEMA_VERSION;
     }
 
     public static void shutdown()
@@ -362,25 +503,62 @@ public class OrmaDatabase
         }
         catch (Exception e2)
         {
+            Log.i(TAG, "ERR:SHUTDOWN:001:" + e2.getMessage());
             e2.printStackTrace();
-            Log.i(TAG, "SHUTDOWN:Error:" + e2.getMessage());
         }
         Log.i(TAG, "SHUTDOWN:finished");
     }
 
-    public static void init(final String database_files_dir, final String database_files_name, String password)
+    public static void init(final int db_schema_version)
     {
+        THIS_DB_SCHEMA_VERSION = db_schema_version;
+
         Log.i(TAG, "INIT:start");
         // create a database connection
         try
         {
             Class.forName("org.sqlite.JDBC");
-            sqldb = DriverManager.getConnection("jdbc:sqlite:" + database_files_dir + File.separator + database_files_name, null, password);
+            sqldb = DriverManager.getConnection("jdbc:sqlite:" + OrmaDatabase.db_file_path);
         }
         catch (Exception e)
         {
+            Log.i(TAG, "ERR:INIT:001:" + e.getMessage());
             e.printStackTrace();
-            Log.i(TAG, "INIT:R_Error:" + e.getMessage());
+        }
+
+        if (OrmaDatabase.wal_mode)
+        {
+            Log.i(TAG, "INIT:journal_mode=" + run_query_for_single_result("PRAGMA journal_mode;"));
+            Log.i(TAG, "INIT:journal_size_limit=" + run_query_for_single_result("PRAGMA journal_size_limit;"));
+
+            // set WAL mode
+            final String set_wal_mode = "PRAGMA journal_mode = WAL;";
+            run_multi_sql(set_wal_mode);
+            Log.i(TAG, "INIT:setting WAL mode");
+
+            Log.i(TAG, "INIT:journal_mode=" + run_query_for_single_result("PRAGMA journal_mode;"));
+            Log.i(TAG, "INIT:journal_size_limit=" + run_query_for_single_result("PRAGMA journal_size_limit;"));
+            Log.i(TAG, "INIT:wal_autocheckpoint=" + run_query_for_single_result("PRAGMA wal_autocheckpoint;"));
+
+            // set journal and wal size limit to 10 MB
+            final String set_journal_size_limit = "PRAGMA journal_size_limit = " + (10 * 1024 * 1024) + ";";
+            run_multi_sql(set_journal_size_limit);
+            Log.i(TAG, "INIT:setting journal_size_limit");
+
+            // set wal_autocheckpoint
+            final String set_wal_autocheckpoint = "PRAGMA wal_autocheckpoint = 1000;";
+            run_multi_sql(set_wal_autocheckpoint);
+            Log.i(TAG, "INIT:setting wal_autocheckpoint");
+
+
+            Log.i(TAG, "INIT:journal_mode=" + run_query_for_single_result("PRAGMA journal_mode;"));
+            Log.i(TAG, "INIT:journal_size_limit=" + run_query_for_single_result("PRAGMA journal_size_limit;"));
+            Log.i(TAG, "INIT:wal_autocheckpoint=" + run_query_for_single_result("PRAGMA wal_autocheckpoint;"));
+        } else {
+            // turn off WAL mode (since this setting will persist inside the database even after a restart)
+            final String set_wal_mode = "PRAGMA journal_mode = DELETE;";
+            run_multi_sql(set_wal_mode);
+            Log.i(TAG, "INIT:turning OFF WAL mode");
         }
 
         Log.i(TAG, "loaded:sqlite:" + get_current_sqlite_version());
@@ -389,11 +567,35 @@ public class OrmaDatabase
         // --------------- CREATE THE DATABASE ---------------
         // --------------- CREATE THE DATABASE ---------------
         // --------------- CREATE THE DATABASE ---------------
-        current_db_version = get_current_db_version();
-        Log.i(TAG, "trifa:current_db_version=" + current_db_version);
-        create_db(current_db_version);
-        current_db_version = update_db(current_db_version);
-        Log.i(TAG, "trifa:new_db_version=" + current_db_version);
+        current_db_schema_version = get_current_db_version();
+        Log.i(TAG, "trifa:current_db_version:A=" + current_db_schema_version);
+        if (current_db_schema_version == 0)
+        {
+            // HINT: try to read "PRAGMA user_version" and see if there is some legacy value there
+            current_db_schema_version = get_current_db_legacy_version();
+        }
+        Log.i(TAG, "trifa:current_db_version:B=" + current_db_schema_version);
+        if ((current_db_schema_version < 0) || (THIS_DB_SCHEMA_VERSION < 0))
+        {
+            Log.i(TAG, "trifa:current_db_schema_version and/or THIS_DB_SCHEMA_VERSION are negative numbers, this is not allowed!");
+        }
+        if ((current_db_schema_version == 0) && (THIS_DB_SCHEMA_VERSION == 0))
+        {
+            Log.i(TAG, "trifa:current_db_schema_version and THIS_DB_SCHEMA_VERSION are both 0, this is not allowed!");
+        }
+        if (current_db_schema_version < THIS_DB_SCHEMA_VERSION)
+        {
+            for (int cur=current_db_schema_version;cur<THIS_DB_SCHEMA_VERSION;cur++)
+            {
+                Log.i(TAG, "trifa:calling schema upgrade callback function for " + cur + " -> " + (cur + 1));
+                if (schema_upgrade_callback_function != null)
+                {
+                    schema_upgrade_callback_function.upgrade(cur, (cur + 1));
+                }
+            }
+        }
+        current_db_schema_version = update_db(current_db_schema_version);
+        Log.i(TAG, "trifa:new_db_version=" + current_db_schema_version);
         // --------------- CREATE THE DATABASE ---------------
         // --------------- CREATE THE DATABASE ---------------
         // --------------- CREATE THE DATABASE ---------------
@@ -401,61 +603,122 @@ public class OrmaDatabase
         Log.i(TAG, "INIT:finished");
     }
 
-    public static void create_db(int current_db_version)
-    {
-        try
-        {
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-    }
-
     /*
      * Runs SQL statements that are seperated by ";" character
      */
     public static void run_multi_sql(String sql_multi)
     {
+        orma_global_sqlfreehand_lock.lock();
         try
         {
             Statement statement = null;
-
-            try
-            {
-                statement = sqldb.createStatement();
-                statement.setQueryTimeout(10);  // set timeout to x sec.
-            }
-            catch (SQLException e)
-            {
-                System.err.println(e.getMessage());
-            }
 
             String[] queries = sql_multi.split(";");
             for (String query : queries)
             {
                 try
                 {
-                    // Log.i(TAG, "SQL:" + query);
+                    statement = sqldb.createStatement();
+                    statement.setQueryTimeout(10);  // set timeout to x sec.
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "ERR:MS:001:" + e.getMessage());
+                }
+
+                try
+                {
+                    if (ORMA_TRACE)
+                    {
+                        Log.i(TAG, "sql=" + query);
+                    }
                     statement.executeUpdate(query);
                 }
-                catch (SQLException e)
+                catch (Exception e)
                 {
-                    System.err.println(e.getMessage());
+                    Log.i(TAG, "ERR:MS:002:" + e.getMessage());
                 }
-            }
 
-            try
-            {
-                statement.close();
-            }
-            catch (Exception ignored)
-            {
+                try
+                {
+                    statement.close();
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "ERR:MS:003:" + e.getMessage());
+                }
             }
         }
         catch (Exception e)
         {
+            Log.i(TAG, "ERR:MS:004:" + e.getMessage());
         }
+        finally
+        {
+            orma_global_sqlfreehand_lock.unlock();
+        }
+    }
+
+    public static String run_query_for_single_result(String sql_multi)
+    {
+        String text_result = null;
+
+        orma_global_sqlfreehand_lock.lock();
+        try
+        {
+            Statement statement = null;
+
+            String[] queries = sql_multi.split(";");
+            for (String query : queries)
+            {
+                try
+                {
+                    statement = sqldb.createStatement();
+                    statement.setQueryTimeout(10);  // set timeout to x sec.
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "ERR:QSL:001:" + e.getMessage());
+                }
+
+                try
+                {
+                    if (ORMA_TRACE)
+                    {
+                        Log.i(TAG, "sql=" + query);
+                    }
+                    ResultSet rs = statement.executeQuery(query);
+                    if (rs.next())
+                    {
+                        text_result = rs.getObject(1).toString();
+                    }
+                    rs.close();
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "ERR:QSL:002:" + e.getMessage());
+                }
+
+                try
+                {
+                    statement.close();
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "ERR:QSL:003:" + e.getMessage());
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "ERR:QSL:004:" + e.getMessage());
+        }
+        finally
+        {
+            orma_global_sqlfreehand_lock.unlock();
+        }
+
+        return text_result;
     }
 
     public static boolean set_bindvars_where(final PreparedStatement statement,
@@ -480,11 +743,13 @@ public class OrmaDatabase
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
+                    Log.i(TAG, "ERR:SBV:001:" + e.getMessage());
                 }
             }
         }
         catch(Exception e1)
         {
+            Log.i(TAG, "ERR:SBV:002:" + e1.getMessage());
             return false;
         }
         return true;
@@ -521,6 +786,7 @@ public class OrmaDatabase
                 catch(Exception e)
                 {
                     e.printStackTrace();
+                    Log.i(TAG, "ERR:SBVWS:001:" + e.getMessage());
                 }
             }
             if (bind_where_count > 0)
@@ -546,11 +812,13 @@ public class OrmaDatabase
                 catch(Exception e)
                 {
                     e.printStackTrace();
+                    Log.i(TAG, "ERR:SBVWS:002:" + e.getMessage());
                 }
             }
         }
         catch(Exception e1)
         {
+            Log.i(TAG, "ERR:SBVWS:003:" + e1.getMessage());
             return false;
         }
         return true;
@@ -597,11 +865,10 @@ public class OrmaDatabase
     }
 
 
-
     public Message selectFromMessage()
     {
         Message ret = new Message();
-        ret.sql_start = "SELECT * FROM Message";
+        ret.sql_start = "SELECT * FROM \"Message\"";
         return ret;
     }
 
@@ -613,95 +880,14 @@ public class OrmaDatabase
     public Message updateMessage()
     {
         Message ret = new Message();
-        ret.sql_start = "UPDATE Message";
+        ret.sql_start = "UPDATE \"Message\"";
         return ret;
     }
 
     public Message deleteFromMessage()
     {
         Message ret = new Message();
-        ret.sql_start = "DELETE FROM Message";
-        return ret;
-    }
-
-
-    public FileDB selectFromFileDB()
-    {
-        FileDB ret = new FileDB();
-        ret.sql_start = "SELECT * FROM FileDB";
-        return ret;
-    }
-
-    public long insertIntoFileDB(FileDB obj)
-    {
-        return obj.insert();
-    }
-
-    public FileDB updateFileDB()
-    {
-        FileDB ret = new FileDB();
-        ret.sql_start = "UPDATE FileDB";
-        return ret;
-    }
-
-    public FileDB deleteFromFileDB()
-    {
-        FileDB ret = new FileDB();
-        ret.sql_start = "DELETE FROM FileDB";
-        return ret;
-    }
-
-
-    public BootstrapNodeEntryDB selectFromBootstrapNodeEntryDB()
-    {
-        BootstrapNodeEntryDB ret = new BootstrapNodeEntryDB();
-        ret.sql_start = "SELECT * FROM BootstrapNodeEntryDB";
-        return ret;
-    }
-
-    public long insertIntoBootstrapNodeEntryDB(BootstrapNodeEntryDB obj)
-    {
-        return obj.insert();
-    }
-
-    public BootstrapNodeEntryDB updateBootstrapNodeEntryDB()
-    {
-        BootstrapNodeEntryDB ret = new BootstrapNodeEntryDB();
-        ret.sql_start = "UPDATE BootstrapNodeEntryDB";
-        return ret;
-    }
-
-    public BootstrapNodeEntryDB deleteFromBootstrapNodeEntryDB()
-    {
-        BootstrapNodeEntryDB ret = new BootstrapNodeEntryDB();
-        ret.sql_start = "DELETE FROM BootstrapNodeEntryDB";
-        return ret;
-    }
-
-
-    public GroupPeerDB selectFromGroupPeerDB()
-    {
-        GroupPeerDB ret = new GroupPeerDB();
-        ret.sql_start = "SELECT * FROM GroupPeerDB";
-        return ret;
-    }
-
-    public long insertIntoGroupPeerDB(GroupPeerDB obj)
-    {
-        return obj.insert();
-    }
-
-    public GroupPeerDB updateGroupPeerDB()
-    {
-        GroupPeerDB ret = new GroupPeerDB();
-        ret.sql_start = "UPDATE GroupPeerDB";
-        return ret;
-    }
-
-    public GroupPeerDB deleteFromGroupPeerDB()
-    {
-        GroupPeerDB ret = new GroupPeerDB();
-        ret.sql_start = "DELETE FROM GroupPeerDB";
+        ret.sql_start = "DELETE FROM \"Message\"";
         return ret;
     }
 
@@ -709,7 +895,7 @@ public class OrmaDatabase
     public TRIFADatabaseGlobalsNew selectFromTRIFADatabaseGlobalsNew()
     {
         TRIFADatabaseGlobalsNew ret = new TRIFADatabaseGlobalsNew();
-        ret.sql_start = "SELECT * FROM TRIFADatabaseGlobalsNew";
+        ret.sql_start = "SELECT * FROM \"TRIFADatabaseGlobalsNew\"";
         return ret;
     }
 
@@ -721,149 +907,41 @@ public class OrmaDatabase
     public TRIFADatabaseGlobalsNew updateTRIFADatabaseGlobalsNew()
     {
         TRIFADatabaseGlobalsNew ret = new TRIFADatabaseGlobalsNew();
-        ret.sql_start = "UPDATE TRIFADatabaseGlobalsNew";
+        ret.sql_start = "UPDATE \"TRIFADatabaseGlobalsNew\"";
         return ret;
     }
 
     public TRIFADatabaseGlobalsNew deleteFromTRIFADatabaseGlobalsNew()
     {
         TRIFADatabaseGlobalsNew ret = new TRIFADatabaseGlobalsNew();
-        ret.sql_start = "DELETE FROM TRIFADatabaseGlobalsNew";
+        ret.sql_start = "DELETE FROM \"TRIFADatabaseGlobalsNew\"";
         return ret;
     }
 
 
-    public Filetransfer selectFromFiletransfer()
+    public FileDB selectFromFileDB()
     {
-        Filetransfer ret = new Filetransfer();
-        ret.sql_start = "SELECT * FROM Filetransfer";
+        FileDB ret = new FileDB();
+        ret.sql_start = "SELECT * FROM \"FileDB\"";
         return ret;
     }
 
-    public long insertIntoFiletransfer(Filetransfer obj)
+    public long insertIntoFileDB(FileDB obj)
     {
         return obj.insert();
     }
 
-    public Filetransfer updateFiletransfer()
+    public FileDB updateFileDB()
     {
-        Filetransfer ret = new Filetransfer();
-        ret.sql_start = "UPDATE Filetransfer";
+        FileDB ret = new FileDB();
+        ret.sql_start = "UPDATE \"FileDB\"";
         return ret;
     }
 
-    public Filetransfer deleteFromFiletransfer()
+    public FileDB deleteFromFileDB()
     {
-        Filetransfer ret = new Filetransfer();
-        ret.sql_start = "DELETE FROM Filetransfer";
-        return ret;
-    }
-
-
-    public GroupMessage selectFromGroupMessage()
-    {
-        GroupMessage ret = new GroupMessage();
-        ret.sql_start = "SELECT * FROM GroupMessage";
-        return ret;
-    }
-
-    public long insertIntoGroupMessage(GroupMessage obj)
-    {
-        return obj.insert();
-    }
-
-    public GroupMessage updateGroupMessage()
-    {
-        GroupMessage ret = new GroupMessage();
-        ret.sql_start = "UPDATE GroupMessage";
-        return ret;
-    }
-
-    public GroupMessage deleteFromGroupMessage()
-    {
-        GroupMessage ret = new GroupMessage();
-        ret.sql_start = "DELETE FROM GroupMessage";
-        return ret;
-    }
-
-
-    public ConferencePeerCacheDB selectFromConferencePeerCacheDB()
-    {
-        ConferencePeerCacheDB ret = new ConferencePeerCacheDB();
-        ret.sql_start = "SELECT * FROM ConferencePeerCacheDB";
-        return ret;
-    }
-
-    public long insertIntoConferencePeerCacheDB(ConferencePeerCacheDB obj)
-    {
-        return obj.insert();
-    }
-
-    public ConferencePeerCacheDB updateConferencePeerCacheDB()
-    {
-        ConferencePeerCacheDB ret = new ConferencePeerCacheDB();
-        ret.sql_start = "UPDATE ConferencePeerCacheDB";
-        return ret;
-    }
-
-    public ConferencePeerCacheDB deleteFromConferencePeerCacheDB()
-    {
-        ConferencePeerCacheDB ret = new ConferencePeerCacheDB();
-        ret.sql_start = "DELETE FROM ConferencePeerCacheDB";
-        return ret;
-    }
-
-
-    public RelayListDB selectFromRelayListDB()
-    {
-        RelayListDB ret = new RelayListDB();
-        ret.sql_start = "SELECT * FROM RelayListDB";
-        return ret;
-    }
-
-    public long insertIntoRelayListDB(RelayListDB obj)
-    {
-        return obj.insert();
-    }
-
-    public RelayListDB updateRelayListDB()
-    {
-        RelayListDB ret = new RelayListDB();
-        ret.sql_start = "UPDATE RelayListDB";
-        return ret;
-    }
-
-    public RelayListDB deleteFromRelayListDB()
-    {
-        RelayListDB ret = new RelayListDB();
-        ret.sql_start = "DELETE FROM RelayListDB";
-        return ret;
-    }
-
-
-    public FriendList selectFromFriendList()
-    {
-        FriendList ret = new FriendList();
-        ret.sql_start = "SELECT * FROM FriendList";
-        return ret;
-    }
-
-    public long insertIntoFriendList(FriendList obj)
-    {
-        return obj.insert();
-    }
-
-    public FriendList updateFriendList()
-    {
-        FriendList ret = new FriendList();
-        ret.sql_start = "UPDATE FriendList";
-        return ret;
-    }
-
-    public FriendList deleteFromFriendList()
-    {
-        FriendList ret = new FriendList();
-        ret.sql_start = "DELETE FROM FriendList";
+        FileDB ret = new FileDB();
+        ret.sql_start = "DELETE FROM \"FileDB\"";
         return ret;
     }
 
@@ -871,7 +949,7 @@ public class OrmaDatabase
     public GroupDB selectFromGroupDB()
     {
         GroupDB ret = new GroupDB();
-        ret.sql_start = "SELECT * FROM GroupDB";
+        ret.sql_start = "SELECT * FROM \"GroupDB\"";
         return ret;
     }
 
@@ -883,14 +961,14 @@ public class OrmaDatabase
     public GroupDB updateGroupDB()
     {
         GroupDB ret = new GroupDB();
-        ret.sql_start = "UPDATE GroupDB";
+        ret.sql_start = "UPDATE \"GroupDB\"";
         return ret;
     }
 
     public GroupDB deleteFromGroupDB()
     {
         GroupDB ret = new GroupDB();
-        ret.sql_start = "DELETE FROM GroupDB";
+        ret.sql_start = "DELETE FROM \"GroupDB\"";
         return ret;
     }
 
@@ -898,7 +976,7 @@ public class OrmaDatabase
     public ConferenceMessage selectFromConferenceMessage()
     {
         ConferenceMessage ret = new ConferenceMessage();
-        ret.sql_start = "SELECT * FROM ConferenceMessage";
+        ret.sql_start = "SELECT * FROM \"ConferenceMessage\"";
         return ret;
     }
 
@@ -910,14 +988,95 @@ public class OrmaDatabase
     public ConferenceMessage updateConferenceMessage()
     {
         ConferenceMessage ret = new ConferenceMessage();
-        ret.sql_start = "UPDATE ConferenceMessage";
+        ret.sql_start = "UPDATE \"ConferenceMessage\"";
         return ret;
     }
 
     public ConferenceMessage deleteFromConferenceMessage()
     {
         ConferenceMessage ret = new ConferenceMessage();
-        ret.sql_start = "DELETE FROM ConferenceMessage";
+        ret.sql_start = "DELETE FROM \"ConferenceMessage\"";
+        return ret;
+    }
+
+
+    public FriendList selectFromFriendList()
+    {
+        FriendList ret = new FriendList();
+        ret.sql_start = "SELECT * FROM \"FriendList\"";
+        return ret;
+    }
+
+    public long insertIntoFriendList(FriendList obj)
+    {
+        return obj.insert();
+    }
+
+    public FriendList updateFriendList()
+    {
+        FriendList ret = new FriendList();
+        ret.sql_start = "UPDATE \"FriendList\"";
+        return ret;
+    }
+
+    public FriendList deleteFromFriendList()
+    {
+        FriendList ret = new FriendList();
+        ret.sql_start = "DELETE FROM \"FriendList\"";
+        return ret;
+    }
+
+
+    public RelayListDB selectFromRelayListDB()
+    {
+        RelayListDB ret = new RelayListDB();
+        ret.sql_start = "SELECT * FROM \"RelayListDB\"";
+        return ret;
+    }
+
+    public long insertIntoRelayListDB(RelayListDB obj)
+    {
+        return obj.insert();
+    }
+
+    public RelayListDB updateRelayListDB()
+    {
+        RelayListDB ret = new RelayListDB();
+        ret.sql_start = "UPDATE \"RelayListDB\"";
+        return ret;
+    }
+
+    public RelayListDB deleteFromRelayListDB()
+    {
+        RelayListDB ret = new RelayListDB();
+        ret.sql_start = "DELETE FROM \"RelayListDB\"";
+        return ret;
+    }
+
+
+    public GroupPeerDB selectFromGroupPeerDB()
+    {
+        GroupPeerDB ret = new GroupPeerDB();
+        ret.sql_start = "SELECT * FROM \"GroupPeerDB\"";
+        return ret;
+    }
+
+    public long insertIntoGroupPeerDB(GroupPeerDB obj)
+    {
+        return obj.insert();
+    }
+
+    public GroupPeerDB updateGroupPeerDB()
+    {
+        GroupPeerDB ret = new GroupPeerDB();
+        ret.sql_start = "UPDATE \"GroupPeerDB\"";
+        return ret;
+    }
+
+    public GroupPeerDB deleteFromGroupPeerDB()
+    {
+        GroupPeerDB ret = new GroupPeerDB();
+        ret.sql_start = "DELETE FROM \"GroupPeerDB\"";
         return ret;
     }
 
@@ -925,7 +1084,7 @@ public class OrmaDatabase
     public ConferenceDB selectFromConferenceDB()
     {
         ConferenceDB ret = new ConferenceDB();
-        ret.sql_start = "SELECT * FROM ConferenceDB";
+        ret.sql_start = "SELECT * FROM \"ConferenceDB\"";
         return ret;
     }
 
@@ -937,14 +1096,122 @@ public class OrmaDatabase
     public ConferenceDB updateConferenceDB()
     {
         ConferenceDB ret = new ConferenceDB();
-        ret.sql_start = "UPDATE ConferenceDB";
+        ret.sql_start = "UPDATE \"ConferenceDB\"";
         return ret;
     }
 
     public ConferenceDB deleteFromConferenceDB()
     {
         ConferenceDB ret = new ConferenceDB();
-        ret.sql_start = "DELETE FROM ConferenceDB";
+        ret.sql_start = "DELETE FROM \"ConferenceDB\"";
+        return ret;
+    }
+
+
+    public Filetransfer selectFromFiletransfer()
+    {
+        Filetransfer ret = new Filetransfer();
+        ret.sql_start = "SELECT * FROM \"Filetransfer\"";
+        return ret;
+    }
+
+    public long insertIntoFiletransfer(Filetransfer obj)
+    {
+        return obj.insert();
+    }
+
+    public Filetransfer updateFiletransfer()
+    {
+        Filetransfer ret = new Filetransfer();
+        ret.sql_start = "UPDATE \"Filetransfer\"";
+        return ret;
+    }
+
+    public Filetransfer deleteFromFiletransfer()
+    {
+        Filetransfer ret = new Filetransfer();
+        ret.sql_start = "DELETE FROM \"Filetransfer\"";
+        return ret;
+    }
+
+
+    public BootstrapNodeEntryDB selectFromBootstrapNodeEntryDB()
+    {
+        BootstrapNodeEntryDB ret = new BootstrapNodeEntryDB();
+        ret.sql_start = "SELECT * FROM \"BootstrapNodeEntryDB\"";
+        return ret;
+    }
+
+    public long insertIntoBootstrapNodeEntryDB(BootstrapNodeEntryDB obj)
+    {
+        return obj.insert();
+    }
+
+    public BootstrapNodeEntryDB updateBootstrapNodeEntryDB()
+    {
+        BootstrapNodeEntryDB ret = new BootstrapNodeEntryDB();
+        ret.sql_start = "UPDATE \"BootstrapNodeEntryDB\"";
+        return ret;
+    }
+
+    public BootstrapNodeEntryDB deleteFromBootstrapNodeEntryDB()
+    {
+        BootstrapNodeEntryDB ret = new BootstrapNodeEntryDB();
+        ret.sql_start = "DELETE FROM \"BootstrapNodeEntryDB\"";
+        return ret;
+    }
+
+
+    public ConferencePeerCacheDB selectFromConferencePeerCacheDB()
+    {
+        ConferencePeerCacheDB ret = new ConferencePeerCacheDB();
+        ret.sql_start = "SELECT * FROM \"ConferencePeerCacheDB\"";
+        return ret;
+    }
+
+    public long insertIntoConferencePeerCacheDB(ConferencePeerCacheDB obj)
+    {
+        return obj.insert();
+    }
+
+    public ConferencePeerCacheDB updateConferencePeerCacheDB()
+    {
+        ConferencePeerCacheDB ret = new ConferencePeerCacheDB();
+        ret.sql_start = "UPDATE \"ConferencePeerCacheDB\"";
+        return ret;
+    }
+
+    public ConferencePeerCacheDB deleteFromConferencePeerCacheDB()
+    {
+        ConferencePeerCacheDB ret = new ConferencePeerCacheDB();
+        ret.sql_start = "DELETE FROM \"ConferencePeerCacheDB\"";
+        return ret;
+    }
+
+
+    public GroupMessage selectFromGroupMessage()
+    {
+        GroupMessage ret = new GroupMessage();
+        ret.sql_start = "SELECT * FROM \"GroupMessage\"";
+        return ret;
+    }
+
+    public long insertIntoGroupMessage(GroupMessage obj)
+    {
+        return obj.insert();
+    }
+
+    public GroupMessage updateGroupMessage()
+    {
+        GroupMessage ret = new GroupMessage();
+        ret.sql_start = "UPDATE \"GroupMessage\"";
+        return ret;
+    }
+
+    public GroupMessage deleteFromGroupMessage()
+    {
+        GroupMessage ret = new GroupMessage();
+        ret.sql_start = "DELETE FROM \"GroupMessage\"";
         return ret;
     }
 
