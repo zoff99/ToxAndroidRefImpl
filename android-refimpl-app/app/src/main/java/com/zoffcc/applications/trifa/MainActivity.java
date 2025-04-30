@@ -2930,7 +2930,7 @@ public class MainActivity extends AppCompatActivity
             }
         });
 
-        OrmaDatabase orma = new OrmaDatabase(dbs_path, "", pref__db_wal_mode);
+        OrmaDatabase orma = new OrmaDatabase(dbs_path, pref__db_secrect_key, pref__db_wal_mode);
         try
         {
             OrmaDatabase.init(ORMA_CURRENT_DB_SCHEMA_VERSION);
