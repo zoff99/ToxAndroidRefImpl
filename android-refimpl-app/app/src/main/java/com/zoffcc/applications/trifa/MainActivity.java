@@ -102,6 +102,7 @@ import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -2930,7 +2931,14 @@ public class MainActivity extends AppCompatActivity
         });
 
         OrmaDatabase orma = new OrmaDatabase(dbs_path, "", pref__db_wal_mode);
-        OrmaDatabase.init(ORMA_CURRENT_DB_SCHEMA_VERSION);
+        try
+        {
+            OrmaDatabase.init(ORMA_CURRENT_DB_SCHEMA_VERSION);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
 
         return orma;
     }

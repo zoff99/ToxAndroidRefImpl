@@ -81,10 +81,7 @@ public class OrmaDatabase
         {
             return Base64.getEncoder().encodeToString(bytes);
         }
-        else
-        {
-            return null;
-        }
+        return null;
     }
 
     public static String sha256sum_of_file(String filename_with_path)
@@ -494,6 +491,45 @@ public class OrmaDatabase
         return THIS_DB_SCHEMA_VERSION;
     }
 
+    private static boolean check_db_open()
+    {
+        boolean ret2 = false;
+        try
+        {
+            Statement statement = sqldb.createStatement();
+            ResultSet rs = statement.executeQuery(
+                    "SELECT count(*) as sqlite_master_count FROM sqlite_master");
+            if (rs.next())
+            {
+                long ret3 = rs.getLong("sqlite_master_count");
+                ret2 = true;
+            }
+            else
+            {
+                Log.i(TAG, "ERR:CHECK_DB_OPEN:001:can not read sqlite_master table");
+                throw new RuntimeException();
+            }
+
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+                Log.i(TAG, "ERR:CHECK_DB_OPEN:002:can not close statement");
+                throw new RuntimeException();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "ERR:CHECK_DB_OPEN:003:some other error opening the DB");
+            throw new RuntimeException(e);
+        }
+        Log.i(TAG, "INFO:CHECK_DB_OPEN:003:DB is open");
+        return ret2;
+    }
+
     public static void shutdown()
     {
         Log.i(TAG, "SHUTDOWN:start");
@@ -509,7 +545,7 @@ public class OrmaDatabase
         Log.i(TAG, "SHUTDOWN:finished");
     }
 
-    public static void init(final int db_schema_version)
+    public static void init(final int db_schema_version) throws Exception
     {
         THIS_DB_SCHEMA_VERSION = db_schema_version;
 
@@ -518,13 +554,23 @@ public class OrmaDatabase
         try
         {
             Class.forName("org.sqlite.JDBC");
-            sqldb = DriverManager.getConnection("jdbc:sqlite:" + OrmaDatabase.db_file_path);
         }
-        catch (Exception e)
+        catch(Exception e)
         {
-            Log.i(TAG, "ERR:INIT:001:" + e.getMessage());
-            e.printStackTrace();
         }
+
+        try
+        {
+            // HINT: "user" is always "NULL" here
+            sqldb = DriverManager.getConnection("jdbc:sqlite:" + OrmaDatabase.db_file_path, null, OrmaDatabase.secrect_key);
+        }
+        catch(Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        // HINT: check if the database can be opened (e.g. the password for an sqlcipher db is correct), if not throw RuntimeException
+        check_db_open();
 
         if (OrmaDatabase.wal_mode)
         {
@@ -568,13 +614,12 @@ public class OrmaDatabase
         // --------------- CREATE THE DATABASE ---------------
         // --------------- CREATE THE DATABASE ---------------
         current_db_schema_version = get_current_db_version();
-        Log.i(TAG, "trifa:current_db_version:A=" + current_db_schema_version);
         if (current_db_schema_version == 0)
         {
             // HINT: try to read "PRAGMA user_version" and see if there is some legacy value there
             current_db_schema_version = get_current_db_legacy_version();
         }
-        Log.i(TAG, "trifa:current_db_version:B=" + current_db_schema_version);
+        Log.i(TAG, "trifa:current_db_version=" + current_db_schema_version);
         if ((current_db_schema_version < 0) || (THIS_DB_SCHEMA_VERSION < 0))
         {
             Log.i(TAG, "trifa:current_db_schema_version and/or THIS_DB_SCHEMA_VERSION are negative numbers, this is not allowed!");
@@ -659,7 +704,7 @@ public class OrmaDatabase
         }
     }
 
-    public static String run_query_for_single_result(String sql_multi)
+    public static String run_query_for_single_result(String sql_query)
     {
         String text_result = null;
 
@@ -667,46 +712,41 @@ public class OrmaDatabase
         try
         {
             Statement statement = null;
-
-            String[] queries = sql_multi.split(";");
-            for (String query : queries)
+            try
             {
-                try
-                {
-                    statement = sqldb.createStatement();
-                    statement.setQueryTimeout(10);  // set timeout to x sec.
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "ERR:QSL:001:" + e.getMessage());
-                }
+                statement = sqldb.createStatement();
+                statement.setQueryTimeout(10);  // set timeout to x sec.
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:QSL:001:" + e.getMessage());
+            }
 
-                try
+            try
+            {
+                if (ORMA_TRACE)
                 {
-                    if (ORMA_TRACE)
-                    {
-                        Log.i(TAG, "sql=" + query);
-                    }
-                    ResultSet rs = statement.executeQuery(query);
-                    if (rs.next())
-                    {
-                        text_result = rs.getObject(1).toString();
-                    }
-                    rs.close();
+                    Log.i(TAG, "sql=" + sql_query);
                 }
-                catch (Exception e)
+                ResultSet rs = statement.executeQuery(sql_query);
+                if (rs.next())
                 {
-                    Log.i(TAG, "ERR:QSL:002:" + e.getMessage());
+                    text_result = rs.getObject(1).toString();
                 }
+                rs.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:QSL:002:" + e.getMessage());
+            }
 
-                try
-                {
-                    statement.close();
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "ERR:QSL:003:" + e.getMessage());
-                }
+            try
+            {
+                statement.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:QSL:003:" + e.getMessage());
             }
         }
         catch (Exception e)

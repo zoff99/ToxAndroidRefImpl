@@ -539,7 +539,7 @@ public class OrmaDatabase
         Log.i(TAG, "SHUTDOWN:finished");
     }
 
-    public static void init(final int db_schema_version)
+    public static void init(final int db_schema_version) throws Exception
     {
         THIS_DB_SCHEMA_VERSION = db_schema_version;
 
@@ -548,13 +548,19 @@ public class OrmaDatabase
         try
         {
             Class.forName("org.sqlite.JDBC");
+        }
+        catch(Exception e)
+        {
+        }
+
+        try
+        {
             // HINT: "user" is always "NULL" here
             sqldb = DriverManager.getConnection("jdbc:sqlite:" + OrmaDatabase.db_file_path, null, OrmaDatabase.secrect_key);
         }
-        catch (Exception e)
+        catch(Exception e)
         {
-            Log.i(TAG, "ERR:INIT:001:" + e.getMessage());
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
 
         // HINT: check if the database can be opened (e.g. the password for an sqlcipher db is correct), if not throw RuntimeException
