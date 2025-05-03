@@ -38,6 +38,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.FriendList;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
@@ -536,7 +537,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         try
         {
             int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
-                    fl.tox_public_key_string).and().is_newEq(true).count();
+                    fl.tox_public_key_string).is_newEq(true).count();
             if (new_messages_count > 0)
             {
                 if (new_messages_count > 99)

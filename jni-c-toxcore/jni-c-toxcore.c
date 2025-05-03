@@ -3196,6 +3196,21 @@ Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single(JNIEnv *
 
 int bootstrap_single(Tox *tox, const char *ip, uint16_t port, const char *key_hex)
 {
+    if (ip == NULL)
+    {
+        return 1;
+    }
+
+    if (key_hex == NULL)
+    {
+        return 1;
+    }
+
+    if (tox_global == NULL)
+    {
+        return 1;
+    }
+
     unsigned char key_bin[TOX_PUBLIC_KEY_SIZE];
     toxpk_hex_to_bin(key_bin, key_hex);
     TOX_ERR_BOOTSTRAP error;

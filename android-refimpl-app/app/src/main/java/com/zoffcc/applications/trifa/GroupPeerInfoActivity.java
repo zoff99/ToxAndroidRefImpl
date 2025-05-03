@@ -33,6 +33,8 @@ import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.GroupPeerDB;
 
 import java.util.Random;
 
@@ -245,7 +247,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
         peer_first_join_text.setText("unknown");
         try
         {
-           GroupPeerDB peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_id).
+           GroupPeerDB peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(group_id).
                     tox_group_peer_pubkeyEq(peer_pubkey).toList().get(0);
             peer_first_join_text.setText(long_date_time_format(peer_from_db.first_join_timestamp));
         }

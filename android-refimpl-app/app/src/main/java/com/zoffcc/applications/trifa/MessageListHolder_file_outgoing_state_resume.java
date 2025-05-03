@@ -42,6 +42,8 @@ import com.luseen.autolinklibrary.EmojiTextViewLinks;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.Message;
 
 import java.net.URLConnection;
 
@@ -198,7 +200,7 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
         // Log.i(TAG, "getView:033:STATE:RESUME:ft_id=" + ft_id);
         if (ft_id != -1)
         {
-            final Filetransfer ft_ = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+            final Filetransfer ft_ = (Filetransfer) orma.selectFromFiletransfer().idEq(ft_id).get(0);
             final int percent = (int) (100f * (float) ft_.current_position / (float) ft_.filesize);
             // Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
             ft_progressbar.setProgress(percent);

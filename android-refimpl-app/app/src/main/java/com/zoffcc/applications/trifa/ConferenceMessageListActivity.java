@@ -53,6 +53,8 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.FriendList;
 
 import androidx.annotation.Px;
 import androidx.appcompat.app.AppCompatActivity;
@@ -1120,7 +1122,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
                                         try
                                         {
-                                            fl_temp = orma.selectFromFriendList().
+                                            fl_temp = (FriendList) orma.selectFromFriendList().
                                                     tox_public_key_stringEq(peer_pubkey).toList().get(0);
 
                                             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))

@@ -29,6 +29,9 @@ import android.os.Build;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
+import com.zoffcc.applications.sorm.FileDB;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.Message;
 import com.zoffcc.applications.trifa.MessageListActivity.outgoing_file_wrapped;
 
 import java.io.BufferedOutputStream;
@@ -241,7 +244,6 @@ public class HelperFiletransfer
             // Log.i(TAG, "get_filetransfer_id_from_friendnum_and_filenum:friend_number=" + friend_number + " file_number=" + file_number);
             long ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
                     file_numberEq(file_number).
                     orderByIdDesc().
                     toList().
@@ -277,7 +279,7 @@ public class HelperFiletransfer
         try
         {
             delete_filetransfer_tmpfile(orma.selectFromFiletransfer().tox_public_key_stringEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).and().file_numberEq(
+                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).file_numberEq(
                     file_number).get(0).id);
         }
         catch (Exception e)
@@ -290,7 +292,7 @@ public class HelperFiletransfer
     {
         try
         {
-            Filetransfer ft = orma.selectFromFiletransfer().idEq(filetransfer_id).get(0);
+            Filetransfer ft = (Filetransfer) orma.selectFromFiletransfer().idEq(filetransfer_id).get(0);
 
             if (MainActivity.VFS_ENCRYPT)
             {
@@ -453,7 +455,6 @@ public class HelperFiletransfer
         {
             set_filetransfer_for_message_from_filetransfer_id(orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
                     file_numberEq(file_number).
                     orderByIdDesc().
                     get(0).id, ft_id);
@@ -482,7 +483,6 @@ public class HelperFiletransfer
         {
             long del_ft_id = orma.selectFromFiletransfer().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
-                    and().
                     file_numberEq(file_number).
                     orderByIdDesc().
                     get(0).id;
@@ -594,9 +594,8 @@ public class HelperFiletransfer
 
         try
         {
-            f = orma.selectFromFiletransfer().
+            f = (Filetransfer) orma.selectFromFiletransfer().
                     file_numberEq(file_number).
-                    and().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     orderByIdDesc().
                     toList().get(0);
@@ -704,11 +703,11 @@ public class HelperFiletransfer
     {
         try
         {
-            List<Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).toList();
-            for (Filetransfer f : fts_active)
+            List<com.zoffcc.applications.sorm.Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).toList();
+            for (com.zoffcc.applications.sorm.Filetransfer f : fts_active)
             {
                 // Log.i(TAG, "set_all_filetransfers_inactive:cancel:id=" + f.tox_file_id_hex + " filename=" + f.file_name);
-                cancel_filetransfer_f(f);
+                cancel_filetransfer_f((Filetransfer) f);
             }
 
             orma.updateFiletransfer().
@@ -728,7 +727,6 @@ public class HelperFiletransfer
     {
         orma.updateFiletransfer().
                 tox_public_key_stringEq(f.tox_public_key_string).
-                and().
                 file_numberEq(f.file_number).
                 current_position(f.current_position).
                 execute();
@@ -789,14 +787,7 @@ public class HelperFiletransfer
         try
         {
             long row_id = orma.insertIntoFiletransfer(f);
-            // Log.i(TAG, "insert_into_filetransfer_db:row_id=" + row_id);
-            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM Filetransfer where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            // Log.i(TAG, "insert_into_filetransfer_db:id res count=" + cursor.getColumnCount());
-            long ft_id = cursor.getLong(0);
-            cursor.close();
-            // Log.i(TAG, "insert_into_filetransfer_db:ft_id=" + ft_id);
-            return ft_id;
+            return row_id;
         }
         catch (Exception e)
         {
@@ -933,7 +924,7 @@ public class HelperFiletransfer
             // update message view
             update_single_message_from_messge_id(m.id, true);
 
-            Filetransfer ft = orma.selectFromFiletransfer().
+            Filetransfer ft = (Filetransfer) orma.selectFromFiletransfer().
                     idEq(m.filetransfer_id).
                     orderByIdDesc().get(0);
 
@@ -1152,7 +1143,7 @@ public class HelperFiletransfer
         try
         {
             final String export_filename = SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey + "/";
-            final FileDB file_ = orma.selectFromFileDB().idEq(m.filedb_id).get(0);
+            final FileDB file_ = (FileDB) orma.selectFromFileDB().idEq(m.filedb_id).get(0);
             java.io.File f = new java.io.File(export_filename + file_.file_name);
             if (f.exists() && (f.isFile()) && (f.canRead() && (f.length() > 0)))
             {

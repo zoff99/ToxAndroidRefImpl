@@ -27,6 +27,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -38,7 +42,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
-import static com.zoffcc.applications.trifa.FriendList.deep_copy;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ONE_HOUR_IN_MS;
@@ -168,13 +171,13 @@ public class FriendListFragment extends Fragment
                 {
                     try
                     {
-                        final FriendList f2 = orma.selectFromFriendList().
+                        final FriendList f2 = (FriendList) orma.selectFromFriendList().
                                 tox_public_key_stringEq(f.tox_public_key_string).
                                 toList().get(0);
 
                         if (f2 != null)
                         {
-                            FriendList n = deep_copy(f2);
+                            FriendList n = (FriendList) com.zoffcc.applications.sorm.FriendList.deep_copy(f2);
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                             cfac.is_friend = COMBINED_IS_FRIEND;
                             cfac.friend_item = n;
@@ -222,13 +225,13 @@ public class FriendListFragment extends Fragment
                     {
                         // who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
                         // and().
-                        final GroupDB conf2 = orma.selectFromGroupDB().
+                        final GroupDB conf2 = (GroupDB) orma.selectFromGroupDB().
                                 group_identifierEq(cc.group_identifier.toLowerCase()).
                                 toList().get(0);
 
                         if (conf2 != null)
                         {
-                            GroupDB n = GroupDB.deep_copy(conf2);
+                            GroupDB n = (GroupDB) GroupDB.deep_copy(conf2);
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                             cfac.is_friend = COMBINED_IS_GROUP;
                             cfac.group_item = n;
@@ -276,13 +279,13 @@ public class FriendListFragment extends Fragment
                     {
                         // who_invited__tox_public_key_stringEq(cc.who_invited__tox_public_key_string).
                         // and().
-                        final ConferenceDB conf2 = orma.selectFromConferenceDB().
+                        final ConferenceDB conf2 = (ConferenceDB) orma.selectFromConferenceDB().
                                 conference_identifierEq(cc.conference_identifier).
                                 toList().get(0);
 
                         if (conf2 != null)
                         {
-                            ConferenceDB n = ConferenceDB.deep_copy(conf2);
+                            ConferenceDB n = (ConferenceDB) ConferenceDB.deep_copy(conf2);
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                             cfac.is_friend = COMBINED_IS_CONFERENCE;
                             cfac.conference_item = n;
@@ -373,7 +376,7 @@ public class FriendListFragment extends Fragment
                 {
                     // reload friendlist
                     Log.i(TAG, "onResume:AA");
-                    List<FriendList> fl = orma.selectFromFriendList().
+                    List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
                             is_relayNotEq(true).
                             orderByTOX_CONNECTION_on_offDesc().
                             orderByNotification_silentAsc().
@@ -388,7 +391,7 @@ public class FriendListFragment extends Fragment
                             int i = 0;
                             for (i = 0; i < fl.size(); i++)
                             {
-                                FriendList n = deep_copy(fl.get(i));
+                                FriendList n = (FriendList) com.zoffcc.applications.sorm.FriendList.deep_copy(fl.get(i));
                                 final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_FRIEND;
                                 cc.friend_item = n;
@@ -399,7 +402,7 @@ public class FriendListFragment extends Fragment
                     }
 
                     // reload conferences
-                    List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                    List<com.zoffcc.applications.sorm.ConferenceDB> confs = orma.selectFromConferenceDB().
                             orderByConference_activeDesc().
                             orderByNotification_silentAsc().
                             toList();
@@ -411,7 +414,7 @@ public class FriendListFragment extends Fragment
                             int i = 0;
                             for (i = 0; i < confs.size(); i++)
                             {
-                                ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
+                                ConferenceDB n = (ConferenceDB) ConferenceDB.deep_copy(confs.get(i));
                                 CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                                 cfac.is_friend = COMBINED_IS_CONFERENCE;
                                 cfac.conference_item = n;
@@ -422,7 +425,7 @@ public class FriendListFragment extends Fragment
                     }
 
                     // reload groups
-                    List<GroupDB> groups = orma.selectFromGroupDB().
+                    List<com.zoffcc.applications.sorm.GroupDB> groups = orma.selectFromGroupDB().
                             orderByNotification_silentAsc().
                             toList();
 
@@ -433,7 +436,7 @@ public class FriendListFragment extends Fragment
                             int i = 0;
                             for (i = 0; i < groups.size(); i++)
                             {
-                                GroupDB n = GroupDB.deep_copy(groups.get(i));
+                                GroupDB n = (GroupDB) GroupDB.deep_copy(groups.get(i));
                                 CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                                 cfac.is_friend = COMBINED_IS_GROUP;
                                 cfac.group_item = n;
@@ -464,7 +467,7 @@ public class FriendListFragment extends Fragment
             {
                 // reload friendlist
                 Log.i(TAG, "onResume:AA");
-                List<FriendList> fl = orma.selectFromFriendList().
+                List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
                         is_relayNotEq(true).
                         orderByTOX_CONNECTION_on_offDesc().
                         orderByNotification_silentAsc().
@@ -479,7 +482,7 @@ public class FriendListFragment extends Fragment
                         int i = 0;
                         for (i = 0; i < fl.size(); i++)
                         {
-                            FriendList n = deep_copy(fl.get(i));
+                            FriendList n = (FriendList) com.zoffcc.applications.sorm.FriendList.deep_copy(fl.get(i));
                             final CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                             cc.is_friend = COMBINED_IS_FRIEND;
                             cc.friend_item = n;
@@ -490,7 +493,7 @@ public class FriendListFragment extends Fragment
                 }
 
                 // reload conferences
-                List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                List<com.zoffcc.applications.sorm.ConferenceDB> confs = orma.selectFromConferenceDB().
                         orderByConference_activeDesc().
                         orderByNotification_silentAsc().
                         toList();
@@ -502,7 +505,7 @@ public class FriendListFragment extends Fragment
                         int i = 0;
                         for (i = 0; i < confs.size(); i++)
                         {
-                            ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
+                            ConferenceDB n = (ConferenceDB) ConferenceDB.deep_copy(confs.get(i));
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                             cfac.is_friend = COMBINED_IS_CONFERENCE;
                             cfac.conference_item = n;
@@ -513,7 +516,7 @@ public class FriendListFragment extends Fragment
                 }
 
                 // reload groups
-                List<GroupDB> groups = orma.selectFromGroupDB().
+                List<com.zoffcc.applications.sorm.GroupDB> groups = orma.selectFromGroupDB().
                         orderByNotification_silentAsc().
                         toList();
 
@@ -524,7 +527,7 @@ public class FriendListFragment extends Fragment
                         int i = 0;
                         for (i = 0; i < groups.size(); i++)
                         {
-                            GroupDB n = GroupDB.deep_copy(groups.get(i));
+                            GroupDB n = (GroupDB) GroupDB.deep_copy(groups.get(i));
                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                             cfac.is_friend = COMBINED_IS_GROUP;
                             cfac.group_item = n;
@@ -580,7 +583,7 @@ public class FriendListFragment extends Fragment
                                 adapter.clear_items(); // clears friends AND conferences!!
 
                                 // ------------- add friends that were added recently first -------------
-                                List<FriendList> fl = orma.selectFromFriendList().
+                                List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
                                         is_relayNotEq(true).
                                         added_timestampGt(System.currentTimeMillis() - ONE_HOUR_IN_MS).
                                         orderByTOX_CONNECTION_on_offDesc().
@@ -596,7 +599,7 @@ public class FriendListFragment extends Fragment
                                         int i = 0;
                                         for (i = 0; i < fl.size(); i++)
                                         {
-                                            FriendList n = FriendList.deep_copy(fl.get(i));
+                                            FriendList n = (FriendList) FriendList.deep_copy(fl.get(i));
                                             CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
                                             cfac.is_friend = COMBINED_IS_FRIEND;
                                             cfac.friend_item = n;
@@ -608,7 +611,7 @@ public class FriendListFragment extends Fragment
                                 // ------------- add friends that were added recently first -------------
 
                                 // ------------- add rest of friends (with new messages) -------------
-                                List<FriendList> fl2m = orma.selectFromFriendList().
+                                List<com.zoffcc.applications.sorm.FriendList> fl2m = orma.selectFromFriendList().
                                         is_relayNotEq(true).
                                         added_timestampLe(System.currentTimeMillis() - ONE_HOUR_IN_MS).
                                         orderByTOX_CONNECTION_on_offDesc().
@@ -624,12 +627,12 @@ public class FriendListFragment extends Fragment
                                         int i = 0;
                                         for (i = 0; i < fl2m.size(); i++)
                                         {
-                                            FriendList n = FriendList.deep_copy(fl2m.get(i));
+                                            FriendList n = (FriendList) FriendList.deep_copy(fl2m.get(i));
 
                                             try
                                             {
                                                 int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
-                                                        n.tox_public_key_string).and().is_newEq(true).count();
+                                                        n.tox_public_key_string).is_newEq(true).count();
                                                 if (new_messages_count > 0)
                                                 {
                                                     CombinedFriendsAndConferences cfac = new CombinedFriendsAndConferences();
@@ -648,7 +651,7 @@ public class FriendListFragment extends Fragment
                                 // ------------- add rest of friends (with new messages) -------------
 
                                 // ------------- add conferences (with new messages) -------------
-                                List<ConferenceDB> confsm = orma.selectFromConferenceDB().
+                                List<com.zoffcc.applications.sorm.ConferenceDB> confsm = orma.selectFromConferenceDB().
                                         orderByConference_activeDesc().
                                         orderByNotification_silentAsc().
                                         toList();
@@ -660,12 +663,12 @@ public class FriendListFragment extends Fragment
                                         int i = 0;
                                         for (i = 0; i < confsm.size(); i++)
                                         {
-                                            ConferenceDB n = ConferenceDB.deep_copy(confsm.get(i));
+                                            ConferenceDB n = (ConferenceDB) ConferenceDB.deep_copy(confsm.get(i));
 
                                             try
                                             {
                                                 int new_messages_count = orma.selectFromConferenceMessage().
-                                                        conference_identifierEq(n.conference_identifier).and().is_newEq(
+                                                        conference_identifierEq(n.conference_identifier).is_newEq(
                                                         true).count();
 
                                                 if (new_messages_count > 0)
@@ -686,7 +689,7 @@ public class FriendListFragment extends Fragment
                                 // ------------- add conferences (with new messages) -------------
 
                                 // ------------- add groups (with new messages) -------------
-                                List<GroupDB> groupsm = orma.selectFromGroupDB().
+                                List<com.zoffcc.applications.sorm.GroupDB> groupsm = orma.selectFromGroupDB().
                                         orderByNotification_silentAsc().
                                         toList();
 
@@ -697,13 +700,13 @@ public class FriendListFragment extends Fragment
                                         int i = 0;
                                         for (i = 0; i < groupsm.size(); i++)
                                         {
-                                            GroupDB n = GroupDB.deep_copy(groupsm.get(i));
+                                            GroupDB n = (GroupDB) GroupDB.deep_copy(groupsm.get(i));
 
                                             try
                                             {
                                                 int new_messages_count = orma.selectFromGroupMessage().
                                                         group_identifierEq(
-                                                        n.group_identifier.toLowerCase()).and().is_newEq(
+                                                        n.group_identifier.toLowerCase()).is_newEq(
                                                         true).count();
 
                                                 if (new_messages_count > 0)
@@ -724,7 +727,7 @@ public class FriendListFragment extends Fragment
                                 // ------------- add groups (with new messages) -------------
 
                                 // ------------- add rest of friends  -------------
-                                List<FriendList> fl2 = orma.selectFromFriendList().
+                                List<com.zoffcc.applications.sorm.FriendList> fl2 = orma.selectFromFriendList().
                                         is_relayNotEq(true).
                                         added_timestampLe(System.currentTimeMillis() - ONE_HOUR_IN_MS).
                                         orderByTOX_CONNECTION_on_offDesc().
@@ -740,13 +743,13 @@ public class FriendListFragment extends Fragment
                                         int i = 0;
                                         for (i = 0; i < fl2.size(); i++)
                                         {
-                                            FriendList n = FriendList.deep_copy(fl2.get(i));
+                                            FriendList n = (FriendList) FriendList.deep_copy(fl2.get(i));
 
                                             int new_messages_count = 0;
                                             try
                                             {
                                                 new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
-                                                        n.tox_public_key_string).and().is_newEq(true).count();
+                                                        n.tox_public_key_string).is_newEq(true).count();
                                             }
                                             catch (Exception e)
                                             {
@@ -766,7 +769,7 @@ public class FriendListFragment extends Fragment
                                 // ------------- add rest of friends  -------------
 
                                 // ------------- add conferences -------------
-                                List<ConferenceDB> confs = orma.selectFromConferenceDB().
+                                List<com.zoffcc.applications.sorm.ConferenceDB> confs = orma.selectFromConferenceDB().
                                         orderByConference_activeDesc().
                                         orderByNotification_silentAsc().
                                         toList();
@@ -778,13 +781,13 @@ public class FriendListFragment extends Fragment
                                         int i = 0;
                                         for (i = 0; i < confs.size(); i++)
                                         {
-                                            ConferenceDB n = ConferenceDB.deep_copy(confs.get(i));
+                                            ConferenceDB n = (ConferenceDB) ConferenceDB.deep_copy(confs.get(i));
 
                                             int new_messages_count = 0;
                                             try
                                             {
                                                 new_messages_count = orma.selectFromConferenceMessage().
-                                                        conference_identifierEq(n.conference_identifier).and().is_newEq(
+                                                        conference_identifierEq(n.conference_identifier).is_newEq(
                                                         true).count();
                                             }
                                             catch (Exception e)
@@ -805,7 +808,7 @@ public class FriendListFragment extends Fragment
                                 // ------------- add conferences -------------
 
                                 // ------------- add groups -------------
-                                List<GroupDB> groups = orma.selectFromGroupDB().
+                                List<com.zoffcc.applications.sorm.GroupDB> groups = orma.selectFromGroupDB().
                                         orderByNotification_silentAsc().
                                         toList();
 
@@ -816,14 +819,14 @@ public class FriendListFragment extends Fragment
                                         int i = 0;
                                         for (i = 0; i < groups.size(); i++)
                                         {
-                                            GroupDB n = GroupDB.deep_copy(groups.get(i));
+                                            GroupDB n = (GroupDB) GroupDB.deep_copy(groups.get(i));
 
                                             int new_messages_count = 0;
                                             try
                                             {
                                                 new_messages_count = orma.selectFromGroupMessage().
                                                         group_identifierEq(
-                                                        n.group_identifier.toLowerCase()).and().is_newEq(
+                                                        n.group_identifier.toLowerCase()).is_newEq(
                                                         true).count();
                                             }
                                             catch (Exception e)

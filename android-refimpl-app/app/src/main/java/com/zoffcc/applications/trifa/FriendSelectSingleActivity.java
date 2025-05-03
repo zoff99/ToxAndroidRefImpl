@@ -28,6 +28,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
+
 import java.security.acl.Group;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +63,7 @@ public class FriendSelectSingleActivity extends ListActivity
         }
         Log.i(TAG, "onCreate:also_ngc_groups=" + also_ngc_groups);
 
-        List<FriendList> fl = null;
+        List<com.zoffcc.applications.sorm.FriendList> fl = null;
         try
         {
             if (also_offline_friends == 1)
@@ -105,7 +108,7 @@ public class FriendSelectSingleActivity extends ListActivity
             }
         }
 
-        List<GroupDB> gr = null;
+        List<com.zoffcc.applications.sorm.GroupDB> gr = null;
         if (also_ngc_groups == 1)
         {
             try

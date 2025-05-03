@@ -31,6 +31,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.zoffcc.applications.sorm.GroupPeerDB;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -350,7 +352,7 @@ public class GroupInfoActivity extends AppCompatActivity
                                 GroupPeerDB peer_from_db = null;
                                 try
                                 {
-                                    peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(
+                                    peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(
                                             group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
                                 }
                                 catch (Exception e)

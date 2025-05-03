@@ -31,6 +31,7 @@ import android.widget.TextView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.l4digital.fastscroll.FastScroller;
+import com.zoffcc.applications.sorm.ConferenceMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -473,7 +474,7 @@ public class ConferenceMessageListFragment extends Fragment
 
             boolean later_messages = false;
             boolean older_messages = false;
-            List<ConferenceMessage> ml = null;
+            List<com.zoffcc.applications.sorm.ConferenceMessage> ml = null;
 
             if ((paging) && ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0)))
             {
@@ -526,8 +527,7 @@ public class ConferenceMessageListFragment extends Fragment
                         conference_identifierEq(current_conf_id).
                         tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                         orderBySent_timestampAsc().
-                        offset(offset).
-                        limit(rowcount).
+                        limit(rowcount, offset).
                         toList();
             }
             else
@@ -536,7 +536,6 @@ public class ConferenceMessageListFragment extends Fragment
                 {
                     ml = orma.selectFromConferenceMessage().
                             conference_identifierEq(current_conf_id).
-                            and().
                             tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                             orderBySent_timestampAsc().
                             toList();
@@ -556,10 +555,9 @@ public class ConferenceMessageListFragment extends Fragment
                      */
                     ml = orma.selectFromConferenceMessage().
                             conference_identifierEq(current_conf_id).
-                            and().
                             tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                             orderBySent_timestampAsc().
-                            where(" like('" + get_sqlite_search_string(conf_search_messages_text) + "', text, '\\')").
+                            textLike(get_sqlite_search_string(conf_search_messages_text)).
                             toList();
                 }
             }
@@ -577,21 +575,21 @@ public class ConferenceMessageListFragment extends Fragment
                     add_message(m_older, false, stay_at_top);
                 }
 
-                for (ConferenceMessage message : ml)
+                for (com.zoffcc.applications.sorm.ConferenceMessage message : ml)
                 {
                     if (message == ml.get(ml.size() - 1))
                     {
-                        add_message(message, false, stay_at_top);
+                        add_message((ConferenceMessage) message, false, stay_at_top);
                     }
                     else
                     {
                         if (later_messages)
                         {
-                            add_message(message, false, stay_at_top);
+                            add_message((ConferenceMessage) message, false, stay_at_top);
                         }
                         else
                         {
-                            add_message(message, false, stay_at_top);
+                            add_message((ConferenceMessage) message, false, stay_at_top);
                         }
                     }
                 }

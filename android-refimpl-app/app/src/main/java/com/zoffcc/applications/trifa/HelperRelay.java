@@ -21,6 +21,11 @@ package com.zoffcc.applications.trifa;
 
 import android.util.Log;
 
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
+import com.zoffcc.applications.sorm.RelayListDB;
+
 import java.util.List;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
@@ -167,7 +172,7 @@ public class HelperRelay
 
     static void send_relay_pubkey_to_all_friends(String relay_public_key_string)
     {
-        List<FriendList> fl = orma.selectFromFriendList().is_relayNotEq(true).toList();
+        List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().is_relayNotEq(true).toList();
 
         if (fl != null)
         {
@@ -178,7 +183,7 @@ public class HelperRelay
 
                 for (i = 0; i < fl.size(); i++)
                 {
-                    FriendList n = fl.get(i);
+                    FriendList n = (FriendList) fl.get(i);
                     friend_num = tox_friend_by_public_key__wrapper(n.tox_public_key_string);
                     byte[] data = HelperGeneric.hex_to_bytes("FF" + relay_public_key_string);
                     data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND.value;
@@ -190,7 +195,7 @@ public class HelperRelay
 
     static void send_all_friend_pubkeys_to_relay(String relay_public_key_string)
     {
-        List<FriendList> fl = orma.selectFromFriendList().is_relayNotEq(true).toList();
+        List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().is_relayNotEq(true).toList();
 
         if (fl != null)
         {
@@ -201,7 +206,7 @@ public class HelperRelay
 
                 for (i = 0; i < fl.size(); i++)
                 {
-                    FriendList n = fl.get(i);
+                    FriendList n = (FriendList) fl.get(i);
                     byte[] data = HelperGeneric.hex_to_bytes("FF" + n.tox_public_key_string);
                     data[0] = (byte) CONTROL_PROXY_MESSAGE_TYPE_FRIEND_PUBKEY_FOR_PROXY.value;
                     tox_friend_send_lossless_packet(friend_num, data, TOX_PUBLIC_KEY_SIZE + 1);
@@ -214,8 +219,8 @@ public class HelperRelay
     {
         try
         {
-            List<ConferenceDB> c = orma.selectFromConferenceDB().conference_activeEq(
-                    true).and().tox_conference_numberNotEq(-1).toList();
+            List<com.zoffcc.applications.sorm.ConferenceDB> c = orma.selectFromConferenceDB().conference_activeEq(
+                    true).tox_conference_numberNotEq(-1).toList();
 
             if (c != null)
             {
@@ -223,7 +228,7 @@ public class HelperRelay
                 {
                     for (int i = 0; i < c.size(); i++)
                     {
-                        ConferenceDB conf = c.get(i);
+                        ConferenceDB conf = (ConferenceDB) c.get(i);
                         int res = tox_conference_invite(tox_friend_by_public_key__wrapper(relay_public_key_string),
                                                         conf.tox_conference_number);
 
@@ -251,7 +256,7 @@ public class HelperRelay
     {
         try
         {
-            List<GroupDB> c = orma.selectFromGroupDB().toList();
+            List<com.zoffcc.applications.sorm.GroupDB> c = orma.selectFromGroupDB().toList();
 
             if (c != null)
             {
@@ -259,7 +264,7 @@ public class HelperRelay
                 {
                     for (int i = 0; i < c.size(); i++)
                     {
-                        GroupDB conf = c.get(i);
+                        GroupDB conf = (GroupDB) c.get(i);
                         if (!is_group_we_left(conf.group_identifier))
                         {
                             // only send group to relay, if we have NOT left it
@@ -403,7 +408,7 @@ public class HelperRelay
         {
             String f_pubkey = orma.selectFromRelayListDB().own_relayEq(false).tox_public_key_stringEq(relay_pubkey).get(
                     0).tox_public_key_string_of_owner;
-            ret = orma.selectFromFriendList().tox_public_key_stringEq(f_pubkey).get(0);
+            ret = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(f_pubkey).get(0);
         }
         catch (Exception e)
         {
@@ -548,7 +553,7 @@ public class HelperRelay
 
         try
         {
-            final List<FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(friend_public_key).toList();
+            final List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().tox_public_key_stringEq(friend_public_key).toList();
 
             if (fl.size() == 1)
             {
@@ -632,7 +637,7 @@ public class HelperRelay
 
         try
         {
-            final List<RelayListDB> rl = orma.selectFromRelayListDB().own_relayEq(true).toList();
+            final List<com.zoffcc.applications.sorm.RelayListDB> rl = orma.selectFromRelayListDB().own_relayEq(true).toList();
 
             if (rl.size() == 1)
             {

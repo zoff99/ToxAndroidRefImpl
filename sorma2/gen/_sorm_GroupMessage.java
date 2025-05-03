@@ -1,0 +1,1 @@
+../templates/GroupMessage.java

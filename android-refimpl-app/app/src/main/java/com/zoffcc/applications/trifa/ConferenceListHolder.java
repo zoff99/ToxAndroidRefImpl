@@ -34,6 +34,7 @@ import android.widget.TextView;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.ConferenceDB;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.PopupMenu;
@@ -221,7 +222,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
         try
         {
             int new_messages_count = orma.selectFromConferenceMessage().
-                    conference_identifierEq(fl.conference_identifier).and().is_newEq(true).count();
+                    conference_identifierEq(fl.conference_identifier).is_newEq(true).count();
 
             if (new_messages_count > 0)
             {

@@ -26,6 +26,9 @@ import android.database.Cursor;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+
 import java.nio.ByteBuffer;
 import java.util.Collections;
 import java.util.Comparator;
@@ -325,9 +328,8 @@ public class HelperConference
     {
         try
         {
-            ConferenceMessage cm = orma.selectFromConferenceMessage().
+            ConferenceMessage cm = (ConferenceMessage) orma.selectFromConferenceMessage().
                     conference_identifierEq(conference_identifier.toLowerCase()).
-                    and().
                     rcvd_timestampGt(System.currentTimeMillis() - (n * 1000)).
                     orderByRcvd_timestampDesc().
                     limit(1).
@@ -353,7 +355,7 @@ public class HelperConference
 
             final int SECONDS_FOR_DOUBLE_MESSAGES_INTERVAL = 60 * 60 * 2; // 2 hours
 
-            ConferenceMessage cm = orma.selectFromConferenceMessage().
+            ConferenceMessage cm = (ConferenceMessage) orma.selectFromConferenceMessage().
                     conference_identifierEq(conference_identifier.toLowerCase()).
                     tox_peerpubkeyEq(sender_pubkey.toUpperCase()).
                     message_id_toxEq(message_id_tox.toLowerCase()).
@@ -379,24 +381,16 @@ public class HelperConference
 
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery(
-                    "SELECT id FROM ConferenceMessage where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            //Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_conference_view_flag)
+            if ((row_id != -1) && (update_conference_view_flag))
             {
-                HelperMessage.add_single_conference_message_from_messge_id(msg_id, true);
+                HelperMessage.add_single_conference_message_from_messge_id(row_id, true);
             }
-
-            return msg_id;
+            return row_id;
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            return -1;
+            return row_id;
         }
     }
 
@@ -503,7 +497,7 @@ public class HelperConference
         try
         {
             return orma.selectFromConferenceDB().
-                    conference_activeEq(true).and().
+                    conference_activeEq(true).
                     conference_identifierEq(conference_id.toLowerCase()).get(0).tox_conference_number;
         }
         catch (Exception e)
@@ -538,7 +532,7 @@ public class HelperConference
         try
         {
             String name = MainActivity.tox_conference_get_title(orma.selectFromConferenceDB().
-                    conference_activeEq(true).and().
+                    conference_activeEq(true).
                     conference_identifierEq(conference_id).get(0).tox_conference_number);
 
             if ((name == null) || (name.equals("-1")))
@@ -665,7 +659,7 @@ public class HelperConference
         try
         {
             // Log.i(TAG, "new_or_updated_conference:" + "conference_number=" + conference_identifier);
-            final ConferenceDB conf2 = orma.selectFromConferenceDB().
+            final ConferenceDB conf2 = (ConferenceDB) orma.selectFromConferenceDB().
                     conference_identifierEq(conference_identifier).toList().get(0);
             // conference already exists -> update and connect
             orma.updateConferenceDB().
@@ -677,12 +671,12 @@ public class HelperConference
             try
             {
                 Log.i(TAG, "new_or_updated_conference:*update*");
-                final ConferenceDB conf3 = orma.selectFromConferenceDB().
+                final ConferenceDB conf3 = (ConferenceDB) orma.selectFromConferenceDB().
                         conference_identifierEq(conference_identifier).toList().get(0);
                 // update or add to "friendlist"
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = COMBINED_IS_CONFERENCE;
-                cc.conference_item = ConferenceDB.deep_copy(conf3);
+                cc.conference_item = (ConferenceDB) ConferenceDB.deep_copy(conf3);
                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
             catch (Exception e3)
@@ -717,7 +711,7 @@ public class HelperConference
                     // update or add to "friendlist"
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = COMBINED_IS_CONFERENCE;
-                    cc.conference_item = ConferenceDB.deep_copy(conf_new);
+                    cc.conference_item = (ConferenceDB) ConferenceDB.deep_copy(conf_new);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                 }
                 catch (Exception e4)

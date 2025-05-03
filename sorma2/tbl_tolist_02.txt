@@ -1,0 +1,46 @@
+
+                list.add(out);
+            }
+            final long t4 = System.currentTimeMillis();
+            if (ORMA_LONG_RUNNING_TRACE)
+            {
+                if ((t4 - t3) > ORMA_LONG_RUNNING_MS)
+                {
+                    Log.i(TAG, "long running (" + (t4 - t3)+ " ms) fetch=" + sql);
+                }
+            }
+            try
+            {
+                rs.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "ERR:toList:001:" + e.getMessage());
+            e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+            orma_global_sqltolist_lock.unlock();
+        }
+
+        return list;
+    }

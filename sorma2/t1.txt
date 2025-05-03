@@ -1,0 +1,26 @@
+
+    public __@@@TABLE@@@__ selectFrom__@@@TABLE@@@__()
+    {
+        __@@@TABLE@@@__ ret = new __@@@TABLE@@@__();
+        ret.sql_start = "SELECT * FROM \"__@@@TABLE@@@__\"";
+        return ret;
+    }
+
+    public long insertInto__@@@TABLE@@@__(__@@@TABLE@@@__ obj)
+    {
+        return obj.insert();
+    }
+
+    public __@@@TABLE@@@__ update__@@@TABLE@@@__()
+    {
+        __@@@TABLE@@@__ ret = new __@@@TABLE@@@__();
+        ret.sql_start = "UPDATE \"__@@@TABLE@@@__\"";
+        return ret;
+    }
+
+    public __@@@TABLE@@@__ deleteFrom__@@@TABLE@@@__()
+    {
+        __@@@TABLE@@@__ ret = new __@@@TABLE@@@__();
+        ret.sql_start = "DELETE FROM \"__@@@TABLE@@@__\"";
+        return ret;
+    }

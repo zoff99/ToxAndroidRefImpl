@@ -33,6 +33,7 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.FriendList;
 
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_peer_get_name__wrapper;
@@ -92,7 +93,7 @@ public class ConferencePeerInfoActivity extends AppCompatActivity
 
             try
             {
-                fl_temp = orma.selectFromFriendList().
+                fl_temp = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(peer_pubkey).toList().get(0);
 
                 if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))

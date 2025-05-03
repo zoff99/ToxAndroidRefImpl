@@ -64,6 +64,8 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupDismissListener;
 import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.Message;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -989,7 +991,7 @@ public class MessageListActivity extends AppCompatActivity
 
             if (need_migrate_old_msg_date == true)
             {
-                orma.getConnection().execSQL(
+                orma.run_multi_sql(
                         "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
                         " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
                         " and msg_version='0'");
@@ -1022,7 +1024,7 @@ public class MessageListActivity extends AppCompatActivity
 
             if (need_migrate_old_ft_date == true)
             {
-                orma.getConnection().execSQL(
+                orma.run_multi_sql(
                         "update Message set sent_timestamp_ms=rcvd_timestamp_ms," + "sent_timestamp=rcvd_timestamp" +
                         " where " + " sent_timestamp_ms='0'" + " and sent_timestamp='0'" + " and direction='0'" +
                         " and TRIFA_MESSAGE_TYPE ='1'");
@@ -1804,7 +1806,7 @@ public class MessageListActivity extends AppCompatActivity
             Log.i(TAG, "add_outgoing_file:MM2MM:2:" + ft_id);
 
             // ---------- DEBUG ----------
-            Filetransfer ft_tmp = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+            Filetransfer ft_tmp = (Filetransfer) orma.selectFromFiletransfer().idEq(ft_id).get(0);
             Log.i(TAG, "add_outgoing_file:MM2MM:4a:" + "fid=" + ft_tmp.id + " mid=" + ft_tmp.message_id);
             // ---------- DEBUG ----------
 
@@ -1835,7 +1837,7 @@ public class MessageListActivity extends AppCompatActivity
 
             // ---------- DEBUG ----------
             Log.i(TAG, "add_outgoing_file:MM2MM:3:" + new_msg_id);
-            Message m_tmp = orma.selectFromMessage().idEq(new_msg_id).get(0);
+            Message m_tmp = (Message) orma.selectFromMessage().idEq(new_msg_id).get(0);
             // Log.i(TAG, "add_outgoing_file:MM2MM:4:" + m.filetransfer_id + "::" + m_tmp);
             // ---------- DEBUG ----------
 
@@ -1844,7 +1846,7 @@ public class MessageListActivity extends AppCompatActivity
             update_filetransfer_db_full(f);
 
             // ---------- DEBUG ----------
-            Filetransfer ft_tmp2 = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+            Filetransfer ft_tmp2 = (Filetransfer) orma.selectFromFiletransfer().idEq(ft_id).get(0);
             Log.i(TAG, "add_outgoing_file:MM2MM:4b:" + "fid=" + ft_tmp2.id + " mid=" + ft_tmp2.message_id);
             // ---------- DEBUG ----------
 

@@ -43,16 +43,17 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.yariksoffice.lingver.Lingver;
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.Message;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -68,7 +69,6 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.camera.core.processing.SurfaceProcessorNode;
 import info.guardianproject.netcipher.client.StrongBuilder;
 import info.guardianproject.netcipher.client.StrongOkHttpClientBuilder2;
 import okhttp3.Interceptor;
@@ -79,7 +79,6 @@ import okhttp3.Response;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_tcprelay_nodes_into_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_udp_nodes_into_db;
 import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
-import static com.zoffcc.applications.trifa.HelperGeneric.get_trifa_build_str;
 import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_for_filename;
 import static com.zoffcc.applications.trifa.HelperGeneric.touch;
@@ -111,7 +110,6 @@ import static com.zoffcc.applications.trifa.MainActivity.libsodium_version;
 import static com.zoffcc.applications.trifa.MainActivity.libvpx_version;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_TOR_USERAGENT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_NODELIST_URL;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_GITHUB_NEW_ISSUE_URL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 import static com.zoffcc.applications.trifa.TrifaSetPatternActivity.filter_out_specials_from_filepath_stricter;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -137,8 +135,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_export_encrypted_files;
     Button button_export_encrypted_chats;
     Button button_import_savedata;
-    Button button_report_issue;
-    Button reveal_passwords;
 
     Boolean button_test_ringtone_start = true;
     MediaPlayer mMediaPlayer = null;
@@ -182,8 +178,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_export_encrypted_files = (Button) findViewById(R.id.button_export_encrypted_files);
         button_export_encrypted_chats = (Button) findViewById(R.id.button_export_encrypted_chats);
         button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
-        button_report_issue = (Button) findViewById(R.id.button_report_issue);
-        reveal_passwords = (Button) findViewById(R.id.reveal_passwords);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
         debug_output = (TextView) findViewById(R.id.debug_output);
 
@@ -273,9 +267,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             try
                             {
                                 Log.i(TAG, "VACUUM:start");
-                                Cursor cursor = orma.getConnection().rawQuery("VACUUM");
-                                cursor.moveToFirst();
-                                cursor.close();
+                                orma.run_multi_sql("VACUUM");
                                 Log.i(TAG, "VACUUM:ready");
                             }
                             catch (Exception e2)
@@ -309,9 +301,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             try
                             {
                                 Log.i(TAG, "ANALYZE:start");
-                                Cursor cursor = orma.getConnection().rawQuery("ANALYZE");
-                                cursor.moveToFirst();
-                                cursor.close();
+                                orma.run_multi_sql("ANALYZE");
                                 Log.i(TAG, "ANALYZE:ready");
                             }
                             catch (Exception e2)
@@ -347,6 +337,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 }
             }
         });
+
 
         button_avatar_icons_delete.setOnClickListener(new View.OnClickListener()
         {
@@ -491,61 +482,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
-        button_report_issue.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                try
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
-                    builder.setTitle("Report a bug");
-                    builder.setMessage(
-                            "This will open a webbrowser to github.com and let you report a bug or issue");
-
-                    builder.setPositiveButton("Yes, I want to report a bug", new DialogInterface.OnClickListener()
-                    {
-                        public void onClick(DialogInterface dialog, int id)
-                        {
-                            String url = TRIFA_GITHUB_NEW_ISSUE_URL;
-                            url = url + "?labels=bug";
-                            url = url + "&title=Bug:%20";
-                            url = url + "&template=bug.yaml";
-                            try
-                            {
-                                url = url + "&trifa_version=" + URLEncoder.encode(MainActivity.versionName, "UTF-8");
-                            }
-                            catch (Exception e)
-                            {
-                                url = url + "&trifa_version=" + "unknown";
-                            }
-
-                            try
-                            {
-                                url = url + "&build=" + URLEncoder.encode(get_trifa_build_str(), "UTF-8");
-                            }
-                            catch (Exception e)
-                            {
-                                url = url + "&build=" + "unknown";
-                            }
-
-                            // Log.i(TAG, "GITHUB_NEW_ISSUE_URL:" + url);
-                            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                            v.getContext().startActivity(intent);
-                        }
-                    });
-                    builder.setNegativeButton("Cancel", null);
-
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        });
-
         button_export_encrypted_files.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -645,40 +581,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                                       };
                                                       import_thread.start();
                                                       return;
-                                                  }
-                                              });
-                    builder.setNegativeButton("Cancel", null);
-
-                    // create and show the alert dialog
-                    AlertDialog dialog = builder.create();
-                    dialog.show();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        reveal_passwords.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                try
-                {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
-                    builder.setTitle("Show Passwords");
-                    builder.setMessage("This will show the Database and Tox passwords");
-
-                    builder.setPositiveButton("Yes, I really want to see the passwords in clear text",
-                                              new DialogInterface.OnClickListener()
-                                              {
-                                                  public void onClick(DialogInterface dialog, int id)
-                                                  {
-                                                      Intent intent = new Intent(v.getContext(), ExportActivity.class);
-                                                      intent.putExtra("act", "MaintenanceActivity");
-                                                      startActivity(intent);
                                                   }
                                               });
                     builder.setNegativeButton("Cancel", null);
@@ -798,10 +700,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__sqlite_user_version = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("PRAGMA user_version");
-            cursor.moveToFirst();
-            debug__sqlite_user_version = cursor.getString(0);
-            cursor.close();
+            debug__sqlite_user_version = orma.run_query_for_single_result("PRAGMA user_version");
         }
         catch (Exception e)
         {
@@ -812,10 +711,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__sqlite_version = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("SELECT sqlite_version()");
-            cursor.moveToFirst();
-            debug__sqlite_version = cursor.getString(0);
-            cursor.close();
+            debug__sqlite_version = orma.run_query_for_single_result("SELECT sqlite_version()");
         }
         catch (Exception e)
         {
@@ -825,10 +721,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_version = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_version");
-            cursor.moveToFirst();
-            debug__cipher_version = cursor.getString(0);
-            cursor.close();
+            debug__cipher_version = orma.run_query_for_single_result("PRAGMA cipher_version");
         }
         catch (Exception e)
         {
@@ -838,10 +731,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_provider = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_provider");
-            cursor.moveToFirst();
-            debug__cipher_provider = cursor.getString(0);
-            cursor.close();
+            debug__cipher_provider = orma.run_query_for_single_result("PRAGMA cipher_provider");
         }
         catch (Exception e)
         {
@@ -851,10 +741,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         String debug__cipher_provider_version = "unknown";
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("PRAGMA cipher_provider_version");
-            cursor.moveToFirst();
-            debug__cipher_provider_version = cursor.getString(0);
-            cursor.close();
+            debug__cipher_provider_version = orma.run_query_for_single_result("PRAGMA cipher_provider_version");
         }
         catch (Exception e)
         {
@@ -1034,9 +921,9 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
                     List<NodeJS> bootstrap_nodes_list_from_internet = fromJson.getNodes();
 
-                    List<BootstrapNodeEntryDB> BootstrapNodeEntryDB_ids_full = orma.selectFromBootstrapNodeEntryDB().orderByIdAsc().toList();
+                    List<com.zoffcc.applications.sorm.BootstrapNodeEntryDB> BootstrapNodeEntryDB_ids_full = orma.selectFromBootstrapNodeEntryDB().orderByIdAsc().toList();
                     List<Long> BootstrapNodeEntryDB_ids = new ArrayList<Long>();
-                    for (BootstrapNodeEntryDB bn1 : BootstrapNodeEntryDB_ids_full)
+                    for (com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn1 : BootstrapNodeEntryDB_ids_full)
                     {
                         BootstrapNodeEntryDB_ids.add(bn1.id);
                     }
@@ -1053,7 +940,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             {
                                 try
                                 {
-                                    BootstrapNodeEntryDB bn2 = new BootstrapNodeEntryDB();
+                                    com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2 = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                     bn2.ip = nl_entry.getIpv4();
                                     bn2.port = nl_entry.getPort();
                                     bn2.key_hex = nl_entry.getPublicKey().toUpperCase();
@@ -1066,7 +953,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                         num_udp++;
                                     }
 
-                                    BootstrapNodeEntryDB bn2_ip6 = new BootstrapNodeEntryDB();
+                                    com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2_ip6 = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                     bn2_ip6.ip = nl_entry.getIpv6();
                                     bn2_ip6.port = nl_entry.getPort();
                                     bn2_ip6.key_hex = nl_entry.getPublicKey().toUpperCase();
@@ -1094,7 +981,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                 {
                                     try
                                     {
-                                        BootstrapNodeEntryDB bn2 = new BootstrapNodeEntryDB();
+                                        com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2 = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                         bn2.ip = nl_entry.getIpv4();
                                         int tcp_ports_count = nl_entry.getTcpPorts().size();
                                         bn2.port = nl_entry.getTcpPorts().get(k);
@@ -1112,7 +999,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                             }
                                         }
 
-                                        BootstrapNodeEntryDB bn2_ip6 = new BootstrapNodeEntryDB();
+                                        com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2_ip6 = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                         bn2_ip6.ip = nl_entry.getIpv6();
                                         int tcp_ports_count_ip6 = nl_entry.getTcpPorts().size();
                                         bn2_ip6.key_hex = nl_entry.getPublicKey().toUpperCase();
@@ -1122,7 +1009,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                         {
                                             for (int p=0;p<tcp_ports_count_ip6;p++)
                                             {
-                                                BootstrapNodeEntryDB bn2_ip6_ = new BootstrapNodeEntryDB();
+                                                com.zoffcc.applications.sorm.BootstrapNodeEntryDB bn2_ip6_ = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
                                                 bn2_ip6_.ip = nl_entry.getIpv6();
                                                 bn2_ip6_.port = nl_entry.getTcpPorts().get(p);
                                                 bn2_ip6_.key_hex = nl_entry.getPublicKey().toUpperCase();
@@ -1244,6 +1131,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         catch (Exception e)
         {
         }
+        // passphrase is unused for now!
+        export_savedata_file_unsecure("_", SD_CARD_FILES_EXPORT_DIR + "/" + "unsecure_export_savedata.tox");
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setTitle("Export Tox Savedata");
@@ -1251,21 +1140,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 "Tox Savedata File will be exported unencrypted to this location:" + "\n\n" + SD_CARD_FILES_EXPORT_DIR +
                 "/" + "unsecure_export_savedata.tox");
 
-        builder.setPositiveButton("Yes, I want to export", new DialogInterface.OnClickListener()
-        {
-            public void onClick(DialogInterface dialog, int id)
-            {
-                try
-                {
-                    // passphrase is unused for now!
-                    export_savedata_file_unsecure("_", SD_CARD_FILES_EXPORT_DIR + "/" + "unsecure_export_savedata.tox");
-                }
-                catch(Exception ignored)
-                {
-                }
-            }
-        });
-        builder.setNegativeButton("Cancel", null);
+        builder.setPositiveButton("OK", null);
 
         // create and show the alert dialog
         AlertDialog dialog = builder.create();
@@ -1323,19 +1198,19 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 File export_dir = new File(export_dir_string);
                 export_dir.mkdirs();
 
-                List<FriendList> fl = orma.selectFromFriendList().
+                List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
                         is_relayEq(false).
                         orderByTox_public_key_stringAsc().
                         toList();
                 // Log.i(TAG, "export_friends:" + fl.size());
-                for (FriendList f : fl)
+                for (com.zoffcc.applications.sorm.FriendList f : fl)
                 {
                     String dirpath = export_dir_string + "/" + f.tox_public_key_string + "_" +
                                      filter_out_specials_from_filepath_stricter(f.name);
                     // Log.i(TAG, "friend:xxx:F:" + dirpath);
                     new File(dirpath).mkdirs();
 
-                    List<Message> ml = orma.selectFromMessage().
+                    List<com.zoffcc.applications.sorm.Message> ml = orma.selectFromMessage().
                             tox_friendpubkeyEq(f.tox_public_key_string).
                             toList();
                     // Log.i(TAG, "export_messages_count:" + ml.size() + " friend=" + f.tox_public_key_string);
@@ -1382,7 +1257,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     }
                 }
 
-                List<ConferenceDB> cl = orma.selectFromConferenceDB().
+                List<com.zoffcc.applications.sorm.ConferenceDB> cl = orma.selectFromConferenceDB().
                         kindEq(TOX_CONFERENCE_TYPE_TEXT.value).
                         orderByConference_identifierAsc().
                         toList();
@@ -1395,7 +1270,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     // Log.i(TAG, "friend:xxx:C:" + dirpath);
                     new File(dirpath).mkdirs();
 
-                    List<ConferenceMessage> cml = orma.selectFromConferenceMessage().
+                    List<com.zoffcc.applications.sorm.ConferenceMessage> cml = orma.selectFromConferenceMessage().
                             conference_identifierEq(conf.conference_identifier).toList();
                     for (ConferenceMessage cm : cml)
                     {

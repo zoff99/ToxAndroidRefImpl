@@ -28,6 +28,9 @@ import android.util.Log;
 
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.iconics.IconicsDrawable;
+import com.zoffcc.applications.sorm.GroupDB;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.GroupPeerDB;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -147,7 +150,7 @@ public class HelperGroup
         try
         {
             // Log.i(TAG, "new_or_updated_group:" + "group_num=" + group_identifier);
-            final GroupDB conf2 = orma.selectFromGroupDB().
+            final GroupDB conf2 = (GroupDB) orma.selectFromGroupDB().
                     group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
             // group already exists -> update and connect
             orma.updateGroupDB().
@@ -158,12 +161,12 @@ public class HelperGroup
             try
             {
                 Log.i(TAG, "new_or_updated_group:*update*");
-                final GroupDB conf3 = orma.selectFromGroupDB().
+                final GroupDB conf3 = (GroupDB) orma.selectFromGroupDB().
                         group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
                 // update or add to "friendlist"
                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                 cc.is_friend = COMBINED_IS_GROUP;
-                cc.group_item = GroupDB.deep_copy(conf3);
+                cc.group_item = (GroupDB) GroupDB.deep_copy(conf3);
                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
             }
             catch (Exception e3)
@@ -215,7 +218,7 @@ public class HelperGroup
                 {
                     CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                     cc.is_friend = COMBINED_IS_GROUP;
-                    cc.group_item = GroupDB.deep_copy(conf_new);
+                    cc.group_item = (GroupDB) GroupDB.deep_copy(conf_new);
                     Log.i(TAG, "new_or_updated_group:EE4__:" + MainActivity.friend_list_fragment + " " + cc);
                     MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                     //!! if we are coming from another activity the friend_list_fragment might not be initialized yet!!
@@ -242,12 +245,12 @@ public class HelperGroup
         {
             final String group_identifier = tox_group_by_groupnum__wrapper(group_num);
             Log.i(TAG, "new_or_updated_group:*update*");
-            final GroupDB conf3 = orma.selectFromGroupDB().
+            final GroupDB conf3 = (GroupDB) orma.selectFromGroupDB().
                     group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
             // update in "friendlist"
             CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
             cc.is_friend = COMBINED_IS_GROUP;
-            cc.group_item = GroupDB.deep_copy(conf3);
+            cc.group_item = (GroupDB) GroupDB.deep_copy(conf3);
             MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
         }
         catch (Exception e3)
@@ -307,13 +310,7 @@ public class HelperGroup
 
         try
         {
-            Cursor cursor = orma.getConnection().rawQuery("SELECT id FROM GroupMessage where rowid='" + row_id + "'");
-            cursor.moveToFirst();
-            //Log.i(TAG, "insert_into_conference_message_db:id res count=" + cursor.getColumnCount());
-            long msg_id = cursor.getLong(0);
-            cursor.close();
-
-            if (update_group_view_flag)
+            if ((row_id != -1) && (update_group_view_flag))
             {
                 if ((PREF__conference_show_system_messages == false) &&
                     (m.tox_group_peer_pubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)))
@@ -322,16 +319,16 @@ public class HelperGroup
                 }
                 else
                 {
-                    add_single_group_message_from_messge_id(msg_id, true);
+                    add_single_group_message_from_messge_id(row_id, true);
                 }
             }
 
-            return msg_id;
+            return row_id;
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            return -1;
+            return row_id;
         }
     }
 
@@ -350,7 +347,7 @@ public class HelperGroup
                         {
                             try
                             {
-                                GroupMessage m = orma.selectFromGroupMessage().idEq(message_id).orderByIdDesc().get(0);
+                                GroupMessage m = (GroupMessage) orma.selectFromGroupMessage().idEq(message_id).orderByIdDesc().get(0);
 
                                 if (m.id != -1)
                                 {
@@ -393,7 +390,7 @@ public class HelperGroup
             GroupPeerDB peer_from_db = null;
             try
             {
-                peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(group_identifier).
+                peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(group_identifier).
                         tox_group_peer_pubkeyEq(group_peer_pubkey).toList().get(0);
 
                 if ((peer_from_db.peer_name!= null) && (peer_from_db.peer_name.length() > 0))
@@ -635,7 +632,7 @@ public class HelperGroup
     {
         try
         {
-            Iterator<GroupMessage> i1 = orma.selectFromGroupMessage().group_identifierEq(group_identifier.toLowerCase()).
+            Iterator<com.zoffcc.applications.sorm.GroupMessage> i1 = orma.selectFromGroupMessage().group_identifierEq(group_identifier.toLowerCase()).
                     directionEq(TRIFA_FT_DIRECTION_INCOMING.value).
                     TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_FILE.value).
                     toList().iterator();
@@ -704,12 +701,12 @@ public class HelperGroup
     {
         try
         {
-            final GroupDB conf3 = orma.selectFromGroupDB().
+            final GroupDB conf3 = (GroupDB) orma.selectFromGroupDB().
                     group_identifierEq(group_identifier.toLowerCase()).toList().get(0);
 
             CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
             cc.is_friend = COMBINED_IS_GROUP;
-            cc.group_item = GroupDB.deep_copy(conf3);
+            cc.group_item = (GroupDB) GroupDB.deep_copy(conf3);
             // TODO: sometimes friend_list_fragment == NULL here!
             //       because its not yet resumed yet
             MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
@@ -834,7 +831,7 @@ public class HelperGroup
             try
             {
                 group_id = tox_group_by_groupnum__wrapper(group_number);
-                group_temp = orma.selectFromGroupDB().group_identifierEq(group_id.toLowerCase()).toList().get(0);
+                group_temp = (GroupDB) orma.selectFromGroupDB().group_identifierEq(group_id.toLowerCase()).toList().get(0);
             }
             catch(Exception ignored)
             {
@@ -875,7 +872,7 @@ public class HelperGroup
         }
         catch(Exception e)
         {
-            return true;
+            return false;
         }
     }
 
@@ -976,7 +973,7 @@ public class HelperGroup
         try
         {
             group_id = tox_group_by_groupnum__wrapper(group_number);
-            group_temp = orma.selectFromGroupDB().
+            group_temp = (GroupDB) orma.selectFromGroupDB().
                     group_identifierEq(group_id.toLowerCase()).
                     toList().get(0);
         }
@@ -1119,7 +1116,7 @@ public class HelperGroup
                 return null;
             }
 
-            GroupMessage gm = orma.selectFromGroupMessage().
+            GroupMessage gm = (GroupMessage) orma.selectFromGroupMessage().
                     group_identifierEq(group_identifier.toLowerCase()).
                     tox_group_peer_pubkeyEq(sender_pubkey.toUpperCase()).
                     message_id_toxEq(message_id_tox.toLowerCase()).
@@ -1178,7 +1175,7 @@ public class HelperGroup
         try
         {
             // TODO: cache me!!
-            group_temp = orma.selectFromGroupDB().
+            group_temp = (GroupDB) orma.selectFromGroupDB().
                     group_identifierEq(group_identifier).get(0);
         }
         catch (Exception e)
@@ -1601,11 +1598,11 @@ public class HelperGroup
                     set_group_active(group_identifier);
                     try
                     {
-                        final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                        final GroupDB conf3 = (GroupDB) orma.selectFromGroupDB().group_identifierEq(
                                 group_identifier.toLowerCase()).toList().get(0);
                         CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                         cc.is_friend = COMBINED_IS_CONFERENCE;
-                        cc.group_item = GroupDB.deep_copy(conf3);
+                        cc.group_item = (GroupDB) GroupDB.deep_copy(conf3);
                         MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                     }
                     catch (Exception e3)
@@ -1649,7 +1646,7 @@ public class HelperGroup
             try
             {
                 group_id = tox_group_by_groupnum__wrapper(group_number);
-                group_temp = orma.selectFromGroupDB().
+                group_temp = (GroupDB) orma.selectFromGroupDB().
                         group_identifierEq(group_id.toLowerCase()).
                         toList().get(0);
             }
@@ -1916,7 +1913,7 @@ public class HelperGroup
 
                     // Log.i(TAG, "sync_group_message_history:sync_from_ts:" + sync_from_ts);
 
-                    Iterator<GroupMessage> i1 =  orma.selectFromGroupMessage()
+                    Iterator<com.zoffcc.applications.sorm.GroupMessage> i1 =  orma.selectFromGroupMessage()
                             .group_identifierEq(group_identifier)
                             // .TRIFA_MESSAGE_TYPEEq(TRIFA_MSG_TYPE_TEXT.value)
                             .private_messageEq(0)
@@ -1931,7 +1928,7 @@ public class HelperGroup
                     {
                         try
                         {
-                            GroupMessage gm = i1.next();
+                            GroupMessage gm = (GroupMessage) i1.next();
                             if (!gm.tox_group_peer_pubkey.equalsIgnoreCase("-1"))
                             {
                                 //Log.i(TAG, "sync_group_message_history:sync:sent_ts="
@@ -2394,7 +2391,7 @@ public class HelperGroup
                 {
                     if ((message_id_tox != null) && (message_id_tox.length()>1))
                     {
-                        GroupMessage gmsg = orma.selectFromGroupMessage().group_identifierEq(group_identifier).
+                        GroupMessage gmsg = (GroupMessage) orma.selectFromGroupMessage().group_identifierEq(group_identifier).
                                 tox_group_peer_pubkeyEq(original_sender_peerpubkey).
                                 message_id_toxEq(message_id_tox).
                                 textEq(message_str).toList().get(0);
@@ -2609,7 +2606,7 @@ public class HelperGroup
                 {
                     if (group_identifier!=null)
                     {
-                        GroupMessage gm = orma.selectFromGroupMessage().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(original_sender_peerpubkey).msg_id_hashEq(
+                        GroupMessage gm = (GroupMessage) orma.selectFromGroupMessage().group_identifierEq(group_identifier).tox_group_peer_pubkeyEq(original_sender_peerpubkey).msg_id_hashEq(
                                 message_id_hash).toList().get(0);
 
                         if (gm != null)
@@ -2660,7 +2657,7 @@ public class HelperGroup
         {
             try
             {
-                group_temp = orma.selectFromGroupDB().
+                group_temp = (GroupDB) orma.selectFromGroupDB().
                         group_identifierEq(group_id.toLowerCase()).
                         toList().get(0);
             }

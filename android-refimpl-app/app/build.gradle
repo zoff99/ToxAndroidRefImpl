@@ -281,11 +281,12 @@ android {
 
 
 dependencies {
+    //noinspection GradleDependency
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
+    //
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(path: ':native-audio-jni')
     implementation project(path: ':loggingstdout')
-    annotationProcessor project(':orma_processor')
     //
     //
     // HINT: can't update to latest version: just too many useless changes and also kotlin again :-(
@@ -324,30 +325,7 @@ dependencies {
         transitive = true
     }
     //
-    implementation 'io.reactivex.rxjava2:rxjava:2.2.21'
-
-    implementation('com.github.zoff99:pkgs_maskaradeOrma-annotations:6.0.2') {
-    }
-    implementation('com.github.zoff99:pkgs_maskaradeOrma-core:6.0.2') {
-        transitive = true
-        exclude group: 'io.reactivex'
-        exclude group: 'com.android.support'
-    }
-    implementation('com.github.zoff99:pkgs_maskaradeOrma-migration:6.0.2') {
-        transitive = true
-        exclude group: 'io.reactivex'
-        exclude group: 'com.android.support'
-    }
-    implementation('com.github.zoff99:pkgs_maskaradeOrma:6.0.2') {
-        transitive = true
-        exclude group: 'io.reactivex'
-        exclude group: 'com.android.support'
-    }
-    implementation('com.github.zoff99:pkgs_maskaradeOrma-encryption:6.0.2') {
-        transitive = true
-        exclude group: 'io.reactivex'
-        exclude group: 'com.android.support'
-    }
+    implementation 'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.5'
     //
     implementation('com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0') {
         exclude group: 'com.android.support'

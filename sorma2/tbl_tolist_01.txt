@@ -1,0 +1,34 @@
+    public List<__@@@TABLE@@@__> toList()
+    {
+        List<__@@@TABLE@@@__> list = new ArrayList<>();
+        orma_global_sqltolist_lock.lock();
+        PreparedStatement statement = null;
+        try
+        {
+            final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
+            log_bindvars_where(sql, bind_where_count, bind_where_vars);
+            final long t1 = System.currentTimeMillis();
+            statement = sqldb.prepareStatement(sql);
+            if (!set_bindvars_where(statement, bind_where_count, bind_where_vars))
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (Exception ignored)
+                {
+                }
+                return null;
+            }
+            ResultSet rs = statement.executeQuery();
+            final long t2 = System.currentTimeMillis();
+            if (ORMA_LONG_RUNNING_TRACE)
+            {
+                if ((t2 - t1) > ORMA_LONG_RUNNING_MS)
+                {
+                    Log.i(TAG, "long running (" + (t2 - t1)+ " ms) sql=" + sql);
+                }
+            }
+            final long t3 = System.currentTimeMillis();
+            while (rs.next())
+            {

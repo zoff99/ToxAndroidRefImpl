@@ -27,6 +27,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.luseen.autolinklibrary.EmojiTextViewLinks;
+import com.zoffcc.applications.sorm.ConferenceMessage;
 
 import androidx.recyclerview.widget.RecyclerView;
 

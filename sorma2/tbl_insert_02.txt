@@ -1,0 +1,73 @@
+            // @formatter:on
+
+            if (ORMA_TRACE)
+            {
+                Log.i(TAG, "sql=" + insert_pstmt);
+            }
+
+            final long t1 = System.currentTimeMillis();
+            orma_semaphore_lastrowid_on_insert.acquire();
+            final long t2 = System.currentTimeMillis();
+            if (ORMA_LONG_RUNNING_TRACE)
+            {
+                if ((t2 - t1) > ORMA_LONG_RUNNING_MS)
+                {
+                    Log.i(TAG, "insertInto"+this.getClass().getSimpleName()+" acquire running long (" + (t2 - t1)+ " ms)");
+                }
+            }
+
+            final long t3 = System.currentTimeMillis();
+            insert_pstmt.executeUpdate();
+            final long t4 = System.currentTimeMillis();
+            if (ORMA_LONG_RUNNING_TRACE)
+            {
+                if ((t4 - t3) > ORMA_LONG_RUNNING_MS)
+                {
+                    Log.i(TAG, "insertInto"+this.getClass().getSimpleName()+" sql running long (" + (t4 - t3)+ " ms)");
+                }
+            }
+
+            final long t5 = System.currentTimeMillis();
+            insert_pstmt.close();
+            final long t6 = System.currentTimeMillis();
+            if (ORMA_LONG_RUNNING_TRACE)
+            {
+                if ((t6 - t5) > ORMA_LONG_RUNNING_MS)
+                {
+                    Log.i(TAG, "insertInto"+this.getClass().getSimpleName()+" statement close running long (" + (t6 - t5)+ " ms)");
+                }
+            }
+
+            final long t7 = System.currentTimeMillis();
+            ret = get_last_rowid_pstmt();
+            final long t8 = System.currentTimeMillis();
+            if (ORMA_LONG_RUNNING_TRACE)
+            {
+                if ((t8 - t7) > ORMA_LONG_RUNNING_MS)
+                {
+                    Log.i(TAG, "insertInto"+this.getClass().getSimpleName()+" getLastRowId running long (" + (t8 - t7)+ " ms)");
+                }
+            }
+
+            orma_semaphore_lastrowid_on_insert.release();
+        }
+        catch (Exception e)
+        {
+            orma_semaphore_lastrowid_on_insert.release();
+            Log.i(TAG, "ERR:insert:001:" + e.getMessage());
+            throw new RuntimeException(e);
+        }
+        finally
+        {
+            try
+            {
+                insert_pstmt.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+            orma_global_sqlinsert_lock.unlock();
+        }
+
+        return ret;
+    }

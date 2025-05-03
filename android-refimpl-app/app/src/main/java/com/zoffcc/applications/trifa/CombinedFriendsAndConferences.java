@@ -19,6 +19,10 @@
 
 package com.zoffcc.applications.trifa;
 
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
+
 public class CombinedFriendsAndConferences
 {
     long id = -1; // primary key for lookup // TODO: unsed now!!!!!

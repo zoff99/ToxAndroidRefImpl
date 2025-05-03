@@ -1,0 +1,14 @@
+
+    public long insert()
+    {
+        long ret = -1;
+
+        orma_global_sqlinsert_lock.lock();
+        PreparedStatement insert_pstmt = null;
+        try
+        {
+            String insert_pstmt_sql = null;
+
+            // @formatter:off
+            insert_pstmt_sql ="insert into \"" + this.getClass().getSimpleName() + "\"" +
+                    "("

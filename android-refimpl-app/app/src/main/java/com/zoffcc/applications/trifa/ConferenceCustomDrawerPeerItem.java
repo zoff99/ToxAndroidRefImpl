@@ -33,6 +33,7 @@ import com.bumptech.glide.request.RequestOptions;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 import com.mikepenz.materialdrawer.model.AbstractBadgeableDrawerItem;
+import com.zoffcc.applications.sorm.FriendList;
 
 import java.util.List;
 
@@ -72,7 +73,7 @@ public class ConferenceCustomDrawerPeerItem extends AbstractBadgeableDrawerItem<
         {
             if (have_avatar_for_pubkey)
             {
-                fl_temp = orma.selectFromFriendList().
+                fl_temp = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(peer_pubkey).get(0);
 
                 if (VFS_ENCRYPT)

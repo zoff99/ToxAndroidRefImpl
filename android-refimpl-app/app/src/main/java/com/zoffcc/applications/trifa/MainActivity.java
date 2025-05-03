@@ -71,8 +71,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.github.gfx.android.orma.AccessThreadConstraint;
-import com.github.gfx.android.orma.encryption.EncryptedDatabase;
 import com.mikepenz.fontawesome_typeface_library.FontAwesome;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
@@ -88,12 +86,23 @@ import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.vanniktech.emoji.EmojiManager;
 import com.yariksoffice.lingver.Lingver;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+import com.zoffcc.applications.sorm.ConferenceDB;
+import com.zoffcc.applications.sorm.ConferenceMessage;
+import com.zoffcc.applications.sorm.ConferencePeerCacheDB;
+import com.zoffcc.applications.sorm.FileDB;
+import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.FriendList;
+import com.zoffcc.applications.sorm.GroupDB;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.Message;
+import com.zoffcc.applications.sorm.OrmaDatabase;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -131,6 +140,8 @@ import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_audio_aec_delay;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_gainprocessing_active;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_rnnoise_active;
+import static com.zoffcc.applications.sorm.OrmaDatabase.run_multi_sql;
+import static com.zoffcc.applications.sorm.OrmaDatabase.set_schema_upgrade_callback;
 import static com.zoffcc.applications.trifa.AudioReceiver.channels_;
 import static com.zoffcc.applications.trifa.AudioReceiver.sampling_rate_;
 import static com.zoffcc.applications.trifa.AudioRecording.audio_engine_starting;
@@ -332,6 +343,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
+    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10241; // increase for database schema changes
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
@@ -460,6 +472,7 @@ public class MainActivity extends AppCompatActivity
     static final int SAMPLE_RATE_FIXED = 48000;
     static int PREF__min_audio_samplingrate_out = SAMPLE_RATE_FIXED;
     static String PREF__DB_secrect_key = "98rj93ßjw3j8j4vj9w8p9eüiü9aci092"; // this is just a dummy, this value is not used!
+    static boolean PREF__DB_wal_mode = true;
     private static final String ALLOWED_CHARACTERS = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz!§$%&()=?,.;:-_+";
     static boolean PREF__software_echo_cancel = false;
     static int PREF__higher_video_quality = 0;
@@ -712,16 +725,16 @@ public class MainActivity extends AppCompatActivity
                 // Log.i(TAG, "db:path=" + dbs_path);
                 File database_dir = new File(new File(dbs_path).getParent());
                 database_dir.mkdirs();
-                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
 
                 if (DB_ENCRYPT)
                 {
-                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                    // builder = builder.provider(new OrmaDatabase.EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                    orma = OrmaDatabase_wrapper(dbs_path, PREF__DB_secrect_key, PREF__DB_wal_mode);
                 }
-
-                orma = builder.name(dbs_path).readOnMainThread(AccessThreadConstraint.NONE).writeOnMainThread(
-                        AccessThreadConstraint.NONE).trace(ORMA_TRACE).build();
-                // Log.i(TAG, "db:open=OK:path=" + dbs_path);
+                else
+                {
+                    orma = OrmaDatabase_wrapper(dbs_path, null, PREF__DB_wal_mode);
+                }
             }
             catch (Exception e)
             {
@@ -744,18 +757,17 @@ public class MainActivity extends AppCompatActivity
                     }
                 }
 
-                // Log.i(TAG, "db:path(2)=" + dbs_path);
-                OrmaDatabase.Builder builder = OrmaDatabase.builder(this);
-
-                if (DB_ENCRYPT)
-                {
-                    builder = builder.provider(new EncryptedDatabase.Provider(PREF__DB_secrect_key));
-                }
-
                 try
                 {
-                    orma = builder.name(dbs_path).readOnMainThread(AccessThreadConstraint.WARNING).writeOnMainThread(
-                            AccessThreadConstraint.WARNING).trace(ORMA_TRACE).build();
+                    if (DB_ENCRYPT)
+                    {
+                        // builder = builder.provider(new OrmaDatabase.EncryptedDatabase.Provider(PREF__DB_secrect_key));
+                        orma = OrmaDatabase_wrapper(dbs_path, PREF__DB_secrect_key, PREF__DB_wal_mode);
+                    }
+                    else
+                    {
+                        orma = OrmaDatabase_wrapper(dbs_path, null, PREF__DB_wal_mode);
+                    }
                 }
                 catch (Exception e4)
                 {
@@ -1854,6 +1866,1081 @@ public class MainActivity extends AppCompatActivity
         */
 
         Log.i(TAG, "M:STARTUP:-- DONE --");
+    }
+
+    void upgrade_db_schema_do(int old_version, int new_version)
+    {
+        if (new_version == 10015) {
+            run_multi_sql("CREATE TABLE `BootstrapNodeEntryDB` (`num` INTEGER NOT NULL, `udp_node` BOOLEAN NOT NULL, `ip` TEXT NOT NULL, `port` INTEGER NOT NULL, `key_hex` TEXT NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("CREATE INDEX `index_num_on_BootstrapNodeEntryDB` ON `BootstrapNodeEntryDB` (`num`)");
+            run_multi_sql("CREATE INDEX `index_udp_node_on_BootstrapNodeEntryDB` ON `BootstrapNodeEntryDB` (`udp_node`)");
+            run_multi_sql("CREATE INDEX `index_ip_on_BootstrapNodeEntryDB` ON `BootstrapNodeEntryDB` (`ip`)");
+            run_multi_sql("CREATE INDEX `index_port_on_BootstrapNodeEntryDB` ON `BootstrapNodeEntryDB` (`port`)");
+            run_multi_sql("CREATE INDEX `index_key_hex_on_BootstrapNodeEntryDB` ON `BootstrapNodeEntryDB` (`key_hex`)");
+            run_multi_sql("CREATE TABLE `ConferenceDB` (`who_invited__tox_public_key_string` TEXT NOT NULL, `name` TEXT , `peer_count` INTEGER NOT NULL DEFAULT -1, `own_peer_number` INTEGER NOT NULL DEFAULT -1, `kind` INTEGER NOT NULL DEFAULT 0, `tox_conference_number` INTEGER NOT NULL DEFAULT -1, `conference_active` BOOLEAN NOT NULL DEFAULT false, `notification_silent` BOOLEAN DEFAULT false, `conference_identifier` TEXT PRIMARY KEY)");
+            run_multi_sql("CREATE INDEX `index_who_invited__tox_public_key_string_on_ConferenceDB` ON `ConferenceDB` (`who_invited__tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_name_on_ConferenceDB` ON `ConferenceDB` (`name`)");
+            run_multi_sql("CREATE INDEX `index_peer_count_on_ConferenceDB` ON `ConferenceDB` (`peer_count`)");
+            run_multi_sql("CREATE INDEX `index_own_peer_number_on_ConferenceDB` ON `ConferenceDB` (`own_peer_number`)");
+            run_multi_sql("CREATE INDEX `index_kind_on_ConferenceDB` ON `ConferenceDB` (`kind`)");
+            run_multi_sql("CREATE INDEX `index_tox_conference_number_on_ConferenceDB` ON `ConferenceDB` (`tox_conference_number`)");
+            run_multi_sql("CREATE INDEX `index_conference_active_on_ConferenceDB` ON `ConferenceDB` (`conference_active`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_ConferenceDB` ON `ConferenceDB` (`notification_silent`)");
+            run_multi_sql("CREATE TABLE `ConferenceMessage` (`conference_identifier` TEXT NOT NULL DEFAULT -1, `tox_peerpubkey` TEXT NOT NULL, `tox_peername` TEXT , `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER , `rcvd_timestamp` INTEGER , `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT , `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("CREATE INDEX `index_conference_identifier_on_ConferenceMessage` ON `ConferenceMessage` (`conference_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_peerpubkey_on_ConferenceMessage` ON `ConferenceMessage` (`tox_peerpubkey`)");
+            run_multi_sql("CREATE INDEX `index_tox_peername_on_ConferenceMessage` ON `ConferenceMessage` (`tox_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_ConferenceMessage` ON `ConferenceMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_ConferenceMessage` ON `ConferenceMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_ConferenceMessage` ON `ConferenceMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_ConferenceMessage` ON `ConferenceMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_ConferenceMessage` ON `ConferenceMessage` (`is_new`)");
+            run_multi_sql("CREATE TABLE `ConferencePeerCacheDB` (`conference_identifier` TEXT NOT NULL, `peer_pubkey` TEXT NOT NULL, `peer_name` TEXT NOT NULL, `last_update_timestamp` INTEGER NOT NULL DEFAULT -1, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("CREATE UNIQUE INDEX `index_conference_identifier_peer_pubkey_on_ConferencePeerCacheDB` ON `ConferencePeerCacheDB` (`conference_identifier`, `peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_conference_identifier_on_ConferencePeerCacheDB` ON `ConferencePeerCacheDB` (`conference_identifier`)");
+            run_multi_sql("CREATE INDEX `index_peer_pubkey_on_ConferencePeerCacheDB` ON `ConferencePeerCacheDB` (`peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_peer_name_on_ConferencePeerCacheDB` ON `ConferencePeerCacheDB` (`peer_name`)");
+            run_multi_sql("CREATE INDEX `index_last_update_timestamp_on_ConferencePeerCacheDB` ON `ConferencePeerCacheDB` (`last_update_timestamp`)");
+            run_multi_sql("CREATE TABLE `FileDB` (`kind` INTEGER NOT NULL, `direction` INTEGER NOT NULL, `tox_public_key_string` TEXT NOT NULL, `path_name` TEXT NOT NULL, `file_name` TEXT NOT NULL, `filesize` INTEGER NOT NULL DEFAULT -1, `is_in_VFS` BOOLEAN NOT NULL DEFAULT true, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("CREATE INDEX `index_kind_on_FileDB` ON `FileDB` (`kind`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_FileDB` ON `FileDB` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_tox_public_key_string_on_FileDB` ON `FileDB` (`tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_FileDB` ON `FileDB` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_FileDB` ON `FileDB` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_filesize_on_FileDB` ON `FileDB` (`filesize`)");
+            run_multi_sql("CREATE INDEX `index_is_in_VFS_on_FileDB` ON `FileDB` (`is_in_VFS`)");
+            run_multi_sql("CREATE TABLE `Filetransfer` (`tox_public_key_string` TEXT NOT NULL, `direction` INTEGER NOT NULL, `file_number` INTEGER NOT NULL, `kind` INTEGER NOT NULL, `state` INTEGER NOT NULL, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `path_name` TEXT NOT NULL, `file_name` TEXT NOT NULL, `fos_open` BOOLEAN NOT NULL DEFAULT false, `filesize` INTEGER NOT NULL DEFAULT -1, `current_position` INTEGER NOT NULL DEFAULT 0, `message_id` INTEGER NOT NULL DEFAULT -1, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("CREATE INDEX `index_tox_public_key_string_on_Filetransfer` ON `Filetransfer` (`tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Filetransfer` ON `Filetransfer` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_file_number_on_Filetransfer` ON `Filetransfer` (`file_number`)");
+            run_multi_sql("CREATE INDEX `index_kind_on_Filetransfer` ON `Filetransfer` (`kind`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Filetransfer` ON `Filetransfer` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Filetransfer` ON `Filetransfer` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Filetransfer` ON `Filetransfer` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_Filetransfer` ON `Filetransfer` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_Filetransfer` ON `Filetransfer` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Filetransfer` ON `Filetransfer` (`message_id`)");
+            run_multi_sql("CREATE TABLE `FriendList` (`name` TEXT , `alias_name` TEXT , `status_message` TEXT , `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT , `avatar_filename` TEXT , `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT -1, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE TABLE `Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT -1, `filetransfer_id` INTEGER NOT NULL DEFAULT -1, `sent_timestamp` INTEGER , `rcvd_timestamp` INTEGER , `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT , `filename_fullpath` TEXT , `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE TABLE `TRIFADatabaseGlobals` (`key` TEXT NOT NULL, `value` TEXT NOT NULL)");
+            run_multi_sql("CREATE INDEX `index_key_on_TRIFADatabaseGlobals` ON `TRIFADatabaseGlobals` (`key`)");
+            run_multi_sql("CREATE INDEX `index_value_on_TRIFADatabaseGlobals` ON `TRIFADatabaseGlobals` (`value`)");
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `filename_fullpath`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `filename_fullpath`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+        }
+
+        if (new_version == 10082) {
+            run_multi_sql("CREATE TABLE `__temp_ConferenceMessage` (`conference_identifier` TEXT NOT NULL DEFAULT - 1, `tox_peerpubkey` TEXT NOT NULL, `tox_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_ConferenceMessage` (`conference_identifier`, `tox_peerpubkey`, `tox_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `id`) SELECT `conference_identifier`, `tox_peerpubkey`, `tox_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `id` FROM `ConferenceMessage`");
+            run_multi_sql("DROP TABLE `ConferenceMessage`");
+            run_multi_sql("ALTER TABLE `__temp_ConferenceMessage` RENAME TO `ConferenceMessage`");
+            run_multi_sql("CREATE INDEX `index_conference_identifier_on_ConferenceMessage` ON `ConferenceMessage` (`conference_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_peerpubkey_on_ConferenceMessage` ON `ConferenceMessage` (`tox_peerpubkey`)");
+            run_multi_sql("CREATE INDEX `index_tox_peername_on_ConferenceMessage` ON `ConferenceMessage` (`tox_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_ConferenceMessage` ON `ConferenceMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_ConferenceMessage` ON `ConferenceMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_ConferenceMessage` ON `ConferenceMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_ConferenceMessage` ON `ConferenceMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_ConferenceMessage` ON `ConferenceMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_ConferenceMessage` ON `ConferenceMessage` (`was_synced`)");
+        }
+
+        if (new_version == 10015) {
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+        }
+
+        if (new_version == 10084) {
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_update` BOOLEAN DEFAULT false, `avatar_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `last_online_timestamp_real` INTEGER NOT NULL DEFAULT - 1, `added_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `added_timestamp`, `is_relay`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `added_timestamp`, `is_relay`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_timestamp_on_FriendList` ON `FriendList` (`avatar_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_real_on_FriendList` ON `FriendList` (`last_online_timestamp_real`)");
+            run_multi_sql("CREATE INDEX `index_added_timestamp_on_FriendList` ON `FriendList` (`added_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+        }
+
+        if (new_version == 10086) {
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+        }
+
+        if (new_version == 10025) {
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_on_off`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `notification_silent`, `sort`, `last_online_timestamp`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_on_off`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `notification_silent`, `sort`, `last_online_timestamp`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+            run_multi_sql("CREATE TABLE `RelayListDB` (`TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `own_relay` BOOLEAN NOT NULL DEFAULT false, `last_online_timestamp` INTEGER NOT NULL DEFAULT -1, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_RelayListDB` ON `RelayListDB` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_RelayListDB` ON `RelayListDB` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_own_relay_on_RelayListDB` ON `RelayListDB` (`own_relay`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_RelayListDB` ON `RelayListDB` (`last_online_timestamp`)");
+        }
+
+        if (new_version == 10093) {
+            run_multi_sql("CREATE TABLE `__temp_ConferenceMessage` (`message_id_tox` TEXT, `conference_identifier` TEXT NOT NULL DEFAULT - 1, `tox_peerpubkey` TEXT NOT NULL, `tox_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_ConferenceMessage` (`conference_identifier`, `tox_peerpubkey`, `tox_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `id`) SELECT `conference_identifier`, `tox_peerpubkey`, `tox_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `id` FROM `ConferenceMessage`");
+            run_multi_sql("DROP TABLE `ConferenceMessage`");
+            run_multi_sql("ALTER TABLE `__temp_ConferenceMessage` RENAME TO `ConferenceMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_ConferenceMessage` ON `ConferenceMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_conference_identifier_on_ConferenceMessage` ON `ConferenceMessage` (`conference_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_peerpubkey_on_ConferenceMessage` ON `ConferenceMessage` (`tox_peerpubkey`)");
+            run_multi_sql("CREATE INDEX `index_tox_peername_on_ConferenceMessage` ON `ConferenceMessage` (`tox_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_ConferenceMessage` ON `ConferenceMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_ConferenceMessage` ON `ConferenceMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_ConferenceMessage` ON `ConferenceMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_ConferenceMessage` ON `ConferenceMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_ConferenceMessage` ON `ConferenceMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_ConferenceMessage` ON `ConferenceMessage` (`was_synced`)");
+        }
+
+        if (new_version == 10025) {
+            run_multi_sql("CREATE TABLE `__temp_RelayListDB` (`TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `own_relay` BOOLEAN NOT NULL DEFAULT false, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `tox_public_key_string_of_owner` TEXT, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_RelayListDB` (`TOX_CONNECTION`, `TOX_CONNECTION_on_off`, `own_relay`, `last_online_timestamp`, `tox_public_key_string`) SELECT `TOX_CONNECTION`, `TOX_CONNECTION_on_off`, `own_relay`, `last_online_timestamp`, `tox_public_key_string` FROM `RelayListDB`");
+            run_multi_sql("DROP TABLE `RelayListDB`");
+            run_multi_sql("ALTER TABLE `__temp_RelayListDB` RENAME TO `RelayListDB`");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_RelayListDB` ON `RelayListDB` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_RelayListDB` ON `RelayListDB` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_own_relay_on_RelayListDB` ON `RelayListDB` (`own_relay`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_RelayListDB` ON `RelayListDB` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_tox_public_key_string_of_owner_on_RelayListDB` ON `RelayListDB` (`tox_public_key_string_of_owner`)");
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_on_off`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `notification_silent`, `sort`, `last_online_timestamp`, `is_relay`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_on_off`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `notification_silent`, `sort`, `last_online_timestamp`, `is_relay`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+        }
+
+        if (new_version == 10026) {
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 2, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+        }
+
+        if (new_version == 10096) {
+            run_multi_sql("CREATE TABLE `__temp_Filetransfer` (`tox_public_key_string` TEXT NOT NULL, `direction` INTEGER NOT NULL, `file_number` INTEGER NOT NULL, `kind` INTEGER NOT NULL, `state` INTEGER NOT NULL, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `path_name` TEXT NOT NULL, `file_name` TEXT NOT NULL, `fos_open` BOOLEAN NOT NULL DEFAULT false, `filesize` INTEGER NOT NULL DEFAULT - 1, `current_position` INTEGER NOT NULL DEFAULT 0, `message_id` INTEGER NOT NULL DEFAULT - 1, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Filetransfer` (`tox_public_key_string`, `direction`, `file_number`, `kind`, `state`, `ft_accepted`, `ft_outgoing_started`, `path_name`, `file_name`, `fos_open`, `filesize`, `current_position`, `message_id`, `id`) SELECT `tox_public_key_string`, `direction`, `file_number`, `kind`, `state`, `ft_accepted`, `ft_outgoing_started`, `path_name`, `file_name`, `fos_open`, `filesize`, `current_position`, `message_id`, `id` FROM `Filetransfer`");
+            run_multi_sql("DROP TABLE `Filetransfer`");
+            run_multi_sql("ALTER TABLE `__temp_Filetransfer` RENAME TO `Filetransfer`");
+            run_multi_sql("CREATE INDEX `index_tox_public_key_string_on_Filetransfer` ON `Filetransfer` (`tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Filetransfer` ON `Filetransfer` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_file_number_on_Filetransfer` ON `Filetransfer` (`file_number`)");
+            run_multi_sql("CREATE INDEX `index_kind_on_Filetransfer` ON `Filetransfer` (`kind`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Filetransfer` ON `Filetransfer` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Filetransfer` ON `Filetransfer` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Filetransfer` ON `Filetransfer` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_Filetransfer` ON `Filetransfer` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_Filetransfer` ON `Filetransfer` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Filetransfer` ON `Filetransfer` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Filetransfer` ON `Filetransfer` (`storage_frame_work`)");
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 2, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+        }
+
+        if (new_version == 10028) {
+            run_multi_sql("CREATE TABLE `TRIFADatabaseGlobalsNew` (`value` TEXT NOT NULL, `key` TEXT PRIMARY KEY)");
+            run_multi_sql("CREATE INDEX `index_value_on_TRIFADatabaseGlobalsNew` ON `TRIFADatabaseGlobalsNew` (`value`)");
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_update` BOOLEAN DEFAULT false, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `notification_silent`, `sort`, `last_online_timestamp`, `is_relay`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `notification_silent`, `sort`, `last_online_timestamp`, `is_relay`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+        }
+
+        if (new_version == 10099) {
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 2, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+        }
+
+        if (new_version == 10028) {
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_update` BOOLEAN DEFAULT false, `avatar_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `notification_silent`, `sort`, `last_online_timestamp`, `is_relay`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `notification_silent`, `sort`, `last_online_timestamp`, `is_relay`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_timestamp_on_FriendList` ON `FriendList` (`avatar_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+        }
+
+        if (new_version == 10101) {
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 2, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `msg_at_relay` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+            run_multi_sql("CREATE INDEX `index_msg_at_relay_on_Message` ON `Message` (`msg_at_relay`)");
+        }
+
+        if (new_version == 10079) {
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_update` BOOLEAN DEFAULT false, `avatar_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `added_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `is_relay`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `is_relay`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_timestamp_on_FriendList` ON `FriendList` (`avatar_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_added_timestamp_on_FriendList` ON `FriendList` (`added_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+        }
+
+        if (new_version == 10112) {
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_update` BOOLEAN DEFAULT false, `avatar_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `last_online_timestamp_real` INTEGER NOT NULL DEFAULT - 1, `added_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `push_url` TEXT, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_timestamp_on_FriendList` ON `FriendList` (`avatar_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_real_on_FriendList` ON `FriendList` (`last_online_timestamp_real`)");
+            run_multi_sql("CREATE INDEX `index_added_timestamp_on_FriendList` ON `FriendList` (`added_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+            run_multi_sql("CREATE INDEX `index_push_url_on_FriendList` ON `FriendList` (`push_url`)");
+        }
+
+        if (new_version == 10124) {
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_update` BOOLEAN DEFAULT false, `avatar_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `last_online_timestamp_real` INTEGER NOT NULL DEFAULT - 1, `added_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `push_url` TEXT, `capabilities` INTEGER NOT NULL DEFAULT 0, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `push_url`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `push_url`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_timestamp_on_FriendList` ON `FriendList` (`avatar_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_real_on_FriendList` ON `FriendList` (`last_online_timestamp_real`)");
+            run_multi_sql("CREATE INDEX `index_added_timestamp_on_FriendList` ON `FriendList` (`added_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+            run_multi_sql("CREATE INDEX `index_push_url_on_FriendList` ON `FriendList` (`push_url`)");
+            run_multi_sql("CREATE INDEX `index_capabilities_on_FriendList` ON `FriendList` (`capabilities`)");
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 2, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `msg_at_relay` BOOLEAN NOT NULL DEFAULT false, `msg_idv3_hash` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+            run_multi_sql("CREATE INDEX `index_msg_at_relay_on_Message` ON `Message` (`msg_at_relay`)");
+            run_multi_sql("CREATE INDEX `index_msg_idv3_hash_on_Message` ON `Message` (`msg_idv3_hash`)");
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 2, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `msg_at_relay` BOOLEAN NOT NULL DEFAULT false, `msg_idv3_hash` TEXT, `sent_push` BOOLEAN, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+            run_multi_sql("CREATE INDEX `index_msg_at_relay_on_Message` ON `Message` (`msg_at_relay`)");
+            run_multi_sql("CREATE INDEX `index_msg_idv3_hash_on_Message` ON `Message` (`msg_idv3_hash`)");
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 2, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `msg_at_relay` BOOLEAN NOT NULL DEFAULT false, `msg_idv3_hash` TEXT, `sent_push` INTEGER, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+            run_multi_sql("CREATE INDEX `index_msg_at_relay_on_Message` ON `Message` (`msg_at_relay`)");
+            run_multi_sql("CREATE INDEX `index_msg_idv3_hash_on_Message` ON `Message` (`msg_idv3_hash`)");
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_update` BOOLEAN DEFAULT false, `avatar_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `last_online_timestamp_real` INTEGER NOT NULL DEFAULT - 1, `added_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `push_url` TEXT, `capabilities` INTEGER NOT NULL DEFAULT 0, `msgv3_capability` INTEGER NOT NULL DEFAULT 0, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `push_url`, `capabilities`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `push_url`, `capabilities`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_timestamp_on_FriendList` ON `FriendList` (`avatar_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_real_on_FriendList` ON `FriendList` (`last_online_timestamp_real`)");
+            run_multi_sql("CREATE INDEX `index_added_timestamp_on_FriendList` ON `FriendList` (`added_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+            run_multi_sql("CREATE INDEX `index_push_url_on_FriendList` ON `FriendList` (`push_url`)");
+            run_multi_sql("CREATE INDEX `index_capabilities_on_FriendList` ON `FriendList` (`capabilities`)");
+            run_multi_sql("CREATE INDEX `index_msgv3_capability_on_FriendList` ON `FriendList` (`msgv3_capability`)");
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 5, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `msg_at_relay` BOOLEAN NOT NULL DEFAULT false, `msg_idv3_hash` TEXT, `sent_push` INTEGER, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+            run_multi_sql("CREATE INDEX `index_msg_at_relay_on_Message` ON `Message` (`msg_at_relay`)");
+            run_multi_sql("CREATE INDEX `index_msg_idv3_hash_on_Message` ON `Message` (`msg_idv3_hash`)");
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 2, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `msg_at_relay` BOOLEAN NOT NULL DEFAULT false, `msg_idv3_hash` TEXT, `sent_push` INTEGER, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+            run_multi_sql("CREATE INDEX `index_msg_at_relay_on_Message` ON `Message` (`msg_at_relay`)");
+            run_multi_sql("CREATE INDEX `index_msg_idv3_hash_on_Message` ON `Message` (`msg_idv3_hash`)");
+        }
+
+        if (new_version == 10127) {
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 4, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `msg_at_relay` BOOLEAN NOT NULL DEFAULT false, `msg_idv3_hash` TEXT, `sent_push` INTEGER, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+            run_multi_sql("CREATE INDEX `index_msg_at_relay_on_Message` ON `Message` (`msg_at_relay`)");
+            run_multi_sql("CREATE INDEX `index_msg_idv3_hash_on_Message` ON `Message` (`msg_idv3_hash`)");
+        }
+
+        if (new_version == 10154) {
+            run_multi_sql("CREATE TABLE `GroupDB` (`who_invited__tox_public_key_string` TEXT NOT NULL, `name` TEXT , `peer_count` INTEGER NOT NULL DEFAULT -1, `own_peer_number` INTEGER NOT NULL DEFAULT -1, `privacy_state` INTEGER NOT NULL DEFAULT 0, `tox_group_number` INTEGER NOT NULL DEFAULT -1, `notification_silent` BOOLEAN DEFAULT false, `group_identifier` TEXT PRIMARY KEY)");
+            run_multi_sql("CREATE INDEX `index_who_invited__tox_public_key_string_on_GroupDB` ON `GroupDB` (`who_invited__tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_name_on_GroupDB` ON `GroupDB` (`name`)");
+            run_multi_sql("CREATE INDEX `index_peer_count_on_GroupDB` ON `GroupDB` (`peer_count`)");
+            run_multi_sql("CREATE INDEX `index_own_peer_number_on_GroupDB` ON `GroupDB` (`own_peer_number`)");
+            run_multi_sql("CREATE INDEX `index_privacy_state_on_GroupDB` ON `GroupDB` (`privacy_state`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_number_on_GroupDB` ON `GroupDB` (`tox_group_number`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_GroupDB` ON `GroupDB` (`notification_silent`)");
+            run_multi_sql("CREATE TABLE `GroupMessage` (`message_id_tox` TEXT , `group_identifier` TEXT NOT NULL DEFAULT -1, `tox_group_peer_pubkey` TEXT NOT NULL, `tox_group_peername` TEXT , `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER , `rcvd_timestamp` INTEGER , `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT , `was_synced` BOOLEAN , `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE TABLE `__temp_GroupDB` (`who_invited__tox_public_key_string` TEXT NOT NULL, `name` TEXT, `peer_count` INTEGER NOT NULL DEFAULT - 1, `own_peer_number` INTEGER NOT NULL DEFAULT - 1, `privacy_state` INTEGER NOT NULL DEFAULT 0, `tox_group_number` INTEGER NOT NULL DEFAULT - 1, `group_active` BOOLEAN NOT NULL DEFAULT false, `notification_silent` BOOLEAN DEFAULT false, `group_identifier` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_GroupDB` (`who_invited__tox_public_key_string`, `name`, `peer_count`, `own_peer_number`, `privacy_state`, `tox_group_number`, `notification_silent`, `group_identifier`) SELECT `who_invited__tox_public_key_string`, `name`, `peer_count`, `own_peer_number`, `privacy_state`, `tox_group_number`, `notification_silent`, `group_identifier` FROM `GroupDB`");
+            run_multi_sql("DROP TABLE `GroupDB`");
+            run_multi_sql("ALTER TABLE `__temp_GroupDB` RENAME TO `GroupDB`");
+            run_multi_sql("CREATE INDEX `index_who_invited__tox_public_key_string_on_GroupDB` ON `GroupDB` (`who_invited__tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_name_on_GroupDB` ON `GroupDB` (`name`)");
+            run_multi_sql("CREATE INDEX `index_peer_count_on_GroupDB` ON `GroupDB` (`peer_count`)");
+            run_multi_sql("CREATE INDEX `index_own_peer_number_on_GroupDB` ON `GroupDB` (`own_peer_number`)");
+            run_multi_sql("CREATE INDEX `index_privacy_state_on_GroupDB` ON `GroupDB` (`privacy_state`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_number_on_GroupDB` ON `GroupDB` (`tox_group_number`)");
+            run_multi_sql("CREATE INDEX `index_group_active_on_GroupDB` ON `GroupDB` (`group_active`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_GroupDB` ON `GroupDB` (`notification_silent`)");
+            run_multi_sql("CREATE TABLE `__temp_GroupDB` (`who_invited__tox_public_key_string` TEXT NOT NULL, `name` TEXT, `topic` TEXT, `peer_count` INTEGER NOT NULL DEFAULT - 1, `own_peer_number` INTEGER NOT NULL DEFAULT - 1, `privacy_state` INTEGER NOT NULL DEFAULT 0, `tox_group_number` INTEGER NOT NULL DEFAULT - 1, `group_active` BOOLEAN NOT NULL DEFAULT false, `notification_silent` BOOLEAN DEFAULT false, `group_identifier` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_GroupDB` (`who_invited__tox_public_key_string`, `name`, `peer_count`, `own_peer_number`, `privacy_state`, `tox_group_number`, `group_active`, `notification_silent`, `group_identifier`) SELECT `who_invited__tox_public_key_string`, `name`, `peer_count`, `own_peer_number`, `privacy_state`, `tox_group_number`, `group_active`, `notification_silent`, `group_identifier` FROM `GroupDB`");
+            run_multi_sql("DROP TABLE `GroupDB`");
+            run_multi_sql("ALTER TABLE `__temp_GroupDB` RENAME TO `GroupDB`");
+            run_multi_sql("CREATE INDEX `index_who_invited__tox_public_key_string_on_GroupDB` ON `GroupDB` (`who_invited__tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_name_on_GroupDB` ON `GroupDB` (`name`)");
+            run_multi_sql("CREATE INDEX `index_topic_on_GroupDB` ON `GroupDB` (`topic`)");
+            run_multi_sql("CREATE INDEX `index_peer_count_on_GroupDB` ON `GroupDB` (`peer_count`)");
+            run_multi_sql("CREATE INDEX `index_own_peer_number_on_GroupDB` ON `GroupDB` (`own_peer_number`)");
+            run_multi_sql("CREATE INDEX `index_privacy_state_on_GroupDB` ON `GroupDB` (`privacy_state`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_number_on_GroupDB` ON `GroupDB` (`tox_group_number`)");
+            run_multi_sql("CREATE INDEX `index_group_active_on_GroupDB` ON `GroupDB` (`group_active`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_GroupDB` ON `GroupDB` (`notification_silent`)");
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `msg_id_hash` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_GroupMessage` ON `GroupMessage` (`msg_id_hash`)");
+        }
+
+        if (new_version == 10157) {
+            run_multi_sql("CREATE TABLE `__temp_Filetransfer` (`tox_public_key_string` TEXT NOT NULL, `direction` INTEGER NOT NULL, `file_number` INTEGER NOT NULL, `kind` INTEGER NOT NULL, `state` INTEGER NOT NULL, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `path_name` TEXT NOT NULL, `file_name` TEXT NOT NULL, `fos_open` BOOLEAN NOT NULL DEFAULT false, `filesize` INTEGER NOT NULL DEFAULT - 1, `current_position` INTEGER NOT NULL DEFAULT 0, `message_id` INTEGER NOT NULL DEFAULT - 1, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `tox_file_id_hex` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Filetransfer` (`tox_public_key_string`, `direction`, `file_number`, `kind`, `state`, `ft_accepted`, `ft_outgoing_started`, `path_name`, `file_name`, `fos_open`, `filesize`, `current_position`, `message_id`, `storage_frame_work`, `id`) SELECT `tox_public_key_string`, `direction`, `file_number`, `kind`, `state`, `ft_accepted`, `ft_outgoing_started`, `path_name`, `file_name`, `fos_open`, `filesize`, `current_position`, `message_id`, `storage_frame_work`, `id` FROM `Filetransfer`");
+            run_multi_sql("DROP TABLE `Filetransfer`");
+            run_multi_sql("ALTER TABLE `__temp_Filetransfer` RENAME TO `Filetransfer`");
+            run_multi_sql("CREATE INDEX `index_tox_public_key_string_on_Filetransfer` ON `Filetransfer` (`tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Filetransfer` ON `Filetransfer` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_file_number_on_Filetransfer` ON `Filetransfer` (`file_number`)");
+            run_multi_sql("CREATE INDEX `index_kind_on_Filetransfer` ON `Filetransfer` (`kind`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Filetransfer` ON `Filetransfer` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Filetransfer` ON `Filetransfer` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Filetransfer` ON `Filetransfer` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_Filetransfer` ON `Filetransfer` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_Filetransfer` ON `Filetransfer` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Filetransfer` ON `Filetransfer` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Filetransfer` ON `Filetransfer` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_tox_file_id_hex_on_Filetransfer` ON `Filetransfer` (`tox_file_id_hex`)");
+            run_multi_sql("CREATE TABLE `__temp_Message` (`message_id` INTEGER NOT NULL, `tox_friendpubkey` TEXT NOT NULL, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `state` INTEGER NOT NULL DEFAULT 1, `ft_accepted` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_started` BOOLEAN NOT NULL DEFAULT false, `filedb_id` INTEGER NOT NULL DEFAULT - 1, `filetransfer_id` INTEGER NOT NULL DEFAULT - 1, `sent_timestamp` INTEGER DEFAULT 0, `sent_timestamp_ms` INTEGER DEFAULT 0, `rcvd_timestamp` INTEGER DEFAULT 0, `rcvd_timestamp_ms` INTEGER DEFAULT 0, `read` BOOLEAN NOT NULL, `send_retries` INTEGER NOT NULL DEFAULT 0, `is_new` BOOLEAN NOT NULL, `text` TEXT, `filename_fullpath` TEXT, `msg_id_hash` TEXT, `raw_msgv2_bytes` TEXT, `msg_version` INTEGER NOT NULL DEFAULT 0, `resend_count` INTEGER NOT NULL DEFAULT 4, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `ft_outgoing_queued` BOOLEAN NOT NULL DEFAULT false, `msg_at_relay` BOOLEAN NOT NULL DEFAULT false, `msg_idv3_hash` TEXT, `sent_push` INTEGER, `filetransfer_kind` INTEGER DEFAULT 0, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_Message` (`message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id`) SELECT `message_id`, `tox_friendpubkey`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `state`, `ft_accepted`, `ft_outgoing_started`, `filedb_id`, `filetransfer_id`, `sent_timestamp`, `sent_timestamp_ms`, `rcvd_timestamp`, `rcvd_timestamp_ms`, `read`, `send_retries`, `is_new`, `text`, `filename_fullpath`, `msg_id_hash`, `raw_msgv2_bytes`, `msg_version`, `resend_count`, `storage_frame_work`, `ft_outgoing_queued`, `msg_at_relay`, `msg_idv3_hash`, `sent_push`, `id` FROM `Message`");
+            run_multi_sql("DROP TABLE `Message`");
+            run_multi_sql("ALTER TABLE `__temp_Message` RENAME TO `Message`");
+            run_multi_sql("CREATE INDEX `index_message_id_on_Message` ON `Message` (`message_id`)");
+            run_multi_sql("CREATE INDEX `index_tox_friendpubkey_on_Message` ON `Message` (`tox_friendpubkey`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_Message` ON `Message` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_Message` ON `Message` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_Message` ON `Message` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_state_on_Message` ON `Message` (`state`)");
+            run_multi_sql("CREATE INDEX `index_ft_accepted_on_Message` ON `Message` (`ft_accepted`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_started_on_Message` ON `Message` (`ft_outgoing_started`)");
+            run_multi_sql("CREATE INDEX `index_filedb_id_on_Message` ON `Message` (`filedb_id`)");
+            run_multi_sql("CREATE INDEX `index_filetransfer_id_on_Message` ON `Message` (`filetransfer_id`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_Message` ON `Message` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_ms_on_Message` ON `Message` (`rcvd_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_send_retries_on_Message` ON `Message` (`send_retries`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_Message` ON `Message` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_text_on_Message` ON `Message` (`text`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_Message` ON `Message` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_raw_msgv2_bytes_on_Message` ON `Message` (`raw_msgv2_bytes`)");
+            run_multi_sql("CREATE INDEX `index_msg_version_on_Message` ON `Message` (`msg_version`)");
+            run_multi_sql("CREATE INDEX `index_resend_count_on_Message` ON `Message` (`resend_count`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_Message` ON `Message` (`storage_frame_work`)");
+            run_multi_sql("CREATE INDEX `index_ft_outgoing_queued_on_Message` ON `Message` (`ft_outgoing_queued`)");
+            run_multi_sql("CREATE INDEX `index_msg_at_relay_on_Message` ON `Message` (`msg_at_relay`)");
+            run_multi_sql("CREATE INDEX `index_msg_idv3_hash_on_Message` ON `Message` (`msg_idv3_hash`)");
+        }
+
+        if (new_version == 10172) {
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `msg_id_hash` TEXT, `sent_privately_to_tox_group_peer_pubkey` TEXT, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `msg_id_hash`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `msg_id_hash`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_GroupMessage` ON `GroupMessage` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_sent_privately_to_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`sent_privately_to_tox_group_peer_pubkey`)");
+        }
+
+        if (new_version == 10189) {
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_ftid_hex` TEXT, `avatar_update` BOOLEAN DEFAULT false, `avatar_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `last_online_timestamp_real` INTEGER NOT NULL DEFAULT - 1, `added_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `push_url` TEXT, `capabilities` INTEGER NOT NULL DEFAULT 0, `msgv3_capability` INTEGER NOT NULL DEFAULT 0, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `push_url`, `capabilities`, `msgv3_capability`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `push_url`, `capabilities`, `msgv3_capability`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_ftid_hex_on_FriendList` ON `FriendList` (`avatar_ftid_hex`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_timestamp_on_FriendList` ON `FriendList` (`avatar_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_real_on_FriendList` ON `FriendList` (`last_online_timestamp_real`)");
+            run_multi_sql("CREATE INDEX `index_added_timestamp_on_FriendList` ON `FriendList` (`added_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+            run_multi_sql("CREATE INDEX `index_push_url_on_FriendList` ON `FriendList` (`push_url`)");
+            run_multi_sql("CREATE INDEX `index_capabilities_on_FriendList` ON `FriendList` (`capabilities`)");
+            run_multi_sql("CREATE INDEX `index_msgv3_capability_on_FriendList` ON `FriendList` (`msgv3_capability`)");
+        }
+
+        if (new_version == 10195) {
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `msg_id_hash` TEXT, `sent_privately_to_tox_group_peer_pubkey` TEXT, `path_name` TEXT, `file_name` TEXT, `filename_fullpath` TEXT, `filesize` INTEGER NOT NULL DEFAULT - 1, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_GroupMessage` ON `GroupMessage` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_sent_privately_to_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`sent_privately_to_tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_GroupMessage` ON `GroupMessage` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_GroupMessage` ON `GroupMessage` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_filesize_on_GroupMessage` ON `GroupMessage` (`filesize`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_GroupMessage` ON `GroupMessage` (`storage_frame_work`)");
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `TRIFA_SYNC_TYPE` INTEGER, `msg_id_hash` TEXT, `sent_privately_to_tox_group_peer_pubkey` TEXT, `path_name` TEXT, `file_name` TEXT, `filename_fullpath` TEXT, `filesize` INTEGER NOT NULL DEFAULT - 1, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_SYNC_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_SYNC_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_GroupMessage` ON `GroupMessage` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_sent_privately_to_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`sent_privately_to_tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_GroupMessage` ON `GroupMessage` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_GroupMessage` ON `GroupMessage` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_filesize_on_GroupMessage` ON `GroupMessage` (`filesize`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_GroupMessage` ON `GroupMessage` (`storage_frame_work`)");
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `TRIFA_SYNC_TYPE` INTEGER, `sync_confirmations` INTEGER NOT NULL DEFAULT 0, `msg_id_hash` TEXT, `sent_privately_to_tox_group_peer_pubkey` TEXT, `path_name` TEXT, `file_name` TEXT, `filename_fullpath` TEXT, `filesize` INTEGER NOT NULL DEFAULT - 1, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `TRIFA_SYNC_TYPE`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `TRIFA_SYNC_TYPE`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_SYNC_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_SYNC_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_sync_confirmations_on_GroupMessage` ON `GroupMessage` (`sync_confirmations`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_GroupMessage` ON `GroupMessage` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_sent_privately_to_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`sent_privately_to_tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_GroupMessage` ON `GroupMessage` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_GroupMessage` ON `GroupMessage` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_filesize_on_GroupMessage` ON `GroupMessage` (`filesize`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_GroupMessage` ON `GroupMessage` (`storage_frame_work`)");
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `TRIFA_SYNC_TYPE` INTEGER, `sync_confirmations` INTEGER NOT NULL DEFAULT 0, `tox_group_peer_pubkey_syncer_01` TEXT, `tox_group_peer_pubkey_syncer_02` TEXT, `tox_group_peer_pubkey_syncer_03` TEXT, `msg_id_hash` TEXT, `sent_privately_to_tox_group_peer_pubkey` TEXT, `path_name` TEXT, `file_name` TEXT, `filename_fullpath` TEXT, `filesize` INTEGER NOT NULL DEFAULT - 1, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `TRIFA_SYNC_TYPE`, `sync_confirmations`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `TRIFA_SYNC_TYPE`, `sync_confirmations`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_SYNC_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_SYNC_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_sync_confirmations_on_GroupMessage` ON `GroupMessage` (`sync_confirmations`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_01_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_01`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_02_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_02`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_03_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_03`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_GroupMessage` ON `GroupMessage` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_sent_privately_to_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`sent_privately_to_tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_GroupMessage` ON `GroupMessage` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_GroupMessage` ON `GroupMessage` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_filesize_on_GroupMessage` ON `GroupMessage` (`filesize`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_GroupMessage` ON `GroupMessage` (`storage_frame_work`)");
+        }
+
+        if (new_version == 10203) {
+            run_multi_sql("CREATE TABLE `GroupPeerDB` (`group_identifier` TEXT NOT NULL, `tox_group_peer_pubkey` TEXT NOT NULL, `peer_name` TEXT , `last_update_timestamp` INTEGER NOT NULL DEFAULT -1, `first_join_timestamp` INTEGER NOT NULL DEFAULT -1, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupPeerDB` ON `GroupPeerDB` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupPeerDB` ON `GroupPeerDB` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_peer_name_on_GroupPeerDB` ON `GroupPeerDB` (`peer_name`)");
+            run_multi_sql("CREATE INDEX `index_last_update_timestamp_on_GroupPeerDB` ON `GroupPeerDB` (`last_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_first_join_timestamp_on_GroupPeerDB` ON `GroupPeerDB` (`first_join_timestamp`)");
+            run_multi_sql("CREATE UNIQUE INDEX `index_group_identifier_tox_group_peer_pubkey_on_GroupPeerDB` ON `GroupPeerDB` (`group_identifier`, `tox_group_peer_pubkey`)");
+        }
+
+        if (new_version == 10206) {
+            run_multi_sql("CREATE TABLE `__temp_GroupPeerDB` (`group_identifier` TEXT NOT NULL, `tox_group_peer_pubkey` TEXT NOT NULL, `peer_name` TEXT, `last_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `first_join_timestamp` INTEGER NOT NULL DEFAULT - 1, `Tox_Group_Role` INTEGER NOT NULL DEFAULT 2, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupPeerDB` (`group_identifier`, `tox_group_peer_pubkey`, `peer_name`, `last_update_timestamp`, `first_join_timestamp`, `id`) SELECT `group_identifier`, `tox_group_peer_pubkey`, `peer_name`, `last_update_timestamp`, `first_join_timestamp`, `id` FROM `GroupPeerDB`");
+            run_multi_sql("DROP TABLE `GroupPeerDB`");
+            run_multi_sql("ALTER TABLE `__temp_GroupPeerDB` RENAME TO `GroupPeerDB`");
+            run_multi_sql("CREATE UNIQUE INDEX `index_group_identifier_tox_group_peer_pubkey_on_GroupPeerDB` ON `GroupPeerDB` (`group_identifier`, `tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupPeerDB` ON `GroupPeerDB` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupPeerDB` ON `GroupPeerDB` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_peer_name_on_GroupPeerDB` ON `GroupPeerDB` (`peer_name`)");
+            run_multi_sql("CREATE INDEX `index_last_update_timestamp_on_GroupPeerDB` ON `GroupPeerDB` (`last_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_first_join_timestamp_on_GroupPeerDB` ON `GroupPeerDB` (`first_join_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_Tox_Group_Role_on_GroupPeerDB` ON `GroupPeerDB` (`Tox_Group_Role`)");
+        }
+
+        if (new_version == 10221) {
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `TRIFA_SYNC_TYPE` INTEGER, `sync_confirmations` INTEGER NOT NULL DEFAULT 0, `tox_group_peer_pubkey_syncer_01` TEXT, `tox_group_peer_pubkey_syncer_02` TEXT, `tox_group_peer_pubkey_syncer_03` TEXT, `tox_group_peer_pubkey_syncer_01_sent_timestamp` INTEGER, `tox_group_peer_pubkey_syncer_02_sent_timestamp` INTEGER, `tox_group_peer_pubkey_syncer_03_sent_timestamp` INTEGER, `msg_id_hash` TEXT, `sent_privately_to_tox_group_peer_pubkey` TEXT, `path_name` TEXT, `file_name` TEXT, `filename_fullpath` TEXT, `filesize` INTEGER NOT NULL DEFAULT - 1, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `TRIFA_SYNC_TYPE`, `sync_confirmations`, `tox_group_peer_pubkey_syncer_01`, `tox_group_peer_pubkey_syncer_02`, `tox_group_peer_pubkey_syncer_03`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `TRIFA_SYNC_TYPE`, `sync_confirmations`, `tox_group_peer_pubkey_syncer_01`, `tox_group_peer_pubkey_syncer_02`, `tox_group_peer_pubkey_syncer_03`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_SYNC_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_SYNC_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_sync_confirmations_on_GroupMessage` ON `GroupMessage` (`sync_confirmations`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_01_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_01`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_02_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_02`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_03_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_03`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_01_sent_timestamp_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_01_sent_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_02_sent_timestamp_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_02_sent_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_03_sent_timestamp_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_03_sent_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_GroupMessage` ON `GroupMessage` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_sent_privately_to_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`sent_privately_to_tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_GroupMessage` ON `GroupMessage` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_GroupMessage` ON `GroupMessage` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_filesize_on_GroupMessage` ON `GroupMessage` (`filesize`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_GroupMessage` ON `GroupMessage` (`storage_frame_work`)");
+        }
+
+        if (new_version == 10226) {
+            run_multi_sql("CREATE TABLE `__temp_FriendList` (`name` TEXT, `alias_name` TEXT, `status_message` TEXT, `TOX_CONNECTION` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_real` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off` INTEGER NOT NULL DEFAULT 0, `TOX_CONNECTION_on_off_real` INTEGER NOT NULL DEFAULT 0, `TOX_USER_STATUS` INTEGER NOT NULL DEFAULT 0, `avatar_pathname` TEXT, `avatar_filename` TEXT, `avatar_ftid_hex` TEXT, `avatar_update` BOOLEAN DEFAULT false, `avatar_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `notification_silent` BOOLEAN DEFAULT false, `sort` INTEGER NOT NULL DEFAULT 0, `last_online_timestamp` INTEGER NOT NULL DEFAULT - 1, `last_online_timestamp_real` INTEGER NOT NULL DEFAULT - 1, `added_timestamp` INTEGER NOT NULL DEFAULT - 1, `is_relay` BOOLEAN DEFAULT false, `push_url` TEXT, `ip_addr_str` TEXT, `capabilities` INTEGER NOT NULL DEFAULT 0, `msgv3_capability` INTEGER NOT NULL DEFAULT 0, `tox_public_key_string` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_FriendList` (`name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_ftid_hex`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `push_url`, `capabilities`, `msgv3_capability`, `tox_public_key_string`) SELECT `name`, `alias_name`, `status_message`, `TOX_CONNECTION`, `TOX_CONNECTION_real`, `TOX_CONNECTION_on_off`, `TOX_CONNECTION_on_off_real`, `TOX_USER_STATUS`, `avatar_pathname`, `avatar_filename`, `avatar_ftid_hex`, `avatar_update`, `avatar_update_timestamp`, `notification_silent`, `sort`, `last_online_timestamp`, `last_online_timestamp_real`, `added_timestamp`, `is_relay`, `push_url`, `capabilities`, `msgv3_capability`, `tox_public_key_string` FROM `FriendList`");
+            run_multi_sql("DROP TABLE `FriendList`");
+            run_multi_sql("ALTER TABLE `__temp_FriendList` RENAME TO `FriendList`");
+            run_multi_sql("CREATE INDEX `index_alias_name_on_FriendList` ON `FriendList` (`alias_name`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_FriendList` ON `FriendList` (`TOX_CONNECTION`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off`)");
+            run_multi_sql("CREATE INDEX `index_TOX_CONNECTION_on_off_real_on_FriendList` ON `FriendList` (`TOX_CONNECTION_on_off_real`)");
+            run_multi_sql("CREATE INDEX `index_TOX_USER_STATUS_on_FriendList` ON `FriendList` (`TOX_USER_STATUS`)");
+            run_multi_sql("CREATE INDEX `index_avatar_ftid_hex_on_FriendList` ON `FriendList` (`avatar_ftid_hex`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_on_FriendList` ON `FriendList` (`avatar_update`)");
+            run_multi_sql("CREATE INDEX `index_avatar_update_timestamp_on_FriendList` ON `FriendList` (`avatar_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_FriendList` ON `FriendList` (`notification_silent`)");
+            run_multi_sql("CREATE INDEX `index_sort_on_FriendList` ON `FriendList` (`sort`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_on_FriendList` ON `FriendList` (`last_online_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_last_online_timestamp_real_on_FriendList` ON `FriendList` (`last_online_timestamp_real`)");
+            run_multi_sql("CREATE INDEX `index_added_timestamp_on_FriendList` ON `FriendList` (`added_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_relay_on_FriendList` ON `FriendList` (`is_relay`)");
+            run_multi_sql("CREATE INDEX `index_push_url_on_FriendList` ON `FriendList` (`push_url`)");
+            run_multi_sql("CREATE INDEX `index_ip_addr_str_on_FriendList` ON `FriendList` (`ip_addr_str`)");
+            run_multi_sql("CREATE INDEX `index_capabilities_on_FriendList` ON `FriendList` (`capabilities`)");
+            run_multi_sql("CREATE INDEX `index_msgv3_capability_on_FriendList` ON `FriendList` (`msgv3_capability`)");
+        }
+
+        if (new_version == 10240) {
+            run_multi_sql("CREATE TABLE `__temp_GroupDB` (`who_invited__tox_public_key_string` TEXT NOT NULL, `name` TEXT, `topic` TEXT, `peer_count` INTEGER NOT NULL DEFAULT - 1, `own_peer_number` INTEGER NOT NULL DEFAULT - 1, `privacy_state` INTEGER NOT NULL DEFAULT 0, `tox_group_number` INTEGER NOT NULL DEFAULT - 1, `group_active` BOOLEAN NOT NULL DEFAULT false, `group_we_left` BOOLEAN NOT NULL DEFAULT false, `notification_silent` BOOLEAN DEFAULT false, `group_identifier` TEXT PRIMARY KEY)");
+            run_multi_sql("INSERT INTO `__temp_GroupDB` (`who_invited__tox_public_key_string`, `name`, `topic`, `peer_count`, `own_peer_number`, `privacy_state`, `tox_group_number`, `group_active`, `notification_silent`, `group_identifier`) SELECT `who_invited__tox_public_key_string`, `name`, `topic`, `peer_count`, `own_peer_number`, `privacy_state`, `tox_group_number`, `group_active`, `notification_silent`, `group_identifier` FROM `GroupDB`");
+            run_multi_sql("DROP TABLE `GroupDB`");
+            run_multi_sql("ALTER TABLE `__temp_GroupDB` RENAME TO `GroupDB`");
+            run_multi_sql("CREATE INDEX `index_who_invited__tox_public_key_string_on_GroupDB` ON `GroupDB` (`who_invited__tox_public_key_string`)");
+            run_multi_sql("CREATE INDEX `index_name_on_GroupDB` ON `GroupDB` (`name`)");
+            run_multi_sql("CREATE INDEX `index_topic_on_GroupDB` ON `GroupDB` (`topic`)");
+            run_multi_sql("CREATE INDEX `index_peer_count_on_GroupDB` ON `GroupDB` (`peer_count`)");
+            run_multi_sql("CREATE INDEX `index_own_peer_number_on_GroupDB` ON `GroupDB` (`own_peer_number`)");
+            run_multi_sql("CREATE INDEX `index_privacy_state_on_GroupDB` ON `GroupDB` (`privacy_state`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_number_on_GroupDB` ON `GroupDB` (`tox_group_number`)");
+            run_multi_sql("CREATE INDEX `index_group_active_on_GroupDB` ON `GroupDB` (`group_active`)");
+            run_multi_sql("CREATE INDEX `index_group_we_left_on_GroupDB` ON `GroupDB` (`group_we_left`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_GroupDB` ON `GroupDB` (`notification_silent`)");
+        }
+
+        if (new_version == 10241) {
+            run_multi_sql("CREATE TABLE `__temp_GroupMessage` (`message_id_tox` TEXT, `group_identifier` TEXT NOT NULL DEFAULT - 1, `tox_group_peer_pubkey` TEXT NOT NULL, `tox_group_peer_role` INTEGER NOT NULL DEFAULT - 1, `private_message` INTEGER, `tox_group_peername` TEXT, `direction` INTEGER NOT NULL, `TOX_MESSAGE_TYPE` INTEGER NOT NULL, `TRIFA_MESSAGE_TYPE` INTEGER NOT NULL DEFAULT 0, `sent_timestamp` INTEGER, `rcvd_timestamp` INTEGER, `read` BOOLEAN NOT NULL, `is_new` BOOLEAN NOT NULL, `text` TEXT, `was_synced` BOOLEAN, `TRIFA_SYNC_TYPE` INTEGER, `sync_confirmations` INTEGER NOT NULL DEFAULT 0, `tox_group_peer_pubkey_syncer_01` TEXT, `tox_group_peer_pubkey_syncer_02` TEXT, `tox_group_peer_pubkey_syncer_03` TEXT, `tox_group_peer_pubkey_syncer_01_sent_timestamp` INTEGER, `tox_group_peer_pubkey_syncer_02_sent_timestamp` INTEGER, `tox_group_peer_pubkey_syncer_03_sent_timestamp` INTEGER, `msg_id_hash` TEXT, `sent_privately_to_tox_group_peer_pubkey` TEXT, `path_name` TEXT, `file_name` TEXT, `filename_fullpath` TEXT, `filesize` INTEGER NOT NULL DEFAULT - 1, `storage_frame_work` BOOLEAN NOT NULL DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupMessage` (`message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `TRIFA_SYNC_TYPE`, `sync_confirmations`, `tox_group_peer_pubkey_syncer_01`, `tox_group_peer_pubkey_syncer_02`, `tox_group_peer_pubkey_syncer_03`, `tox_group_peer_pubkey_syncer_01_sent_timestamp`, `tox_group_peer_pubkey_syncer_02_sent_timestamp`, `tox_group_peer_pubkey_syncer_03_sent_timestamp`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id`) SELECT `message_id_tox`, `group_identifier`, `tox_group_peer_pubkey`, `private_message`, `tox_group_peername`, `direction`, `TOX_MESSAGE_TYPE`, `TRIFA_MESSAGE_TYPE`, `sent_timestamp`, `rcvd_timestamp`, `read`, `is_new`, `text`, `was_synced`, `TRIFA_SYNC_TYPE`, `sync_confirmations`, `tox_group_peer_pubkey_syncer_01`, `tox_group_peer_pubkey_syncer_02`, `tox_group_peer_pubkey_syncer_03`, `tox_group_peer_pubkey_syncer_01_sent_timestamp`, `tox_group_peer_pubkey_syncer_02_sent_timestamp`, `tox_group_peer_pubkey_syncer_03_sent_timestamp`, `msg_id_hash`, `sent_privately_to_tox_group_peer_pubkey`, `path_name`, `file_name`, `filename_fullpath`, `filesize`, `storage_frame_work`, `id` FROM `GroupMessage`");
+            run_multi_sql("DROP TABLE `GroupMessage`");
+            run_multi_sql("ALTER TABLE `__temp_GroupMessage` RENAME TO `GroupMessage`");
+            run_multi_sql("CREATE INDEX `index_message_id_tox_on_GroupMessage` ON `GroupMessage` (`message_id_tox`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupMessage` ON `GroupMessage` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_role_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_role`)");
+            run_multi_sql("CREATE INDEX `index_private_message_on_GroupMessage` ON `GroupMessage` (`private_message`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peername_on_GroupMessage` ON `GroupMessage` (`tox_group_peername`)");
+            run_multi_sql("CREATE INDEX `index_direction_on_GroupMessage` ON `GroupMessage` (`direction`)");
+            run_multi_sql("CREATE INDEX `index_TOX_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TOX_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_MESSAGE_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_MESSAGE_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_rcvd_timestamp_on_GroupMessage` ON `GroupMessage` (`rcvd_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_is_new_on_GroupMessage` ON `GroupMessage` (`is_new`)");
+            run_multi_sql("CREATE INDEX `index_was_synced_on_GroupMessage` ON `GroupMessage` (`was_synced`)");
+            run_multi_sql("CREATE INDEX `index_TRIFA_SYNC_TYPE_on_GroupMessage` ON `GroupMessage` (`TRIFA_SYNC_TYPE`)");
+            run_multi_sql("CREATE INDEX `index_sync_confirmations_on_GroupMessage` ON `GroupMessage` (`sync_confirmations`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_01_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_01`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_02_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_02`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_03_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_03`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_01_sent_timestamp_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_01_sent_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_02_sent_timestamp_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_02_sent_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_syncer_03_sent_timestamp_on_GroupMessage` ON `GroupMessage` (`tox_group_peer_pubkey_syncer_03_sent_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_msg_id_hash_on_GroupMessage` ON `GroupMessage` (`msg_id_hash`)");
+            run_multi_sql("CREATE INDEX `index_sent_privately_to_tox_group_peer_pubkey_on_GroupMessage` ON `GroupMessage` (`sent_privately_to_tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_path_name_on_GroupMessage` ON `GroupMessage` (`path_name`)");
+            run_multi_sql("CREATE INDEX `index_file_name_on_GroupMessage` ON `GroupMessage` (`file_name`)");
+            run_multi_sql("CREATE INDEX `index_filesize_on_GroupMessage` ON `GroupMessage` (`filesize`)");
+            run_multi_sql("CREATE INDEX `index_storage_frame_work_on_GroupMessage` ON `GroupMessage` (`storage_frame_work`)");
+            run_multi_sql("CREATE TABLE `__temp_GroupPeerDB` (`group_identifier` TEXT NOT NULL, `tox_group_peer_pubkey` TEXT NOT NULL, `peer_name` TEXT, `last_update_timestamp` INTEGER NOT NULL DEFAULT - 1, `first_join_timestamp` INTEGER NOT NULL DEFAULT - 1, `Tox_Group_Role` INTEGER NOT NULL DEFAULT 2, `notification_silent` BOOLEAN DEFAULT false, `id` INTEGER PRIMARY KEY AUTOINCREMENT)");
+            run_multi_sql("INSERT INTO `__temp_GroupPeerDB` (`group_identifier`, `tox_group_peer_pubkey`, `peer_name`, `last_update_timestamp`, `first_join_timestamp`, `Tox_Group_Role`, `id`) SELECT `group_identifier`, `tox_group_peer_pubkey`, `peer_name`, `last_update_timestamp`, `first_join_timestamp`, `Tox_Group_Role`, `id` FROM `GroupPeerDB`");
+            run_multi_sql("DROP TABLE `GroupPeerDB`");
+            run_multi_sql("ALTER TABLE `__temp_GroupPeerDB` RENAME TO `GroupPeerDB`");
+            run_multi_sql("CREATE UNIQUE INDEX `index_group_identifier_tox_group_peer_pubkey_on_GroupPeerDB` ON `GroupPeerDB` (`group_identifier`, `tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_group_identifier_on_GroupPeerDB` ON `GroupPeerDB` (`group_identifier`)");
+            run_multi_sql("CREATE INDEX `index_tox_group_peer_pubkey_on_GroupPeerDB` ON `GroupPeerDB` (`tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_peer_name_on_GroupPeerDB` ON `GroupPeerDB` (`peer_name`)");
+            run_multi_sql("CREATE INDEX `index_last_update_timestamp_on_GroupPeerDB` ON `GroupPeerDB` (`last_update_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_first_join_timestamp_on_GroupPeerDB` ON `GroupPeerDB` (`first_join_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_Tox_Group_Role_on_GroupPeerDB` ON `GroupPeerDB` (`Tox_Group_Role`)");
+            run_multi_sql("CREATE INDEX `index_notification_silent_on_GroupPeerDB` ON `GroupPeerDB` (`notification_silent`)");
+        }
+
+    }
+
+    private OrmaDatabase OrmaDatabase_wrapper(String dbs_path, String pref__db_secrect_key, boolean pref__db_wal_mode)
+    {
+        set_schema_upgrade_callback(new OrmaDatabase.schema_upgrade_callback()
+        {
+            @Override
+            public void upgrade(int old_version, int new_version)
+            {
+                Log.i(TAG, "trying to upgrade schema from " + old_version + " to " + new_version);
+                upgrade_db_schema_do(old_version, new_version);
+            }
+        });
+
+        OrmaDatabase orma = new OrmaDatabase(dbs_path, pref__db_secrect_key, pref__db_wal_mode);
+        try
+        {
+            OrmaDatabase.init(ORMA_CURRENT_DB_SCHEMA_VERSION);
+        }
+        catch (Exception e)
+        {
+            throw new RuntimeException(e);
+        }
+
+        return orma;
     }
 
     private void manually_log_in()
@@ -4833,9 +5920,9 @@ public class MainActivity extends AppCompatActivity
                     try
                     {
                         // Log.i(TAG, "check_for_stale_ft:001:friend=" + f);
-                        List<Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).kindEq(
+                        List<com.zoffcc.applications.sorm.Filetransfer> fts_active = orma.selectFromFiletransfer().file_numberNotEq(-1).kindEq(
                                 TOX_FILE_KIND_DATA.value).tox_public_key_stringEq(f.tox_public_key_string).toList();
-                        for (Filetransfer ft : fts_active)
+                        for (com.zoffcc.applications.sorm.Filetransfer ft : fts_active)
                         {
                             // Log.i(TAG, "check_for_stale_ft:002:ft=" + ft);
 
@@ -5099,7 +6186,7 @@ public class MainActivity extends AppCompatActivity
                     if (friend_of_relay != null)
                     {
 
-                        Message m = orma.selectFromMessage().msg_id_hashEq(
+                        Message m = (Message) orma.selectFromMessage().msg_id_hashEq(
                                 message_id_hash_as_hex_string).tox_friendpubkeyEq(
                                 friend_of_relay.tox_public_key_string).directionEq(1).readEq(false).toList().get(0);
 
@@ -5135,7 +6222,7 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            final Message m = orma.selectFromMessage().msg_id_hashEq(message_id_hash_as_hex_string).tox_friendpubkeyEq(
+            final Message m = (Message) orma.selectFromMessage().msg_id_hashEq(message_id_hash_as_hex_string).tox_friendpubkeyEq(
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(1).readEq(
                     false).toList().get(0);
 
@@ -5205,7 +6292,7 @@ public class MainActivity extends AppCompatActivity
             }
 
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
-            final Message m = orma.selectFromMessage().message_idEq(message_id).tox_friendpubkeyEq(
+            final Message m = (Message) orma.selectFromMessage().message_idEq(message_id).tox_friendpubkeyEq(
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).directionEq(
                     1).orderByIdDesc().toList().get(0);
             // there can be older messages with same message_id for this friend! so always take the latest one! -------
@@ -5631,7 +6718,7 @@ public class MainActivity extends AppCompatActivity
             {
                 long ft_id = HelperFiletransfer.get_filetransfer_id_from_friendnum_and_filenum(friend_number,
                                                                                                file_number);
-                Filetransfer ft_check = orma.selectFromFiletransfer().idEq(ft_id).get(0);
+                com.zoffcc.applications.sorm.Filetransfer ft_check = orma.selectFromFiletransfer().idEq(ft_id).get(0);
 
                 // -------- DEBUG --------
                 //                List<Filetransfer> ft_res = orma.selectFromFiletransfer().
@@ -5728,9 +6815,9 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            Filetransfer ft = orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).stateNotEq(
+            com.zoffcc.applications.sorm.Filetransfer ft = orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_OUTGOING.value).stateNotEq(
                     TOX_FILE_CONTROL_CANCEL.value).tox_public_key_stringEq(
-                    HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).file_numberEq(
+                    tox_friend_get_public_key__wrapper(friend_number)).file_numberEq(
                     file_number).orderByIdDesc().get(0);
 
             if (ft == null)
@@ -5786,7 +6873,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (length == 0)
                 {
-                    remove_ft_from_cache(ft);
+                    remove_ft_from_cache((Filetransfer) ft);
 
                     Log.i(TAG, "file_chunk_request:file fully sent");
                     // transfer finished -----------
@@ -5804,8 +6891,8 @@ public class MainActivity extends AppCompatActivity
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                            ft.tox_public_key_string).and().file_nameEq(ft.file_name).and().path_nameEq(
-                            ft.path_name).and().directionEq(ft.direction).and().filesizeEq(
+                            ft.tox_public_key_string).file_nameEq(ft.file_name).path_nameEq(
+                            ft.path_name).directionEq(ft.direction).filesizeEq(
                             ft.filesize).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
 
@@ -5884,7 +6971,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES) < position)
                         {
                             ft.current_position = position;
-                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position((Filetransfer) ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -5907,7 +6994,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
                         {
                             ft.current_position = position;
-                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position((Filetransfer) ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -5931,7 +7018,7 @@ public class MainActivity extends AppCompatActivity
             {
                 if (length == 0)
                 {
-                    remove_ft_from_cache(ft);
+                    remove_ft_from_cache((Filetransfer) ft);
 
                     Log.i(TAG, "file_chunk_request:file fully sent");
                     // transfer finished -----------
@@ -5949,8 +7036,8 @@ public class MainActivity extends AppCompatActivity
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_chunk_request:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                            ft.tox_public_key_string).and().file_nameEq(ft.file_name).and().path_nameEq(
-                            ft.path_name).and().directionEq(ft.direction).and().filesizeEq(
+                            ft.tox_public_key_string).file_nameEq(ft.file_name).path_nameEq(
+                            ft.path_name).directionEq(ft.direction).filesizeEq(
                             ft.filesize).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_chunk_request:FileDB:filedb_id=" + filedb_id);
 
@@ -6028,7 +7115,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES_SMALL_FILES) < position)
                         {
                             ft.current_position = position;
-                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position((Filetransfer) ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -6051,7 +7138,7 @@ public class MainActivity extends AppCompatActivity
                         if ((ft.current_position + UPDATE_MESSAGE_PROGRESS_AFTER_BYTES) < position)
                         {
                             ft.current_position = position;
-                            HelperFiletransfer.update_filetransfer_db_current_position(ft);
+                            HelperFiletransfer.update_filetransfer_db_current_position((Filetransfer) ft);
 
                             if (ft.kind != TOX_FILE_KIND_AVATAR.value)
                             {
@@ -6286,7 +7373,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // update "new" status on friendlist fragment
-                FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                FriendList f2 = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
                 // HelperFriend.update_single_friend_in_friendlist_view(f2);
                 HelperFriend.add_all_friends_clear_wrapper(0);
 
@@ -6447,7 +7534,7 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // update "new" status on friendlist fragment
-                FriendList f2 = orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
+                FriendList f2 = (FriendList) orma.selectFromFriendList().tox_public_key_stringEq(m.tox_friendpubkey).toList().get(0);
                 // HelperFriend.update_single_friend_in_friendlist_view(f2);
                 HelperFriend.add_all_friends_clear_wrapper(0);
 
@@ -6524,14 +7611,14 @@ public class MainActivity extends AppCompatActivity
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_outgoung_ft_ts = System.currentTimeMillis();
 
-        // Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
-        // Log.i(TAG, "file_recv_chunk:--START--");
-        // Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":" + position + ":" + length);
+        //Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
+        //Log.i(TAG, "file_recv_chunk:--START--");
+        //Log.i(TAG, "file_recv_chunk:" + friend_number + ":" + file_number + ":" + position + ":" + length);
         Filetransfer f = null;
 
         try
         {
-            f = orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_INCOMING.value).file_numberEq(
+            f = (Filetransfer) orma.selectFromFiletransfer().directionEq(TRIFA_FT_DIRECTION_INCOMING.value).file_numberEq(
                     file_number).stateNotEq(TOX_FILE_CONTROL_CANCEL.value).tox_public_key_stringEq(
                     HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).orderByIdDesc().get(0);
 
@@ -6594,7 +7681,7 @@ public class MainActivity extends AppCompatActivity
                     long row_id = orma.insertIntoFileDB(file_);
                     // Log.i(TAG, "file_recv_chunk:FileDB:row_id=" + row_id);
                     filedb_id = orma.selectFromFileDB().tox_public_key_stringEq(
-                            f.tox_public_key_string).and().file_nameEq(f.file_name).orderByIdDesc().get(0).id;
+                            f.tox_public_key_string).file_nameEq(f.file_name).orderByIdDesc().get(0).id;
                     // Log.i(TAG, "file_recv_chunk:FileDB:filedb_id=" + filedb_id);
                 }
 
@@ -6879,8 +7966,8 @@ public class MainActivity extends AppCompatActivity
         try
         {
             // TODO: cache me!!
-            conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
-                    conference_number).and().conference_activeEq(true).toList().get(0);
+            conf_temp = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
+                    conference_number).conference_activeEq(true).toList().get(0);
             conf_id = conf_temp.conference_identifier;
         }
         catch (Exception e)
@@ -6996,8 +8083,8 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     // TODO: cache me!!
-                    conf_temp2 = orma.selectFromConferenceDB().tox_conference_numberEq(
-                            conference_number).and().conference_activeEq(true).get(0);
+                    conf_temp2 = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
+                            conference_number).conference_activeEq(true).get(0);
 
                     if (conf_temp2 != null)
                     {
@@ -7052,8 +8139,8 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // TODO: cache me!!
-                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
-                        conference_number).and().conference_activeEq(true).get(0);
+                conf_temp = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
+                        conference_number).conference_activeEq(true).get(0);
             }
             catch (Exception e)
             {
@@ -7185,8 +8272,8 @@ public class MainActivity extends AppCompatActivity
             try
             {
                 // TODO: cache me!!
-                conf_temp = orma.selectFromConferenceDB().tox_conference_numberEq(
-                        conference_number).and().conference_activeEq(true).get(0);
+                conf_temp = (ConferenceDB) orma.selectFromConferenceDB().tox_conference_numberEq(
+                        conference_number).conference_activeEq(true).get(0);
             }
             catch (Exception e)
             {
@@ -7658,9 +8745,9 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            //Log.i(TAG,
-            //      "group_custom_private_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
-            //      " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
+            Log.i(TAG,
+                  "group_custom_private_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
+                  " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
         }
         catch(Exception e)
         {
@@ -7910,11 +8997,11 @@ public class MainActivity extends AppCompatActivity
                             }
                             try
                             {
-                                final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                                final GroupDB conf3 = (GroupDB) orma.selectFromGroupDB().group_identifierEq(
                                         group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
-                                cc.group_item = GroupDB.deep_copy(conf3);
+                                cc.group_item = (GroupDB) GroupDB.deep_copy(conf3);
                                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                             }
                             catch (Exception e3)
@@ -7981,11 +9068,11 @@ public class MainActivity extends AppCompatActivity
                             }
                             try
                             {
-                                final GroupDB conf3 = orma.selectFromGroupDB().group_identifierEq(
+                                final GroupDB conf3 = (GroupDB) orma.selectFromGroupDB().group_identifierEq(
                                         group_identifier.toLowerCase()).toList().get(0);
                                 CombinedFriendsAndConferences cc = new CombinedFriendsAndConferences();
                                 cc.is_friend = COMBINED_IS_CONFERENCE;
-                                cc.group_item = GroupDB.deep_copy(conf3);
+                                cc.group_item = (GroupDB) GroupDB.deep_copy(conf3);
                                 MainActivity.friend_list_fragment.modify_friend(cc, cc.is_friend);
                             }
                             catch (Exception e3)
@@ -8191,7 +9278,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     long mid = (Long) i.next();
-                    final Message m_to_delete = orma.selectFromMessage().idEq(mid).get(0);
+                    final Message m_to_delete = (Message) orma.selectFromMessage().idEq(mid).get(0);
 
                     // ---------- delete fileDB if this message is an outgoing file ----------
                     if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
@@ -8234,7 +9321,7 @@ public class MainActivity extends AppCompatActivity
                         {
                             try
                             {
-                                FileDB file_ = orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
+                                FileDB file_ = (FileDB) orma.selectFromFileDB().idEq(m_to_delete.filedb_id).get(0);
 
                                 try
                                 {
@@ -8406,8 +9493,8 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     long mid = (Long) i.next();
-                    Message m = orma.selectFromMessage().idEq(mid).get(0);
-                    FileDB file_ = orma.selectFromFileDB().idEq(m.filedb_id).get(0);
+                    Message m = (Message) orma.selectFromMessage().idEq(mid).get(0);
+                    FileDB file_ = (FileDB) orma.selectFromFileDB().idEq(m.filedb_id).get(0);
                     HelperGeneric.export_vfs_file_to_real_file(file_.path_name, file_.file_name,
                                                                SD_CARD_FILES_EXPORT_DIR + "/" + m.tox_friendpubkey +
                                                                "/", file_.file_name);
@@ -8615,7 +9702,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     long mid = (Long) i.next();
-                    final ConferenceMessage m_to_delete = orma.selectFromConferenceMessage().idEq(mid).get(0);
+                    final ConferenceMessage m_to_delete = (ConferenceMessage) orma.selectFromConferenceMessage().idEq(mid).get(0);
 
                     // ---------- delete the message itself ----------
                     try
@@ -8769,7 +9856,7 @@ public class MainActivity extends AppCompatActivity
                 try
                 {
                     long mid = (Long) i.next();
-                    final GroupMessage m_to_delete = orma.selectFromGroupMessage().idEq(mid).get(0);
+                    final GroupMessage m_to_delete = (GroupMessage) orma.selectFromGroupMessage().idEq(mid).get(0);
 
                     // ---------- delete file if this message is an outgoing file ----------
                     if (m_to_delete.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)

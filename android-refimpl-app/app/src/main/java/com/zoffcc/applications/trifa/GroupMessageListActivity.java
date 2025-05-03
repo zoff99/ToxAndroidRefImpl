@@ -83,6 +83,8 @@ import com.vanniktech.emoji.listeners.OnEmojiPopupShownListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardCloseListener;
 import com.vanniktech.emoji.listeners.OnSoftKeyboardOpenListener;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.GroupPeerDB;
 
 import java.io.File;
 import java.nio.ByteBuffer;
@@ -1491,7 +1493,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                         GroupPeerDB peer_from_db = null;
                         try
                         {
-                            peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(
+                            peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(
                                     group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
                         }
                         catch (Exception e)
@@ -1581,7 +1583,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                     GroupPeerDB peer_from_db = null;
                     try
                     {
-                        peer_from_db = orma.selectFromGroupPeerDB().group_identifierEq(
+                        peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(
                                 group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
                     }
                     catch (Exception e)

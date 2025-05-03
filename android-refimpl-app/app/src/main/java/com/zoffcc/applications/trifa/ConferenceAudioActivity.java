@@ -53,6 +53,7 @@ import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IDrawerItem;
 import com.mikepenz.materialdrawer.model.interfaces.IProfile;
 import com.zoffcc.applications.nativeaudio.NativeAudio;
+import com.zoffcc.applications.sorm.FriendList;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -1208,7 +1209,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
                                         try
                                         {
-                                            fl_temp = orma.selectFromFriendList().
+                                            fl_temp = (FriendList) orma.selectFromFriendList().
                                                     tox_public_key_stringEq(peer_pubkey).toList().get(0);
 
                                             if ((fl_temp.avatar_filename != null) && (fl_temp.avatar_pathname != null))

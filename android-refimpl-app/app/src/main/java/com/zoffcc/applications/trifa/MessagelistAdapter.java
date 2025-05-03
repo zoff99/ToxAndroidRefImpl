@@ -26,6 +26,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.l4digital.fastscroll.FastScroller;
+import com.zoffcc.applications.sorm.Message;
 
 import java.util.Iterator;
 import java.util.List;
@@ -51,7 +52,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 {
     private static final String TAG = "trifa.MessagelistAdptr";
 
-    private final List<Message> messagelistitems;
+    private final List<com.zoffcc.applications.sorm.Message> messagelistitems;
     private Context context;
     long getSectionText_message_object_ts = -1L;
     long getSectionText_message_object_ts2 = -1L;
@@ -59,7 +60,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     String getSectionText_message_object_ts_string2 = " ";
 
 
-    public MessagelistAdapter(Context context, List<Message> items)
+    public MessagelistAdapter(Context context, List<com.zoffcc.applications.sorm.Message> items)
     {
         Log.i(TAG, "MessagelistAdapter");
 
@@ -189,7 +190,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     @Override
     public int getItemViewType(int position)
     {
-        Message my_msg = this.messagelistitems.get(position);
+        Message my_msg = (Message) this.messagelistitems.get(position);
 
         if (my_msg.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
         {
@@ -362,7 +363,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
         try
         {
-            Message m2 = this.messagelistitems.get(position);
+            Message m2 = (Message) this.messagelistitems.get(position);
 
             switch (getItemViewType(position))
             {
@@ -449,7 +450,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         }
     }
 
-    public void add_list_clear(List<Message> new_items)
+    public void add_list_clear(List<com.zoffcc.applications.sorm.Message> new_items)
     {
         // Log.i(TAG, "add_list_clear:" + new_items);
 
@@ -563,7 +564,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         // set fastscroller bluble text
         try
         {
-            Message getSectionText_message_object = messagelistitems.get(position);
+            Message getSectionText_message_object = (Message) messagelistitems.get(position);
 
             if (getSectionText_message_object.direction == 0)
             {
@@ -607,7 +608,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     {
         try
         {
-            Message getSectionText_message_object2 = messagelistitems.get(position);
+            Message getSectionText_message_object2 = (Message) messagelistitems.get(position);
 
             if (getSectionText_message_object2.direction == 0)
             {
@@ -660,7 +661,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         try
         {
             // direction: 0 -> msg received, 1 -> msg sent
-            Message getSectionText_message_object2 = messagelistitems.get(position);
+            Message getSectionText_message_object2 = (Message) messagelistitems.get(position);
 
             if (getSectionText_message_object2.direction == 0)
             {

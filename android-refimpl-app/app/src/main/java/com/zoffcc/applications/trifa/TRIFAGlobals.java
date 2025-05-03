@@ -21,6 +21,8 @@ package com.zoffcc.applications.trifa;
 
 import android.graphics.Color;
 
+import com.zoffcc.applications.sorm.BootstrapNodeEntryDB;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -261,8 +263,8 @@ public class TRIFAGlobals
     static Map<String, PositionInputStream> cache_ft_fis_saf = new HashMap<String, PositionInputStream>();
     // ---- lookup cache ----
 
-    static List<BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<>();
-    public static List<BootstrapNodeEntryDB> tcprelay_node_list = new ArrayList<>();
+    static List<com.zoffcc.applications.sorm.BootstrapNodeEntryDB> bootstrap_node_list = new ArrayList<>();
+    public static List<com.zoffcc.applications.sorm.BootstrapNodeEntryDB> tcprelay_node_list = new ArrayList<>();
 
     static final int[] MESSAGE_TEXT_SIZE = {9, 11, 15, 20,   25, 30, 45}; // values in "sp"
     static final int[] MESSAGE_EMOJI_SIZE = {13, 18, 25, 36,   40, 40, 40}; // values in "dp"

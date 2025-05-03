@@ -21,6 +21,9 @@ package com.zoffcc.applications.trifa;
 
 import android.util.Log;
 
+import com.zoffcc.applications.sorm.FileDB;
+import com.zoffcc.applications.sorm.FriendList;
+
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.ByteBuffer;
@@ -74,7 +77,7 @@ public class HelperFriend
         {
             String pubkey_temp = tox_friend_get_public_key__wrapper(friendnum);
             // Log.i(TAG, "main_get_friend:pubkey=" + pubkey_temp + " fnum=" + friendnum);
-            List<FriendList> fl = orma.selectFromFriendList().
+            List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
                     tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                     toList();
 
@@ -82,7 +85,7 @@ public class HelperFriend
 
             if (fl.size() > 0)
             {
-                f = fl.get(0);
+                f = (FriendList) fl.get(0);
                 // Log.i(TAG, "main_get_friend:f=" + f);
             }
             else
@@ -104,13 +107,13 @@ public class HelperFriend
 
         try
         {
-            List<FriendList> fl = orma.selectFromFriendList().
+            List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
                     tox_public_key_stringEq(friend_pubkey).
                     toList();
 
             if (fl.size() > 0)
             {
-                f = fl.get(0);
+                f = (FriendList) fl.get(0);
             }
             else
             {
@@ -144,7 +147,7 @@ public class HelperFriend
     {
         try
         {
-            final FriendList f = orma.selectFromFriendList().
+            final FriendList f = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                     toList().get(0);
             if ((f.TOX_CONNECTION_real != 0) && (f.msgv3_capability == 1))
@@ -167,7 +170,7 @@ public class HelperFriend
     {
         try
         {
-            final FriendList f = orma.selectFromFriendList().
+            final FriendList f = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(tox_friend_get_public_key__wrapper(friendnum)).
                     toList().get(0);
             if ((f.TOX_CONNECTION_real != 0) && (f.msgv3_capability != 1))
@@ -321,7 +324,7 @@ public class HelperFriend
     synchronized static void update_friend_in_db_status(FriendList f)
     {
         // Log.i(TAG, "update_friend_in_db_status:f=" + f);
-        int numrows = orma.updateFriendList().
+        orma.updateFriendList().
                 tox_public_key_stringEq(f.tox_public_key_string).
                 TOX_USER_STATUS(f.TOX_USER_STATUS).
                 execute();
@@ -427,7 +430,7 @@ public class HelperFriend
         long ret = 0;
         try
         {
-            FriendList f = orma.selectFromFriendList().
+            FriendList f = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(friend_public_key_string).
                     get(0);
             if (f != null)
@@ -448,7 +451,7 @@ public class HelperFriend
         long ret = 0;
         try
         {
-            FriendList f = orma.selectFromFriendList().
+            FriendList f = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                     get(0);
             if (f != null)
@@ -473,7 +476,7 @@ public class HelperFriend
         {
             if ((new_value == 0) || (new_value == 1))
             {
-                FriendList f = orma.selectFromFriendList().
+                FriendList f = (FriendList) orma.selectFromFriendList().
                         tox_public_key_stringEq(HelperFriend.tox_friend_get_public_key__wrapper(friend_number)).
                         get(0);
                 if (f != null)
@@ -1140,7 +1143,7 @@ public class HelperFriend
                 e1.printStackTrace();
             }
 
-            FriendList fl = orma.selectFromFriendList().
+            FriendList fl = (FriendList) orma.selectFromFriendList().
                     tox_public_key_stringEq(pub_key).
                     toList().get(0);
 
@@ -1476,7 +1479,7 @@ public class HelperFriend
 
         try
         {
-            List<FriendList> fl = orma.selectFromFriendList().
+            List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
                     is_relayNotEq(true).
                     toList();
 
@@ -1487,7 +1490,7 @@ public class HelperFriend
                     int i = 0;
                     for (i = 0; i < fl.size(); i++)
                     {
-                        FriendList n = fl.get(i);
+                        FriendList n = (FriendList) fl.get(i);
                         send_pushurl_to_friend(n.tox_public_key_string);
                     }
                 }
