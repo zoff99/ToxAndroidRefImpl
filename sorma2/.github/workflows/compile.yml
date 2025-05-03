@@ -1,0 +1,73 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+jobs:
+
+  test_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: java-version
+        run: java -version
+
+      - name: compile
+        run: |
+          ./do_compile.sh
+
+      - name: test
+        run: |
+          ./do_run.sh
+
+
+  test_macos:
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: java-version
+        run: java -version
+
+      - name: compile
+        run: |
+          ./do_compile.sh
+
+      - name: test
+        run: |
+          ./do_run.sh
+
+
+  test_macos14arm:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: java-version
+        run: java -version
+
+      - name: compile
+        run: |
+          ./do_compile.sh
+
+      - name: test
+        run: |
+          ./do_run.sh
+

@@ -20,6 +20,8 @@ import com.zoffcc.applications.sorm.Log;
 public class OrmaDatabase
 {
     private static final String TAG = "sorm.OrmaDatabase";
+    public static final String OrmaDatabaseVersion = "1.0.1";
+
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean ORMA_LONG_RUNNING_TRACE = true; // set "false" for release builds
     final static long ORMA_LONG_RUNNING_MS = 180;
@@ -50,6 +52,11 @@ public class OrmaDatabase
     private static String db_file_path = null;
     private static String secrect_key = null;
     private static boolean wal_mode = false; // default mode is WAL off!
+
+    public static String getVersion()
+    {
+        return OrmaDatabase.OrmaDatabaseVersion;
+    }
 
     public OrmaDatabase(final String db_file_path, final String secrect_key, boolean wal_mode)
     {
