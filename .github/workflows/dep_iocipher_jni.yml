@@ -1,0 +1,53 @@
+name: Auto update iocipher JNI
+
+on:
+  schedule:
+    # runs Tue at 12:00 am
+    - cron: '0 0 * * 2'
+  push:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+
+jobs:
+  auto-update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Run auto dependency update
+      run: ./tools/check_iocipher_jni.sh > output.txt
+
+    - name: check for changes
+      run:  git diff || echo "no changes"
+
+    - name: check if jni update or witness checksums only
+      id: titletext_str
+      run: |
+        (git diff android-refimpl-app/app/build.gradle android-refimpl-app/app/witness.gradle 2>/dev/null|grep '^\+' 2>/dev/null|(grep 'com.github.zoff99:pkgs_guardianprojectIOCipher' 2>/dev/null| grep 'implementation' 2>/dev/null) && echo "jni version update" && release_tag=$(cat output.txt|grep '__VERSIONUPDATE__'|cut -d':' -f2) && echo "titletext=update iocipher JNI to $release_tag" >> $GITHUB_OUTPUT) || \
+        (echo "gradle witness checksums update";echo "titletext=update gradle witness checksums 2" >> $GITHUB_OUTPUT;echo "release_tag=" >> $GITHUB_OUTPUT)
+
+    - name: cleanup
+      run: rm -f output.txt
+
+    - name: Create Pull Request
+      if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/zoff99/dev003' }}
+      uses: peter-evans/create-pull-request@v7
+      with:
+        commit-message: ${{ steps.titletext_str.outputs.titletext }}
+        branch: create-pull-request/iocipher
+        delete-branch: true
+        title: ${{ steps.titletext_str.outputs.titletext }}
+        body: |
+          - Dependency updates
+
+          https://github.com/zoff99/iocipher_pack/
+
+          have a look at the iocipher_pack repository for all changes.
