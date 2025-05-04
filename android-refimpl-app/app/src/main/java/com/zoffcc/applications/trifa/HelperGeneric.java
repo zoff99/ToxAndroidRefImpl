@@ -667,6 +667,8 @@ public class HelperGeneric
                                     Filetransfer ft_avatar_outgoing = new Filetransfer();
                                     ft_avatar_outgoing.tox_public_key_string = HelperFriend.tox_friend_get_public_key__wrapper(
                                             friend_number_);
+                                    ft_avatar_outgoing.path_name = VFS_PREFIX + VFS_TMP_FILE_DIR + "/" + "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b852";
+                                    ft_avatar_outgoing.file_name = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b851";
                                     ft_avatar_outgoing.direction = TRIFA_FT_DIRECTION_OUTGOING.value;
                                     ft_avatar_outgoing.file_number = filenum;
                                     ft_avatar_outgoing.kind = TOX_FILE_KIND_AVATAR.value;
