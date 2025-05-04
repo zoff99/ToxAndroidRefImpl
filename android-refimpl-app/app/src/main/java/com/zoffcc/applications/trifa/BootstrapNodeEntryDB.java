@@ -226,9 +226,9 @@ public class BootstrapNodeEntryDB extends com.zoffcc.applications.sorm.Bootstrap
         // @formatter:on
     }
 
-    public static BootstrapNodeEntryDB BootstrapNodeEntryDB_(boolean udp_node_, int num_, String ip_, long port_, String key_hex_)
+    public static com.zoffcc.applications.sorm.BootstrapNodeEntryDB BootstrapNodeEntryDB_(boolean udp_node_, int num_, String ip_, long port_, String key_hex_)
     {
-        BootstrapNodeEntryDB n = new BootstrapNodeEntryDB();
+        com.zoffcc.applications.sorm.BootstrapNodeEntryDB n = new com.zoffcc.applications.sorm.BootstrapNodeEntryDB();
         n.num = num_;
         n.udp_node = udp_node_;
         n.ip = ip_;
