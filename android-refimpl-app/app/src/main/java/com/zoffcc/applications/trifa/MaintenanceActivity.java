@@ -47,6 +47,7 @@ import com.zoffcc.applications.sorm.ConferenceDB;
 import com.zoffcc.applications.sorm.ConferenceMessage;
 import com.zoffcc.applications.sorm.FriendList;
 import com.zoffcc.applications.sorm.Message;
+import com.zoffcc.applications.sorm.OrmaDatabase;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 
@@ -749,17 +750,32 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
 
         debug_output_clear();
+        //
+        debug_output_append("--- IOCipher ---");
+        debug_output_append("sqlfs_version=" + vfs.sqlfsVersion());
+        debug_output_append("iocipher_version=" + vfs.iocipherVersion());
+        debug_output_append("iocipherjni_version=" + vfs.iocipherJNIVersion());
+        //
+        debug_output_append("");
+        debug_output_append("--- sorma2 ---");
+        debug_output_append("sorma_version=" + OrmaDatabase.getVersion());
         debug_output_append("cipher_version=" + debug__cipher_version);
         debug_output_append("sqlite_version=" + debug__sqlite_version);
         debug_output_append("cipher_provider=" + debug__cipher_provider);
         debug_output_append("cipher_provider_version=" + debug__cipher_provider_version);
+        //
+        debug_output_append("");
+        debug_output_append("--- ToxAV ---");
         debug_output_append("libavutil_version=" + libavutil_version());
         debug_output_append("libopus_version=" + libopus_version());
         debug_output_append("libvpx_version=" + libvpx_version());
+        //
+        debug_output_append("");
+        debug_output_append("--- Tox ---");
         debug_output_append("libsodium_version=" + libsodium_version());
-        debug_output_append("sqlfs_version=" + vfs.sqlfsVersion());
-        debug_output_append("iocipher_version=" + vfs.iocipherVersion());
-        debug_output_append("iocipherjni_version=" + vfs.iocipherJNIVersion());
+        //
+        debug_output_append("");
+        debug_output_append("--- other info ---");
         debug_output_append("audio_pkt_incoming=" + debug__audio_pkt_incoming);
         debug_output_append("audio_frame_played=" + debug__audio_frame_played);
         debug_output_append("audio_play_buf_count_max=" + debug__audio_play_buf_count_max);
@@ -1313,7 +1329,14 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     }
                 }
 
-                // now dump the DB to file in SQL format
+                // now dump the DB to file in SQL format -------------
+                // now dump the DB to file in SQL format -------------
+
+                // TODO: change to sorma2
+                // TODO: change to sorma2
+                // TODO: change to sorma2
+
+                /*
                 final String dbs_path = c.getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
                 net.sqlcipher.database.SQLiteDatabase database = net.sqlcipher.database.SQLiteDatabase.openDatabase(
                         dbs_path, PREF__DB_secrect_key, null, net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE);
@@ -1342,6 +1365,14 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
                            cursor.getCount());
                 database.close();
+                */
+
+                // TODO: change to sorma2
+                // TODO: change to sorma2
+                // TODO: change to sorma2
+
+                // now dump the DB to file in SQL format -------------
+                // now dump the DB to file in SQL format -------------
             }
             catch (Exception e)
             {
