@@ -2020,7 +2020,7 @@ public class TrifaToxService extends Service
                     int used = 0;
                     while (i2.hasNext())
                     {
-                        ee = (BootstrapNodeEntryDB) i2.next();
+                        ee = (com.zoffcc.applications.sorm.BootstrapNodeEntryDB) i2.next();
                         int bootstrap_result = 1;
                         if ((ee.ip != null) && (ee.key_hex != null))
                         {
