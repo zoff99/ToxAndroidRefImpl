@@ -213,7 +213,6 @@ dependencyVerification {
         'net.java.dev.jna:jna-platform:5.6.0:jna-platform-5.6.0.jar:9ecea8bf2b1b39963939d18b70464eef60c508fed8820f9dcaba0c35518eabf7',
         'net.java.dev.jna:jna:5.6.0:jna-5.6.0.jar:5557e235a8aa2f9766d5dc609d67948f2a8832c2d796cea9ef1d6cbe0b3b7eaf',
         'net.sf.kxml:kxml2:2.3.0:kxml2-2.3.0.jar:f264dd9f79a1fde10ce5ecc53221eff24be4c9331c830b7d52f2f08a7b633de2',
-        'net.zetetic:android-database-sqlcipher:4.5.4:android-database-sqlcipher-4.5.4.aar:b7e2c945b9a34c366826330c2af51800ef399c13dbf7ea02229c6aedb176978b',
         'org.bouncycastle:bcprov-jdk18on:1.77:bcprov-jdk18on-1.77.jar:dabb98c24d72c9b9f585633d1df9c5cd58d9ad373d0cd681367e6a603a495d58',
         'org.checkerframework:checker-qual:3.13.0:checker-qual-3.13.0.jar:3ea0dcd73b4d6cb2fb34bd7ed4dad6db327a01ebad7db05eb7894076b3d64491',
         'org.checkerframework:checker-qual:3.5.0:checker-qual-3.5.0.jar:729990b3f18a95606fc2573836b6958bcdb44cb52bfbd1b7aa9c339cff35a5a4',
