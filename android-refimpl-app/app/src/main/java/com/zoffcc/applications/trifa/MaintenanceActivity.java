@@ -1215,9 +1215,9 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 export_dir.mkdirs();
 
                 List<com.zoffcc.applications.sorm.FriendList> fl = orma.selectFromFriendList().
-                        is_relayEq(false).
-                        orderByTox_public_key_stringAsc().
-                        toList();
+                    is_relayEq(false).
+                    orderByTox_public_key_stringAsc().
+                    toList();
                 // Log.i(TAG, "export_friends:" + fl.size());
                 for (com.zoffcc.applications.sorm.FriendList f : fl)
                 {
@@ -1226,9 +1226,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     // Log.i(TAG, "friend:xxx:F:" + dirpath);
                     new File(dirpath).mkdirs();
 
-                    List<com.zoffcc.applications.sorm.Message> ml = orma.selectFromMessage().
-                            tox_friendpubkeyEq(f.tox_public_key_string).
-                            toList();
+                    List<com.zoffcc.applications.sorm.Message> ml = orma.selectFromMessage().tox_friendpubkeyEq(f.tox_public_key_string).toList();
                     // Log.i(TAG, "export_messages_count:" + ml.size() + " friend=" + f.tox_public_key_string);
                     long counter = 0;
                     for (Message m : ml)
@@ -1257,8 +1255,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                 msg_type_state = "OU";
                             }
                         }
-                        String msg_path = dirpath + "/" + long_date_time_format_for_filename(ts) + "_" +
-                                          String.format("%03d", counter) + "_" + msg_type_state + ".txt";
+                        String msg_path = dirpath + "/" + long_date_time_format_for_filename(ts) + "_" + String.format("%03d", counter) + "_" + msg_type_state + ".txt";
                         // Log.i(TAG, "friend:xxx:F:M:" + msg_path);
 
                         try
@@ -1273,10 +1270,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     }
                 }
 
-                List<com.zoffcc.applications.sorm.ConferenceDB> cl = orma.selectFromConferenceDB().
-                        kindEq(TOX_CONFERENCE_TYPE_TEXT.value).
-                        orderByConference_identifierAsc().
-                        toList();
+                List<com.zoffcc.applications.sorm.ConferenceDB> cl = orma.selectFromConferenceDB().kindEq(
+                        TOX_CONFERENCE_TYPE_TEXT.value).orderByConference_identifierAsc().toList();
                 long counter = 0;
                 for (ConferenceDB conf : cl)
                 {
@@ -1286,8 +1281,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     // Log.i(TAG, "friend:xxx:C:" + dirpath);
                     new File(dirpath).mkdirs();
 
-                    List<com.zoffcc.applications.sorm.ConferenceMessage> cml = orma.selectFromConferenceMessage().
-                            conference_identifierEq(conf.conference_identifier).toList();
+                    List<com.zoffcc.applications.sorm.ConferenceMessage> cml = orma.selectFromConferenceMessage().conference_identifierEq(
+                            conf.conference_identifier).toList();
                     for (ConferenceMessage cm : cml)
                     {
                         long ts = 0;
@@ -1311,10 +1306,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                                 msg_type_state = "OU";
                             }
                         }
-                        String msg_path = dirpath + "/" + long_date_time_format_for_filename(ts) + "_" +
-                                          String.format("%03d", counter) + "_" + msg_type_state + "_" +
-                                          cm.tox_peerpubkey + "_" +
-                                          filter_out_specials_from_filepath_stricter(cm.tox_peername) + ".txt";
+                        String msg_path = dirpath + "/" + long_date_time_format_for_filename(ts) + "_" + String.format("%03d", counter) + "_" + msg_type_state + "_" +
+                                          cm.tox_peerpubkey + "_" + filter_out_specials_from_filepath_stricter(cm.tox_peername) + ".txt";
                         // Log.i(TAG, "friend:xxx:C:M:" + msg_path);
 
                         try
@@ -1331,46 +1324,25 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
                 // now dump the DB to file in SQL format -------------
                 // now dump the DB to file in SQL format -------------
-
-                // TODO: change to sorma2
-                // TODO: change to sorma2
-                // TODO: change to sorma2
-
-                /*
                 final String dbs_path = c.getDir("dbs", MODE_PRIVATE).getAbsolutePath() + "/" + MAIN_DB_NAME;
-                net.sqlcipher.database.SQLiteDatabase database = net.sqlcipher.database.SQLiteDatabase.openDatabase(
-                        dbs_path, PREF__DB_secrect_key, null, net.sqlcipher.database.SQLiteDatabase.OPEN_READWRITE);
-
                 final String sql_export_filename = export_dir_string + "/" + "export.sqlite";
 
                 try
                 {
-                    new File(sql_export_filename).delete();
+                    new java.io.File(sql_export_filename).delete();
                 }
                 catch (Exception e)
                 {
                     e.printStackTrace();
                 }
 
-                touch(new File(sql_export_filename));
-                String sql = "ATTACH DATABASE '" + sql_export_filename + "' AS export KEY '';";
-                net.sqlcipher.Cursor cursor = database.rawQuery(sql, null);
-
-                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
-                           cursor.getCount());
-                cursor = database.rawQuery("SELECT sqlcipher_export('export');", null);
-                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
-                           cursor.getCount());
-                cursor = database.rawQuery("DETACH DATABASE export;", null);
-                Log.i(TAG, "export:chats:sqlfile:" + cursor.getColumnNames() + " " + cursor.getColumnCount() + " " +
-                           cursor.getCount());
-                database.close();
-                */
-
-                // TODO: change to sorma2
-                // TODO: change to sorma2
-                // TODO: change to sorma2
-
+                touch(new java.io.File(sql_export_filename));
+                String sql_01 = "ATTACH DATABASE '" + sql_export_filename + "' AS export KEY '';";
+                String sql_02 = "SELECT sqlcipher_export('export');";
+                String sql_03 = "DETACH DATABASE export;";
+                OrmaDatabase.run_query_for_single_result(sql_01);
+                OrmaDatabase.run_query_for_single_result(sql_02);
+                OrmaDatabase.run_query_for_single_result(sql_03);
                 // now dump the DB to file in SQL format -------------
                 // now dump the DB to file in SQL format -------------
             }
