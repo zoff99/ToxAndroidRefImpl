@@ -97,6 +97,7 @@ jobs:
            git bc wget rsync cmake make pkg-config libtool \
            ssh gzip tar \
            coreutils \
+           yasm \
            libncurses5
 
     - name: use mnt dir
