@@ -140,7 +140,7 @@ jobs:
 
     - name: build_maven_deps
       run: |
-           export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64
+           export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.452/x64
            java -version
            sudo mkdir -p ~/work/deploy
            sudo mkdir -p ~/.android/
@@ -149,14 +149,14 @@ jobs:
            sudo mkdir -p /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir
            pwd
            ls -al
-           sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh debugbuild"
+           sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.452/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/deps.sh debugbuild"
 
     - name: build_maven_pkg
       run: |
            pwd
-           export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64
+           export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.452/x64
            sudo bash -c "cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/stub* /root/work/"
-           sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.422/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
+           sudo bash -c "export JAVA_HOME=/opt/hostedtoolcache/jdk/8.0.452/x64;cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/build_dir/;../circle_scripts/trifa.sh '../'"
 
     - name: acls_maven_pkg
       run: |
