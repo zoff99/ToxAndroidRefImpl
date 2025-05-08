@@ -752,8 +752,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         debug_output_clear();
         //
         debug_output_append("--- IOCipher ---");
-        debug_output_append("iocipher_version=" + vfs.iocipherVersion());
         debug_output_append("iocipherjni_version=" + vfs.iocipherJNIVersion());
+        debug_output_append("iocipher_version=" + vfs.iocipherVersion());
         debug_output_append("sqlfs_version=" + vfs.sqlfsVersion());
         //
         debug_output_append("");
