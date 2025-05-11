@@ -386,7 +386,7 @@ if [ "$full""x" == "1x" ]; then
         --disable-bzlib \
         --disable-libxcb-shm \
         --disable-libxcb-xfixes \
-        --disable-ffmpeg --disable-ffprobe \
+        --enable-ffmpeg --enable-ffprobe \
         --enable-parser=hevc \
         --enable-decoder=hevc \
         --enable-parser=h264 \
@@ -923,7 +923,7 @@ if [ "$full""x" == "1x" ]; then
         --disable-bzlib \
         --disable-libxcb-shm \
         --disable-libxcb-xfixes \
-        --disable-ffmpeg --disable-ffprobe \
+        --enable-ffmpeg --enable-ffprobe \
         --enable-parser=hevc \
         --enable-decoder=hevc \
         --enable-parser=h264 \
@@ -1531,7 +1531,7 @@ if [ "$full""x" == "1x" ]; then
         --disable-bzlib \
         --disable-libxcb-shm \
         --disable-libxcb-xfixes \
-        --disable-ffmpeg --disable-ffprobe \
+        --enable-ffmpeg --enable-ffprobe \
         --enable-parser=h264 \
         --enable-runtime-cpudetect \
         --enable-jni \
@@ -1966,7 +1966,7 @@ if [ "$full""x" == "1x" ]; then
         --disable-bzlib \
         --disable-libxcb-shm \
         --disable-libxcb-xfixes \
-        --disable-ffmpeg --disable-ffprobe \
+        --enable-ffmpeg --enable-ffprobe \
         --enable-parser=h264 \
         --enable-runtime-cpudetect \
         --enable-jni \
