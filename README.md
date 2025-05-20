@@ -8,7 +8,6 @@ This is now also a Tox Client for Android.
 ### Important Notice: Since Google has changed their <a href="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/google_play_dev_verify_02.png">Playstore policy</a> in a way that is unacceptable, future Versions are not published on the Playstore anymore. Github Releases are signed with the same key as the Playstore version.
 
 <a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/f-droid.png" width="200"></a>
-<a href="https://play.google.com/store/apps/details?id=com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/playstore.png" width="200"></a>
 <a href="https://github.com/zoff99/ToxAndroidRefImpl/releases/latest/download/play.trifa.apk"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/on_github.png" width="200"></a>
 <a href="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/TRIfA-nightly.apk"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/on_github_nightly.png" width="200"></a>
 
