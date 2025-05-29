@@ -25,7 +25,7 @@ public class TRIFADatabaseGlobalsNew
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public String value;
 
-    static TRIFADatabaseGlobalsNew deep_copy(TRIFADatabaseGlobalsNew in)
+    public static TRIFADatabaseGlobalsNew deep_copy(TRIFADatabaseGlobalsNew in)
     {
         TRIFADatabaseGlobalsNew out = new TRIFADatabaseGlobalsNew();
         out.key = in.key;

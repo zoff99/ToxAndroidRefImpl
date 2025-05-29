@@ -109,7 +109,7 @@ public class Message
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public int filetransfer_kind;
 
-    static Message deep_copy(Message in)
+    public static Message deep_copy(Message in)
     {
         Message out = new Message();
         out.id = in.id;

@@ -91,7 +91,7 @@ public class FriendList
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public long msgv3_capability;
 
-    static FriendList deep_copy(FriendList in)
+    public static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();
         out.tox_public_key_string = in.tox_public_key_string;

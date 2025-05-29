@@ -112,7 +112,7 @@ public class GroupMessage
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public boolean storage_frame_work;
 
-    static GroupMessage deep_copy(GroupMessage in)
+    public static GroupMessage deep_copy(GroupMessage in)
     {
         GroupMessage out = new GroupMessage();
         out.id = in.id;

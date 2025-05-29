@@ -34,7 +34,7 @@ public class ConferencePeerCacheDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public long last_update_timestamp;
 
-    static ConferencePeerCacheDB deep_copy(ConferencePeerCacheDB in)
+    public static ConferencePeerCacheDB deep_copy(ConferencePeerCacheDB in)
     {
         ConferencePeerCacheDB out = new ConferencePeerCacheDB();
         out.id = in.id;

@@ -52,7 +52,7 @@ public class GroupDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public boolean notification_silent;
 
-    static GroupDB deep_copy(GroupDB in)
+    public static GroupDB deep_copy(GroupDB in)
     {
         GroupDB out = new GroupDB();
         out.group_identifier = in.group_identifier;

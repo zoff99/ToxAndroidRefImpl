@@ -37,7 +37,7 @@ public class RelayListDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public String tox_public_key_string_of_owner;
 
-    static RelayListDB deep_copy(RelayListDB in)
+    public static RelayListDB deep_copy(RelayListDB in)
     {
         RelayListDB out = new RelayListDB();
         out.tox_public_key_string = in.tox_public_key_string;

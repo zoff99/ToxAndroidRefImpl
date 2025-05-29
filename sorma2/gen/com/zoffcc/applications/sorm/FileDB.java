@@ -43,7 +43,7 @@ public class FileDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public boolean is_in_VFS;
 
-    static FileDB deep_copy(FileDB in)
+    public static FileDB deep_copy(FileDB in)
     {
         FileDB out = new FileDB();
         out.id = in.id;

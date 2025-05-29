@@ -43,7 +43,7 @@ public class GroupPeerDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public boolean notification_silent;
 
-    static GroupPeerDB deep_copy(GroupPeerDB in)
+    public static GroupPeerDB deep_copy(GroupPeerDB in)
     {
         GroupPeerDB out = new GroupPeerDB();
         out.id = in.id;
