@@ -1,0 +1,63 @@
+name: Auto update sorma2
+
+on:
+  schedule:
+    # runs Tue at 12:00 am
+    - cron: '0 0 * * 2'
+  push:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+
+jobs:
+  auto-update-dependencies:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Install Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: |
+          17
+
+    - name: test java1
+      run:  |
+            pwd
+            type java
+            echo "===========1========="
+            java -version || exit 0
+            echo "===========2========="
+
+    - name: Run auto dependency update
+      run: |
+        ./tools/update_sorma2.sh && ./tools/init_sorma2.sh
+
+    - name: check for changes
+      run:  git diff || echo "no changes"
+
+    - name: cleanup
+      run: rm -f output.txt
+
+    - name: Create Pull Request
+      if: ${{ (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/zoff99/dev003' }}
+      uses: peter-evans/create-pull-request@v7
+      with:
+        commit-message: "update sorma2"
+        branch: create-pull-request/sorma2
+        delete-branch: true
+        title: "update sorma2"
+        body: |
+          - Dependency updates
+
+          https://github.com/zoff99/sorma2
+
+          have a look at the sorma2 repository for all changes.
