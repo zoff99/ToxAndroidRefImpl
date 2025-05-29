@@ -20,6 +20,6 @@ java \
 -classpath ".:sqlite-jdbc-3.46.1.2.jar:sorma2.jar" \
 com/zoffcc/applications/sorm/Generator "gen" || exit 1
 
-cp -v \
-../sorma2/gen/com/zoffcc/applications/sorm/OrmaDatabase.java \
-../android-refimpl-app/app/src/main/java/com/zoffcc/applications/sorm/OrmaDatabase.java
+# cp -v \
+# ../sorma2/gen/com/zoffcc/applications/sorm/OrmaDatabase.java \
+# ../android-refimpl-app/app/src/main/java/com/zoffcc/applications/sorm/OrmaDatabase.java
