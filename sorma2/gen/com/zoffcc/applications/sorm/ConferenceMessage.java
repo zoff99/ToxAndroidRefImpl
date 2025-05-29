@@ -61,7 +61,7 @@ public class ConferenceMessage
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public boolean was_synced;
 
-    static ConferenceMessage deep_copy(ConferenceMessage in)
+    public static ConferenceMessage deep_copy(ConferenceMessage in)
     {
         ConferenceMessage out = new ConferenceMessage();
         out.id = in.id;

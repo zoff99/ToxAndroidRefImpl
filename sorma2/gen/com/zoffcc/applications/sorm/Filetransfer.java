@@ -67,7 +67,7 @@ public class Filetransfer
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public String tox_file_id_hex;
 
-    static Filetransfer deep_copy(Filetransfer in)
+    public static Filetransfer deep_copy(Filetransfer in)
     {
         Filetransfer out = new Filetransfer();
         out.id = in.id;

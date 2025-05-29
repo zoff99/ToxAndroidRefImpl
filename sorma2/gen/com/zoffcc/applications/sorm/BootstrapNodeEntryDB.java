@@ -37,7 +37,7 @@ public class BootstrapNodeEntryDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public String key_hex;
 
-    static BootstrapNodeEntryDB deep_copy(BootstrapNodeEntryDB in)
+    public static BootstrapNodeEntryDB deep_copy(BootstrapNodeEntryDB in)
     {
         BootstrapNodeEntryDB out = new BootstrapNodeEntryDB();
         out.id = in.id;
