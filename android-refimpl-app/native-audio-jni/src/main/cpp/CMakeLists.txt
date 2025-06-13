@@ -41,7 +41,8 @@ set(CMAKE_C_FLAGS1 "${CMAKE_C_FLAGS} -Wall \
 
 set(CMAKE_C_FLAGS2 "${CMAKE_C_FLAGS} -Wall -Iwebrtc6/webrtc -Irnnoise1/include")
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS1} -std=c99 -fPIC -g -fstack-protector-all")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS1} -std=c99 -fPIC -g -fstack-protector-all -Wl,-z,max-page-size=16384")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-z,max-page-size=16384")
 
 add_library(native-audio-jni SHARED
         native-audio-jni.c
