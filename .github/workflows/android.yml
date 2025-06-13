@@ -46,6 +46,17 @@ jobs:
         echo ${{github.workspace}} || echo "NO ERR"
         echo ${{github.workflow}} || echo "NO ERR"
 
+
+    - name: create /home/runner/.config/.android with normal user
+      run: |
+          pwd
+          id -a
+          mkdir -p /home/runner/.android/
+          mkdir -p /home/runner/.config/.android/
+          ls -al /home/runner/
+          ls -al /home/runner/.config/
+          ls -al /home/runner/.config/.android/
+
     - name: Install system packages
       run: |
           sudo apt-get update && \
