@@ -249,7 +249,7 @@ android {
         versionCode 10249
         versionName "1.0.249"
 
-        renderscriptTargetApi 18
+        renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
         // renderscriptSupportModeBlasEnabled true
 

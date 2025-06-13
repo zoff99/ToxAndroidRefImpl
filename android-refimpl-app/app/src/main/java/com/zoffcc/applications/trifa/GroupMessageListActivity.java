@@ -109,11 +109,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.camera.core.impl.utils.CompareSizesByArea;
 import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.renderscript.Allocation;
-import androidx.renderscript.Element;
-import androidx.renderscript.RenderScript;
-import androidx.renderscript.ScriptIntrinsicYuvToRGB;
-import androidx.renderscript.Type;
+import android.renderscript.Allocation;
+import android.renderscript.Element;
+import android.renderscript.RenderScript;
+import android.renderscript.ScriptIntrinsicYuvToRGB;
+import android.renderscript.Type;
 
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_in;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_vu_out;
