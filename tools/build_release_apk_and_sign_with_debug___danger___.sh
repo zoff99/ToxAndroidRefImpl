@@ -31,5 +31,7 @@ rm -fv working.apk.idsig
 
 mv -v "$temp_apk_file" "$release_apk_file"
 
+cd "$basedir"/
 echo "singed apk file is:"
-echo "$release_apk_file"
+release_apk_file2=$(find . -name '*.apk' 2>/dev/null)
+echo "$release_apk_file2"
