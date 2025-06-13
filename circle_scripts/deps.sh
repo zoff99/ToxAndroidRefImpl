@@ -16,6 +16,7 @@ build_yasm="0"
 
 ## ----------------------
 FORTIFY_FLAGS="" # "-D_FORTIFY_SOURCE=2"
+JNI_CUSTOM_FLAGS="-Wl,-z,max-page-size=16384" # align for 16kB
 _FFMPEG_VERSION_="n7.1"
 _OPUS_VERSION_="v1.5.2"
 _VPX_VERSION_="v1.15.2"
@@ -674,6 +675,7 @@ popd
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     $WARNS \
     $FORTIFY_FLAGS \
+    $JNI_CUSTOM_FLAGS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
@@ -1269,6 +1271,7 @@ set -x
 cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     $WARNS \
     $FORTIFY_FLAGS \
+    $JNI_CUSTOM_FLAGS \
     $ASAN_CLANG_FLAGS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,-soname,libjni-c-toxcore.so \
@@ -1708,6 +1711,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     -Wno-pointer-sign -Wno-unused-but-set-variable \
     $WARNS \
     $FORTIFY_FLAGS \
+    $JNI_CUSTOM_FLAGS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
@@ -2143,6 +2147,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     -Wno-pointer-sign -Wno-unused-but-set-variable \
     $WARNS \
     $FORTIFY_FLAGS \
+    $JNI_CUSTOM_FLAGS \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
