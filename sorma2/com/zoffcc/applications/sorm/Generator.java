@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 public class Generator {
     private static final String TAG = "Generator";
-    static final String Version = "0.99.1";
+    static final String Version = "0.99.2";
     static final String prefix = "_sorm_";
     static final String tbl_f_ext = ".java";
     static final String tbl_s_ext = ".sql";
