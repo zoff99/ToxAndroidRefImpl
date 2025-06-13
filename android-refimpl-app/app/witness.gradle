@@ -136,7 +136,7 @@ dependencyVerification {
         'com.github.zoff99:pkgs_TensorflowLiteAndroidMediapipeGPU:2.6.0:pkgs_TensorflowLiteAndroidMediapipeGPU-2.6.0.aar:08ddc31d4f7061c99a79f6757d59e35621ec8a0fcae48536c920a174dc147dd4',
         'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.161:pkgs_ToxAndroidRefImpl-1.0.161.aar:36d3fd16426ae75d8a664717e9d82fb3f127c9b08b39dd6962a154b7c4b16f68',
         'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0:pkgs_armchaAutoLinkTextView-0.3.0.aar:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
-        'com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.11:pkgs_guardianprojectIOCipher-1.0.11.aar:8d1fb7cba815bff4905bc54662e8de7902fdc5c589944254ecf370bda498ac4d',
+        'com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.12:pkgs_guardianprojectIOCipher-1.0.12.aar:31758077e5e91518865a36db01cb0250fb853a3dc104838db55be8c123cbddbc',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0:pkgs_hotchemiPermissionsdispatcher-processor-3.2.0.jar:f7374192b263a94f63186dee91cb954c9369122519e4f08e055b72969699b52d',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0:pkgs_hotchemiPermissionsdispatcher-3.2.0.aar:40191c8c726445dcab4fa2a4ef7a7e76186ef154dc385fe07520944fe4720089',
         'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.6:pkgs_zoffccAndroidJDBC-1.0.6.aar:914d80f790453ac2e94101e06327ab2e49a4082fbfccdb6dbe60160d4e120f71',
