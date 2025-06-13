@@ -56,7 +56,6 @@ android {
 
     sourceSets {
         main {
-            jni.srcDirs = []
             jniLibs.srcDirs = ['nativelibs']
             java {
                 exclude 'com/zoffcc/applications/trifa/VideoFrameAnalyser.java'
@@ -280,6 +279,7 @@ android {
             // proguardFile ('proguard-disable.pro')
         }
     }
+    namespace 'com.zoffcc.applications.trifa'
 }
 
 

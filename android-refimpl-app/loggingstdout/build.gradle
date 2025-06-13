@@ -55,5 +55,6 @@ android {
             path 'src/main/cpp/CMakeLists.txt'
         }
     }
+    namespace 'com.zoffcc.applications.loggingstdout'
 }
 
