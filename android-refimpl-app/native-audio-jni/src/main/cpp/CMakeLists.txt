@@ -36,6 +36,7 @@ set(CMAKE_C_FLAGS1 "${CMAKE_C_FLAGS} -Wall \
 -Wno-error=strict-prototypes \
 -Wno-error=gnu-statement-expression \
 -Wno-documentation \
+-Wno-error=unused-command-line-argument \
 -Werror \
 ")
 
