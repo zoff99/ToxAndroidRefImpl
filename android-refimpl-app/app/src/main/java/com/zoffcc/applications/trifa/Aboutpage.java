@@ -84,6 +84,7 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             aboutPage.setDescription(getString(R.string.Aboutpage_5a) + "\n" + getString(R.string.Aboutpage_5b) + " " +
                                      MainActivity.versionName + "\n\n" +
                                      "Build: " + get_trifa_build_str()  + "\n" +
+                                     "BuildType: " + BuildConfig.BUILD_TYPE  + "\n" +
                                      "TRIfA commit hash: " + BuildConfig.GitHash +
                                      "\n" + "JNI commit hash: " + MainActivity.getNativeLibGITHASH() + "\n" +
                                      "c-toxcore commit hash: " + MainActivity.getNativeLibTOXGITHASH() + "\n" +
