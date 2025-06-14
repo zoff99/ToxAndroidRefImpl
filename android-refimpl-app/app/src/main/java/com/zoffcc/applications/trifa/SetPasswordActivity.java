@@ -129,9 +129,27 @@ public class SetPasswordActivity extends AppCompatActivity
         {
         }
 
+        String abis = "??";
         try
         {
-            githash_text.setText("build: " + BuildConfig.GitHash + "\n" + "API: " + Build.VERSION.SDK_INT + "            ");
+            abis = Build.SUPPORTED_ABIS[0];
+        }
+        catch(Exception e)
+        {
+            try
+            {
+                abis = Build.CPU_ABI;
+            }
+            catch(Exception e2)
+            {
+            }
+        }
+
+        try
+        {
+            githash_text.setText("build: " + BuildConfig.GitHash +
+                                 "\n" + "API: " + Build.VERSION.SDK_INT + "            " +
+                                 "\n" + "ABI: " + abis + "            ");
         }
         catch(Exception ignored)
         {
