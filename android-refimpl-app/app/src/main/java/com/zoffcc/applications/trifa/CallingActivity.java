@@ -112,7 +112,6 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_screen_off_
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__h264_encoder_use_intra_refresh;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_H264_hw_encoding;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__use_camera_x;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__use_software_aec;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_call_quality;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_cam_resolution;
@@ -177,8 +176,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static CameraSurfacePreview cameraSurfacePreview = null;
     static PreviewView cameraXPreview = null;
     static CameraDrawingOverlay drawingOverlay = null;
-    static Object videoFrameAnalyser = null;
-    static VideoFrameAnalyserTFLite videoFrameAnalyser_tflite = null;
     static ProcessCameraProvider cameraProvider = null;
     static ListenableFuture<ProcessCameraProvider> cameraProviderListenableFuture = null;
     static float mPreviewRate = -1f;
@@ -1205,35 +1202,26 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     camera_toggle_button_pressed = true;
                     Log.i(TAG, "camera_toggle_button_pressed[press start]=" + camera_toggle_button_pressed);
-                    if (PREF__use_camera_x)
+                    final Thread toggle_thread = new Thread()
                     {
-                        toggle_camera();
-                        camera_toggle_button_pressed = false;
-                        Log.i(TAG, "camera_toggle_button_pressed[press end:M]=" + camera_toggle_button_pressed);
-                    }
-                    else
-                    {
-                        final Thread toggle_thread = new Thread()
+                        @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+                        @Override
+                        public void run()
                         {
-                            @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-                            @Override
-                            public void run()
+                            try
                             {
-                                try
-                                {
-                                    Thread.sleep(30);
-                                }
-                                catch (Exception e)
-                                {
-                                    // e.printStackTrace();
-                                }
-                                toggle_camera();
-                                camera_toggle_button_pressed = false;
-                                Log.i(TAG, "camera_toggle_button_pressed[press end]=" + camera_toggle_button_pressed);
+                                Thread.sleep(30);
                             }
-                        };
-                        toggle_thread.start();
-                    }
+                            catch (Exception e)
+                            {
+                                // e.printStackTrace();
+                            }
+                            toggle_camera();
+                            camera_toggle_button_pressed = false;
+                            Log.i(TAG, "camera_toggle_button_pressed[press end]=" + camera_toggle_button_pressed);
+                        }
+                    };
+                    toggle_thread.start();
                 }
 
                 return true;
@@ -1766,64 +1754,37 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     void toggle_camera()
     {
-        if (PREF__use_camera_x)
+        Thread openThread = new Thread()
         {
-            try
+            @Override
+            public void run()
             {
-                cameraProvider.unbindAll();
+                try
+                {
+                    CameraWrapper.getInstance().doStopCamera();
 
-                if (active_camera_type == FRONT_CAMERA_USED)
-                {
-                    active_camera_type = BACK_CAMERA_USED;
-                    Log.i(TAG, "active_camera_type(8a)=" + active_camera_type);
-                    bindImageAnalysis(cameraProvider);
-                }
-                else
-                {
-                    active_camera_type = FRONT_CAMERA_USED;
-                    Log.i(TAG, "active_camera_type(8b)=" + active_camera_type);
-                    bindImageAnalysis(cameraProvider);
-                }
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            Thread openThread = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    try
+                    if (active_camera_type == FRONT_CAMERA_USED)
                     {
-                        CameraWrapper.getInstance().doStopCamera();
-
-                        if (active_camera_type == FRONT_CAMERA_USED)
-                        {
-                            CameraWrapper.camera_preview_size2 = null;
-                            active_camera_type = BACK_CAMERA_USED;
-                            Log.i(TAG, "active_camera_type(8a)=" + active_camera_type);
-                            CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, false);
-                        }
-                        else
-                        {
-                            CameraWrapper.camera_preview_size2 = null;
-                            active_camera_type = FRONT_CAMERA_USED;
-                            Log.i(TAG, "active_camera_type(8b)=" + active_camera_type);
-                            CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
-                        }
+                        CameraWrapper.camera_preview_size2 = null;
+                        active_camera_type = BACK_CAMERA_USED;
+                        Log.i(TAG, "active_camera_type(8a)=" + active_camera_type);
+                        CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, false);
                     }
-                    catch (Exception e)
+                    else
                     {
-                        // e.printStackTrace();
+                        CameraWrapper.camera_preview_size2 = null;
+                        active_camera_type = FRONT_CAMERA_USED;
+                        Log.i(TAG, "active_camera_type(8b)=" + active_camera_type);
+                        CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
                     }
                 }
-            };
-            openThread.start();
-        }
+                catch (Exception e)
+                {
+                    // e.printStackTrace();
+                }
+            }
+        };
+        openThread.start();
     }
 
     // -------------------------------------------------------
@@ -1834,19 +1795,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         try
         {
-            if (PREF__use_camera_x)
-            {
-            }
-            else
-            {
-                Log.i(TAG, "active_camera_type(1)=" + active_camera_type);
-                CameraWrapper.getInstance().doStopCamera();
-                Log.i(TAG, "active_camera_type(2)=" + active_camera_type);
-                CameraWrapper.camera_preview_size2 = null;
-                Log.i(TAG, "active_camera_type(3)=" + active_camera_type);
-                CameraWrapper.getInstance().doOpenCamera(c, true);
-                Log.i(TAG, "active_camera_type(4)=" + active_camera_type);
-            }
+            Log.i(TAG, "active_camera_type(1)=" + active_camera_type);
+            CameraWrapper.getInstance().doStopCamera();
+            Log.i(TAG, "active_camera_type(2)=" + active_camera_type);
+            CameraWrapper.camera_preview_size2 = null;
+            Log.i(TAG, "active_camera_type(3)=" + active_camera_type);
+            CameraWrapper.getInstance().doOpenCamera(c, true);
+            Log.i(TAG, "active_camera_type(4)=" + active_camera_type);
         }
         catch (Exception e)
         {
@@ -1975,155 +1930,76 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         super.onStart();
         final CallingActivity c_this = this;
 
-        if (PREF__use_camera_x)
+        Thread openThread = new Thread()
         {
-            active_camera_type = FRONT_CAMERA_USED;
-            cameraProviderListenableFuture = ProcessCameraProvider.getInstance(this);
-            cameraProviderListenableFuture.addListener(new Runnable()
+            @Override
+            public void run()
             {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        cameraProvider = cameraProviderListenableFuture.get();
-                        bindImageAnalysis(cameraProvider);
-                        Callstate.camera_opened = true;
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
-            }, ContextCompat.getMainExecutor(this));
-        }
-        else
-        {
-            Thread openThread = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    active_camera_type = FRONT_CAMERA_USED;
-                    Log.i(TAG, "active_camera_type(01)=" + active_camera_type);
-                    CameraWrapper.camera_preview_size2 = null;
+                active_camera_type = FRONT_CAMERA_USED;
+                Log.i(TAG, "active_camera_type(01)=" + active_camera_type);
+                CameraWrapper.camera_preview_size2 = null;
 
-                    try
-                    {
-                        CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
+                try
+                {
+                    CameraWrapper.getInstance().doOpenCamera(CallingActivity.this, true);
 
-                        // wait for 1 seconds to actually get a camera preview. if not, restart camera
-                        int WAIT_SECONDS = 2;
-                        long startup_ts = System.currentTimeMillis();
-                        for (int j = 0; j < 100 * WAIT_SECONDS; j++)
+                    // wait for 1 seconds to actually get a camera preview. if not, restart camera
+                    int WAIT_SECONDS = 2;
+                    long startup_ts = System.currentTimeMillis();
+                    for (int j = 0; j < 100 * WAIT_SECONDS; j++)
+                    {
+                        // Log.i(TAG, "onStart:01:ts=" + camera_preview_call_back_ts_first_frame + " " +
+                        //            camera_preview_call_back_start_ts);
+
+                        if (camera_toggle_button_pressed == true)
                         {
-                            // Log.i(TAG, "onStart:01:ts=" + camera_preview_call_back_ts_first_frame + " " +
-                            //            camera_preview_call_back_start_ts);
+                            break;
+                        }
 
-                            if (camera_toggle_button_pressed == true)
-                            {
-                                break;
-                            }
-
-                            if (camera_preview_call_back_ts_first_frame > startup_ts)
-                            {
-                                Log.i(TAG, "onStart:01:ts:got a frame");
-                                // ok we got a video frame from the camera
-                                break;
-                            }
-
-                            try
-                            {
-                                Thread.sleep(10);
-                            }
-                            catch (Exception e)
-                            {
-                                e.printStackTrace();
-                            }
+                        if (camera_preview_call_back_ts_first_frame > startup_ts)
+                        {
+                            Log.i(TAG, "onStart:01:ts:got a frame");
+                            // ok we got a video frame from the camera
+                            break;
                         }
 
                         try
                         {
-                            if (camera_toggle_button_pressed != true)
-                            {
-                                Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restarting ...");
-                                reinit_camera(c_this);
-                            }
-                            else
-                            {
-                                Log.i(TAG, "onStart:01:ts:camera toggle button pressed");
-                            }
+                            Thread.sleep(10);
                         }
                         catch (Exception e)
                         {
-                            Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restart:EE:" + e.getMessage());
                             e.printStackTrace();
                         }
                     }
-                    catch (Exception e33)
+
+                    try
                     {
-                        Log.i(TAG, "onStart:EE33:" + e33.getMessage());
+                        if (camera_toggle_button_pressed != true)
+                        {
+                            Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restarting ...");
+                            reinit_camera(c_this);
+                        }
+                        else
+                        {
+                            Log.i(TAG, "onStart:01:ts:camera toggle button pressed");
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Log.i(TAG, "onStart:01:ts:NO FRAME from camera, restart:EE:" + e.getMessage());
+                        e.printStackTrace();
                     }
                 }
-            };
-            openThread.start();
-        }
-
-        Log.i(TAG, "onStart:99");
-    }
-
-    private void bindImageAnalysis(@NonNull ProcessCameraProvider cameraProvider)
-    {
-        OrientationEventListener orientationEventListener = new OrientationEventListener(this)
-        {
-            @Override
-            public void onOrientationChanged(int orientation)
-            {
+                catch (Exception e33)
+                {
+                    Log.i(TAG, "onStart:EE33:" + e33.getMessage());
+                }
             }
         };
+        openThread.start();
 
-        orientationEventListener.enable();
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
-        {
-            Preview preview = new Preview.Builder().build();
-
-            CameraSelector cameraSelector = null;
-            if (active_camera_type == FRONT_CAMERA_USED)
-            {
-                cameraSelector = new CameraSelector.Builder().requireLensFacing(
-                        CameraSelector.LENS_FACING_FRONT).build();
-                drawingOverlay.flipimage = true;
-            }
-            else
-            {
-                cameraSelector = new CameraSelector.Builder().requireLensFacing(
-                        CameraSelector.LENS_FACING_BACK).build();
-                drawingOverlay.flipimage = false;
-            }
-
-            preview.setSurfaceProvider(cameraXPreview.getSurfaceProvider());
-            ImageAnalysis imageAnalysis = new ImageAnalysis.Builder().setOutputImageFormat(
-                    ImageAnalysis.OUTPUT_IMAGE_FORMAT_YUV_420_888).setBackpressureStrategy(
-                    ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build();
-
-            imageAnalysis.setAnalyzer(Executors.newSingleThreadExecutor(),
-                                      (VideoFrameAnalyserTFLite) videoFrameAnalyser_tflite);
-            cameraProvider.bindToLifecycle((LifecycleOwner) this, cameraSelector, imageAnalysis, preview);
-        }
-    }
-
-    static MappedByteBuffer loadModelFile(Activity activity) throws IOException
-    {
-        // final String tf_model_file = "deeplabv3_257_mv_gpu.tflite";
-        final String tf_model_file = "selfiesegmentation_mlkit-256x256-2021_01_19-v1215.f16.tflite";
-
-        AssetFileDescriptor fileDescriptor = activity.getAssets().openFd(tf_model_file);
-        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
-        FileChannel fileChannel = inputStream.getChannel();
-        long startOffset = fileDescriptor.getStartOffset();
-        long declaredLength = fileDescriptor.getDeclaredLength();
-        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+        Log.i(TAG, "onStart:99");
     }
 
     private void initUI()
@@ -2132,19 +2008,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         drawingOverlay = findViewById(R.id.camera_drawing_overlay);
         cameraSurfacePreview = (CameraSurfacePreview) findViewById(R.id.camera_surfaceview);
 
-        if (PREF__use_camera_x)
-        {
-            cameraSurfacePreview.setVisibility(View.INVISIBLE);
-            //
-            drawingOverlay.setWillNotDraw(false);
-            drawingOverlay.setZOrderOnTop(true);
-            videoFrameAnalyser_tflite = new VideoFrameAnalyserTFLite(drawingOverlay, this, this);
-        }
-        else
-        {
-            cameraXPreview.setVisibility(View.INVISIBLE);
-            drawingOverlay.setVisibility(View.INVISIBLE);
-        }
+        cameraXPreview.setVisibility(View.INVISIBLE);
+        drawingOverlay.setVisibility(View.INVISIBLE);
     }
 
     private void initViewParams()
@@ -2170,17 +2035,10 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         Callstate.camera_opened = true;
         try
         {
-            if (PREF__use_camera_x)
-            {
-
-            }
-            else
-            {
-                SurfaceHolder holder = cameraSurfacePreview.getSurfaceHolder();
-                Log.i(TAG, "cameraHasOpened:holder=" + holder);
-                Log.i(TAG, "cameraHasOpened:CameraWrapper.getInstance()=" + CameraWrapper.getInstance());
-                CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
-            }
+            SurfaceHolder holder = cameraSurfacePreview.getSurfaceHolder();
+            Log.i(TAG, "cameraHasOpened:holder=" + holder);
+            Log.i(TAG, "cameraHasOpened:CameraWrapper.getInstance()=" + CameraWrapper.getInstance());
+            CameraWrapper.getInstance().doStartPreview(holder, mPreviewRate);
         }
         catch (Exception e)
         {
@@ -2510,15 +2368,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         try
                         {
-                            if (PREF__use_camera_x)
-                            {
-                                cameraXPreview.setAlpha(1.0f);
-                                drawingOverlay.setAlpha(1.0f);
-                            }
-                            else
-                            {
-                                cameraSurfacePreview.setAlpha(1.0f);
-                            }
+                            cameraSurfacePreview.setAlpha(1.0f);
                         }
                         catch (Exception e)
                         {
@@ -2538,15 +2388,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         try
                         {
-                            if (PREF__use_camera_x)
-                            {
-                                cameraXPreview.setAlpha(0.0f);
-                                drawingOverlay.setAlpha(0.0f);
-                            }
-                            else
-                            {
-                                cameraSurfacePreview.setAlpha(0.0f);
-                            }
+                            cameraSurfacePreview.setAlpha(0.0f);
                         }
                         catch (Exception e)
                         {
@@ -2569,15 +2411,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         try
                         {
-                            if (PREF__use_camera_x)
-                            {
-                                cameraXPreview.setVisibility(View.VISIBLE);
-                                drawingOverlay.setVisibility(View.VISIBLE);
-                            }
-                            else
-                            {
-                                cameraSurfacePreview.setVisibility(View.VISIBLE);
-                            }
+                            cameraSurfacePreview.setVisibility(View.VISIBLE);
                         }
                         catch (Exception e)
                         {
@@ -2597,15 +2431,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     {
                         try
                         {
-                            if (PREF__use_camera_x)
-                            {
-                                cameraXPreview.setVisibility(View.INVISIBLE);
-                                drawingOverlay.setVisibility(View.INVISIBLE);
-                            }
-                            else
-                            {
-                                cameraSurfacePreview.setVisibility(View.INVISIBLE);
-                            }
+                            cameraSurfacePreview.setVisibility(View.INVISIBLE);
                         }
                         catch (Exception e)
                         {

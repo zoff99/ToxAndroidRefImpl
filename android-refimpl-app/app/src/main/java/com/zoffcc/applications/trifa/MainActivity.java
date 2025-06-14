@@ -514,7 +514,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_screen_off_in_audio_call = true;
     static boolean PREF__use_H264_hw_encoding = true;
     static String PREF__camera_get_preview_format = "YV12"; // "YV12"; // "NV21";
-    static boolean PREF__use_camera_x = false;
+    // static boolean PREF__use_camera_x = false;
     static boolean PREF__NO_RECYCLE_VIDEO_FRAME_BITMAP = true;
     static int PREF__audio_play_volume_percent = 100;
     static int PREF__video_play_delay_ms = GLOBAL_INIT_PLAY_DELAY;
@@ -1320,22 +1320,7 @@ public class MainActivity extends AppCompatActivity
             PREF__rnnoise_active = false;
         }
 
-        //if (MainActivity.IS_GPLAY_VERSION)
-        //{
-        try
-        {
-            PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__use_camera_x = false;
-        }
-        //}
-        //else
-        //{
         //    PREF__use_camera_x = false;
-        //}
 
         // prefs ----------
 
@@ -3982,22 +3967,7 @@ public class MainActivity extends AppCompatActivity
             set_rnnoise_active(0);
         }
 
-        //if (MainActivity.IS_GPLAY_VERSION)
-        //{
-        try
-        {
-            PREF__use_camera_x = settings.getBoolean("use_camera_x", false);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__use_camera_x = false;
-        }
-        //}
-        //else
-        //{
         //    PREF__use_camera_x = false;
-        //}
 
         try
         {
