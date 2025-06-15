@@ -28,7 +28,6 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetFileDescriptor;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
@@ -49,7 +48,6 @@ import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.OrientationEventListener;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
@@ -61,28 +59,15 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.etiennelawlor.discreteslider.library.ui.DiscreteSlider;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.speech.levelmeter.BarLevelDrawable;
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
 import com.mikepenz.iconics.IconicsDrawable;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.MappedByteBuffer;
-import java.nio.channels.FileChannel;
-import java.util.concurrent.Executors;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.camera.core.CameraSelector;
-import androidx.camera.core.ImageAnalysis;
-import androidx.camera.core.Preview;
-import androidx.camera.lifecycle.ProcessCameraProvider;
-import androidx.camera.view.PreviewView;
-import androidx.core.content.ContextCompat;
-import androidx.lifecycle.LifecycleOwner;
 
 import static android.media.MediaCodec.BUFFER_FLAG_END_OF_STREAM;
 import static com.zoffcc.applications.nativeaudio.NativeAudio.get_aec_active;
@@ -174,14 +159,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static boolean trifa_is_MicrophoneMute = false;
     private static final String TAG = "trifa.CallingActivity";
     static CameraSurfacePreview cameraSurfacePreview = null;
-    static PreviewView cameraXPreview = null;
     static CameraDrawingOverlay drawingOverlay = null;
-    static ProcessCameraProvider cameraProvider = null;
-    static ListenableFuture<ProcessCameraProvider> cameraProviderListenableFuture = null;
     static float mPreviewRate = -1f;
-    // static int front_camera_id = -1;
-    // static int back_camera_id = -1;
-    // static int active_camera_id = 0;
     static AudioRecording audio_thread = null;
     static AudioReceiver audio_receiver_thread = null;
     private SensorManager sensor_manager = null;
@@ -515,8 +494,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         try
                         {
                             int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                             ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
-                                             -PREF__video_play_delay_ms);
+                                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
+                                                       -PREF__video_play_delay_ms);
                             Log.i(TAG, "play_delay_ms=" + -PREF__video_play_delay_ms + ":res=" + res);
                         }
                         catch (Exception e)
@@ -1254,7 +1233,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     }
                     else
                     {
-                        Log.i(TAG, "accept_button:onTouch:003 " + Callstate.accepted_call + " " + Callstate.friend_pubkey);
+                        Log.i(TAG,
+                              "accept_button:onTouch:003 " + Callstate.accepted_call + " " + Callstate.friend_pubkey);
                         if (Callstate.accepted_call != 1)
                         {
                             Log.i(TAG, "answer button pressed");
@@ -1677,7 +1657,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         sensor_manager.registerListener(this, proximity_sensor, SensorManager.SENSOR_DELAY_NORMAL);
         sensor_manager.registerListener(this, accelerometer_sensor, SensorManager.SENSOR_DELAY_NORMAL);
 
-        Log.i(TAG,"restart_audio_system__normal_call:101");
+        Log.i(TAG, "restart_audio_system__normal_call:101");
         HelperGeneric.restart_audio_system();
 
         // update call time every second -----------
@@ -1818,7 +1798,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             set_rec_preset(true);
         }
-        catch(Exception ignored)
+        catch (Exception ignored)
         {
         }
 
@@ -1834,7 +1814,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             else
             {
-                Log.i(TAG,"restart_audio_system__normal_call:005:preset_TRUE");
+                Log.i(TAG, "restart_audio_system__normal_call:005:preset_TRUE");
                 HelperGeneric.restart_audio_system();
             }
         }
@@ -2004,11 +1984,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     private void initUI()
     {
-        cameraXPreview = findViewById(R.id.camera_preview_view);
         drawingOverlay = findViewById(R.id.camera_drawing_overlay);
         cameraSurfacePreview = (CameraSurfacePreview) findViewById(R.id.camera_surfaceview);
 
-        cameraXPreview.setVisibility(View.INVISIBLE);
         drawingOverlay.setVisibility(View.INVISIBLE);
     }
 
@@ -2074,7 +2052,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         try
         {
-            // calling_activity_top_viewgroup_vg.setVisibility(View.VISIBLE);
             mContentView.setVisibility(View.VISIBLE);
         }
         catch (Exception e)
@@ -2093,7 +2070,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         {
             // in case the phone does not really turn the screen off
             mContentView.setVisibility(View.INVISIBLE);
-            // calling_activity_top_viewgroup_vg.setVisibility(View.INVISIBLE);
         }
         catch (Exception e)
         {
