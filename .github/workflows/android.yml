@@ -171,10 +171,3 @@ jobs:
         delete-branch: true
         title: update witness checksums
 
-
-  gradle-wrapper-validation:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: gradle/wrapper-validation-action@v3
-
