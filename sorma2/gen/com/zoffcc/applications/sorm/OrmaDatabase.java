@@ -20,7 +20,7 @@ import com.zoffcc.applications.sorm.Log;
 public class OrmaDatabase
 {
     private static final String TAG = "sorm.OrmaDatabase";
-    public static final String OrmaDatabaseVersion = "1.0.1";
+    public static final String OrmaDatabaseVersion = "1.0.2";
 
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean ORMA_LONG_RUNNING_TRACE = false; // set "false" for release builds
@@ -760,6 +760,83 @@ public class OrmaDatabase
         }
 
         return text_result;
+    }
+
+    public static long run_query_for_single_result_l(String sql_query)
+    {
+        long long_result = 0L;
+
+        orma_global_sqlfreehand_lock.lock();
+        try
+        {
+            Statement statement = null;
+            try
+            {
+                statement = sqldb.createStatement();
+                statement.setQueryTimeout(10);  // set timeout to x sec.
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:QSLL:001:" + e.getMessage());
+            }
+
+            try
+            {
+                if (ORMA_TRACE)
+                {
+                    Log.i(TAG, "sql=" + sql_query);
+                }
+                ResultSet rs = statement.executeQuery(sql_query);
+                if (rs.next())
+                {
+                    long_result = rs.getLong(1);
+                }
+                rs.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:QSLL:002:" + e.getMessage());
+            }
+
+            try
+            {
+                statement.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:QSLL:003:" + e.getMessage());
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "ERR:QSLL:004:" + e.getMessage());
+        }
+        finally
+        {
+            orma_global_sqlfreehand_lock.unlock();
+        }
+
+        return long_result;
+    }
+
+    public static String now_datetime_utc()
+    {
+        return run_query_for_single_result("select datetime('now')");
+    }
+
+    public static String now_datetime_localtime()
+    {
+        return run_query_for_single_result("select datetime('now','localtime')");
+    }
+
+    public static long now_unixepoch_utc()
+    {
+        return run_query_for_single_result_l("select unixepoch('now')");
+    }
+
+    public static long now_unixepoch_localtime()
+    {
+        return run_query_for_single_result_l("select unixepoch('now','localtime')");
     }
 
     public static boolean set_bindvars_where(final PreparedStatement statement,
