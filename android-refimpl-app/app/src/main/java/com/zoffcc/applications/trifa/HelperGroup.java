@@ -2287,7 +2287,7 @@ public class HelperGroup
             if (res == peer_id)
             {
                 // HINT: do not add our own messages, they are already in the DB!
-                Log.i(TAG, "handle_incoming_sync_group_message:gn=" + group_number + " peerid=" + peer_id + " ignoring self");
+                // Log.i(TAG, "handle_incoming_sync_group_message:gn=" + group_number + " peerid=" + peer_id + " ignoring self");
                 return;
             }
 
@@ -2364,7 +2364,7 @@ public class HelperGroup
                 String peer_name = utf8_string_from_bytes_with_padding(name_buffer,
                                                                              TOX_NGC_HISTORY_SYNC_MAX_PEERNAME_BYTES,
                                                                              "peer");
-                Log.i(TAG,"handle_incoming_sync_group_message:peer_name str=" + peer_name);
+                // Log.i(TAG,"handle_incoming_sync_group_message:peer_name str=" + peer_name);
 
 
                 //

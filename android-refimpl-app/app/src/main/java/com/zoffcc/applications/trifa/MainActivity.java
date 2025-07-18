@@ -8715,9 +8715,9 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            Log.i(TAG,
-                  "group_custom_private_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
-                  " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
+            //Log.i(TAG,
+            //      "group_custom_private_packet_cb:group_number=" + group_number + " peer_id=" + peer_id + " length=" + length +
+            //      " data=" + HelperGeneric.bytesToHex(data, 0, (int) length));
         }
         catch(Exception e)
         {
@@ -8729,7 +8729,7 @@ public class MainActivity extends AppCompatActivity
             if (res == peer_id)
             {
                 // HINT: ignore own packets
-                Log.i(TAG, "group_custom_private_packet_cb:gn=" + group_number + " peerid=" + peer_id + " ignoring own packet");
+                // Log.i(TAG, "group_custom_private_packet_cb:gn=" + group_number + " peerid=" + peer_id + " ignoring own packet");
                 return;
             }
         }
@@ -8771,7 +8771,7 @@ public class MainActivity extends AppCompatActivity
         {
             if ((data[6] == (byte)0x1) && (data[7] == (byte)0x1))
             {
-                Log.i(TAG, "group_custom_private_packet_cb: got ngch_request");
+                // Log.i(TAG, "group_custom_private_packet_cb: got ngch_request");
                 int privacy_state = tox_group_get_privacy_state(group_number);
                 if (privacy_state == ToxVars.TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value)
                 {
