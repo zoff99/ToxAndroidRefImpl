@@ -204,6 +204,20 @@ public class JavaFriendTester
         wait_(1);
         Espresso.closeSoftKeyboard();
         screenshot("005");
+
+
+        // we are connected with "friend" and we are in the 1-on-1 chat with "friend"
+        // now press the video call button
+        onView(
+                getElementFromMatchAtPosition(
+                        allOf(withId(R.id.ml_video_icon), withParent(withId(R.id.ml_container_001)))
+                        ,0
+                )
+        ).perform(click());
+        screenshot("006");
+        wait_(30);
+        screenshot("007");
+
         wait_(120);
         screenshot("099");
     }
