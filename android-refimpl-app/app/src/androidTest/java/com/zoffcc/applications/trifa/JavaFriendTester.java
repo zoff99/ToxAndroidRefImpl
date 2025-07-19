@@ -208,12 +208,7 @@ public class JavaFriendTester
 
         // we are connected with "friend" and we are in the 1-on-1 chat with "friend"
         // now press the video call button
-        onView(
-                getElementFromMatchAtPosition(
-                        allOf(withId(R.id.ml_video_icon), withParent(withId(R.id.ml_container_001)))
-                        ,0
-                )
-        ).perform(click());
+        onView(withId(R.id.ml_video_icon)).perform(click());
         screenshot("006");
         wait_(1);
         screenshot("007");
