@@ -215,8 +215,10 @@ public class JavaFriendTester
                 )
         ).perform(click());
         screenshot("006");
-        wait_(30);
+        wait_(1);
         screenshot("007");
+        wait_(30);
+        screenshot("008");
 
         wait_(120);
         screenshot("099");
