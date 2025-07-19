@@ -211,8 +211,13 @@ public class JavaFriendTester
         onView(withId(R.id.ml_video_icon)).perform(click());
         screenshot("006");
         wait_(1);
+
         screenshot("007");
-        wait_(30);
+        wait_(10);
+
+        onView(withId(R.id.decline_button)).perform(click());
+
+        wait_(1);
         screenshot("008");
 
         wait_(120);
