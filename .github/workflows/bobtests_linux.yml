@@ -187,7 +187,7 @@ jobs:
           pwd
           cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_004b.png screen_shot_android_${{ matrix.api-level }}_02.png
           cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_099.png screen_shot_android_${{ matrix.api-level }}_03.png
-          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_007.png screen_shot_android_${{ matrix.api-level }}_04.png
+          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_007.png screen_shot_android_${{ matrix.api-level }}_11.png
       - name: Upload to nightly release
         uses: ncipollo/release-action@v1
         if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
@@ -199,5 +199,5 @@ jobs:
           prerelease: true
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "screen_shot_android_${{ matrix.api-level }}_02.png,screen_shot_android_${{ matrix.api-level }}_03.png,screen_shot_android_${{ matrix.api-level }}_04.png"
+          artifacts: "screen_shot_android_${{ matrix.api-level }}_02.png,screen_shot_android_${{ matrix.api-level }}_03.png,screen_shot_android_${{ matrix.api-level }}_11.png"
 
