@@ -24,7 +24,7 @@ Status
 
 Latest Automated Screenshots
 =
-<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_02.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_03.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_11.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_04.png" width="200">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_05.png" width="200">
+<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_02.png" width="150">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_03.png" width="150">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_11.png" width="150">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_04.png" width="150">&nbsp;<img src="https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_05.png" width="150">
 
 <br>
 Startup Test Automated Screenshots
