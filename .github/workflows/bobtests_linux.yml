@@ -109,6 +109,11 @@ jobs:
             chmod u+rx /home/runner/a.sh
             bash /home/runner/a.sh &
             cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.JavaFriendTester || echo "NOERR"
+            cat /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
+            echo "================"
+            echo "================"
+            echo "================"
+            echo "================"
             pwd
             adb pull /sdcard/googletest/test_outputfiles .
             ls -al /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/
