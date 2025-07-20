@@ -245,6 +245,21 @@ public class JavaFriendTester
         }
     }
 
+
+    private static void screenshot_full(final String num)
+    {
+        try
+        {
+            writeToTestStorage(captureToBitmap(onView(isRoot())), "test_" + num);
+            Log.i(TAG, "capture full screenshot: "+ "test_" + num + ".png");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "ERROR on ca pturing full screenshot: "+ "test_" + num + ".png" + " E:" + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     private static void screenshot(final String num)
     {
         try
