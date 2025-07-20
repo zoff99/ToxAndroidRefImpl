@@ -217,10 +217,14 @@ public class JavaFriendTester
         screenshot_full("007");
 
         wait_(4);
+        Log.i(TAG, "going to stop video call ...");
         onView(withId(R.id.decline_button)).perform(click());
+        Log.i(TAG, "decline button pressed");
 
         wait_(10);
-        screenshot("099");
+        Log.i(TAG, "taking last screenshot ...");
+        screenshot_full("099");
+        Log.i(TAG, "taking last screenshot ... DONE");
     }
 
     private static void testwrite(final String num, final String text)
