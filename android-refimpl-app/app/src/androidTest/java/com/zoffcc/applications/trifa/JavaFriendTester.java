@@ -186,7 +186,7 @@ public class JavaFriendTester
             loops++;
             if (loops > max_loops)
             {
-                Log.i(TAG, "ERROR: waiting to long for friend");
+                Log.i(TAG, "ERROR: waiting too long for friend");
                 break;
             }
             count_friends = orma.selectFromFriendList().count();
