@@ -35,6 +35,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.filters.LargeTest;
 import androidx.test.rule.GrantPermissionRule;
 import androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry;
+import androidx.test.runner.screenshot.Screenshot;
 
 import static androidx.test.InstrumentationRegistry.getTargetContext;
 import static androidx.test.core.graphics.BitmapStorage.writeToTestStorage;
@@ -212,7 +213,7 @@ public class JavaFriendTester
         screenshot("006");
         wait_(10);
 
-        screenshot("007");
+        screenshot_full("007");
         wait_(10);
 
         onView(withId(R.id.decline_button)).perform(click());
@@ -250,7 +251,7 @@ public class JavaFriendTester
     {
         try
         {
-            writeToTestStorage(captureToBitmap(onView(isRoot())), "test_" + num);
+            writeToTestStorage(Screenshot.capture().getBitmap(), "test_" + num);
             Log.i(TAG, "capture full screenshot: "+ "test_" + num + ".png");
         }
         catch (Exception e)
