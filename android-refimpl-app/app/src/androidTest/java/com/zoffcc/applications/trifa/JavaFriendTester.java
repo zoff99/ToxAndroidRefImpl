@@ -258,7 +258,7 @@ public class JavaFriendTester
         }
         catch (Exception e)
         {
-            Log.i(TAG, "ERROR on ca pturing full screenshot: "+ "test_" + num + ".png" + " E:" + e.getMessage());
+            Log.i(TAG, "ERROR on capturing full screenshot: "+ "test_" + num + ".png" + " E:" + e.getMessage());
             e.printStackTrace();
         }
     }
