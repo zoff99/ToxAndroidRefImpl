@@ -199,5 +199,5 @@ jobs:
           prerelease: true
           replacesArtifacts: true
           token: ${{ secrets.GITHUB_TOKEN }}
-          artifacts: "screen_shot_android_${{ matrix.api-level }}_02.png,screen_shot_android_${{ matrix.api-level }}_03.png,,screen_shot_android_${{ matrix.api-level }}_04.png"
+          artifacts: "screen_shot_android_${{ matrix.api-level }}_02.png,screen_shot_android_${{ matrix.api-level }}_03.png,screen_shot_android_${{ matrix.api-level }}_04.png"
 
