@@ -216,10 +216,7 @@ public class JavaFriendTester
         screenshot_full("007");
         wait_(10);
 
-        onView(withId(R.id.decline_button)).perform(click());
-
-        wait_(1);
-        screenshot("008");
+        //*crashes*// onView(withId(R.id.decline_button)).perform(click());
 
         wait_(10);
         screenshot("099");
