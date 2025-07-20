@@ -90,6 +90,9 @@ jobs:
           emulator-options: -no-snapshot-save -skin 1080x2220 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
           disable-animations: true
           disable-spellchecker: true
+          pre-emulator-launch-script: |
+            echo "Running pre emulator launch script. Printing the working directory now:"
+            pwd
           script: |
             df -h
             rm -f /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
@@ -113,6 +116,15 @@ jobs:
             ls -al /home/runner/a.sh
             chmod u+rx /home/runner/a.sh
             bash /home/runner/a.sh &
+            echo "+++++++++++++++++++++++++++"
+            adb devices
+            echo "+++++++++++++++++++++++++++"
+            adb shell settings get secure immersive_mode_confirmations
+            echo "+++++++++++++++++++++++++++"
+            adb shell settings put secure immersive_mode_confirmations confirmed
+            echo "+++++++++++++++++++++++++++"
+            adb shell settings get secure immersive_mode_confirmations
+            echo "+++++++++++++++++++++++++++"
             cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.JavaFriendTester || echo "NOERR"
             cat /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
             echo "================"
