@@ -77,7 +77,7 @@ jobs:
              cd /home/runner/work
              du -s *|sort -n
       - name: android test
-        timeout-minutes: 30
+        timeout-minutes: 40
         continue-on-error: true
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -103,7 +103,7 @@ jobs:
             echo 'sleep 40' >> /home/runner/a.sh
             echo 'sleep 10' >> /home/runner/a.sh
             echo 'sleep 10' >> /home/runner/a.sh
-            echo 'sleep 10' >> /home/runner/a.sh
+            echo 'sleep 30' >> /home/runner/a.sh
             cat /home/runner/a.sh
             ls -al /home/runner/a.sh
             chmod u+rx /home/runner/a.sh
