@@ -68,7 +68,7 @@ jobs:
       - name: start tester
         shell: bash
         run: |
-             cd java_tox_tester-master/ ; ls -al ; ./do_wait_for_app.sh &
+             cd java_tox_tester-master/ ; ls -al ; ./do_wait_for_app.sh > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/tester.log 2>&1 &
       - name: check disk space
         shell: bash
         run: |
@@ -112,6 +112,7 @@ jobs:
             cat /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
             echo "================"
             echo "================"
+            cat /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/tester.log
             echo "================"
             echo "================"
             pwd
