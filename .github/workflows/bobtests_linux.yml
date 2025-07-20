@@ -100,10 +100,15 @@ jobs:
             adb logcat -c || echo "NOERR"
             adb logcat > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt &
             echo 'sleep 100' > /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
             echo 'sleep 40' >> /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
             echo 'sleep 10' >> /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
             echo 'sleep 10' >> /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
             echo 'sleep 30' >> /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
             cat /home/runner/a.sh
             ls -al /home/runner/a.sh
             chmod u+rx /home/runner/a.sh
