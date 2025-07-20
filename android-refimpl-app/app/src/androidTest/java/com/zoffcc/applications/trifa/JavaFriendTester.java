@@ -204,9 +204,9 @@ public class JavaFriendTester
 
         wait_(1);
         Espresso.closeSoftKeyboard();
-        screenshot("005");
 
         wait_(3);
+        screenshot("005");
 
         // we are connected with "friend" and we are in the 1-on-1 chat with "friend"
         // now press the video call button
