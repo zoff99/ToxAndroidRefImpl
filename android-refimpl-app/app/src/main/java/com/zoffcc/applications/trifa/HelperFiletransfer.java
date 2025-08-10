@@ -101,7 +101,7 @@ public class HelperFiletransfer
                 if (PREF__auto_accept_image)
                 {
                     if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                        AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB * 1024 *
+                        (long) AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB * 1024 *
                         1024) // if file size is smaller than 12 MByte accept FT
                     {
                         if (mimeType.startsWith("image/"))
@@ -129,7 +129,7 @@ public class HelperFiletransfer
                 if (PREF__auto_accept_video)
                 {
                     if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                        AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB * 1024 *
+                        (long) AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB * 1024 *
                         1024) // if file size is smaller than 40 MByte accept FT
                     {
                         if (mimeType.startsWith("video/"))
@@ -158,7 +158,7 @@ public class HelperFiletransfer
             if (PREF__auto_accept_all_upto)
             {
                 if (get_filetransfer_filesize_from_id(message.filetransfer_id) <=
-                    AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB * 1014 *
+                    (long) AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB * 1014 *
                     1024) // if file size is smaller than 200 MByte accept FT
                 {
                     if (get_filetransfer_state_from_id(message.filetransfer_id) == TOX_FILE_CONTROL_PAUSE.value)
