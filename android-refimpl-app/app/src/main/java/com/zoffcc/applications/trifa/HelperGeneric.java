@@ -1411,7 +1411,7 @@ public class HelperGeneric
                 orma.insertIntoTRIFADatabaseGlobalsNew(g_opts);
                 Log.i(TAG, "set_g_opts:(INSERT):key=" + key + " value=" + "xxxxxxxxxxxxx");
             }
-            catch (android.database.sqlite.SQLiteConstraintException e)
+            catch (Exception e)
             {
                 // e.printStackTrace();
                 try

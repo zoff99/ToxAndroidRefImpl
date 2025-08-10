@@ -739,12 +739,6 @@ public class HelperFriend
                     long res = orma.insertIntoFriendList(f);
                     Log.i(TAG, "friend_request:insert:002:res=" + res);
                 }
-                catch (android.database.sqlite.SQLiteConstraintException e)
-                {
-                    // e.printStackTrace();
-                    Log.i(TAG, "friend_request:insert:EE1:" + e.getMessage());
-                    return;
-                }
                 catch (Exception e)
                 {
                     e.printStackTrace();
