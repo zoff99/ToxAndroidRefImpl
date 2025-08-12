@@ -174,6 +174,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_ke
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_capabilities;
 import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_ip_addr_str;
+import static com.zoffcc.applications.trifa.HelperGeneric.append_logger_msg;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
@@ -5759,9 +5760,21 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_self_connection_status_cb_method(int a_TOX_CONNECTION)
     {
+        final int connection_status_prev = global_self_connection_status;
         Log.i(TAG, "self_connection_status:" + a_TOX_CONNECTION);
         global_self_connection_status = a_TOX_CONNECTION;
         TrifaToxService.write_debug_file("CB_SELF_CONN_STATUS__cstatus:" + a_TOX_CONNECTION + "_b:" + bootstrapping);
+
+        if ((connection_status_prev == TOX_CONNECTION_NONE.value) && (a_TOX_CONNECTION != TOX_CONNECTION_NONE.value))
+        {
+            // we just went online
+            append_logger_msg(TAG + "::" + "went online:self connection status=" + a_TOX_CONNECTION);
+        }
+        else if ((connection_status_prev != TOX_CONNECTION_NONE.value) && (a_TOX_CONNECTION == TOX_CONNECTION_NONE.value))
+        {
+            // we just went OFFLINE
+            append_logger_msg(TAG + "::" + "went OFFLINE:self connection status=" + a_TOX_CONNECTION);
+        }
 
         if (bootstrapping)
         {
