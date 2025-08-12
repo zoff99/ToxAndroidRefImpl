@@ -113,6 +113,7 @@ import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_m
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_resend_count;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
+import static com.zoffcc.applications.trifa.MainActivity.DEBUG_USE_LOGFRIEND;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
@@ -127,6 +128,8 @@ import static com.zoffcc.applications.trifa.ProfileActivity.update_toxid_display
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEIN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FAB_SCROLL_TO_BOTTOM_FADEOUT_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOGFRIEND_TOXID_DB_KEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_AVATAR_HEIGHT_COMPACT_LAYOUT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_AVATAR_HEIGHT_NORMAL_LAYOUT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_V2_MSG_SENT_OK;
@@ -155,6 +158,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_C
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CAPABILITY_MSGV2;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_RESUME;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_AVATAR;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
@@ -5038,5 +5042,81 @@ public class HelperGeneric
         build_str = build_str + "-" + abis;
 
         return build_str;
+    }
+
+    static public void append_logger_msg(final String logmsg)
+    {
+        if (DEBUG_USE_LOGFRIEND)
+        {
+            // Log.i(TAG, "append_logger_msg:000:LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID + " msg=" + logmsg);
+            String log_friend_pubkey = LOG_FRIEND_TOXID;
+            if ((log_friend_pubkey == null) || (log_friend_pubkey.length() < 2))
+            {
+                try
+                {
+                    log_friend_pubkey = get_g_opts(LOGFRIEND_TOXID_DB_KEY);
+                    if ((log_friend_pubkey == null) || (log_friend_pubkey.length() < 2))
+                    {
+                        // some error with the TOX PUBKEY of log friend
+                        // Log.i(TAG, "append_logger_msg:ret1: LOG_FRIEND_TOXID=" + log_friend_pubkey);
+                        return;
+                    }
+                    // Log.i(TAG, "append_logger_msg: LOG_FRIEND_TOXID=" + log_friend_pubkey);
+                }
+                catch (Exception e)
+                {
+                    // some error with the TOX PUBKEY of log friend
+                    // Log.i(TAG, "append_logger_msg:ret2: LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID);
+                    return;
+                }
+            }
+
+            Log.i(TAG, "append_logger_msg:3:msg=" + logmsg);
+
+            long pin_timestamp = System.currentTimeMillis();
+            Message m = new Message();
+
+            m.is_new = false;
+            m.tox_friendpubkey = log_friend_pubkey;
+            m.direction = 0; // msg received
+            m.TOX_MESSAGE_TYPE = 0;
+            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+            m.filetransfer_id = -1;
+            m.filedb_id = -1;
+            m.state = TOX_FILE_CONTROL_CANCEL.value;
+            m.ft_accepted = false;
+            m.ft_outgoing_started = false;
+            m.ft_outgoing_queued = false;
+            m.sent_timestamp = pin_timestamp;
+            m.sent_timestamp_ms = 0;
+            m.rcvd_timestamp = pin_timestamp;
+            m.rcvd_timestamp_ms = 0;
+            m.text = logmsg;
+            m.msg_version = 0;
+            m.resend_count = 0;
+            m.sent_push = 0;
+            m.msg_idv3_hash = "";
+            m.msg_id_hash = "";
+            m.raw_msgv2_bytes = "";
+
+            long row_id = -99;
+            if (MainActivity.message_list_activity != null)
+            {
+                final long friend_number_ = tox_friend_by_public_key__wrapper(log_friend_pubkey);
+                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number_)
+                {
+                    row_id = HelperMessage.insert_into_message_db(m, true);
+                }
+                else
+                {
+                    row_id = HelperMessage.insert_into_message_db(m, false);
+                }
+            }
+            else
+            {
+                row_id = HelperMessage.insert_into_message_db(m, false);
+            }
+            // Log.i(TAG, "append_logger_msg:row_id=" + row_id);
+        }
     }
 }
