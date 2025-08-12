@@ -140,6 +140,12 @@ public class TRIFAGlobals
 
     static boolean orbot_is_really_running = false;
 
+    static final String LOGFRIEND_ON_STARTUP_DONE_DB_KEY = "ADD_LOGFRIEND_ON_STARTUP_done";
+    static final String LOGFRIEND_TOXID_DB_KEY = "LOGFRIEND_TOXID";
+    static final String LOG_FRIEND_INIT_STATUSMSG = "contains application log messages";
+    static final String LOG_FRIEND_INIT_NAME = "internal logger";
+    static String LOG_FRIEND_TOXID = null;
+
     final static int HIGHER_GLOBAL_VIDEO_BITRATE = 2500;
     final static int NORMAL_GLOBAL_VIDEO_BITRATE = 1200;
     final static int LOWER_GLOBAL_VIDEO_BITRATE = 250;

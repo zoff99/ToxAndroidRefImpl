@@ -935,6 +935,89 @@ public class HelperFriend
         //t.start();
     }
 
+    static void add_friend_real_norequest(String friend_tox_id)
+    {
+        // Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);
+        // add friend ---------------
+        if (friend_tox_id == null)
+        {
+            Log.i(TAG, "add_friend_real_norequest:add friend ID = NULL");
+            return;
+        }
+
+        Log.i(TAG, "add_friend_real_norequest:add friend ID len:" + friend_tox_id.length());
+        long friendnum = MainActivity.tox_friend_add_norequest(friend_tox_id); // add friend
+        Log.i(TAG, "add_friend_real_norequest:add friend  #:" + friendnum);
+        HelperGeneric.update_savedata_file_wrapper(); // save toxcore datafile (new friend added)
+
+        if (friendnum == UINT32_MAX_JAVA)
+        {
+            display_toast(context_s.getString(R.string.add_friend_failed), false, 300);
+        }
+        else if (friendnum > -1)
+        {
+            String friend_public_key = friend_tox_id;
+            // Log.i(TAG, "add_friend_real_norequest:add friend PK:" + friend_public_key);
+            FriendList f = new FriendList();
+            f.tox_public_key_string = friend_public_key;
+
+            try
+            {
+                // set name as the last 5 char of TOXID (until we get a name sent from friend)
+                f.name = friend_public_key.substring(friend_public_key.length() - 5, friend_public_key.length());
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                f.name = "Unknown";
+            }
+
+            f.TOX_USER_STATUS = 0;
+            f.TOX_CONNECTION = 0;
+            f.TOX_CONNECTION_on_off = HelperGeneric.get_toxconnection_wrapper(f.TOX_CONNECTION);
+            f.avatar_filename = null;
+            f.avatar_pathname = null;
+
+            display_toast(context_s.getString(R.string.add_friend_success), false, 300);
+
+            try
+            {
+                insert_into_friendlist_db(f);
+            }
+            catch (Exception e)
+            {
+                // e.printStackTrace();
+            }
+
+            update_single_friend_in_friendlist_view(f);
+        }
+        else
+        {
+            display_toast(context_s.getString(R.string.add_friend_failed), false, 300);
+        }
+
+        if (friendnum == -1)
+        {
+            Log.i(TAG, "add_friend_real_norequest:friend already added, or request already sent");
+
+            /*
+            // still add the friend to the DB
+            String friend_public_key = friend_tox_id.substring(0, friend_tox_id.length() - 12);
+            add_friend_to_system(friend_public_key, false, null);
+            */
+        }
+        else if (friendnum == UINT32_MAX_JAVA)
+        {
+            Log.i(TAG, "add_friend_real_norequest:some other error occured");
+        }
+        else if (friendnum < -1)
+        {
+            Log.i(TAG, "add_friend_real_norequest:some error occured");
+        }
+
+        // add friend ---------------
+    }
+
     static void add_friend_real(String friend_tox_id)
     {
         // Log.i(TAG, "add_friend_real:add friend ID:" + friend_tox_id);

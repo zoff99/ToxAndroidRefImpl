@@ -59,6 +59,7 @@ import static com.zoffcc.applications.trifa.HelperConference.set_all_conferences
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_all_filetransfers_inactive;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.start_outgoing_ft;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
+import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real_norequest;
 import static com.zoffcc.applications.trifa.HelperFriend.friend_call_push_url;
 import static com.zoffcc.applications.trifa.HelperFriend.get_friend_msgv3_capability;
 import static com.zoffcc.applications.trifa.HelperFriend.is_friend_online;
@@ -71,7 +72,9 @@ import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_con
 import static com.zoffcc.applications.trifa.HelperGeneric.IPisValid;
 import static com.zoffcc.applications.trifa.HelperGeneric.battery_saving_can_sleep;
 import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
+import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
+import static com.zoffcc.applications.trifa.HelperGeneric.del_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_combined_connection_status;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_g_opts;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_toxconnection_wrapper;
@@ -97,6 +100,7 @@ import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notificati
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_change_wrapper;
 import static com.zoffcc.applications.trifa.HelperToxNotification.tox_notification_setup;
 import static com.zoffcc.applications.trifa.MainActivity.DEBUG_BATTERY_OPTIMIZATION_LOGGING;
+import static com.zoffcc.applications.trifa.MainActivity.DEBUG_USE_LOGFRIEND;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_timeout;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__force_udp_only;
@@ -150,6 +154,11 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_INIT_STATUSMSG;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOGFRIEND_ON_STARTUP_DONE_DB_KEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOGFRIEND_TOXID_DB_KEY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_INIT_NAME;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_INIT_STATUSMSG;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_IP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_KEYHEX;
@@ -178,6 +187,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messagev
 import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 
 public class TrifaToxService extends Service
 {
@@ -1168,6 +1178,94 @@ public class TrifaToxService extends Service
                         Log.i(TAG, "need_add_bots=true (INSERT)");
                     }
                 }
+
+                // -------- add log friend --------
+                // -------- add log friend --------
+                // -------- add log friend --------
+                if (DEBUG_USE_LOGFRIEND)
+                {
+                    boolean need_add_log_pseudo_friend = true;
+                    try
+                    {
+                        if (get_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY) != null)
+                        {
+                            if (get_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY).equals("true"))
+                            {
+                                if (get_g_opts(LOGFRIEND_TOXID_DB_KEY) != null)
+                                {
+                                    if (get_g_opts(LOGFRIEND_TOXID_DB_KEY).length() > 2)
+                                    {
+                                        LOG_FRIEND_TOXID = get_g_opts(LOGFRIEND_TOXID_DB_KEY);
+                                        need_add_log_pseudo_friend = false;
+                                        Log.i(TAG, "need_add_log_pseudo_friend=false");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+
+                    if (need_add_log_pseudo_friend)
+                    {
+                        Log.i(TAG, "need_add_log_pseudo_friend:start");
+
+                        ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+                        MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
+                        LOG_FRIEND_TOXID = bytebuffer_to_hexstring(hash_bytes, true);
+                        if (LOG_FRIEND_TOXID == null)
+                        {
+                            del_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY);
+                            del_g_opts(LOGFRIEND_TOXID_DB_KEY);
+                            Log.i(TAG, "need_add_log_pseudo_friend:some error generating the ID for log_pseudo_friend");
+                        }
+                        else
+                        {
+                            Log.i(TAG, "need_add_log_pseudo_friend:LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID + " len=" +
+                                       LOG_FRIEND_TOXID.length());
+                            add_friend_real_norequest(LOG_FRIEND_TOXID);
+                            set_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY, "true");
+                            set_g_opts(LOGFRIEND_TOXID_DB_KEY, LOG_FRIEND_TOXID);
+                            // Log.i(TAG, "need_add_log_pseudo_friend:get:" + LOG_FRIEND_TOXID + " :: " + (LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase()));
+                            FriendList f_log_friend = main_get_friend(
+                                    LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase());
+                            if (f_log_friend != null)
+                            {
+                                f_log_friend.status_message = LOG_FRIEND_INIT_STATUSMSG;
+                                f_log_friend.name = LOG_FRIEND_INIT_NAME;
+                                HelperFriend.update_friend_in_db_name(f_log_friend);
+                                HelperFriend.update_friend_in_db_status_message(f_log_friend);
+                                HelperFriend.update_single_friend_in_friendlist_view(f_log_friend);
+                                Log.i(TAG, "need_add_log_pseudo_friend=update meta data");
+                            }
+                            Log.i(TAG, "need_add_log_pseudo_friend=true (INSERT)");
+                        }
+                    }
+                    else
+                    {
+                        if ((LOG_FRIEND_TOXID != null) && (LOG_FRIEND_TOXID.length() > 2))
+                        {
+                            add_friend_real_norequest(LOG_FRIEND_TOXID);
+                            FriendList f_log_friend = main_get_friend(
+                                    LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase());
+                            if (f_log_friend != null)
+                            {
+                                f_log_friend.status_message = LOG_FRIEND_INIT_STATUSMSG;
+                                f_log_friend.name = LOG_FRIEND_INIT_NAME;
+                                HelperFriend.update_friend_in_db_name(f_log_friend);
+                                HelperFriend.update_friend_in_db_status_message(f_log_friend);
+                                HelperFriend.update_single_friend_in_friendlist_view(f_log_friend);
+                                Log.i(TAG, "need_add_log_pseudo_friend=update meta data");
+                            }
+                            Log.i(TAG, "need_add_log_pseudo_friend=true (refresh)");
+                        }
+                    }
+                }
+                // -------- add log friend --------
+                // -------- add log friend --------
+                // -------- add log friend --------
 
                 try
                 {
