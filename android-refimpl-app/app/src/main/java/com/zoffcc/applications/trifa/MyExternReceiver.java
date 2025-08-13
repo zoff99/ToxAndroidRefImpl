@@ -34,6 +34,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.append_logger_msg;
+import static com.zoffcc.applications.trifa.HelperGeneric.trigger_proper_wakeup_outside_tox_service_thread;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 
@@ -163,9 +164,7 @@ public class MyExternReceiver extends BroadcastReceiver
                     if (trifa_service_thread != null)
                     {
                         append_logger_msg(TAG + "::" + "need_wakeup_now trigger 002");
-                        TrifaToxService.need_wakeup_now = true;
-                        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
-                        trifa_service_thread.interrupt();
+                        trigger_proper_wakeup_outside_tox_service_thread();
                     }
                 }
                 catch (Exception e)

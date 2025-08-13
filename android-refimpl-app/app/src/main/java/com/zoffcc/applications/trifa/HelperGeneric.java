@@ -168,6 +168,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.stop_tox_fg_done;
+import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 public class HelperGeneric
@@ -5048,75 +5049,109 @@ public class HelperGeneric
     {
         if (DEBUG_USE_LOGFRIEND)
         {
-            // Log.i(TAG, "append_logger_msg:000:LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID + " msg=" + logmsg);
-            String log_friend_pubkey = LOG_FRIEND_TOXID;
-            if ((log_friend_pubkey == null) || (log_friend_pubkey.length() < 2))
+            try
             {
-                try
+                // Log.i(TAG, "append_logger_msg:000:LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID + " msg=" + logmsg);
+                String log_friend_pubkey = LOG_FRIEND_TOXID;
+                if ((log_friend_pubkey == null) || (log_friend_pubkey.length() < 2))
                 {
-                    log_friend_pubkey = get_g_opts(LOGFRIEND_TOXID_DB_KEY);
-                    if ((log_friend_pubkey == null) || (log_friend_pubkey.length() < 2))
+                    try
+                    {
+                        log_friend_pubkey = get_g_opts(LOGFRIEND_TOXID_DB_KEY);
+                        if ((log_friend_pubkey == null) || (log_friend_pubkey.length() < 2))
+                        {
+                            // some error with the TOX PUBKEY of log friend
+                            // Log.i(TAG, "append_logger_msg:ret1: LOG_FRIEND_TOXID=" + log_friend_pubkey);
+                            return;
+                        }
+                        // Log.i(TAG, "append_logger_msg: LOG_FRIEND_TOXID=" + log_friend_pubkey);
+                    }
+                    catch (Exception e)
                     {
                         // some error with the TOX PUBKEY of log friend
-                        // Log.i(TAG, "append_logger_msg:ret1: LOG_FRIEND_TOXID=" + log_friend_pubkey);
+                        // Log.i(TAG, "append_logger_msg:ret2: LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID);
                         return;
                     }
-                    // Log.i(TAG, "append_logger_msg: LOG_FRIEND_TOXID=" + log_friend_pubkey);
                 }
-                catch (Exception e)
+
+                Log.i(TAG, "append_logger_msg:3:msg=" + logmsg);
+
+                long pin_timestamp = System.currentTimeMillis();
+                Message m = new Message();
+
+                m.is_new = false;
+                m.tox_friendpubkey = log_friend_pubkey;
+                m.direction = 0; // msg received
+                m.TOX_MESSAGE_TYPE = 0;
+                m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
+                m.filetransfer_id = -1;
+                m.filedb_id = -1;
+                m.state = TOX_FILE_CONTROL_CANCEL.value;
+                m.ft_accepted = false;
+                m.ft_outgoing_started = false;
+                m.ft_outgoing_queued = false;
+                m.sent_timestamp = pin_timestamp;
+                m.sent_timestamp_ms = 0;
+                m.rcvd_timestamp = pin_timestamp;
+                m.rcvd_timestamp_ms = 0;
+                m.text = logmsg;
+                m.msg_version = 0;
+                m.resend_count = 0;
+                m.sent_push = 0;
+                m.msg_idv3_hash = "";
+                m.msg_id_hash = "";
+                m.raw_msgv2_bytes = "";
+
+                long row_id = -99;
+                if (MainActivity.message_list_activity != null)
                 {
-                    // some error with the TOX PUBKEY of log friend
-                    // Log.i(TAG, "append_logger_msg:ret2: LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID);
-                    return;
-                }
-            }
-
-            Log.i(TAG, "append_logger_msg:3:msg=" + logmsg);
-
-            long pin_timestamp = System.currentTimeMillis();
-            Message m = new Message();
-
-            m.is_new = false;
-            m.tox_friendpubkey = log_friend_pubkey;
-            m.direction = 0; // msg received
-            m.TOX_MESSAGE_TYPE = 0;
-            m.TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
-            m.filetransfer_id = -1;
-            m.filedb_id = -1;
-            m.state = TOX_FILE_CONTROL_CANCEL.value;
-            m.ft_accepted = false;
-            m.ft_outgoing_started = false;
-            m.ft_outgoing_queued = false;
-            m.sent_timestamp = pin_timestamp;
-            m.sent_timestamp_ms = 0;
-            m.rcvd_timestamp = pin_timestamp;
-            m.rcvd_timestamp_ms = 0;
-            m.text = logmsg;
-            m.msg_version = 0;
-            m.resend_count = 0;
-            m.sent_push = 0;
-            m.msg_idv3_hash = "";
-            m.msg_id_hash = "";
-            m.raw_msgv2_bytes = "";
-
-            long row_id = -99;
-            if (MainActivity.message_list_activity != null)
-            {
-                final long friend_number_ = tox_friend_by_public_key__wrapper(log_friend_pubkey);
-                if (MainActivity.message_list_activity.get_current_friendnum() == friend_number_)
-                {
-                    row_id = HelperMessage.insert_into_message_db(m, true);
+                    final long friend_number_ = tox_friend_by_public_key__wrapper(log_friend_pubkey);
+                    if (MainActivity.message_list_activity.get_current_friendnum() == friend_number_)
+                    {
+                        row_id = HelperMessage.insert_into_message_db(m, true);
+                    }
+                    else
+                    {
+                        row_id = HelperMessage.insert_into_message_db(m, false);
+                    }
                 }
                 else
                 {
                     row_id = HelperMessage.insert_into_message_db(m, false);
                 }
+                // Log.i(TAG, "append_logger_msg:row_id=" + row_id);
             }
-            else
+            catch(Exception e)
             {
-                row_id = HelperMessage.insert_into_message_db(m, false);
             }
-            // Log.i(TAG, "append_logger_msg:row_id=" + row_id);
+        }
+    }
+
+    static public void trigger_proper_wakeup_outside_tox_service_thread()
+    {
+        append_logger_msg(TAG + "::trigger_proper_wakeup_outside_tox_service_thread");
+        TrifaToxService.need_wakeup_now = true;
+        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        try
+        {
+            trifa_service_thread.interrupt();
+        }
+        catch(Exception ignored)
+        {
+        }
+    }
+
+    static public void trigger_proper_wakeup_from_tox_service_thread()
+    {
+        append_logger_msg(TAG + "::trigger_proper_wakeup_from_tox_service_thread");
+        TrifaToxService.need_wakeup_now = true;
+        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        try
+        {
+            trifa_service_thread.interrupt();
+        }
+        catch(Exception ignored)
+        {
         }
     }
 }

@@ -35,6 +35,7 @@ import android.util.Log;
 import androidx.core.app.NotificationCompat;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.set_g_opts;
+import static com.zoffcc.applications.trifa.HelperGeneric.trigger_proper_wakeup_outside_tox_service_thread;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_NTFY_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY_NEED_ACK;
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
@@ -201,8 +202,7 @@ public class MyTokenReceiver extends BroadcastReceiver
 
                     if (trifa_service_thread != null)
                     {
-                        TrifaToxService.need_wakeup_now = true;
-                        trifa_service_thread.interrupt();
+                        trigger_proper_wakeup_outside_tox_service_thread();
                     }
                 }
                 catch (Exception e)

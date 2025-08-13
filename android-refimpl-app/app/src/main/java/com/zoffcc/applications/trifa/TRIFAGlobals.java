@@ -40,7 +40,6 @@ public class TRIFAGlobals
     static long global_self_last_went_online_timestamp = -1;
     static long global_self_last_went_offline_timestamp = -1;
     static long global_last_activity_for_battery_savings_ts = -1;
-    static long global_self_last_entered_battery_saving_timestamp = -1;
     static boolean global_showing_messageview = false;
     static boolean global_showing_anygroupview = false;
     final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 100;
@@ -67,9 +66,6 @@ public class TRIFAGlobals
             1000 * 60 * 2; // bootstrap again after 2 minutes offline
     final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 60 * 3; // 3 minutes
     static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
-    static int BATTERY_OPTIMIZATION_LAST_SLEEP1 = -1;
-    static int BATTERY_OPTIMIZATION_LAST_SLEEP2 = -1;
-    static int BATTERY_OPTIMIZATION_LAST_SLEEP3 = -1;
 
     static int AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB = 12;
     static int AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB = 40;
