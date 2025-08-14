@@ -153,6 +153,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
 // import com.vanniktech.emoji.listeners.OnEmojiClickedListener;
 
+/** @noinspection ConstantValue*/
 public class MessageListActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.MsgListActivity";
