@@ -133,10 +133,10 @@ public class TRIFAGlobals
     final static long AVATAR_INCOMING_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
     final static long AVATAR_SELF_MAX_BYTE_SIZE = 1 * 1024 * 1024; // limit incoming avatars at 1MByte size
 
-    final static int FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK =
-            800 * 1024 * 1024; // above this size we need Storage Framework for outgoing FTs
-    final static int FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL = 20 * 1024 * 1024; // 20MByte max outgoing NGC filesize
-    final static int FT_OUTGOING_FILESIZE_FRIEND_MAX_TOTAL = 2 * 1000 * 1000 * 1000; // 2Gbyte max outoing filesize
+    final static long FT_OUTGOING_FILESIZE_BYTE_USE_STORAGE_FRAMEWORK =
+            2 * 1024 * MiByte_BYTES; // above this size we need Storage Framework for outgoing FTs
+    final static long FT_OUTGOING_FILESIZE_NGC_MAX_TOTAL = 20 * 1024 * 1024; // 20MByte max outgoing NGC filesize
+    final static long FT_OUTGOING_FILESIZE_FRIEND_MAX_TOTAL = 10 * 1024 * MiByte_BYTES; // 20Gbyte max outoing filesize
 
     static boolean orbot_is_really_running = false;
 
