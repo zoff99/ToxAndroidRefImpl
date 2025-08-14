@@ -5125,6 +5125,10 @@ public class HelperGeneric
             {
             }
         }
+        else
+        {
+            Log.i(TAG, "append_logger_msg:3:msg=" + logmsg);
+        }
     }
 
     static public void trigger_proper_wakeup_outside_tox_service_thread()
