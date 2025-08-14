@@ -1691,6 +1691,8 @@ public class TrifaToxService extends Service
                     {
                         Message m_resend_ft = (Message) ii.next();
 
+                        friend_call_push_url(m_resend_ft.tox_friendpubkey, System.currentTimeMillis());
+                        Log.i(TAG, "start_ft:sent ping to push url");
                         if (is_friend_online_real(tox_friend_by_public_key__wrapper(m_resend_ft.tox_friendpubkey)) != 0)
                         {
                             start_outgoing_ft(m_resend_ft);
