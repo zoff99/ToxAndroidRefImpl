@@ -238,6 +238,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITR
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_QUANTIZER;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_ALLOWED_INCOMING_FILESIZE_BYTES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_GROUP_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_AUDIO_BITRATE;
@@ -7152,8 +7153,9 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
     {
-        // HINT: IOCipher can only handle files up to 2GBytes in size
-        if (file_size >= ((UINT32_MAX_JAVA / 2L) - 1L))
+        // HINT: ~~IOCipher can only handle files up to 2GBytes in size~~
+        //         ^^^ this is no longer true!!
+        if (file_size >= MAX_ALLOWED_INCOMING_FILESIZE_BYTES)
         {
             try
             {
@@ -7164,7 +7166,7 @@ public class MainActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
-            display_toast(context_s.getString(R.string.incoming_filetransfer_size_too_large), false, 800);
+            display_toast("Incoming file is too large", false, 800);
             return;
         }
 
