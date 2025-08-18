@@ -1,3 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="layout___join_public_group">公開グループに参加する</string>
 </resources>
