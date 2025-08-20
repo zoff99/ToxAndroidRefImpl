@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="layout___join_public_group">公開グループに参加する</string>
+    <string name="add_friend_activity_name">友達を追加</string>
 </resources>
