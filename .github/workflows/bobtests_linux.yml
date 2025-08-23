@@ -87,7 +87,7 @@ jobs:
           ndk: 21.0.6113669
           cmake: 3.10.2.4988404
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -skin 1080x2220 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back virtualscene
+          emulator-options: -no-snapshot-save -skin 1080x2220 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back virtualscene -camera-front virtualscene
           disable-animations: true
           disable-spellchecker: true
           pre-emulator-launch-script: |
