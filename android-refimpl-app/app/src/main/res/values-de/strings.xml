@@ -419,4 +419,11 @@
     <string name="layout___ipaddress">IP:</string>
     <string name="MainActivity_manually_logged_out_true">aktivieren</string>
     <string name="MainActivity_manually_logged_out_false">Ausloggen</string>
+    <string name="title_activity_export">Exportieren</string>
+    <string name="pref_title_gainprocessing_active">Mikrofon Gewinn</string>
+    <string name="pref_description_gainprocessing_active">mikrofon einstellen Gewinnen Sie Semi automatisch, um Sound lauter zu machen.\nWenn es ein Problem während Calls versuchen, diese Option auszuschalten</string>
+    <string name="pref_title_rnnoise_active">Hintergrund Geräusch</string>
+    <string name="pref_description_rnnoise_active">Entfern Hintergrund Geräusch mit RNNoise</string>
+    <string name="layout___report_issue">Berichte einen Käfer oder gib heraus</string>
+    <string name="layout___reveal_passwords">Oute Passwörter und exportiert</string>
 </resources>
