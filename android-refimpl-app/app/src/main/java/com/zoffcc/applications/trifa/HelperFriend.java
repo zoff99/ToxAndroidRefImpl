@@ -1,6 +1,6 @@
 /**
  * [TRIfA], Java part of Tox Reference Implementation for Android
- * Copyright (C) 2020 Zoff <zoff@zoff.cc>
+ * Copyright (C) 2020 - 2025 Zoff <zoff@zoff.cc>
  * <p>
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -27,6 +27,7 @@ import com.zoffcc.applications.sorm.FriendList;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -68,6 +69,9 @@ import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 public class HelperFriend
 {
     private static final String TAG = "trifa.Hlp.Friend";
+
+    static HashMap<String, Long> ping_push_blocker_cache = new HashMap<>();
+    final static long TWO_HOURS_IN_MILLIS = (2 * 3600 * 1000); // 2 hours in millis
 
     static FriendList main_get_friend(long friendnum)
     {
@@ -1423,6 +1427,22 @@ public class HelperFriend
             }
         }
 
+        long check_for_http_too_many_request_timeout = 0L;
+        try
+        {
+            //noinspection DataFlowIssue
+            check_for_http_too_many_request_timeout = ping_push_blocker_cache.getOrDefault(pushurl_for_friend, 0L);
+        }
+        catch(Exception ignored)
+        {
+        }
+
+        if (check_for_http_too_many_request_timeout + TWO_HOURS_IN_MILLIS > System.currentTimeMillis())
+        {
+            Log.i(TAG, "friend_call_push_url:HTTP 429: too many requests -> timeout");
+            return false;
+        }
+
         if (PREF__orbot_enabled)
         {
             InetSocketAddress proxyAddr = new InetSocketAddress(ORBOT_PROXY_HOST, (int) ORBOT_PROXY_PORT);
@@ -1461,12 +1481,23 @@ public class HelperFriend
         try (Response response = client.newCall(request).execute())
         {
             Log.i(TAG, "friend_call_push_url"); // :url=" + pushurl_for_friend + " RES=" + response.code());
-            if ((response.code() < 300) && (response.code() > 199))
+            if (response.code() == 429)
             {
-                if (update_message_flag)
+                // HINT: set timestamp of last 429 HTTP code (Error Too Many Requests)
+                ping_push_blocker_cache.put(pushurl_for_friend, System.currentTimeMillis());
+                if (ping_push_blocker_cache.size() >= 20000)
                 {
-                    update_message_in_db_sent_push_set(friend_pubkey, message_timestamp_circa);
+                    // HINT: too many entries. just clear the hasmap.
+                    // but probably nobody will have 20k friends in this app in sum?
+                    ping_push_blocker_cache.clear();
                 }
+            }
+            else if ((response.code() < 300) && (response.code() > 199))
+            {
+                    if (update_message_flag)
+                    {
+                        update_message_in_db_sent_push_set(friend_pubkey, message_timestamp_circa);
+                    }
             }
         }
         catch (Exception e1)
