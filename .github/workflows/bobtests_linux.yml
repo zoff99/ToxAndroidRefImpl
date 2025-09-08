@@ -76,6 +76,27 @@ jobs:
              du -hs /home/runner/work
              cd /home/runner/work
              du -s *|sort -n
+
+      - name: install deps for fake webcam
+        run: |
+               sudo apt-get install v4l2loopback-utils ffmpeg
+               sudo apt-get install linux-modules-extra-$(uname -r)
+
+      - name: start fake webcam
+        run: |
+               pwd
+               git clone https://github.com/whokilleddb/Fake-Stream
+               cd Fake-Stream/
+               ls -al
+               pwd
+               sudo modprobe v4l2loopback card_label="My Fake Webcam" video_nr=10 devices=1 exclusive_caps=1
+               sleep 2
+               ls -al /dev/video*
+               sudo ffmpeg -stream_loop -1 -re -i ./test.mp4 -vcodec rawvideo -threads 0 -f v4l2 /dev/video10 &
+               sleep 10
+               sudo chmod a+rw /dev/video*
+               ls -al /dev/video*
+
       - name: android test
         timeout-minutes: 40
         continue-on-error: true
@@ -87,7 +108,7 @@ jobs:
           ndk: 21.0.6113669
           cmake: 3.10.2.4988404
           force-avd-creation: false
-          emulator-options: -no-snapshot-save -skin 1080x2220 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back virtualscene -camera-front emulated
+          emulator-options: -no-snapshot-save -skin 1080x2220 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back virtualscene -camera-front webcam0
           disable-animations: true
           disable-spellchecker: true
           pre-emulator-launch-script: |
