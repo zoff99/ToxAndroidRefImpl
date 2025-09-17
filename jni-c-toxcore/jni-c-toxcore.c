@@ -538,6 +538,29 @@ void dbg(int level, const char *fmt, ...)
     }
 }
 
+#ifdef DEBUG_ENABLE_TRACE_LOGGING
+#define TRACE_LOGGER() trace_logger(__FILE__, __LINE__, __func__)
+void trace_logger(const char *file, int line, const char *func)
+{
+
+    // Only pass the file name, not the entire file path, for privacy reasons.
+    // The full path may contain PII of the person compiling toxcore (their
+    // username and directory layout).
+    const char *filename = strrchr(file, '/');
+    file = filename != NULL ? filename + 1 : file;
+#if defined(_WIN32) || defined(__CYGWIN__)
+    // On Windows, the path separator *may* be a backslash, so we look for that
+    // one too.
+    const char *windows_filename = strrchr(file, '\\');
+    file = windows_filename != nullptr ? windows_filename + 1 : file;
+#endif
+
+    dbg(9, "JNI-TRACE:%s:%d:%s", file, line, func);
+}
+#else
+#define TRACE_LOGGER()
+#endif
+
 // gives the time in SECONDS sind the epoch (1.1.1970)
 time_t get_unix_time(void)
 {
@@ -1134,6 +1157,7 @@ void init_tox_callbacks()
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
 {
+    TRACE_LOGGER();
     JNIEnv *env_this;
     cachedJVM = jvm;
 
@@ -2251,6 +2275,7 @@ void android_toxav_callback_video_receive_frame_h264_cb(uint32_t friend_number, 
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1av_1call_1status(JNIEnv *env, jobject thiz, jint status)
 {
+    TRACE_LOGGER();
     global_av_call_active = (uint8_t)status;
 }
 
@@ -2258,6 +2283,7 @@ JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1audio_1play_1volume_1percent(JNIEnv *env, jclass clazz,
         jint volume_percent)
 {
+    TRACE_LOGGER();
     if((volume_percent >= 0) && (volume_percent <= 100))
     {
         audio_play_volume_percent_c = volume_percent;
@@ -2295,6 +2321,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer(JNIEnv *env, jobject thiz, jobject buffer,
         jint frame_width_px, jint frame_height_px)
 {
+    TRACE_LOGGER();
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     // jclass cls = (*jnienv2)->GetObjectClass(jnienv2, buffer);
@@ -2328,6 +2355,7 @@ JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer2(JNIEnv *env, jobject thiz, jobject buffer2,
         jint frame_width_px, jint frame_height_px)
 {
+    TRACE_LOGGER();
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     video_buffer_2 = (uint8_t *)(*jnienv2)->GetDirectBufferAddress(jnienv2, buffer2);
@@ -2349,6 +2377,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1video_1buffer2(JNIEnv 
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer(JNIEnv *env, jobject thiz, jobject audio_buffer)
 {
+    TRACE_LOGGER();
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     audio_buffer_pcm_1 = (uint8_t *)(*jnienv2)->GetDirectBufferAddress(jnienv2, audio_buffer);
@@ -2361,6 +2390,7 @@ JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_set_1JNI_1audio_1buffer2(JNIEnv *env, jobject thiz,
         jobject audio_buffer2)
 {
+    TRACE_LOGGER();
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
     audio_buffer_pcm_2 = (uint8_t *)(*jnienv2)->GetDirectBufferAddress(jnienv2, audio_buffer2);
@@ -2382,6 +2412,7 @@ JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_crgb2yuv(JNIEnv *env, jobject thiz, jobject rgba_buf,
         jobject yuv_buf, jint w_yuv, jint h_yuv, jint w_rgba, jint h_rgba)
 {
+    TRACE_LOGGER();
     JNIEnv *jnienv2;
     jnienv2 = jni_getenv();
 
@@ -3035,6 +3066,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, 
         jint enable_ipv6, jint force_udp_mode, jint ngc_video_bitrate, jint max_quantizer,
         jint ngc_audio_bitrate, jint ngc_audio_sampling_rate, jint ngc_audio_channel_count)
 {
+    TRACE_LOGGER();
     Java_com_zoffcc_applications_trifa_MainActivity_init__real(env, thiz, datadir, udp_enabled,
                    local_discovery_enabled, orbot_enabled, proxy_host, proxy_port, passphrase_j,
                    enable_ipv6, force_udp_mode,
@@ -3070,6 +3102,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__rea
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv *env, jobject thiz, jstring passphrase_j)
 {
+    TRACE_LOGGER();
     Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz,
                    passphrase_j);
 }
@@ -3188,6 +3221,7 @@ JNIEXPORT int JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single(JNIEnv *env, jobject thiz, jstring ip,
         jstring key_hex, long port)
 {
+    TRACE_LOGGER();
     jint retcode = 0;
     retcode = Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single__real(env, thiz,
                                   ip, key_hex, port);
@@ -3196,6 +3230,21 @@ Java_com_zoffcc_applications_trifa_MainActivity_add_1tcp_1relay_1single(JNIEnv *
 
 int bootstrap_single(Tox *tox, const char *ip, uint16_t port, const char *key_hex)
 {
+    if (ip == NULL)
+    {
+        return 1;
+    }
+
+    if (key_hex == NULL)
+    {
+        return 1;
+    }
+
+    if (tox_global == NULL)
+    {
+        return 1;
+    }
+
     unsigned char key_bin[TOX_PUBLIC_KEY_SIZE];
     toxpk_hex_to_bin(key_bin, key_hex);
     TOX_ERR_BOOTSTRAP error;
@@ -3261,6 +3310,7 @@ JNIEXPORT int JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single(JNIEnv *env, jobject thiz, jobject ip,
         jobject key_hex, long port)
 {
+    TRACE_LOGGER();
     jint retcode = 0;
     retcode = Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single__real(env, thiz, ip,
                                   key_hex, port);
@@ -3273,6 +3323,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_bootstrap_1single(JNIEnv *env, j
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1get_1all_1tcp_1relays(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     size_t length = 60301; // minimum according to tox.h
     char result_c[length];
     CLEAR(result_c);
@@ -3290,6 +3341,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1get_1all_1tcp_1relays(JNIEn
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1get_1all_1udp_1connections(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     size_t length = 60301; // minimum according to tox.h
     char result_c[length];
     CLEAR(result_c);
@@ -3307,6 +3359,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1get_1all_1udp_1connections(
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     jstring result;
     // dbg(9, "get_my_toxid");
     char tox_id_hex[TOX_ADDRESS_SIZE*2 + 1];
@@ -3328,6 +3381,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1connection_1status(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         dbg(9, "tox_self_get_connection_status:NULL:1");
@@ -3340,6 +3394,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1connection_1stat
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1capabilities(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     return (jlong)(tox_self_get_capabilities());
 }
 
@@ -3353,6 +3408,7 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks__real(
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks__real(env, thiz);
 }
 
@@ -3375,12 +3431,14 @@ jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1videocall_1au
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(env, thiz);
 }
 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list_1size(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return -1;
@@ -3394,6 +3452,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1capabilities(JNIEnv *env, jobject thiz,
         jlong friend_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return 0; // 0 --> TOX_CAPABILITY_BASIC
@@ -3405,6 +3464,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1capabilities(J
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1name(JNIEnv *env, jobject thiz, jlong friend_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return NULL;
@@ -3434,6 +3494,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong friend_number)
 {
+    TRACE_LOGGER();
     jstring result;
 
     if(tox_global == NULL)
@@ -3465,6 +3526,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNIEnv *env, jobject thiz,
         jobject public_key_str)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-1;
@@ -3511,6 +3573,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1by_1public_1key(JNI
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return NULL;
@@ -3584,12 +3647,14 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(env, thiz);
 }
 
 JNIEXPORT void JNICALL Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv *env, jobject thiz) __attribute__((noreturn));
 JNIEXPORT void JNICALL Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     dbg(9, "Exit Program");
     exit(0);
 }
@@ -3599,6 +3664,7 @@ JNIEXPORT void JNICALL Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIE
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)tox_iteration_interval(tox_global);
     // dbg(9, "tox_iteration_interval=%lld", (long long)l);
     return (jlong)(unsigned long long)l;
@@ -3608,6 +3674,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1max_1message_1length(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)tox_max_message_length();
     return (jlong)(unsigned long long)l;
 }
@@ -3616,6 +3683,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1max_1message_1length(JNIEnv
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1id_1length(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)tox_file_id_length();
     return (jlong)(unsigned long long)l;
 }
@@ -3623,6 +3691,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1id_1length(JNIEnv *en
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1max_1filename_1length(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)tox_max_filename_length();
     return (jlong)(unsigned long long)l;
 }
@@ -3630,6 +3699,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1max_1filename_1length(JNIEn
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1major(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)tox_version_major();
     return (jlong)(unsigned long long)l;
 }
@@ -3637,6 +3707,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1major(JNIEnv *env,
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1minor(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)tox_version_minor();
     return (jlong)(unsigned long long)l;
 }
@@ -3644,6 +3715,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1minor(JNIEnv *env,
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1patch(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)tox_version_patch();
     return (jlong)(unsigned long long)l;
 }
@@ -3651,6 +3723,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1version_1patch(JNIEnv *env,
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_jnictoxcore_1version(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
 #if defined(__SANITIZE_ADDRESS__)
     return (*env)->NewStringUTF(env, global_version_asan_string);
 #else
@@ -3661,6 +3734,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_jnictoxcore_1version(JNIEnv *env
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_libavutil_1version(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     char libavutil_version_str[2000];
     CLEAR(libavutil_version_str);
     snprintf(libavutil_version_str, 1999, "%d.%d.%d", (int)LIBAVUTIL_VERSION_MAJOR, (int)LIBAVUTIL_VERSION_MINOR, (int)LIBAVUTIL_VERSION_MICRO);
@@ -3670,24 +3744,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_libavutil_1version(JNIEnv *env, 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_x264_1version(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     return (*env)->NewStringUTF(env, X264_VERSION);
 }
 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_libopus_1version(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     return (*env)->NewStringUTF(env, opus_get_version_string());
 }
 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_libsodium_1version(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     return (*env)->NewStringUTF(env, sodium_version_string());
 }
 
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_libvpx_1version(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     return (*env)->NewStringUTF(env, vpx_codec_version_str());
 }
 
@@ -3696,6 +3774,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1msg_1re
         jobject thiz, jlong friend_number, jlong ts_sec,
         jobject msgid_buffer)
 {
+    TRACE_LOGGER();
 #ifdef TOX_HAVE_TOXUTIL
 
     if(msgid_buffer == NULL)
@@ -3729,6 +3808,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1resend_1messa
         jobject raw_message_buffer,
         jlong raw_msg_len)
 {
+    TRACE_LOGGER();
 #ifdef TOX_HAVE_TOXUTIL
 
     if(raw_message_buffer == NULL)
@@ -3781,6 +3861,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
         jobject raw_msg_len_back,
         jobject msgid_back_buffer)
 {
+    TRACE_LOGGER();
 #ifdef TOX_HAVE_TOXUTIL
     long capacity = 0;
 
@@ -3925,6 +4006,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1util_1friend_1send_1message
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1get_1new_1message_1id(JNIEnv *env, jobject thiz, jobject hash_buffer)
 {
+    TRACE_LOGGER();
 
     uint8_t *hash_buffer_c = NULL;
     long capacity_hash = 0;
@@ -3954,6 +4036,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1friend_1send_1message(JNIEnv *env, jobject thiz,
         jlong friend_number, jint type, jobject message, jobject hash_buffer, jlong timestamp)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-99;
@@ -4111,6 +4194,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEnv *env, jobject thiz,
         jlong friend_number, jint type, jobject message)
 {
+    TRACE_LOGGER();
 
     if(tox_global == NULL)
     {
@@ -4197,6 +4281,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1lossless_1packet(JNIEnv *env, jobject thiz,
         jlong friend_number, jbyteArray data, jint data_length)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-9991;
@@ -4224,6 +4309,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv *env, jobject thiz, jobject toxid_str,
         jobject message)
 {
+    TRACE_LOGGER();
 
     if(tox_global == NULL)
     {
@@ -4282,6 +4368,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIEnv *env, jobject thiz,
         jobject public_key_str)
 {
+    TRACE_LOGGER();
     unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
     char *public_key_str2 = NULL;
     const char *s = NULL;
@@ -4305,6 +4392,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env, jobject thiz, jobject name)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)-1;
@@ -4347,6 +4435,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(JNIEnv *env, jobject thiz,
         jobject status_message)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)-1;
@@ -4389,6 +4478,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status(JNIEnv *env, jobject thiz, jint status)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return;
@@ -4402,6 +4492,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1typing(JNIEnv *env, jobject thiz, jlong friend_number,
         jint typing)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)-1;
@@ -4416,6 +4507,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1connection_1status(JNIEnv *env, jobject thiz,
         jlong friend_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)TOX_CONNECTION_NONE;
@@ -4430,6 +4522,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1connection_1ip(JNIEnv *env, jobject thiz,
         jlong friend_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return NULL;
@@ -4454,6 +4547,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1connection_1ip
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1delete(JNIEnv *env, jobject thiz, jlong friend_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)false;
@@ -4472,6 +4566,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1delete(JNIEnv *env,
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return NULL;
@@ -4491,6 +4586,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv *env
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name_1size(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)0;
@@ -4503,6 +4599,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name_1size(JNIEn
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message_1size(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)tox_self_get_status_message_size(tox_global);
     return (jlong)(unsigned long long)l;
 }
@@ -4510,6 +4607,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message_
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     size_t length = tox_self_get_status_message_size(tox_global);
     char message[length + 1];
     CLEAR(message);
@@ -4522,6 +4620,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1control(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong file_number, jint control)
 {
+    TRACE_LOGGER();
     TOX_ERR_FILE_CONTROL error;
     bool res = tox_file_control(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (TOX_FILE_CONTROL)control,
                                 &error);
@@ -4540,6 +4639,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1hash(JNIEnv *env, jobject thiz, jobject hash_buffer,
         jobject data_buffer, jlong data_length)
 {
+    TRACE_LOGGER();
     uint8_t *hash_buffer_c = NULL;
     long capacity_hash = 0;
     uint8_t *data_buffer_c = NULL;
@@ -4580,6 +4680,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1seek(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong file_number, jlong position)
 {
+    TRACE_LOGGER();
     TOX_ERR_FILE_SEEK error;
     bool res = tox_file_seek(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (uint64_t)position, &error);
 
@@ -4633,6 +4734,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1get_1file_1id(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong file_number, jobject file_id_buffer)
 {
+    TRACE_LOGGER();
     uint8_t *file_id_buffer_c = NULL;
     long capacity = 0;
 
@@ -4665,6 +4767,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1get_1file_1id(JNIEnv 
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1sending_1active(JNIEnv *env, jobject thiz, jlong friend_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return -1;
@@ -4676,6 +4779,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1sending_1active(JNIEn
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1receiving_1active(JNIEnv *env, jobject thiz, jlong friend_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return -1;
@@ -4688,6 +4792,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong kind, jlong file_size, jobject file_id_buffer, jstring file_name, jlong filename_length)
 {
+    TRACE_LOGGER();
     uint8_t *file_id_buffer_c = NULL;
     long capacity = 0;
 
@@ -4749,6 +4854,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong file_number, jlong position, jobject data_buffer, jlong data_length)
 {
+    TRACE_LOGGER();
     uint8_t *data_buffer_c = NULL;
     long capacity = 0;
 
@@ -4818,6 +4924,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv *e
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1nospam(JNIEnv *env, jobject thiz, jlong nospam)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return;
@@ -4829,6 +4936,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1nospam(JNIEnv *e
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1nospam(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return -1;
@@ -4841,6 +4949,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1nospam(JNIEnv *e
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1do_1not_1sync_1av(JNIEnv *env, jobject thiz, jint do_not_sync_av)
 {
+    TRACE_LOGGER();
     if (do_not_sync_av == 1)
     {
         tox_set_do_not_sync_av(true);
@@ -4854,6 +4963,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1do_1not_1sync_1av(JNIE
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1set_1onion_1active(JNIEnv *env, jobject thiz, jint active)
 {
+    TRACE_LOGGER();
     if (active == 1)
     {
         tox_set_onion_active(true);
@@ -4896,6 +5006,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1size(JNIEnv *env, jobject thiz, jlong text_length,
         jlong type, jlong alter_type)
 {
+    TRACE_LOGGER();
     uint32_t tox_msg_size = tox_messagev2_size((uint32_t)text_length, (uint32_t)type, (uint32_t)alter_type);
     return (jlong)tox_msg_size;
 }
@@ -4908,6 +5019,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1wrap(JNIEnv *env
         jlong ts_ms, jobject raw_message_buffer,
         jobject msgid_buffer)
 {
+    TRACE_LOGGER();
     if(message_text_buffer == NULL)
     {
         return -1;
@@ -4956,6 +5068,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1message_1pubkey(JNIEnv *env, jobject thiz,
         jobject raw_message_buffer)
 {
+    TRACE_LOGGER();
     if(raw_message_buffer == NULL)
     {
         return (jstring)NULL;
@@ -4993,6 +5106,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1sync_1message_1type(JNIEnv *env, jobject thiz,
         jobject raw_message_buffer)
 {
+    TRACE_LOGGER();
     if(raw_message_buffer == NULL)
     {
         return (jlong)-1;
@@ -5022,6 +5136,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1id(JNIEnv *env, jobject thiz,
         jobject raw_message_buffer, jobject msgid_buffer)
 {
+    TRACE_LOGGER();
     if(raw_message_buffer == NULL)
     {
         return -1;
@@ -5053,6 +5168,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1sec(JNIEnv *env, jobject thiz,
         jobject raw_message_buffer)
 {
+    TRACE_LOGGER();
     if(raw_message_buffer == NULL)
     {
         return -1;
@@ -5069,6 +5185,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1ts_1ms(JNIEnv *env, jobject thiz,
         jobject raw_message_buffer)
 {
+    TRACE_LOGGER();
     if(raw_message_buffer == NULL)
     {
         return -1;
@@ -5088,6 +5205,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev2_1get_1message_1te
         jlong alter_type,
         jobject message_text_buffer)
 {
+    TRACE_LOGGER();
     if(message_text_buffer == NULL)
     {
         return -1;
@@ -5142,6 +5260,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1join_1av_1groupchat(JNIEnv *env, jobject thiz, jlong friend_number,
         jobject cookie_buffer, jlong cookie_length)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-2;
@@ -5173,6 +5292,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1join_1av_1groupchat(JNIEn
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1add_1av_1groupchat(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-2;
@@ -5446,6 +5566,7 @@ int process_incoming_group_audio_on_iterate(int delta_new, int want_ms_output)
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1enable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
 {
+    TRACE_LOGGER();
     pthread_mutex_lock(&group_audio___mutex);
     // dbg(9, "toxav_1groupchat_1enable_1av:START");
 
@@ -5472,6 +5593,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1enable_1av(JNI
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1disable_1av(JNIEnv *env, jobject thiz, jlong conference_number)
 {
+    TRACE_LOGGER();
     pthread_mutex_lock(&group_audio___mutex);
     dbg(9, "toxav_1groupchat_1disable_1av:START");
 
@@ -5498,6 +5620,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1disable_1av(JN
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1groupchat_1av_1enabled(JNIEnv *env, jobject thiz, jlong conference_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-2;
@@ -5533,6 +5656,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1group_1send_1audio(JNIEnv *env, jobject thiz,
         jlong groupnumber, jlong sample_count, jint channels, jlong sampling_rate)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)-2;
@@ -5587,6 +5711,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1delete(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    TRACE_LOGGER();
     TOX_ERR_CONFERENCE_DELETE error;
     bool res = tox_conference_delete(tox_global, (uint32_t)conference_number, &error);
 
@@ -5604,6 +5729,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1join(JNIEnv *env, jobject thiz, jlong friend_number,
         jobject cookie_buffer, jlong cookie_length)
 {
+    TRACE_LOGGER();
     uint8_t *cookie_buffer_c = NULL;
     long capacity = 0;
 
@@ -5688,6 +5814,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1send_1message(JNIEnv *env, jobject thiz,
         jlong conference_number, jint type, jobject message)
 {
+    TRACE_LOGGER();
 
 #ifdef JAVA_LINUX
 
@@ -5757,6 +5884,8 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1set_1title(JNIEnv *env, jobject thiz,
         jlong conference_number, jobject title)
 {
+    TRACE_LOGGER();
+
 #ifdef JAVA_LINUX
 
     const jclass stringClass = (*env)->GetObjectClass(env, (jstring)title);
@@ -5824,6 +5953,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1type(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)-2;
@@ -5847,6 +5977,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jstring)NULL;
@@ -5881,6 +6012,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1count(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-99;
@@ -5922,6 +6054,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1count(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-99;
@@ -5964,6 +6097,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name_1size(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-99;
@@ -6009,6 +6143,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1get_1name(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
+    TRACE_LOGGER();
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     size_t length = tox_conference_peer_get_name_size(tox_global, (uint32_t)conference_number, (uint32_t)peer_number,
                     &error);
@@ -6042,6 +6177,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1peer_1number_1is_1ours(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong peer_number)
 {
+    TRACE_LOGGER();
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     bool res = tox_conference_peer_number_is_ours(tox_global, (uint32_t)conference_number, (uint32_t)peer_number, &error);
 
@@ -6059,6 +6195,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1get_1name_1size(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong offline_peer_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-99;
@@ -6097,6 +6234,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1get_1name(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong offline_peer_number)
 {
+    TRACE_LOGGER();
     TOX_ERR_CONFERENCE_PEER_QUERY error;
     size_t length = tox_conference_offline_peer_get_name_size(tox_global, (uint32_t)conference_number, (uint32_t)offline_peer_number,
                     &error);
@@ -6127,6 +6265,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong offline_peer_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jstring)NULL;
@@ -6158,6 +6297,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1offline_1peer_1get_1last_1active(JNIEnv *env, jobject thiz,
         jlong conference_number, jlong offline_peer_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-99;
@@ -6207,6 +6347,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title_1size(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jlong)-99;
@@ -6259,6 +6400,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIEnv *env, jobject thiz,
         jlong conference_number)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jstring)NULL;
@@ -6297,6 +6439,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1title(JNIE
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1size(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     size_t res = tox_conference_get_chatlist_size(tox_global);
     // dbg(9, "tox_conference_get_chatlist_size=%d", (int)res);
     return (jlong)(unsigned long long)res;
@@ -6310,6 +6453,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     size_t numconferences = tox_conference_get_chatlist_size(tox_global);
     size_t memsize = (numconferences * sizeof(uint32_t));
     uint32_t *conferences_list = malloc(memsize);
@@ -6346,6 +6490,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv *env, jobject thiz,
         jlong conference_number, jobject cookie_buffer)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)-99;
@@ -6385,6 +6530,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1id(JNIEnv 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1new(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return (jint)-99;
@@ -6426,6 +6572,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1invite(JNIEnv *env, jobject thiz,
         jlong friend_number, jlong conference_number)
 {
+    TRACE_LOGGER();
     TOX_ERR_CONFERENCE_INVITE error;
     bool res = tox_conference_invite(tox_global, (uint32_t)friend_number, (uint32_t)conference_number, &error);
 
@@ -6469,6 +6616,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1peer_1id(JNIEnv *env, jobject thiz,
         jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -6495,6 +6643,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1leave(JNIEnv *env, jobject thiz,
         jlong group_number, jstring part_message)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -6522,6 +6671,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1disconnect(JNIEnv *env, jobject thiz,
         jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -6548,6 +6698,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1set_1name(JNIEnv *env, jobject thiz,
         jlong group_number, jstring name)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -6605,6 +6756,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jstring)NULL;
 #else
@@ -6641,6 +6793,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1join(JNIEnv *env, jobject thiz,
         jobject chat_id_buffer, jlong chat_id_length, jobject my_peer_name, jobject password)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -6776,6 +6929,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1savedpeer_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong group_number, jlong slot_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jstring)NULL;
 #else
@@ -6812,6 +6966,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1public_1key(JNIEnv *env, jobject thiz,
         jlong group_number, jlong peer_id)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jstring)NULL;
 #else
@@ -6848,6 +7003,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1by_1public_1key(JNIEnv *env, jobject thiz,
         jlong group_number, jobject public_key_str)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jlong)-1;
 #else
@@ -6900,6 +7056,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1name(JNIEnv *env, jobject thiz,
         jlong group_number, jlong peer_id)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jstring)NULL;
 #else
@@ -6939,6 +7096,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1name(JNIEnv *env, jobject thiz,
         jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jstring)NULL;
 #else
@@ -6978,6 +7136,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1topic(JNIEnv *env, jobject thiz,
         jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jstring)NULL;
 #else
@@ -7017,6 +7176,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1kick_1peer(JNIEnv *env, jobject thiz, jlong group_number,
             jlong peer_id)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7043,6 +7203,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1set_1role(JNIEnv *env, jobject thiz, jlong group_number,
             jlong peer_id, jint role)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7068,6 +7229,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1set_1role(JNIEn
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peer_1limit(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7093,6 +7255,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peer_1limit(JNI
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1voice_1state(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7119,6 +7282,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1voice_1state(JN
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1founder_1set_1voice_1state(JNIEnv *env, jobject thiz, jlong group_number, jint voice_state)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7145,6 +7309,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1founder_1set_1peer_1limit(JNIEnv *env, jobject thiz, jlong group_number,
             jint max_peers)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7176,6 +7341,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1connection_1status(JNIEnv *env, jobject thiz, jlong group_number,
             jlong peer_id)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7201,6 +7367,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1connectio
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1role(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7226,6 +7393,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1get_1role(JNIE
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1get_1role(JNIEnv *env, jobject thiz, jlong group_number, jlong peer_id)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7252,6 +7420,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1chat_1id(JNIEnv *env, jobject thiz,
         jlong group_number, jobject chat_id_buffer)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7287,6 +7456,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1by_1chat_1id(JNIEnv *env, jobject thiz,
         jobject chat_id_buffer)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -7321,6 +7491,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1by_1chat_1id(JNIEnv 
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1grouplist(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     uint32_t numgroups = tox_group_get_number_groups(tox_global);
     size_t memsize = (numgroups * sizeof(uint32_t));
     uint32_t *groups_list = malloc(memsize);
@@ -7355,6 +7526,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1grouplist(JNIEn
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1number_1groups(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -7371,6 +7543,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1number_1groups(
 JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peerlist(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
     Tox_Err_Group_Peer_Query error;
     size_t numpeers = tox_group_peer_count(tox_global, (uint32_t)group_number, &error);
     if (error != TOX_ERR_GROUP_PEER_QUERY_OK)
@@ -7422,6 +7595,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peerlist(JNIEnv
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1count(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -7446,6 +7620,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1peer_1count(JNIEnv *
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1offline_1peer_1count(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -7470,6 +7645,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1offline_1peer_1count
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1privacy_1state(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7495,6 +7671,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1privacy_1state(
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1is_1connected(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7528,6 +7705,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1decode(JNIEnv
         jint flush_decoder
         )
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7591,6 +7769,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1video_1encode(JNIEnv
         jbyteArray v, jint v_bytes,
         jbyteArray encoded_frame_bytes)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7648,6 +7827,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1audio_1encode(JNIEnv
         jint sample_count_per_frame,
         jbyteArray encoded_frame_bytes)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7700,6 +7880,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1ngc_1audio_1decode(JNIEnv
         jbyteArray pcm_decoded
         )
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7748,6 +7929,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1custom_1packet(JNIEnv *env, jobject thiz, jlong group_number,
         jint lossless, jbyteArray data, jint data_length)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7791,6 +7973,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1custom_1private_1packet(JNIEnv *env, jobject thiz, jlong group_number,
         jlong peer_id, jint lossless, jbyteArray data, jint data_length)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7830,6 +8013,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1custom_1privat
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1reconnect(JNIEnv *env, jobject thiz, jlong group_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7855,6 +8039,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1reconnect(JNIEnv *en
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1invite_1friend(JNIEnv *env, jobject thiz, jlong group_number, jlong friend_number)
 {
+    TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
@@ -7881,6 +8066,7 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peer_1connection_1ip(JNIEnv *env, jobject thiz,
         jlong group_number, jlong peer_id)
 {
+    TRACE_LOGGER();
     if(tox_global == NULL)
     {
         return NULL;
@@ -7906,6 +8092,7 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1new(JNIEnv *env, jobject thiz,
         jint privacy_state, jobject group_name, jobject my_peer_name)
 {
+    TRACE_LOGGER();
 
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
@@ -7988,6 +8175,8 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1invite_1accept(JNIEnv *env, jobject thiz,
         jlong friend_number, jobject invite_data_buffer, jlong invite_data_length, jobject my_peer_name, jobject password)
 {
+    TRACE_LOGGER();
+
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -8097,6 +8286,8 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1message(JNIEnv *env, jobject thiz,
         jlong group_number, jint type, jobject message)
 {
+    TRACE_LOGGER();
+
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -8177,6 +8368,8 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1private_1message(JNIEnv *env, jobject thiz,
         jlong group_number, jlong peer_id, jint type, jobject message)
 {
+    TRACE_LOGGER();
+
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -8279,6 +8472,8 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1private_1message_1by_1peerpubkey(JNIEnv *env, jobject thiz,
         jlong group_number, jobject peer_public_key_string, jint type, jobject message)
 {
+    TRACE_LOGGER();
+
 #ifndef HAVE_TOX_NGC
     return (jlong)-99;
 #else
@@ -8713,6 +8908,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1answer(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong audio_bit_rate, jlong video_bit_rate)
 {
+    TRACE_LOGGER();
     TOXAV_ERR_ANSWER error;
     bool res = toxav_answer(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate, (uint32_t)video_bit_rate,
                             &error);
@@ -8723,6 +8919,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1answer(JNIEnv *env, jobje
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1iteration_1interval(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
     long long l = (long long)toxav_iteration_interval(tox_av_global);
     // dbg(9, "toxav_iteration_interval=%lld", (long long)l);
     return (jlong)(unsigned long long)l;
@@ -8733,6 +8930,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong audio_bit_rate, jlong video_bit_rate)
 {
+    TRACE_LOGGER();
     // clear jni incoming audio buffer
     if (audio_buffer_pcm_2 != NULL)
     {
@@ -8753,6 +8951,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1bit_1rate_1set(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong audio_bit_rate, jlong video_bit_rate)
 {
+    TRACE_LOGGER();
     TOXAV_ERR_BIT_RATE_SET error;
     bool res = toxav_bit_rate_set(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate,
                                   (uint32_t)video_bit_rate, &error);
@@ -8765,6 +8964,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1option_1set(JNIEnv *env, jobject thiz, jlong friend_number,
         jlong option, jlong value)
 {
+    TRACE_LOGGER();
     TOXAV_ERR_OPTION_SET error;
     int res = toxav_option_set(tox_av_global, (uint32_t)friend_number, (TOXAV_OPTIONS_OPTION)option, (int32_t)value,
                                &error);
@@ -8776,6 +8976,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1call_1control(JNIEnv *env, jobject thiz, jlong friend_number,
         jint control)
 {
+    TRACE_LOGGER();
     // dbg(9, "JNI:toxav_call_control:ENTER");
     TOXAV_ERR_CALL_CONTROL error;
     bool res = toxav_call_control(tox_av_global, (uint32_t)friend_number, (TOXAV_CALL_CONTROL)control, &error);
@@ -8790,6 +8991,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1uv_1reversed(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px)
 {
+    TRACE_LOGGER();
     if(tox_av_global == NULL)
     {
         return (jint)-99;
@@ -8852,6 +9054,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px)
 {
+    TRACE_LOGGER();
     if(tox_av_global == NULL)
     {
         return (jint)-99;
@@ -8896,6 +9099,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1age(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px, jint age_ms)
 {
+    TRACE_LOGGER();
     if(tox_av_global == NULL)
     {
         return (jint)-99;
@@ -8939,6 +9143,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264_1age(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len, jint age_ms)
 {
+    TRACE_LOGGER();
     if(tox_av_global == NULL)
     {
         return (jint)-99;
@@ -8977,6 +9182,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1video_1send_1frame_1h264(JNIEnv *env, jobject thiz,
         jlong friend_number, jint frame_width_px, jint frame_height_px, jlong data_len)
 {
+    TRACE_LOGGER();
     if(tox_av_global == NULL)
     {
         return (jint)-99;
@@ -9036,6 +9242,7 @@ JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1send_1frame(JNIEnv *env, jobject thiz,
         jlong friend_number, jlong sample_count, jint channels, jlong sampling_rate)
 {
+    TRACE_LOGGER();
     TOXAV_ERR_SEND_FRAME error = 0;
 
     if(global_toxav_valid != true)
@@ -9696,6 +9903,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibTOXGITHASH(JNIEnv *e
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunreachable-code-return"
 
+    TRACE_LOGGER();
+
 #if defined(TOX_GIT_COMMIT_HASH)
     if (strlen(TOX_GIT_COMMIT_HASH) < 2)
     {
@@ -9718,6 +9927,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibGITHASH(JNIEnv *env,
 {
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunreachable-code-return"
+
+    TRACE_LOGGER();
 
 #if defined(GIT_HASH)
     if (strlen(GIT_HASH) < 2)
@@ -9750,6 +9961,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibGITHASH(JNIEnv *env,
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_getNativeLibAPI(JNIEnv *env, jobject thiz)
 {
+    TRACE_LOGGER();
+
 #if defined(__arm__)
 #if defined(__ARM_ARCH_7A__)
 #if defined(__ARM_NEON__)
