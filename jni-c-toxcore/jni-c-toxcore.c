@@ -3431,7 +3431,7 @@ jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1videocall_1au
 JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate(JNIEnv *env, jobject thiz)
 {
-    TRACE_LOGGER();
+    //***// HINT: thats just too much output // TRACE_LOGGER();
     Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(env, thiz);
 }
 
@@ -3664,7 +3664,7 @@ JNIEXPORT void JNICALL Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIE
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv *env, jobject thiz)
 {
-    TRACE_LOGGER();
+    //***// HINT: thats just too much output // TRACE_LOGGER();
     long long l = (long long)tox_iteration_interval(tox_global);
     // dbg(9, "tox_iteration_interval=%lld", (long long)l);
     return (jlong)(unsigned long long)l;
