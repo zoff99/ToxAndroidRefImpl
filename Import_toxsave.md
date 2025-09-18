@@ -28,3 +28,4 @@ Import a Tox Savefile from another Client into TRIfA with root on your Android D
     ```
 4) change the uid and gid accordingly and also read/write access
 5) restart TRIfA, now your imported profile should be active
+
