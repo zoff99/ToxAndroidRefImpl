@@ -53,6 +53,7 @@ export DEBUG_TOXCORE_LOGGING=" "
 
 if [ "$1""x" == "debugbuildx" ]; then
     export DEBUG_TOXCORE_LOGGING=" -DMIN_LOGGER_LEVEL=LOGGER_LEVEL_TRACE "
+    JNI_CUSTOM_FLAGS=" ""$JNI_CUSTOM_FLAGS"" -DDEBUG_ENABLE_TRACE_LOGGING "
 fi
 ## set this to make c-toxcore log more verbose -------------
 
