@@ -3105,6 +3105,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file(JNIEnv *e
     TRACE_LOGGER();
     Java_com_zoffcc_applications_trifa_MainActivity_update_1savedata_1file__real(env, thiz,
                    passphrase_j);
+    TRACE_LOGGER();
 }
 
 void Java_com_zoffcc_applications_trifa_MainActivity_export_1savedata_1file_1unsecure(JNIEnv *env, jobject thiz,
