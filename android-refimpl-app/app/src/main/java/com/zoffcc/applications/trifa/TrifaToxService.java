@@ -759,6 +759,8 @@ public class TrifaToxService extends Service
 
     void load_and_add_all_groups()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         long num_groups = tox_group_get_number_groups();
         Log.i(TAG, "load groups at startup: num=" + num_groups);
 
@@ -807,6 +809,8 @@ public class TrifaToxService extends Service
                 }
             }
         }
+
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     static void write_debug_file(String filename)

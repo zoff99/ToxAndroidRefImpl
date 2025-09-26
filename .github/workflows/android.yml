@@ -85,6 +85,8 @@ jobs:
       run: |
         sed -i -e 's#final static boolean NDK_STDOUT_LOGGING =.*#final static boolean NDK_STDOUT_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
         sed -i -e 's#final static boolean CTOXCORE_NATIVE_LOGGING =.*#final static boolean CTOXCORE_NATIVE_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
+        sed -i -e 's#final static boolean ORMA_TRACE =.*#final static boolean ORMA_TRACE = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
+        sed -i -e 's#final static boolean INSANE_TRACE_LOGGING =.*#final static boolean INSANE_TRACE_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
 
     - name: download the latest JNI debug lib
       run: |

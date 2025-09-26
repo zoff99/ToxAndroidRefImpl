@@ -345,6 +345,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean ORMA_TRACE = false; // set "false" for release builds
+    final static boolean INSANE_TRACE_LOGGING = false; // set "false" for release builds
     final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10241; // increase for database schema changes
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
@@ -612,6 +613,8 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         Log.i(TAG, "M:STARTUP:onCreate");
         Log.i(TAG, "onCreate");
+
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         Log.i(TAG, "M:STARTUP:Lingver set");
         Log.d(TAG, "Lingver_Locale: " + Lingver.getInstance().getLocale());

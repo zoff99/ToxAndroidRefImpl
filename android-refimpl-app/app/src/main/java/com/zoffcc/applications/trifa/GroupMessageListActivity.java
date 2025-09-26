@@ -334,7 +334,10 @@ public class GroupMessageListActivity extends AppCompatActivity
         // ---------- video stuff ----------
         final int ngc_frame_width_px = 480; // + 32; // 240 + 16;
         final int ngc_frame_height_px = 640; // 320;
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_video_frame_image = Bitmap.createBitmap(ngc_frame_width_px, ngc_frame_height_px, Bitmap.Config.ARGB_8888);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         if (1 == 2 + 2)
         {
             RenderScript rs = RenderScript.create(this);
@@ -351,8 +354,11 @@ public class GroupMessageListActivity extends AppCompatActivity
         //
         final int ngc_own_frame_width_px = 480;
         final int ngc_own_frame_height_px = 640;
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_own_video_frame_image = Bitmap.createBitmap(ngc_own_frame_width_px, ngc_own_frame_height_px,
                                                         Bitmap.Config.ARGB_8888);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         if (1 == 2 + 2)
         {
             RenderScript own_rs = RenderScript.create(this);
@@ -394,13 +400,16 @@ public class GroupMessageListActivity extends AppCompatActivity
         // Log.i(TAG, "onCreate:003:conf_id=" + conf_id + " conf_id_prev=" + conf_id_prev);
         group_id_prev = group_id;
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         setContentView(R.layout.activity_group_message_list);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         MainActivity.group_message_list_activity = this;
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         final Drawable drawer_header_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_group).color(
                 getResources().getColor(R.color.md_dark_primary_text)).sizeDp(100);
 
@@ -483,6 +492,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
         }
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         insert_emoji = (ImageView) findViewById(R.id.insert_emoji);
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
@@ -508,13 +518,16 @@ public class GroupMessageListActivity extends AppCompatActivity
         audio_rec_popup_container = findViewById(R.id.audio_rec_popup_container);
 
         audio_rec_popup_container.setVisibility(View.GONE);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         ml_is_recording = false;
         ml_is_rec_ok = false;
 
         ngc_camera_info_text.setText("");
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_nmn3 = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
         {
@@ -529,13 +542,16 @@ public class GroupMessageListActivity extends AppCompatActivity
             ngc_nmn3.createNotificationChannel(ngc_notification_channel_group_audio_play_service);
         }
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         final Drawable d9 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_rotate_right).backgroundColor(
                 Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         ngc_camera_next_button.setImageDrawable(d9);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         // on startup always use back camera
         ngc_active_camera_type = NGC_BACK_CAMERA_USED;
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         if (ngc_active_camera_type == NGC_FRONT_CAMERA_USED)
         {
             final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_camera_front).backgroundColor(
@@ -550,6 +566,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             ngc_camera_toggle_button.setImageDrawable(d6);
             Log.i(TAG, "ngc_active_camera_type(6)=" + ngc_active_camera_type);
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         PREF__ngc_video_bitrate = LOWER_NGC_VIDEO_BITRATE;
         if (PREF__ngc_video_bitrate == LOWER_NGC_VIDEO_BITRATE)
@@ -566,6 +583,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             ngc_video_quality_toggle_button.setImageDrawable(d2a);
         }
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_camera_toggle_button.setOnTouchListener(new View.OnTouchListener()
         {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -638,6 +656,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         });
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_camera_next_button.setOnTouchListener(new View.OnTouchListener()
         {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -687,6 +706,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_audio_mute = true;
         ngc_audio_bar_in_v.setLevel(0);
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         if (ngc_audio_mute == true)
         {
             final Drawable d5 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_mic_off).backgroundColor(
@@ -700,6 +721,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             ngc_mute_button.setImageDrawable(d6);
         }
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_mute_button.setOnTouchListener(new View.OnTouchListener()
         {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -786,6 +808,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             ngc_video_off_button.setImageDrawable(d6);
         }
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_video_off_button.setOnTouchListener(new View.OnTouchListener()
         {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -864,6 +887,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         });
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_video_quality_toggle_button.setOnTouchListener(new View.OnTouchListener()
         {
             @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
@@ -931,14 +955,17 @@ public class GroupMessageListActivity extends AppCompatActivity
         ml_phone_icon.setVisibility(View.GONE);
         ml_status_icon.setVisibility(View.INVISIBLE);
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         final Drawable d3 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_video).color(
                 getResources().getColor(R.color.icon_colors)).sizeDp(80);
         ml_video_icon.setImageDrawable(d3);
         ngc_video_view_container.setVisibility(View.GONE);
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ml_icon.setImageResource(R.drawable.circle_red);
         set_group_connection_status_icon();
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         messageSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
         {
 
@@ -1013,14 +1040,18 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         });
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         setUpEmojiPopup();
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         final Drawable d1 = new IconicsDrawable(getBaseContext()).icon(
                 GoogleMaterial.Icon.gmd_sentiment_satisfied).color(getResources().getColor(R.color.icon_colors)).sizeDp(
                 80);
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         insert_emoji.setImageDrawable(d1);
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         insert_emoji.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -1030,16 +1061,21 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         });
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         // final Drawable add_attachement_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_attachment).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(80);
         final Drawable send_message_icon = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_send).color(
                 getResources().getColor(R.color.icon_colors)).sizeDp(80);
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         attachemnt_instead_of_send = true;
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ml_button_01.setImageDrawable(send_message_icon);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         final Drawable d2 = new IconicsDrawable(this).icon(FontAwesome.Icon.faw_phone).color(
                 getResources().getColor(R.color.icon_colors)).sizeDp(80);
         ml_phone_icon.setImageDrawable(d2);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         if (PREF__use_incognito_keyboard)
         {
@@ -1057,8 +1093,11 @@ public class GroupMessageListActivity extends AppCompatActivity
             initializeScreenshotSecurity(this);
         }
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         set_peer_count_header();
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         set_peer_names_and_avatars();
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         ml_button_recaudio.setOnLongClickListener(new View.OnLongClickListener()
         {
@@ -1319,6 +1358,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 return true;
             }
         });
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         audio_rec_popup_button.setOnClickListener(new View.OnClickListener()
         {
@@ -1338,6 +1378,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
             }
         });
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         audio_rec_popup_time.setOnClickListener(new View.OnClickListener()
         {
@@ -1357,6 +1398,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
             }
         });
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         audio_rec_popup_container.setOnClickListener(new View.OnClickListener()
         {
@@ -1376,6 +1418,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
             }
         });
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         ml_button_recaudio.setOnClickListener(new View.OnClickListener()
         {
@@ -1398,17 +1441,23 @@ public class GroupMessageListActivity extends AppCompatActivity
                               false, 0);
             }
         });
+
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         Log.i(TAG, "onCreate:099");
         oncreate_finished = true;
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     synchronized void set_peer_count_header()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         Thread t = new Thread()
         {
             @Override
             public void run()
             {
+                if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
                 final long conference_num = tox_group_by_groupid__wrapper(group_id);
                 String group_topic = tox_group_get_name(conference_num);
                 if (group_topic == null)
@@ -1450,9 +1499,11 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                     main_handler_s.post(myRunnable);
                 }
+                if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
             }
         };
         t.start();
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     static class group_list_peer
@@ -1467,6 +1518,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     synchronized void set_peer_names_and_avatars()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         try
         {
             remove_group_all_users();
@@ -1475,18 +1527,22 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         // Log.d(TAG, "set_peer_names_and_avatars:002");
 
         final long conference_num = tox_group_by_groupid__wrapper(group_id);
         long num_peers = tox_group_peer_count(conference_num);
         final long self_peer_id = tox_group_self_get_peer_id(conference_num);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         if (num_peers > 0)
         {
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
             long[] peers = tox_group_get_peerlist(conference_num);
             if (peers != null)
             {
+                if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
                 List<group_list_peer> group_peers1 = new ArrayList<>();
                 long i = 0;
                 for (i = 0; i < num_peers; i++)
@@ -1585,12 +1641,16 @@ public class GroupMessageListActivity extends AppCompatActivity
                                    peerl.self, peerl.notification_silent);
                 }
             }
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         long offline_num_peers = tox_group_offline_peer_count(conference_num);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         if (offline_num_peers > 0)
         {
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
             List<group_list_peer> group_peers_offline = new ArrayList<group_list_peer>();
             long i = 0;
             for (i = 0; i < GC_MAX_SAVED_PEERS; i++)
@@ -1645,6 +1705,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                 }
             }
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
             try
             {
@@ -1668,8 +1729,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                 add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name,
                                peerloffline.peer_connection_status, false, peerloffline.notification_silent);
             }
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
     }
 
@@ -1738,15 +1801,22 @@ public class GroupMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onResume");
         super.onResume();
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         // reset update trigger timestamp
         update_group_all_users_last_trigger_ts = 0;
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         stop_group_video(this, true);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         closeCamera();
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         ngc_video_packet_last_incoming_ts = -1;
         ngc_incoming_video_peer_toggle_current_index = 0;
         flush_decoder = 1;
         ngc_purge_video_incoming_peer_list();
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         try
         {
@@ -1757,6 +1827,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             ee.printStackTrace();
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
@@ -1766,7 +1837,9 @@ public class GroupMessageListActivity extends AppCompatActivity
             // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
         }
 
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, group_id, null, null);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         MainActivity.group_message_list_activity = this;
         wakeup_tox_thread();
@@ -1777,6 +1850,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         catch (Exception e)
         {
         }
+
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         NGC_Group_video_check_incoming_thread = new Thread()
         {
             @Override
@@ -1854,6 +1929,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         };
         NGC_Group_video_check_incoming_thread_running = true;
         NGC_Group_video_check_incoming_thread.start();
+
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     static void set_recording_pop_text_s(final String t)
@@ -2804,9 +2881,11 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     public void openCamera()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
         try
         {
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
             String cameraId = manager.getCameraIdList()[0];
             try
             {
@@ -2840,6 +2919,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 e.printStackTrace();
             }
 
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
             CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
             StreamConfigurationMap map = characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
             Size[] outputSizes = map.getOutputSizes(ImageFormat.YUV_420_888);
@@ -2848,15 +2928,19 @@ public class GroupMessageListActivity extends AppCompatActivity
                                                    ImageFormat.YUV_420_888, CAMERAX_NGC_CAPTURE_MAX_IMAGES);
             mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
             manager.openCamera(cameraId, mStateCallback, mBackgroundHandler);
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         }
         catch (CameraAccessException e)
         {
             e.printStackTrace();
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         }
         catch (Exception e2)
         {
             e2.printStackTrace();
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     private final CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback()
@@ -2885,6 +2969,8 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     private void createCaptureSession()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         try
         {
             Surface surface = mImageReader.getSurface();
@@ -2915,10 +3001,14 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             e2.printStackTrace();
         }
+
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     private void startPreview()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         try
         {
             CaptureRequest.Builder captureRequestBuilder = mCameraDevice.createCaptureRequest(
@@ -2934,6 +3024,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             e2.printStackTrace();
         }
+
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener()
@@ -3076,6 +3168,8 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     public void closeCamera()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+
         try
         {
             if (mCaptureSession != null)
@@ -3123,10 +3217,12 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     private void flush_output_image()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         try
         {
             ngc_video_view.setBitmap(null);
@@ -3134,11 +3230,13 @@ public class GroupMessageListActivity extends AppCompatActivity
         catch (Exception e)
         {
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     @SuppressLint("RestrictedApi")
     private Size chooseOptimalSize(Size[] choices, int width, int height)
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         try
         {
             List<Size> bigEnough = new ArrayList<>();
@@ -3151,21 +3249,25 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
             if (bigEnough.size() > 0)
             {
+                if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
                 return choices[0]; // Collections.min(bigEnough, new CompareSizesByArea());
             }
             else
             {
+                if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
                 return choices[0];
             }
         }
         catch (Exception e)
         {
+            if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
             return new Size(640, 480);
         }
     }
 
     synchronized public static void stop_group_video(final Context c, boolean reset_call_values)
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_video_showing_video_from_peer_pubkey = "-1";
         NGC_Group_video_play_thread_running = false;
         NGC_Group_audio_record_thread_running = false;
@@ -3185,6 +3287,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         // ---- stop audio stuff
 
         ngc_set_video_call_icon(NGC_VIDEO_ICON_STATE_INACTIVE);
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     public static void play_ngc_incoming_audio_frame(final long group_number, final long peer_id, final byte[] encoded_audio_and_header, long length)
@@ -3549,6 +3652,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     synchronized public static void start_group_video(final Context c)
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         // just in case there is a thread still running
         ngc_video_showing_video_from_peer_pubkey = "-1";
         NGC_Group_video_play_thread_running = false;
@@ -3914,6 +4018,8 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         }, 1000);
         // update every x times per second -----------
+
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     public void toggle_group_video(final View view)
@@ -4158,6 +4264,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     static void init_native_audio_stuff()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         final int sampling_rate = 48000;
         final int channels = 1;
         final int sample_count = NGC_AUDIO_PCM_BUFFER_SAMPLES; // bytes = sample_count * 2
@@ -4193,10 +4300,12 @@ public class GroupMessageListActivity extends AppCompatActivity
             NativeAudio.restartNativeAudioPlayEngine((int) sampling_rate_, channels_);
         }
         NativeAudio.n_cur_buf = 0;
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 
     static void update_call_ngc_audio_bars()
     {
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         try
         {
             Runnable myRunnable = new Runnable()
@@ -4227,5 +4336,6 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+        if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
 }

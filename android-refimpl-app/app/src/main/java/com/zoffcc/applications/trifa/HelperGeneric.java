@@ -3843,6 +3843,24 @@ public class HelperGeneric
         }
     }
 
+    /*
+     * log the source line where this function is called from.
+     * good for trace logging.
+     */
+    static void log_source_line()
+    {
+        try
+        {
+            final int offset = 3;
+            Log.i(TAG, "INSANE_TRACE:" + Thread.currentThread().getStackTrace()[offset].getMethodName() + " " +
+                       Thread.currentThread().getStackTrace()[offset].getFileName() + ":" + Thread.currentThread().getStackTrace()[offset].getLineNumber());
+        }
+        catch(Exception ignored)
+        {
+            ignored.printStackTrace();
+        }
+    }
+
     static void draw_main_top_icon__real(ImageView view, Context c, int blur_color, boolean is_fg)
     {
         try
