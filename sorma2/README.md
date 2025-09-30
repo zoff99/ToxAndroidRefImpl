@@ -62,6 +62,11 @@ cp -av ./com /home/user/your/project/source/tree/
 in your Java project you will need the `sqlite jdbc jar` and in your
 Android project you will need `com.github.zoff99:pkgs_zoffccAndroidJDBC` from [jitpack.io](https://jitpack.io/#zoff99/pkgs_zoffccAndroidJDBC)
 
+add this dependency to your `build.gradle` file
+
+```
+implementation 'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.12'
+```
 
 
 Android Example App:
