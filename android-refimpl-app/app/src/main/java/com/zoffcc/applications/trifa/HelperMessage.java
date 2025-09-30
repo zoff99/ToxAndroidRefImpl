@@ -1279,6 +1279,7 @@ public class HelperMessage
                     sent_timestampBetween(sent_timestamp - PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev,
                                           sent_timestamp + PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after).
                     directionEq(1).
+                    sent_pushEq(0).
                     orderBySent_timestampAsc().
                     limit(1).toList().get(0);
 
