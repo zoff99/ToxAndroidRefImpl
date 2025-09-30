@@ -1007,6 +1007,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             @Override
             public void run()
             {
+                Response response = null;
                 try
                 {
                     Log.i(TAG, "onConnected:002");
@@ -1016,7 +1017,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                             header("User-Agent", GENERIC_TOR_USERAGENT).
                             build();
 
-                    Response response = okHttpClient.
+                    response = okHttpClient.
                             newCall(request).
                             execute();
                     Log.i(TAG, "onConnected:003");
@@ -1175,6 +1176,13 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 catch (Exception e)
                 {
                     Log.i(TAG, "onConnected:EE2:" + e.getMessage());
+                }
+                try
+                {
+                    response.body().close();
+                }
+                catch(Exception e2)
+                {
                 }
             }
         }.start();
