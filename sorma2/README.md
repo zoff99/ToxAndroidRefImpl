@@ -65,7 +65,7 @@ Android project you will need `com.github.zoff99:pkgs_zoffccAndroidJDBC` from [j
 add this dependency to your `build.gradle` file
 
 ```
-implementation 'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.12'
+implementation 'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.15'
 ```
 
 
