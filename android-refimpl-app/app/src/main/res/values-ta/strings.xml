@@ -184,7 +184,7 @@
     <string name="title_activity_aboutpage">பற்றி</string>
     <string name="title_activity_set_password">கடவுச்சொல்லை அமைக்கவும்</string>
     <string name="title_activity_check_password">கடவுச்சொல்லை உள்ளிடவும்</string>
-    <string name="title_activity_share">ட்ரிஃபாவுடன் திறந்திருக்கும்</string>
+    <string name="title_activity_share">ட்ரிஃபாவுடன் திற</string>
     <string name="title_activity_maintenance">பராமரிப்பு</string>
     <string name="pref_title_auto_accept_image">ஆட்டோ ஏற்றுக்கொள்ளும் படங்கள்</string>
     <string name="pref_description_auto_accept_image">12 mbyte வரை படங்களையும் புகைப்படங்களையும் தானாக ஏற்றுக்கொள்கிறது</string>
