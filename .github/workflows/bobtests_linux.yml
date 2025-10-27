@@ -209,7 +209,7 @@ jobs:
               mv test_007_time.png test_007.png
               mv test_099_time.png test_099.png
       - name: upload screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: linuxscreen_${{ matrix.api-level }}
           path: |
@@ -217,7 +217,7 @@ jobs:
             /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
       - name: upload logcat output
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: logcat_${{ matrix.api-level }}
           path: |
