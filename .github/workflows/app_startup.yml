@@ -90,14 +90,14 @@ jobs:
             sleep 2
 
       - name: upload screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: android_startup_${{ matrix.api-level }}
           path: |
             /home/runner/android_screen*.png
 
       - name: upload screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: android_startup_adb_log_${{ matrix.api-level }}
           path: |
