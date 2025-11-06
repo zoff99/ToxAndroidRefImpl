@@ -43,6 +43,7 @@ Help Translate the App in your Language
 Use Weblate:
 https://hosted.weblate.org/engage/trifa-a-tox-client-for-android/
 
+
 Push Notification
 =
 See [PUSH_NOTIFICATION.md](./PUSH_NOTIFICATION.md)
