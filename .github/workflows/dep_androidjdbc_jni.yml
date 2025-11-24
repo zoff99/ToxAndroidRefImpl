@@ -20,7 +20,7 @@ jobs:
       pull-requests: write
     steps:
     - name: Checkout
-      uses: actions/checkout@v5
+      uses: actions/checkout@v6
 
     - name: Run auto dependency update
       run: ./tools/check_android_jdbc.sh > output.txt
