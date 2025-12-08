@@ -620,20 +620,20 @@ public class OrmaDatabase
             // HINT: try to read "PRAGMA user_version" and see if there is some legacy value there
             current_db_schema_version = get_current_db_legacy_version();
         }
-        Log.i(TAG, "trifa:current_db_version=" + current_db_schema_version);
+        Log.i(TAG, "INIT:current_db_version=" + current_db_schema_version);
         if ((current_db_schema_version < 0) || (THIS_DB_SCHEMA_VERSION < 0))
         {
-            Log.i(TAG, "trifa:current_db_schema_version and/or THIS_DB_SCHEMA_VERSION are negative numbers, this is not allowed!");
+            Log.i(TAG, "INIT:current_db_schema_version and/or THIS_DB_SCHEMA_VERSION are negative numbers, this is not allowed!");
         }
         if ((current_db_schema_version == 0) && (THIS_DB_SCHEMA_VERSION == 0))
         {
-            Log.i(TAG, "trifa:current_db_schema_version and THIS_DB_SCHEMA_VERSION are both 0, this is not allowed!");
+            Log.i(TAG, "INIT:current_db_schema_version and THIS_DB_SCHEMA_VERSION are both 0, this is not allowed!");
         }
         if (current_db_schema_version < THIS_DB_SCHEMA_VERSION)
         {
             for (int cur=current_db_schema_version;cur<THIS_DB_SCHEMA_VERSION;cur++)
             {
-                Log.i(TAG, "trifa:calling schema upgrade callback function for " + cur + " -> " + (cur + 1));
+                Log.i(TAG, "INIT:calling schema upgrade callback function for " + cur + " -> " + (cur + 1));
                 if (schema_upgrade_callback_function != null)
                 {
                     schema_upgrade_callback_function.upgrade(cur, (cur + 1));
@@ -641,7 +641,7 @@ public class OrmaDatabase
             }
         }
         current_db_schema_version = update_db(current_db_schema_version);
-        Log.i(TAG, "trifa:new_db_version=" + current_db_schema_version);
+        Log.i(TAG, "INIT:new_db_version=" + current_db_schema_version);
         // --------------- CREATE THE DATABASE ---------------
         // --------------- CREATE THE DATABASE ---------------
         // --------------- CREATE THE DATABASE ---------------
