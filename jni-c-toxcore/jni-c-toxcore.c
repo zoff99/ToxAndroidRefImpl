@@ -841,6 +841,11 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
         dbg(9, "update_savedata_file:ERROR:tox ptr is NULL");
         return;
     }
+
+    bool save_unencrypted = false;
+    size_t size_enc = 0;
+    uint8_t *savedata_enc = NULL;
+
     size_t size = tox_get_savedata_size(tox);
     // dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
 
@@ -875,42 +880,56 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_tmp_filename);
 #endif
 
-    size_t size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
-    // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
-    uint8_t *savedata_enc = calloc(1, size_enc);
-    // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
-    TOX_ERR_ENCRYPTION error;
-    tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
-    // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
-
-    if ((size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH) || (error != TOX_ERR_ENCRYPTION_OK))
+    if ((passphrase == NULL) || (passphrase_len == 0))
     {
-        dbg(9, "update_savedata_file:ERROR:size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH or error != TOX_ERR_ENCRYPTION_OK: error=%d", (int)error);
-        if(savedata)
-        {
-            free(savedata);
-        }
-        if(savedata_enc)
-        {
-            free(savedata_enc);
-        }
-        return;
+        // HINT: caller wants to save UN-encrypted
+        dbg(9, "update_savedata_file:!!!!!!! saving UN-encrypted !!!!!!!");
+        save_unencrypted = true;
     }
     else
     {
-        bool res = false;
-        res = tox_is_data_encrypted((const uint8_t *)savedata_enc);
-        if (!res)
+        size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
+        // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
+        savedata_enc = calloc(1, size_enc);
+        // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
+        TOX_ERR_ENCRYPTION error;
+        tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
+        // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
+
+        if ((size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH) || (error != TOX_ERR_ENCRYPTION_OK))
         {
-            dbg(9, "update_savedata_file:ERROR:savedata_enc is corrupted");
+            dbg(9, "update_savedata_file:ERROR:size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH or error != TOX_ERR_ENCRYPTION_OK: error=%d", (int)error);
             free(savedata);
             free(savedata_enc);
+            free(full_path_filename);
+            free(full_path_filename_tmp);
             return;
+        }
+        else
+        {
+            bool res = false;
+            res = tox_is_data_encrypted((const uint8_t *)savedata_enc);
+            if (!res)
+            {
+                dbg(9, "update_savedata_file:ERROR:savedata_enc is corrupted");
+                free(savedata);
+                free(savedata_enc);
+                free(full_path_filename);
+                free(full_path_filename_tmp);
+                return;
+            }
         }
     }
 
     FILE *f = fopen(full_path_filename_tmp, "wb");
-    fwrite((const void *)savedata_enc, size_enc, 1, f);
+    if (save_unencrypted)
+    {
+        fwrite((const void *)savedata, size, 1, f);
+    }
+    else
+    {
+        fwrite((const void *)savedata_enc, size_enc, 1, f);
+    }
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
     // dbg(0, "update_savedata_file:ftell:savedata size=%ld", fsize);
@@ -920,14 +939,10 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     if (fsize < 1)
     {
         dbg(9, "update_savedata_file:ERROR:fsize < 1");
-        if(savedata)
-        {
-            free(savedata);
-        }
-        if(savedata_enc)
-        {
-            free(savedata_enc);
-        }
+        free(savedata);
+        free(savedata_enc);
+        free(full_path_filename);
+        free(full_path_filename_tmp);
         return;
     }
 
@@ -940,18 +955,10 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 
     int res_rename = rename(full_path_filename_tmp, full_path_filename);
     // dbg(9, "update_savedata_file:rename src=%s dst=%s res=%d", full_path_filename_tmp, full_path_filename, res_rename);
+    free(savedata);
+    free(savedata_enc);
     free(full_path_filename);
     free(full_path_filename_tmp);
-
-    if(savedata)
-    {
-        free(savedata);
-    }
-
-    if(savedata_enc)
-    {
-        free(savedata_enc);
-    }
 }
 
 
