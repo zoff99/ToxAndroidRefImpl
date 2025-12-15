@@ -20,11 +20,13 @@ import com.zoffcc.applications.sorm.Log;
 public class OrmaDatabase
 {
     private static final String TAG = "sorm.OrmaDatabase";
-    public static final String OrmaDatabaseVersion = "1.0.2";
+    public static final String OrmaDatabaseVersion = "1.0.3";
 
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean ORMA_LONG_RUNNING_TRACE = false; // set "false" for release builds
     final static long ORMA_LONG_RUNNING_MS = 180;
+
+    private static final String SQLCIPHER_NOT_USED = "sqlcipher not in use";
 
     public static Connection sqldb = null;
     static int THIS_DB_SCHEMA_VERSION = 1; // HINT: this is the version the database schema should be upgraded to
@@ -52,6 +54,19 @@ public class OrmaDatabase
     private static String db_file_path = null;
     private static String secrect_key = null;
     private static boolean wal_mode = false; // default mode is WAL off!
+
+    public static enum SQLITE_TYPE {
+        UNLOADED(0),
+        SQLITE(1),
+        SQLCIPHER(2);
+
+        public final int type;
+
+        private SQLITE_TYPE(int type) {
+            this.type = type;
+        }
+    }
+    private static boolean is_shutdown = true;
 
     public static String getVersion()
     {
@@ -274,6 +289,24 @@ public class OrmaDatabase
         return results;
     }
 
+    public static SQLITE_TYPE get_sqlite_type()
+    {
+        if (is_shutdown)
+        {
+            return SQLITE_TYPE.UNLOADED;
+        }
+
+        final String sqlcipher_version_used = get_current_sqlcipher_version();
+        if (sqlcipher_version_used.equals(SQLCIPHER_NOT_USED))
+        {
+            return SQLITE_TYPE.SQLITE;
+        }
+        else
+        {
+            return SQLITE_TYPE.SQLCIPHER;
+        }
+    }
+
     public static String get_current_sqlite_version()
     {
         String ret = "unknown";
@@ -303,6 +336,53 @@ public class OrmaDatabase
         {
             Log.i(TAG, "ERR:CSQLV:002:" + e.getMessage());
             e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                statement.close();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+            orma_global_sqlfreehand_lock.unlock();
+        }
+
+        return ret;
+    }
+
+    public static String get_current_sqlcipher_version()
+    {
+        String ret = SQLCIPHER_NOT_USED;
+
+        orma_global_sqlfreehand_lock.lock();
+        Statement statement = null;
+        try
+        {
+            statement = sqldb.createStatement();
+            final ResultSet rs = statement.executeQuery("PRAGMA cipher_version");
+            if (rs.next())
+            {
+                ret = rs.getString(1);
+            }
+            try
+            {
+                rs.close();
+            }
+            catch (Exception e)
+            {
+                Log.i(TAG, "ERR:CSQCV:001:" + e.getMessage());
+                e.printStackTrace();
+            }
+            return ret;
+        }
+        catch (Exception e)
+        {
+            // HINT: if sqlcipher is not used we would get this error. so do not show it
+            // Log.i(TAG, "ERR:CSQCV:002:" + e.getMessage());
+            // e.printStackTrace();
         }
         finally
         {
@@ -543,6 +623,7 @@ public class OrmaDatabase
             Log.i(TAG, "ERR:SHUTDOWN:001:" + e2.getMessage());
             e2.printStackTrace();
         }
+        is_shutdown = true;
         Log.i(TAG, "SHUTDOWN:finished");
     }
 
@@ -570,8 +651,12 @@ public class OrmaDatabase
             throw new RuntimeException(e);
         }
 
+        Log.i(TAG, "loaded:sqlite_type:1:" + get_sqlite_type());
+
         // HINT: check if the database can be opened (e.g. the password for an sqlcipher db is correct), if not throw RuntimeException
         check_db_open();
+
+        is_shutdown = false;
 
         if (OrmaDatabase.wal_mode)
         {
@@ -608,7 +693,9 @@ public class OrmaDatabase
             Log.i(TAG, "INIT:turning OFF WAL mode");
         }
 
+        Log.i(TAG, "loaded:sqlite_type:2:" + get_sqlite_type());
         Log.i(TAG, "loaded:sqlite:" + get_current_sqlite_version());
+        Log.i(TAG, "loaded:sqlcipher:" + get_current_sqlcipher_version());
 
         // --------------- CREATE THE DATABASE ---------------
         // --------------- CREATE THE DATABASE ---------------
