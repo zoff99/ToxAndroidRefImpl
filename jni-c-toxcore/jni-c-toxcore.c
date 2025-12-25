@@ -3374,6 +3374,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1callback_1friend_1lossless_
         return -1;
     }
     tox_callback_friend_lossless_packet_per_pktid(tox_global, friend_lossless_packet_cb, pktid);
+
+    // HINT: since we have no return value from c-toxcore, we just return "1" (== true)
+    return 1;
 }
 
 JNIEXPORT jstring JNICALL
