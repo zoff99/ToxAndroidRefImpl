@@ -3364,6 +3364,18 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1get_1all_1udp_1connections(
     return result;
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1callback_1friend_1lossless_1packet_1per_1pktid(JNIEnv *env, jobject thiz, int pktid)
+{
+    TRACE_LOGGER();
+    if(tox_global == NULL)
+    {
+        return -1;
+    }
+    tox_callback_friend_lossless_packet_per_pktid(tox_global, friend_lossless_packet_cb, pktid);
+}
+
 JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobject thiz)
 {
