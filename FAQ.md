@@ -13,7 +13,7 @@ related to Trifa Tox Client.
 
 There are 3 circles on the contact item, see
 
-![Example Trifa Contact List](https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/refs/heads/add_faq/images/trifa-contact-list.png)
+![Example Trifa Contact List](https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/refs/heads/zoff99/dev003/images/trifa-contact-list.png)
 
 * the circle around avatar (`1`) tells the connection type, like
     * <span style="background-color: green; color: white">green</span> -> friend is online via UDP
