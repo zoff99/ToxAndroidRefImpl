@@ -20,3 +20,4 @@ Tox is free software. That's free as in freedom, as well as in price. This means
 <br>
 * Join discussion on Matrix: https://matrix.to/#/#trifa:matrix.org
 <br>
+Have a look at the desktop version: https://github.com/Zoxcore/trifa_material
