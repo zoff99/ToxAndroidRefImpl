@@ -132,7 +132,7 @@ dependencyVerification {
         'com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.19:pkgs_guardianprojectIOCipher-1.0.19.aar:f27a6b747b005579514ff102aca5636c88cbd497592708f5ee7fd2138edd2afe',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0:pkgs_hotchemiPermissionsdispatcher-processor-3.2.0.jar:f7374192b263a94f63186dee91cb954c9369122519e4f08e055b72969699b52d',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0:pkgs_hotchemiPermissionsdispatcher-3.2.0.aar:40191c8c726445dcab4fa2a4ef7a7e76186ef154dc385fe07520944fe4720089',
-        'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.20:pkgs_zoffccAndroidJDBC-1.0.20.aar:b19701b1a6883f4ee5760a7f188ea99cba9d1a48e480f1e4dfc606fc6e0f606f',
+        'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.21:pkgs_zoffccAndroidJDBC-1.0.21.aar:978f4a6395c08a65e6134ff7aea784827c5728b2d96cd4274563dd297cd73a7a',
         'com.google.android.material:material:1.13.0:material-1.13.0.aar:6d5e1cbb67c05bcdcbbf84005787dafd354a155f59a4d3800fd45fa7eb3689f5',
         'com.google.android:annotations:4.1.1.4:annotations-4.1.1.4.jar:ba734e1e84c09d615af6a09d33034b4f0442f8772dec120efb376d86a565ae15',
         'com.google.api.grpc:proto-google-common-protos:2.17.0:proto-google-common-protos-2.17.0.jar:4ef1fe0c327fc1521d1d753b0b1c4a875a54bd14ebded3afff0ca395320b6ea9',
