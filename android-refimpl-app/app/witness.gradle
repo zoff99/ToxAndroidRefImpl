@@ -129,7 +129,7 @@ dependencyVerification {
         'com.github.piasy:rxandroidaudio:1.7.0:rxandroidaudio-1.7.0.aar:70f93bd866b5dff068744211a441c463196a323a84e0fce5aa917fe9d8228ccc',
         'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.170:pkgs_ToxAndroidRefImpl-1.0.170.aar:cc12a3d7f279714099eaefdfa40deedc4af7f0c3347467a5568c6502f41d04f5',
         'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0:pkgs_armchaAutoLinkTextView-0.3.0.aar:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
-        'com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.19:pkgs_guardianprojectIOCipher-1.0.19.aar:f27a6b747b005579514ff102aca5636c88cbd497592708f5ee7fd2138edd2afe',
+        'com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.22:pkgs_guardianprojectIOCipher-1.0.22.aar:87f0dde49dec06665df54ed9a14663d09bbdcec291a208b7bc384607427fc624',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0:pkgs_hotchemiPermissionsdispatcher-processor-3.2.0.jar:f7374192b263a94f63186dee91cb954c9369122519e4f08e055b72969699b52d',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0:pkgs_hotchemiPermissionsdispatcher-3.2.0.aar:40191c8c726445dcab4fa2a4ef7a7e76186ef154dc385fe07520944fe4720089',
         'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.21:pkgs_zoffccAndroidJDBC-1.0.21.aar:978f4a6395c08a65e6134ff7aea784827c5728b2d96cd4274563dd297cd73a7a',
