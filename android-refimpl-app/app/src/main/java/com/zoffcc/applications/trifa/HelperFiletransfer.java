@@ -42,6 +42,7 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 import androidx.core.content.FileProvider;
 
@@ -341,12 +342,30 @@ public class HelperFiletransfer
     {
         try
         {
-            orma.updateFiletransfer().idEq(filetransfer_id).ft_accepted(true).execute();
+            orma.updateFiletransfer().idEq(filetransfer_id).ft_accepted(true).
+                    transfer_start_ts(System.currentTimeMillis()).
+                    execute();
         }
         catch (Exception e)
         {
             e.printStackTrace();
         }
+    }
+
+    public static String format_speed(float bytes_per_second) {
+        try {
+            if (bytes_per_second > 1024) {
+                if (bytes_per_second > (1024 * 1024)) {
+                    return String.format("%.2f MiB/s", bytes_per_second / (1024 * 1024));
+                } else {
+                    return String.format("%.2f kiB/s", bytes_per_second / 1024);
+                }
+            } else {
+                return String.format("%.2f Bytes/s", bytes_per_second);
+            }
+        } catch (Exception e) {
+        }
+        return "? Bytes/s";
     }
 
     public static long get_filetransfer_filenum_from_id(long filetransfer_id)

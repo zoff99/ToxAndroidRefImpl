@@ -52,6 +52,7 @@ import androidx.core.content.ContextCompat;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.HelperFiletransfer.format_speed;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_state_from_id;
@@ -204,9 +205,18 @@ public class MessageListHolder_file_outgoing_state_resume extends RecyclerView.V
             final int percent = (int) (100f * (float) ft_.current_position / (float) ft_.filesize);
             // Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
             ft_progressbar.setProgress(percent);
+            long start_ts = ft_.transfer_start_ts;
+            long now = System.currentTimeMillis();
+            long delta_ts_ms = now - start_ts;
+            if (delta_ts_ms < 1)
+            {
+                delta_ts_ms = 1;
+            }
+            float speed_bytes_per_second = (((float)ft_.current_position) / (float)delta_ts_ms) * 1000.0f;
             // TODO: make text better
             textView.setAutoLinkText(
-                    "" + message.text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n sending ...");
+                    "" + message.text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n sending ..." +
+                    "\n" + format_speed(speed_bytes_per_second));
         }
         else
         {

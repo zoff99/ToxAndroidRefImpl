@@ -40,6 +40,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static com.zoffcc.applications.trifa.HelperFiletransfer.format_speed;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.get_filetransfer_filenum_from_id;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.remove_vfs_ft_from_cache;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.set_filetransfer_state_from_id;
@@ -209,8 +210,17 @@ public class MessageListHolder_file_incoming_state_resume extends RecyclerView.V
             final int percent = (int) (100f * (float) ft_.current_position / (float) ft_.filesize);
             // Log.i(TAG, "getView:033:STATE:RESUME:percent=" + percent + " cur=" + ft_.current_position + " size=" + ft_.filesize);
             ft_progressbar.setProgress(percent);
+            long start_ts = ft_.transfer_start_ts;
+            long now = System.currentTimeMillis();
+            long delta_ts_ms = now - start_ts;
+            if (delta_ts_ms < 1)
+            {
+                delta_ts_ms = 1;
+            }
+            float speed_bytes_per_second = (((float)ft_.current_position) / (float)delta_ts_ms) * 1000.0f;
             // TODO: make text better
-            textView.setText("" + message.text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n receiving ...");
+            textView.setText("" + message.text + "\n" + ft_.current_position + "/" + ft_.filesize + "\n receiving ..."+
+                             "\n" + format_speed(speed_bytes_per_second));
             if (MESSAGE_TEXT_SIZE[PREF__global_font_size] > MESSAGE_TEXT_SIZE_FT_SMALL)
             {
                 textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE_FT_SMALL);

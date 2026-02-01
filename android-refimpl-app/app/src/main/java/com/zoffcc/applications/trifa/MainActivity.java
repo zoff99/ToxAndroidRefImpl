@@ -6924,6 +6924,20 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
+                    if (position == 0)
+                    {
+                        // this is the first chunk of an outgoing FT
+                        // remember this timestamp as FT start time
+                        try
+                        {
+                            orma.updateFiletransfer().idEq(ft.id).transfer_start_ts(
+                                    System.currentTimeMillis()).execute();
+                        }
+                        catch(Exception e)
+                        {
+                        }
+                    }
+
                     if (ft.storage_frame_work)
                     {
                         long file_chunk_length = length;
@@ -7073,6 +7087,20 @@ public class MainActivity extends AppCompatActivity
                 }
                 else
                 {
+                    if (position == 0)
+                    {
+                        // this is the first chunk of an outgoing FT
+                        // remember this timestamp as FT start time
+                        try
+                        {
+                            orma.updateFiletransfer().idEq(ft.id).transfer_start_ts(
+                                    System.currentTimeMillis()).execute();
+                        }
+                        catch(Exception e)
+                        {
+                        }
+                    }
+
                     if (ft.storage_frame_work)
                     {
                         long file_chunk_length = length;
