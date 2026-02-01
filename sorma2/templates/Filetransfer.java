@@ -71,6 +71,9 @@ public class Filetransfer
     @Column(defaultExpr = "0")
     long current_position = 0;
 
+    @Column(defaultExpr = "0")
+    long transfer_start_ts = 0;
+
     @Column(indexed = true, defaultExpr = "-1")
     long message_id; // f_key -> Message.id
 

@@ -59,6 +59,9 @@ public class Filetransfer
     public long current_position;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
+    public long transfer_start_ts;
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
     public long message_id;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
@@ -83,6 +86,7 @@ public class Filetransfer
         out.fos_open = in.fos_open;
         out.filesize = in.filesize;
         out.current_position = in.current_position;
+        out.transfer_start_ts = in.transfer_start_ts;
         out.message_id = in.message_id;
         out.storage_frame_work = in.storage_frame_work;
         out.tox_file_id_hex = in.tox_file_id_hex;
@@ -93,7 +97,7 @@ public class Filetransfer
     @Override
     public String toString()
     {
-        return "id=" + id + ", tox_public_key_string=" + tox_public_key_string + ", direction=" + direction + ", file_number=" + file_number + ", kind=" + kind + ", state=" + state + ", ft_accepted=" + ft_accepted + ", ft_outgoing_started=" + ft_outgoing_started + ", path_name=" + path_name + ", file_name=" + file_name + ", fos_open=" + fos_open + ", filesize=" + filesize + ", current_position=" + current_position + ", message_id=" + message_id + ", storage_frame_work=" + storage_frame_work + ", tox_file_id_hex=" + tox_file_id_hex;
+        return "id=" + id + ", tox_public_key_string=" + tox_public_key_string + ", direction=" + direction + ", file_number=" + file_number + ", kind=" + kind + ", state=" + state + ", ft_accepted=" + ft_accepted + ", ft_outgoing_started=" + ft_outgoing_started + ", path_name=" + path_name + ", file_name=" + file_name + ", fos_open=" + fos_open + ", filesize=" + filesize + ", current_position=" + current_position + ", transfer_start_ts=" + transfer_start_ts + ", message_id=" + message_id + ", storage_frame_work=" + storage_frame_work + ", tox_file_id_hex=" + tox_file_id_hex;
     }
 
 
@@ -156,6 +160,7 @@ public class Filetransfer
                 out.fos_open = rs.getBoolean("fos_open");
                 out.filesize = rs.getLong("filesize");
                 out.current_position = rs.getLong("current_position");
+                out.transfer_start_ts = rs.getLong("transfer_start_ts");
                 out.message_id = rs.getLong("message_id");
                 out.storage_frame_work = rs.getBoolean("storage_frame_work");
                 out.tox_file_id_hex = rs.getString("tox_file_id_hex");
@@ -232,6 +237,7 @@ public class Filetransfer
                     + ",\"fos_open\""
                     + ",\"filesize\""
                     + ",\"current_position\""
+                    + ",\"transfer_start_ts\""
                     + ",\"message_id\""
                     + ",\"storage_frame_work\""
                     + ",\"tox_file_id_hex\""
@@ -253,6 +259,7 @@ public class Filetransfer
                     + ",?13"
                     + ",?14"
                     + ",?15"
+                    + ",?16"
                     + ")";
 
             insert_pstmt = sqldb.prepareStatement(insert_pstmt_sql);
@@ -270,9 +277,10 @@ public class Filetransfer
             insert_pstmt.setBoolean(10, this.fos_open);
             insert_pstmt.setLong(11, this.filesize);
             insert_pstmt.setLong(12, this.current_position);
-            insert_pstmt.setLong(13, this.message_id);
-            insert_pstmt.setBoolean(14, this.storage_frame_work);
-            insert_pstmt.setString(15, this.tox_file_id_hex);
+            insert_pstmt.setLong(13, this.transfer_start_ts);
+            insert_pstmt.setLong(14, this.message_id);
+            insert_pstmt.setBoolean(15, this.storage_frame_work);
+            insert_pstmt.setString(16, this.tox_file_id_hex);
             // @formatter:on
 
             if (ORMA_TRACE)
@@ -688,6 +696,22 @@ public class Filetransfer
         }
         this.sql_set = this.sql_set + " \"current_position\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, current_position));
+        bind_set_count++;
+        return this;
+    }
+
+    public Filetransfer transfer_start_ts(long transfer_start_ts)
+    {
+        if (this.sql_set.equals(""))
+        {
+            this.sql_set = " set ";
+        }
+        else
+        {
+            this.sql_set = this.sql_set + " , ";
+        }
+        this.sql_set = this.sql_set + " \"transfer_start_ts\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts));
         bind_set_count++;
         return this;
     }
@@ -1448,6 +1472,76 @@ public class Filetransfer
         return this;
     }
 
+    public Filetransfer transfer_start_tsEq(long transfer_start_ts)
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts));
+        bind_where_count++;
+        return this;
+    }
+
+    public Filetransfer transfer_start_tsNotEq(long transfer_start_ts)
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts));
+        bind_where_count++;
+        return this;
+    }
+
+    public Filetransfer transfer_start_tsLt(long transfer_start_ts)
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\"<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts));
+        bind_where_count++;
+        return this;
+    }
+
+    public Filetransfer transfer_start_tsLe(long transfer_start_ts)
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\"<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts));
+        bind_where_count++;
+        return this;
+    }
+
+    public Filetransfer transfer_start_tsGt(long transfer_start_ts)
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts));
+        bind_where_count++;
+        return this;
+    }
+
+    public Filetransfer transfer_start_tsGe(long transfer_start_ts)
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\">=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts));
+        bind_where_count++;
+        return this;
+    }
+
+    public Filetransfer transfer_start_tsBetween(long transfer_start_ts1, long transfer_start_ts2)
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and transfer_start_ts<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts1));
+        bind_where_count++;
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, transfer_start_ts2));
+        bind_where_count++;
+        return this;
+    }
+
+    public Filetransfer transfer_start_tsIsNull()
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\" IS NULL ";
+        return this;
+    }
+
+    public Filetransfer transfer_start_tsIsNotNull()
+    {
+        this.sql_where = this.sql_where + " and \"transfer_start_ts\" IS NOT NULL ";
+        return this;
+    }
+
     public Filetransfer message_idEq(long message_id)
     {
         this.sql_where = this.sql_where + " and \"message_id\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
@@ -1953,6 +2047,34 @@ public class Filetransfer
             this.sql_orderby = this.sql_orderby + " , ";
         }
         this.sql_orderby = this.sql_orderby + " \"current_position\" DESC ";
+        return this;
+    }
+
+    public Filetransfer orderByTransfer_start_tsAsc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"transfer_start_ts\" ASC ";
+        return this;
+    }
+
+    public Filetransfer orderByTransfer_start_tsDesc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"transfer_start_ts\" DESC ";
         return this;
     }
 

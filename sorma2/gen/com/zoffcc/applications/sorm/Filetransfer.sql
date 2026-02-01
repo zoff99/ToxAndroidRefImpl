@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS "Filetransfer" (
   "fos_open" BOOLEAN,
   "filesize" INTEGER,
   "current_position" INTEGER,
+  "transfer_start_ts" INTEGER,
   "message_id" INTEGER,
   "storage_frame_work" BOOLEAN,
   "tox_file_id_hex" TEXT,
