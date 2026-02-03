@@ -1,0 +1,181 @@
+name: Linux Info Tests
+on:
+  push:
+    paths-ignore:
+     - 'README.md'
+     - '.github/workflows/android.yml'
+  pull_request:
+    paths-ignore:
+     - 'README.md'
+     - '.github/workflows/android.yml'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  android-linux-test_info:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        api-level: [35, 33, 29, 21]
+    permissions:
+      contents: write
+    if: ${{ true }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: install deps
+        run: |
+          sudo apt-get update && \
+          sudo DEBIAN_FRONTEND=noninteractive \
+          apt-get install -y --no-install-recommends \
+          fonts-freefont-otf \
+          adb \
+          ghostscript \
+          imagemagick \
+          ca-certificates
+
+      - name: check imagemagick
+        run: |
+          convert -list font || echo "NO ERR"
+
+      - name: Install Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: 'temurin'
+          java-version: |
+            17
+
+      - name: Enable KVM group perms
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: test java1
+        run:  |
+              pwd
+              type java
+              echo "===========1========="
+              java -version || exit 0
+              echo "===========2========="
+
+      - name: turn on more debug logging
+        run: |
+          sed -i -e 's#final static boolean NDK_STDOUT_LOGGING =.*#final static boolean NDK_STDOUT_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
+          sed -i -e 's#final static boolean CTOXCORE_NATIVE_LOGGING =.*#final static boolean CTOXCORE_NATIVE_LOGGING = true;#' android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/MainActivity.java
+
+      - name: android test
+        timeout-minutes: 40
+        continue-on-error: true
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          profile: Nexus 6
+          arch: x86_64
+          ndk: 21.0.6113669
+          cmake: 3.10.2.4988404
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -skin 1080x2220 -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back virtualscene -camera-front webcam0
+          disable-animations: true
+          disable-spellchecker: true
+          pre-emulator-launch-script: |
+            echo "Running pre emulator launch script. Printing the working directory now:"
+            pwd
+          script: |
+            df -h
+            rm -f /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+            printf 'dependencyVerification {\nverify = [\n]\n}\n' > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/app/witness.gradle
+            java -version
+            cd android-refimpl-app ; ./gradlew assemble
+            adb logcat -c || echo "NOERR"
+            adb logcat > /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt &
+            echo 'sleep 100' > /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
+            echo 'sleep 40' >> /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
+            echo 'sleep 10' >> /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
+            echo 'sleep 10' >> /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
+            echo 'sleep 30' >> /home/runner/a.sh
+            echo 'adb shell settings put secure immersive_mode_confirmations confirmed' >> /home/runner/a.sh
+            cat /home/runner/a.sh
+            ls -al /home/runner/a.sh
+            chmod u+rx /home/runner/a.sh
+            bash /home/runner/a.sh &
+            echo "+++++++++++++++++++++++++++"
+            adb devices
+            echo "+++++++++++++++++++++++++++"
+            adb shell settings get secure immersive_mode_confirmations
+            echo "+++++++++++++++++++++++++++"
+            adb shell settings put secure immersive_mode_confirmations confirmed
+            echo "+++++++++++++++++++++++++++"
+            adb shell settings get secure immersive_mode_confirmations
+            echo "+++++++++++++++++++++++++++"
+            cd android-refimpl-app ; ./gradlew app:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class=com.zoffcc.applications.trifa.ShowMaintenanceInfo || echo "NOERR"
+            cat /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
+            echo "================"
+            echo "================"
+            pwd
+            adb pull /sdcard/googletest/test_outputfiles .
+            ls -al /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/
+            echo "---------------"
+            ls -al /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
+
+      - name: put datetime on screenshots
+        run:  |
+              cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/
+              git rev-parse --short HEAD
+              c="$(git rev-parse --short HEAD)"
+              cd /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/
+              ls -al
+              d="$(date '+%Y-%m-%d %H:%M:%S')"
+              convert test_004b.png -gravity SouthEast -pointsize 62 -fill white -annotate +30+30 "$d ($c)" test_004b_time.png
+              convert test_005.png -gravity SouthEast -pointsize 62 -fill white -annotate +30+30 "$d ($c)" test_005_time.png
+              convert test_007.png -gravity SouthEast -pointsize 62 -fill white -annotate +30+30 "$d ($c)" test_007_time.png
+              convert test_099.png -gravity SouthEast -pointsize 62 -fill white -annotate +30+30 "$d ($c)" test_099_time.png
+              mv test_004b_time.png test_004b.png
+              mv test_005_time.png test_005.png
+              mv test_007_time.png test_007.png
+              mv test_099_time.png test_099.png
+
+      - name: upload screenshots
+        uses: actions/upload-artifact@v6
+        with:
+          name: linuxscreen_${{ matrix.api-level }}
+          path: |
+            /home/runner/screen*.png
+            /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/*.png
+
+      - name: upload logcat output
+        continue-on-error: true
+        uses: actions/upload-artifact@v6
+        with:
+          name: logcat_${{ matrix.api-level }}
+          path: |
+            /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/android-refimpl-app/logcat.txt
+
+      - name: Rename artifact for nightly upload
+        if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
+        run: |
+          pwd
+          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_004b.png screen_shot_info_${{ matrix.api-level }}_02.png
+          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_005.png screen_shot_info_${{ matrix.api-level }}_03.png
+          cp -av /home/runner/work/ToxAndroidRefImpl/ToxAndroidRefImpl/test_outputfiles/test_099.png screen_shot_info_${{ matrix.api-level }}_11.png
+
+      - name: Upload to nightly release
+        uses: ncipollo/release-action@v1
+        if: github.event_name == 'push' && github.ref == 'refs/heads/zoff99/dev003'
+        with:
+          allowUpdates: true
+          tag: nightly
+          omitBodyDuringUpdate: true
+          omitNameDuringUpdate: true
+          prerelease: true
+          replacesArtifacts: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "screen_shot_info_${{ matrix.api-level }}_02.png,screen_shot_info_${{ matrix.api-level }}_03.png,screen_shot_info_${{ matrix.api-level }}_11.png"
+
