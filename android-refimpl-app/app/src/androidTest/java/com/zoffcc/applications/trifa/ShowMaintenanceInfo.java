@@ -177,12 +177,11 @@ public class ShowMaintenanceInfo
 
         scrollToTextViewById(R.id.debug_output);
 
-        screenshot_full("007");
-
         wait_(4);
-        // Log.i(TAG, "going to stop video call ...");
-        // onView(withId(R.id.decline_button)).perform(click());
-        // Log.i(TAG, "decline button pressed");
+
+        screenshot("004b");
+        screenshot("005");
+        screenshot_full("007");
 
         wait_(10);
         Log.i(TAG, "taking last screenshot ...");
