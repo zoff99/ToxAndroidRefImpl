@@ -1,0 +1,27 @@
+name: check jitpack artefact checksums
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  auto-update-dependencies:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v6
+
+    - name: Run check 1
+      run: ./tools/check_jitpack_checksums__pkgs_ToxAndroidRefImpl__.sh
+
+    - name: Run check 2
+      run: ./tools/check_jitpack_checksums__pkgs_guardianprojectIOCipher__.sh
+
+    - name: Run check 3
+      run: ./tools/check_jitpack_checksums__pkgs_zoffccAndroidJDBC__.sh
+
