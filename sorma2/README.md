@@ -5,7 +5,7 @@ It is based on the wonderful https://github.com/maskarade/Android-Orma by [FUJI 
 <br>
 This is a rewrite in pure java, to generate most stuff you need and then add it to your project
 either as a ```.jar file``` or as ```java source```.<br>
-You still need to add ```sqlite-jdbc-3.51.1.0.jar``` to your project to use it.<br>
+You still need to add ```sqlite-jdbc-3.51.2.0.jar``` to your project to use it.<br>
 <br><br>
 ~~sadly [sqlite-jdbc](https://github.com/xerial/sqlite-jdbc) project decided that it needs ```slf4j-api jar``` (for no good reason).~~
 this was solved by: https://github.com/xerial/sqlite-jdbc/pull/1178
@@ -40,7 +40,7 @@ public class Person
 
 now create the Java sources with the Java SORMA2 Generator. <b>you need at least java 17</b>.<br>
 ```bash
-java -classpath ".:sqlite-jdbc-3.51.1.0.jar:sorma2.jar" \
+java -classpath ".:sqlite-jdbc-3.51.2.0.jar:sorma2.jar" \
   com/zoffcc/applications/sorm/Generator "gen"
 ```
 
@@ -85,7 +85,7 @@ see: https://github.com/zoff99/sorma2/tree/master/test
 
 <img src="https://github.com/zoff99/sorma2/releases/download/nightly/console_screen.png" width="70%">
 
-Use the `sorma_generated.jar` (that is generated in the `gen` directory) and `sqlite-jdbc-3.51.1.0.jar` for the Java project.<br>
+Use the `sorma_generated.jar` (that is generated in the `gen` directory) and `sqlite-jdbc-3.51.2.0.jar` for the Java project.<br>
 Check `TestSorma.java` for an Example usage.
 <br>
 
