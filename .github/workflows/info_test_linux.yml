@@ -143,7 +143,7 @@ jobs:
               mv test_099_time.png test_099.png
 
       - name: upload screenshots
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: linuxscreen_${{ matrix.api-level }}
           path: |
@@ -152,7 +152,7 @@ jobs:
 
       - name: upload logcat output
         continue-on-error: true
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: logcat_${{ matrix.api-level }}
           path: |
