@@ -20,3 +20,4 @@ Tox 是自由软件。自由且免费。这意味着 Tox 属于您 — 使用，
 <br>
 *加入Matrix 上的讨论: https://matrix.to/#/#trifa:matrix.org
 <br>
+瞧一瞧桌面版：https://github.com/Zoxcore/trifa_material
