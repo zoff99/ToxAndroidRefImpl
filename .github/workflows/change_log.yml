@@ -27,7 +27,7 @@ jobs:
             CHANGELOG_GEN_TOKEN: ${{ secrets.CHANGELOG_GEN_TOKEN }}
       run:  |
             pwd
-            docker run -it --rm -v "$(pwd)":/usr/local/src/your-app githubchangeloggenerator/github-changelog-generator \
+            docker run --rm -v "$(pwd)":/usr/local/src/your-app githubchangeloggenerator/github-changelog-generator \
             -u zoff99 -p ToxAndroidRefImpl \
             --exclude-tags "$(git tag -l 'trifajni*'| tr '\n' ',')nightly" \
                --token "$CHANGELOG_GEN_TOKEN"
