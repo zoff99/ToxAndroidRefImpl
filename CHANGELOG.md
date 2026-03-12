@@ -1,5 +1,299 @@
 # Changelog
 
+## [Unreleased](https://github.com/zoff99/ToxAndroidRefImpl/tree/HEAD)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.265...HEAD)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#756](https://github.com/zoff99/ToxAndroidRefImpl/pull/756) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#753](https://github.com/zoff99/ToxAndroidRefImpl/pull/753) ([weblate](https://github.com/weblate))
+- Bump actions/upload-artifact from 6 to 7 [\#752](https://github.com/zoff99/ToxAndroidRefImpl/pull/752) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update sorma2 [\#751](https://github.com/zoff99/ToxAndroidRefImpl/pull/751) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update sorma2 [\#750](https://github.com/zoff99/ToxAndroidRefImpl/pull/750) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.265](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.265) (2026-02-05)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.264...1.0.265)
+
+**Merged pull requests:**
+
+- update AndroidJDBC JNI to 1.0.22 [\#745](https://github.com/zoff99/ToxAndroidRefImpl/pull/745) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update iocipher JNI to 1.0.23 [\#744](https://github.com/zoff99/ToxAndroidRefImpl/pull/744) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update toxcore JNI to 1.0.172 [\#743](https://github.com/zoff99/ToxAndroidRefImpl/pull/743) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update sorma2 [\#731](https://github.com/zoff99/ToxAndroidRefImpl/pull/731) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.21 [\#730](https://github.com/zoff99/ToxAndroidRefImpl/pull/730) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.264](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.264) (2026-01-19)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.263...1.0.264)
+
+**Merged pull requests:**
+
+- Add FAQ section [\#729](https://github.com/zoff99/ToxAndroidRefImpl/pull/729) ([zoff99](https://github.com/zoff99))
+- update toxcore JNI to 1.0.170 [\#728](https://github.com/zoff99/ToxAndroidRefImpl/pull/728) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update gradle witness checksums 1 [\#723](https://github.com/zoff99/ToxAndroidRefImpl/pull/723) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.github.zoff99:pkgs\_ToxAndroidRefImpl from 1.0.168 to 1.0.169 in /android-refimpl-app [\#722](https://github.com/zoff99/ToxAndroidRefImpl/pull/722) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.263](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.263) (2025-12-21)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.262...1.0.263)
+
+**Merged pull requests:**
+
+- update toxcore JNI to 1.0.168 [\#721](https://github.com/zoff99/ToxAndroidRefImpl/pull/721) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update sorma2 [\#718](https://github.com/zoff99/ToxAndroidRefImpl/pull/718) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump peter-evans/create-pull-request from 7 to 8 [\#717](https://github.com/zoff99/ToxAndroidRefImpl/pull/717) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/upload-artifact from 5 to 6 [\#716](https://github.com/zoff99/ToxAndroidRefImpl/pull/716) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update sorma2 [\#714](https://github.com/zoff99/ToxAndroidRefImpl/pull/714) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update toxcore JNI to 1.0.166 [\#712](https://github.com/zoff99/ToxAndroidRefImpl/pull/712) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.262](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.262) (2025-11-28)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.261...1.0.262)
+
+**Merged pull requests:**
+
+- update sorma2 [\#711](https://github.com/zoff99/ToxAndroidRefImpl/pull/711) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump actions/checkout from 5 to 6 [\#710](https://github.com/zoff99/ToxAndroidRefImpl/pull/710) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update AndroidJDBC JNI to 1.0.20 [\#709](https://github.com/zoff99/ToxAndroidRefImpl/pull/709) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update sorma2 [\#707](https://github.com/zoff99/ToxAndroidRefImpl/pull/707) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.19 [\#706](https://github.com/zoff99/ToxAndroidRefImpl/pull/706) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update gradle witness checksums 2 [\#703](https://github.com/zoff99/ToxAndroidRefImpl/pull/703) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.google.zxing:core from 3.5.3 to 3.5.4 in /android-refimpl-app [\#702](https://github.com/zoff99/ToxAndroidRefImpl/pull/702) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump com.github.zoff99:pkgs\_zoffccAndroidJDBC from 1.0.17 to 1.0.18 in /android-refimpl-app [\#701](https://github.com/zoff99/ToxAndroidRefImpl/pull/701) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.261](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.261) (2025-11-16)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.260...1.0.261)
+
+**Merged pull requests:**
+
+- update sorma2 [\#700](https://github.com/zoff99/ToxAndroidRefImpl/pull/700) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.17 [\#699](https://github.com/zoff99/ToxAndroidRefImpl/pull/699) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump actions/upload-artifact from 4 to 5 [\#698](https://github.com/zoff99/ToxAndroidRefImpl/pull/698) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Translations update from Hosted Weblate [\#662](https://github.com/zoff99/ToxAndroidRefImpl/pull/662) ([weblate](https://github.com/weblate))
+
+## [1.0.260](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.260) (2025-10-18)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.259...1.0.260)
+
+**Merged pull requests:**
+
+- update iocipher JNI to 1.0.19 [\#697](https://github.com/zoff99/ToxAndroidRefImpl/pull/697) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.16 [\#696](https://github.com/zoff99/ToxAndroidRefImpl/pull/696) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump github/codeql-action from 3 to 4 [\#695](https://github.com/zoff99/ToxAndroidRefImpl/pull/695) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.259](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.259) (2025-10-12)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.258...1.0.259)
+
+**Merged pull requests:**
+
+- update iocipher JNI to 1.0.18 [\#694](https://github.com/zoff99/ToxAndroidRefImpl/pull/694) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update sorma2 [\#693](https://github.com/zoff99/ToxAndroidRefImpl/pull/693) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.15 [\#692](https://github.com/zoff99/ToxAndroidRefImpl/pull/692) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.258](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.258) (2025-10-01)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.257...1.0.258)
+
+**Merged pull requests:**
+
+- update sorma2 [\#691](https://github.com/zoff99/ToxAndroidRefImpl/pull/691) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.257](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.257) (2025-09-17)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.256...1.0.257)
+
+**Merged pull requests:**
+
+- update iocipher JNI to 1.0.16 [\#686](https://github.com/zoff99/ToxAndroidRefImpl/pull/686) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.12 [\#685](https://github.com/zoff99/ToxAndroidRefImpl/pull/685) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update gradle witness checksums 2 [\#684](https://github.com/zoff99/ToxAndroidRefImpl/pull/684) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.github.bumptech.glide:glide from 5.0.4 to 5.0.5 in /android-refimpl-app [\#679](https://github.com/zoff99/ToxAndroidRefImpl/pull/679) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update gradle witness checksums 2 [\#674](https://github.com/zoff99/ToxAndroidRefImpl/pull/674) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.google.android.material:material from 1.12.0 to 1.13.0 in /android-refimpl-app [\#673](https://github.com/zoff99/ToxAndroidRefImpl/pull/673) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.256](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.256) (2025-09-07)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.255...1.0.256)
+
+**Implemented enhancements:**
+
+- Allow adding notes to chat participants [\#661](https://github.com/zoff99/ToxAndroidRefImpl/issues/661)
+
+**Merged pull requests:**
+
+- update iocipher JNI to 1.0.15 [\#672](https://github.com/zoff99/ToxAndroidRefImpl/pull/672) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.11 [\#671](https://github.com/zoff99/ToxAndroidRefImpl/pull/671) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.github.bumptech.glide:glide from 5.0.0-rc01 to 5.0.4 in /android-refimpl-app [\#670](https://github.com/zoff99/ToxAndroidRefImpl/pull/670) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update gradle witness checksums 2 [\#668](https://github.com/zoff99/ToxAndroidRefImpl/pull/668) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.github.bumptech.glide:compiler from 5.0.0-rc01 to 5.0.4 in /android-refimpl-app [\#666](https://github.com/zoff99/ToxAndroidRefImpl/pull/666) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Bump actions/setup-java from 4 to 5 [\#664](https://github.com/zoff99/ToxAndroidRefImpl/pull/664) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update toxcore JNI to 1.0.165 [\#663](https://github.com/zoff99/ToxAndroidRefImpl/pull/663) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump actions/checkout from 4 to 5 [\#660](https://github.com/zoff99/ToxAndroidRefImpl/pull/660) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.255](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.255) (2025-08-10)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.254...1.0.255)
+
+## [1.0.254](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.254) (2025-08-09)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.253...1.0.254)
+
+## [1.0.253](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.253) (2025-08-09)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.252...1.0.253)
+
+**Merged pull requests:**
+
+- update sorma2 [\#657](https://github.com/zoff99/ToxAndroidRefImpl/pull/657) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update iocipher JNI to 1.0.14 [\#656](https://github.com/zoff99/ToxAndroidRefImpl/pull/656) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.10 [\#655](https://github.com/zoff99/ToxAndroidRefImpl/pull/655) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Translations update from Hosted Weblate [\#647](https://github.com/zoff99/ToxAndroidRefImpl/pull/647) ([weblate](https://github.com/weblate))
+
+## [1.0.252](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.252) (2025-07-19)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.251...1.0.252)
+
+## [1.0.251](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.251) (2025-07-18)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.250...1.0.251)
+
+**Merged pull requests:**
+
+- update gradle witness checksums [\#650](https://github.com/zoff99/ToxAndroidRefImpl/pull/650) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.squareup.okhttp3:okhttp from 4.12.0 to 5.1.0 in /android-refimpl-app [\#649](https://github.com/zoff99/ToxAndroidRefImpl/pull/649) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update sorma2 [\#646](https://github.com/zoff99/ToxAndroidRefImpl/pull/646) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update sorma2 [\#645](https://github.com/zoff99/ToxAndroidRefImpl/pull/645) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update iocipher JNI to 1.0.13 [\#644](https://github.com/zoff99/ToxAndroidRefImpl/pull/644) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.9 [\#643](https://github.com/zoff99/ToxAndroidRefImpl/pull/643) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.8 [\#642](https://github.com/zoff99/ToxAndroidRefImpl/pull/642) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update gradle witness checksums 1 [\#641](https://github.com/zoff99/ToxAndroidRefImpl/pull/641) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump androidx.sqlite:sqlite from 2.5.1 to 2.5.2 in /android-refimpl-app [\#638](https://github.com/zoff99/ToxAndroidRefImpl/pull/638) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.250](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.250) (2025-06-17)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.249...1.0.250)
+
+**Merged pull requests:**
+
+- update toxcore JNI to 1.0.164 [\#637](https://github.com/zoff99/ToxAndroidRefImpl/pull/637) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update toxcore JNI to 1.0.163 [\#631](https://github.com/zoff99/ToxAndroidRefImpl/pull/631) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.7 [\#630](https://github.com/zoff99/ToxAndroidRefImpl/pull/630) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update iocipher JNI to 1.0.12 [\#629](https://github.com/zoff99/ToxAndroidRefImpl/pull/629) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update sorma2 [\#628](https://github.com/zoff99/ToxAndroidRefImpl/pull/628) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update sorma2 [\#626](https://github.com/zoff99/ToxAndroidRefImpl/pull/626) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update AndroidJDBC JNI to 1.0.6 [\#625](https://github.com/zoff99/ToxAndroidRefImpl/pull/625) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.249](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.249) (2025-05-22)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.248...1.0.249)
+
+**Implemented enhancements:**
+
+- switch ORM provider [\#566](https://github.com/zoff99/ToxAndroidRefImpl/issues/566)
+- switch orm provider [\#608](https://github.com/zoff99/ToxAndroidRefImpl/pull/608) ([zoff99](https://github.com/zoff99))
+
+**Fixed bugs:**
+
+- Can't accept calls when in a group chat [\#572](https://github.com/zoff99/ToxAndroidRefImpl/issues/572)
+
+**Closed issues:**
+
+- trifa show tox service avaliable in china but cannot show any friend and/or text anyone but atox can do [\#395](https://github.com/zoff99/ToxAndroidRefImpl/issues/395)
+- connection issues [\#165](https://github.com/zoff99/ToxAndroidRefImpl/issues/165)
+
+**Merged pull requests:**
+
+- update iocipher JNI to 1.0.11 [\#624](https://github.com/zoff99/ToxAndroidRefImpl/pull/624) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update gradle witness checksums 1 [\#623](https://github.com/zoff99/ToxAndroidRefImpl/pull/623) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump androidx.sqlite:sqlite from 2.5.0 to 2.5.1 in /android-refimpl-app [\#621](https://github.com/zoff99/ToxAndroidRefImpl/pull/621) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update toxcore JNI to 1.0.162 [\#618](https://github.com/zoff99/ToxAndroidRefImpl/pull/618) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update toxcore JNI to 1.0.161 [\#617](https://github.com/zoff99/ToxAndroidRefImpl/pull/617) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update gradle witness checksums 1 [\#612](https://github.com/zoff99/ToxAndroidRefImpl/pull/612) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.github.zoff99:pkgs\_guardianprojectIOCipher from 1.0.9 to 1.0.10 in /android-refimpl-app [\#611](https://github.com/zoff99/ToxAndroidRefImpl/pull/611) ([dependabot[bot]](https://github.com/apps/dependabot))
+- update gradle witness checksums 2 [\#609](https://github.com/zoff99/ToxAndroidRefImpl/pull/609) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Translations update from Hosted Weblate [\#607](https://github.com/zoff99/ToxAndroidRefImpl/pull/607) ([weblate](https://github.com/weblate))
+- update iocipher JNI to 1.0.9 [\#606](https://github.com/zoff99/ToxAndroidRefImpl/pull/606) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update gradle witness checksums 1 [\#604](https://github.com/zoff99/ToxAndroidRefImpl/pull/604) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump androidx.sqlite:sqlite from 2.4.0 to 2.5.0 in /android-refimpl-app [\#603](https://github.com/zoff99/ToxAndroidRefImpl/pull/603) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.248](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.248) (2025-03-28)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.247...1.0.248)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#601](https://github.com/zoff99/ToxAndroidRefImpl/pull/601) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#600](https://github.com/zoff99/ToxAndroidRefImpl/pull/600) ([weblate](https://github.com/weblate))
+- update gradle witness checksums 2 [\#598](https://github.com/zoff99/ToxAndroidRefImpl/pull/598) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Bump com.github.zoff99:pkgs\_guardianprojectIOCipher from 1.0.7 to 1.0.8 in /android-refimpl-app [\#597](https://github.com/zoff99/ToxAndroidRefImpl/pull/597) ([dependabot[bot]](https://github.com/apps/dependabot))
+- Translations update from Hosted Weblate [\#593](https://github.com/zoff99/ToxAndroidRefImpl/pull/593) ([weblate](https://github.com/weblate))
+- Bump com.google.code.gson:gson from 2.11.0 to 2.12.1 in /android-refimpl-app [\#589](https://github.com/zoff99/ToxAndroidRefImpl/pull/589) ([dependabot[bot]](https://github.com/apps/dependabot))
+
+## [1.0.247](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.247) (2025-02-15)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.246...1.0.247)
+
+**Implemented enhancements:**
+
+- add possibility for a full export [\#579](https://github.com/zoff99/ToxAndroidRefImpl/issues/579)
+- show encryption password in maintenance activity [\#578](https://github.com/zoff99/ToxAndroidRefImpl/issues/578)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#592](https://github.com/zoff99/ToxAndroidRefImpl/pull/592) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#591](https://github.com/zoff99/ToxAndroidRefImpl/pull/591) ([weblate](https://github.com/weblate))
+- Translations update from Hosted Weblate [\#590](https://github.com/zoff99/ToxAndroidRefImpl/pull/590) ([weblate](https://github.com/weblate))
+- update iocipher JNI to 1.0.7 [\#587](https://github.com/zoff99/ToxAndroidRefImpl/pull/587) ([github-actions[bot]](https://github.com/apps/github-actions))
+- update iocipher JNI to 1.0.6 [\#586](https://github.com/zoff99/ToxAndroidRefImpl/pull/586) ([github-actions[bot]](https://github.com/apps/github-actions))
+- Translations update from Hosted Weblate [\#583](https://github.com/zoff99/ToxAndroidRefImpl/pull/583) ([weblate](https://github.com/weblate))
+
+## [1.0.246](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.246) (2025-01-12)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.245...1.0.246)
+
+**Merged pull requests:**
+
+- update toxcore JNI to 1.0.160 [\#582](https://github.com/zoff99/ToxAndroidRefImpl/pull/582) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.245](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.245) (2025-01-11)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.244...1.0.245)
+
+**Fixed bugs:**
+
+- actually check for errors when encryting the tox save file [\#576](https://github.com/zoff99/ToxAndroidRefImpl/pull/576) ([zoff99](https://github.com/zoff99))
+
+**Merged pull requests:**
+
+- update toxcore JNI to 1.0.159 [\#580](https://github.com/zoff99/ToxAndroidRefImpl/pull/580) ([github-actions[bot]](https://github.com/apps/github-actions))
+- add additional error checks on encryption of the toxsave file [\#577](https://github.com/zoff99/ToxAndroidRefImpl/pull/577) ([zoff99](https://github.com/zoff99))
+- Translations update from Hosted Weblate [\#575](https://github.com/zoff99/ToxAndroidRefImpl/pull/575) ([weblate](https://github.com/weblate))
+
+## [1.0.244](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.244) (2025-01-07)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.243...1.0.244)
+
+**Merged pull requests:**
+
+- update toxcore JNI to 1.0.157 [\#573](https://github.com/zoff99/ToxAndroidRefImpl/pull/573) ([github-actions[bot]](https://github.com/apps/github-actions))
+
+## [1.0.243](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.243) (2025-01-05)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.242...1.0.243)
+
+## [1.0.242](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.242) (2025-01-01)
+
+[Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.241...1.0.242)
+
+**Merged pull requests:**
+
+- Translations update from Hosted Weblate [\#570](https://github.com/zoff99/ToxAndroidRefImpl/pull/570) ([weblate](https://github.com/weblate))
+- update toxcore JNI to 1.0.155 [\#568](https://github.com/zoff99/ToxAndroidRefImpl/pull/568) ([github-actions[bot]](https://github.com/apps/github-actions))
+
 ## [1.0.241](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.241) (2024-12-09)
 
 [Full Changelog](https://github.com/zoff99/ToxAndroidRefImpl/compare/1.0.240...1.0.241)
@@ -399,6 +693,7 @@
 **Implemented enhancements:**
 
 - How to change auto generated usernames [\#391](https://github.com/zoff99/ToxAndroidRefImpl/issues/391)
+- some Tox clients handle UTF-8 strings in a different way [\#325](https://github.com/zoff99/ToxAndroidRefImpl/issues/325)
 
 **Merged pull requests:**
 
@@ -788,10 +1083,6 @@
 **Fixed bugs:**
 
 - Consider migrating to libera.chat instead freenode [\#276](https://github.com/zoff99/ToxAndroidRefImpl/issues/276)
-
-**Merged pull requests:**
-
-- Add Import/Export section to README.md [\#316](https://github.com/zoff99/ToxAndroidRefImpl/pull/316) ([ghost](https://github.com/ghost))
 
 ## [1.0.133](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.133) (2022-01-12)
 
@@ -1402,7 +1693,7 @@
 
 **Merged pull requests:**
 
-- Add Kannada translation [\#146](https://github.com/zoff99/ToxAndroidRefImpl/pull/146) ([ehmry](https://github.com/ehmry))
+- Add Kannada translation [\#146](https://github.com/zoff99/ToxAndroidRefImpl/pull/146) ([ghost](https://github.com/ghost))
 
 ## [1.0.50](https://github.com/zoff99/ToxAndroidRefImpl/tree/1.0.50) (2020-05-31)
 
