@@ -14,6 +14,9 @@ see: https://github.com/xerial/sqlite-jdbc/issues/1094<br>
 <br>
 
 [![build](https://github.com/zoff99/iocipher_pack/actions/workflows/ci.yml/badge.svg)](https://github.com/zoff99/iocipher_pack/actions/workflows/ci.yml)
+[![License: GPL v3](https://img.shields.io/badge/License-GPL%20v3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![Liberapay](https://img.shields.io/liberapay/goal/zoff.svg?logo=liberapay)](https://liberapay.com/zoff/donate)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/zoff99/sorma2)
 
 <img src="https://raw.githubusercontent.com/zoff99/sorma2/refs/heads/master/sorma2_coms.png" width="300">
 
