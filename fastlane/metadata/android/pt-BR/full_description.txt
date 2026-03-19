@@ -20,3 +20,4 @@ O Tox é um programa livre e grátis. Livre como em liberdade e grátis no preç
 <br>
 * Participe da discussão no Matrix: https://matrix.to/#/#trifa:matrix.org
 <br>
+Dê uma olhada na versão para computador: https://github.com/Zoxcore/trifa_material
