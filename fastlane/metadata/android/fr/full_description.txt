@@ -4,19 +4,20 @@ Qu’il s’agisse d’entreprises ou de gouvernements, la surveillance numériq
 Tox est un logiciel facile à utiliser qui vous connecte avec vos amis et votre famille sans que personne d’autre n’écoute.<br>
 Alors que d’autres services de grands noms exigent que vous payiez pour des fonctionnalités, Tox est entièrement gratuit et vient sans publicité – pour toujours.<br><br>
 
-<b>Encrypté :</b><br>
+<b>Encrypté :</b><br>
 Tout ce que vous faites avec Tox est crypté à l’aide de bibliothèques à code source ouvert. Les seules personnes qui peuvent voir vos conversations sont les gens avec qui vous parlez.<br><br>
 
-<b>Distribué :</b><br>
+<b>Distribué :</b><br>
 Tox n’a pas de serveurs centraux qui peuvent être attaqués, arrêtés ou forcés de livrer des données – le réseau est composé de ses utilisateurs. Dites adieu aux pannes de serveur !<br><br>
 
-<b>Libre :</b><br>
+<b>Libre :</b><br>
 Tox est un logiciel libre. C’est libre comme dans liberté, ainsi que dans le prix. Cela signifie que Tox est à vous – à utiliser, modifier et partager – car Tox est développé par et pour les utilisateurs.<br><br>
 
-<b>Plus d’informations :</b><br>
-* À propos de Tox : https://tox.zoff.cc
+<b>Plus d’informations :</b><br>
+* À propos de Tox : https://tox.zoff.cc
 <br<
-* Rejoignez le tchat du groupe TRIfA Tox : https://trifagrp.tox.zoff.cc/
+* Rejoignez le tchat du groupe TRIfA Tox : https://trifagrp.tox.zoff.cc/
 <br>
-* Participez à la discussion sur Matrix : https://matrix.to/#/#trifa:matrix.org
+* Participez à la discussion sur Matrix : https://matrix.to/#/#trifa:matrix.org
 <br>
+Jetez un œil à la version pour ordinateur : https://github.com/Zoxcore/trifa_material
