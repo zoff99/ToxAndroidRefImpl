@@ -20,3 +20,4 @@ Tox es software libre. Eso es gratis como en libertad, así como en precio. Esto
 <br>
 * Únase a la discusión en Matrix: https://matrix.to/#/#trifa:matrix.org
 <br>
+Echa un vistazo a la versión para computadora: https://github.com/Zoxcore/trifa_material
