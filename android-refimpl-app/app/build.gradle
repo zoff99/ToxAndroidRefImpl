@@ -328,7 +328,7 @@ dependencies {
         transitive = true
     }
     //
-    implementation 'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.22'
+    implementation 'com.github.zoff99:pkgs_zoffccAndroidJDBC:1.0.23'
     //
     implementation('com.github.zoff99:pkgs_hotchemiPermissionsdispatcher:3.2.0') {
         exclude group: 'com.android.support'
