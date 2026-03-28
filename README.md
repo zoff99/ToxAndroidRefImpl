@@ -5,6 +5,8 @@
 ~~This is not a Reference Client, it's c-toxcore for Android.~~<br>
 This is now also a Tox Client for Android.
 
+TRIfA represents a comprehensive engineering effort to bring P2P communication to mobile platforms, balancing security, performance, and usability while maintaining full compatibility with the broader Tox ecosystem. The codebase demonstrates advanced Android development techniques including JNI integration, battery optimization, and secure storage implementation.
+
 ### Important Notice: Since Google has changed their <a href="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/google_play_dev_verify_02.png">Playstore policy</a> in a way that is unacceptable, future Versions are not published on the Playstore anymore. Github Releases are signed with the same key as the Playstore version.
 
 <a href="https://f-droid.org/app/com.zoffcc.applications.trifa"><img src="https://raw.githubusercontent.com/zoff99/ToxAndroidRefImpl/zoff99/dev003/images/f-droid.png" width="200"></a>
