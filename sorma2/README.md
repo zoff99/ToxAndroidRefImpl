@@ -22,6 +22,36 @@ see: https://github.com/xerial/sqlite-jdbc/issues/1094<br>
 
 <img src="https://raw.githubusercontent.com/zoff99/sorma2/refs/heads/master/sorma2_coms.png" width="300">
 
+## What is Sorma2?
+
+sorma2 is a pure Java code generator designed for efficient SQLite database access. It is suitable for both Android and Desktop Java applications.
+
+- **Purpose:** Generates Java source code for SQLite ORM based on schema definition files.
+- **Approach:** Unlike runtime ORMs, Sorma2 generates all necessary code at development time, avoiding reflection overhead and ensuring compile-time type safety.
+
+
+## Architecture
+
+### 1. Development Phase
+- Developers write schema files prefixed with `_sorm_`.
+- Schema files contain annotated Java class definitions.
+- The **Generator** class processes these files to produce complete ORM implementation code.
+
+### 2. Runtime Phase
+- The generated code offers a fluent API for database operations.
+- Platform-specific JDBC drivers handle actual SQLite communication.
+
+
+## Key Characteristics
+
+- **No Reflection at Runtime:** Improves performance and type safety.
+- **Readable Java Source Code:** Generated code is clear and maintainable.
+- **Type-safe Query Building API:** Ensures compile-time correctness.
+- **Support for Encrypted Databases:** Compatible with SQLCipher.
+- **Multi-threaded Operation:** Supports WAL mode for concurrency.
+- **Cross-platform Compatibility:** Works on Android API 21+ and Desktop Java 17+.
+
+
 # Usage
 
 create one file for each database table that you need.
