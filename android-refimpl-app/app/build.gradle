@@ -324,7 +324,7 @@ dependencies {
     implementation('androidx.sqlite:sqlite:2.5.2') {
         transitive = true
     }
-    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.24') {
+    implementation('com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.25') {
         transitive = true
     }
     //
