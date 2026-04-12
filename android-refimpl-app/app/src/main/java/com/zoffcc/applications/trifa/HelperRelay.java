@@ -37,6 +37,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_w
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_we_left;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_push_server_ntfy;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_push_server_sunup;
 import static com.zoffcc.applications.trifa.MainActivity.tox_conference_invite;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_lossless_packet;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_invite_friend;
@@ -44,9 +45,11 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_T
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_GROUP_ID_FOR_PROXY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_NOTIFICATION_TOKEN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PROXY_PUBKEY_FOR_FRIEND;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_PUSH_URL_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_FCM_PUSH_URL_PREFIX_OLD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_NTFY_PUSH_URL_PREFIX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_SUNUP_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_UP_PUSH_URL_PREFIX;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
@@ -371,7 +374,7 @@ public class HelperRelay
                 notification_push_url = NOTIFICATION_FCM_PUSH_URL_PREFIX + push_token;
             }
 
-            if (notification_push_url.length() < 1000)
+            if (notification_push_url.length() < MAX_PUSH_URL_LENGTH)
             {
                 return notification_push_url;
             }
@@ -537,6 +540,18 @@ public class HelperRelay
             if (push_url.length() > NOTIFICATION_NTFY_PUSH_URL_PREFIX.length())
             {
                 if (push_url.startsWith(NOTIFICATION_NTFY_PUSH_URL_PREFIX))
+                {
+                    return true;
+                }
+            }
+        }
+
+        // whitelist mozilla sunup server
+        if (PREF__allow_push_server_sunup)
+        {
+            if (push_url.length() > NOTIFICATION_SUNUP_PUSH_URL_PREFIX.length())
+            {
+                if (push_url.startsWith(NOTIFICATION_SUNUP_PUSH_URL_PREFIX))
                 {
                     return true;
                 }

@@ -195,6 +195,9 @@
     <string name="pref_title_allow_push_server_ntfy">Allow ntfy.sh Server</string>
     <string name="pref_description_allow_push_server_ntfy">WARNING: Allow ntfy.sh server for push notifications, this may leak your metadata of timestamps when you receive push notifications, if a friend subscribes with your push token. ntfy.sh has NO passwords and NO authentication. you have been warned.</string>
 
+    <string name="pref_title_allow_push_server_sunup">Allow Moziall sunup Server</string>
+    <string name="pref_description_allow_push_server_sunup">WARNING: Allow Mozilla sunup server for push notifications, this may leak your metadata of timestamps when you receive push notifications, if a friend subscribes with your push token. Mozilla sunup has NO passwords and NO authentication. you have been warned.</string>
+
     <string name="pref_title_download_push_msg_app">Download Push Message App</string>
 
     <string name="pref_title_custom_bootstrap_nodes">Use Custom Bootstrap nodes</string>
