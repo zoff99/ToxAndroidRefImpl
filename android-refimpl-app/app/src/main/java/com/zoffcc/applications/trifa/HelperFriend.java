@@ -54,6 +54,8 @@ import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_send_lossless_packet;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONTROL_PROXY_MESSAGE_TYPE.CONTROL_PROXY_MESSAGE_TYPE_PUSH_URL_FOR_FRIEND;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_TOR_USERAGENT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_UNIFIED_WEBPUSH_CONTENT_ENCODING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.GENERIC_UNIFIED_WEBPUSH_TTL_SECONDS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ONLINE_NOW;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
@@ -1475,6 +1477,8 @@ public class HelperFriend
                 cacheControl(new CacheControl.Builder().noCache().build()).
                 url(pushurl_for_friend).
                 header("User-Agent", GENERIC_TOR_USERAGENT).
+                header("TTL", "" + GENERIC_UNIFIED_WEBPUSH_TTL_SECONDS).
+                header("Content-Encoding", GENERIC_UNIFIED_WEBPUSH_CONTENT_ENCODING).
                 post(formBody).
                 build();
 

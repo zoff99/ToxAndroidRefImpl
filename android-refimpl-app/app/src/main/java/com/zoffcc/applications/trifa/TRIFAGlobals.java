@@ -219,6 +219,9 @@ public class TRIFAGlobals
     static final int PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_prev = 100;
     static final int PUSH_URL_TRIGGER_GET_MESSAGE_FOR_delta_ms_after = 1000;
 
+    static final int GENERIC_UNIFIED_WEBPUSH_TTL_SECONDS = 5 * 60 * 60; // 5 hours in seconds
+    static final String GENERIC_UNIFIED_WEBPUSH_CONTENT_ENCODING = "aes128gcm";
+
 
     static final String TOX_NODELIST_HOST = "nodes.tox.chat";
     static final String TOX_NODELIST_URL = "https://" + TOX_NODELIST_HOST + "/json";
