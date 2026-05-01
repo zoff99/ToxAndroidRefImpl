@@ -224,6 +224,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static int BUFFER_DEQUEUE_TIMEOUT_US = 0; // "us" fetch encoded data from encoder
     private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 0; // "us" feed raw data to encoder
 
+    static Object VIDEO_ROTATION_LOCK = new Object();
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -2273,47 +2275,50 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     //Log.d(TAG, "onSensorChanged: x=" + event.values[0] + "  y=" + event.values[1] + "  z=" +
                     //           event.values[2]);
 
-                    float x = event.values[0];
-                    float y = event.values[1];
+                    synchronized(VIDEO_ROTATION_LOCK)
+                    {
+                        float x = event.values[0];
+                        float y = event.values[1];
 
-                    if (x < 5 && x > -5 && y > 5)
-                    {
-                        if (device_orientation != 0)
+                        if (x < 5 && x > -5 && y > 5)
                         {
-                            device_orientation = 0;
-                            //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
-                            CameraWrapper.camera_video_rotate_angle = getRotation();
-                            video_output_orentation_update();
+                            if (device_orientation != 0)
+                            {
+                                device_orientation = 0;
+                                //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
+                                CameraWrapper.camera_video_rotate_angle = getRotation();
+                                video_output_orentation_update();
+                            }
                         }
-                    }
-                    else if (x < -5 && y < 5 && y > -5)
-                    {
-                        if (device_orientation != 90)
+                        else if (x < -5 && y < 5 && y > -5)
                         {
-                            device_orientation = 90;
-                            //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
-                            CameraWrapper.camera_video_rotate_angle = getRotation();
-                            video_output_orentation_update();
+                            if (device_orientation != 90)
+                            {
+                                device_orientation = 90;
+                                //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
+                                CameraWrapper.camera_video_rotate_angle = getRotation();
+                                video_output_orentation_update();
+                            }
                         }
-                    }
-                    else if (x < 5 && x > -5 && y < -5)
-                    {
-                        if (device_orientation != 180)
+                        else if (x < 5 && x > -5 && y < -5)
                         {
-                            device_orientation = 180;
-                            //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
-                            CameraWrapper.camera_video_rotate_angle = getRotation();
-                            video_output_orentation_update();
+                            if (device_orientation != 180)
+                            {
+                                device_orientation = 180;
+                                //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
+                                CameraWrapper.camera_video_rotate_angle = getRotation();
+                                video_output_orentation_update();
+                            }
                         }
-                    }
-                    else if (x > 5 && y < 5 && y > -5)
-                    {
-                        if (device_orientation != 270)
+                        else if (x > 5 && y < 5 && y > -5)
                         {
-                            device_orientation = 270;
-                            //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
-                            CameraWrapper.camera_video_rotate_angle = getRotation();
-                            video_output_orentation_update();
+                            if (device_orientation != 270)
+                            {
+                                device_orientation = 270;
+                                //Log.d(TAG, "onSensorChanged:device_orientation=" + device_orientation);
+                                CameraWrapper.camera_video_rotate_angle = getRotation();
+                                video_output_orentation_update();
+                            }
                         }
                     }
                 }
