@@ -128,6 +128,9 @@
         <item>NV21</item>
     </string-array>
 
+    <string name="pref_title_use_H264_hw_encoding">H264 Hardware Encoding</string>
+    <string name="pref_description_use_H264_hw_encoding">Use hardware acceleration for H264 video encoding</string>
+
     <string name="pref_title_mic_gain_factor">Mic Gain</string>
     <string name="pref_description_mic_gain_factor">Set a higher Gain if your microphone records with low volume</string>
 

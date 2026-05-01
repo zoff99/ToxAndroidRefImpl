@@ -938,6 +938,7 @@ public class MainActivity extends AppCompatActivity
         PREF__mic_gain_factor_toggle = settings.getBoolean("mic_gain_factor_toggle", false);
         PREF__window_security = settings.getBoolean("window_security", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
+        PREF__use_H264_hw_encoding = settings.getBoolean("use_H264_hw_encoding", true);
 
         try
         {
@@ -3505,6 +3506,7 @@ public class MainActivity extends AppCompatActivity
         PREF__window_security = settings.getBoolean("window_security", true);
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
         PREF__tox_set_do_not_sync_av = settings.getBoolean("X_tox_set_do_not_sync_av", false);
+        PREF__use_H264_hw_encoding = settings.getBoolean("use_H264_hw_encoding", true);
 
         // reset trigger for throttled saving
         update_savedata_file_wrapper_throttled_last_trigger_ts = 0;

@@ -122,6 +122,12 @@
             android:summary="@string/pref_description_camera_get_preview_format"
             android:title="@string/pref_title_camera_get_preview_format" />
 
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="use_H264_hw_encoding"
+            android:summary="@string/pref_description_use_H264_hw_encoding"
+            android:title="@string/pref_title_use_H264_hw_encoding" />
+
         <!--<SwitchPreference-->
         <!--android:defaultValue="true"-->
         <!--android:key="software_echo_cancel"-->
