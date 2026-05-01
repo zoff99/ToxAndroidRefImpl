@@ -3127,6 +3127,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                                                 MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible);
             }
 
+            // *************** //
+            // *************** //
+            // *************** //
+            // *** // video_encoder_format.setInteger(MediaFormat.KEY_ROTATION, 90);
+            // *************** //
+            // *************** //
+            // *************** //
+
 
             Log.i(TAG, "prepareEncoder:mEncoder.getName=" + mEncoder.getName());
 
