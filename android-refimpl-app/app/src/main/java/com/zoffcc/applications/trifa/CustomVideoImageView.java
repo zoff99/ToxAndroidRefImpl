@@ -10,7 +10,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-// import static com.zoffcc.applications.trifa.CallingActivity.VIDEO_ROTATION_LOCK;
+import static com.zoffcc.applications.trifa.CallingActivity.VIDEO_ROTATION_LOCK;
 import static com.zoffcc.applications.trifa.CallingActivity.device_orientation;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_zoom_incoming_video;
 
@@ -118,7 +118,7 @@ public class CustomVideoImageView extends androidx.appcompat.widget.AppCompatIma
 
     public void setBitmap(Bitmap bitmap)
     {
-        //*DISABLE*// synchronized(VIDEO_ROTATION_LOCK)
+        synchronized(VIDEO_ROTATION_LOCK)
         {
             if (bitmap != null)
             {

@@ -224,7 +224,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     private static int BUFFER_DEQUEUE_TIMEOUT_US = 0; // "us" fetch encoded data from encoder
     private static int BUFFER_DEQUEUE_FEEDER_TIMEOUT_US = 0; // "us" feed raw data to encoder
 
-    // static Object VIDEO_ROTATION_LOCK = new Object();
+    static Object VIDEO_ROTATION_LOCK = new Object();
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -2275,7 +2275,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     //Log.d(TAG, "onSensorChanged: x=" + event.values[0] + "  y=" + event.values[1] + "  z=" +
                     //           event.values[2]);
 
-                    //*DISABLE*// synchronized(VIDEO_ROTATION_LOCK)
+                    synchronized(VIDEO_ROTATION_LOCK)
                     {
                         float x = event.values[0];
                         float y = event.values[1];
