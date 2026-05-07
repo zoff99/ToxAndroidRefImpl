@@ -1,13 +1,1 @@
-#! /bin/bash
-
-javac \
--cp "sqlite-jdbc-3.53.0.0.jar" \
-com/zoffcc/applications/sorm/Column.java \
-com/zoffcc/applications/sorm/Index.java \
-com/zoffcc/applications/sorm/Log.java \
-com/zoffcc/applications/sorm/Nullable.java \
-com/zoffcc/applications/sorm/OnConflict.java \
-com/zoffcc/applications/sorm/PrimaryKey.java \
-com/zoffcc/applications/sorm/Table.java \
-com/zoffcc/applications/sorm/Generator.java || exit 1
-
+do_compile_part1_java_17_needed.sh
