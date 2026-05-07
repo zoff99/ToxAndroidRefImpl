@@ -17,7 +17,7 @@ build_yasm="0"
 ## ----------------------
 FORTIFY_FLAGS="" # "-D_FORTIFY_SOURCE=2"
 JNI_CUSTOM_FLAGS="-Wl,-z,max-page-size=16384" # align for 16kB
-_FFMPEG_VERSION_="n8.1"
+_FFMPEG_VERSION_="n8.1.1"
 _OPUS_VERSION_="v1.6.1"
 _VPX_VERSION_="v1.16.0"
 _LIBSODIUM_VERSION_="1.0.22-RELEASE"
