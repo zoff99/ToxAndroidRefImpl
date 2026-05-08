@@ -306,4 +306,8 @@
     <string name="layout___group_myname2">Вашето име в груповия разговор:</string>
     <string name="layout___ipaddress">IP:</string>
     <string name="layout___group_name2">Име на груповия разговор:</string>
+    <string name="pref_title_use_H264_hw_encoding">Хардуерно кодиране H264</string>
+    <string name="pref_description_use_H264_hw_encoding">Използване на хардуерно ускорение за кодиране на видео с H264</string>
+    <string name="pref_title_allow_push_server_sunup">Разрешаване на сървъра Sunup на Мозила</string>
+    <string name="pref_description_allow_push_server_sunup">ВНИМАНИЕ: Ако разрешите на сървъра Sunup на Мозила да ви изпраща известия, може да доведе до изтичане на описателни данни за времето на получаване на известия, ако някой се абонира с вашия ключ за известия. Sunup на Мозила НЕ използва пароли и НЕ изисква удостоверяване.</string>
 </resources>
