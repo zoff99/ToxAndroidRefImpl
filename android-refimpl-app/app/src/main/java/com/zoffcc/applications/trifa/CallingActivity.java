@@ -2210,7 +2210,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     {
         if (event.sensor.getType() == Sensor.TYPE_PROXIMITY)
         {
-            Log.i(TAG, "onSensorChanged:value=" + event.values[0] + " max=" + proximity_sensor.getMaximumRange());
+            // Log.i(TAG, "onSensorChanged:value=" + event.values[0] + " max=" + proximity_sensor.getMaximumRange());
             if (event.values[0] < proximity_sensor.getMaximumRange())
             {
                 // close to ear
