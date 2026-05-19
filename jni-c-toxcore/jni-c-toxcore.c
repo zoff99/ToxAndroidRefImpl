@@ -488,7 +488,8 @@ void dbg(int level, const char *fmt, ...)
         level = 0;
     }
 
-    level_and_format = malloc(strlen(fmt) + 3);
+    size_t fmt_len = strlen(fmt);
+    level_and_format = malloc(fmt_len + 3);
 
     if(!level_and_format)
     {
@@ -496,7 +497,7 @@ void dbg(int level, const char *fmt, ...)
     }
 
     fmt_copy = level_and_format + 2;
-    strcpy(fmt_copy, fmt);
+    memcpy(fmt_copy, fmt, fmt_len + 1);
     level_and_format[1] = ':';
 
     if(level == 0)
@@ -3603,8 +3604,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1friend_1list(JNI
     }
 
     size_t numfriends = tox_self_get_friend_list_size(tox_global);
-    size_t memsize = (numfriends * sizeof(uint32_t));
-    uint32_t *friend_list = malloc(memsize);
+    uint32_t *friend_list = calloc(numfriends, sizeof(uint32_t));
     uint32_t *friend_list_iter = friend_list;
     jlongArray result;
     tox_self_get_friend_list(tox_global, friend_list);
@@ -6478,8 +6478,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist(J
 {
     TRACE_LOGGER();
     size_t numconferences = tox_conference_get_chatlist_size(tox_global);
-    size_t memsize = (numconferences * sizeof(uint32_t));
-    uint32_t *conferences_list = malloc(memsize);
+    uint32_t *conferences_list = calloc(numconferences, sizeof(uint32_t));
     uint32_t *conferences_list_iter = conferences_list;
     jlongArray result;
     tox_conference_get_chatlist(tox_global, conferences_list);
@@ -7516,8 +7515,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1grouplist(JNIEn
 {
     TRACE_LOGGER();
     uint32_t numgroups = tox_group_get_number_groups(tox_global);
-    size_t memsize = (numgroups * sizeof(uint32_t));
-    uint32_t *groups_list = malloc(memsize);
+    uint32_t *groups_list = calloc(numgroups, sizeof(uint32_t));
     uint32_t *groups_list_iter = groups_list;
     jlongArray result;
     tox_group_get_grouplist(tox_global, groups_list);
@@ -7574,8 +7572,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1peerlist(JNIEnv
         return NULL;
     }
 
-    size_t memsize = (numpeers * sizeof(uint32_t));
-    uint32_t *peer_list = malloc(memsize);
+    uint32_t *peer_list = calloc(numpeers, sizeof(uint32_t));
     uint32_t *peer_list_iter = peer_list;
     jlongArray result;
     Tox_Err_Group_Peer_Query error2;
