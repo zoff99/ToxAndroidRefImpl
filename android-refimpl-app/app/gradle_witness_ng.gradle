@@ -82,6 +82,13 @@ static DependencyKey makeKey(String path) {
     return new DependencyKey(parts[0], parts[1], parts[2], parts[4])
 }
 
+/**
+ * Set like this example in your build.gradle file:
+ *
+ * project.extensions.extraProperties['noWitness'] = 'android:sdk:platforms:android.jar,android:sdk:platforms:core-for-system-modules'
+ *
+ */
+
 static Map<DependencyKey, String> calculateHashes(Project project) {
     def excludedProp = project.properties.get('noWitness')
     def excluded = excludedProp == null ? [] : excludedProp.split(',')
