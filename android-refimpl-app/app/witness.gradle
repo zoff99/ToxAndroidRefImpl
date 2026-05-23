@@ -127,7 +127,7 @@ dependencyVerification {
         'com.github.lawloretienne:discreteslider:0.0.9:discreteslider-0.0.9.aar:2a5b1a28060d20e070ff8ee2c9538e4427e04d56467453813b5efa05ea9390d1',
         'com.github.medyo:android-about-page:1.2.4:android-about-page-1.2.4.aar:15108c8bdedf5975d2aa60604107017109a4ad3640e0e95fa97fd438d347eb5c',
         'com.github.piasy:rxandroidaudio:1.7.0:rxandroidaudio-1.7.0.aar:70f93bd866b5dff068744211a441c463196a323a84e0fce5aa917fe9d8228ccc',
-        'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.174:pkgs_ToxAndroidRefImpl-1.0.174.aar:35ac3d0f6c34b781eb85f076daab7a74863aebaa5cfbad223901a1a3f3f2e667',
+        'com.github.zoff99:pkgs_ToxAndroidRefImpl:1.0.175:pkgs_ToxAndroidRefImpl-1.0.175.aar:224a44b94ceab44293c652ec5d94e8b54ae4ede8198e7fd950e0ef9b387de456',
         'com.github.zoff99:pkgs_armchaAutoLinkTextView:0.3.0:pkgs_armchaAutoLinkTextView-0.3.0.aar:31e292b56159e6de8e57ccfdbf78add69827493d72238b8c17699d2a08c7486c',
         'com.github.zoff99:pkgs_guardianprojectIOCipher:1.0.28:pkgs_guardianprojectIOCipher-1.0.28.aar:4a083fcc90f9e07a063fe48498ded6ac2e58c1d01fb29ae264558eb26295c285',
         'com.github.zoff99:pkgs_hotchemiPermissionsdispatcher-processor:3.2.0:pkgs_hotchemiPermissionsdispatcher-processor-3.2.0.jar:f7374192b263a94f63186dee91cb954c9369122519e4f08e055b72969699b52d',
