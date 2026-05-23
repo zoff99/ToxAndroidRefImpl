@@ -6,11 +6,16 @@ import java.security.MessageDigest
 
 // ----------------------------------------------------
 //
-// Zoff (c) in 2020 - 2022
+// Zoff (c) in 2020 - 2026
 //
 // run: "gradlew -q calculateChecksums"
 // to generate new checksums. you need to put those manually into 'witness.gradle'
 // ----------------------------------------------------
+
+def witnessFile = file('witness.gradle')
+if (!witnessFile.exists()) {
+    witnessFile.createNewFile()
+}
 
 class DependencyKey implements Comparable<DependencyKey> {
 
@@ -98,22 +103,19 @@ static Map<DependencyKey, String> calculateHashes(Project project) {
             // DEBUG: println "IT222::: ${it.properties}"
             // DEBUG: println "IT222::: ${it.properties.get("asFiletree")}"
             try {
-                if (
-                        (it.toString() != "configuration ':app:releaseIntransitiveDependenciesMetadata'") &&
-                                (it.toString() != "configuration ':app:debugImplementationDependenciesMetadata'") &&
-                                (it.toString() != "configuration ':app:implementationDependenciesMetadata'") &&
-                                (it.toString() != "configuration ':app:releaseImplementationDependenciesMetadata'")
-                ) {
-                    it.fileCollection { dep ->
-                        // DEBUG: println "DEP::::::::${dep}"
-                        // Skip dependencies on other projects
-                        dep.version != 'unspecified'
-                    }.each {
-                        // Skip files within project directory
-                        if (!it.canonicalPath.startsWith(projectPath)) {
-                            def key = makeKey it.path
-                            if (!dependencies.containsKey(key))
-                                dependencies.put key, calculateSha256(it)
+                it.incoming.artifactView { view ->
+                    view.componentFilter { id ->
+                        // Filter out project dependencies (usually identified by ProjectComponentIdentifier)
+                        // and 'unspecified' versions if necessary.
+                        // In Gradle 9, we typically check the type of the identifier.
+                        !(id instanceof ProjectComponentIdentifier)
+                    }
+                }.files.each { file ->
+                    // Skip files within project directory
+                    if (!file.canonicalPath.startsWith(projectPath)) {
+                        def key = makeKey(file.path)
+                        if (!dependencies.containsKey(key)) {
+                            dependencies.put(key, calculateSha256(file))
                         }
                     }
                 }
@@ -159,10 +161,16 @@ static Map<String, ConfigurationInfo> findDependencies(Project project) {
     return dependencies
 }
 
+// HINT: default the witness check to "true"
+def runWitnessChecker_ = project.hasProperty('runWitnessChecker') ? project.property('runWitnessChecker').toBoolean() : true
 
 tasks.register("pinChecksums") {
     group = 'Verification'
     description = 'checks if binary downloads from maven have the correct checksums.'
+
+    if (!runWitnessChecker_) {
+        return
+    }
 
     doLast {
         def dependencies = calculateHashes project
@@ -190,16 +198,19 @@ project.task('calculateChecksums').doLast {
     description = 'prints checksums for dependencies that can be used later to pin those versions.'
 
     def dependencies = calculateHashes project
-    println "dependencyVerification {"
-    println "    verify = ["
+    // HINT: add some magic at the start
+    System.err.println "=e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855:WITNESS:START:="
+    witnessFile.write("") // empty the file
+    witnessFile.append("dependencyVerification {" + "\n")
+    witnessFile.append("    verify = [" + "\n")
     dependencies.each {dep ->
         // HINT: exclude deps that change for different architcures
         if ((!dep.key.all.startsWith("and:sdk:platforms:android.jar")) && ((!dep.key.all.startsWith("and:sdk:platforms:core-for-system-modules.jar")))) {
-            println "        '${dep.key.all}:${dep.value}',"
+            witnessFile.append("        '${dep.key.all}:${dep.value}'," + "\n")
         }
     }
-    println "    ]"
-    println "}"
+    witnessFile.append("    ]" + "\n")
+    witnessFile.append("}" + "\n")
 }
 
 class WitnessPluginExtension {
@@ -207,7 +218,8 @@ class WitnessPluginExtension {
 }
 
 project.extensions.create("dependencyVerification", WitnessPluginExtension)
-apply from: 'witness.gradle'
+
+apply from: witnessFile
 
 project.task('printDependencies').doLast {
     def dependencies = findDependencies project
