@@ -410,6 +410,6 @@ dependencies {
     // ---------------------
 }
 
-project.extensions.extraProperties['noWitness'] = 'android:sdk:platforms:android.jar,android:sdk:platforms:core-for-system-modules'
+project.extensions.extraProperties['noWitness'] = 'android:sdk:platforms'
 
 apply from: 'gradle_witness_ng.gradle'
