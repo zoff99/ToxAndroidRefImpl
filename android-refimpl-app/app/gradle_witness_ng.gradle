@@ -90,19 +90,15 @@ static DependencyKey makeKey(String path) {
  */
 
 static Map<DependencyKey, String> calculateHashes(Project project) {
-    def excludedProp = project.properties.get('noWitness')
-    def excluded = excludedProp == null ? [] : excludedProp.split(',')
     def projectPath = project.file('.').canonicalPath
     def dependencies = new TreeMap<DependencyKey, String>()
     def addDependencies = {
         // Skip excluded configurations and their subconfigurations
         def scopedName = "${project.name}:${it.name}"
+        // println "DEBUG:Q001:${project.name}:${it.name}"
         it.hierarchy.each {
             def superScopedName = "${project.name}:${it.name}"
-            if (excluded.contains(it.name) || excluded.contains(superScopedName)) {
-                println "Skipping excluded configuration ${scopedName}"
-                return
-            }
+            // println "DEBUG:Q002:${project.name}:${it.name}"
         }
         // Skip unresolvable configurations
         if (it.metaClass.respondsTo(it, 'isCanBeResolved') ? it.isCanBeResolved() : true) {
@@ -210,9 +206,22 @@ project.task('calculateChecksums').doLast {
     witnessFile.write("") // empty the file
     witnessFile.append("dependencyVerification {" + "\n")
     witnessFile.append("    verify = [" + "\n")
-    dependencies.each {dep ->
-        // HINT: exclude deps that change for different architcures
-        if ((!dep.key.all.startsWith("and:sdk:platforms:android.jar")) && ((!dep.key.all.startsWith("and:sdk:platforms:core-for-system-modules.jar")))) {
+
+    def excludedProp = project.properties.get('noWitness')
+    def excluded = excludedProp == null ? [] : excludedProp.split(',')
+    println "calculateChecksums:noWitness: ${excluded}"
+    dependencies.each { dep ->
+        // println "DEBUG:C001:${dep.key.all} ---> ${dep.value}"
+        boolean isExcluded = false
+        for (excl in excluded) {
+            if (dep.key.all.startsWith(excl)) {
+                isExcluded = true
+                break
+            }
+        }
+        if (isExcluded) {
+            println "Skipping excluded configuration ${dep.key.all}:${dep.value}"
+        } else {
             witnessFile.append("        '${dep.key.all}:${dep.value}'," + "\n")
         }
     }
