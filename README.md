@@ -38,6 +38,7 @@ Join a growing community of security-conscious people. Check out these featured 
 *   **[ToLoShare for Desktop](https://github.com/zoff99/ToLoShare_material)**: A cross-platform desktop application for secure peer-to-peer real-time location sharing.
 *   **[ToFShare](https://github.com/zoff99/ToFShare)**: Secure decentralized file sharing for Android using the Tox protocol.
 *   **[tox_videoplayer](https://github.com/zoff99/tox_videoplayer)**: A command-line application that streams video and audio content over the Tox network.
+*   **[Tox Kodi video addon](https://github.com/zoff99/kodi_tox_plugin)**: Kodi add-on for streaming video from a Tox client.
 
 Latest Automated Screenshots
 =
