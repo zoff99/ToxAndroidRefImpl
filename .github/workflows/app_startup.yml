@@ -22,7 +22,7 @@ jobs:
       contents: write
     if: ${{ true }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: install deps
         run: |
