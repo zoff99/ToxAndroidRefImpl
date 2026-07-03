@@ -8981,6 +8981,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_toxav_1bit_1rate_1set(JNIEnv *en
     return (jint)res;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_toxav_1audio_1set_1bit_1rate(JNIEnv *env, jobject thiz, jlong friend_number,
+        jlong audio_bit_rate)
+{
+    TRACE_LOGGER();
+    TOXAV_ERR_BIT_RATE_SET error;
+    bool res = toxav_audio_set_bit_rate(tox_av_global, (uint32_t)friend_number, (uint32_t)audio_bit_rate, &error);
+    return (jint)res;
+}
 
 #ifdef HAVE_TOXAV_OPTION_SET
 JNIEXPORT jint JNICALL
