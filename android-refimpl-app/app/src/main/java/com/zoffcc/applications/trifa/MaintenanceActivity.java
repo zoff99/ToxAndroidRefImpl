@@ -869,6 +869,8 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         debug_output_append("");
         debug_output_append("--- Tox ---");
         debug_output_append("libsodium_version=" + libsodium_version());
+        debug_output_append("JNI_commit=" + MainActivity.getNativeLibGITHASH());
+        debug_output_append("c-toxcore_commit=" + MainActivity.getNativeLibTOXGITHASH());
         //
         debug_output_append("");
         debug_output_append("--- other info ---");
