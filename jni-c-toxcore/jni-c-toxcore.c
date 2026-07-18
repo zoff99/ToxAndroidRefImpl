@@ -8525,6 +8525,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1private_1messa
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
     jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
+    dbg(9, "tox_group_send_private_message_by_peerpubkey:DEBUG:group_number=%d type=%d pBytes1=%s pBytes=%s", (int)group_number, type, pBytes1, pBytes);
+
     res = tox_group_send_private_message_by_peerpubkey(tox_global, (uint32_t)group_number, (const uint8_t *)pBytes1, (int)type,
                                            (const uint8_t *)pBytes,
                                            (size_t)plength, &error);
