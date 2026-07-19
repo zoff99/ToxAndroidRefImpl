@@ -329,7 +329,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
             {
                 if (private_message_text.length() > 0)
                 {
-                    int res = tox_group_send_private_message_by_peerpubkey(tox_group_by_groupid__wrapper(group_id),
+                    long res = tox_group_send_private_message_by_peerpubkey(tox_group_by_groupid__wrapper(group_id),
                                                                            peer_pubkey, 0, private_message_text);
                     Log.i(TAG, "onPause:tox_group_send_private_message_by_peerpubkey:res=" + res);
 
