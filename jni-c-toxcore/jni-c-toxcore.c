@@ -8436,7 +8436,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1private_1messa
 
 #endif
 
-    if(res == false)
+    if(error != TOX_ERR_GROUP_SEND_PRIVATE_MESSAGE_OK)
     {
         if(error == TOX_ERR_GROUP_SEND_PRIVATE_MESSAGE_GROUP_NOT_FOUND)
         {
@@ -8586,7 +8586,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1private_1messa
 
 #endif
 
-    if(res == false)
+    if(error != TOX_ERR_GROUP_SEND_PRIVATE_MESSAGE_OK)
     {
         if(error == TOX_ERR_GROUP_SEND_PRIVATE_MESSAGE_GROUP_NOT_FOUND)
         {
