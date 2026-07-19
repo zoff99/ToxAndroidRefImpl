@@ -360,7 +360,7 @@ void group_message_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_Mes
                       const uint8_t *message, size_t length, uint32_t message_id, void *user_data);
 
 void group_private_message_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_Message_Type type,
-                      const uint8_t *message, size_t length, void *user_data);
+                      const uint8_t *message, size_t length, uint32_t message_id, void *user_data);
 
 void group_invite_cb(Tox *tox, uint32_t friend_number, const uint8_t *invite_data, size_t length,
                                  const uint8_t *group_name, size_t group_name_length, void *user_data);
