@@ -4669,7 +4669,7 @@ public class MainActivity extends AppCompatActivity
      * @param peer_id      The ID of the peer the message is intended for.
      * @param message      A non-NULL pointer to the first element of a byte array
      *                     containing the message text.
-     * @return 0 on success. return < 0 on error.
+     * @return pseudo message ID on success. return < 0 on error.
      */
     public static native int tox_group_send_private_message(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
@@ -4688,7 +4688,7 @@ public class MainActivity extends AppCompatActivity
      *                               message is intended for. If this parameter is NULL, this function will return false.
      * @param message                A non-NULL pointer to the first element of a byte array
      *                               containing the message text.
-     * @return 0 on success. return < 0 on error.
+     * @return pseudo message ID on success. return < 0 on error.
      */
     public static native int tox_group_send_private_message_by_peerpubkey(long group_number, @NonNull String peer_public_key_string, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
@@ -8410,10 +8410,10 @@ public class MainActivity extends AppCompatActivity
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
     }
 
-    static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length)
+    static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length, long message_id)
     {
         android_tox_callback_group_message_cb_method_wrapper(group_number, peer_id, a_TOX_MESSAGE_TYPE, message_orig,
-                                                             length, 0, true);
+                                                             length, message_id, true);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
     }
 

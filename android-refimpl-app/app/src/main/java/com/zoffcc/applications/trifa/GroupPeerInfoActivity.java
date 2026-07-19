@@ -332,7 +332,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                                                                            peer_pubkey, 0, private_message_text);
                     Log.i(TAG, "onPause:tox_group_send_private_message_by_peerpubkey:res=" + res);
 
-                    if (res == 0)
+                    if (res >= 0)
                     {
                         GroupMessage m = new GroupMessage();
                         m.is_new = false; // own messages are always "not new"
@@ -350,6 +350,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                         m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
                         m.text = private_message_text;
                         m.was_synced = false;
+                        m.message_id_tox = Long.toHexString(res);
                         m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
 
                         insert_into_group_message_db(m, true);

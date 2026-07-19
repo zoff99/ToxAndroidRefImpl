@@ -960,10 +960,7 @@ public class HelperGroup
         message_id_ = "";
         // TODO: add message ID later --------
 
-        if (!is_private_message)
-        {
-            message_id_ = fourbytes_of_long_to_hex(message_id);
-        }
+        message_id_ = fourbytes_of_long_to_hex(message_id);
 
         boolean do_notification = true;
         boolean do_badge_update = true;
