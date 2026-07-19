@@ -44,6 +44,7 @@ import androidx.appcompat.widget.AppCompatSpinner;
 import androidx.appcompat.widget.Toolbar;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.fourbytes_of_long_to_hex;
 import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
@@ -350,7 +351,7 @@ public class GroupPeerInfoActivity extends AppCompatActivity
                         m.rcvd_timestamp = System.currentTimeMillis(); // since we do not have anything better assume "now"
                         m.text = private_message_text;
                         m.was_synced = false;
-                        m.message_id_tox = Long.toHexString(res);
+                        m.message_id_tox = fourbytes_of_long_to_hex(res);
                         m.TRIFA_SYNC_TYPE = TRIFAGlobals.TRIFA_SYNC_TYPE.TRIFA_SYNC_TYPE_NONE.value;
 
                         insert_into_group_message_db(m, true);
