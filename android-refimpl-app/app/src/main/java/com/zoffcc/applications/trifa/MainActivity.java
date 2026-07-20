@@ -4671,7 +4671,7 @@ public class MainActivity extends AppCompatActivity
      *                     containing the message text.
      * @return pseudo message ID on success. return < 0 on error.
      */
-    public static native int tox_group_send_private_message(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, @NonNull String message);
+    public static native long tox_group_send_private_message(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
     /**
      * Send a text chat message to the specified peer in the specified group.
@@ -4690,7 +4690,7 @@ public class MainActivity extends AppCompatActivity
      *                               containing the message text.
      * @return pseudo message ID on success. return < 0 on error.
      */
-    public static native int tox_group_send_private_message_by_peerpubkey(long group_number, @NonNull String peer_public_key_string, int a_TOX_MESSAGE_TYPE, @NonNull String message);
+    public static native long tox_group_send_private_message_by_peerpubkey(long group_number, @NonNull String peer_public_key_string, int a_TOX_MESSAGE_TYPE, @NonNull String message);
 
     /**
      * Accept an invite to a group chat that the client previously received from a friend. The invite
