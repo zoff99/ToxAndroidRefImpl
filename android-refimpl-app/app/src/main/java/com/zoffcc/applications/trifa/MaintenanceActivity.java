@@ -20,6 +20,8 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
+import android.app.ActivityManager;
+import android.app.ApplicationExitInfo;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -873,6 +875,17 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         debug_output_append("c-toxcore_commit=" + MainActivity.getNativeLibTOXGITHASH());
         //
         debug_output_append("");
+        debug_output_append("--- Last App Exit ---");
+        try
+        {
+            debug_output_append(getLastExitReasonMessage());
+        }
+        catch(Exception e)
+        {
+            debug_output_append("error getting info");
+        }
+        //
+        debug_output_append("");
         debug_output_append("--- other info ---");
         debug_output_append("audio_pkt_incoming=" + debug__audio_pkt_incoming);
         debug_output_append("audio_frame_played=" + debug__audio_frame_played);
@@ -987,6 +1000,66 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             int id = msg.what;
         }
     };
+
+    private String getLastExitReasonMessage() {
+        // This API requires Android 11 (API 30) or higher
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            return "Exit diagnosis requires Android 11 or higher.";
+        }
+
+        ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) {
+            return "System service unavailable.";
+        }
+
+        // Retrieve the single most recent exit reason
+        List<ApplicationExitInfo> exitList = am.getHistoricalProcessExitReasons(null, 0, 1);
+
+        if (exitList == null || exitList.isEmpty()) {
+            return "No previous exit history found.";
+        }
+
+        ApplicationExitInfo lastExit = exitList.get(0);
+        int reason = lastExit.getReason();
+        String systemDescription = lastExit.getDescription();
+
+        // Build a user-friendly string based on the reason code
+        StringBuilder message = new StringBuilder();
+
+        switch (reason) {
+            case ApplicationExitInfo.REASON_LOW_MEMORY:
+                message.append("Status: Killed by System (Low Memory)\n\n");
+                message.append("The system ran out of RAM and closed the app to save resources.");
+                break;
+            case ApplicationExitInfo.REASON_USER_REQUESTED:
+                message.append("Status: Closed by User\n\n");
+                message.append("The app was closed because you swiped it away or forced it to stop.");
+                break;
+            case ApplicationExitInfo.REASON_SIGNALED:
+                message.append("Status: Terminated by System Signal\n\n");
+                message.append("The system abruptly shut down the app (often due to battery limits or OS optimization).");
+                break;
+            case ApplicationExitInfo.REASON_EXIT_SELF:
+                message.append("Status: Intentional Shutdown\n\n");
+                message.append("The app code requested to close itself.");
+                break;
+            case ApplicationExitInfo.REASON_CRASH:
+                message.append("Status: Application Crash\n\n");
+                message.append("A Java-level exception occurred.");
+                break;
+            default:
+                message.append("Status: Unknown Reason (Code ").append(reason).append(")\n\n");
+                message.append("The process was ended by the operating system.");
+                break;
+        }
+
+        // Append additional raw logs from the system if available
+        if (systemDescription != null && !systemDescription.isEmpty()) {
+            message.append("\n\nSystem Note: ").append(systemDescription);
+        }
+
+        return message.toString();
+    }
 
     void debug_output_clear()
     {
