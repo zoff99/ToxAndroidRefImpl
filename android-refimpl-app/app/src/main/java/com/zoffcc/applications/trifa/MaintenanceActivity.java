@@ -53,8 +53,11 @@ import com.zoffcc.applications.sorm.OrmaDatabase;
 
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -1012,7 +1015,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             return "System service unavailable.";
         }
 
-        // Retrieve the single most recent exit reason
+        // Retrieve only the single most recent exit reason
         List<ApplicationExitInfo> exitList = am.getHistoricalProcessExitReasons(null, 0, 1);
 
         if (exitList == null || exitList.isEmpty()) {
@@ -1021,41 +1024,86 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         ApplicationExitInfo lastExit = exitList.get(0);
         int reason = lastExit.getReason();
+        int status = lastExit.getStatus();
+        int importance = lastExit.getImportance();
         String systemDescription = lastExit.getDescription();
 
-        // Build a user-friendly string based on the reason code
         StringBuilder message = new StringBuilder();
 
+        // 1. Map the Main Reason Code
         switch (reason) {
             case ApplicationExitInfo.REASON_LOW_MEMORY:
-                message.append("Status: Killed by System (Low Memory)\n\n");
-                message.append("The system ran out of RAM and closed the app to save resources.");
+                message.append("Status: Killed by System (Low Memory)\n");
+                message.append("The system ran out of RAM and closed the app to save resources.\n");
                 break;
             case ApplicationExitInfo.REASON_USER_REQUESTED:
-                message.append("Status: Closed by User\n\n");
-                message.append("The app was closed because you swiped it away or forced it to stop.");
+                message.append("Status: Closed by User\n");
+                message.append("The app was closed because you swiped it away or forced it to stop.\n");
                 break;
             case ApplicationExitInfo.REASON_SIGNALED:
-                message.append("Status: Terminated by System Signal\n\n");
-                message.append("The system abruptly shut down the app (often due to battery limits or OS optimization).");
+                message.append("Status: Terminated by System Signal\n");
+                message.append("The process was forcefully terminated via a low-level OS command.\n");
+                // Decode specific common Linux signals
+                if (status == 9) {
+                    message.append("Detail: Process was forced killed via SIGKILL (Signal 9).\n");
+                } else if (status == 11) {
+                    message.append("Detail: Native Segmentation Fault (SIGSEGV - Signal 11).\n");
+                } else {
+                    message.append("Detail: Linux OS Signal Code: ").append(status).append("\n");
+                }
                 break;
             case ApplicationExitInfo.REASON_EXIT_SELF:
-                message.append("Status: Intentional Shutdown\n\n");
-                message.append("The app code requested to close itself.");
+                message.append("Status: Intentional Shutdown\n");
+                message.append("The app code explicitly requested to close itself.\n");
                 break;
             case ApplicationExitInfo.REASON_CRASH:
-                message.append("Status: Application Crash\n\n");
-                message.append("A Java-level exception occurred.");
+                message.append("Status: Application Crash\n");
+                message.append("An unhandled exception caused the app to close.\n");
+                break;
+            case ApplicationExitInfo.REASON_ANR:
+                message.append("Status: Application Not Responding (ANR)\n");
+                message.append("The main UI thread froze for too long.\n");
                 break;
             default:
-                message.append("Status: Unknown Reason (Code ").append(reason).append(")\n\n");
-                message.append("The process was ended by the operating system.");
+                message.append("Status: Unknown Reason Code (").append(reason).append(")\n");
+                message.append("Detail: Process ended with status ").append(status).append(".\n");
                 break;
         }
 
-        // Append additional raw logs from the system if available
+        // 2. Add App Process State at time of death
+        message.append("\nApp Visibility State: ");
+        if (importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+            message.append("Foreground (Active on screen)\n");
+        } else if (importance == ActivityManager.RunningAppProcessInfo.IMPORTANCE_BACKGROUND) {
+            message.append("Background (Running hidden)\n");
+        } else if (importance >= ActivityManager.RunningAppProcessInfo.IMPORTANCE_CACHED) {
+            message.append("Cached (Suspended memory state)\n");
+        } else {
+            message.append("Code ").append(importance).append("\n");
+        }
+
+        // 3. Append raw truncated System Description if it exists
         if (systemDescription != null && !systemDescription.isEmpty()) {
-            message.append("\n\nSystem Note: ").append(systemDescription);
+            message.append("\nSystem Note: ").append(systemDescription).append("\n");
+        }
+
+        // 4. Safely pull full untruncated system logs/traces if applicable
+        if (reason == ApplicationExitInfo.REASON_ANR || reason == ApplicationExitInfo.REASON_CRASH) {
+            try (InputStream inputStream = lastExit.getTraceInputStream()) {
+                if (inputStream != null) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    StringBuilder traceBuilder = new StringBuilder();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        traceBuilder.append(line).append("\n");
+                    }
+                    if (traceBuilder.length() > 0) {
+                        message.append("\n--- Untruncated Trace Log ---\n").append(traceBuilder.toString());
+                    }
+                }
+            } catch (Exception e) {
+                message.append("\n[Could not parse deeper trace logs: ").append(e.getMessage()).append("]");
+            }
         }
 
         return message.toString();
