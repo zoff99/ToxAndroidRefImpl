@@ -1628,7 +1628,28 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         @Override
         protected Void doInBackground(Void... args)
         {
-            String export_dir_string = MainActivity.SD_CARD_FILES_EXPORT_DIR + SD_CARD_ENC_FILES_EXPORT_DIR;
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("File Path");
+
+            final EditText input = new EditText(this);
+            input.setHint("/storage/emulated/0/Download/your-export.tox");
+            builder.setView(input);
+
+            builder.setPositiveButton("OK", (dialog, which) -> {
+                String filePath = input.getText().toString().trim();
+                File file = new File(filePath);
+                if (file.exists()) {
+                    Toast.makeText(this, "File already exists : " + filePath, Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(this, "File location available", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+            builder.show();
+        
+        
+            String export_dir_string = filePath ; // MainActivity.SD_CARD_FILES_EXPORT_DIR + SD_CARD_ENC_FILES_EXPORT_DIR;
 
             try
             {
