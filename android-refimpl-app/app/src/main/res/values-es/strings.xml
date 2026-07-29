@@ -434,4 +434,8 @@
     <string name="pref_description_rnnoise_active">Eliminar el ruido de fondo con RNNoise</string>
     <string name="layout___report_issue">reportar un error o problema</string>
     <string name="layout___reveal_passwords">revelar contraseñas y exportar</string>
+    <string name="pref_title_use_H264_hw_encoding">Codificación de hardware H264</string>
+    <string name="pref_description_use_H264_hw_encoding">Usa la aceleración del hardware para la codificación de vídeo H264</string>
+    <string name="pref_title_allow_push_server_sunup">Permitir el Servidor Mozilla Sunup</string>
+    <string name="pref_description_allow_push_server_sunup">ADVERTENCIA: Autorizar el servidor Sunup de Mozilla para recibir notificaciones push puede provocar la filtración de tus metadatos de marcas de tiempo cuando recibas notificaciones push, en caso de que un amigo se suscriba con tu token de notificaciones push. Sunup de Mozilla NO utiliza contraseñas NI autenticación. Quedas advertido.</string>
 </resources>
