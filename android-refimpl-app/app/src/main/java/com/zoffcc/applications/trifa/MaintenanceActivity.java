@@ -1030,15 +1030,47 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
 
         StringBuilder message = new StringBuilder();
 
-        // 1. Map the Main Reason Code
+        // 1. Map all official Main Reason Codes
         switch (reason) {
+            case ApplicationExitInfo.REASON_UNKNOWN:
+                message.append("Status: Unknown Reason\n");
+                message.append("The process died or was killed for an unmapped or unknown reason.\n");
+                break;
+            case ApplicationExitInfo.REASON_EXIT_SELF:
+                message.append("Status: Intentional Shutdown\n");
+                message.append("The app code explicitly requested to close itself (e.g., System.exit()).\n");
+                break;
+            case ApplicationExitInfo.REASON_CRASH:
+                message.append("Status: Application Crash (Java/Kotlin)\n");
+                message.append("An unhandled exception in the runtime environment caused the app to close.\n");
+                break;
+            case ApplicationExitInfo.REASON_CRASH_NATIVE:
+                message.append("Status: Native Code Crash\n");
+                message.append("The process died because of a crash within native C/C++ libraries.\n");
+                break;
+            case ApplicationExitInfo.REASON_ANR:
+                message.append("Status: Application Not Responding (ANR)\n");
+                message.append("The system terminated the app because the main UI thread froze for too long.\n");
+                break;
+            case ApplicationExitInfo.REASON_INITIALIZATION_FAILURE:
+                message.append("Status: Initialization Failure\n");
+                message.append("The process failed to initialize properly or timed out while attaching to the system.\n");
+                break;
             case ApplicationExitInfo.REASON_LOW_MEMORY:
                 message.append("Status: Killed by System (Low Memory)\n");
-                message.append("The system ran out of RAM and closed the app to save resources.\n");
+                message.append("The LMKD (Low Memory Killer Daemon) reclaimed the app to free up device RAM.\n");
+                break;
+            case ApplicationExitInfo.REASON_EXCESSIVE_RESOURCE_USAGE:
+                message.append("Status: Excessive Resource Usage\n");
+                message.append("The system terminated the app for consuming too much CPU, battery, or memory background resources.\n");
                 break;
             case ApplicationExitInfo.REASON_USER_REQUESTED:
                 message.append("Status: Closed by User\n");
-                message.append("The app was closed because you swiped it away or forced it to stop.\n");
+                message.append("The app was closed because you swiped it away from recents or forced it to stop.\n");
+                break;
+            case ApplicationExitInfo.REASON_USER_STOPPED:
+                message.append("Status: User Stopped\n");
+                message.append("The process was terminated because the user was switched or stopped via system management.\n");
                 break;
             case ApplicationExitInfo.REASON_SIGNALED:
                 message.append("Status: Terminated by System Signal\n");
@@ -1052,20 +1084,28 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     message.append("Detail: Linux OS Signal Code: ").append(status).append("\n");
                 }
                 break;
-            case ApplicationExitInfo.REASON_EXIT_SELF:
-                message.append("Status: Intentional Shutdown\n");
-                message.append("The app code explicitly requested to close itself.\n");
+            case ApplicationExitInfo.REASON_DEPENDENCY_DIED:
+                message.append("Status: Dependency Died\n");
+                message.append("The process was killed because an external subsystem or ContentProvider it relied on died.\n");
                 break;
-            case ApplicationExitInfo.REASON_CRASH:
-                message.append("Status: Application Crash\n");
-                message.append("An unhandled exception caused the app to close.\n");
+            case ApplicationExitInfo.REASON_OTHER:
+                message.append("Status: Other Reason\n");
+                message.append("The process was killed by the system for specific internal runtime or maintenance optimization rules.\n");
                 break;
-            case ApplicationExitInfo.REASON_ANR:
-                message.append("Status: Application Not Responding (ANR)\n");
-                message.append("The main UI thread froze for too long.\n");
+            case ApplicationExitInfo.REASON_FREEZER:
+                message.append("Status: Killed by App Freezer\n");
+                message.append("The app received unexpected sync binder transactions or ran amok while in a frozen state.\n");
+                break;
+            case ApplicationExitInfo.REASON_PACKAGE_STATE_CHANGE:
+                message.append("Status: Package State Changed\n");
+                message.append("The app process was cleared because the application component was updated, disabled, or changed.\n");
+                break;
+            case ApplicationExitInfo.REASON_PACKAGE_UPDATED:
+                message.append("Status: Package Updated\n");
+                message.append("The application process was stopped because a new version of the APK was being installed.\n");
                 break;
             default:
-                message.append("Status: Unknown Reason Code (").append(reason).append(")\n");
+                message.append("Status: Unrecognized System Code (").append(reason).append(")\n");
                 message.append("Detail: Process ended with status ").append(status).append(".\n");
                 break;
         }
@@ -1088,7 +1128,10 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
 
         // 4. Safely pull full untruncated system logs/traces if applicable
-        if (reason == ApplicationExitInfo.REASON_ANR || reason == ApplicationExitInfo.REASON_CRASH) {
+        if (reason == ApplicationExitInfo.REASON_ANR ||
+            reason == ApplicationExitInfo.REASON_CRASH ||
+            reason == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+
             try (InputStream inputStream = lastExit.getTraceInputStream()) {
                 if (inputStream != null) {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
