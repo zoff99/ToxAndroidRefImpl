@@ -61,7 +61,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -146,6 +149,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     Button button_import_savedata;
     Button button_report_issue;
     Button reveal_passwords;
+    Button share_crash_report;
 
     Boolean button_test_ringtone_start = true;
     MediaPlayer mMediaPlayer = null;
@@ -191,6 +195,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         button_import_savedata = (Button) findViewById(R.id.button_import_savedata);
         button_report_issue = (Button) findViewById(R.id.button_report_issue);
         reveal_passwords = (Button) findViewById(R.id.reveal_passwords);
+        share_crash_report = (Button) findViewById(R.id.share_crash_report);
         text_sqlstats = (TextView) findViewById(R.id.text_sqlstats);
         debug_output = (TextView) findViewById(R.id.debug_output);
 
@@ -664,6 +669,22 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             }
         });
 
+        share_crash_report.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                try
+                {
+                    shareFirstTombstoneData(v.getContext());
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         reveal_passwords.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -1127,6 +1148,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             message.append("\nSystem Note: ").append(systemDescription).append("\n");
         }
 
+        /*
         // 4. Safely pull full untruncated system logs/traces if applicable
         if (reason == ApplicationExitInfo.REASON_ANR ||
             reason == ApplicationExitInfo.REASON_CRASH ||
@@ -1148,8 +1170,126 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 message.append("\n[Could not parse deeper trace logs: ").append(e.getMessage()).append("]");
             }
         }
+        */
 
         return message.toString();
+    }
+
+    public static int getTombstoneCount(Context c) {
+        // This API requires Android 11 (API Level 30) or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            ActivityManager activityManager = (ActivityManager) c.getSystemService(Context.ACTIVITY_SERVICE);
+
+            if (activityManager != null) {
+                String packageName = c.getPackageName();
+                List<ApplicationExitInfo> exitReasons = activityManager.getHistoricalProcessExitReasons(
+                        null, 0, 5 // Pull up to 5 entries to scan for tombstones
+                );
+
+                int count = 0;
+                for (ApplicationExitInfo info : exitReasons) {
+                    Log.i(TAG, "" + info.getReason());
+                    if (info.getReason() == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                        count++;
+                    }
+                }
+                return count;
+            }
+            else
+            {
+                return -2;
+            }
+        }
+        else
+        {
+            return -1;
+        }
+    }
+
+    public static String getTombstoneTextData(Context c, int targetTombstoneNumber) {
+        // Tombstone stream extraction requires Android 12 (API Level 31) or higher
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            ActivityManager activityManager = (ActivityManager) c.getSystemService(Context.ACTIVITY_SERVICE);
+
+            if (activityManager != null) {
+                String packageName = c.getPackageName();
+                List<ApplicationExitInfo> exitReasons = activityManager.getHistoricalProcessExitReasons(
+                        null, 0, 5
+                );
+
+                int currentTombstoneIndex = 0;
+                for (ApplicationExitInfo info : exitReasons) {
+                    if (info.getReason() == ApplicationExitInfo.REASON_CRASH_NATIVE) {
+                        currentTombstoneIndex++;
+
+                        // Match the 1-based index requested by the user
+                        if (currentTombstoneIndex == targetTombstoneNumber) {
+                            try (InputStream traceStream = info.getTraceInputStream()) {
+                                if (traceStream != null) {
+                                    StringBuilder stringBuilder = new StringBuilder();
+                                    try (BufferedReader reader = new BufferedReader(
+                                            new InputStreamReader(traceStream, StandardCharsets.UTF_8))) {
+                                        String line;
+                                        while ((line = reader.readLine()) != null) {
+                                            stringBuilder.append(line).append("\n");
+                                        }
+                                    }
+                                    return stringBuilder.toString();
+                                }
+                            } catch (Exception e) {
+                                return "Error reading tombstone stream: " + e.getMessage();
+                            }
+                            return "Tombstone found, but trace stream data is empty.";
+                        }
+                    }
+                }
+                return "Tombstone #" + targetTombstoneNumber + " not found in exit history.";
+            }
+        }
+        return "Tombstone text extraction is only supported on Android 12 (API 31) or higher.";
+    }
+
+    public static void shareFirstTombstoneData(Context c) {
+        int totalTombstones = getTombstoneCount(c);
+
+        if (totalTombstones > 0) {
+            String tombstoneText = getTombstoneTextData(c, 1);
+
+            if (tombstoneText != null) {
+                // 1. Truncate the text to a maximum of 150,000 bytes safely
+                byte[] rawBytes = tombstoneText.getBytes(StandardCharsets.UTF_8);
+                final int MAX_BYTES = 150000;
+
+                if (rawBytes.length > MAX_BYTES) {
+                    // Construct a new string using only the first 150,000 bytes
+                    tombstoneText = new String(rawBytes, 0, MAX_BYTES, StandardCharsets.UTF_8)
+                                    + "\n\n[... TRUNCATED TO 150KB TO PREVENT TRANSACTION CRASHES ...]";
+                }
+            }
+
+            // 2. Build the standard text share intent
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "TRIfA Native Crash Log");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, tombstoneText);
+
+            Intent chooserIntent = Intent.createChooser(shareIntent, "Share Tombstone Log Via:");
+
+            // Ensure flag compatibility if called outside an Activity
+            if (!(c instanceof android.app.Activity)) {
+                chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            }
+
+            // 3. Execute safely inside a try-catch block
+            try {
+                c.startActivity(chooserIntent);
+            } catch (android.content.ActivityNotFoundException e) {
+                Toast.makeText(c, "No apps found to handle text sharing.", Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+            Toast.makeText(c, "No tombstones found to share.", Toast.LENGTH_SHORT).show();
+        }
     }
 
     void debug_output_clear()
