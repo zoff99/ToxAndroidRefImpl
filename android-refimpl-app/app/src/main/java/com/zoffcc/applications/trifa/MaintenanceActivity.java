@@ -54,6 +54,9 @@ import com.zoffcc.applications.sorm.OrmaDatabase;
 import org.apache.http.conn.ssl.AllowAllHostnameVerifier;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,6 +72,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.zip.GZIPInputStream;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -1183,7 +1187,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             if (activityManager != null) {
                 String packageName = c.getPackageName();
                 List<ApplicationExitInfo> exitReasons = activityManager.getHistoricalProcessExitReasons(
-                        null, 0, 5 // Pull up to 5 entries to scan for tombstones
+                        null, 0, 10 // Pull up to 10 entries to scan for tombstones
                 );
 
                 int count = 0;
@@ -1214,7 +1218,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             if (activityManager != null) {
                 String packageName = c.getPackageName();
                 List<ApplicationExitInfo> exitReasons = activityManager.getHistoricalProcessExitReasons(
-                        null, 0, 5
+                        null, 0, 10
                 );
 
                 int currentTombstoneIndex = 0;
@@ -1226,15 +1230,26 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                         if (currentTombstoneIndex == targetTombstoneNumber) {
                             try (InputStream traceStream = info.getTraceInputStream()) {
                                 if (traceStream != null) {
-                                    StringBuilder stringBuilder = new StringBuilder();
-                                    try (BufferedReader reader = new BufferedReader(
-                                            new InputStreamReader(traceStream, StandardCharsets.UTF_8))) {
-                                        String line;
-                                        while ((line = reader.readLine()) != null) {
-                                            stringBuilder.append(line).append("\n");
-                                        }
+                                    // 1. Drain the stream fully into memory once
+                                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                                    byte[] buf = new byte[4096];
+                                    int len;
+                                    while ((len = traceStream.read(buf)) != -1) {
+                                        baos.write(buf, 0, len);
                                     }
-                                    return stringBuilder.toString();
+                                    byte[] rawTombstoneBytes = baos.toByteArray();
+
+                                    // 2. Decode the crash reason using the new independent helper
+                                    String crashReason = TombstoneSignalDecoder.parseCrashReason(new ByteArrayInputStream(rawTombstoneBytes));
+
+                                    // 3. Decode the raw backtrace frames using your current working decoder
+                                    String stacktrace = TombstoneDecoder.parseNativeStacktrace(new ByteArrayInputStream(rawTombstoneBytes));
+
+                                    // 4. Combine them cleanly into the final output text block
+                                    return "=== NATIVE CRASH DETAILS ===\n" +
+                                           crashReason + "\n\n" +
+                                           "=== BACKTRACE ===\n" +
+                                           stacktrace;
                                 }
                             } catch (Exception e) {
                                 return "Error reading tombstone stream: " + e.getMessage();
@@ -1248,6 +1263,18 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         }
         return "Tombstone text extraction is only supported on Android 12 (API 31) or higher.";
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public static void shareFirstTombstoneData(Context c) {
         int totalTombstones = getTombstoneCount(c);
