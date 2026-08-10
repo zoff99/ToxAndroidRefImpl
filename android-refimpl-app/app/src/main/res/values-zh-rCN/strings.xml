@@ -454,4 +454,5 @@
     <string name="pref_description_use_H264_hw_encoding">对 H 264 视频编码使用硬件加速</string>
     <string name="pref_title_allow_push_server_sunup">允许 Mozilla sunup 服务器</string>
     <string name="pref_description_allow_push_server_sunup">警告：允许使用 Mozilla sunup 服务器用于通知推送，如果你的好友用你的推送令牌订阅，该设置可能会在你接收推送通知时泄露你的时间戳元数据。警告：Mozilla sunup 没有密码也没有身份认证。</string>
+    <string name="layout___share_crash_report">分享崩溃报告 （可能包含私密数据）</string>
 </resources>
