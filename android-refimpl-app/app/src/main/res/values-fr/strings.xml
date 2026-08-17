@@ -449,4 +449,9 @@
     <string name="pref_title_rnnoise_active">Bruit de fond</string>
     <string name="pref_description_rnnoise_active">Supprimer le bruit de fond avec RNNoise</string>
     <string name="layout___reveal_passwords">révéler les mots de passe et les exporter</string>
+    <string name="pref_description_allow_push_server_sunup">AVERTISSEMENT : si vous autorisez le serveur Mozilla Sunup à envoyer des notifications push, cela peut entraîner la divulgation de vos métadonnées (horodatages) lorsque vous recevez des notifications push, si un ami s\'abonne à l\'aide de votre jeton push. Mozilla Sunup n\'utilise AUCUN mot de passe et AUCUNE authentification. Vous êtes prévenu.</string>
+    <string name="layout___share_crash_report">Partager un rapport d\'incident ( !peut contenir des données personnelles !)</string>
+    <string name="pref_title_use_H264_hw_encoding">Encodage matériel H.264</string>
+    <string name="pref_description_use_H264_hw_encoding">Utiliser l\'accélération matérielle pour l\'encodage vidéo H.264</string>
+    <string name="pref_title_allow_push_server_sunup">Autoriser le serveur Mozilla Sunup</string>
 </resources>
