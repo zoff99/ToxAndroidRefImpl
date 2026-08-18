@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -20,7 +22,7 @@ public class FriendList
 {
     private static final String TAG = "DB.FriendList";
     @PrimaryKey
-    public String tox_public_key_string;
+    public String tox_public_key_string = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public String name;
@@ -32,52 +34,52 @@ public class FriendList
     public String status_message;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TOX_CONNECTION;
+    public int TOX_CONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TOX_CONNECTION_real;
+    public int TOX_CONNECTION_real; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TOX_CONNECTION_on_off;
+    public int TOX_CONNECTION_on_off; // 0 --> offline, 1 --> online
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TOX_CONNECTION_on_off_real;
+    public int TOX_CONNECTION_on_off_real; // 0 --> offline, 1 --> online
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TOX_USER_STATUS;
+    public int TOX_USER_STATUS; // 0 --> NONE, 1 --> online AWAY, 2 --> online BUSY
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String avatar_pathname;
+    public String avatar_pathname = null;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String avatar_filename;
+    public String avatar_filename = null;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String avatar_ftid_hex;
+    public String avatar_ftid_hex = null;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean avatar_update;
+    public boolean avatar_update = false; // has avatar changed for this friend?
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long avatar_update_timestamp;
+    public long avatar_update_timestamp = -1L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean notification_silent;
+    public boolean notification_silent = false; // show notifications for this friend?
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int sort;
+    public int sort = 0;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long last_online_timestamp;
+    public long last_online_timestamp = -1L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long last_online_timestamp_real;
+    public long last_online_timestamp_real = -1L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long added_timestamp;
+    public long added_timestamp = -1L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean is_relay;
+    public boolean is_relay = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public String push_url;
@@ -86,10 +88,10 @@ public class FriendList
     public String ip_addr_str;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long capabilities;
+    public long capabilities = 0;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long msgv3_capability;
+    public long msgv3_capability = 0;
 
     public static FriendList deep_copy(FriendList in)
     {
@@ -140,13 +142,66 @@ public class FriendList
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<FriendList> toList()
+    {
+        return toList(null);
+    }
+
+    public List<FriendList> toList(String[] columns)
     {
         List<FriendList> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -175,30 +230,30 @@ public class FriendList
             while (rs.next())
             {
                 FriendList out = new FriendList();
-                out.tox_public_key_string = rs.getString("tox_public_key_string");
-                out.name = rs.getString("name");
-                out.alias_name = rs.getString("alias_name");
-                out.status_message = rs.getString("status_message");
-                out.TOX_CONNECTION = rs.getInt("TOX_CONNECTION");
-                out.TOX_CONNECTION_real = rs.getInt("TOX_CONNECTION_real");
-                out.TOX_CONNECTION_on_off = rs.getInt("TOX_CONNECTION_on_off");
-                out.TOX_CONNECTION_on_off_real = rs.getInt("TOX_CONNECTION_on_off_real");
-                out.TOX_USER_STATUS = rs.getInt("TOX_USER_STATUS");
-                out.avatar_pathname = rs.getString("avatar_pathname");
-                out.avatar_filename = rs.getString("avatar_filename");
-                out.avatar_ftid_hex = rs.getString("avatar_ftid_hex");
-                out.avatar_update = rs.getBoolean("avatar_update");
-                out.avatar_update_timestamp = rs.getLong("avatar_update_timestamp");
-                out.notification_silent = rs.getBoolean("notification_silent");
-                out.sort = rs.getInt("sort");
-                out.last_online_timestamp = rs.getLong("last_online_timestamp");
-                out.last_online_timestamp_real = rs.getLong("last_online_timestamp_real");
-                out.added_timestamp = rs.getLong("added_timestamp");
-                out.is_relay = rs.getBoolean("is_relay");
-                out.push_url = rs.getString("push_url");
-                out.ip_addr_str = rs.getString("ip_addr_str");
-                out.capabilities = rs.getLong("capabilities");
-                out.msgv3_capability = rs.getLong("msgv3_capability");
+                if (selectAll || selectedCols.contains("tox_public_key_string".toLowerCase())) out.tox_public_key_string = rs.getString("tox_public_key_string");
+                if (selectAll || selectedCols.contains("name".toLowerCase())) out.name = rs.getString("name");
+                if (selectAll || selectedCols.contains("alias_name".toLowerCase())) out.alias_name = rs.getString("alias_name");
+                if (selectAll || selectedCols.contains("status_message".toLowerCase())) out.status_message = rs.getString("status_message");
+                if (selectAll || selectedCols.contains("TOX_CONNECTION".toLowerCase())) out.TOX_CONNECTION = rs.getInt("TOX_CONNECTION");
+                if (selectAll || selectedCols.contains("TOX_CONNECTION_real".toLowerCase())) out.TOX_CONNECTION_real = rs.getInt("TOX_CONNECTION_real");
+                if (selectAll || selectedCols.contains("TOX_CONNECTION_on_off".toLowerCase())) out.TOX_CONNECTION_on_off = rs.getInt("TOX_CONNECTION_on_off");
+                if (selectAll || selectedCols.contains("TOX_CONNECTION_on_off_real".toLowerCase())) out.TOX_CONNECTION_on_off_real = rs.getInt("TOX_CONNECTION_on_off_real");
+                if (selectAll || selectedCols.contains("TOX_USER_STATUS".toLowerCase())) out.TOX_USER_STATUS = rs.getInt("TOX_USER_STATUS");
+                if (selectAll || selectedCols.contains("avatar_pathname".toLowerCase())) out.avatar_pathname = rs.getString("avatar_pathname");
+                if (selectAll || selectedCols.contains("avatar_filename".toLowerCase())) out.avatar_filename = rs.getString("avatar_filename");
+                if (selectAll || selectedCols.contains("avatar_ftid_hex".toLowerCase())) out.avatar_ftid_hex = rs.getString("avatar_ftid_hex");
+                if (selectAll || selectedCols.contains("avatar_update".toLowerCase())) out.avatar_update = rs.getBoolean("avatar_update");
+                if (selectAll || selectedCols.contains("avatar_update_timestamp".toLowerCase())) out.avatar_update_timestamp = rs.getLong("avatar_update_timestamp");
+                if (selectAll || selectedCols.contains("notification_silent".toLowerCase())) out.notification_silent = rs.getBoolean("notification_silent");
+                if (selectAll || selectedCols.contains("sort".toLowerCase())) out.sort = rs.getInt("sort");
+                if (selectAll || selectedCols.contains("last_online_timestamp".toLowerCase())) out.last_online_timestamp = rs.getLong("last_online_timestamp");
+                if (selectAll || selectedCols.contains("last_online_timestamp_real".toLowerCase())) out.last_online_timestamp_real = rs.getLong("last_online_timestamp_real");
+                if (selectAll || selectedCols.contains("added_timestamp".toLowerCase())) out.added_timestamp = rs.getLong("added_timestamp");
+                if (selectAll || selectedCols.contains("is_relay".toLowerCase())) out.is_relay = rs.getBoolean("is_relay");
+                if (selectAll || selectedCols.contains("push_url".toLowerCase())) out.push_url = rs.getString("push_url");
+                if (selectAll || selectedCols.contains("ip_addr_str".toLowerCase())) out.ip_addr_str = rs.getString("ip_addr_str");
+                if (selectAll || selectedCols.contains("capabilities".toLowerCase())) out.capabilities = rs.getLong("capabilities");
+                if (selectAll || selectedCols.contains("msgv3_capability".toLowerCase())) out.msgv3_capability = rs.getLong("msgv3_capability");
 
                 list.add(out);
             }
@@ -2932,6 +2987,31 @@ public class FriendList
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+
+    @Override
+    public String toString()
+    {
+        try
+        {
+            return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) + ", is_relay=" + is_relay +
+                   ", name=" + name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION +
+                   ", TOX_CONNECTION_on_off=" + TOX_CONNECTION_on_off + ", TOX_CONNECTION_real=" + TOX_CONNECTION_real +
+                   ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname +
+                   ", avatar_filename=" + avatar_filename + ", notification_silent=" + notification_silent + ", sort=" +
+                   sort + ", last_online_timestamp=" + last_online_timestamp + ", alias_name=" + alias_name +
+                   ", avatar_update=" + avatar_update + ", added_timestamp=" + added_timestamp + ", push_url=" +
+                   "*****" + ", capabilities=" + capabilities + ", avatar_ftid_hex=" + avatar_ftid_hex;
+        }
+        catch (Exception e)
+        {
+            return "*Exception*";
+        }
+    }
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 

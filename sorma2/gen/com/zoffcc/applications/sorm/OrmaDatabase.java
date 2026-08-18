@@ -20,7 +20,7 @@ import com.zoffcc.applications.sorm.Log;
 public class OrmaDatabase
 {
     private static final String TAG = "sorm.OrmaDatabase";
-    public static final String OrmaDatabaseVersion = "1.0.3";
+    public static final String OrmaDatabaseVersion = "1.0.5";
 
     final static boolean ORMA_TRACE = false; // set "false" for release builds
     final static boolean ORMA_LONG_RUNNING_TRACE = false; // set "false" for release builds

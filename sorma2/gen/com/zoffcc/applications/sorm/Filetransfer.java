@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -20,55 +22,55 @@ public class Filetransfer
 {
     private static final String TAG = "DB.Filetransfer";
     @PrimaryKey(autoincrement = true, auto = true)
-    public long id;
+    public long id; // unique ID!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String tox_public_key_string;
+    public String tox_public_key_string = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int direction;
+    public int direction = TRIFA_FT_DIRECTION_INCOMING.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long file_number;
+    public long file_number = -1; // given from toxcore!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int kind;
+    public int kind = TOX_FILE_KIND_DATA.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int state;
+    public int state = TOX_FILE_CONTROL_PAUSE.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean ft_accepted;
+    public boolean ft_accepted = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean ft_outgoing_started;
+    public boolean ft_outgoing_started = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String path_name;
+    public String path_name = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String file_name;
+    public String file_name = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean fos_open;
+    public boolean fos_open = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long filesize;
+    public long filesize = -1;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long current_position;
+    public long current_position = 0;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long transfer_start_ts;
+    public long transfer_start_ts = 0;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long message_id;
+    public long message_id; // f_key -> Message.id
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean storage_frame_work;
+    public boolean storage_frame_work = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String tox_file_id_hex;
+    public String tox_file_id_hex = "";
 
     public static Filetransfer deep_copy(Filetransfer in)
     {
@@ -112,13 +114,66 @@ public class Filetransfer
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<Filetransfer> toList()
+    {
+        return toList(null);
+    }
+
+    public List<Filetransfer> toList(String[] columns)
     {
         List<Filetransfer> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -147,23 +202,23 @@ public class Filetransfer
             while (rs.next())
             {
                 Filetransfer out = new Filetransfer();
-                out.id = rs.getLong("id");
-                out.tox_public_key_string = rs.getString("tox_public_key_string");
-                out.direction = rs.getInt("direction");
-                out.file_number = rs.getLong("file_number");
-                out.kind = rs.getInt("kind");
-                out.state = rs.getInt("state");
-                out.ft_accepted = rs.getBoolean("ft_accepted");
-                out.ft_outgoing_started = rs.getBoolean("ft_outgoing_started");
-                out.path_name = rs.getString("path_name");
-                out.file_name = rs.getString("file_name");
-                out.fos_open = rs.getBoolean("fos_open");
-                out.filesize = rs.getLong("filesize");
-                out.current_position = rs.getLong("current_position");
-                out.transfer_start_ts = rs.getLong("transfer_start_ts");
-                out.message_id = rs.getLong("message_id");
-                out.storage_frame_work = rs.getBoolean("storage_frame_work");
-                out.tox_file_id_hex = rs.getString("tox_file_id_hex");
+                if (selectAll || selectedCols.contains("id".toLowerCase())) out.id = rs.getLong("id");
+                if (selectAll || selectedCols.contains("tox_public_key_string".toLowerCase())) out.tox_public_key_string = rs.getString("tox_public_key_string");
+                if (selectAll || selectedCols.contains("direction".toLowerCase())) out.direction = rs.getInt("direction");
+                if (selectAll || selectedCols.contains("file_number".toLowerCase())) out.file_number = rs.getLong("file_number");
+                if (selectAll || selectedCols.contains("kind".toLowerCase())) out.kind = rs.getInt("kind");
+                if (selectAll || selectedCols.contains("state".toLowerCase())) out.state = rs.getInt("state");
+                if (selectAll || selectedCols.contains("ft_accepted".toLowerCase())) out.ft_accepted = rs.getBoolean("ft_accepted");
+                if (selectAll || selectedCols.contains("ft_outgoing_started".toLowerCase())) out.ft_outgoing_started = rs.getBoolean("ft_outgoing_started");
+                if (selectAll || selectedCols.contains("path_name".toLowerCase())) out.path_name = rs.getString("path_name");
+                if (selectAll || selectedCols.contains("file_name".toLowerCase())) out.file_name = rs.getString("file_name");
+                if (selectAll || selectedCols.contains("fos_open".toLowerCase())) out.fos_open = rs.getBoolean("fos_open");
+                if (selectAll || selectedCols.contains("filesize".toLowerCase())) out.filesize = rs.getLong("filesize");
+                if (selectAll || selectedCols.contains("current_position".toLowerCase())) out.current_position = rs.getLong("current_position");
+                if (selectAll || selectedCols.contains("transfer_start_ts".toLowerCase())) out.transfer_start_ts = rs.getLong("transfer_start_ts");
+                if (selectAll || selectedCols.contains("message_id".toLowerCase())) out.message_id = rs.getLong("message_id");
+                if (selectAll || selectedCols.contains("storage_frame_work".toLowerCase())) out.storage_frame_work = rs.getBoolean("storage_frame_work");
+                if (selectAll || selectedCols.contains("tox_file_id_hex".toLowerCase())) out.tox_file_id_hex = rs.getString("tox_file_id_hex");
 
                 list.add(out);
             }
@@ -2163,6 +2218,11 @@ public class Filetransfer
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 

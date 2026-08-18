@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -52,13 +54,66 @@ public class TRIFADatabaseGlobalsNew
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<TRIFADatabaseGlobalsNew> toList()
+    {
+        return toList(null);
+    }
+
+    public List<TRIFADatabaseGlobalsNew> toList(String[] columns)
     {
         List<TRIFADatabaseGlobalsNew> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -87,8 +142,8 @@ public class TRIFADatabaseGlobalsNew
             while (rs.next())
             {
                 TRIFADatabaseGlobalsNew out = new TRIFADatabaseGlobalsNew();
-                out.key = rs.getString("key");
-                out.value = rs.getString("value");
+                if (selectAll || selectedCols.contains("key".toLowerCase())) out.key = rs.getString("key");
+                if (selectAll || selectedCols.contains("value".toLowerCase())) out.value = rs.getString("value");
 
                 list.add(out);
             }
@@ -556,6 +611,11 @@ public class TRIFADatabaseGlobalsNew
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 
