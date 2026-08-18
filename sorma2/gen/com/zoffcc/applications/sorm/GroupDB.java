@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -20,37 +22,37 @@ public class GroupDB
 {
     private static final String TAG = "DB.GroupDB";
     @PrimaryKey
-    public String group_identifier;
+    public String group_identifier = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String who_invited__tox_public_key_string;
+    public String who_invited__tox_public_key_string = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String name;
+    public String name = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String topic;
+    public String topic = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long peer_count;
+    public long peer_count = -1;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long own_peer_number;
+    public long own_peer_number = -1;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int privacy_state;
+    public int privacy_state = TOX_GROUP_PRIVACY_STATE.TOX_GROUP_PRIVACY_STATE_PUBLIC.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long tox_group_number;
+    public long tox_group_number = -1; // this changes often!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean group_active;
+    public boolean group_active = false; // is this conference active now? are we invited?
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean group_we_left;
+    public boolean group_we_left = false; // did we "leave" keeping our credentials? (we can rejoin)
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean notification_silent;
+    public boolean notification_silent = false; // show notifications for this conference?
 
     public static GroupDB deep_copy(GroupDB in)
     {
@@ -88,13 +90,66 @@ public class GroupDB
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<GroupDB> toList()
+    {
+        return toList(null);
+    }
+
+    public List<GroupDB> toList(String[] columns)
     {
         List<GroupDB> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -123,17 +178,17 @@ public class GroupDB
             while (rs.next())
             {
                 GroupDB out = new GroupDB();
-                out.group_identifier = rs.getString("group_identifier");
-                out.who_invited__tox_public_key_string = rs.getString("who_invited__tox_public_key_string");
-                out.name = rs.getString("name");
-                out.topic = rs.getString("topic");
-                out.peer_count = rs.getLong("peer_count");
-                out.own_peer_number = rs.getLong("own_peer_number");
-                out.privacy_state = rs.getInt("privacy_state");
-                out.tox_group_number = rs.getLong("tox_group_number");
-                out.group_active = rs.getBoolean("group_active");
-                out.group_we_left = rs.getBoolean("group_we_left");
-                out.notification_silent = rs.getBoolean("notification_silent");
+                if (selectAll || selectedCols.contains("group_identifier".toLowerCase())) out.group_identifier = rs.getString("group_identifier");
+                if (selectAll || selectedCols.contains("who_invited__tox_public_key_string".toLowerCase())) out.who_invited__tox_public_key_string = rs.getString("who_invited__tox_public_key_string");
+                if (selectAll || selectedCols.contains("name".toLowerCase())) out.name = rs.getString("name");
+                if (selectAll || selectedCols.contains("topic".toLowerCase())) out.topic = rs.getString("topic");
+                if (selectAll || selectedCols.contains("peer_count".toLowerCase())) out.peer_count = rs.getLong("peer_count");
+                if (selectAll || selectedCols.contains("own_peer_number".toLowerCase())) out.own_peer_number = rs.getLong("own_peer_number");
+                if (selectAll || selectedCols.contains("privacy_state".toLowerCase())) out.privacy_state = rs.getInt("privacy_state");
+                if (selectAll || selectedCols.contains("tox_group_number".toLowerCase())) out.tox_group_number = rs.getLong("tox_group_number");
+                if (selectAll || selectedCols.contains("group_active".toLowerCase())) out.group_active = rs.getBoolean("group_active");
+                if (selectAll || selectedCols.contains("group_we_left".toLowerCase())) out.group_we_left = rs.getBoolean("group_we_left");
+                if (selectAll || selectedCols.contains("notification_silent".toLowerCase())) out.notification_silent = rs.getBoolean("notification_silent");
 
                 list.add(out);
             }
@@ -1476,6 +1531,12 @@ public class GroupDB
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 

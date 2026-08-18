@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -23,25 +25,25 @@ public class FileDB
     public long id;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int kind;
+    public int kind = TOX_FILE_KIND_DATA.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int direction;
+    public int direction = TRIFA_FT_DIRECTION_INCOMING.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String tox_public_key_string;
+    public String tox_public_key_string = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String path_name;
+    public String path_name = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String file_name;
+    public String file_name = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long filesize;
+    public long filesize = -1;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean is_in_VFS;
+    public boolean is_in_VFS = true;
 
     public static FileDB deep_copy(FileDB in)
     {
@@ -76,13 +78,66 @@ public class FileDB
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<FileDB> toList()
+    {
+        return toList(null);
+    }
+
+    public List<FileDB> toList(String[] columns)
     {
         List<FileDB> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -111,14 +166,14 @@ public class FileDB
             while (rs.next())
             {
                 FileDB out = new FileDB();
-                out.id = rs.getLong("id");
-                out.kind = rs.getInt("kind");
-                out.direction = rs.getInt("direction");
-                out.tox_public_key_string = rs.getString("tox_public_key_string");
-                out.path_name = rs.getString("path_name");
-                out.file_name = rs.getString("file_name");
-                out.filesize = rs.getLong("filesize");
-                out.is_in_VFS = rs.getBoolean("is_in_VFS");
+                if (selectAll || selectedCols.contains("id".toLowerCase())) out.id = rs.getLong("id");
+                if (selectAll || selectedCols.contains("kind".toLowerCase())) out.kind = rs.getInt("kind");
+                if (selectAll || selectedCols.contains("direction".toLowerCase())) out.direction = rs.getInt("direction");
+                if (selectAll || selectedCols.contains("tox_public_key_string".toLowerCase())) out.tox_public_key_string = rs.getString("tox_public_key_string");
+                if (selectAll || selectedCols.contains("path_name".toLowerCase())) out.path_name = rs.getString("path_name");
+                if (selectAll || selectedCols.contains("file_name".toLowerCase())) out.file_name = rs.getString("file_name");
+                if (selectAll || selectedCols.contains("filesize".toLowerCase())) out.filesize = rs.getLong("filesize");
+                if (selectAll || selectedCols.contains("is_in_VFS".toLowerCase())) out.is_in_VFS = rs.getBoolean("is_in_VFS");
 
                 list.add(out);
             }
@@ -1217,6 +1272,11 @@ public class FileDB
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 

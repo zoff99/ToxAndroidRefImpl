@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -23,25 +25,25 @@ public class GroupPeerDB
     public long id;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String group_identifier;
+    public String group_identifier = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String tox_group_peer_pubkey;
+    public String tox_group_peer_pubkey = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String peer_name;
+    public String peer_name = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long last_update_timestamp;
+    public long last_update_timestamp = -1L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long first_join_timestamp;
+    public long first_join_timestamp = -1L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int Tox_Group_Role;
+    public int Tox_Group_Role = 2;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean notification_silent;
+    public boolean notification_silent = false; // show notifications for this peer?
 
     public static GroupPeerDB deep_copy(GroupPeerDB in)
     {
@@ -76,13 +78,66 @@ public class GroupPeerDB
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<GroupPeerDB> toList()
+    {
+        return toList(null);
+    }
+
+    public List<GroupPeerDB> toList(String[] columns)
     {
         List<GroupPeerDB> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -111,14 +166,14 @@ public class GroupPeerDB
             while (rs.next())
             {
                 GroupPeerDB out = new GroupPeerDB();
-                out.id = rs.getLong("id");
-                out.group_identifier = rs.getString("group_identifier");
-                out.tox_group_peer_pubkey = rs.getString("tox_group_peer_pubkey");
-                out.peer_name = rs.getString("peer_name");
-                out.last_update_timestamp = rs.getLong("last_update_timestamp");
-                out.first_join_timestamp = rs.getLong("first_join_timestamp");
-                out.Tox_Group_Role = rs.getInt("Tox_Group_Role");
-                out.notification_silent = rs.getBoolean("notification_silent");
+                if (selectAll || selectedCols.contains("id".toLowerCase())) out.id = rs.getLong("id");
+                if (selectAll || selectedCols.contains("group_identifier".toLowerCase())) out.group_identifier = rs.getString("group_identifier");
+                if (selectAll || selectedCols.contains("tox_group_peer_pubkey".toLowerCase())) out.tox_group_peer_pubkey = rs.getString("tox_group_peer_pubkey");
+                if (selectAll || selectedCols.contains("peer_name".toLowerCase())) out.peer_name = rs.getString("peer_name");
+                if (selectAll || selectedCols.contains("last_update_timestamp".toLowerCase())) out.last_update_timestamp = rs.getLong("last_update_timestamp");
+                if (selectAll || selectedCols.contains("first_join_timestamp".toLowerCase())) out.first_join_timestamp = rs.getLong("first_join_timestamp");
+                if (selectAll || selectedCols.contains("Tox_Group_Role".toLowerCase())) out.Tox_Group_Role = rs.getInt("Tox_Group_Role");
+                if (selectAll || selectedCols.contains("notification_silent".toLowerCase())) out.notification_silent = rs.getBoolean("notification_silent");
 
                 list.add(out);
             }
@@ -1217,6 +1272,21 @@ public class GroupPeerDB
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+
+    @Override
+    public String toString()
+    {
+        return "id=" + id + ", group_identifier=" + group_identifier + ", tox_group_peer_pubkey=" +
+               tox_group_peer_pubkey.substring(0, 4) + ", peer_name=" + peer_name +
+               ", last_update_timestamp=" + last_update_timestamp +
+               ", first_join_timestamp=" + first_join_timestamp + ", Tox_Group_Role=" + Tox_Group_Role +
+               ", notification_silent=" + notification_silent;
+    }
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 

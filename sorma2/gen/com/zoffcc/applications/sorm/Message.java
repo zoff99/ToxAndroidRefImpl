@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -20,94 +22,94 @@ public class Message
 {
     private static final String TAG = "DB.Message";
     @PrimaryKey(autoincrement = true, auto = true)
-    public long id;
+    public long id; // uniqe message id!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long message_id;
+    public long message_id = -1; // ID given from toxcore!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public String tox_friendpubkey;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int direction;
+    public int direction = 0; // 0 -> msg received, 1 -> msg sent
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TOX_MESSAGE_TYPE;
+    public int TOX_MESSAGE_TYPE = 0; // 0 -> normal, 1 -> action
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TRIFA_MESSAGE_TYPE;
+    public int TRIFA_MESSAGE_TYPE = TRIFA_MSG_TYPE_TEXT.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int state;
+    public int state = TOX_FILE_CONTROL_PAUSE.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean ft_accepted;
+    public boolean ft_accepted = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean ft_outgoing_started;
+    public boolean ft_outgoing_started = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long filedb_id;
+    public long filedb_id; // f_key -> FileDB.id
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long filetransfer_id;
+    public long filetransfer_id; // f_key -> Filetransfer.id
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long sent_timestamp;
+    public long sent_timestamp = 0L; // the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long sent_timestamp_ms;
+    public long sent_timestamp_ms = 0L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long rcvd_timestamp;
+    public long rcvd_timestamp = 0L; // the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long rcvd_timestamp_ms;
+    public long rcvd_timestamp_ms = 0L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean read;
+    public boolean read = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int send_retries;
+    public int send_retries = 0;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean is_new;
+    public boolean is_new = true;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String text;
+    public String text = null;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String filename_fullpath;
+    public String filename_fullpath = null;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String msg_id_hash;
+    public String msg_id_hash = null; // 32byte hash, used for MessageV2 Messages! and otherwise NULL
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String raw_msgv2_bytes;
+    public String raw_msgv2_bytes = null; // used for MessageV2 Messages! and otherwise NULL
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int msg_version;
+    public int msg_version; // 0 -> old Message, 1 -> for MessageV2 Message
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int resend_count;
+    public int resend_count; // how many times we have tried to resend old text messages
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean storage_frame_work;
+    public boolean storage_frame_work = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean ft_outgoing_queued;
+    public boolean ft_outgoing_queued = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean msg_at_relay;
+    public boolean msg_at_relay = false;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String msg_idv3_hash;
+    public String msg_idv3_hash = null; // 32byte hash, used for MessageV3 Messages! and otherwise NULL
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int sent_push;
+    public int sent_push = 0;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int filetransfer_kind;
+    public int filetransfer_kind = TOX_FILE_KIND_DATA.value;
 
     public static Message deep_copy(Message in)
     {
@@ -164,13 +166,66 @@ public class Message
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<Message> toList()
+    {
+        return toList(null);
+    }
+
+    public List<Message> toList(String[] columns)
     {
         List<Message> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -199,36 +254,36 @@ public class Message
             while (rs.next())
             {
                 Message out = new Message();
-                out.id = rs.getLong("id");
-                out.message_id = rs.getLong("message_id");
-                out.tox_friendpubkey = rs.getString("tox_friendpubkey");
-                out.direction = rs.getInt("direction");
-                out.TOX_MESSAGE_TYPE = rs.getInt("TOX_MESSAGE_TYPE");
-                out.TRIFA_MESSAGE_TYPE = rs.getInt("TRIFA_MESSAGE_TYPE");
-                out.state = rs.getInt("state");
-                out.ft_accepted = rs.getBoolean("ft_accepted");
-                out.ft_outgoing_started = rs.getBoolean("ft_outgoing_started");
-                out.filedb_id = rs.getLong("filedb_id");
-                out.filetransfer_id = rs.getLong("filetransfer_id");
-                out.sent_timestamp = rs.getLong("sent_timestamp");
-                out.sent_timestamp_ms = rs.getLong("sent_timestamp_ms");
-                out.rcvd_timestamp = rs.getLong("rcvd_timestamp");
-                out.rcvd_timestamp_ms = rs.getLong("rcvd_timestamp_ms");
-                out.read = rs.getBoolean("read");
-                out.send_retries = rs.getInt("send_retries");
-                out.is_new = rs.getBoolean("is_new");
-                out.text = rs.getString("text");
-                out.filename_fullpath = rs.getString("filename_fullpath");
-                out.msg_id_hash = rs.getString("msg_id_hash");
-                out.raw_msgv2_bytes = rs.getString("raw_msgv2_bytes");
-                out.msg_version = rs.getInt("msg_version");
-                out.resend_count = rs.getInt("resend_count");
-                out.storage_frame_work = rs.getBoolean("storage_frame_work");
-                out.ft_outgoing_queued = rs.getBoolean("ft_outgoing_queued");
-                out.msg_at_relay = rs.getBoolean("msg_at_relay");
-                out.msg_idv3_hash = rs.getString("msg_idv3_hash");
-                out.sent_push = rs.getInt("sent_push");
-                out.filetransfer_kind = rs.getInt("filetransfer_kind");
+                if (selectAll || selectedCols.contains("id".toLowerCase())) out.id = rs.getLong("id");
+                if (selectAll || selectedCols.contains("message_id".toLowerCase())) out.message_id = rs.getLong("message_id");
+                if (selectAll || selectedCols.contains("tox_friendpubkey".toLowerCase())) out.tox_friendpubkey = rs.getString("tox_friendpubkey");
+                if (selectAll || selectedCols.contains("direction".toLowerCase())) out.direction = rs.getInt("direction");
+                if (selectAll || selectedCols.contains("TOX_MESSAGE_TYPE".toLowerCase())) out.TOX_MESSAGE_TYPE = rs.getInt("TOX_MESSAGE_TYPE");
+                if (selectAll || selectedCols.contains("TRIFA_MESSAGE_TYPE".toLowerCase())) out.TRIFA_MESSAGE_TYPE = rs.getInt("TRIFA_MESSAGE_TYPE");
+                if (selectAll || selectedCols.contains("state".toLowerCase())) out.state = rs.getInt("state");
+                if (selectAll || selectedCols.contains("ft_accepted".toLowerCase())) out.ft_accepted = rs.getBoolean("ft_accepted");
+                if (selectAll || selectedCols.contains("ft_outgoing_started".toLowerCase())) out.ft_outgoing_started = rs.getBoolean("ft_outgoing_started");
+                if (selectAll || selectedCols.contains("filedb_id".toLowerCase())) out.filedb_id = rs.getLong("filedb_id");
+                if (selectAll || selectedCols.contains("filetransfer_id".toLowerCase())) out.filetransfer_id = rs.getLong("filetransfer_id");
+                if (selectAll || selectedCols.contains("sent_timestamp".toLowerCase())) out.sent_timestamp = rs.getLong("sent_timestamp");
+                if (selectAll || selectedCols.contains("sent_timestamp_ms".toLowerCase())) out.sent_timestamp_ms = rs.getLong("sent_timestamp_ms");
+                if (selectAll || selectedCols.contains("rcvd_timestamp".toLowerCase())) out.rcvd_timestamp = rs.getLong("rcvd_timestamp");
+                if (selectAll || selectedCols.contains("rcvd_timestamp_ms".toLowerCase())) out.rcvd_timestamp_ms = rs.getLong("rcvd_timestamp_ms");
+                if (selectAll || selectedCols.contains("read".toLowerCase())) out.read = rs.getBoolean("read");
+                if (selectAll || selectedCols.contains("send_retries".toLowerCase())) out.send_retries = rs.getInt("send_retries");
+                if (selectAll || selectedCols.contains("is_new".toLowerCase())) out.is_new = rs.getBoolean("is_new");
+                if (selectAll || selectedCols.contains("text".toLowerCase())) out.text = rs.getString("text");
+                if (selectAll || selectedCols.contains("filename_fullpath".toLowerCase())) out.filename_fullpath = rs.getString("filename_fullpath");
+                if (selectAll || selectedCols.contains("msg_id_hash".toLowerCase())) out.msg_id_hash = rs.getString("msg_id_hash");
+                if (selectAll || selectedCols.contains("raw_msgv2_bytes".toLowerCase())) out.raw_msgv2_bytes = rs.getString("raw_msgv2_bytes");
+                if (selectAll || selectedCols.contains("msg_version".toLowerCase())) out.msg_version = rs.getInt("msg_version");
+                if (selectAll || selectedCols.contains("resend_count".toLowerCase())) out.resend_count = rs.getInt("resend_count");
+                if (selectAll || selectedCols.contains("storage_frame_work".toLowerCase())) out.storage_frame_work = rs.getBoolean("storage_frame_work");
+                if (selectAll || selectedCols.contains("ft_outgoing_queued".toLowerCase())) out.ft_outgoing_queued = rs.getBoolean("ft_outgoing_queued");
+                if (selectAll || selectedCols.contains("msg_at_relay".toLowerCase())) out.msg_at_relay = rs.getBoolean("msg_at_relay");
+                if (selectAll || selectedCols.contains("msg_idv3_hash".toLowerCase())) out.msg_idv3_hash = rs.getString("msg_idv3_hash");
+                if (selectAll || selectedCols.contains("sent_push".toLowerCase())) out.sent_push = rs.getInt("sent_push");
+                if (selectAll || selectedCols.contains("filetransfer_kind".toLowerCase())) out.filetransfer_kind = rs.getInt("filetransfer_kind");
 
                 list.add(out);
             }
@@ -3571,6 +3626,25 @@ public class Message
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+
+    @Override
+    public String toString()
+    {
+        return "id=" + id + ", message_id=" + message_id + ", filetransfer_id=" + filetransfer_id + ", filedb_id=" +
+               filedb_id + ", tox_friendpubkey=" + "*pubkey*" + ", direction=" + direction + ", state=" + state +
+               ", TRIFA_MESSAGE_TYPE=" + TRIFA_MESSAGE_TYPE + ", TOX_MESSAGE_TYPE=" + TOX_MESSAGE_TYPE +
+               ", sent_timestamp=" + sent_timestamp + ", rcvd_timestamp=" + rcvd_timestamp + ", read=" + read +
+               ", send_retries=" + send_retries + ", text=" + "xxxxxx" + ", filename_fullpath=" + filename_fullpath +
+               ", is_new=" + is_new + ", msg_id_hash=" + msg_id_hash + ", msg_version=" + msg_version +
+               ", resend_count=" + resend_count + ", raw_msgv2_bytes=" + "xxxxxx" + ", storage_frame_work=" +
+               storage_frame_work + ", ft_outgoing_queued=" + ft_outgoing_queued + ", msg_at_relay=" + msg_at_relay +
+               ", sent_push=" + sent_push + ", filetransfer_kind=" + filetransfer_kind;
+    }
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 

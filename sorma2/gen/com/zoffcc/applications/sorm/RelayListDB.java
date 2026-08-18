@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -20,22 +22,22 @@ public class RelayListDB
 {
     private static final String TAG = "DB.RelayListDB";
     @PrimaryKey
-    public String tox_public_key_string;
+    public String tox_public_key_string = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TOX_CONNECTION;
+    public int TOX_CONNECTION; // 0 --> NONE (offline), 1 --> TCP (online), 2 --> UDP (online)
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int TOX_CONNECTION_on_off;
+    public int TOX_CONNECTION_on_off; // 0 --> offline, 1 --> online
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean own_relay;
+    public boolean own_relay = false; // false --> friends relay, true --> my relay
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long last_online_timestamp;
+    public long last_online_timestamp = -1L;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String tox_public_key_string_of_owner;
+    public String tox_public_key_string_of_owner = "";
 
     public static RelayListDB deep_copy(RelayListDB in)
     {
@@ -68,13 +70,66 @@ public class RelayListDB
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<RelayListDB> toList()
+    {
+        return toList(null);
+    }
+
+    public List<RelayListDB> toList(String[] columns)
     {
         List<RelayListDB> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -103,12 +158,12 @@ public class RelayListDB
             while (rs.next())
             {
                 RelayListDB out = new RelayListDB();
-                out.tox_public_key_string = rs.getString("tox_public_key_string");
-                out.TOX_CONNECTION = rs.getInt("TOX_CONNECTION");
-                out.TOX_CONNECTION_on_off = rs.getInt("TOX_CONNECTION_on_off");
-                out.own_relay = rs.getBoolean("own_relay");
-                out.last_online_timestamp = rs.getLong("last_online_timestamp");
-                out.tox_public_key_string_of_owner = rs.getString("tox_public_key_string_of_owner");
+                if (selectAll || selectedCols.contains("tox_public_key_string".toLowerCase())) out.tox_public_key_string = rs.getString("tox_public_key_string");
+                if (selectAll || selectedCols.contains("TOX_CONNECTION".toLowerCase())) out.TOX_CONNECTION = rs.getInt("TOX_CONNECTION");
+                if (selectAll || selectedCols.contains("TOX_CONNECTION_on_off".toLowerCase())) out.TOX_CONNECTION_on_off = rs.getInt("TOX_CONNECTION_on_off");
+                if (selectAll || selectedCols.contains("own_relay".toLowerCase())) out.own_relay = rs.getBoolean("own_relay");
+                if (selectAll || selectedCols.contains("last_online_timestamp".toLowerCase())) out.last_online_timestamp = rs.getLong("last_online_timestamp");
+                if (selectAll || selectedCols.contains("tox_public_key_string_of_owner".toLowerCase())) out.tox_public_key_string_of_owner = rs.getString("tox_public_key_string_of_owner");
 
                 list.add(out);
             }
@@ -1002,6 +1057,29 @@ public class RelayListDB
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+
+    @Override
+    public String toString()
+    {
+        try
+        {
+            return "tox_public_key_string=" + tox_public_key_string.substring(0, 4) +
+                   ", owner_pubkey=" + tox_public_key_string_of_owner.substring(0, 4) +
+                   ", own_relay=" + own_relay +
+                   ", TOX_CONNECTION=" + TOX_CONNECTION +
+                   ", TOX_CONNECTION_on_off=" + TOX_CONNECTION_on_off
+                   + ", last_online_timestamp=" + last_online_timestamp;
+        }
+        catch (Exception e)
+        {
+            return "*Exception*";
+        }
+    }
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 

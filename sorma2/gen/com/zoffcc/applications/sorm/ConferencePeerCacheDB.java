@@ -10,7 +10,9 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
 
@@ -23,16 +25,16 @@ public class ConferencePeerCacheDB
     public long id;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String conference_identifier;
+    public String conference_identifier = ""; // for now (bytes->HexString) of the cookie used to join the conference!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String peer_pubkey;
+    public String peer_pubkey = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String peer_name;
+    public String peer_name = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long last_update_timestamp;
+    public long last_update_timestamp = -1L;
 
     public static ConferencePeerCacheDB deep_copy(ConferencePeerCacheDB in)
     {
@@ -64,13 +66,66 @@ public class ConferencePeerCacheDB
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<ConferencePeerCacheDB> toList()
+    {
+        return toList(null);
+    }
+
+    public List<ConferencePeerCacheDB> toList(String[] columns)
     {
         List<ConferencePeerCacheDB> list = new ArrayList<>();
         orma_global_sqltolist_lock.lock();
         PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
@@ -99,11 +154,11 @@ public class ConferencePeerCacheDB
             while (rs.next())
             {
                 ConferencePeerCacheDB out = new ConferencePeerCacheDB();
-                out.id = rs.getLong("id");
-                out.conference_identifier = rs.getString("conference_identifier");
-                out.peer_pubkey = rs.getString("peer_pubkey");
-                out.peer_name = rs.getString("peer_name");
-                out.last_update_timestamp = rs.getLong("last_update_timestamp");
+                if (selectAll || selectedCols.contains("id".toLowerCase())) out.id = rs.getLong("id");
+                if (selectAll || selectedCols.contains("conference_identifier".toLowerCase())) out.conference_identifier = rs.getString("conference_identifier");
+                if (selectAll || selectedCols.contains("peer_pubkey".toLowerCase())) out.peer_pubkey = rs.getString("peer_pubkey");
+                if (selectAll || selectedCols.contains("peer_name".toLowerCase())) out.peer_name = rs.getString("peer_name");
+                if (selectAll || selectedCols.contains("last_update_timestamp".toLowerCase())) out.last_update_timestamp = rs.getLong("last_update_timestamp");
 
                 list.add(out);
             }
@@ -893,6 +948,11 @@ public class ConferencePeerCacheDB
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+
+}
+
+    // =========== CUSTOM USER CODE END ===========
 
 }
 
