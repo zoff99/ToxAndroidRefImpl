@@ -1454,7 +1454,7 @@ public class HelperFriend
                     proxy(proxy).
                     readTimeout(5, TimeUnit.SECONDS).
                     callTimeout(6, TimeUnit.SECONDS).
-                    connectTimeout(8, TimeUnit.SECONDS).
+                    connectTimeout(12, TimeUnit.SECONDS).
                     writeTimeout(5, TimeUnit.SECONDS).
                     build();
         }
