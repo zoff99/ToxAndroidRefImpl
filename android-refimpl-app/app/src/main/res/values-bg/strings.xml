@@ -310,4 +310,5 @@
     <string name="pref_description_use_H264_hw_encoding">Използване на хардуерно ускорение за кодиране на видео с H264</string>
     <string name="pref_title_allow_push_server_sunup">Разрешаване на сървъра Sunup на Мозила</string>
     <string name="pref_description_allow_push_server_sunup">ВНИМАНИЕ: Ако разрешите на сървъра Sunup на Мозила да ви изпраща известия, може да доведе до изтичане на описателни данни за времето на получаване на известия, ако някой се абонира с вашия ключ за известия. Sunup на Мозила НЕ използва пароли и НЕ изисква удостоверяване.</string>
+    <string name="layout___share_crash_report">Споделяне на подробности за срив (може да съдържа лична информация!)</string>
 </resources>
