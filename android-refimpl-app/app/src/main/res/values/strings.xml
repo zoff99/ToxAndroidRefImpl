@@ -535,6 +535,7 @@
     <string name="layout___skip">skip</string>
     <string name="layout___leave">Leave</string>
     <string name="layout___delete">Delete</string>
+    <string name="layout___delete_messages_files_only">Delete Messages and Files only</string>
     <string name="layout___info">Info</string>
     <string name="layout___create_text_group">Create Text Group</string>
     <string name="layout___create_audio_group">Create Audio Group</string>
