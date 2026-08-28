@@ -650,6 +650,9 @@ size_t xnet_unpack_u32(const uint8_t *bytes, uint32_t *v)
     return p - bytes;
 }
 
+/*
+ * return NULL on failure
+ */
 Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port,
                 int local_discovery_enabled_, const uint8_t *passphrase, size_t passphrase_len,
                 int enable_ipv6, int force_udp_mode)
@@ -768,7 +771,21 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
         if(res1 == true)
         {
             size_t savedata_len = (size_t)(fsize - TOX_PASS_ENCRYPTION_EXTRA_LENGTH);
-            savedata = malloc(savedata_len);
+            savedata = calloc(1, savedata_len);
+
+            // SECURITY FIX: Check for calloc failure to prevent NULL pointer dereference
+            if (savedata == NULL) {
+                dbg(0, "create_tox:ERROR:calloc for savedata failed");
+                if (savedata_enc)
+                {
+                    free(savedata_enc);
+                }
+                free(full_path_filename);
+                fclose(f);
+                pthread_mutex_destroy(&group_audio___mutex);
+                return NULL;
+            }
+
             TOX_ERR_DECRYPTION error2;
             bool res_decrypt = tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
             dbg(9, "create_tox:tox_pass_decrypt:res=%d", (int)res_decrypt);
@@ -777,16 +794,36 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
             {
                 free(savedata_enc);
             }
+
+            if (!res_decrypt) {
+                /*
+                 * SECURITY FIX: Decryption failed (e.g., wrong password or corrupted file).
+                 * The 'savedata' buffer contains uninitialized memory.
+                 * We must NOT pass it to tox_new, nor should we use the inflated 'fsize' length
+                 * which would cause a Heap Out-Of-Bounds read inside tox_new!
+                 */
+                dbg(0, "create_tox:ERROR:tox_pass_decrypt failed (error=%d)", error2);
+                free(savedata);
+                savedata = NULL;
+                options.savedata_type = TOX_SAVEDATA_TYPE_NONE;
+                options.savedata_data = NULL;
+                options.savedata_length = 0;
+            } else {
+                options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
+                options.savedata_data = savedata;
+                /* SECURITY FIX: Use the actual decrypted length, not the encrypted file size 'fsize'! */
+                options.savedata_length = savedata_len;
+            }
         }
         else
         {
             // save data is not encrypted (yet) !
             savedata = savedata_enc;
+            options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
+            options.savedata_data = savedata;
+            options.savedata_length = fsize;
         }
 
-        options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
-        options.savedata_data = savedata;
-        options.savedata_length = fsize;
         dbg(9, "create_tox:1009:2");
 #ifdef TOX_HAVE_TOXUTIL
         tox = tox_utils_new(&options, &error);
