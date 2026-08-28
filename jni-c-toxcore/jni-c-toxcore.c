@@ -8261,6 +8261,16 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1invite_1accept(JNIEn
     invite_data_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, invite_data_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, invite_data_buffer);
 
+    /*
+     * SECURITY FIX: Validate that the requested length does not exceed the actual capacity
+     * of the direct buffer. Passing a length larger than the capacity causes a Heap-Buffer-Overflow
+     * (Out-Of-Bounds Read) inside tox_group_invite_accept.
+     */
+    if (invite_data_length < 0 || (size_t)invite_data_length > (size_t)capacity) {
+        dbg(0, "tox_group_invite_accept:ERROR:invite_data_length (%lld) exceeds buffer capacity (%ld)", (long long)invite_data_length, capacity);
+        return (jlong)-23;
+    }
+
     Tox_Err_Group_Invite_Accept error;
     uint32_t res = 0;
 
