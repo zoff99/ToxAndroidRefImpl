@@ -8638,15 +8638,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1private_1messa
     }
 
     s = (*env)->GetStringUTFChars(env, peer_public_key_string, NULL);
+    if(s == NULL) {
+        dbg(0, "tox_group_send_private_message_by_peerpubkey:ERROR:GetStringUTFChars failed");
+        return (jlong)-1;
+    }
 
-    if(s == NULL)
-    {
+    /* SECURITY FIX: Validate the public key string length before passing it to hex-to-bin conversion.
+     * A tox public key is exactly TOX_PUBLIC_KEY_SIZE bytes (32 bytes), which is 64 hex characters.
+     * Passing a shorter string causes Out-Of-Bounds reads inside toxpk_hex_to_bin. */
+    if (strlen(s) != (TOX_PUBLIC_KEY_SIZE * 2)) {
+        dbg(0, "tox_group_send_private_message_by_peerpubkey:ERROR:Invalid public key length");
         (*env)->ReleaseStringUTFChars(env, peer_public_key_string, s);
         return (jlong)-1;
     }
 
     peer_public_key_string2 = strdup(s);
     (*env)->ReleaseStringUTFChars(env, peer_public_key_string, s);
+
+    if (peer_public_key_string2 == NULL) {
+         dbg(0, "tox_group_send_private_message_by_peerpubkey:ERROR:strdup failed");
+         return (jlong)-1;
+    }
+
     toxpk_hex_to_bin(peer_public_key_bin, peer_public_key_string2);
 
     if(peer_public_key_string2)
