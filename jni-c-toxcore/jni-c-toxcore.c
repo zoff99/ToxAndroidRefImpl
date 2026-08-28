@@ -959,6 +959,15 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     }
 
     FILE *f = fopen(full_path_filename_tmp, "wb");
+    /* SECURITY FIX: Check for fopen failure to prevent passing NULL to fwrite/fclose which causes segfaults */
+    if (f == NULL) {
+        dbg(0, "update_savedata_file:ERROR:fopen failed for %s", full_path_filename_tmp);
+        free(savedata);
+        free(savedata_enc);
+        free(full_path_filename);
+        free(full_path_filename_tmp);
+        return;
+    }
     if (save_unencrypted)
     {
         fwrite((const void *)savedata, size, 1, f);
