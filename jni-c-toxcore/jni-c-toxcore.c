@@ -650,6 +650,9 @@ size_t xnet_unpack_u32(const uint8_t *bytes, uint32_t *v)
     return p - bytes;
 }
 
+/*
+ * return NULL on failure
+ */
 Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint16_t proxy_port,
                 int local_discovery_enabled_, const uint8_t *passphrase, size_t passphrase_len,
                 int enable_ipv6, int force_udp_mode)
@@ -768,7 +771,21 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
         if(res1 == true)
         {
             size_t savedata_len = (size_t)(fsize - TOX_PASS_ENCRYPTION_EXTRA_LENGTH);
-            savedata = malloc(savedata_len);
+            savedata = calloc(1, savedata_len);
+
+            // SECURITY FIX: Check for calloc failure to prevent NULL pointer dereference
+            if (savedata == NULL) {
+                dbg(0, "create_tox:ERROR:calloc for savedata failed");
+                if (savedata_enc)
+                {
+                    free(savedata_enc);
+                }
+                free(full_path_filename);
+                fclose(f);
+                pthread_mutex_destroy(&group_audio___mutex);
+                return NULL;
+            }
+
             TOX_ERR_DECRYPTION error2;
             bool res_decrypt = tox_pass_decrypt(savedata_enc, (size_t)fsize, passphrase, passphrase_len, savedata, &error2);
             dbg(9, "create_tox:tox_pass_decrypt:res=%d", (int)res_decrypt);
@@ -777,16 +794,36 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
             {
                 free(savedata_enc);
             }
+
+            if (!res_decrypt) {
+                /*
+                 * SECURITY FIX: Decryption failed (e.g., wrong password or corrupted file).
+                 * The 'savedata' buffer contains uninitialized memory.
+                 * We must NOT pass it to tox_new, nor should we use the inflated 'fsize' length
+                 * which would cause a Heap Out-Of-Bounds read inside tox_new!
+                 */
+                dbg(0, "create_tox:ERROR:tox_pass_decrypt failed (error=%d)", error2);
+                free(savedata);
+                savedata = NULL;
+                options.savedata_type = TOX_SAVEDATA_TYPE_NONE;
+                options.savedata_data = NULL;
+                options.savedata_length = 0;
+            } else {
+                options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
+                options.savedata_data = savedata;
+                /* SECURITY FIX: Use the actual decrypted length, not the encrypted file size 'fsize'! */
+                options.savedata_length = savedata_len;
+            }
         }
         else
         {
             // save data is not encrypted (yet) !
             savedata = savedata_enc;
+            options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
+            options.savedata_data = savedata;
+            options.savedata_length = fsize;
         }
 
-        options.savedata_type = TOX_SAVEDATA_TYPE_TOX_SAVE;
-        options.savedata_data = savedata;
-        options.savedata_length = fsize;
         dbg(9, "create_tox:1009:2");
 #ifdef TOX_HAVE_TOXUTIL
         tox = tox_utils_new(&options, &error);
@@ -922,6 +959,15 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     }
 
     FILE *f = fopen(full_path_filename_tmp, "wb");
+    /* SECURITY FIX: Check for fopen failure to prevent passing NULL to fwrite/fclose which causes segfaults */
+    if (f == NULL) {
+        dbg(0, "update_savedata_file:ERROR:fopen failed for %s", full_path_filename_tmp);
+        free(savedata);
+        free(savedata_enc);
+        free(full_path_filename);
+        free(full_path_filename_tmp);
+        return;
+    }
     if (save_unencrypted)
     {
         fwrite((const void *)savedata, size, 1, f);
@@ -965,19 +1011,41 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 void export_savedata_file_unsecure(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len,
                                    const char *export_full_path_of_file)
 {
+    if (tox == NULL || export_full_path_of_file == NULL)
+    {
+        return;
+    }
+
     size_t size = tox_get_savedata_size(tox);
     dbg(9, "export_savedata_file_unsecure:tox_get_savedata_size=%d", (int)size);
+
+    if (size < 1) {
+        dbg(9, "export_savedata_file_unsecure:ERROR:size < 1");
+        return;
+    }
+
     char *savedata = malloc(size);
+    /* SECURITY FIX: Check for malloc failure to prevent NULL pointer dereference */
+    if (savedata == NULL) {
+        dbg(0, "export_savedata_file_unsecure:ERROR:malloc failed");
+        return;
+    }
+
     dbg(9, "export_savedata_file_unsecure:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
+
     FILE *f = fopen(export_full_path_of_file, "wb");
+    /* SECURITY FIX: Check for fopen failure to prevent passing NULL to fwrite/fclose which causes segfaults */
+    if (f == NULL) {
+        dbg(0, "export_savedata_file_unsecure:ERROR:fopen failed for %s", export_full_path_of_file);
+        free(savedata);
+        return;
+    }
+
     fwrite(savedata, size, 1, f);
     fclose(f);
 
-    if(savedata)
-    {
-        free(savedata);
-    }
+    free(savedata);
 }
 
 
@@ -8224,6 +8292,16 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1invite_1accept(JNIEn
     invite_data_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, invite_data_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, invite_data_buffer);
 
+    /*
+     * SECURITY FIX: Validate that the requested length does not exceed the actual capacity
+     * of the direct buffer. Passing a length larger than the capacity causes a Heap-Buffer-Overflow
+     * (Out-Of-Bounds Read) inside tox_group_invite_accept.
+     */
+    if (invite_data_length < 0 || (size_t)invite_data_length > (size_t)capacity) {
+        dbg(0, "tox_group_invite_accept:ERROR:invite_data_length (%lld) exceeds buffer capacity (%ld)", (long long)invite_data_length, capacity);
+        return (jlong)-23;
+    }
+
     Tox_Err_Group_Invite_Accept error;
     uint32_t res = 0;
 
@@ -8560,15 +8638,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1send_1private_1messa
     }
 
     s = (*env)->GetStringUTFChars(env, peer_public_key_string, NULL);
+    if(s == NULL) {
+        dbg(0, "tox_group_send_private_message_by_peerpubkey:ERROR:GetStringUTFChars failed");
+        return (jlong)-1;
+    }
 
-    if(s == NULL)
-    {
+    /* SECURITY FIX: Validate the public key string length before passing it to hex-to-bin conversion.
+     * A tox public key is exactly TOX_PUBLIC_KEY_SIZE bytes (32 bytes), which is 64 hex characters.
+     * Passing a shorter string causes Out-Of-Bounds reads inside toxpk_hex_to_bin. */
+    if (strlen(s) != (TOX_PUBLIC_KEY_SIZE * 2)) {
+        dbg(0, "tox_group_send_private_message_by_peerpubkey:ERROR:Invalid public key length");
         (*env)->ReleaseStringUTFChars(env, peer_public_key_string, s);
         return (jlong)-1;
     }
 
     peer_public_key_string2 = strdup(s);
     (*env)->ReleaseStringUTFChars(env, peer_public_key_string, s);
+
+    if (peer_public_key_string2 == NULL) {
+         dbg(0, "tox_group_send_private_message_by_peerpubkey:ERROR:strdup failed");
+         return (jlong)-1;
+    }
+
     toxpk_hex_to_bin(peer_public_key_bin, peer_public_key_string2);
 
     if(peer_public_key_string2)
