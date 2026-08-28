@@ -1002,19 +1002,41 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 void export_savedata_file_unsecure(const Tox *tox, const uint8_t *passphrase, size_t passphrase_len,
                                    const char *export_full_path_of_file)
 {
+    if (tox == NULL || export_full_path_of_file == NULL)
+    {
+        return;
+    }
+
     size_t size = tox_get_savedata_size(tox);
     dbg(9, "export_savedata_file_unsecure:tox_get_savedata_size=%d", (int)size);
+
+    if (size < 1) {
+        dbg(9, "export_savedata_file_unsecure:ERROR:size < 1");
+        return;
+    }
+
     char *savedata = malloc(size);
+    /* SECURITY FIX: Check for malloc failure to prevent NULL pointer dereference */
+    if (savedata == NULL) {
+        dbg(0, "export_savedata_file_unsecure:ERROR:malloc failed");
+        return;
+    }
+
     dbg(9, "export_savedata_file_unsecure:savedata=%p", savedata);
     tox_get_savedata(tox, (uint8_t *)savedata);
+
     FILE *f = fopen(export_full_path_of_file, "wb");
+    /* SECURITY FIX: Check for fopen failure to prevent passing NULL to fwrite/fclose which causes segfaults */
+    if (f == NULL) {
+        dbg(0, "export_savedata_file_unsecure:ERROR:fopen failed for %s", export_full_path_of_file);
+        free(savedata);
+        return;
+    }
+
     fwrite(savedata, size, 1, f);
     fclose(f);
 
-    if(savedata)
-    {
-        free(savedata);
-    }
+    free(savedata);
 }
 
 
