@@ -74,9 +74,10 @@ $(UNIT_BIN): $(RUNNER) harness.c $(TEST_SRCS) $(FUNC_SRCS)
 test: $(UNIT_BIN)
 > ./$(UNIT_BIN)
 
-# Show only failed tests
+# Show only failed tests with suite name
 failures: $(UNIT_BIN)
-> ./$(UNIT_BIN) 2>&1 | grep -E '\[FAIL\]' || true
+> ./$(UNIT_BIN) 2>&1 | grep -e 'SUITE:' -e '\[FAIL\]' 2>&1| sed -e 's# |  SUITE:#SUITE:#' | grep --no-group-separator -B1 '\[FAIL\]' || true
+
 
 # -----------------------------------------------------------
 # ASAN targets.
