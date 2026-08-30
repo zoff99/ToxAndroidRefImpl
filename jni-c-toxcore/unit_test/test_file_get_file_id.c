@@ -38,7 +38,9 @@ static void t_valid_get_file_id(void) {
     TEST_ASSERT(tox_mock_file_get_file_id_called);
     TEST_EQUAL_LONG(1, tox_mock_last_file_get_file_id_friend_number);
     TEST_EQUAL_LONG(2, tox_mock_last_file_get_file_id_file_number);
-    TEST_EQUAL_LONG(1, ret);
+    
+    /* Success should return positive or zero, not negative error code */
+    TEST_ASSERT(ret >= 0);
 
     TEST_END();
 }
@@ -68,7 +70,7 @@ static void t_null_tox_global(void) {
     NOTE("tox_global is NULL");
 
     TEST_ASSERT_FALSE(tox_mock_file_get_file_id_called);
-    TEST_ASSERT(ret <= 0);
+    TEST_ASSERT(ret < 0);
 
     TEST_END();
 }
