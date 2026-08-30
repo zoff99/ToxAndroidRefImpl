@@ -1,0 +1,12 @@
+*
+!.gitignore
+
+#########
+
+!extract_function.py
+!Makefile
+!harness.c
+!harness.h
+!runner.c
+!test_*.c
+!function_*.c
