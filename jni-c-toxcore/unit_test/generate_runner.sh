@@ -1,20 +1,43 @@
+#!/bin/sh
+
+set -e
+
+GROUPS="${1:-test_groups.txt}"
+
+cat <<HDR
+/* Generated from $GROUPS. Do not edit. */
 #include "harness.h"
 
-void run_friend_send_lossless_packet_tests(void);
-void run_messagev3_get_new_message_id_tests(void);
+HDR
+
+awk '
+    $1 !~ /^#/ && NF >= 2 {
+        printf "void run_%s_tests(void);\n", $1
+    }
+' "$GROUPS"
+
+cat <<MAIN
 
 int main(void) {
     printf("\n");
     printf("  ================================================================\n");
     printf("   JNI-C-TOXCORE UNIT TESTS\n");
     printf("   Source: ../jni-c-toxcore.c (extracted functions)\n");
-    printf("   Verifies: JNI boundary behavior and vulnerability docs\n");
+    printf("   Verifies: JNI boundary behavior and security invariants\n");
     printf("  ================================================================\n");
 
-    run_friend_send_lossless_packet_tests();
-    run_messagev3_get_new_message_id_tests();
+MAIN
+
+awk '
+    $1 !~ /^#/ && NF >= 2 {
+        printf "    run_%s_tests();\n", $1
+    }
+' "$GROUPS"
+
+cat <<END
 
     harness_print_report("jni-c-toxcore unit tests");
 
     return harness_result();
 }
+END

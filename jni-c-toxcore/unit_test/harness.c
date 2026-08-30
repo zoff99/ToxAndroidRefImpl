@@ -317,45 +317,274 @@ void jni_mock_set_string_null(void) {
 }
 
 /* =========================================================
- * Tox mock
+ * Tox mock state
  * ========================================================= */
 
-static int tox_mock_dummy_tox;
+static char tox_mock_dummy_tox;
 
-void* tox_global = NULL;
+Tox* tox_global = NULL;
 
+/* friend_send_lossless_packet */
 bool tox_mock_lossless_called = false;
 uint32_t tox_mock_last_lossless_friend_number = 0;
 const uint8_t* tox_mock_last_lossless_data = NULL;
 size_t tox_mock_last_lossless_length = 0;
-uint32_t tox_mock_lossless_return = 1;
-TOX_ERR_FRIEND_CUSTOM_PACKET tox_mock_lossless_error = TOX_ERR_FRIEND_CUSTOM_PACKET_OK;
+bool tox_mock_lossless_return = true;
+Tox_Err_Friend_Custom_Packet tox_mock_lossless_error = TOX_ERR_FRIEND_CUSTOM_PACKET_OK;
 
+/* messagev3_get_new_message_id */
 bool tox_mock_messagev3_id_called = false;
 bool tox_mock_messagev3_id_return = true;
 uint8_t* tox_mock_messagev3_id_last_buffer = NULL;
 
-void tox_mock_reset(void) {
-    tox_global = &tox_mock_dummy_tox;
+/* friend_add / toxid_hex_to_bin */
+bool tox_mock_hex_to_bin_called = false;
+char tox_mock_last_hex[512] = "";
+size_t tox_mock_last_hex_length = 0;
 
+bool tox_mock_friend_add_called = false;
+uint8_t tox_mock_last_friend_add_address[TOX_ADDRESS_SIZE];
+size_t tox_mock_last_friend_add_message_length = 0;
+uint32_t tox_mock_friend_add_return = 0;
+Tox_Err_Friend_Add tox_mock_friend_add_error = TOX_ERR_FRIEND_ADD_OK;
+
+/* friend_add_norequest / toxpk_hex_to_bin */
+bool tox_mock_pk_hex_to_bin_called = false;
+char tox_mock_last_pk_hex[512] = "";
+size_t tox_mock_last_pk_hex_length = 0;
+
+bool tox_mock_friend_add_norequest_called = false;
+uint8_t tox_mock_last_friend_add_norequest_key[TOX_PUBLIC_KEY_SIZE];
+uint32_t tox_mock_friend_add_norequest_return = 0;
+
+/* friend_send_message / messagev3_friend_send_message */
+bool tox_mock_friend_send_message_called = false;
+uint32_t tox_mock_last_friend_send_message_friend_number = 0;
+Tox_Message_Type tox_mock_last_friend_send_message_type = TOX_MESSAGE_TYPE_NORMAL;
+size_t tox_mock_last_friend_send_message_length = 0;
+uint32_t tox_mock_friend_send_message_return = 0;
+Tox_Err_Friend_Send_Message tox_mock_friend_send_message_error = TOX_ERR_FRIEND_SEND_MESSAGE_OK;
+
+/* xnet_pack_u32 */
+bool tox_mock_xnet_pack_u32_called = false;
+uint32_t tox_mock_last_xnet_pack_u32_value = 0;
+
+/* self_set_name */
+bool tox_mock_self_set_name_called = false;
+size_t tox_mock_self_set_name_length = 0;
+bool tox_mock_self_set_name_return = true;
+Tox_Err_Set_Info tox_mock_self_set_name_error = TOX_ERR_SET_INFO_OK;
+
+/* self_set_status_message */
+bool tox_mock_self_set_status_message_called = false;
+size_t tox_mock_self_set_status_message_length = 0;
+bool tox_mock_self_set_status_message_return = true;
+Tox_Err_Set_Info tox_mock_self_set_status_message_error = TOX_ERR_SET_INFO_OK;
+
+/* file_control */
+bool tox_mock_file_control_called = false;
+uint32_t tox_mock_last_file_control_friend_number = 0;
+uint32_t tox_mock_last_file_control_file_number = 0;
+Tox_File_Control tox_mock_last_file_control_control = TOX_FILE_CONTROL_RESUME;
+bool tox_mock_file_control_return = true;
+Tox_Err_File_Control tox_mock_file_control_error = TOX_ERR_FILE_CONTROL_OK;
+
+/* friend_delete */
+bool tox_mock_friend_delete_called = false;
+uint32_t tox_mock_last_friend_delete_friend_number = 0;
+bool tox_mock_friend_delete_return = true;
+Tox_Err_Friend_Delete tox_mock_friend_delete_error = TOX_ERR_FRIEND_DELETE_OK;
+
+/* friend_get_connection_ip */
+bool tox_mock_friend_get_connection_ip_called = false;
+uint32_t tox_mock_last_friend_get_connection_ip_friend_number = 0;
+char tox_mock_ip_to_write[TOX_MOCK_IP_BUFFER_SIZE] = "";
+
+/* c_safe_string_from_java */
+bool tox_mock_safe_string_called = false;
+size_t tox_mock_safe_string_last_length = 0;
+char tox_mock_safe_string_last[1024] = "";
+static char tox_mock_safe_string_dummy[] = "mock_jstring";
+
+/* self_get_name */
+size_t tox_mock_self_get_name_size_return = 0;
+bool tox_mock_self_get_name_called = false;
+char tox_mock_self_get_name_data[1024] = "";
+
+/* self_get_status_message */
+size_t tox_mock_self_get_status_message_size_return = 0;
+bool tox_mock_self_get_status_message_called = false;
+char tox_mock_self_get_status_message_data[1024] = "";
+
+/* self_set_status */
+bool tox_mock_self_set_status_called = false;
+int tox_mock_last_self_set_status = 0;
+
+/* friend_get_connection_status */
+bool tox_mock_friend_get_connection_status_called = false;
+int tox_mock_friend_get_connection_status_return = 0;
+uint32_t tox_mock_last_friend_get_connection_status_friend_number = 0;
+
+/* get_all_tcp_relays */
+bool tox_mock_get_all_tcp_relays_called = false;
+char tox_mock_get_all_tcp_relays_data[1024] = "";
+
+/* self_set_typing */
+bool tox_mock_self_set_typing_called = false;
+bool tox_mock_self_set_typing_return = true;
+uint32_t tox_mock_last_self_set_typing_friend_number = 0;
+
+/* friend_get_name */
+bool tox_mock_friend_get_name_called = false;
+size_t tox_mock_friend_get_name_size_return = 0;
+char tox_mock_friend_get_name_data[1024] = "";
+bool tox_mock_friend_get_name_return = true;
+uint32_t tox_mock_last_friend_get_name_friend_number = 0;
+
+/* self_get_address / self_get_public_key / self_get_secret_key */
+bool tox_mock_self_get_address_called = false;
+bool tox_mock_self_get_public_key_called = false;
+bool tox_mock_self_get_secret_key_called = false;
+
+/* =========================================================
+ * tox_mock_reset()
+ * ========================================================= */
+
+void tox_mock_reset(void) {
+    tox_global = (Tox*)&tox_mock_dummy_tox;
+
+    /* lossless */
     tox_mock_lossless_called = false;
     tox_mock_last_lossless_friend_number = 0;
     tox_mock_last_lossless_data = NULL;
     tox_mock_last_lossless_length = 0;
-    tox_mock_lossless_return = 1;
+    tox_mock_lossless_return = true;
     tox_mock_lossless_error = TOX_ERR_FRIEND_CUSTOM_PACKET_OK;
 
+    /* messagev3 id */
     tox_mock_messagev3_id_called = false;
     tox_mock_messagev3_id_return = true;
     tox_mock_messagev3_id_last_buffer = NULL;
+
+    /* friend_add / toxid_hex_to_bin */
+    tox_mock_hex_to_bin_called = false;
+    tox_mock_last_hex[0] = '\0';
+    tox_mock_last_hex_length = 0;
+
+    tox_mock_friend_add_called = false;
+    memset(tox_mock_last_friend_add_address, 0, sizeof(tox_mock_last_friend_add_address));
+    tox_mock_last_friend_add_message_length = 0;
+    tox_mock_friend_add_return = 0;
+    tox_mock_friend_add_error = TOX_ERR_FRIEND_ADD_OK;
+
+    /* friend_add_norequest / toxpk_hex_to_bin */
+    tox_mock_pk_hex_to_bin_called = false;
+    tox_mock_last_pk_hex[0] = '\0';
+    tox_mock_last_pk_hex_length = 0;
+
+    tox_mock_friend_add_norequest_called = false;
+    memset(tox_mock_last_friend_add_norequest_key, 0, sizeof(tox_mock_last_friend_add_norequest_key));
+    tox_mock_friend_add_norequest_return = 0;
+
+    /* friend_send_message / messagev3_friend_send_message */
+    tox_mock_friend_send_message_called = false;
+    tox_mock_last_friend_send_message_friend_number = 0;
+    tox_mock_last_friend_send_message_type = TOX_MESSAGE_TYPE_NORMAL;
+    tox_mock_last_friend_send_message_length = 0;
+    tox_mock_friend_send_message_return = 0;
+    tox_mock_friend_send_message_error = TOX_ERR_FRIEND_SEND_MESSAGE_OK;
+
+    /* xnet_pack_u32 */
+    tox_mock_xnet_pack_u32_called = false;
+    tox_mock_last_xnet_pack_u32_value = 0;
+
+    /* self_set_name */
+    tox_mock_self_set_name_called = false;
+    tox_mock_self_set_name_length = 0;
+    tox_mock_self_set_name_return = true;
+    tox_mock_self_set_name_error = TOX_ERR_SET_INFO_OK;
+
+    /* self_set_status_message */
+    tox_mock_self_set_status_message_called = false;
+    tox_mock_self_set_status_message_length = 0;
+    tox_mock_self_set_status_message_return = true;
+    tox_mock_self_set_status_message_error = TOX_ERR_SET_INFO_OK;
+
+    /* file_control */
+    tox_mock_file_control_called = false;
+    tox_mock_last_file_control_friend_number = 0;
+    tox_mock_last_file_control_file_number = 0;
+    tox_mock_last_file_control_control = TOX_FILE_CONTROL_RESUME;
+    tox_mock_file_control_return = true;
+    tox_mock_file_control_error = TOX_ERR_FILE_CONTROL_OK;
+
+    /* friend_delete */
+    tox_mock_friend_delete_called = false;
+    tox_mock_last_friend_delete_friend_number = 0;
+    tox_mock_friend_delete_return = true;
+    tox_mock_friend_delete_error = TOX_ERR_FRIEND_DELETE_OK;
+
+    /* friend_get_connection_ip */
+    tox_mock_friend_get_connection_ip_called = false;
+    tox_mock_last_friend_get_connection_ip_friend_number = 0;
+    tox_mock_ip_to_write[0] = '\0';
+
+    /* c_safe_string_from_java */
+    tox_mock_safe_string_called = false;
+    tox_mock_safe_string_last_length = 0;
+    tox_mock_safe_string_last[0] = '\0';
+
+    /* self_get_name */
+    tox_mock_self_get_name_size_return = 0;
+    tox_mock_self_get_name_called = false;
+    tox_mock_self_get_name_data[0] = '\0';
+
+    /* self_get_status_message */
+    tox_mock_self_get_status_message_size_return = 0;
+    tox_mock_self_get_status_message_called = false;
+    tox_mock_self_get_status_message_data[0] = '\0';
+
+    /* self_set_status */
+    tox_mock_self_set_status_called = false;
+    tox_mock_last_self_set_status = 0;
+
+    /* friend_get_connection_status */
+    tox_mock_friend_get_connection_status_called = false;
+    tox_mock_friend_get_connection_status_return = 0;
+    tox_mock_last_friend_get_connection_status_friend_number = 0;
+
+    /* get_all_tcp_relays */
+    tox_mock_get_all_tcp_relays_called = false;
+    tox_mock_get_all_tcp_relays_data[0] = '\0';
+
+    /* self_set_typing */
+    tox_mock_self_set_typing_called = false;
+    tox_mock_self_set_typing_return = true;
+    tox_mock_last_self_set_typing_friend_number = 0;
+
+    /* friend_get_name */
+    tox_mock_friend_get_name_called = false;
+    tox_mock_friend_get_name_size_return = 0;
+    tox_mock_friend_get_name_data[0] = '\0';
+    tox_mock_friend_get_name_return = true;
+    tox_mock_last_friend_get_name_friend_number = 0;
+
+    /* self_get_address / self_get_public_key / self_get_secret_key */
+    tox_mock_self_get_address_called = false;
+    tox_mock_self_get_public_key_called = false;
+    tox_mock_self_get_secret_key_called = false;
 }
 
-uint32_t tox_friend_send_lossless_packet(
-    void* tox,
+/* =========================================================
+ * Mocked Tox / helper functions
+ * ========================================================= */
+
+bool tox_friend_send_lossless_packet(
+    Tox* tox,
     uint32_t friend_number,
     const uint8_t* data,
     size_t length,
-    TOX_ERR_FRIEND_CUSTOM_PACKET* error
+    Tox_Err_Friend_Custom_Packet* error
 ) {
     (void)tox;
 
@@ -380,4 +609,416 @@ bool tox_messagev3_get_new_message_id(uint8_t* buffer) {
     }
 
     return tox_mock_messagev3_id_return;
+}
+
+int toxid_hex_to_bin(uint8_t* bin, const char* hex) {
+    tox_mock_hex_to_bin_called = true;
+
+    if (!hex) {
+        tox_mock_last_hex[0] = '\0';
+        tox_mock_last_hex_length = 0;
+        return -1;
+    }
+
+    size_t len = strlen(hex);
+
+    tox_mock_last_hex_length = len;
+    snprintf(tox_mock_last_hex, sizeof(tox_mock_last_hex), "%s", hex);
+
+    if (len != (size_t)(TOX_ADDRESS_SIZE * 2)) {
+        return -1;
+    }
+
+    if (bin) {
+        memset(bin, 0xAB, TOX_ADDRESS_SIZE);
+    }
+
+    return 0;
+}
+
+uint32_t tox_friend_add(
+    Tox* tox,
+    const uint8_t* address,
+    const uint8_t* message,
+    size_t length,
+    Tox_Err_Friend_Add* error
+) {
+    (void)tox;
+    (void)message;
+
+    tox_mock_friend_add_called = true;
+
+    if (address) {
+        memcpy(tox_mock_last_friend_add_address, address, TOX_ADDRESS_SIZE);
+    } else {
+        memset(tox_mock_last_friend_add_address, 0, TOX_ADDRESS_SIZE);
+    }
+
+    tox_mock_last_friend_add_message_length = length;
+
+    if (error) {
+        *error = tox_mock_friend_add_error;
+    }
+
+    return tox_mock_friend_add_return;
+}
+
+int toxpk_hex_to_bin(uint8_t* bin, const char* hex) {
+    tox_mock_pk_hex_to_bin_called = true;
+
+    if (!hex) {
+        tox_mock_last_pk_hex[0] = '\0';
+        tox_mock_last_pk_hex_length = 0;
+        return -1;
+    }
+
+    size_t len = strlen(hex);
+
+    tox_mock_last_pk_hex_length = len;
+    snprintf(tox_mock_last_pk_hex, sizeof(tox_mock_last_pk_hex), "%s", hex);
+
+    if (len != (size_t)(TOX_PUBLIC_KEY_SIZE * 2)) {
+        return -1;
+    }
+
+    if (bin) {
+        memset(bin, 0xCD, TOX_PUBLIC_KEY_SIZE);
+    }
+
+    return 0;
+}
+
+uint32_t tox_friend_add_norequest(
+    Tox* tox,
+    const uint8_t* public_key,
+    Tox_Err_Friend_Add* error
+) {
+    (void)tox;
+
+    tox_mock_friend_add_norequest_called = true;
+
+    if (public_key) {
+        memcpy(tox_mock_last_friend_add_norequest_key, public_key, TOX_PUBLIC_KEY_SIZE);
+    } else {
+        memset(tox_mock_last_friend_add_norequest_key, 0, TOX_PUBLIC_KEY_SIZE);
+    }
+
+    if (error) {
+        *error = TOX_ERR_FRIEND_ADD_OK;
+    }
+
+    return tox_mock_friend_add_norequest_return;
+}
+
+uint32_t tox_friend_send_message(
+    Tox* tox,
+    uint32_t friend_number,
+    Tox_Message_Type type,
+    const uint8_t* message,
+    size_t length,
+    Tox_Err_Friend_Send_Message* error
+) {
+    (void)tox;
+    (void)message;
+
+    tox_mock_friend_send_message_called = true;
+    tox_mock_last_friend_send_message_friend_number = friend_number;
+    tox_mock_last_friend_send_message_type = type;
+    tox_mock_last_friend_send_message_length = length;
+
+    if (error) {
+        *error = tox_mock_friend_send_message_error;
+    }
+
+    return tox_mock_friend_send_message_return;
+}
+
+void xnet_pack_u32(uint8_t* dst, uint32_t value) {
+    tox_mock_xnet_pack_u32_called = true;
+    tox_mock_last_xnet_pack_u32_value = value;
+
+    if (dst) {
+        dst[0] = (uint8_t)(value & 0xFF);
+        dst[1] = (uint8_t)((value >> 8) & 0xFF);
+        dst[2] = (uint8_t)((value >> 16) & 0xFF);
+        dst[3] = (uint8_t)((value >> 24) & 0xFF);
+    }
+}
+
+bool tox_self_set_name(
+    Tox* tox,
+    const uint8_t* name,
+    size_t length,
+    Tox_Err_Set_Info* error
+) {
+    (void)tox;
+    (void)name;
+
+    tox_mock_self_set_name_called = true;
+    tox_mock_self_set_name_length = length;
+
+    if (error) {
+        *error = tox_mock_self_set_name_error;
+    }
+
+    return tox_mock_self_set_name_return;
+}
+
+bool tox_self_set_status_message(
+    Tox* tox,
+    const uint8_t* status_message,
+    size_t length,
+    Tox_Err_Set_Info* error
+) {
+    (void)tox;
+    (void)status_message;
+
+    tox_mock_self_set_status_message_called = true;
+    tox_mock_self_set_status_message_length = length;
+
+    if (error) {
+        *error = tox_mock_self_set_status_message_error;
+    }
+
+    return tox_mock_self_set_status_message_return;
+}
+
+bool tox_file_control(
+    Tox* tox,
+    uint32_t friend_number,
+    uint32_t file_number,
+    Tox_File_Control control,
+    Tox_Err_File_Control* error
+) {
+    (void)tox;
+
+    tox_mock_file_control_called = true;
+    tox_mock_last_file_control_friend_number = friend_number;
+    tox_mock_last_file_control_file_number = file_number;
+    tox_mock_last_file_control_control = control;
+
+    if (error) {
+        *error = tox_mock_file_control_error;
+    }
+
+    return tox_mock_file_control_return;
+}
+
+bool tox_friend_delete(
+    Tox* tox,
+    uint32_t friend_number,
+    Tox_Err_Friend_Delete* error
+) {
+    (void)tox;
+
+    tox_mock_friend_delete_called = true;
+    tox_mock_last_friend_delete_friend_number = friend_number;
+
+    if (error) {
+        *error = tox_mock_friend_delete_error;
+    }
+
+    return tox_mock_friend_delete_return;
+}
+
+bool tox_utils_friend_delete(Tox *tox, uint32_t friend_number, Tox_Err_Friend_Delete *error) {
+    return tox_friend_delete(tox, friend_number, error);
+}
+
+void tox_friend_get_connection_ip(
+    const Tox* tox,
+    uint32_t friend_number,
+    uint8_t* ip_str
+) {
+    (void)tox;
+
+    tox_mock_friend_get_connection_ip_called = true;
+    tox_mock_last_friend_get_connection_ip_friend_number = friend_number;
+
+    if (ip_str) {
+        snprintf(
+            (char*)ip_str,
+            TOX_MOCK_IP_BUFFER_SIZE,
+            "%.*s",
+            TOX_MOCK_IP_BUFFER_SIZE - 1,
+            tox_mock_ip_to_write
+        );
+    }
+}
+
+size_t tox_self_get_name_size(const Tox* tox) {
+    (void)tox;
+
+    return tox_mock_self_get_name_size_return;
+}
+
+void tox_self_get_name(
+    const Tox* tox,
+    uint8_t* name
+) {
+    (void)tox;
+
+    tox_mock_self_get_name_called = true;
+
+    if (!name) {
+        return;
+    }
+
+    size_t len = tox_mock_self_get_name_size_return;
+    size_t data_len = strlen(tox_mock_self_get_name_data);
+
+    for (size_t i = 0; i < len; i++) {
+        if (i < data_len) {
+            name[i] = (uint8_t)tox_mock_self_get_name_data[i];
+        } else {
+            name[i] = (uint8_t)'A';
+        }
+    }
+}
+
+size_t tox_self_get_status_message_size(const Tox* tox) {
+    (void)tox;
+
+    return tox_mock_self_get_status_message_size_return;
+}
+
+void tox_self_get_status_message(
+    const Tox* tox,
+    uint8_t* message
+) {
+    (void)tox;
+
+    tox_mock_self_get_status_message_called = true;
+
+    if (!message) {
+        return;
+    }
+
+    size_t len = tox_mock_self_get_status_message_size_return;
+    size_t data_len = strlen(tox_mock_self_get_status_message_data);
+
+    for (size_t i = 0; i < len; i++) {
+        if (i < data_len) {
+            message[i] = (uint8_t)tox_mock_self_get_status_message_data[i];
+        } else {
+            message[i] = (uint8_t)'B';
+        }
+    }
+}
+
+/* self_set_status */
+void tox_self_set_status(Tox* tox, Tox_User_Status status) {
+    (void)tox;
+    tox_mock_self_set_status_called = true;
+    tox_mock_last_self_set_status = (int)status;
+}
+
+/* friend_get_connection_status */
+Tox_Connection tox_friend_get_connection_status(const Tox* tox, uint32_t friend_number, Tox_Err_Friend_Query* error) {
+    (void)tox;
+    tox_mock_friend_get_connection_status_called = true;
+    tox_mock_last_friend_get_connection_status_friend_number = friend_number;
+    if (error) *error = TOX_ERR_FRIEND_QUERY_OK;
+    return (Tox_Connection)tox_mock_friend_get_connection_status_return;
+}
+
+/* self_set_typing */
+bool tox_self_set_typing(Tox* tox, uint32_t friend_number, bool typing, Tox_Err_Set_Typing* error) {
+    (void)tox;
+    (void)typing;
+    tox_mock_self_set_typing_called = true;
+    tox_mock_last_self_set_typing_friend_number = friend_number;
+    if (error) *error = TOX_ERR_SET_TYPING_OK;
+    return tox_mock_self_set_typing_return;
+}
+
+/* self_get_address */
+void tox_self_get_address(const Tox* tox, uint8_t* address) {
+    (void)tox;
+    tox_mock_self_get_address_called = true;
+    if (address) {
+        memset(address, 0xAA, TOX_ADDRESS_SIZE);
+    }
+}
+
+/* self_get_public_key */
+void tox_self_get_public_key(const Tox* tox, uint8_t* public_key) {
+    (void)tox;
+    tox_mock_self_get_public_key_called = true;
+    if (public_key) {
+        memset(public_key, 0xBB, TOX_PUBLIC_KEY_SIZE);
+    }
+}
+
+/* self_get_secret_key */
+void tox_self_get_secret_key(const Tox* tox, uint8_t* secret_key) {
+    (void)tox;
+    tox_mock_self_get_secret_key_called = true;
+    if (secret_key) {
+        memset(secret_key, 0xCC, TOX_SECRET_KEY_SIZE);
+    }
+}
+
+/* friend_get_name_size */
+size_t tox_friend_get_name_size(const Tox* tox, uint32_t friend_number, Tox_Err_Friend_Query* error) {
+    (void)tox;
+    (void)friend_number;
+    if (error) *error = TOX_ERR_FRIEND_QUERY_OK;
+    return tox_mock_friend_get_name_size_return;
+}
+
+/* friend_get_name */
+bool tox_friend_get_name(const Tox* tox, uint32_t friend_number, uint8_t* name, Tox_Err_Friend_Query* error) {
+    (void)tox;
+    tox_mock_friend_get_name_called = true;
+    tox_mock_last_friend_get_name_friend_number = friend_number;
+    if (error) *error = TOX_ERR_FRIEND_QUERY_OK;
+    if (name) {
+        size_t len = tox_mock_friend_get_name_size_return;
+        size_t data_len = strlen(tox_mock_friend_get_name_data);
+        for (size_t i = 0; i < len; i++) {
+            if (i < data_len) {
+                name[i] = (uint8_t)tox_mock_friend_get_name_data[i];
+            } else {
+                name[i] = (uint8_t)'A';
+            }
+        }
+    }
+    return tox_mock_friend_get_name_return;
+}
+
+/* get_all_tcp_relays - adjust function name to match toxutil.h */
+char* tox_utils_get_all_tcp_relays(const Tox* tox) {
+    (void)tox;
+    tox_mock_get_all_tcp_relays_called = true;
+    return tox_mock_get_all_tcp_relays_data;
+}
+
+void tox_get_all_tcp_relays(const Tox* tox, char* report) {
+    (void)tox;
+    tox_mock_get_all_tcp_relays_called = true;
+
+    if (report) {
+        snprintf(report, 4096, "%s", tox_mock_get_all_tcp_relays_data);
+    }
+}
+
+jstring c_safe_string_from_java(char* str, size_t length) {
+    tox_mock_safe_string_called = true;
+    tox_mock_safe_string_last_length = length;
+
+    if (str) {
+        size_t copy = length;
+
+        if (copy >= sizeof(tox_mock_safe_string_last)) {
+            copy = sizeof(tox_mock_safe_string_last) - 1;
+        }
+
+        memcpy(tox_mock_safe_string_last, str, copy);
+        tox_mock_safe_string_last[copy] = '\0';
+    } else {
+        tox_mock_safe_string_last[0] = '\0';
+    }
+
+    return (jstring)tox_mock_safe_string_dummy;
 }

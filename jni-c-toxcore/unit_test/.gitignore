@@ -3,10 +3,16 @@
 
 #########
 
+!tox.h
+!toxutil.h
+!symbols.mk
+!runner_generated.c
+!new_test.sh
+!test_groups.txt
+!generate_runner.sh
 !extract_function.py
 !Makefile
 !harness.c
 !harness.h
-!runner.c
 !test_*.c
 !function_*.c
