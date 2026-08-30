@@ -21,6 +21,10 @@ void run_self_get_status_message_size_tests(void);
 void run_get_all_tcp_relays_tests(void);
 void run_self_set_typing_tests(void);
 void run_friend_get_name_tests(void);
+void run_file_send_tests(void);
+void run_file_send_chunk_tests(void);
+void run_file_seek_tests(void);
+void run_file_get_file_id_tests(void);
 
 int main(void) {
     printf("\n");
@@ -50,6 +54,10 @@ int main(void) {
     run_get_all_tcp_relays_tests();
     run_self_set_typing_tests();
     run_friend_get_name_tests();
+    run_file_send_tests();
+    run_file_send_chunk_tests();
+    run_file_seek_tests();
+    run_file_get_file_id_tests();
 
     harness_print_report("jni-c-toxcore unit tests");
 

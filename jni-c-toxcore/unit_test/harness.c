@@ -446,6 +446,38 @@ bool tox_mock_self_get_address_called = false;
 bool tox_mock_self_get_public_key_called = false;
 bool tox_mock_self_get_secret_key_called = false;
 
+/* file_send */
+bool tox_mock_file_send_called = false;
+uint32_t tox_mock_file_send_return = 0;
+TOX_ERR_FILE_SEND tox_mock_file_send_error = TOX_ERR_FILE_SEND_OK;
+uint32_t tox_mock_last_file_send_friend_number = 0;
+uint64_t tox_mock_last_file_send_file_size = 0;
+size_t tox_mock_last_file_send_filename_length = 0;
+
+/* file_send_chunk */
+bool tox_mock_file_send_chunk_called = false;
+bool tox_mock_file_send_chunk_return = true;
+TOX_ERR_FILE_SEND_CHUNK tox_mock_file_send_chunk_error = TOX_ERR_FILE_SEND_CHUNK_OK;
+uint32_t tox_mock_last_file_send_chunk_friend_number = 0;
+uint32_t tox_mock_last_file_send_chunk_file_number = 0;
+uint64_t tox_mock_last_file_send_chunk_position = 0;
+size_t tox_mock_last_file_send_chunk_length = 0;
+
+/* file_seek */
+bool tox_mock_file_seek_called = false;
+bool tox_mock_file_seek_return = true;
+TOX_ERR_FILE_SEEK tox_mock_file_seek_error = TOX_ERR_FILE_SEEK_OK;
+uint32_t tox_mock_last_file_seek_friend_number = 0;
+uint32_t tox_mock_last_file_seek_file_number = 0;
+uint64_t tox_mock_last_file_seek_position = 0;
+
+/* file_get_file_id */
+bool tox_mock_file_get_file_id_called = false;
+bool tox_mock_file_get_file_id_return = true;
+TOX_ERR_FILE_GET tox_mock_file_get_file_id_error = TOX_ERR_FILE_GET_OK;
+uint32_t tox_mock_last_file_get_file_id_friend_number = 0;
+uint32_t tox_mock_last_file_get_file_id_file_number = 0;
+
 /* =========================================================
  * tox_mock_reset()
  * ========================================================= */
@@ -573,6 +605,38 @@ void tox_mock_reset(void) {
     tox_mock_self_get_address_called = false;
     tox_mock_self_get_public_key_called = false;
     tox_mock_self_get_secret_key_called = false;
+
+    /* file_send */
+    tox_mock_file_send_called = false;
+    tox_mock_file_send_return = 0;
+    tox_mock_file_send_error = TOX_ERR_FILE_SEND_OK;
+    tox_mock_last_file_send_friend_number = 0;
+    tox_mock_last_file_send_file_size = 0;
+    tox_mock_last_file_send_filename_length = 0;
+
+    /* file_send_chunk */
+    tox_mock_file_send_chunk_called = false;
+    tox_mock_file_send_chunk_return = true;
+    tox_mock_file_send_chunk_error = TOX_ERR_FILE_SEND_CHUNK_OK;
+    tox_mock_last_file_send_chunk_friend_number = 0;
+    tox_mock_last_file_send_chunk_file_number = 0;
+    tox_mock_last_file_send_chunk_position = 0;
+    tox_mock_last_file_send_chunk_length = 0;
+
+    /* file_seek */
+    tox_mock_file_seek_called = false;
+    tox_mock_file_seek_return = true;
+    tox_mock_file_seek_error = TOX_ERR_FILE_SEEK_OK;
+    tox_mock_last_file_seek_friend_number = 0;
+    tox_mock_last_file_seek_file_number = 0;
+    tox_mock_last_file_seek_position = 0;
+
+    /* file_get_file_id */
+    tox_mock_file_get_file_id_called = false;
+    tox_mock_file_get_file_id_return = true;
+    tox_mock_file_get_file_id_error = TOX_ERR_FILE_GET_OK;
+    tox_mock_last_file_get_file_id_friend_number = 0;
+    tox_mock_last_file_get_file_id_file_number = 0;
 }
 
 /* =========================================================
@@ -1001,6 +1065,107 @@ void tox_get_all_tcp_relays(const Tox* tox, char* report) {
     if (report) {
         snprintf(report, 4096, "%s", tox_mock_get_all_tcp_relays_data);
     }
+}
+
+/* file_send */
+uint32_t tox_file_send(
+    Tox* tox,
+    uint32_t friend_number,
+    uint32_t kind,
+    uint64_t file_size,
+    const uint8_t* file_id,
+    const uint8_t* filename,
+    size_t filename_length,
+    TOX_ERR_FILE_SEND* error
+) {
+    (void)tox;
+    (void)kind;
+    (void)file_id;
+    (void)filename;
+
+    tox_mock_file_send_called = true;
+    tox_mock_last_file_send_friend_number = friend_number;
+    tox_mock_last_file_send_file_size = file_size;
+    tox_mock_last_file_send_filename_length = filename_length;
+
+    if (error) {
+        *error = tox_mock_file_send_error;
+    }
+
+    return tox_mock_file_send_return;
+}
+
+/* file_send_chunk */
+bool tox_file_send_chunk(
+    Tox* tox,
+    uint32_t friend_number,
+    uint32_t file_number,
+    uint64_t position,
+    const uint8_t* data,
+    size_t length,
+    TOX_ERR_FILE_SEND_CHUNK* error
+) {
+    (void)tox;
+    (void)data;
+
+    tox_mock_file_send_chunk_called = true;
+    tox_mock_last_file_send_chunk_friend_number = friend_number;
+    tox_mock_last_file_send_chunk_file_number = file_number;
+    tox_mock_last_file_send_chunk_position = position;
+    tox_mock_last_file_send_chunk_length = length;
+
+    if (error) {
+        *error = tox_mock_file_send_chunk_error;
+    }
+
+    return tox_mock_file_send_chunk_return;
+}
+
+/* file_seek */
+bool tox_file_seek(
+    Tox* tox,
+    uint32_t friend_number,
+    uint32_t file_number,
+    uint64_t position,
+    TOX_ERR_FILE_SEEK* error
+) {
+    (void)tox;
+
+    tox_mock_file_seek_called = true;
+    tox_mock_last_file_seek_friend_number = friend_number;
+    tox_mock_last_file_seek_file_number = file_number;
+    tox_mock_last_file_seek_position = position;
+
+    if (error) {
+        *error = tox_mock_file_seek_error;
+    }
+
+    return tox_mock_file_seek_return;
+}
+
+/* file_get_file_id */
+bool tox_file_get_file_id(
+    const Tox* tox,
+    uint32_t friend_number,
+    uint32_t file_number,
+    uint8_t* file_id,
+    TOX_ERR_FILE_GET* error
+) {
+    (void)tox;
+
+    tox_mock_file_get_file_id_called = true;
+    tox_mock_last_file_get_file_id_friend_number = friend_number;
+    tox_mock_last_file_get_file_id_file_number = file_number;
+
+    if (file_id) {
+        memset(file_id, 0xDD, TOX_FILE_ID_LENGTH);
+    }
+
+    if (error) {
+        *error = tox_mock_file_get_file_id_error;
+    }
+
+    return tox_mock_file_get_file_id_return;
 }
 
 jstring c_safe_string_from_java(char* str, size_t length) {

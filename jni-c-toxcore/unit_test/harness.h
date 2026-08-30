@@ -334,6 +334,50 @@ extern char tox_mock_friend_get_name_data[1024];
 extern bool tox_mock_friend_get_name_return;
 extern uint32_t tox_mock_last_friend_get_name_friend_number;
 
+/* ---------------------------------------------------------
+ * file_send
+ * --------------------------------------------------------- */
+
+extern bool tox_mock_file_send_called;
+extern uint32_t tox_mock_file_send_return;
+extern TOX_ERR_FILE_SEND tox_mock_file_send_error;
+extern uint32_t tox_mock_last_file_send_friend_number;
+extern uint64_t tox_mock_last_file_send_file_size;
+extern size_t tox_mock_last_file_send_filename_length;
+
+/* ---------------------------------------------------------
+ * file_send_chunk
+ * --------------------------------------------------------- */
+
+extern bool tox_mock_file_send_chunk_called;
+extern bool tox_mock_file_send_chunk_return;
+extern TOX_ERR_FILE_SEND_CHUNK tox_mock_file_send_chunk_error;
+extern uint32_t tox_mock_last_file_send_chunk_friend_number;
+extern uint32_t tox_mock_last_file_send_chunk_file_number;
+extern uint64_t tox_mock_last_file_send_chunk_position;
+extern size_t tox_mock_last_file_send_chunk_length;
+
+/* ---------------------------------------------------------
+ * file_seek
+ * --------------------------------------------------------- */
+
+extern bool tox_mock_file_seek_called;
+extern bool tox_mock_file_seek_return;
+extern TOX_ERR_FILE_SEEK tox_mock_file_seek_error;
+extern uint32_t tox_mock_last_file_seek_friend_number;
+extern uint32_t tox_mock_last_file_seek_file_number;
+extern uint64_t tox_mock_last_file_seek_position;
+
+/* ---------------------------------------------------------
+ * file_get_file_id
+ * --------------------------------------------------------- */
+
+extern bool tox_mock_file_get_file_id_called;
+extern bool tox_mock_file_get_file_id_return;
+extern TOX_ERR_FILE_GET tox_mock_file_get_file_id_error;
+extern uint32_t tox_mock_last_file_get_file_id_friend_number;
+extern uint32_t tox_mock_last_file_get_file_id_file_number;
+
 /* =========================================================
  * Mocked helper functions
  *
