@@ -74,6 +74,10 @@ $(UNIT_BIN): $(RUNNER) harness.c $(TEST_SRCS) $(FUNC_SRCS)
 test: $(UNIT_BIN)
 > ./$(UNIT_BIN)
 
+# Show only failed tests
+failures: $(UNIT_BIN)
+> ./$(UNIT_BIN) 2>&1 | grep -E '\[FAIL\]' || true
+
 # -----------------------------------------------------------
 # ASAN targets.
 # -----------------------------------------------------------
