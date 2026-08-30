@@ -112,10 +112,12 @@ void harness_test_end(void) {
     if (current_test_failed) {
         failed_tests++;
         suite_failed_tests++;
-        printf("  [FAIL] %-48.48s (%.3fs)\n", current_test_name, elapsed);
+        printf("  \033[31m[FAIL] %-48.48s (%.3fs)\033[0m\n",
+               current_test_name, elapsed);
     } else {
         passed_tests++;
-        printf("  [PASS] %-48.48s (%.3fs)\n", current_test_name, elapsed);
+        printf("  \033[32m[PASS] %-48.48s (%.3fs)\033[0m\n",
+               current_test_name, elapsed);
     }
 }
 
