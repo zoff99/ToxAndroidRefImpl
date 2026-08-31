@@ -1694,8 +1694,15 @@ void friend_sync_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *
 void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
         size_t length)
 {
-    JNIEnv *jnienv2;
-    jnienv2 = jni_getenv();
+    JNIEnv *jnienv2 = jni_getenv();
+
+    // CRITICAL SECURITY FIX: Check jnienv2 before dereferencing.
+    // jni_getenv() can return NULL if the thread is not attached to the JVM.
+    // Without this check, any subsequent JNI call will cause a NULL pointer
+    // dereference crash (SIGSEGV).
+    if (jnienv2 == NULL) {
+        return;
+    }
 
     uint8_t *message_copy = (uint8_t *)message;
     size_t new_length = length;
@@ -1707,7 +1714,7 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
     //        (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD),
     //        message);
 
-    if ((message) && (length > (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD)))
+    if ((message != NULL) && (length > (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD)))
     {
         int pos = length - (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD);
 
@@ -1758,7 +1765,9 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
 
     jstring js1 = c_safe_string_from_java((char *)message_copy, new_length);
 
-    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+    // Guard against NULL global references before calling Java
+    if (MainActivity != NULL && android_tox_callback_friend_message_cb_method != NULL) {
+          (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_friend_message_cb_method,
                                      (jlong)(unsigned long long)friend_number,
                                      (jint) type,
@@ -1766,15 +1775,18 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
                                      (jlong)(unsigned long long)new_length,
                                      msgV3_hash_jbuffer,
                                      (jlong)msgV3_timestamp);
+    }
 
-    (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+    if (js1 != NULL) {
+        (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+    }
 
     if(msgV3_hash_jbuffer != NULL)
     {
         (*jnienv2)->DeleteLocalRef(jnienv2, msgV3_hash_jbuffer);
     }
 
-    if (need_free == 1)
+    if (need_free == 1 && message_copy != NULL)
     {
         free(message_copy);
     }
@@ -1853,14 +1865,82 @@ void android_tox_callback_file_recv_cb(uint32_t friend_number, uint32_t file_num
     // dbg(9, "file_recv_cb:009");
 }
 
+/**
+ * Safely converts a C string (which may contain invalid UTF-8 or binary data)
+ * into a Java String using a dedicated Java-side sanitization method.
+ *
+ * WHY THIS IS USED:
+ * Standard JNI functions like NewStringUTF() will crash the JVM (SIGABRT) if
+ * the input C string contains invalid UTF-8 sequences. Tox core data (names,
+ * status messages, etc.) is not guaranteed to be valid UTF-8. By passing the
+ * raw bytes as a jbyteArray to a Java method (safe_string_method), we delegate
+ * the UTF-8 sanitization and fallback handling to Java, which is much more
+ * robust and prevents JVM crashes.
+ *
+ * SECURITY & ROBUSTNESS GUARANTEES:
+ * 1. NULL pointer checks for instr, jnienv, class, and method.
+ * 2. Length overflow protection: rejects lengths that exceed INT_MAX to prevent
+ *    integer truncation when casting to (int) for JNI calls.
+ * 3. Graceful degradation: returns NULL on any JNI failure (OOM, missing class)
+ *    instead of crashing the native process.
+ * 4. Proper cleanup: ensures the temporary jbyteArray is deleted even if the
+ *    Java method call fails or throws an exception.
+ *
+ * @param instr Pointer to the raw C string/byte array. Can be NULL if len == 0.
+ * @param len   Length of the string in bytes.
+ * @return      A valid jstring on success, or NULL on any failure.
+ */
 jstring c_safe_string_from_java(const char *instr, size_t len)
 {
-    JNIEnv *jnienv2;
-    jnienv2 = jni_getenv();
-    jbyteArray data = (*jnienv2)->NewByteArray(jnienv2, (int)len);
-    (*jnienv2)->SetByteArrayRegion(jnienv2, data, 0, (int)len, (const jbyte *)instr);
+    // 1. Handle zero-length strings explicitly to avoid NULL pointer issues in JNI
+    if (len == 0) {
+        JNIEnv *jnienv2 = jni_getenv();
+        if (jnienv2 == NULL) return NULL;
+        return (jstring)(*jnienv2)->NewStringUTF(jnienv2, "");
+    }
+
+    // 2. Reject NULL input for non-zero length to prevent segfaults
+    if (instr == NULL) {
+        return NULL;
+    }
+
+    // 3. Prevent integer overflow when casting size_t to jint (int)
+    if (len > (size_t)INT_MAX) {
+        return NULL;
+    }
+
+    JNIEnv *jnienv2 = jni_getenv();
+    if (jnienv2 == NULL) {
+        return NULL;
+    }
+
+    if (TrifaToxService_class == NULL || safe_string_method == NULL) {
+        return NULL;
+    }
+
+    // 5. Allocate byte array. May return NULL on OutOfMemoryError.
+    jbyteArray data = (*jnienv2)->NewByteArray(jnienv2, (jsize)len);
+    if (data == NULL) {
+        (*jnienv2)->ExceptionClear(jnienv2);
+        return NULL;
+    }
+
+    // 6. Copy data. Safe because len <= INT_MAX and instr != NULL
+    (*jnienv2)->SetByteArrayRegion(jnienv2, data, 0, (jsize)len, (const jbyte *)instr);
+
+    // 7. Call Java sanitization method
     jstring js1 = (jstring)(*jnienv2)->CallStaticObjectMethod(jnienv2, TrifaToxService_class, safe_string_method, data);
+
+    // Check for Java exceptions (e.g., if the Java method threw something)
+    if ((*jnienv2)->ExceptionCheck(jnienv2)) {
+        (*jnienv2)->ExceptionClear(jnienv2);
+        (*jnienv2)->DeleteLocalRef(jnienv2, data);
+        return NULL;
+    }
+
+    // 8. Clean up local reference
     (*jnienv2)->DeleteLocalRef(jnienv2, data);
+
     return js1;
 }
 
@@ -3568,6 +3648,21 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1get_1name(JNIEnv *e
         return NULL;
     }
 
+    // HIGH SECURITY FIX: Reject the operation if the name size exceeds TOX_MAX_NAME_LENGTH.
+    // tox_friend_get_name_size() returns the size of the friend's name stored in toxcore.
+    // Under normal conditions this is at most TOX_MAX_NAME_LENGTH (128 bytes), but if the
+    // toxcore state is corrupted or a future bug causes it to return an excessively large
+    // value, the VLA "char name[length + 1]" would allocate a massive buffer on the stack,
+    // causing stack exhaustion and a crash. If length is SIZE_MAX, then "length + 1" wraps
+    // to 0, creating a zero-length VLA which is undefined behavior in C.
+    // We must reject the operation entirely rather than trying to truncate, because
+    // tox_friend_get_name() will write the full name into the buffer, and truncating the
+    // length would cause a buffer overflow.
+    if(length > TOX_MAX_NAME_LENGTH)
+    {
+        return NULL;
+    }
+
     char name[length + 1];
     CLEAR(name);
 
@@ -4109,6 +4204,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1get_1new_1messag
         return -2;
     }
 
+    // CRITICAL SECURITY FIX: Validate that the direct buffer address is not NULL.
+    // GetDirectBufferAddress() can return NULL if the buffer is invalid or has been freed.
+    // Without this check, passing NULL to tox_messagev3_get_new_message_id() would cause
+    // a NULL pointer dereference, leading to a crash (Denial of Service vulnerability).
+    if (hash_buffer_c == NULL) {
+        return -2;  // Return error code for invalid buffer
+    }
+
     bool res = tox_messagev3_get_new_message_id(hash_buffer_c);
 
     if(res != true)
@@ -4286,6 +4389,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEn
         jlong friend_number, jint type, jobject message)
 {
     TRACE_LOGGER();
+    TOX_ERR_FRIEND_SEND_MESSAGE error;
+    uint32_t res = 0;
 
     if(tox_global == NULL)
     {
@@ -4299,15 +4404,31 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEn
     const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
 
     const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    // MEDIUM SECURITY FIX: NewStringUTF can return NULL on out-of-memory.
+    if(charsetName == NULL)
+    {
+        return (jlong)-98;
+    }
+
     const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)message, getBytes, charsetName);
     (*env)->DeleteLocalRef(env, charsetName);
 
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
     jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
 
-    TOX_ERR_FRIEND_SEND_MESSAGE error;
-    uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)pBytes,
-                                           (size_t)plength, &error);
+    // MEDIUM SECURITY FIX: Validate message length before passing to toxcore.
+    // The Tox protocol limits messages to TOX_MAX_MESSAGE_LENGTH.
+    // Without this check, a malicious caller could pass an arbitrarily long
+    // message string, which would be forwarded to toxcore.
+    if(plength > TOX_MAX_MESSAGE_LENGTH)
+    {
+        (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+        (*env)->DeleteLocalRef(env, stringJbytes);
+        return (jlong)-97;
+    }
+
+    res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)pBytes,
+                                  (size_t)plength, &error);
     (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
     (*env)->DeleteLocalRef(env, stringJbytes);
 
@@ -4316,9 +4437,23 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1message(JNIEn
     const char *message_str = NULL;
     // TODO: UTF-8
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
-    TOX_ERR_FRIEND_SEND_MESSAGE error;
-    uint32_t res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)message_str,
-                                           (size_t)strlen(message_str), &error);
+
+    // MEDIUM SECURITY FIX: GetStringUTFChars can return NULL on out-of-memory.
+    if(message_str == NULL)
+    {
+        return (jlong)-98;
+    }
+
+    // MEDIUM SECURITY FIX: Validate message length before passing to toxcore.
+    // The Tox protocol limits messages to TOX_MAX_MESSAGE_LENGTH.
+    if(strlen(message_str) > TOX_MAX_MESSAGE_LENGTH)
+    {
+        (*env)->ReleaseStringUTFChars(env, message, message_str);
+        return (jlong)-97;
+    }
+
+    res = tox_friend_send_message(tox_global, (uint32_t)friend_number, (int)type, (uint8_t *)message_str,
+                                  (size_t)strlen(message_str), &error);
     (*env)->ReleaseStringUTFChars(env, message, message_str);
 
 #endif
@@ -4379,9 +4514,20 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1send_1lossless_1pac
     }
 
     jbyte *data2 = (*env)->GetByteArrayElements(env, data, 0);
+
+    // CRITICAL SECURITY FIX: Validate that data_length does not exceed the actual Java array length.
+    // Without this check, a malicious caller could pass a data_length larger than the array,
+    // causing toxcore to read beyond the buffer boundary (Out-Of-Bounds Read vulnerability).
+    jsize actual_array_length = (*env)->GetArrayLength(env, data);
+    if (data_length > actual_array_length) {
+        (*env)->ReleaseByteArrayElements(env, data, data2, JNI_ABORT);
+        return (jlong)-99;  // Return error code for invalid length
+    }
+
     TOX_ERR_FRIEND_CUSTOM_PACKET error;
     uint32_t res = tox_friend_send_lossless_packet(tox_global, (uint32_t)friend_number, (const uint8_t *)data2,
                    (size_t)data_length, &error);
+
     (*env)->ReleaseByteArrayElements(env, data, data2, JNI_ABORT); /* abort to not copy back contents */
 
     if(error != 0)
@@ -4419,6 +4565,24 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv *env, jo
     // dbg(9, "add friend:public_key_str2 len=%d", strlen(public_key_str2));
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
     TOX_ERR_FRIEND_ADD error;
+
+    // HIGH SECURITY FIX: Validate hex string length before conversion.
+    // A Tox address must be exactly TOX_ADDRESS_SIZE * 2 hex characters (76 chars).
+    // Without this check, a hex string that is too long will cause toxid_hex_to_bin()
+    // to write beyond the public_key_bin buffer (buffer overflow vulnerability).
+    // A string that is too short may result in incomplete or incorrect conversion.
+    // Both cases can lead to memory corruption or adding the wrong friend.
+    if(public_key_str2 == NULL || strlen(public_key_str2) != TOX_ADDRESS_SIZE * 2)
+    {
+        if(public_key_str2)
+        {
+            free(public_key_str2);
+        }
+        (*env)->ReleaseStringUTFChars(env, message, message_str);
+        (*env)->ReleaseStringUTFChars(env, toxid_str, s);
+        return (jlong)-4;  // Return error code for invalid Tox ID length
+    }
+
     toxid_hex_to_bin(public_key_bin, public_key_str2);
     // dbg(9, "add friend:public_key_bin=%p", public_key_bin);
     // dbg(9, "add friend:public_key_bin len=%d", strlen(public_key_bin));
@@ -4460,12 +4624,48 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
         jobject public_key_str)
 {
     TRACE_LOGGER();
+
+    // MEDIUM SECURITY FIX: Check tox_global before using it.
+    // Without this check, calling tox_friend_add_norequest() with a NULL tox_global
+    // pointer would cause a NULL pointer dereference crash inside toxcore.
+    if(tox_global == NULL)
+    {
+        return (jlong)-3;
+    }
+
     unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
     char *public_key_str2 = NULL;
     const char *s = NULL;
     s = (*env)->GetStringUTFChars(env, public_key_str, NULL);
+
+    // HIGH SECURITY FIX: GetStringUTFChars can return NULL on out-of-memory
+    // or if the string cannot be converted. Without this check, passing NULL
+    // to strdup() is undefined behavior (crashes on glibc with SIGSEGV),
+    // and later strlen(public_key_str2) would also crash.
+    if(s == NULL)
+    {
+        return (jlong)-2;
+    }
+
     public_key_str2 = strdup(s);
     (*env)->ReleaseStringUTFChars(env, public_key_str, s);
+
+    // HIGH SECURITY FIX: Validate hex string length before conversion.
+    // A Tox public key must be exactly TOX_PUBLIC_KEY_SIZE * 2 hex characters (64 chars).
+    // Without this check, a hex string that is too long will cause toxpk_hex_to_bin()
+    // to write beyond the public_key_bin buffer (buffer overflow vulnerability).
+    // A string that is too short may result in incomplete or incorrect conversion.
+    // Both cases can lead to memory corruption or adding the wrong friend.
+    // Also check strdup() result - it can return NULL on OOM.
+    if(public_key_str2 == NULL || strlen(public_key_str2) != TOX_PUBLIC_KEY_SIZE * 2)
+    {
+        if(public_key_str2)
+        {
+            free(public_key_str2);
+        }
+        return (jlong)-1;
+    }
+
     toxpk_hex_to_bin(public_key_bin, public_key_str2);
     uint32_t friendnum = tox_friend_add_norequest(tox_global, (uint8_t *)public_key_bin, NULL);
 
@@ -4495,11 +4695,34 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env
     const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
 
     const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+
+    // MEDIUM SECURITY FIX: NewStringUTF can return NULL on out-of-memory.
+    // Without this check, passing NULL to CallObjectMethod would cause
+    // undefined behavior or a crash.
+    if(charsetName == NULL)
+    {
+        return (jint)-3;
+    }
+
     const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)name, getBytes, charsetName);
     (*env)->DeleteLocalRef(env, charsetName);
 
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
     jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    // MEDIUM SECURITY FIX: Validate name length before passing to toxcore.
+    // The Tox protocol limits names to TOX_MAX_NAME_LENGTH (128 bytes).
+    // Without this check, a malicious caller could pass an arbitrarily long
+    // name string, which would be forwarded to toxcore. While toxcore may
+    // reject it internally, passing oversized data wastes resources and
+    // could expose the system to edge cases or future vulnerabilities in
+    // the toxcore name handling path.
+    if(plength > TOX_MAX_NAME_LENGTH)
+    {
+        (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+        (*env)->DeleteLocalRef(env, stringJbytes);
+        return (jint)-2;
+    }
 
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_name(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
@@ -4514,6 +4737,25 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env
     const char *s = NULL;
     // TODO: UTF-8
     s = (*env)->GetStringUTFChars(env, name, NULL);
+
+    // MEDIUM SECURITY FIX: GetStringUTFChars can return NULL on out-of-memory.
+    // Without this check, passing NULL to strlen() would cause undefined
+    // behavior (crash), and ReleaseStringUTFChars with NULL is also invalid.
+    if(s == NULL)
+    {
+        return (jint)-4;
+    }
+
+    // MEDIUM SECURITY FIX: Validate name length before passing to toxcore.
+    // The Tox protocol limits names to TOX_MAX_NAME_LENGTH (128 bytes).
+    // Without this check, a malicious caller could pass an arbitrarily long
+    // name string, which would be forwarded to toxcore.
+    if(strlen(s) > TOX_MAX_NAME_LENGTH)
+    {
+        (*env)->ReleaseStringUTFChars(env, name, s);
+        return (jint)-2;
+    }
+
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_name(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
     (*env)->ReleaseStringUTFChars(env, name, s);
@@ -4538,11 +4780,27 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(
     const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
 
     const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    // MEDIUM SECURITY FIX: NewStringUTF can return NULL on out-of-memory.
+    if(charsetName == NULL)
+    {
+        return (jint)-3;
+    }
+
     const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)status_message, getBytes, charsetName);
     (*env)->DeleteLocalRef(env, charsetName);
 
     const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
     jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+
+    // MEDIUM SECURITY FIX: Validate status message length before passing to toxcore.
+    // The Tox protocol limits status messages to TOX_MAX_STATUS_MESSAGE_LENGTH (1007 bytes).
+    // Without this check, a malicious caller could pass an arbitrarily long string.
+    if(plength > TOX_MAX_STATUS_MESSAGE_LENGTH)
+    {
+        (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+        (*env)->DeleteLocalRef(env, stringJbytes);
+        return (jint)-2;
+    }
 
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_status_message(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
@@ -4557,6 +4815,21 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(
     const char *s = NULL;
     // TODO: UTF-8
     s = (*env)->GetStringUTFChars(env, status_message, NULL);
+
+    // MEDIUM SECURITY FIX: GetStringUTFChars can return NULL on out-of-memory.
+    if(s == NULL)
+    {
+        return (jint)-4;
+    }
+
+    // MEDIUM SECURITY FIX: Validate status message length before passing to toxcore.
+    // The Tox protocol limits status messages to TOX_MAX_STATUS_MESSAGE_LENGTH (1007 bytes).
+    if(strlen(s) > TOX_MAX_STATUS_MESSAGE_LENGTH)
+    {
+        (*env)->ReleaseStringUTFChars(env, status_message, s);
+        return (jint)-2;
+    }
+
     TOX_ERR_SET_INFO error;
     bool res = tox_self_set_status_message(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
     (*env)->ReleaseStringUTFChars(env, status_message, s);
@@ -4662,8 +4935,23 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1name(JNIEnv *env
     {
         return NULL;
     }
-
     size_t length = tox_self_get_name_size(tox_global);
+
+    // HIGH SECURITY FIX: Reject the operation if the name size exceeds TOX_MAX_NAME_LENGTH.
+    // tox_self_get_name_size() returns the size of the name stored in toxcore.
+    // Under normal conditions this is at most TOX_MAX_NAME_LENGTH (128 bytes), but if the
+    // toxcore state is corrupted or a future bug causes it to return an excessively large
+    // value, the VLA "char name[length + 1]" would allocate a massive buffer on the stack,
+    // causing stack exhaustion and a crash. If length is SIZE_MAX, then "length + 1" wraps
+    // to 0, creating a zero-length VLA which is undefined behavior in C.
+    // We must reject the operation entirely rather than trying to truncate, because
+    // tox_self_get_name() will write the full name into the buffer, and truncating the
+    // length would cause a buffer overflow.
+    if(length > TOX_MAX_NAME_LENGTH)
+    {
+        return NULL;
+    }
+
     char name[length + 1];
     CLEAR(name);
     // dbg(9, "name len=%d", (int)length);
@@ -4700,6 +4988,22 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(
 {
     TRACE_LOGGER();
     size_t length = tox_self_get_status_message_size(tox_global);
+
+    // HIGH SECURITY FIX: Reject the operation if the status message size exceeds TOX_MAX_STATUS_MESSAGE_LENGTH.
+    // tox_self_get_status_message_size() returns the size of the status message stored in toxcore.
+    // Under normal conditions this is at most TOX_MAX_STATUS_MESSAGE_LENGTH (1007 bytes), but if the
+    // toxcore state is corrupted or a future bug causes it to return an excessively large value,
+    // the VLA "char message[length + 1]" would allocate a massive buffer on the stack, causing
+    // stack exhaustion and a crash. If length is SIZE_MAX, then "length + 1" wraps to 0, creating
+    // a zero-length VLA which is undefined behavior in C.
+    // We must reject the operation entirely rather than trying to truncate, because
+    // tox_self_get_status_message() will write the full message into the buffer, and truncating
+    // the length would cause a buffer overflow.
+    if(length > TOX_MAX_STATUS_MESSAGE_LENGTH)
+    {
+        return NULL;
+    }
+
     char message[length + 1];
     CLEAR(message);
     tox_self_get_status_message(tox_global, (uint8_t *)message);
@@ -4956,6 +5260,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv *e
 
     data_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, data_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, data_buffer);
+
+    // CRITICAL SECURITY FIX #1: Validate that GetDirectBufferAddress() returned a non-NULL pointer.
+    // GetDirectBufferAddress() can return NULL even when data_buffer itself is non-NULL, for example
+    // if the DirectByteBuffer was freed, is invalid, or the JVM failed to map it.
+    // Without this check, passing NULL as data_buffer_c to tox_file_send_chunk() would cause a
+    // NULL pointer dereference inside toxcore, leading to an application crash (DoS vulnerability).
+    if(data_buffer_c == NULL)
+    {
+        return -22;
+    }
+
+    // CRITICAL SECURITY FIX #2: Validate that data_length does not exceed the buffer capacity.
+    // data_length comes from Java as a jlong parameter. Without this check, a malicious caller
+    // could pass a data_length larger than the actual buffer capacity, causing toxcore to read
+    // beyond the buffer boundary (Out-Of-Bounds Read vulnerability).
+    // This could lead to information disclosure (reading heap memory) or application crashes.
+    // Note: data_length is jlong (signed), so also reject negative values.
+    if(data_length < 0 || data_length > (jlong)capacity)
+    {
+        return -23;
+    }
+
     TOX_ERR_FILE_SEND_CHUNK error;
     bool res = tox_file_send_chunk(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (uint64_t)position,
                                    data_buffer_c,
