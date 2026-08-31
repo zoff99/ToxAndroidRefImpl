@@ -4109,6 +4109,14 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1messagev3_1get_1new_1messag
         return -2;
     }
 
+    // CRITICAL SECURITY FIX: Validate that the direct buffer address is not NULL.
+    // GetDirectBufferAddress() can return NULL if the buffer is invalid or has been freed.
+    // Without this check, passing NULL to tox_messagev3_get_new_message_id() would cause
+    // a NULL pointer dereference, leading to a crash (Denial of Service vulnerability).
+    if (hash_buffer_c == NULL) {
+        return -2;  // Return error code for invalid buffer
+    }
+
     bool res = tox_messagev3_get_new_message_id(hash_buffer_c);
 
     if(res != true)
