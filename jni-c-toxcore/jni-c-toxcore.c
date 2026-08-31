@@ -1694,8 +1694,15 @@ void friend_sync_message_v2_cb(Tox *tox, uint32_t friend_number, const uint8_t *
 void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_TYPE type, const uint8_t *message,
         size_t length)
 {
-    JNIEnv *jnienv2;
-    jnienv2 = jni_getenv();
+    JNIEnv *jnienv2 = jni_getenv();
+
+    // CRITICAL SECURITY FIX: Check jnienv2 before dereferencing.
+    // jni_getenv() can return NULL if the thread is not attached to the JVM.
+    // Without this check, any subsequent JNI call will cause a NULL pointer
+    // dereference crash (SIGSEGV).
+    if (jnienv2 == NULL) {
+        return;
+    }
 
     uint8_t *message_copy = (uint8_t *)message;
     size_t new_length = length;
@@ -1707,7 +1714,7 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
     //        (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD),
     //        message);
 
-    if ((message) && (length > (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD)))
+    if ((message != NULL) && (length > (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD)))
     {
         int pos = length - (TOX_MSGV3_MSGID_LENGTH + TOX_MSGV3_TIMESTAMP_LENGTH + TOX_MSGV3_GUARD);
 
@@ -1758,7 +1765,9 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
 
     jstring js1 = c_safe_string_from_java((char *)message_copy, new_length);
 
-    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+    // Guard against NULL global references before calling Java
+    if (MainActivity != NULL && android_tox_callback_friend_message_cb_method != NULL) {
+          (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
                                      android_tox_callback_friend_message_cb_method,
                                      (jlong)(unsigned long long)friend_number,
                                      (jint) type,
@@ -1766,15 +1775,18 @@ void android_tox_callback_friend_message_cb(uint32_t friend_number, TOX_MESSAGE_
                                      (jlong)(unsigned long long)new_length,
                                      msgV3_hash_jbuffer,
                                      (jlong)msgV3_timestamp);
+    }
 
-    (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+    if (js1 != NULL) {
+        (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+    }
 
     if(msgV3_hash_jbuffer != NULL)
     {
         (*jnienv2)->DeleteLocalRef(jnienv2, msgV3_hash_jbuffer);
     }
 
-    if (need_free == 1)
+    if (need_free == 1 && message_copy != NULL)
     {
         free(message_copy);
     }
