@@ -22,6 +22,24 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add(JNIEnv *env, jo
     // dbg(9, "add friend:public_key_str2 len=%d", strlen(public_key_str2));
     message_str = (*env)->GetStringUTFChars(env, message, NULL);
     TOX_ERR_FRIEND_ADD error;
+
+    // HIGH SECURITY FIX: Validate hex string length before conversion.
+    // A Tox address must be exactly TOX_ADDRESS_SIZE * 2 hex characters (76 chars).
+    // Without this check, a hex string that is too long will cause toxid_hex_to_bin()
+    // to write beyond the public_key_bin buffer (buffer overflow vulnerability).
+    // A string that is too short may result in incomplete or incorrect conversion.
+    // Both cases can lead to memory corruption or adding the wrong friend.
+    if(public_key_str2 == NULL || strlen(public_key_str2) != TOX_ADDRESS_SIZE * 2)
+    {
+        if(public_key_str2)
+        {
+            free(public_key_str2);
+        }
+        (*env)->ReleaseStringUTFChars(env, message, message_str);
+        (*env)->ReleaseStringUTFChars(env, toxid_str, s);
+        return (jlong)-4;  // Return error code for invalid Tox ID length
+    }
+
     toxid_hex_to_bin(public_key_bin, public_key_str2);
     // dbg(9, "add friend:public_key_bin=%p", public_key_bin);
     // dbg(9, "add friend:public_key_bin len=%d", strlen(public_key_bin));
