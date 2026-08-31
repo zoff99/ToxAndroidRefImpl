@@ -285,6 +285,73 @@ static jlong mock_GetDirectBufferCapacity(JNIEnv* env, jobject buf) {
     return ((MockDirectBuffer*)buf)->capacity;
 }
 
+/* Additional JNI mock functions for c_safe_string_from_java */
+bool mock_NewStringUTF_called = false;
+jstring mock_NewStringUTF_return = NULL;
+
+bool mock_NewByteArray_called = false;
+jbyteArray mock_NewByteArray_return = NULL;
+
+bool mock_SetByteArrayRegion_called = false;
+
+bool mock_CallStaticObjectMethod_called = false;
+jobject mock_CallStaticObjectMethod_return = NULL;
+
+bool mock_ExceptionCheck_called = false;
+jboolean mock_ExceptionCheck_return = JNI_FALSE;
+
+bool mock_ExceptionClear_called = false;
+
+bool mock_DeleteLocalRef_called = false;
+
+static jstring mock_NewStringUTF(JNIEnv* env, const char* str) {
+    (void)env;
+    (void)str;
+    mock_NewStringUTF_called = true;
+    return mock_NewStringUTF_return;
+}
+
+static jbyteArray mock_NewByteArray(JNIEnv* env, jsize length) {
+    (void)env;
+    (void)length;
+    mock_NewByteArray_called = true;
+    return mock_NewByteArray_return;
+}
+
+static void mock_SetByteArrayRegion(JNIEnv* env, jbyteArray array, jsize start, jsize len, const jbyte* buf) {
+    (void)env;
+    (void)array;
+    (void)start;
+    (void)len;
+    (void)buf;
+    mock_SetByteArrayRegion_called = true;
+}
+
+static jobject mock_CallStaticObjectMethod(JNIEnv* env, jclass clazz, jmethodID methodID, ...) {
+    (void)env;
+    (void)clazz;
+    (void)methodID;
+    mock_CallStaticObjectMethod_called = true;
+    return mock_CallStaticObjectMethod_return;
+}
+
+static jboolean mock_ExceptionCheck(JNIEnv* env) {
+    (void)env;
+    mock_ExceptionCheck_called = true;
+    return mock_ExceptionCheck_return;
+}
+
+static void mock_ExceptionClear(JNIEnv* env) {
+    (void)env;
+    mock_ExceptionClear_called = true;
+}
+
+static void mock_DeleteLocalRef(JNIEnv* env, jobject localRef) {
+    (void)env;
+    (void)localRef;
+    mock_DeleteLocalRef_called = true;
+}
+
 static struct JNINativeInterface_ jni_table = {
     mock_GetStringUTFChars,
     mock_ReleaseStringUTFChars,
@@ -292,7 +359,14 @@ static struct JNINativeInterface_ jni_table = {
     mock_ReleaseByteArrayElements,
     mock_GetArrayLength,
     mock_GetDirectBufferAddress,
-    mock_GetDirectBufferCapacity
+    mock_GetDirectBufferCapacity,
+    mock_NewStringUTF,
+    mock_NewByteArray,
+    mock_SetByteArrayRegion,
+    mock_CallStaticObjectMethod,
+    mock_ExceptionCheck,
+    mock_ExceptionClear,
+    mock_DeleteLocalRef
 };
 
 static JNIEnv jni_env_value = &jni_table;
@@ -404,7 +478,6 @@ char tox_mock_ip_to_write[TOX_MOCK_IP_BUFFER_SIZE] = "";
 bool tox_mock_safe_string_called = false;
 size_t tox_mock_safe_string_last_length = 0;
 char tox_mock_safe_string_last[1024] = "";
-static char tox_mock_safe_string_dummy[] = "mock_jstring";
 
 /* self_get_name */
 size_t tox_mock_self_get_name_size_return = 0;
@@ -477,6 +550,16 @@ bool tox_mock_file_get_file_id_return = true;
 TOX_ERR_FILE_GET tox_mock_file_get_file_id_error = TOX_ERR_FILE_GET_OK;
 uint32_t tox_mock_last_file_get_file_id_friend_number = 0;
 uint32_t tox_mock_last_file_get_file_id_file_number = 0;
+
+/* c_safe_string_from_java mock state */
+JNIEnv* mock_jni_env_ptr = NULL;
+jclass TrifaToxService_class = NULL;
+jmethodID safe_string_method = NULL;
+
+/* Mock jni_getenv to return our controlled environment */
+JNIEnv* jni_getenv(void) {
+    return mock_jni_env_ptr;
+}
 
 /* =========================================================
  * tox_mock_reset()
@@ -637,6 +720,22 @@ void tox_mock_reset(void) {
     tox_mock_file_get_file_id_error = TOX_ERR_FILE_GET_OK;
     tox_mock_last_file_get_file_id_friend_number = 0;
     tox_mock_last_file_get_file_id_file_number = 0;
+
+    /* c_safe_string_from_java mocks */
+    mock_jni_env_ptr = jni_mock_env();
+    TrifaToxService_class = NULL;
+    safe_string_method = NULL;
+    mock_NewStringUTF_called = false;
+    mock_NewStringUTF_return = NULL;
+    mock_NewByteArray_called = false;
+    mock_NewByteArray_return = NULL;
+    mock_SetByteArrayRegion_called = false;
+    mock_CallStaticObjectMethod_called = false;
+    mock_CallStaticObjectMethod_return = NULL;
+    mock_ExceptionCheck_called = false;
+    mock_ExceptionCheck_return = JNI_FALSE;
+    mock_ExceptionClear_called = false;
+    mock_DeleteLocalRef_called = false;
 }
 
 /* =========================================================
@@ -1166,24 +1265,4 @@ bool tox_file_get_file_id(
     }
 
     return tox_mock_file_get_file_id_return;
-}
-
-jstring c_safe_string_from_java(char* str, size_t length) {
-    tox_mock_safe_string_called = true;
-    tox_mock_safe_string_last_length = length;
-
-    if (str) {
-        size_t copy = length;
-
-        if (copy >= sizeof(tox_mock_safe_string_last)) {
-            copy = sizeof(tox_mock_safe_string_last) - 1;
-        }
-
-        memcpy(tox_mock_safe_string_last, str, copy);
-        tox_mock_safe_string_last[copy] = '\0';
-    } else {
-        tox_mock_safe_string_last[0] = '\0';
-    }
-
-    return (jstring)tox_mock_safe_string_dummy;
 }

@@ -15,6 +15,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <limits.h>
 
 /*
     Include the real tox.h and toxutil.h for enums, constants, and types.
@@ -58,6 +59,15 @@ struct JNINativeInterface_ {
 
     void* (*GetDirectBufferAddress)(JNIEnv* env, jobject buf);
     jlong (*GetDirectBufferCapacity)(JNIEnv* env, jobject buf);
+
+    /* Additional JNI functions for c_safe_string_from_java */
+    jstring (*NewStringUTF)(JNIEnv* env, const char* str);
+    jbyteArray (*NewByteArray)(JNIEnv* env, jsize length);
+    void (*SetByteArrayRegion)(JNIEnv* env, jbyteArray array, jsize start, jsize len, const jbyte* buf);
+    jobject (*CallStaticObjectMethod)(JNIEnv* env, jclass clazz, jmethodID methodID, ...);
+    jboolean (*ExceptionCheck)(JNIEnv* env);
+    void (*ExceptionClear)(JNIEnv* env);
+    void (*DeleteLocalRef)(JNIEnv* env, jobject localRef);
 };
 
 /* =========================================================
@@ -378,6 +388,44 @@ extern TOX_ERR_FILE_GET tox_mock_file_get_file_id_error;
 extern uint32_t tox_mock_last_file_get_file_id_friend_number;
 extern uint32_t tox_mock_last_file_get_file_id_file_number;
 
+/* ---------------------------------------------------------
+ * c_safe_string_from_java mocks
+ * --------------------------------------------------------- */
+
+extern JNIEnv* mock_jni_env_ptr;
+extern jclass TrifaToxService_class;
+extern jmethodID safe_string_method;
+
+extern bool mock_NewStringUTF_called;
+extern jstring mock_NewStringUTF_return;
+
+extern bool mock_NewByteArray_called;
+extern jbyteArray mock_NewByteArray_return;
+
+extern bool mock_SetByteArrayRegion_called;
+
+extern bool mock_CallStaticObjectMethod_called;
+extern jobject mock_CallStaticObjectMethod_return;
+
+extern bool mock_ExceptionCheck_called;
+extern jboolean mock_ExceptionCheck_return;
+
+extern bool mock_ExceptionClear_called;
+
+extern bool mock_DeleteLocalRef_called;
+
+/* Mock function implementations to be wired into your mock JNIEnv */
+jstring mock_NewStringUTF_fn(JNIEnv* env, const char* str);
+jbyteArray mock_NewByteArray_fn(JNIEnv* env, jsize length);
+void mock_SetByteArrayRegion_fn(JNIEnv* env, jbyteArray array, jsize start, jsize len, const jbyte* buf);
+jobject mock_CallStaticObjectMethod_fn(JNIEnv* env, jclass clazz, jmethodID methodID, ...);
+jboolean mock_ExceptionCheck_fn(JNIEnv* env);
+void mock_ExceptionClear_fn(JNIEnv* env);
+void mock_DeleteLocalRef_fn(JNIEnv* env, jobject localRef);
+
+/* Override jni_getenv for testing */
+JNIEnv* jni_getenv(void);
+
 /* =========================================================
  * Mocked helper functions
  *
@@ -389,7 +437,7 @@ extern uint32_t tox_mock_last_file_get_file_id_file_number;
 int toxid_hex_to_bin(uint8_t* bin, const char* hex);
 int toxpk_hex_to_bin(uint8_t* bin, const char* hex);
 void xnet_pack_u32(uint8_t* dst, uint32_t value);
-jstring c_safe_string_from_java(char* str, size_t length);
+jstring c_safe_string_from_java(const char* str, size_t length);
 bool tox_messagev3_get_new_message_id(uint8_t* buffer);
 
 /* =========================================================

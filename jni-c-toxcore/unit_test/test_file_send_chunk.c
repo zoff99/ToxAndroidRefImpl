@@ -74,6 +74,8 @@ static void t_null_tox_global(void) {
 
     NOTE("tox_global is NULL - function does not guard against this");
 
+    TEST_ASSERT(ret < 0);
+
     /* This will fail until the NULL check is added */
     TEST_ASSERT_FALSE(tox_mock_file_send_chunk_called);
 

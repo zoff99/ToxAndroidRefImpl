@@ -25,6 +25,7 @@ void run_file_send_tests(void);
 void run_file_send_chunk_tests(void);
 void run_file_seek_tests(void);
 void run_file_get_file_id_tests(void);
+void run_c_safe_string_from_java_tests(void);
 
 int main(void) {
     printf("\n");
@@ -58,6 +59,7 @@ int main(void) {
     run_file_send_chunk_tests();
     run_file_seek_tests();
     run_file_get_file_id_tests();
+    run_c_safe_string_from_java_tests();
 
     harness_print_report("jni-c-toxcore unit tests");
 
