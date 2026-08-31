@@ -4,6 +4,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1friend_1add_1norequest(JNIE
         jobject public_key_str)
 {
     TRACE_LOGGER();
+
+    // MEDIUM SECURITY FIX: Check tox_global before using it.
+    // Without this check, calling tox_friend_add_norequest() with a NULL tox_global
+    // pointer would cause a NULL pointer dereference crash inside toxcore.
+    if(tox_global == NULL)
+    {
+        return (jlong)-3;
+    }
+
     unsigned char public_key_bin[TOX_PUBLIC_KEY_SIZE];
     char *public_key_str2 = NULL;
     const char *s = NULL;
