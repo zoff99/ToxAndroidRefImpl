@@ -14,6 +14,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv *e
 
     data_buffer_c = (uint8_t *)(*env)->GetDirectBufferAddress(env, data_buffer);
     capacity = (*env)->GetDirectBufferCapacity(env, data_buffer);
+
+    // CRITICAL SECURITY FIX #1: Validate that GetDirectBufferAddress() returned a non-NULL pointer.
+    // GetDirectBufferAddress() can return NULL even when data_buffer itself is non-NULL, for example
+    // if the DirectByteBuffer was freed, is invalid, or the JVM failed to map it.
+    // Without this check, passing NULL as data_buffer_c to tox_file_send_chunk() would cause a
+    // NULL pointer dereference inside toxcore, leading to an application crash (DoS vulnerability).
+    if(data_buffer_c == NULL)
+    {
+        return -22;
+    }
+
+    // CRITICAL SECURITY FIX #2: Validate that data_length does not exceed the buffer capacity.
+    // data_length comes from Java as a jlong parameter. Without this check, a malicious caller
+    // could pass a data_length larger than the actual buffer capacity, causing toxcore to read
+    // beyond the buffer boundary (Out-Of-Bounds Read vulnerability).
+    // This could lead to information disclosure (reading heap memory) or application crashes.
+    // Note: data_length is jlong (signed), so also reject negative values.
+    if(data_length < 0 || data_length > (jlong)capacity)
+    {
+        return -23;
+    }
+
     TOX_ERR_FILE_SEND_CHUNK error;
     bool res = tox_file_send_chunk(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (uint64_t)position,
                                    data_buffer_c,
