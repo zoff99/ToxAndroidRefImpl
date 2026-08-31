@@ -304,6 +304,8 @@ bool mock_ExceptionClear_called = false;
 
 bool mock_DeleteLocalRef_called = false;
 
+bool mock_CallStaticVoidMethod_called = false;
+
 static jstring mock_NewStringUTF(JNIEnv* env, const char* str) {
     (void)env;
     (void)str;
@@ -352,21 +354,49 @@ static void mock_DeleteLocalRef(JNIEnv* env, jobject localRef) {
     mock_DeleteLocalRef_called = true;
 }
 
+void mock_CallStaticVoidMethod_fn(JNIEnv* env, jclass clazz, jmethodID methodID, ...) {
+    (void)env;
+    (void)clazz;
+    mock_CallStaticVoidMethod_called = true;
+
+    if (methodID == android_tox_callback_friend_message_cb_method) {
+        va_list args;
+        va_start(args, methodID);
+        jlong fn = va_arg(args, jlong);
+        jint type = va_arg(args, jint);
+        jstring js1 = va_arg(args, jstring);
+        jlong new_length = va_arg(args, jlong);
+        jbyteArray hash = va_arg(args, jbyteArray);
+        jlong timestamp = va_arg(args, jlong);
+        va_end(args);
+
+        tox_mock_callback_friend_message_called = true;
+        tox_mock_callback_friend_message_friend_number = (uint32_t)fn;
+        tox_mock_callback_friend_message_type = (Tox_Message_Type)type;
+        tox_mock_callback_friend_message_length = (size_t)new_length;
+        tox_mock_callback_friend_message_js1 = js1;
+        tox_mock_callback_friend_message_hash_jbuffer = hash;
+        tox_mock_callback_friend_message_timestamp = (uint32_t)timestamp;
+    }
+}
+
+/* Use designated initializers to avoid ordering issues */
 static struct JNINativeInterface_ jni_table = {
-    mock_GetStringUTFChars,
-    mock_ReleaseStringUTFChars,
-    mock_GetByteArrayElements,
-    mock_ReleaseByteArrayElements,
-    mock_GetArrayLength,
-    mock_GetDirectBufferAddress,
-    mock_GetDirectBufferCapacity,
-    mock_NewStringUTF,
-    mock_NewByteArray,
-    mock_SetByteArrayRegion,
-    mock_CallStaticObjectMethod,
-    mock_ExceptionCheck,
-    mock_ExceptionClear,
-    mock_DeleteLocalRef
+    .GetStringUTFChars = mock_GetStringUTFChars,
+    .ReleaseStringUTFChars = mock_ReleaseStringUTFChars,
+    .GetByteArrayElements = mock_GetByteArrayElements,
+    .ReleaseByteArrayElements = mock_ReleaseByteArrayElements,
+    .GetArrayLength = mock_GetArrayLength,
+    .GetDirectBufferAddress = mock_GetDirectBufferAddress,
+    .GetDirectBufferCapacity = mock_GetDirectBufferCapacity,
+    .CallStaticVoidMethod = mock_CallStaticVoidMethod_fn,
+    .NewStringUTF = mock_NewStringUTF,
+    .NewByteArray = mock_NewByteArray,
+    .SetByteArrayRegion = mock_SetByteArrayRegion,
+    .CallStaticObjectMethod = mock_CallStaticObjectMethod,
+    .ExceptionCheck = mock_ExceptionCheck,
+    .ExceptionClear = mock_ExceptionClear,
+    .DeleteLocalRef = mock_DeleteLocalRef,
 };
 
 static JNIEnv jni_env_value = &jni_table;
@@ -551,6 +581,26 @@ TOX_ERR_FILE_GET tox_mock_file_get_file_id_error = TOX_ERR_FILE_GET_OK;
 uint32_t tox_mock_last_file_get_file_id_friend_number = 0;
 uint32_t tox_mock_last_file_get_file_id_file_number = 0;
 
+/* android_tox_callback_friend_message mock state */
+bool tox_mock_callback_friend_message_called = false;
+uint32_t tox_mock_callback_friend_message_friend_number = 0;
+Tox_Message_Type tox_mock_callback_friend_message_type = TOX_MESSAGE_TYPE_NORMAL;
+size_t tox_mock_callback_friend_message_length = 0;
+jstring tox_mock_callback_friend_message_js1 = NULL;
+jbyteArray tox_mock_callback_friend_message_hash_jbuffer = NULL;
+uint32_t tox_mock_callback_friend_message_timestamp = 0;
+
+/* Global variables used by android_tox_callback_friend_message_cb */
+jclass MainActivity = NULL;
+jmethodID android_tox_callback_friend_message_cb_method = NULL;
+
+size_t xnet_unpack_u32(const uint8_t* src, uint32_t* value) {
+    if (src && value) {
+        *value = (uint32_t)src[0] | ((uint32_t)src[1] << 8) | ((uint32_t)src[2] << 16) | ((uint32_t)src[3] << 24);
+    }
+    return 4;
+}
+
 /* c_safe_string_from_java mock state */
 JNIEnv* mock_jni_env_ptr = NULL;
 jclass TrifaToxService_class = NULL;
@@ -720,6 +770,18 @@ void tox_mock_reset(void) {
     tox_mock_file_get_file_id_error = TOX_ERR_FILE_GET_OK;
     tox_mock_last_file_get_file_id_friend_number = 0;
     tox_mock_last_file_get_file_id_file_number = 0;
+
+    /* android_tox_callback_friend_message */
+    tox_mock_callback_friend_message_called = false;
+    tox_mock_callback_friend_message_friend_number = 0;
+    tox_mock_callback_friend_message_type = TOX_MESSAGE_TYPE_NORMAL;
+    tox_mock_callback_friend_message_length = 0;
+    tox_mock_callback_friend_message_js1 = NULL;
+    tox_mock_callback_friend_message_hash_jbuffer = NULL;
+    tox_mock_callback_friend_message_timestamp = 0;
+    MainActivity = NULL;
+    android_tox_callback_friend_message_cb_method = NULL;
+    mock_CallStaticVoidMethod_called = false;
 
     /* c_safe_string_from_java mocks */
     mock_jni_env_ptr = jni_mock_env();

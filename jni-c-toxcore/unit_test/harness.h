@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <limits.h>
+#include <stdarg.h>
 
 /*
     Include the real tox.h and toxutil.h for enums, constants, and types.
@@ -68,6 +69,9 @@ struct JNINativeInterface_ {
     jboolean (*ExceptionCheck)(JNIEnv* env);
     void (*ExceptionClear)(JNIEnv* env);
     void (*DeleteLocalRef)(JNIEnv* env, jobject localRef);
+    
+    /* JNI function for android_tox_callback_friend_message_cb */
+    void (*CallStaticVoidMethod)(JNIEnv* env, jclass clazz, jmethodID methodID, ...);
 };
 
 /* =========================================================
@@ -389,6 +393,25 @@ extern uint32_t tox_mock_last_file_get_file_id_friend_number;
 extern uint32_t tox_mock_last_file_get_file_id_file_number;
 
 /* ---------------------------------------------------------
+ * android_tox_callback_friend_message
+ * --------------------------------------------------------- */
+extern bool tox_mock_callback_friend_message_called;
+extern uint32_t tox_mock_callback_friend_message_friend_number;
+extern Tox_Message_Type tox_mock_callback_friend_message_type;
+extern size_t tox_mock_callback_friend_message_length;
+extern jstring tox_mock_callback_friend_message_js1;
+extern jbyteArray tox_mock_callback_friend_message_hash_jbuffer;
+extern uint32_t tox_mock_callback_friend_message_timestamp;
+
+extern bool mock_CallStaticVoidMethod_called;
+
+/* Global variables used by android_tox_callback_friend_message_cb */
+extern jclass MainActivity;
+extern jmethodID android_tox_callback_friend_message_cb_method;
+
+size_t xnet_unpack_u32(const uint8_t* src, uint32_t* value);
+
+/* ---------------------------------------------------------
  * c_safe_string_from_java mocks
  * --------------------------------------------------------- */
 
@@ -422,6 +445,7 @@ jobject mock_CallStaticObjectMethod_fn(JNIEnv* env, jclass clazz, jmethodID meth
 jboolean mock_ExceptionCheck_fn(JNIEnv* env);
 void mock_ExceptionClear_fn(JNIEnv* env);
 void mock_DeleteLocalRef_fn(JNIEnv* env, jobject localRef);
+void mock_CallStaticVoidMethod_fn(JNIEnv* env, jclass clazz, jmethodID methodID, ...);
 
 /* Override jni_getenv for testing */
 JNIEnv* jni_getenv(void);
