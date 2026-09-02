@@ -883,25 +883,43 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
     size_t size_enc = 0;
     uint8_t *savedata_enc = NULL;
 
-    size_t size = tox_get_savedata_size(tox);
-    // dbg(9, "update_savedata_file:tox_get_savedata_size=%d", (int)size);
+    // 1. Get initial estimate
+    size_t estimate = tox_get_savedata_size(tox);
 
-    if (size < 1)
+    if (estimate < 1)
     {
         dbg(9, "update_savedata_file:ERROR:save file zero bytes size!");
         return;
     }
 
-    char *savedata = calloc(1, size);
-    // dbg(9, "update_savedata_file:savedata=%p", savedata);
-    if (tox == NULL)
+    // 2. SECURITY FIX: Add a 1MB safety margin to prevent TOCTOU heap buffer overflow.
+    // The background tox_iterate thread might process network events that increase 
+    // the Tox state size between the estimate and the actual save.
+    size_t safe_size = estimate + (1024 * 1024); // 1 MB margin
+
+    char *savedata = calloc(1, safe_size);
+    if (savedata == NULL)
     {
-        dbg(9, "update_savedata_file:ERROR:tox ptr is NULL");
+        dbg(0, "update_savedata_file:ERROR:calloc failed for safe_size");
+        return;
+    }
+
+    // 3. Use the new thread-safe function that verifies the buffer size while holding the lock
+    size_t final_size = tox_get_savedata_len(tox, (uint8_t *)savedata, safe_size);
+
+    if (final_size == (size_t)-1)
+    {
+        // This should practically never happen with a 1MB margin, but handle it gracefully
+        dbg(0, "update_savedata_file:ERROR:buffer too small due to rapid state growth");
         free(savedata);
         return;
     }
-    tox_get_savedata(tox, (uint8_t *)savedata);
+
     char *full_path_filename = calloc(1, MAX_FULL_PATH_LENGTH);
+    if (full_path_filename == NULL) {
+        free(savedata);
+        return;
+    }
 
 #ifdef __MINGW32__
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_filename);
@@ -910,6 +928,11 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 #endif
 
     char *full_path_filename_tmp = malloc(MAX_FULL_PATH_LENGTH);
+    if (full_path_filename_tmp == NULL) {
+        free(savedata);
+        free(full_path_filename);
+        return;
+    }
 
 #ifdef __MINGW32__
     snprintf(full_path_filename_tmp, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_tmp_filename);
@@ -919,23 +942,29 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 
     if ((passphrase == NULL) || (passphrase_len == 0))
     {
-        // HINT: caller wants to save UN-encrypted
         dbg(9, "update_savedata_file:!!!!!!! saving UN-encrypted !!!!!!!");
         save_unencrypted = true;
     }
     else
     {
-        size_enc = size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
-        // dbg(9, "update_savedata_file:size_enc=%d", (int)size_enc);
+        // 4. Use final_size for encryption to ensure we encrypt exactly the valid data
+        size_enc = final_size + TOX_PASS_ENCRYPTION_EXTRA_LENGTH;
         savedata_enc = calloc(1, size_enc);
-        // dbg(9, "update_savedata_file:savedata_enc=%p", savedata_enc);
+        
+        if (savedata_enc == NULL) {
+            dbg(0, "update_savedata_file:ERROR:calloc failed for savedata_enc");
+            free(savedata);
+            free(full_path_filename);
+            free(full_path_filename_tmp);
+            return;
+        }
+
         TOX_ERR_ENCRYPTION error;
-        tox_pass_encrypt((const uint8_t *)savedata, size, passphrase, passphrase_len, savedata_enc, &error);
-        // dbg(9, "update_savedata_file:tox_pass_encrypt:%d", (int)error);
+        tox_pass_encrypt((const uint8_t *)savedata, final_size, passphrase, passphrase_len, savedata_enc, &error);
 
         if ((size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH) || (error != TOX_ERR_ENCRYPTION_OK))
         {
-            dbg(9, "update_savedata_file:ERROR:size_enc < TOX_PASS_ENCRYPTION_EXTRA_LENGTH or error != TOX_ERR_ENCRYPTION_OK: error=%d", (int)error);
+            dbg(9, "update_savedata_file:ERROR:encryption failed: error=%d", (int)error);
             free(savedata);
             free(savedata_enc);
             free(full_path_filename);
@@ -944,8 +973,7 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
         }
         else
         {
-            bool res = false;
-            res = tox_is_data_encrypted((const uint8_t *)savedata_enc);
+            bool res = tox_is_data_encrypted((const uint8_t *)savedata_enc);
             if (!res)
             {
                 dbg(9, "update_savedata_file:ERROR:savedata_enc is corrupted");
@@ -968,14 +996,17 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
         free(full_path_filename_tmp);
         return;
     }
+    
+    // 5. Write exactly final_size bytes. Zero file bloat.
     if (save_unencrypted)
     {
-        fwrite((const void *)savedata, size, 1, f);
+        fwrite((const void *)savedata, final_size, 1, f);
     }
     else
     {
         fwrite((const void *)savedata_enc, size_enc, 1, f);
     }
+    
     fseek(f, 0, SEEK_END);
     long fsize = ftell(f);
     // dbg(0, "update_savedata_file:ftell:savedata size=%ld", fsize);
@@ -1016,23 +1047,36 @@ void export_savedata_file_unsecure(const Tox *tox, const uint8_t *passphrase, si
         return;
     }
 
-    size_t size = tox_get_savedata_size(tox);
-    dbg(9, "export_savedata_file_unsecure:tox_get_savedata_size=%d", (int)size);
+    // 1. Get initial estimate
+    size_t estimate = tox_get_savedata_size(tox);
+    dbg(9, "export_savedata_file_unsecure:tox_get_savedata_size=%d", (int)estimate);
 
-    if (size < 1) {
+    if (estimate < 1) {
         dbg(9, "export_savedata_file_unsecure:ERROR:size < 1");
         return;
     }
 
-    char *savedata = malloc(size);
-    /* SECURITY FIX: Check for malloc failure to prevent NULL pointer dereference */
+    // 2. SECURITY FIX: Add a 1MB safety margin to prevent TOCTOU heap buffer overflow.
+    // The background tox_iterate thread might process network events that increase 
+    // the Tox state size between the estimate and the actual save.
+    size_t safe_size = estimate + (1024 * 1024); // 1 MB margin
+
+    char *savedata = calloc(1, safe_size);
+    /* SECURITY FIX: Check for calloc failure to prevent NULL pointer dereference */
     if (savedata == NULL) {
-        dbg(0, "export_savedata_file_unsecure:ERROR:malloc failed");
+        dbg(0, "export_savedata_file_unsecure:ERROR:calloc failed for safe_size");
         return;
     }
 
-    dbg(9, "export_savedata_file_unsecure:savedata=%p", savedata);
-    tox_get_savedata(tox, (uint8_t *)savedata);
+    // 3. Use the new thread-safe function that verifies the buffer size while holding the lock
+    size_t final_size = tox_get_savedata_len(tox, (uint8_t *)savedata, safe_size);
+
+    if (final_size == (size_t)-1) {
+        // This should practically never happen with a 1MB margin, but handle it gracefully
+        dbg(0, "export_savedata_file_unsecure:ERROR:buffer too small due to rapid state growth");
+        free(savedata);
+        return;
+    }
 
     FILE *f = fopen(export_full_path_of_file, "wb");
     /* SECURITY FIX: Check for fopen failure to prevent passing NULL to fwrite/fclose which causes segfaults */
@@ -1042,7 +1086,8 @@ void export_savedata_file_unsecure(const Tox *tox, const uint8_t *passphrase, si
         return;
     }
 
-    fwrite(savedata, size, 1, f);
+    // 4. Write exactly final_size bytes. Zero file bloat.
+    fwrite(savedata, final_size, 1, f);
     fclose(f);
 
     free(savedata);
