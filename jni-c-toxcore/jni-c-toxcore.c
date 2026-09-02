@@ -3593,6 +3593,17 @@ Java_com_zoffcc_applications_trifa_MainActivity_get_1my_1toxid(JNIEnv *env, jobj
     return result;
 }
 
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1network_1health(JNIEnv *env, jobject thiz)
+{
+    TRACE_LOGGER();
+    if(tox_global == NULL)
+    {
+        return TOX_NETWORK_HEALTH_UNKNOWN;
+    }
+
+    return (jint)tox_self_get_network_health(tox_global);
+}
 
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1connection_1status(JNIEnv *env, jobject thiz)
