@@ -144,6 +144,35 @@
                             android:scaleType="fitStart"
                             android:src="@drawable/about_icon_github"
                             android:visibility="visible" />
+
+                        <!-- [ADDED] Internet Connectivity Status Icon -->
+                        <ImageView
+                            android:id="@+id/internet_conn_icon"
+                            android:layout_width="32dp"
+                            android:layout_height="match_parent"
+                            android:layout_margin="0dp"
+                            android:paddingLeft="8dp"
+                            android:paddingTop="0dp"
+                            android:paddingRight="2dp"
+                            android:paddingBottom="0dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/ic_network_offline"
+                            android:contentDescription="Network Status"
+                            android:visibility="visible" />
+
+                        <!-- [ADDED] Internet Connectivity Status Text -->
+                        <TextView
+                            android:id="@+id/internet_conn_text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingLeft="2dp"
+                            android:paddingRight="5dp"
+                            android:text="offline"
+                            android:textColor="@color/md_black_1000"
+                            android:textSize="12sp"
+                            android:textStyle="bold"
+                            android:visibility="visible" />
+
                     </LinearLayout>
 
                 </RelativeLayout>

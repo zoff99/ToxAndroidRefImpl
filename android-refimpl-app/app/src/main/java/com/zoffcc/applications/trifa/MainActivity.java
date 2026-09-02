@@ -350,7 +350,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
     final static boolean VFS_CUSTOM_WRITE_CACHE = true; // set "true" for release builds
-    final static boolean DEBUG_USE_LOGFRIEND = false; // set "false" for release builds
+    final static boolean DEBUG_USE_LOGFRIEND = true; // set "false" for release builds
     public final static boolean DEBUG_BSN_ON_PROFILE = false; // set "false" for release builds
     // --------- global config ---------
     // --------- global config ---------
@@ -653,6 +653,24 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "M:STARTUP:setContentView start");
         setContentView(R.layout.activity_main);
         Log.i(TAG, "M:STARTUP:setContentView end");
+
+        try
+        {
+            ImageView connIcon = findViewById(R.id.internet_conn_icon);
+            TextView connText = findViewById(R.id.internet_conn_text);
+
+            // Safety check: make sure the views were actually found.
+            if (connIcon == null || connText == null)
+            {
+                Log.e(TAG, "internet_conn_icon / internet_conn_text not found in layout!");
+            }
+
+            ConnectionManager.attachUIViews(connIcon, connText);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
@@ -3472,6 +3490,9 @@ public class MainActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+
+        // Repopulate the views after rotation / returning to this screen.
+        ConnectionManager.refreshConnectivityUI();
 
         /*
          // **************************************

@@ -863,6 +863,9 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "is_tox_started=" + is_tox_started);
                 Log.i(TAG, "is_tox_started:==============================");
 
+                // Register the modern network monitor as soon as the app starts
+                ConnectionManager.registerModernNetworkCallback(getApplicationContext());
+
                 is_tox_started = true;
 
                 Runnable myRunnable = new Runnable()
@@ -1469,6 +1472,9 @@ public class TrifaToxService extends Service
                 append_logger_msg(TAG + "::" + "tox main loop stop");
 
                 tox_thread_starting_up = 2;
+
+                // Clean up the callback when the app is fully closed
+                ConnectionManager.unregisterModernNetworkCallback(getApplicationContext());
 
                 try
                 {

@@ -62,7 +62,7 @@ public class TRIFAGlobals
     final static String TRIFA_GITHUB_REPO_URL = "https://github.com/zoff99/ToxAndroidRefImpl";
     final static String TRIFA_GITHUB_NEW_ISSUE_URL = TRIFA_GITHUB_REPO_URL + "/issues/new";
 
-    static boolean HAVE_INTERNET_CONNECTIVITY = true;
+    static volatile boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_MIN_INTERVAL_SECS = 60; // 60 seconds
     final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =
             1000 * 60 * 2; // bootstrap again after 2 minutes offline
