@@ -741,6 +741,79 @@ public class ToxVars
     }
 
 
+    public static enum TOX_NETWORK_HEALTH
+    {
+
+        /**
+         * No established connections yet, or not enough data to determine health.
+         */
+        TOX_NETWORK_HEALTH_UNKNOWN(0),
+
+        /**
+         * Excellent connection: direct UDP, very low latency, almost no packet loss.
+         */
+        TOX_NETWORK_HEALTH_EXCELLENT(1),
+
+        /**
+         * Good connection: direct UDP, acceptable latency, minimal retransmits.
+         */
+        TOX_NETWORK_HEALTH_GOOD(2),
+
+        /**
+         * Fair connection: mixed TCP/UDP or moderate latency, some retransmits.
+         */
+        TOX_NETWORK_HEALTH_FAIR(3),
+
+        /**
+         * Poor connection: mostly TCP relays or high latency, frequent retransmits.
+         * The device may run warm on mobile networks.
+         */
+        TOX_NETWORK_HEALTH_POOR(4),
+
+        /**
+         * Bad connection: very high latency or severe packet loss, active congestion.
+         * The device will likely overheat on mobile networks.
+         */
+        TOX_NETWORK_HEALTH_BAD(5);
+
+        public int value;
+
+        private TOX_NETWORK_HEALTH(int value)
+        {
+            this.value = value;
+        }
+
+        public static String value_str(int value)
+        {
+            if (value == TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_UNKNOWN.value)
+            {
+                return "TOX_NETWORK_HEALTH_UNKNOWN";
+            }
+            else if (value == TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_EXCELLENT.value)
+            {
+                return "TOX_NETWORK_HEALTH_EXCELLENT";
+            }
+            else if (value == TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_GOOD.value)
+            {
+                return "TOX_NETWORK_HEALTH_GOOD";
+            }
+            else if (value == TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_FAIR.value)
+            {
+                return "TOX_NETWORK_HEALTH_FAIR";
+            }
+            else if (value == TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_POOR.value)
+            {
+                return "TOX_NETWORK_HEALTH_POOR";
+            }
+            else if (value == TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_BAD.value)
+            {
+                return "TOX_NETWORK_HEALTH_BAD";
+            }
+            return "UNKNOWN";
+        }
+
+    }
+
     public static enum TOX_ERR_OPTIONS_NEW
     {
 

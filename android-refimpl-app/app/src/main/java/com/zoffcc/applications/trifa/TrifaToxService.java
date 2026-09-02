@@ -30,9 +30,13 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.zoffcc.applications.nativeaudio.NativeAudio;
 import com.zoffcc.applications.sorm.FriendList;
@@ -41,6 +45,7 @@ import com.zoffcc.applications.sorm.OrmaDatabase;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -48,6 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import androidx.core.app.ServiceCompat;
+import androidx.core.content.ContextCompat;
 import info.guardianproject.iocipher.VirtualFileSystem;
 
 import static com.zoffcc.applications.nativeaudio.NativeAudio.set_aec_active;
@@ -140,6 +146,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_capabiliti
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_name_size;
+import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_network_health;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_get_status_message_size;
 import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_name;
@@ -190,6 +197,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_UNKNOWN;
 
 public class TrifaToxService extends Service
 {
@@ -214,6 +222,88 @@ public class TrifaToxService extends Service
     static long last_start_queued_fts_ms = -1;
     static boolean need_wakeup_now = false;
     static int tox_thread_starting_up = 0;
+
+    // [ADDED] WeakReferences to hold the Tox health UI views safely
+    private static WeakReference<ImageView> toxHealthIconRef = null;
+    private static WeakReference<TextView> toxHealthTextRef = null;
+
+    // [ADDED] Main-thread handler for UI updates
+    private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
+
+    /**
+     * [ADDED] Call this once after inflating the layout to attach the UI views.
+     */
+    public static void attachToxHealthUIViews(ImageView icon, TextView text)
+    {
+        toxHealthIconRef = new WeakReference<>(icon);
+        toxHealthTextRef = new WeakReference<>(text);
+    }
+
+    /**
+     * [ADDED] Thread-safe method to update the Tox health UI.
+     * Call this from your tox loop (background thread) - it will safely post to UI thread.
+     */
+    public static void updateToxHealthUI(int health)
+    {
+        MAIN_HANDLER.post(() -> applyToxHealthToViews(health));
+    }
+
+    // [ADDED] Applies the health state to the views. Runs on main thread.
+    private static void applyToxHealthToViews(int health)
+    {
+        if (toxHealthIconRef == null || toxHealthTextRef == null)
+        {
+            return;
+        }
+
+        final ImageView iconView = toxHealthIconRef.get();
+        final TextView textView = toxHealthTextRef.get();
+
+        if (iconView == null || textView == null)
+        {
+            return;
+        }
+
+        int iconRes;
+        String displayText;
+        int textColor;
+        Context context = iconView.getContext();
+
+        if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_EXCELLENT.value) {
+            displayText = "Excellent";
+            iconRes = R.drawable.ic_health_excellent;
+            textColor = ContextCompat.getColor(context, R.color.md_green_700);
+        }
+        else if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_GOOD.value) {
+            displayText = "Good";
+            iconRes = R.drawable.ic_health_good;
+            textColor = ContextCompat.getColor(context, R.color.md_light_green_700);
+        }
+        else if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_FAIR.value) {
+            displayText = "Fair";
+            iconRes = R.drawable.ic_health_fair;
+            textColor = ContextCompat.getColor(context, R.color.md_yellow_700);
+        }
+        else if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_POOR.value) {
+            displayText = "Poor";
+            iconRes = R.drawable.ic_health_poor;
+            textColor = ContextCompat.getColor(context, R.color.md_orange_700);
+        }
+        else if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_BAD.value) {
+            displayText = "Bad";
+            iconRes = R.drawable.ic_health_bad;
+            textColor = ContextCompat.getColor(context, R.color.md_red_700);
+        }
+        else { // UNKNOWN
+            displayText = "Unknown";
+            iconRes = R.drawable.ic_health_unknown;
+            textColor = ContextCompat.getColor(context, R.color.md_grey_700);
+        }
+
+        iconView.setImageResource(iconRes);
+        textView.setText(displayText);
+        textView.setTextColor(textColor);
+    }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId)
@@ -1300,6 +1390,20 @@ public class TrifaToxService extends Service
                 Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp +
                            " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
 
+                int current_health_init = tox_self_get_network_health();
+                String health_text_init = ToxVars.TOX_NETWORK_HEALTH.value_str(current_health_init).replace("TOX_NETWORK_HEALTH_", "");
+                append_logger_msg(TAG + "::" + "network health initial value: " + current_health_init + " (" + health_text_init + ")");
+                try
+                {
+                    updateToxHealthUI(current_health_init);
+                }
+                catch(Exception e)
+                {
+                }
+
+                // [ADDED] Track when we last checked network health
+                long last_health_check_ms = 0;
+                int last_network_health = current_health_init;
 
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -1308,6 +1412,7 @@ public class TrifaToxService extends Service
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 append_logger_msg(TAG + "::" + "tox main loop START");
                 tox_thread_starting_up = 1;
+
                 while (!stop_me)
                 {
                     try
@@ -1410,6 +1515,37 @@ public class TrifaToxService extends Service
 
                     MainActivity.tox_iterate();
 
+                    // [ADDED] Check network health every 3 seconds
+                    long current_time_ms = System.currentTimeMillis();
+                    if ((current_time_ms - last_health_check_ms) >= 3000)
+                    {
+                        last_health_check_ms = current_time_ms;
+
+                        try
+                        {
+                            int current_health = tox_self_get_network_health();
+
+                            if (current_health != last_network_health)
+                            {
+                                String health_text = ToxVars.TOX_NETWORK_HEALTH.value_str(current_health).replace("TOX_NETWORK_HEALTH_", "");
+                                append_logger_msg(TAG + "::" + "network health changed: " + last_network_health + " -> " + current_health + " (" + health_text + ")");
+                                last_network_health = current_health;
+
+                                try
+                                {
+                                    updateToxHealthUI(current_health);
+                                }
+                                catch(Exception e)
+                                {
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            append_logger_msg(TAG + "::" + "error checking network health: " + e.getMessage());
+                        }
+                    }
+
                     if ((Callstate.state != 0) || (Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
                     {
                         if ((Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
@@ -1451,6 +1587,29 @@ public class TrifaToxService extends Service
                         {
                             tox_iteration_interval_ms = Math.max(TOX_MIN_NORMAL_ITERATE_DELTA_MS, MainActivity.tox_iteration_interval());
                         }
+
+                        /*
+                        // [ADDED] Apply health-based throttling on top of the computed interval
+                        // This only applies when NOT in active calls or file transfers
+                        int health = MainActivity.tox_self_get_network_health();
+                        switch (health) {
+                            case TOX_NETWORK_HEALTH_BAD:
+                                // BAD: 2 seconds max to let radio idle
+                                tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 2000);
+                                break;
+                            case TOX_NETWORK_HEALTH_POOR:
+                                // POOR: 1 second max
+                                tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 1000);
+                                break;
+                            case TOX_NETWORK_HEALTH_FAIR:
+                                // FAIR: 500ms max
+                                tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 500);
+                                break;
+                            default:
+                                // EXCELLENT, GOOD, UNKNOWN: use computed interval as-is
+                                break;
+                        }
+                         */
                     }
 
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)

@@ -316,11 +316,13 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STA
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_BUSY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE;
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
+import static com.zoffcc.applications.trifa.TrifaToxService.attachToxHealthUIViews;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.manually_logged_out;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.resend_old_messages;
 import static com.zoffcc.applications.trifa.TrifaToxService.resend_v3_messages;
+import static com.zoffcc.applications.trifa.TrifaToxService.updateToxHealthUI;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
 /*
@@ -350,7 +352,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
     final static boolean VFS_CUSTOM_WRITE_CACHE = true; // set "true" for release builds
-    final static boolean DEBUG_USE_LOGFRIEND = true; // set "false" for release builds
+    final static boolean DEBUG_USE_LOGFRIEND = false; // set "false" for release builds
     public final static boolean DEBUG_BSN_ON_PROFILE = false; // set "false" for release builds
     // --------- global config ---------
     // --------- global config ---------
@@ -671,6 +673,28 @@ public class MainActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+
+        try
+        {
+            // Attach internet connectivity UI
+            ImageView connIcon = findViewById(R.id.internet_conn_icon);
+            TextView connText = findViewById(R.id.internet_conn_text);
+            ConnectionManager.attachUIViews(connIcon, connText);
+
+            // [ADDED] Attach Tox health UI
+            ImageView toxHealthIcon = findViewById(R.id.tox_health_icon);
+            TextView toxHealthText = findViewById(R.id.tox_health_text);
+            attachToxHealthUIViews(toxHealthIcon, toxHealthText);
+
+            // [ADDED] Set initial health state
+            int current_health_init = tox_self_get_network_health();
+            updateToxHealthUI(current_health_init);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
 
         mt = (TextView) this.findViewById(R.id.main_maintext);
         mt.setText("...");
@@ -4355,6 +4379,8 @@ public class MainActivity extends AppCompatActivity
     public static native int add_tcp_relay_single(String ip, String key_hex, long port);
 
     public static native int bootstrap_single(String ip, String key_hex, long port);
+
+    public static native int tox_self_get_network_health();
 
     public static native int tox_self_get_connection_status();
 
