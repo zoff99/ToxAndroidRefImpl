@@ -207,6 +207,33 @@
                                 android:gravity="center" />
                         </LinearLayout>
 
+                        <View
+                            android:layout_width="0dp"
+                            android:layout_height="0dp"
+                            android:layout_weight="1" />
+
+                        <!-- [ADDED] Search Icon -->
+                        <ImageView
+                            android:id="@+id/main_search_icon"
+                            android:layout_width="60dp"
+                            android:layout_height="match_parent"
+                            android:layout_margin="0dp"
+                            android:paddingLeft="4dp"
+                            android:paddingTop="0dp"
+                            android:paddingRight="8dp"
+                            android:paddingBottom="0dp"
+                            android:scaleType="fitCenter"
+                            android:src="@drawable/ic_search"
+                            android:contentDescription="Search friends"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:background="?android:attr/selectableItemBackgroundBorderless"
+                            android:tooltipText="Search / filter friend list"
+                            tools:ignore="HardcodedText" />
+
+                        <View
+                            android:layout_width="6dp"
+                            android:layout_height="0dp" />
                     </LinearLayout>
 
                 </RelativeLayout>
