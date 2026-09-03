@@ -93,7 +93,8 @@
                         android:id="@+id/icon_container"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:orientation="horizontal">
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical">
 
                         <TextView
                             android:id="@+id/main_maintext"
@@ -145,66 +146,66 @@
                             android:src="@drawable/about_icon_github"
                             android:visibility="visible" />
 
-                        <!-- [ADDED] Internet Connectivity Status Icon -->
-                        <ImageView
-                            android:id="@+id/internet_conn_icon"
-                            android:layout_width="32dp"
+                        <!-- [ADDED] Internet Connectivity Status Container -->
+                        <LinearLayout
+                            android:id="@+id/internet_conn_container"
+                            android:layout_width="60dp"
                             android:layout_height="match_parent"
-                            android:layout_margin="0dp"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:tooltipText="Android network validation: shows if the OS confirmed internet access"
                             android:paddingLeft="8dp"
-                            android:paddingTop="0dp"
-                            android:paddingRight="2dp"
-                            android:paddingBottom="0dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_network_offline"
-                            android:contentDescription="Network Status"
-                            android:tooltipText="Android network validation: shows if the OS confirmed internet access"
-                            android:visibility="visible"
-                            tools:ignore="HardcodedText" />
+                            android:paddingRight="4dp">
 
-                        <!-- [ADDED] Internet Connectivity Status Text -->
-                        <TextView
-                            android:id="@+id/internet_conn_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="2dp"
-                            android:paddingRight="5dp"
-                            android:text="offline"
-                            android:tooltipText="Android network validation: shows if the OS confirmed internet access"
-                            android:textColor="@color/md_black_1000"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:visibility="visible" />
+                            <ImageView
+                                android:id="@+id/internet_conn_icon"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_network_offline"
+                                android:contentDescription="Network Status"
+                                tools:ignore="HardcodedText" />
 
-                        <!-- [ADDED] Tox Network Health Status Icon -->
-                        <ImageView
-                            android:id="@+id/tox_health_icon"
-                            android:layout_width="32dp"
+                            <TextView
+                                android:id="@+id/internet_conn_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="off"
+                                android:textColor="@color/md_black_1000"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:gravity="center" />
+                        </LinearLayout>
+
+                        <!-- [ADDED] Tox Network Health Status Container -->
+                        <LinearLayout
+                            android:id="@+id/tox_health_container"
+                            android:layout_width="60dp"
                             android:layout_height="match_parent"
-                            android:layout_margin="0dp"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:tooltipText="Toxcore link quality: RTT, packet loss, and connection type"
                             android:paddingLeft="8dp"
-                            android:paddingTop="0dp"
-                            android:paddingRight="2dp"
-                            android:paddingBottom="0dp"
-                            android:scaleType="fitCenter"
-                            android:src="@drawable/ic_health_unknown"
-                            android:contentDescription="Tox Network Health"
-                            android:tooltipText="Toxcore link quality: RTT, packet loss, and connection type"
-                            android:visibility="visible" />
+                            android:paddingRight="4dp">
 
-                        <!-- [ADDED] Tox Network Health Status Text -->
-                        <TextView
-                            android:id="@+id/tox_health_text"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingLeft="2dp"
-                            android:paddingRight="5dp"
-                            android:text="unknown"
-                            android:tooltipText="Toxcore link quality: RTT, packet loss, and connection type"
-                            android:textColor="@color/md_black_1000"
-                            android:textSize="12sp"
-                            android:textStyle="bold"
-                            android:visibility="visible" />
+                            <ImageView
+                                android:id="@+id/tox_health_icon"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_health_unknown"
+                                android:contentDescription="Tox Network Health" />
+
+                            <TextView
+                                android:id="@+id/tox_health_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="?"
+                                android:textColor="@color/md_black_1000"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:gravity="center" />
+                        </LinearLayout>
 
                     </LinearLayout>
 

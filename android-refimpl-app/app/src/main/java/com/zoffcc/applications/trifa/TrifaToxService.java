@@ -270,32 +270,32 @@ public class TrifaToxService extends Service
         Context context = iconView.getContext();
 
         if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_EXCELLENT.value) {
-            displayText = "Excellent";
+            displayText = "exc";
             iconRes = R.drawable.ic_health_excellent;
             textColor = ContextCompat.getColor(context, R.color.md_green_700);
         }
         else if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_GOOD.value) {
-            displayText = "Good";
+            displayText = "good";
             iconRes = R.drawable.ic_health_good;
             textColor = ContextCompat.getColor(context, R.color.md_light_green_700);
         }
         else if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_FAIR.value) {
-            displayText = "Fair";
+            displayText = "fair";
             iconRes = R.drawable.ic_health_fair;
             textColor = ContextCompat.getColor(context, R.color.md_yellow_700);
         }
         else if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_POOR.value) {
-            displayText = "Poor";
+            displayText = "poor";
             iconRes = R.drawable.ic_health_poor;
             textColor = ContextCompat.getColor(context, R.color.md_orange_700);
         }
         else if (health == ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_BAD.value) {
-            displayText = "Bad";
+            displayText = "bad";
             iconRes = R.drawable.ic_health_bad;
             textColor = ContextCompat.getColor(context, R.color.md_red_700);
         }
         else { // UNKNOWN
-            displayText = "Unknown";
+            displayText = "?";
             iconRes = R.drawable.ic_health_unknown;
             textColor = ContextCompat.getColor(context, R.color.md_grey_700);
         }

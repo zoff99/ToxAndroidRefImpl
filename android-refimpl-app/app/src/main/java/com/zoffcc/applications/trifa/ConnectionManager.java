@@ -250,13 +250,13 @@ public class ConnectionManager extends BroadcastReceiver
         switch (state)
         {
             case REGISTERED:
-                displayText = "Checking…";
+                displayText = "Checking";
                 iconRes = R.drawable.ic_network_unknown;
                 textColor = ContextCompat.getColor(context, R.color.md_blue_700);
                 break;
 
             case UNREGISTERED:
-                displayText = "Monitor off";
+                displayText = "Mon. off";
                 iconRes = R.drawable.ic_network_unknown;
                 textColor = ContextCompat.getColor(context, R.color.md_grey_700);
                 break;
@@ -268,7 +268,7 @@ public class ConnectionManager extends BroadcastReceiver
                 break;
 
             case UNVALIDATED:
-                displayText = "Limited access";
+                displayText = "Limited";
                 iconRes = R.drawable.ic_network_unvalidated;
                 textColor = ContextCompat.getColor(context, R.color.md_orange_700);
                 break;
@@ -280,30 +280,29 @@ public class ConnectionManager extends BroadcastReceiver
                 break;
 
             case OLD_FALLBACK_COMBINED_CONNECTED:
-                displayText = "Online (legacy)";
+                displayText = "Legacy on";
                 iconRes = R.drawable.ic_network_validated;
                 textColor = ContextCompat.getColor(context, R.color.md_green_700);
                 break;
 
             case OLD_FALLBACK_COMBINED_DISCONNECTED:
-                displayText = "Offline (legacy)";
+                displayText = "Legacy off";
                 iconRes = R.drawable.ic_network_offline;
                 textColor = ContextCompat.getColor(context, R.color.md_red_700);
                 break;
 
             case ERROR_FALLBACK_ASSUME_CONNECTED:
-                displayText = "Online (assumed)";
+                displayText = "Assumed";
                 iconRes = R.drawable.ic_network_validated;
                 textColor = ContextCompat.getColor(context, R.color.md_amber_700);
                 break;
 
             default:
-                displayText = "Unknown";
+                displayText = "??";
                 iconRes = R.drawable.ic_network_unknown;
                 textColor = ContextCompat.getColor(context, R.color.md_grey_700);
                 break;
         }
-
         Log.i(TAG, "applyCurrentStateToViews: applying state=" + state.text + " text=" + displayText);
 
         iconView.setImageResource(iconRes);
