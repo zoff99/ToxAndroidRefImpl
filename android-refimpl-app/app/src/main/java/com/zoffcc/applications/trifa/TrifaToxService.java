@@ -1447,6 +1447,14 @@ public class TrifaToxService extends Service
                                 sleep_in_sec = sleep_in_sec / 10; // now in 10s of seconds!!
                                 append_logger_msg(TAG + "::" + "entering BATTERY SAVINGS MODE ... sleep for " + (10 * sleep_in_sec) + "s");
 
+                                try
+                                {
+                                    updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value);
+                                }
+                                catch(Exception e)
+                                {
+                                }
+
                                 for (int ii = 0; ii < sleep_in_sec; ii++)
                                 {
                                     if ((global_showing_messageview) || (global_showing_anygroupview))
@@ -1462,6 +1470,14 @@ public class TrifaToxService extends Service
                                         trigger_proper_wakeup_from_tox_service_thread();
                                         append_logger_msg(TAG + "::" + "need_wakeup_now trigger 001");
                                         break;
+                                    }
+
+                                    try
+                                    {
+                                        updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value);
+                                    }
+                                    catch(Exception e)
+                                    {
                                     }
 
                                     try
