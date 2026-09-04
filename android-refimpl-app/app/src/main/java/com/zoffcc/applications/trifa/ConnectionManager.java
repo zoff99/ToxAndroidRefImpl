@@ -256,7 +256,7 @@ public class ConnectionManager extends BroadcastReceiver
                 break;
 
             case UNREGISTERED:
-                displayText = "Mon. off";
+                displayText = "M. off";
                 iconRes = R.drawable.ic_network_unknown;
                 textColor = ContextCompat.getColor(context, R.color.md_grey_700);
                 break;
