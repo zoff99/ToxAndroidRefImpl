@@ -740,6 +740,76 @@ public class ToxVars
 
     }
 
+    public static enum TOX_GROUP_HEALTH
+    {
+
+        /**
+         * No active group peers, or not enough data to determine health.
+         */
+        TOX_GROUP_HEALTH_UNKNOWN(0),
+
+        /**
+         * Excellent group connections: direct UDP, no backlog, fresh receives.
+         */
+        TOX_GROUP_HEALTH_EXCELLENT(1),
+
+        /**
+         * Good group connections: healthy links, possibly TCP-relayed.
+         */
+        TOX_GROUP_HEALTH_GOOD(2),
+
+        /**
+         * Fair group connections: some degradation detected.
+         */
+        TOX_GROUP_HEALTH_FAIR(3),
+
+        /**
+         * Poor group connections: notable degradation, device may run warm.
+         */
+        TOX_GROUP_HEALTH_POOR(4),
+
+        /**
+         * Bad group connections: severe degradation, device will likely overheat.
+         */
+        TOX_GROUP_HEALTH_BAD(5);
+
+        public int value;
+
+        private TOX_GROUP_HEALTH(int value)
+        {
+            this.value = value;
+        }
+
+        public static String value_str(int value)
+        {
+            if (value == TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value)
+            {
+                return "TOX_GROUP_HEALTH_UNKNOWN";
+            }
+            else if (value == TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_EXCELLENT.value)
+            {
+                return "TOX_GROUP_HEALTH_EXCELLENT";
+            }
+            else if (value == TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_GOOD.value)
+            {
+                return "TOX_GROUP_HEALTH_GOOD";
+            }
+            else if (value == TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_FAIR.value)
+            {
+                return "TOX_GROUP_HEALTH_FAIR";
+            }
+            else if (value == TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_POOR.value)
+            {
+                return "TOX_GROUP_HEALTH_POOR";
+            }
+            else if (value == TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_BAD.value)
+            {
+                return "TOX_GROUP_HEALTH_BAD";
+            }
+            return "UNKNOWN";
+        }
+
+    }
 
     public static enum TOX_NETWORK_HEALTH
     {

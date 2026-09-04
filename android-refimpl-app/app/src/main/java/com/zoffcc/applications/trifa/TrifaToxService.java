@@ -135,6 +135,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_conference_get_type
 import static com.zoffcc.applications.trifa.MainActivity.tox_friend_get_connection_status;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_chat_id;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_grouplist;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_health;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_number_groups;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_privacy_state;
@@ -227,6 +228,9 @@ public class TrifaToxService extends Service
     private static WeakReference<ImageView> toxHealthIconRef = null;
     private static WeakReference<TextView> toxHealthTextRef = null;
 
+    private static WeakReference<ImageView> toxGcHealthIconRef = null;
+    private static WeakReference<TextView> toxGcHealthTextRef = null;
+
     // [ADDED] Main-thread handler for UI updates
     private static final Handler MAIN_HANDLER = new Handler(Looper.getMainLooper());
 
@@ -239,6 +243,17 @@ public class TrifaToxService extends Service
         toxHealthTextRef = new WeakReference<>(text);
     }
 
+    public static void attachToxGcHealthUIViews(ImageView icon, TextView text)
+    {
+        toxGcHealthIconRef = new WeakReference<>(icon);
+        toxGcHealthTextRef = new WeakReference<>(text);
+    }
+
+    public static void updateToxGcHealthUI(int gc_health)
+    {
+        MAIN_HANDLER.post(() -> applyToxGcHealthToViews(gc_health));
+    }
+
     /**
      * [ADDED] Thread-safe method to update the Tox health UI.
      * Call this from your tox loop (background thread) - it will safely post to UI thread.
@@ -246,6 +261,63 @@ public class TrifaToxService extends Service
     public static void updateToxHealthUI(int health)
     {
         MAIN_HANDLER.post(() -> applyToxHealthToViews(health));
+    }
+
+    // [ADDED] Applies the GC health state to the views. Runs on main thread.
+    private static void applyToxGcHealthToViews(int gc_health)
+    {
+        if (toxGcHealthIconRef == null || toxGcHealthTextRef == null)
+        {
+            return;
+        }
+
+        final ImageView iconView = toxGcHealthIconRef.get();
+        final TextView textView = toxGcHealthTextRef.get();
+
+        if (iconView == null || textView == null)
+        {
+            return;
+        }
+
+        int iconRes;
+        String displayText;
+        int textColor;
+        Context context = iconView.getContext();
+
+        if (gc_health == ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_EXCELLENT.value) {
+            displayText = "exc";
+            iconRes = R.drawable.ic_health_excellent;
+            textColor = ContextCompat.getColor(context, R.color.md_green_700);
+        }
+        else if (gc_health == ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_GOOD.value) {
+            displayText = "good";
+            iconRes = R.drawable.ic_health_good;
+            textColor = ContextCompat.getColor(context, R.color.md_light_green_700);
+        }
+        else if (gc_health == ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_FAIR.value) {
+            displayText = "fair";
+            iconRes = R.drawable.ic_health_fair;
+            textColor = ContextCompat.getColor(context, R.color.md_yellow_700);
+        }
+        else if (gc_health == ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_POOR.value) {
+            displayText = "poor";
+            iconRes = R.drawable.ic_health_poor;
+            textColor = ContextCompat.getColor(context, R.color.md_orange_700);
+        }
+        else if (gc_health == ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_BAD.value) {
+            displayText = "bad";
+            iconRes = R.drawable.ic_health_bad;
+            textColor = ContextCompat.getColor(context, R.color.md_red_700);
+        }
+        else { // UNKNOWN
+            displayText = "?";
+            iconRes = R.drawable.ic_health_unknown;
+            textColor = ContextCompat.getColor(context, R.color.md_grey_700);
+        }
+
+        iconView.setImageResource(iconRes);
+        textView.setText(displayText);
+        textView.setTextColor(textColor);
     }
 
     // [ADDED] Applies the health state to the views. Runs on main thread.
@@ -1401,9 +1473,15 @@ public class TrifaToxService extends Service
                 {
                 }
 
+                int current_gc_health_init = tox_group_get_health();
+                String gc_health_text_init = ToxVars.TOX_GROUP_HEALTH.value_str(current_gc_health_init).replace("TOX_GROUP_HEALTH_", "");
+                append_logger_msg(TAG + "::" + "gc health initial value: " + current_gc_health_init + " (" + gc_health_text_init + ")");
+
+
                 // [ADDED] Track when we last checked network health
                 long last_health_check_ms = 0;
                 int last_network_health = current_health_init;
+                int last_gc_health = current_gc_health_init;
 
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -1550,6 +1628,23 @@ public class TrifaToxService extends Service
                                 try
                                 {
                                     updateToxHealthUI(current_health);
+                                }
+                                catch(Exception e)
+                                {
+                                }
+                            }
+
+                            int current_gc_health = tox_group_get_health();
+
+                            if (current_gc_health != last_gc_health)
+                            {
+                                String gc_health_text = ToxVars.TOX_GROUP_HEALTH.value_str(current_gc_health).replace("TOX_GROUP_HEALTH_", "");
+                                append_logger_msg(TAG + "::" + "gc health changed: " + last_gc_health + " -> " + current_gc_health + " (" + gc_health_text + ")");
+                                last_gc_health = current_gc_health;
+
+                                try
+                                {
+                                    updateToxGcHealthUI(current_gc_health);
                                 }
                                 catch(Exception e)
                                 {

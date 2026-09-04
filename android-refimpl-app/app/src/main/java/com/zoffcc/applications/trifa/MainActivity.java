@@ -316,12 +316,14 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STA
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_BUSY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE;
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
+import static com.zoffcc.applications.trifa.TrifaToxService.attachToxGcHealthUIViews;
 import static com.zoffcc.applications.trifa.TrifaToxService.attachToxHealthUIViews;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.manually_logged_out;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 import static com.zoffcc.applications.trifa.TrifaToxService.resend_old_messages;
 import static com.zoffcc.applications.trifa.TrifaToxService.resend_v3_messages;
+import static com.zoffcc.applications.trifa.TrifaToxService.updateToxGcHealthUI;
 import static com.zoffcc.applications.trifa.TrifaToxService.updateToxHealthUI;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 
@@ -689,6 +691,13 @@ public class MainActivity extends AppCompatActivity
             // [ADDED] Set initial health state
             int current_health_init = tox_self_get_network_health();
             updateToxHealthUI(current_health_init);
+
+            ImageView toxGcHealthIcon = findViewById(R.id.tox_gc_health_icon);
+            TextView toxGcHealthText = findViewById(R.id.tox_gc_health_text);
+            attachToxGcHealthUIViews(toxGcHealthIcon, toxGcHealthText);
+
+            int current_gc_health_init = tox_group_get_health();
+            updateToxGcHealthUI(current_gc_health_init);
         }
         catch(Exception e)
         {
@@ -4651,6 +4660,8 @@ public class MainActivity extends AppCompatActivity
     public static native long tox_group_by_chat_id(@NonNull ByteBuffer chat_id_buffer);
 
     public static native int tox_group_get_privacy_state(long group_number);
+
+    public static native int tox_group_get_health();
 
     public static native int tox_group_mod_kick_peer(long group_number, long peer_id);
 

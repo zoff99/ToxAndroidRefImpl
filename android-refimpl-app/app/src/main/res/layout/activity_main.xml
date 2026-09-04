@@ -180,12 +180,12 @@
                         <!-- [ADDED] Tox Network Health Status Container -->
                         <LinearLayout
                             android:id="@+id/tox_health_container"
-                            android:layout_width="60dp"
+                            android:layout_width="40dp"
                             android:layout_height="match_parent"
                             android:orientation="vertical"
                             android:gravity="center"
-                            android:tooltipText="Toxcore link quality: RTT, packet loss, and connection type"
-                            android:paddingLeft="8dp"
+                            android:tooltipText="Toxcore friend link quality: RTT, packet loss, and connection type"
+                            android:paddingLeft="4dp"
                             android:paddingRight="4dp">
 
                             <ImageView
@@ -204,8 +204,40 @@
                                 android:textColor="@color/md_black_1000"
                                 android:textSize="10sp"
                                 android:textStyle="bold"
-                                android:gravity="center" />
+                                android:gravity="center"
+                                android:maxLines="1" />
                         </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/tox_gc_health_container"
+                            android:layout_width="40dp"
+                            android:layout_height="match_parent"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:tooltipText="Toxcore group chat link quality: queue depth, receive staleness, and connection type"
+                            android:paddingLeft="4dp"
+                            android:paddingRight="4dp">
+
+                            <ImageView
+                                android:id="@+id/tox_gc_health_icon"
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_health_unknown"
+                                android:contentDescription="Tox GC Health" />
+
+                            <TextView
+                                android:id="@+id/tox_gc_health_text"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="?"
+                                android:textColor="@color/md_black_1000"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:maxLines="1" />
+                        </LinearLayout>
+
 
                         <View
                             android:layout_width="0dp"
