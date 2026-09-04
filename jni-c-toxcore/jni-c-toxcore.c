@@ -7154,6 +7154,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1health(JNIEnv *
     }
 
     return (jint)tox_group_get_health(tox_global);
+#endif
 }
 
 
