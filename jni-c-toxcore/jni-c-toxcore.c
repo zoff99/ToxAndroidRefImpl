@@ -7140,6 +7140,23 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1leave(JNIEnv *env, j
 #endif
 }
 
+
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1health(JNIEnv *env, jobject thiz)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if(tox_global == NULL)
+    {
+        return TOX_GROUP_HEALTH_UNKNOWN;
+    }
+
+    return (jint)tox_group_get_health(tox_global);
+}
+
+
 JNIEXPORT jint JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1disconnect(JNIEnv *env, jobject thiz,
         jlong group_number)
