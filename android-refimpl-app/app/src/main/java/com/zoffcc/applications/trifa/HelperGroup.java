@@ -878,6 +878,8 @@ public class HelperGroup
 
     static void update_group_in_groupmessagelist(final String group_identifier)
     {
+        // ** DEACTIVATE ** -> NGCMID //
+        /*
         try
         {
             if (group_message_list_activity != null)
@@ -897,6 +899,7 @@ public class HelperGroup
             Log.i(TAG, "update_group_in_groupmessagelist:EE1:" + e1.getMessage());
             e1.printStackTrace();
         }
+         */
     }
 
     static void add_system_message_to_group_chat(final String group_identifier, final String system_message)

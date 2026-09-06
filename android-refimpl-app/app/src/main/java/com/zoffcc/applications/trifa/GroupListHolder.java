@@ -61,6 +61,9 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_disconnect;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_get_name;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_leave;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_mid_announce_leave;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_mid_offline_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_mid_online_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FL_NOTIFICATION_ICON_ALPHA_NOT_SELECTED;
@@ -172,8 +175,8 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
 
         try
         {
-            long user_count = tox_group_peer_count(fl.tox_group_number);
-            long offline_user_count = tox_group_offline_peer_count(fl.tox_group_number);
+            long user_count = tox_group_mid_online_count(fl.group_identifier);
+            long offline_user_count = tox_group_mid_offline_count(fl.group_identifier);
 
             if (user_count < 0)
             {
@@ -463,6 +466,8 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                 if (f2.group_identifier != null)
                 {
                     final long group_num = tox_group_by_groupid__wrapper(f2.group_identifier);
+
+                    tox_group_mid_announce_leave(group_num);
                     tox_group_leave(group_num, "bye");
                     update_savedata_file_wrapper(); // after deleteing a conference
                 }
