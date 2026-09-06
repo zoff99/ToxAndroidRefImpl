@@ -677,6 +677,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     $WARNS \
     $FORTIFY_FLAGS \
     $JNI_CUSTOM_FLAGS \
+    -DTOX_HAVE_NGCMID \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
@@ -1274,6 +1275,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared \
     $FORTIFY_FLAGS \
     $JNI_CUSTOM_FLAGS \
     $ASAN_CLANG_FLAGS \
+    -DTOX_HAVE_NGCMID \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
@@ -1713,6 +1715,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     $WARNS \
     $FORTIFY_FLAGS \
     $JNI_CUSTOM_FLAGS \
+    -DTOX_HAVE_NGCMID \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \
@@ -2149,6 +2152,7 @@ cd $_s_/jni-c-toxcore/; export V=1;$GCC -O3 -fPIC -g -shared -Wall -Wextra \
     $WARNS \
     $FORTIFY_FLAGS \
     $JNI_CUSTOM_FLAGS \
+    -DTOX_HAVE_NGCMID \
     -DGIT_HASH=\"$git_hash_for_jni\" \
     -funwind-tables -Wl,--no-merge-exidx-entries -Wl,-soname,libjni-c-toxcore.so \
     jni-c-toxcore.c -o libjni-c-toxcore.so \

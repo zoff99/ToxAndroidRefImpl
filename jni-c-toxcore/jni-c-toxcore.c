@@ -46,6 +46,12 @@
 #include <tox/toxav.h>
 #include <tox/toxencryptsave.h>
 
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+#include <tox/mid_roster.h>
+#endif
+/* MID_PEERLIST */
+
 #include <sodium/utils.h>
 
 #include <pthread.h>
@@ -173,6 +179,14 @@ ToxAV *tox_av_global = NULL;
 void *tox_av_ngc_vcoders_global = NULL;
 void *tox_av_ngc_acoders_global = NULL;
 bool global_toxav_valid = false;
+
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+MidState *mid_peerlist_global = NULL; /* persistent group roster middleware state */
+#endif
+/* MID_PEERLIST */
+
+
 CallControl mytox_CC;
 pthread_t tid[3]; // 0 -> toxav_iterate thread, 1 -> video iterate thread, 2 -> audio iterate thread
 
@@ -280,6 +294,11 @@ jmethodID android_tox_callback_group_privacy_state_cb_method = NULL;
 jmethodID android_tox_callback_group_custom_packet_cb_method = NULL;
 jmethodID android_tox_callback_group_custom_private_packet_cb_method = NULL;
 // -------- _newGroup-callbacks_ -----
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+jmethodID android_tox_callback_group_mid_peer_list_changed_cb_method = NULL;
+#endif
+/* MID_PEERLIST */
 // -------- _AV-callbacks_ -----
 jmethodID android_toxav_callback_call_cb_method = NULL;
 jmethodID android_toxav_callback_video_receive_frame_cb_method = NULL;
@@ -375,6 +394,12 @@ void group_custom_packet_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, c
 
 void group_custom_private_packet_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *data,
                         size_t length, void *user_data);
+
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+void group_mid_peer_list_changed_cb(const uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE], void *user_data);
+#endif
+/* MID_PEERLIST */
 
 void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const uint8_t *name,
                                     size_t length, void *user_data);
@@ -650,6 +675,97 @@ size_t xnet_unpack_u32(const uint8_t *bytes, uint32_t *v)
     return p - bytes;
 }
 
+
+/**
+ * Safely extracts a Standard UTF-8 string from a Java jstring.
+ * Handles both Desktop (Modified UTF-8 bypass) and Android (Standard UTF-8) quirks.
+ * 
+ * Returns a malloc'd uint8_t* buffer on success (caller MUST free() it).
+ * Returns NULL on failure, and populates out_err with the error code.
+ */
+static uint8_t* jni_get_utf8_safe(JNIEnv *env, jstring jstr, size_t max_len, size_t *out_len, jint *out_err) {
+    *out_err = 0;
+    *out_len = 0;
+    if (jstr == NULL) { *out_err = -4; return NULL; }
+
+#ifdef JAVA_LINUX
+    // --- DESKTOP LOGIC (Forces Standard UTF-8 via Reflection) ---
+    jclass stringClass = (*env)->GetObjectClass(env, jstr);
+    jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
+    
+    jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
+    if (charsetName == NULL) { *out_err = -3; return NULL; } // OOM
+
+    jbyteArray stringJbytes = (jbyteArray)(*env)->CallObjectMethod(env, jstr, getBytes, charsetName);
+    (*env)->DeleteLocalRef(env, charsetName);
+    if (stringJbytes == NULL) { *out_err = -3; return NULL; }
+
+    jsize plength = (*env)->GetArrayLength(env, stringJbytes);
+    if (plength > (jsize)max_len) {
+        (*env)->DeleteLocalRef(env, stringJbytes);
+        *out_err = -2; // Too long
+        return NULL;
+    }
+
+    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
+    if (pBytes == NULL) {
+        (*env)->DeleteLocalRef(env, stringJbytes);
+        *out_err = -4; // OOM
+        return NULL;
+    }
+
+    // Allocate our own buffer and copy the bytes
+    uint8_t* result = (uint8_t*)malloc((size_t)plength + 1);
+    if (result == NULL) {
+        (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+        (*env)->DeleteLocalRef(env, stringJbytes);
+        *out_err = -4;
+        return NULL;
+    }
+
+    memcpy(result, pBytes, (size_t)plength);
+    result[plength] = '\0'; // Null-terminate for safety
+    *out_len = (size_t)plength;
+
+    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
+    (*env)->DeleteLocalRef(env, stringJbytes);
+    return result;
+
+#else
+    // --- ANDROID LOGIC (Direct C API) ---
+    const char *s = (*env)->GetStringUTFChars(env, jstr, NULL);
+    if (s == NULL) { *out_err = -4; return NULL; } // OOM
+
+    size_t len = strlen(s);
+    if (len > max_len) {
+        (*env)->ReleaseStringUTFChars(env, jstr, s);
+        *out_err = -2; // Too long
+        return NULL;
+    }
+
+    // Allocate our own buffer and copy the bytes
+    uint8_t* result = (uint8_t*)malloc(len + 1);
+    if (result == NULL) {
+        (*env)->ReleaseStringUTFChars(env, jstr, s);
+        *out_err = -4;
+        return NULL;
+    }
+
+    memcpy(result, s, len + 1);
+    *out_len = len;
+
+    (*env)->ReleaseStringUTFChars(env, jstr, s);
+    return result;
+#endif
+}
+
+
+
+
+
+
+
+
 /*
  * return NULL on failure
  */
@@ -722,12 +838,43 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
         return NULL;
     }
     dbg(9, "create_tox:1008");
+    
+    char *mid_save_filename = calloc(1, MAX_FULL_PATH_LENGTH);
+    if (mid_save_filename == NULL)
+    {
+        free(full_path_filename);
+        pthread_mutex_destroy(&group_audio___mutex);
+        return NULL;
+    }
+
+    dbg(9, "create_tox:1008a");
 
 #ifdef __MINGW32__
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s\\%s", app_data_dir, savedata_filename);
 #else
     snprintf(full_path_filename, (size_t)MAX_FULL_PATH_LENGTH, "%s/%s", app_data_dir, savedata_filename);
 #endif
+
+    /*
+     * Middleware save file:
+     * Example:
+     *   /home/user/.config/app/tox_save.tox
+     * becomes:
+     *   /home/user/.config/app/tox_save.tox.mid.save
+     */
+    int n = snprintf(mid_save_filename,
+                     (size_t)MAX_FULL_PATH_LENGTH,
+                     "%s.mid.save",
+                     full_path_filename);
+
+    if (n < 0 || n >= MAX_FULL_PATH_LENGTH) {
+        /*
+         * Path was truncated or formatting failed.
+         * Do not use mid_save_filename.
+         */
+        free(mid_save_filename);
+        mid_save_filename = NULL;
+    }
 
     dbg(9, "create_tox:1009");
     FILE *f = fopen(full_path_filename, "rb");
@@ -743,6 +890,8 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
         {
             fclose(f);
             free(full_path_filename);
+            free(mid_save_filename);
+            mid_save_filename = NULL;
             pthread_mutex_destroy(&group_audio___mutex);
             return NULL;
         }
@@ -781,6 +930,8 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
                     free(savedata_enc);
                 }
                 free(full_path_filename);
+                free(mid_save_filename);
+                mid_save_filename = NULL;
                 fclose(f);
                 pthread_mutex_destroy(&group_audio___mutex);
                 return NULL;
@@ -868,6 +1019,26 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
     bool local_discovery_enabled = tox_options_get_local_discovery_enabled(&options);
     dbg(9, "create_tox:local discovery enabled = %d", (int)local_discovery_enabled);
     free(full_path_filename);
+
+
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (tox != NULL)
+    {
+        if (mid_peerlist_global != NULL)
+        {
+            mid_free(mid_peerlist_global);
+            mid_peerlist_global = NULL;
+        }
+        mid_peerlist_global = mid_new(mid_save_filename, passphrase, passphrase_len);
+        dbg(9, "MID_PEERLIST:mid_peerlist_global created in create_tox=%p", (void *)mid_peerlist_global);
+    }
+#endif
+    /* MID_PEERLIST */
+
+    free(mid_save_filename);
+    mid_save_filename = NULL;
+
     return tox;
 }
 
@@ -878,6 +1049,15 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
         dbg(9, "update_savedata_file:ERROR:tox ptr is NULL");
         return;
     }
+
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global != NULL)
+    {
+        mid_save(mid_peerlist_global, passphrase, passphrase_len);
+    }
+#endif
+/* MID_PEERLIST */
 
     bool save_unencrypted = false;
     size_t size_enc = 0;
@@ -1265,6 +1445,16 @@ void init_tox_callbacks()
     tox_callback_group_custom_private_packet(tox_global, group_custom_private_packet_cb);
 #endif
     // -------- newGroups _callbacks_ --------
+
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global != NULL) {
+        mid_set_peer_list_changed_cb(mid_peerlist_global, group_mid_peer_list_changed_cb, NULL);
+        dbg(9, "MID_PEERLIST:peer_list_changed_cb registered");
+    }
+#endif
+   /* MID_PEERLIST */
+
 
 }
 
@@ -3125,6 +3315,19 @@ void Java_com_zoffcc_applications_trifa_MainActivity_init__real(JNIEnv *env, job
             "android_tox_callback_group_custom_private_packet_cb_method", "(JJ[BJ)V");
     // -------- _newGroup _callbacks_ --------
 
+
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    android_tox_callback_group_mid_peer_list_changed_cb_method =
+        (*env)->GetStaticMethodID(env, MainActivity,
+            "android_tox_callback_group_mid_peer_list_changed_cb", "(Ljava/lang/String;)V");
+    if (android_tox_callback_group_mid_peer_list_changed_cb_method == NULL)
+    {
+        dbg(0, "MID_PEERLIST:cannot find android_tox_callback_group_mid_peer_list_changed_cb");
+    }
+    /* MID_PEERLIST */
+#endif
+
     dbg(9, "linking callbacks ... READY");
     // -------- _callbacks_ --------
 
@@ -3643,6 +3846,16 @@ Java_com_zoffcc_applications_trifa_MainActivity_init_1tox_1callbacks(JNIEnv *env
 void Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(JNIEnv *env, jobject thiz)
 {
     tox_iterate(tox_global, NULL);
+
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global == NULL)
+    {
+        return;
+    }
+    mid_iterate(mid_peerlist_global, tox_global);
+#endif
+    /* MID_PEERLIST */
 }
 
 jint Java_com_zoffcc_applications_trifa_MainActivity_jni_1iterate_1group_1audio(JNIEnv *env, jobject thiz, jint delta_new, jint want_ms_output)
@@ -3867,6 +4080,14 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1kill__real(JNIEnv *env
     tox_av_ngc_vcoders_global = NULL;
     toxav_ngc_audio_kill(tox_av_ngc_acoders_global);
     tox_av_ngc_acoders_global = NULL;
+
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    dbg(9, "MID_PEERLIST:freeing mid_peerlist_global=%p", (void *)mid_peerlist_global);
+    mid_free(mid_peerlist_global);
+    mid_peerlist_global = NULL;
+#endif
+    /* MID_PEERLIST */
 
     // HINT: set pointers to NULL, and then really kill tox and toxav after that
     Tox *tox_global_copy = tox_global;
@@ -4821,78 +5042,28 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1name(JNIEnv *env
 }
 
 JNIEXPORT jint JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(JNIEnv *env, jobject thiz,
-        jobject status_message)
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1set_1status_1message(JNIEnv *env, jobject thiz, jobject status_message)
 {
     TRACE_LOGGER();
-    if(tox_global == NULL)
-    {
-        return (jint)-1;
+    if (tox_global == NULL) return (jint)-1;
+
+    size_t len = 0;
+    jint err = 0;
+    
+    // 1. Get the safely converted Standard UTF-8 string
+    uint8_t* data = jni_get_utf8_safe(env, (jstring)status_message, TOX_MAX_STATUS_MESSAGE_LENGTH, &len, &err);
+    
+    if (data == NULL) {
+        return -1;
     }
 
-#ifdef JAVA_LINUX
-
-    const jclass stringClass = (*env)->GetObjectClass(env, (jstring)status_message);
-    const jmethodID getBytes = (*env)->GetMethodID(env, stringClass, "getBytes", "(Ljava/lang/String;)[B");
-
-    const jstring charsetName = (*env)->NewStringUTF(env, "UTF-8");
-    // MEDIUM SECURITY FIX: NewStringUTF can return NULL on out-of-memory.
-    if(charsetName == NULL)
-    {
-        return (jint)-3;
-    }
-
-    const jbyteArray stringJbytes = (jbyteArray) (*env)->CallObjectMethod(env, (jstring)status_message, getBytes, charsetName);
-    (*env)->DeleteLocalRef(env, charsetName);
-
-    const jsize plength = (*env)->GetArrayLength(env, stringJbytes);
-    jbyte* pBytes = (*env)->GetByteArrayElements(env, stringJbytes, NULL);
-
-    // MEDIUM SECURITY FIX: Validate status message length before passing to toxcore.
-    // The Tox protocol limits status messages to TOX_MAX_STATUS_MESSAGE_LENGTH (1007 bytes).
-    // Without this check, a malicious caller could pass an arbitrarily long string.
-    if(plength > TOX_MAX_STATUS_MESSAGE_LENGTH)
-    {
-        (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
-        (*env)->DeleteLocalRef(env, stringJbytes);
-        return (jint)-2;
-    }
-
+    // 2. Pass to Toxcore
     TOX_ERR_SET_INFO error;
-    bool res = tox_self_set_status_message(tox_global, (uint8_t *)pBytes, (size_t)plength, &error);
+    bool res = tox_self_set_status_message(tox_global, data, len, &error);
 
-    (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
-    (*env)->DeleteLocalRef(env, stringJbytes);
-
+    // 3. Clean up and return
+    free(data);
     return (jint)res;
-
-#else
-
-    const char *s = NULL;
-    // TODO: UTF-8
-    s = (*env)->GetStringUTFChars(env, status_message, NULL);
-
-    // MEDIUM SECURITY FIX: GetStringUTFChars can return NULL on out-of-memory.
-    if(s == NULL)
-    {
-        return (jint)-4;
-    }
-
-    // MEDIUM SECURITY FIX: Validate status message length before passing to toxcore.
-    // The Tox protocol limits status messages to TOX_MAX_STATUS_MESSAGE_LENGTH (1007 bytes).
-    if(strlen(s) > TOX_MAX_STATUS_MESSAGE_LENGTH)
-    {
-        (*env)->ReleaseStringUTFChars(env, status_message, s);
-        return (jint)-2;
-    }
-
-    TOX_ERR_SET_INFO error;
-    bool res = tox_self_set_status_message(tox_global, (uint8_t *)s, (size_t)strlen(s), &error);
-    (*env)->ReleaseStringUTFChars(env, status_message, s);
-    return (jint)res;
-
-#endif
-
 }
 
 JNIEXPORT void JNICALL
@@ -7216,6 +7387,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1set_1name(JNIE
             (uint8_t *)pBytes, (size_t)plength,
             &error);
 
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global != NULL)
+    {
+        bool unused = mid_self_set_name(mid_peerlist_global, tox_global, (uint32_t)group_number, (uint8_t *)pBytes, (size_t)plength);
+    }
+#endif
+/* MID_PEERLIST */
+
     (*env)->DeleteLocalRef(env, charsetName);
 
     (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
@@ -7228,6 +7408,15 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1set_1name(JNIE
             (uint32_t)group_number,
             (uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str),
             &error);
+
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global != NULL)
+    {
+        bool unused = mid_self_set_name(mid_peerlist_global, tox_global, (uint32_t)group_number, (uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str));
+    }
+#endif
+/* MID_PEERLIST */
 
     (*env)->ReleaseStringUTFChars(env, name, my_peer_name_str);
 #endif
@@ -7676,6 +7865,29 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1kick_1peer(JNIE
         return (jint)-99;
     }
 
+    /*
+     * IMPORTANT: The peer that INITIATES a kick does NOT receive the
+     * group_moderation or group_peer_exit event (see tox.h).
+     * Therefore the middleware cannot auto-delete the kicked peer on the
+     * kicker's side. We must:
+     *   1. Get the kicked peer's identity key BEFORE the kick
+     *      (after the kick, the peer is no longer queryable in Toxcore)
+     *   2. Perform the kick
+     *   3. Explicitly delete the kicked peer from the middleware roster
+     */
+    uint8_t kicked_identity_key[TOX_GROUP_PEER_PUBLIC_KEY_SIZE];
+    bool have_kicked_key = false;
+
+    Tox_Err_Group_Peer_Query pq_error;
+    if (tox_group_peer_get_public_key(tox_global, (uint32_t)group_number,
+                                      (uint32_t)peer_id, kicked_identity_key, &pq_error))
+    {
+        if (pq_error == TOX_ERR_GROUP_PEER_QUERY_OK)
+        {
+            have_kicked_key = true;
+        }
+    }
+
     Tox_Err_Group_Mod_Kick_Peer error;
     uint32_t res = tox_group_mod_kick_peer(tox_global, (uint32_t)group_number, (uint32_t)peer_id, &error);
 
@@ -7685,6 +7897,31 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1kick_1peer(JNIE
     }
     else
     {
+        /*
+         * Kick succeeded. Explicitly remove the kicked peer from the
+         * middleware persistent roster. Without this, the kicked peer
+         * would remain in the roster forever on the kicker's side.
+         */
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+        if ((mid_peerlist_global != NULL) && (have_kicked_key))
+        {
+            uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+            Tox_Err_Group_State_Queries sq_error;
+            if (tox_group_get_chat_id(tox_global, (uint32_t)group_number, chat_id, &sq_error))
+            {
+                if (sq_error == TOX_ERR_GROUP_STATE_QUERIES_OK)
+                {
+                    bool mid_del_res = mid_delete_peer_by_identity(mid_peerlist_global,
+                                                                   chat_id,
+                                                                   kicked_identity_key);
+                    dbg(9, "MID_PEERLIST:mod_kick_peer:deleted kicked peer from roster:res=%d",
+                        (int)mid_del_res);
+                }
+            }
+        }
+#endif
+/* MID_PEERLIST */
         return (jint)res;
     }
 #endif
@@ -8624,6 +8861,17 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1new(JNIEnv *env, job
                     (uint8_t *)pBytes2, (size_t)plength2,
                     &error);
 
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if ((error == TOX_ERR_GROUP_NEW_OK) && (mid_peerlist_global != NULL))
+    {
+        dbg(9, "MID_PEERLIST:tox_group_new:calling mid_on_group_self_join:g=%u", res);
+        mid_on_group_self_join(mid_peerlist_global, tox_global, res,
+                               (const uint8_t *)pBytes2, (size_t)plength2);
+    }
+#endif
+    /* MID_PEERLIST */
+
     (*env)->DeleteLocalRef(env, charsetName);
 
     (*env)->ReleaseByteArrayElements(env, stringJbytes, pBytes, JNI_ABORT);
@@ -8645,6 +8893,17 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1new(JNIEnv *env, job
                     (uint8_t *)group_name_str, (size_t)strlen(group_name_str),
                     (uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str),
                     &error);
+
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if ((error == TOX_ERR_GROUP_NEW_OK) && (mid_peerlist_global != NULL))
+    {
+        dbg(9, "MID_PEERLIST:tox_group_new:calling mid_on_group_self_join:g=%u", res);
+        mid_on_group_self_join(mid_peerlist_global, tox_global, res,
+                               (const uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str));
+    }
+#endif
+    /* MID_PEERLIST */
 
     (*env)->ReleaseStringUTFChars(env, group_name, group_name_str);
     (*env)->ReleaseStringUTFChars(env, my_peer_name, my_peer_name_str);
@@ -9215,6 +9474,16 @@ void android_tox_callback_group_peer_join_cb(uint32_t group_number, uint32_t pee
 void group_peer_join_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, void *user_data)
 {
     android_tox_callback_group_peer_join_cb(group_number, peer_id);
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global == NULL)
+    {
+        return;
+    }
+    dbg(9, "MID_PEERLIST:group_peer_join_cb:g=%u peer_id=%u", group_number, peer_id);
+    mid_on_group_peer_join(mid_peerlist_global, tox, group_number, peer_id);
+#endif
+    /* MID_PEERLIST */
 }
 
 void android_tox_callback_group_peer_exit_cb(uint32_t group_number, uint32_t peer_id, Tox_Group_Exit_Type exit_type)
@@ -9234,6 +9503,16 @@ void group_peer_exit_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_G
 
 {
     android_tox_callback_group_peer_exit_cb(group_number, peer_id, exit_type);
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global == NULL)
+    {
+        return;
+    }
+    dbg(9, "MID_PEERLIST:group_peer_exit_cb:g=%u peer_id=%u exit_type=%d", group_number, peer_id, (int)exit_type);
+    mid_on_group_peer_exit(mid_peerlist_global, tox, group_number, exit_type);
+#endif
+    /* MID_PEERLIST */
 }
 
 void android_tox_callback_group_custom_packet_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *data, size_t length)
@@ -9263,6 +9542,16 @@ void group_custom_packet_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, c
                         size_t length, void *user_data)
 {
     android_tox_callback_group_custom_packet_cb(group_number, peer_id, data, length);
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global == NULL)
+    {
+        return;
+    }
+    dbg(9, "MID_PEERLIST:group_custom_packet_cb:g=%u peer_id=%u len=%zu", group_number, peer_id, length);
+    mid_on_group_custom_packet(mid_peerlist_global, tox, group_number, peer_id, data, length);
+#endif
+    /* MID_PEERLIST */
 }
 
 void android_tox_callback_group_custom_private_packet_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *data, size_t length)
@@ -9294,6 +9583,38 @@ void group_custom_private_packet_cb(Tox *tox, uint32_t group_number, uint32_t pe
     android_tox_callback_group_custom_private_packet_cb(group_number, peer_id, data, length);
 }
 
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+void android_tox_callback_group_mid_peer_list_changed_cb(const uint8_t *chat_id)
+{
+    JNIEnv *jnienv2;
+    jnienv2 = jni_getenv();
+
+    if (jnienv2 == NULL) return;
+    if (chat_id == NULL) return;
+
+    char chat_id_hex[TOX_GROUP_CHAT_ID_SIZE * 2 + 1];
+    CLEAR(chat_id_hex);
+    sodium_bin2hex(chat_id_hex, sizeof(chat_id_hex), chat_id, TOX_GROUP_CHAT_ID_SIZE);
+
+    jstring js1 = (*jnienv2)->NewStringUTF(jnienv2, chat_id_hex);
+
+    (*jnienv2)->CallStaticVoidMethod(jnienv2, MainActivity,
+                                     android_tox_callback_group_mid_peer_list_changed_cb_method,
+                                     js1);
+
+    if (js1 != NULL) (*jnienv2)->DeleteLocalRef(jnienv2, js1);
+}
+
+void group_mid_peer_list_changed_cb(const uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE], void *user_data)
+{
+    android_tox_callback_group_mid_peer_list_changed_cb(chat_id);
+}
+#endif
+/* MID_PEERLIST */
+
+
+
 void android_tox_callback_group_peer_name_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *name, size_t length)
 {
     JNIEnv *jnienv2;
@@ -9311,6 +9632,16 @@ void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const
 
 {
     android_tox_callback_group_peer_name_cb(group_number, peer_id, name, length);
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global == NULL)
+    {
+        return;
+    }
+    dbg(9, "MID_PEERLIST:group_peer_name_cb:g=%u peer_id=%u", group_number, peer_id);
+    mid_on_group_peer_name(mid_peerlist_global, tox, group_number, peer_id);
+#endif
+    /* MID_PEERLIST */
 }
 
 
@@ -9333,6 +9664,21 @@ void group_moderation_cb(Tox *tox, uint32_t group_number, uint32_t source_peer_i
 
 {
     android_tox_callback_group_moderation_cb(group_number, source_peer_id, target_peer_id, mod_type);
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    if (mid_peerlist_global == NULL)
+    {
+        return;
+    }
+    dbg(9, "MID_PEERLIST:group_moderation_cb:g=%u src=%u dst=%u type=%d", group_number, source_peer_id, target_peer_id, (int)mod_type);
+    bool mid_we_were_kicked = mid_on_group_moderation(mid_peerlist_global, tox, group_number, source_peer_id, target_peer_id, mod_type);
+    if (mid_we_were_kicked)
+    {
+        dbg(0, "MID_PEERLIST:we were KICKED from group %u ! middleware wiped group state", group_number);
+        /* HINT: the Java side should also clear its group reference for this group_number */
+    }
+#endif
+    /* MID_PEERLIST */
 }
 
 
@@ -9384,6 +9730,56 @@ void android_tox_callback_group_self_join_cb(uint32_t group_number)
 void group_self_join_cb(Tox *tox, uint32_t group_number, void *user_data)
 {
     android_tox_callback_group_self_join_cb(group_number);
+    /* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+    dbg(9, "MID_PEERLIST:group_self_join_cb:g=%u", group_number);
+    if ((mid_peerlist_global != NULL) && (tox != NULL))
+    {
+        Tox_Err_Group_Self_Query self_name_err;
+        size_t mid_self_name_size = tox_group_self_get_name_size(tox, group_number, &self_name_err);
+        uint8_t *mid_self_name_buf = NULL;
+
+        if ((self_name_err == TOX_ERR_GROUP_SELF_QUERY_OK) && (mid_self_name_size > 0))
+        {
+            mid_self_name_buf = calloc(1, mid_self_name_size + 1);
+            if (mid_self_name_buf)
+            {
+                bool name_ok = tox_group_self_get_name(tox, group_number, mid_self_name_buf, &self_name_err);
+                if (!name_ok || self_name_err != TOX_ERR_GROUP_SELF_QUERY_OK)
+                {
+                    free(mid_self_name_buf);
+                    mid_self_name_buf = NULL;
+                    mid_self_name_size = 0;
+                }
+            }
+            else
+            {
+                mid_self_name_size = 0;
+            }
+        }
+        else
+        {
+            mid_self_name_size = 0;
+        }
+
+        if (mid_self_name_size > TOX_MAX_NAME_LENGTH)
+        {
+            mid_self_name_size = TOX_MAX_NAME_LENGTH;
+        }
+
+        if (mid_self_name_buf)
+        {
+            mid_on_group_self_join(mid_peerlist_global, tox, group_number,
+                                  (const uint8_t *)mid_self_name_buf, mid_self_name_size);
+            free(mid_self_name_buf);
+        }
+        else
+        {
+            mid_on_group_self_join(mid_peerlist_global, tox, group_number, NULL, 0);
+        }
+    }
+#endif
+    /* MID_PEERLIST */
 }
 
 void android_tox_callback_group_topic_cb(uint32_t group_number, uint32_t peer_id, const uint8_t *topic, size_t length)
@@ -9421,6 +9817,448 @@ void group_privacy_state_cb(Tox *tox, uint32_t group_number, Tox_Group_Privacy_S
 {
     android_tox_callback_group_privacy_state_cb(group_number, privacy_state);
 }
+
+
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
+/******************************************************************************
+ * JNI exports for the persistent peer-list middleware (mid_roster)
+ * These allow the Java/Kotlin side to query the persistent roster and
+ * to properly announce leave / delete groups.
+ ******************************************************************************/
+
+/*
+ * Call this IMMEDIATELY BEFORE calling tox_group_leave() from Java.
+ * It broadcasts a signed LEFT tombstone so other peers know we left permanently.
+ * Returns: 1 on success, 0 on failure, -99 if tox is NULL.
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1announce_1leave(JNIEnv *env, jobject thiz, jlong group_number)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if (tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+    if (mid_peerlist_global == NULL)
+    {
+        return (jint)-99;
+    }
+    dbg(9, "MID_PEERLIST:tox_group_mid_announce_leave:g=%ld", (long)group_number);
+    bool res = mid_announce_leave(mid_peerlist_global, tox_global, (int64_t)group_number);
+    return (jint)(res ? 1 : 0);
+#endif
+}
+
+/*
+ * Call this AFTER calling tox_group_leave() from Java.
+ * It wipes the middleware state (keys + roster) for this group.
+ * Always call this even if tox_group_leave() returned an error.
+ * Returns: 0 on success, -99 if tox is NULL.
+ */
+JNIEXPORT jint JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1on_1group_1delete(JNIEnv *env, jobject thiz, jlong group_number)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return (jint)-99;
+#else
+    if (tox_global == NULL)
+    {
+        return (jint)-99;
+    }
+    if (mid_peerlist_global == NULL)
+    {
+        return (jint)-99;
+    }
+
+    dbg(9, "MID_PEERLIST:tox_group_mid_on_group_delete:g=%ld", (long)group_number);
+    mid_on_group_delete(mid_peerlist_global, tox_global, (int64_t)group_number);
+    return (jint)0;
+#endif
+}
+
+/*
+* Return the number of peers in the persistent middleware roster for a group.
+* This includes offline peers and LEFT tombstones.
+* Returns: count >= 0, or -99 if middleware is not initialized or invalid input.
+*/
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1peer_1list_1count(JNIEnv *env, jobject thiz, jobject group_id)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return (jlong)-99;
+#else
+    if (mid_peerlist_global == NULL)
+    {
+        return (jlong)-99;
+    }
+    if (group_id == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    const char *group_id_str = (*env)->GetStringUTFChars(env, (jstring)group_id, NULL);
+    if (group_id_str == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    /* A 32-byte chat_id must be exactly 64 hex characters */
+    if (strlen(group_id_str) != (TOX_GROUP_CHAT_ID_SIZE * 2))
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+    if (sodium_hex2bin(chat_id, TOX_GROUP_CHAT_ID_SIZE, group_id_str, (TOX_GROUP_CHAT_ID_SIZE * 2), NULL, NULL, NULL) != 0)
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+
+    size_t res = mid_peer_list_count(mid_peerlist_global, chat_id);
+    return (jlong)res;
+#endif
+}
+
+/*
+* Get one peer entry from the persistent middleware roster by index.
+* Returns an Object array with:
+*   [0] identity_key hex (String, 64 chars)
+*   [1] signing_key hex (String, 64 chars)
+*   [2] status (Integer: 0=ACTIVE, 1=LEFT)
+*   [3] connection_status (Integer: 0=NONE, 1=TCP, 2=UDP)
+*   [4] has_signature (Integer: 0 or 1)
+*   [5] last_seen (Long: unix timestamp)
+*   [6] nickname (String, safely converted from raw bytes)
+*   [7] role (Integer: 0=FOUNDER, 1=MOD, 2=USER, 3=OBSERVER)
+* Returns NULL on failure.
+*/
+JNIEXPORT jobjectArray JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1peer_1list_1get(JNIEnv *env, jobject thiz, jobject group_id, jlong index)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return NULL;
+#else
+    if (mid_peerlist_global == NULL)
+    {
+        return NULL;
+    }
+    if (group_id == NULL)
+    {
+        return NULL;
+    }
+
+    const char *group_id_str = (*env)->GetStringUTFChars(env, (jstring)group_id, NULL);
+    if (group_id_str == NULL)
+    {
+        return NULL;
+    }
+
+    if (strlen(group_id_str) != (TOX_GROUP_CHAT_ID_SIZE * 2))
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return NULL;
+    }
+
+    uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+    if (sodium_hex2bin(chat_id, TOX_GROUP_CHAT_ID_SIZE, group_id_str, (TOX_GROUP_CHAT_ID_SIZE * 2), NULL, NULL, NULL) != 0)
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return NULL;
+    }
+
+    (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+
+    MidPeerInfo info;
+    CLEAR(info);
+    bool res = mid_peer_list_get(mid_peerlist_global, chat_id, (size_t)index, &info);
+    if (!res)
+    {
+        return NULL;
+    }
+
+    /* convert binary keys to hex strings */
+    char id_hex[(MID_IDENTITY_KEY_SIZE * 2) + 1];
+    char sig_hex[(MID_SIGNING_KEY_SIZE * 2) + 1];
+    CLEAR(id_hex);
+    CLEAR(sig_hex);
+    sodium_bin2hex(id_hex, sizeof(id_hex), info.identity_key, MID_IDENTITY_KEY_SIZE);
+    sodium_bin2hex(sig_hex, sizeof(sig_hex), info.signing_key, MID_SIGNING_KEY_SIZE);
+
+    /* Use java/lang/Object so the array can hold mixed String, Integer, and Long types */
+    jclass objectClass = (*env)->FindClass(env, "java/lang/Object");
+    if (objectClass == NULL)
+    {
+        return NULL;
+    }
+
+    jobjectArray result = (*env)->NewObjectArray(env, 8, objectClass, NULL);
+    if (result == NULL)
+    {
+        (*env)->DeleteLocalRef(env, objectClass);
+        return NULL;
+    }
+
+    jstring s0 = (*env)->NewStringUTF(env, id_hex);
+    jstring s1 = (*env)->NewStringUTF(env, sig_hex);
+
+    /* Create Integer objects for numeric flags */
+    jclass integerClass = (*env)->FindClass(env, "java/lang/Integer");
+    jmethodID integerInit = (*env)->GetMethodID(env, integerClass, "<init>", "(I)V");
+    jobject o2 = (*env)->NewObject(env, integerClass, integerInit, (jint)info.status);
+    jobject o3 = (*env)->NewObject(env, integerClass, integerInit, (jint)info.connection_status);
+    jobject o4 = (*env)->NewObject(env, integerClass, integerInit, (jint)info.has_signature);
+
+    /* Create Long object for last_seen timestamp */
+    jclass longClass = (*env)->FindClass(env, "java/lang/Long");
+    jmethodID longInit = (*env)->GetMethodID(env, longClass, "<init>", "(J)V");
+    jobject o5 = (*env)->NewObject(env, longClass, longInit, (jlong)info.last_seen);
+
+    /* Create Integer object for role */
+    jobject o7 = (*env)->NewObject(env, integerClass, integerInit, (jint)info.role);
+
+    (*env)->SetObjectArrayElement(env, result, 0, s0);
+    (*env)->SetObjectArrayElement(env, result, 1, s1);
+    (*env)->SetObjectArrayElement(env, result, 2, o2);
+    (*env)->SetObjectArrayElement(env, result, 3, o3);
+    (*env)->SetObjectArrayElement(env, result, 4, o4);
+    (*env)->SetObjectArrayElement(env, result, 5, o5);
+    /* 6 is set later */
+    (*env)->SetObjectArrayElement(env, result, 7, o7);
+
+    if (s0 != NULL) (*env)->DeleteLocalRef(env, s0);
+    if (s1 != NULL) (*env)->DeleteLocalRef(env, s1);
+    if (o2 != NULL) (*env)->DeleteLocalRef(env, o2);
+    if (o3 != NULL) (*env)->DeleteLocalRef(env, o3);
+    if (o4 != NULL) (*env)->DeleteLocalRef(env, o4);
+    if (o5 != NULL) (*env)->DeleteLocalRef(env, o5);
+    if (o7 != NULL) (*env)->DeleteLocalRef(env, o7);
+
+    /* MID_PEERLIST: handle random byte buffers as nickname safely using explicit length */
+    jstring nick_str = c_safe_string_from_java((const char *)info.nickname, info.nickname_len);
+    (*env)->SetObjectArrayElement(env, result, 6, nick_str);
+    if (nick_str != NULL)
+    {
+        (*env)->DeleteLocalRef(env, nick_str);
+    }
+
+    /* Clean up class references */
+    if (integerClass != NULL) (*env)->DeleteLocalRef(env, integerClass);
+    if (longClass != NULL) (*env)->DeleteLocalRef(env, longClass);
+    if (objectClass != NULL) (*env)->DeleteLocalRef(env, objectClass);
+
+    return result;
+#endif
+}
+
+
+/*
+* Return the total number of peers in the persistent middleware roster for a group.
+* This includes ALL peers: online, offline, and LEFT tombstones.
+* Returns: count >= 0, or -99 on error.
+*/
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1peer_1count(JNIEnv *env, jobject thiz, jobject group_id)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return (jlong)-99;
+#else
+    if (mid_peerlist_global == NULL)
+    {
+        return (jlong)-99;
+    }
+    if (group_id == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    const char *group_id_str = (*env)->GetStringUTFChars(env, (jstring)group_id, NULL);
+    if (group_id_str == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    if (strlen(group_id_str) != (TOX_GROUP_CHAT_ID_SIZE * 2))
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+    if (sodium_hex2bin(chat_id, TOX_GROUP_CHAT_ID_SIZE, group_id_str, (TOX_GROUP_CHAT_ID_SIZE * 2), NULL, NULL, NULL) != 0)
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+
+    size_t res = mid_peer_count(mid_peerlist_global, chat_id);
+    return (jlong)res;
+#endif
+}
+
+/*
+* Return the number of SIGNED peers in the persistent middleware roster for a group.
+* A signed peer has a cryptographically verified presence record (Ed25519 signature).
+* This includes signed peers that are online, offline, or have LEFT.
+* Returns: count >= 0, or -99 on error.
+*/
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1signed_1count(JNIEnv *env, jobject thiz, jobject group_id)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return (jlong)-99;
+#else
+    if (mid_peerlist_global == NULL)
+    {
+        return (jlong)-99;
+    }
+    if (group_id == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    const char *group_id_str = (*env)->GetStringUTFChars(env, (jstring)group_id, NULL);
+    if (group_id_str == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    if (strlen(group_id_str) != (TOX_GROUP_CHAT_ID_SIZE * 2))
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+    if (sodium_hex2bin(chat_id, TOX_GROUP_CHAT_ID_SIZE, group_id_str, (TOX_GROUP_CHAT_ID_SIZE * 2), NULL, NULL, NULL) != 0)
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+
+    size_t res = mid_signed_count(mid_peerlist_global, chat_id);
+    return (jlong)res;
+#endif
+}
+
+/*
+* Return the number of ONLINE peers in the persistent middleware roster for a group.
+* A peer is considered online if its connection_status is TCP or UDP (not NONE).
+* LEFT tombstones are never counted as online.
+* Returns: count >= 0, or -99 on error.
+*/
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1online_1count(JNIEnv *env, jobject thiz, jobject group_id)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return (jlong)-99;
+#else
+    if (mid_peerlist_global == NULL)
+    {
+        return (jlong)-99;
+    }
+    if (group_id == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    const char *group_id_str = (*env)->GetStringUTFChars(env, (jstring)group_id, NULL);
+    if (group_id_str == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    if (strlen(group_id_str) != (TOX_GROUP_CHAT_ID_SIZE * 2))
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+    if (sodium_hex2bin(chat_id, TOX_GROUP_CHAT_ID_SIZE, group_id_str, (TOX_GROUP_CHAT_ID_SIZE * 2), NULL, NULL, NULL) != 0)
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+
+    size_t res = mid_online_count(mid_peerlist_global, chat_id);
+    return (jlong)res;
+#endif
+}
+
+
+/*
+* Return the number of OFFLINE (but not LEFT) peers in the persistent middleware roster for a group.
+* These are peers who are still ACTIVE members but currently disconnected.
+* LEFT tombstones and online peers are NOT counted.
+* Returns: count >= 0, or -99 on error.
+*/
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1offline_1count(JNIEnv *env, jobject thiz, jobject group_id)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return (jlong)-99;
+#else
+    if (mid_peerlist_global == NULL)
+    {
+        return (jlong)-99;
+    }
+    if (group_id == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    const char *group_id_str = (*env)->GetStringUTFChars(env, (jstring)group_id, NULL);
+    if (group_id_str == NULL)
+    {
+        return (jlong)-99;
+    }
+
+    if (strlen(group_id_str) != (TOX_GROUP_CHAT_ID_SIZE * 2))
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+    if (sodium_hex2bin(chat_id, TOX_GROUP_CHAT_ID_SIZE, group_id_str, (TOX_GROUP_CHAT_ID_SIZE * 2), NULL, NULL, NULL) != 0)
+    {
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+        return (jlong)-99;
+    }
+
+    (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+
+    size_t res = mid_offline_count(mid_peerlist_global, chat_id);
+    return (jlong)res;
+#endif
+}
+
+
+
+#endif
+/* MID_PEERLIST */
+
 
 
 
