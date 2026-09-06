@@ -94,6 +94,7 @@ import com.zoffcc.applications.sorm.Filetransfer;
 import com.zoffcc.applications.sorm.FriendList;
 import com.zoffcc.applications.sorm.GroupDB;
 import com.zoffcc.applications.sorm.GroupMessage;
+import com.zoffcc.applications.sorm.GroupPeerDB;
 import com.zoffcc.applications.sorm.Message;
 import com.zoffcc.applications.sorm.OrmaDatabase;
 
@@ -113,7 +114,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -156,6 +161,7 @@ import static com.zoffcc.applications.trifa.ConferenceAudioActivity.conf_id;
 import static com.zoffcc.applications.trifa.FriendListFragment.fl_loading_progressbar;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.play_ngc_incoming_audio_frame;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.show_ngc_incoming_video_frame_v2;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.update_group_all_users_last_trigger_ts;
 import static com.zoffcc.applications.trifa.HelperConference.get_last_conference_message_in_this_conference_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperConference.tox_conference_by_confid__wrapper;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_auto_accept_incoming_filetransfer;
@@ -190,6 +196,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.write_chunk_to_VFS_fil
 import static com.zoffcc.applications.trifa.HelperGroup.add_group_peer_to_db;
 import static com.zoffcc.applications.trifa.HelperGroup.add_system_message_to_group_chat;
 import static com.zoffcc.applications.trifa.HelperGroup.android_tox_callback_group_message_cb_method_wrapper;
+import static com.zoffcc.applications.trifa.HelperGroup.get_group_peernum_from_peer_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.get_last_group_message_in_this_group_within_n_seconds_from_sender_pubkey;
 import static com.zoffcc.applications.trifa.HelperGroup.group_message_add_from_sync;
 import static com.zoffcc.applications.trifa.HelperGroup.handle_incoming_group_file;
@@ -234,6 +241,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_MIN_VIDEO_BITRAT
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGHER_GLOBAL_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_UPDATE_NGC_GROUP_ALL_USERS_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_GLOBAL_VIDEO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOWER_NGC_VIDEO_BITRATE;
@@ -242,6 +250,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_ALLOWED_INCOMING_FI
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_GROUP_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_SYNC_DOUBLE_INTERVAL_SECS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_AUDIO_BITRATE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NGC_NEW_PEERS_TIMEDELTA_IN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NORMAL_GLOBAL_AUDIO_BITRATE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_KEY;
@@ -346,7 +355,7 @@ public class MainActivity extends AppCompatActivity
     // --------- global config ---------
     // --------- global config ---------
     final static boolean CTOXCORE_NATIVE_LOGGING = false; // set "false" for release builds
-    final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
+    final static boolean NDK_STDOUT_LOGGING = true; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean INSANE_TRACE_LOGGING = false; // set "false" for release builds
     final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10242; // increase for database schema changes
@@ -398,13 +407,13 @@ public class MainActivity extends AppCompatActivity
     static int NOTIFICATION_ID = 293821038;
     static int WATCHDOG_NOTIFICATION_ID = 696935351;
     static RemoteViews notification_view = null;
-    static FriendListFragment friend_list_fragment = null;
-    static MessageListFragment message_list_fragment = null;
-    static MessageListActivity message_list_activity = null;
-    static ConferenceMessageListFragment conference_message_list_fragment = null;
-    static ConferenceMessageListActivity conference_message_list_activity = null;
-    static GroupMessageListFragment group_message_list_fragment = null;
-    static GroupMessageListActivity group_message_list_activity = null;
+    static volatile FriendListFragment friend_list_fragment = null;
+    static volatile MessageListFragment message_list_fragment = null;
+    static volatile MessageListActivity message_list_activity = null;
+    static volatile ConferenceMessageListFragment conference_message_list_fragment = null;
+    static volatile ConferenceMessageListActivity conference_message_list_activity = null;
+    static volatile GroupMessageListFragment group_message_list_fragment = null;
+    static volatile GroupMessageListActivity group_message_list_activity = null;
     static ConferenceAudioActivity conference_audio_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";
@@ -609,6 +618,95 @@ public class MainActivity extends AppCompatActivity
     // main drawer ----------
 
     Spinner spinner_own_status = null;
+
+    // Thread-safe executor for peer list updates (single-threaded to serialize)
+    private static final ExecutorService mid_peer_list_executor = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "mid-peer-list-update");
+        t.setDaemon(true);
+        return t;
+    });
+
+    // Holds the Future of the currently running update so we can cancel it
+    private static volatile Future<?> mid_peer_list_update_future = null;
+
+    // The atomic peer list snapshot. Readers always see a fully-built, consistent list.
+    // Swapped atomically after building the complete list in the background.
+    static final AtomicReference<List<MidPeerEntry>> mid_peer_list_snapshot =
+            new AtomicReference<>(Collections.emptyList());
+
+    /**
+     * Data class representing one peer entry from the persistent middleware roster.
+     * Immutable once constructed → safe to share across threads without synchronization.
+     * @noinspection ClassCanBeRecord
+     */
+    public static class MidPeerEntry implements Comparable<MidPeerEntry>
+    {
+        public final String identity_key_hex;   // [0] 64-char hex
+        public final String signing_key_hex;    // [1] 64-char hex
+        public final int status;                // [2] 0=ACTIVE, 1=LEFT
+        public final int connection_status;     // [3] 0=NONE, 1=TCP, 2=UDP
+        public final int has_signature;         // [4] 0 or 1
+        public final long last_seen;            // [5] unix timestamp
+        public final String nickname;           // [6]
+        public final int role;                  // [7] 0=FOUNDER, 1=MOD, 2=USER, 3=OBSERVER
+
+        public MidPeerEntry(String identity_key_hex, String signing_key_hex, int status,
+                            int connection_status, int has_signature, long last_seen,
+                            String nickname, int role)
+        {
+            this.identity_key_hex = identity_key_hex;
+            this.signing_key_hex = signing_key_hex;
+            this.status = status;
+            this.connection_status = connection_status;
+            this.has_signature = has_signature;
+            this.last_seen = last_seen;
+            this.nickname = nickname;
+            this.role = role;
+        }
+
+        public boolean is_online()
+        {
+            return connection_status != 0;
+        }
+
+        public boolean is_active()
+        {
+            return status == 0;
+        }
+
+        public boolean is_left()
+        {
+            return status == 1;
+        }
+
+        public boolean is_signed()
+        {
+            return has_signature == 1;
+        }
+
+        @Override
+        public int compareTo(@NonNull MidPeerEntry other)
+        {
+            // Default sort: online first, then by nickname
+            if (this.is_online() != other.is_online())
+            {
+                return this.is_online() ? -1 : 1;
+            }
+            String n1 = this.nickname != null ? this.nickname : "";
+            String n2 = other.nickname != null ? other.nickname : "";
+            return n1.compareToIgnoreCase(n2);
+        }
+
+        @NonNull
+        @Override
+        public String toString()
+        {
+            return "MidPeerEntry{nick='" + nickname + "', online=" + is_online()
+                   + ", active=" + is_active() + ", signed=" + is_signed()
+                   + ", role=" + role + ", last_seen=" + last_seen + "}";
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -4760,6 +4858,37 @@ public class MainActivity extends AppCompatActivity
      * @return the group_number on success, UINT32_MAX on failure.
      */
     public static native long tox_group_invite_accept(long friend_number, @NonNull ByteBuffer invite_data_buffer, long invite_data_length, @NonNull String my_peer_name, String password);
+
+    public static native long tox_group_mid_peer_count(String group_id);
+
+    public static native long tox_group_mid_signed_count(String group_id);
+
+    public static native long tox_group_mid_online_count(String group_id);
+
+    public static native long tox_group_mid_offline_count(String group_id);
+
+    /**
+     * Call IMMEDIATELY BEFORE tox_group_leave().
+     * Broadcasts a signed LEFT tombstone.
+     * Returns: 1=success, 0=failure, -99=tox NULL
+     */
+    public static native int tox_group_mid_announce_leave(long group_number);
+
+    /**
+     * Call AFTER tox_group_leave().
+     * Wipes middleware state for this group.
+     * Returns: 0=success, -99=tox NULL
+     */
+    public static native int tox_group_mid_on_group_delete(long group_number);
+
+    /**
+     * Returns the number of peers in the persistent middleware roster.
+     * Includes offline peers and LEFT tombstones.
+     * Returns: count >= 0, or -99 if middleware not initialized.
+     */
+    public static native long tox_group_mid_peer_list_count(String group_id);
+
+    public static native Object[] tox_group_mid_peer_list_get(String group_id, long index);
 
     public static native int toxav_ngc_video_encode(int vbitrate, int max_quantizer, int width, int height, byte[] y, int y_bytes, byte[] u, int u_bytes, byte[] v, int v_bytes, byte[] encoded_frame_bytes);
 
@@ -8938,6 +9067,185 @@ public class MainActivity extends AppCompatActivity
     // -------- called by native new Group methods --------
     // -------- called by native new Group methods --------
     // -------- called by native new Group methods --------
+
+    // -------- called by native NGCMID --------
+    // -------- called by native NGCMID --------
+    // -------- called by native NGCMID --------
+
+    /**
+     * Called from JNI whenever the persistent peer roster changes for a group.
+     * Refresh your UI list here.
+     *
+     * THREAD SAFETY:
+     * - This may be called from ANY thread (JNI callback thread).
+     * - We use a single-threaded executor + Future cancellation to ensure only
+     *   one update runs at a time. If a new callback arrives while an update is
+     *   in progress, the old one is cancelled and a fresh update starts.
+     * - The final peer list is built completely in the background, then swapped
+     *   atomically via AtomicReference. Readers never see a half-built list.
+     *
+     * @noinspection ExtractMethodRecommender
+     */
+    static void android_tox_callback_group_mid_peer_list_changed_cb(String group_id)
+    {
+        // --- Guard: activity must exist ---
+        final GroupMessageListActivity activity = group_message_list_activity;
+        if (activity == null)
+        {
+            // Log.d(TAG, "MID_PEERLIST:no activity, ignoring");
+            return;
+        }
+
+        // --- Guard: only update if this is the currently displayed group ---
+        final String activity_gid = activity.group_id;
+        if (activity_gid == null || group_id == null)
+        {
+            return;
+        }
+
+        if (!activity_gid.toLowerCase().equals(group_id.toLowerCase()))
+        {
+            // Log.d(TAG, "MID_PEERLIST:group_id mismatch (activity=" + activity_gid
+            //           + " cb=" + group_id + "), ignoring");
+            return;
+        }
+
+        Log.d(TAG, "MID_PEERLIST:peer list changed for group " + group_id);
+
+        group_message_list_activity.set_peer_count_header();
+
+        // --- Cancel any in-progress update ---
+        final Future<?> prev = mid_peer_list_update_future;
+        if (prev != null && !prev.isDone())
+        {
+            prev.cancel(true); // interrupt if running
+        }
+
+        // --- Submit a new update task ---
+        final String gid_lower = group_id.toLowerCase();
+        mid_peer_list_update_future = mid_peer_list_executor.submit(() -> {
+            try
+            {
+                // 1. Get the peer count from JNI
+                long count_long = tox_group_mid_peer_list_count(gid_lower);
+                if (count_long < 0)
+                {
+                    Log.e(TAG, "MID_PEERLIST:mid_peer_list_count returned error: " + count_long);
+                    return;
+                }
+                int count = (int) count_long;
+                if (count == 0)
+                {
+                    // Atomically swap in an empty list
+                    mid_peer_list_snapshot.set(Collections.emptyList());
+                    // Notify UI on main thread
+                    notify_peer_list_updated(activity);
+                    return;
+                }
+
+                // 2. Build the complete list (transaction-style: build fully, then swap)
+                List<MidPeerEntry> new_list = new ArrayList<>(count);
+
+                for (int i = 0; i < count; i++)
+                {
+                    // Check for cancellation between iterations
+                    if (Thread.currentThread().isInterrupted())
+                    {
+                        Log.d(TAG, "MID_PEERLIST:update cancelled during read at index " + i);
+                        return;
+                    }
+
+                    Object[] peer_data = tox_group_mid_peer_list_get(gid_lower, i);
+                    if (peer_data == null || peer_data.length < 8)
+                    {
+                        continue; // skip malformed entry
+                    }
+
+                    try
+                    {
+                        String identity_key_hex = ((String) peer_data[0]).toUpperCase();
+                        String signing_key_hex  = ((String) peer_data[1]).toUpperCase();;
+                        int status              = (Integer) peer_data[2];
+                        int connection_status   = (Integer) peer_data[3];
+                        int has_signature       = (Integer) peer_data[4];
+                        long last_seen          = (Long) peer_data[5];
+                        String nickname         = (String) peer_data[6];
+                        int role                = (Integer) peer_data[7];
+
+                        MidPeerEntry entry = new MidPeerEntry(
+                                identity_key_hex,
+                                signing_key_hex,
+                                status,
+                                connection_status,
+                                has_signature,
+                                last_seen,
+                                nickname,
+                                role
+                        );
+                        new_list.add(entry);
+                    }
+                    catch (ClassCastException | NullPointerException e)
+                    {
+                        Log.w(TAG, "MID_PEERLIST:malformed peer entry at index " + i, e);
+                    }
+                }
+
+                // 3. Sort the list (online first, then alphabetical by nickname)
+                Collections.sort(new_list);
+
+                // 4. Wrap in unmodifiable list → immutable snapshot
+                List<MidPeerEntry> immutable_snapshot = Collections.unmodifiableList(new_list);
+
+                // 5. ATOMIC SWAP: readers now see the fully-built list
+                mid_peer_list_snapshot.set(immutable_snapshot);
+
+                Log.d(TAG, "MID_PEERLIST:update complete, " + immutable_snapshot.size() + " peers loaded");
+
+                // 6. Notify the UI activity on the main thread
+                notify_peer_list_updated(activity);
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "MID_PEERLIST:error during peer list update", e);
+            }
+        });
+    }
+
+    /**
+     * Notify the activity that the peer list snapshot has been updated.
+     * Runs the UI callback on the main thread.
+     */
+    static void notify_peer_list_updated(final GroupMessageListActivity activity)
+    {
+        if (activity == null)
+        {
+            return;
+        }
+        try
+        {
+            group_message_list_activity.set_peer_names_and_avatars();
+        }
+        catch (Exception e)
+        {
+            // Activity might have been destroyed between check and runOnUiThread
+            Log.w(TAG, "MID_PEERLIST:could not notify activity", e);
+        }
+    }
+
+    /**
+     * Public accessor for the current peer list snapshot.
+     * Returns an immutable list. Thread-safe to call from any thread.
+     * The returned list is a consistent snapshot (never half-built).
+     */
+    public static List<MidPeerEntry> get_mid_peer_list_snapshot()
+    {
+        return mid_peer_list_snapshot.get();
+    }
+
+
+    // -------- called by native NGCMID --------
+    // -------- called by native NGCMID --------
+    // -------- called by native NGCMID --------
 
     /*
      * this is used to load the native library on
