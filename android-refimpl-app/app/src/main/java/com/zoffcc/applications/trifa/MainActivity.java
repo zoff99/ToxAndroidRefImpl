@@ -117,7 +117,10 @@ import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
@@ -619,15 +622,15 @@ public class MainActivity extends AppCompatActivity
 
     Spinner spinner_own_status = null;
 
-    // Thread-safe executor for peer list updates (single-threaded to serialize)
-    private static final ExecutorService mid_peer_list_executor = Executors.newSingleThreadExecutor(r -> {
-        Thread t = new Thread(r, "mid-peer-list-update");
-        t.setDaemon(true);
-        return t;
-    });
-
+    // Change ExecutorService to ScheduledExecutorService
+    private static ScheduledExecutorService mid_peer_list_executor = Executors.newSingleThreadScheduledExecutor();
     // Holds the Future of the currently running update so we can cancel it
-    private static volatile Future<?> mid_peer_list_update_future = null;
+    private static ScheduledFuture<?> mid_peer_list_update_future = null;
+
+    // New fields for throttling logic
+    private static ScheduledFuture<?> trailing_update_future = null;
+    private static long last_execution_time = 0;
+    private static final Object update_lock = new Object();
 
     // The atomic peer list snapshot. Readers always see a fully-built, consistent list.
     // Swapped atomically after building the complete list in the background.
@@ -9109,11 +9112,12 @@ public class MainActivity extends AppCompatActivity
      * Called from JNI whenever the persistent peer roster changes for a group.
      * Refresh your UI list here.
      *
-     * THREAD SAFETY:
+     * THREAD SAFETY & THROTTLING:
      * - This may be called from ANY thread (JNI callback thread).
-     * - We use a single-threaded executor + Future cancellation to ensure only
-     *   one update runs at a time. If a new callback arrives while an update is
-     *   in progress, the old one is cancelled and a fresh update starts.
+     * - We use a single-threaded scheduled executor to ensure only one update runs
+     *   at a time, and to throttle updates to at most once per second.
+     * - If updates arrive faster than 1/sec, we schedule a "trailing" update to
+     *   ensure the final state of a burst is never missed.
      * - The final peer list is built completely in the background, then swapped
      *   atomically via AtomicReference. Readers never see a half-built list.
      *
@@ -9130,7 +9134,7 @@ public class MainActivity extends AppCompatActivity
         }
 
         // --- Guard: only update if this is the currently displayed group ---
-        final String activity_gid = activity.group_id;
+        final String activity_gid = GroupMessageListActivity.group_id;
         if (activity_gid == null || group_id == null)
         {
             return;
@@ -9147,103 +9151,142 @@ public class MainActivity extends AppCompatActivity
 
         group_message_list_activity.set_peer_count_header();
 
-        // --- Cancel any in-progress update ---
-        final Future<?> prev = mid_peer_list_update_future;
-        if (prev != null && !prev.isDone())
-        {
-            prev.cancel(true); // interrupt if running
-        }
-
-        // --- Submit a new update task ---
         final String gid_lower = group_id.toLowerCase();
-        mid_peer_list_update_future = mid_peer_list_executor.submit(() -> {
-            try
+
+        // --- Throttling Logic: At most 1 update per second, without missing the tail ---
+        synchronized (update_lock) {
+            long now = System.currentTimeMillis();
+
+            if (now - last_execution_time >= 1000) {
+                // Enough time has passed, run immediately
+                last_execution_time = now;
+
+                // Cancel any currently running task to save CPU since data is now stale
+                if (mid_peer_list_update_future != null && !mid_peer_list_update_future.isDone()) {
+                    mid_peer_list_update_future.cancel(true);
+                }
+
+                mid_peer_list_update_future = (ScheduledFuture<?>) mid_peer_list_executor.submit(() -> {
+                    run_peer_list_update(gid_lower, activity);
+                });
+            } else {
+                // We are in the 1-second cooldown.
+                // Cancel the currently running task if it's not the trailing task we are waiting for
+                if (mid_peer_list_update_future != null && !mid_peer_list_update_future.isDone()) {
+                    if (mid_peer_list_update_future != trailing_update_future) {
+                        mid_peer_list_update_future.cancel(true);
+                    }
+                }
+
+                // Schedule a trailing update if one isn't already scheduled
+                if (trailing_update_future == null || trailing_update_future.isDone()) {
+                    long delay = 1000 - (now - last_execution_time);
+                    trailing_update_future = mid_peer_list_executor.schedule(() -> {
+                        synchronized (update_lock) {
+                            last_execution_time = System.currentTimeMillis();
+                            trailing_update_future = null;
+                        }
+                        run_peer_list_update(gid_lower, activity);
+                    }, delay, TimeUnit.MILLISECONDS);
+
+                    // Track it so we don't accidentally cancel it later
+                    mid_peer_list_update_future = trailing_update_future;
+                }
+            }
+        }
+    }
+
+    /**
+     * Extracted the actual update logic to keep the callback method clean.
+     * @noinspection ExtractMethodRecommender
+     */
+    private static void run_peer_list_update(String gid_lower, GroupMessageListActivity activity) {
+        try
+        {
+            // 1. Get the peer count from JNI
+            long count_long = tox_group_mid_peer_list_count(gid_lower);
+            if (count_long < 0)
             {
-                // 1. Get the peer count from JNI
-                long count_long = tox_group_mid_peer_list_count(gid_lower);
-                if (count_long < 0)
-                {
-                    Log.e(TAG, "MID_PEERLIST:mid_peer_list_count returned error: " + count_long);
-                    // Atomically swap in an empty list
-                    mid_peer_list_snapshot.set(Collections.emptyList());
-                    return;
-                }
-                int count = (int) count_long;
-                if (count == 0)
-                {
-                    // Atomically swap in an empty list
-                    mid_peer_list_snapshot.set(Collections.emptyList());
-                    // Notify UI on main thread
-                    notify_peer_list_updated(activity);
-                    return;
-                }
-
-                // 2. Build the complete list (transaction-style: build fully, then swap)
-                List<MidPeerEntry> new_list = new ArrayList<>(count);
-
-                for (int i = 0; i < count; i++)
-                {
-                    // Check for cancellation between iterations
-                    if (Thread.currentThread().isInterrupted())
-                    {
-                        Log.d(TAG, "MID_PEERLIST:update cancelled during read at index " + i);
-                        return;
-                    }
-
-                    Object[] peer_data = tox_group_mid_peer_list_get(gid_lower, i);
-                    if (peer_data == null || peer_data.length < 8)
-                    {
-                        continue; // skip malformed entry
-                    }
-
-                    try
-                    {
-                        String identity_key_hex = ((String) peer_data[0]).toUpperCase();
-                        String signing_key_hex  = ((String) peer_data[1]).toUpperCase();;
-                        int status              = (Integer) peer_data[2];
-                        int connection_status   = (Integer) peer_data[3];
-                        int has_signature       = (Integer) peer_data[4];
-                        long last_seen          = (Long) peer_data[5];
-                        String nickname         = (String) peer_data[6];
-                        int role                = (Integer) peer_data[7];
-
-                        MidPeerEntry entry = new MidPeerEntry(
-                                identity_key_hex,
-                                signing_key_hex,
-                                status,
-                                connection_status,
-                                has_signature,
-                                last_seen,
-                                nickname,
-                                role
-                        );
-                        new_list.add(entry);
-                    }
-                    catch (ClassCastException | NullPointerException e)
-                    {
-                        Log.w(TAG, "MID_PEERLIST:malformed peer entry at index " + i, e);
-                    }
-                }
-
-                // 3. Sort the list (online first, then alphabetical by nickname)
-                Collections.sort(new_list);
-
-                // 4. Wrap in unmodifiable list → immutable snapshot
-                List<MidPeerEntry> immutable_snapshot = Collections.unmodifiableList(new_list);
-
-                // 5. ATOMIC SWAP: readers now see the fully-built list
-                mid_peer_list_snapshot.set(immutable_snapshot);
-
-                Log.d(TAG, "MID_PEERLIST:update complete, " + immutable_snapshot.size() + " peers loaded");
-
-                // 6. Notify the UI activity on the main thread
+                Log.e(TAG, "MID_PEERLIST:mid_peer_list_count returned error: " + count_long);
+                // Atomically swap in an empty list
+                mid_peer_list_snapshot.set(Collections.emptyList());
+                return;
+            }
+            int count = (int) count_long;
+            if (count == 0)
+            {
+                // Atomically swap in an empty list
+                mid_peer_list_snapshot.set(Collections.emptyList());
+                // Notify UI on main thread
                 notify_peer_list_updated(activity);
+                return;
             }
-            catch (Exception e)
+
+            // 2. Build the complete list (transaction-style: build fully, then swap)
+            List<MidPeerEntry> new_list = new ArrayList<>(count);
+
+            for (int i = 0; i < count; i++)
             {
-                Log.e(TAG, "MID_PEERLIST:error during peer list update", e);
+                // Check for cancellation between iterations
+                if (Thread.currentThread().isInterrupted())
+                {
+                    Log.d(TAG, "MID_PEERLIST:update cancelled during read at index " + i);
+                    return;
+                }
+
+                Object[] peer_data = tox_group_mid_peer_list_get(gid_lower, i);
+                if (peer_data == null || peer_data.length < 8)
+                {
+                    continue; // skip malformed entry
+                }
+
+                try
+                {
+                    String identity_key_hex = ((String) peer_data[0]).toUpperCase();
+                    String signing_key_hex  = ((String) peer_data[1]).toUpperCase();
+                    int status              = (Integer) peer_data[2];
+                    int connection_status   = (Integer) peer_data[3];
+                    int has_signature       = (Integer) peer_data[4];
+                    long last_seen          = (Long) peer_data[5];
+                    String nickname         = (String) peer_data[6];
+                    int role                = (Integer) peer_data[7];
+
+                    MidPeerEntry entry = new MidPeerEntry(
+                            identity_key_hex,
+                            signing_key_hex,
+                            status,
+                            connection_status,
+                            has_signature,
+                            last_seen,
+                            nickname,
+                            role
+                    );
+                    new_list.add(entry);
+                }
+                catch (ClassCastException | NullPointerException e)
+                {
+                    Log.w(TAG, "MID_PEERLIST:malformed peer entry at index " + i, e);
+                }
             }
-        });
+
+            // 3. Sort the list (online first, then alphabetical by nickname)
+            Collections.sort(new_list);
+
+            // 4. Wrap in unmodifiable list → immutable snapshot
+            List<MidPeerEntry> immutable_snapshot = Collections.unmodifiableList(new_list);
+
+            // 5. ATOMIC SWAP: readers now see the fully-built list
+            mid_peer_list_snapshot.set(immutable_snapshot);
+
+            Log.d(TAG, "MID_PEERLIST:update complete, " + immutable_snapshot.size() + " peers loaded");
+
+            // 6. Notify the UI activity on the main thread
+            notify_peer_list_updated(activity);
+        }
+        catch (Exception e)
+        {
+            Log.e(TAG, "MID_PEERLIST:error during peer list update", e);
+        }
     }
 
     /**
