@@ -1533,6 +1533,14 @@ public class TrifaToxService extends Service
                                 {
                                 }
 
+                                try
+                                {
+                                    updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value);
+                                }
+                                catch(Exception e)
+                                {
+                                }
+
                                 for (int ii = 0; ii < sleep_in_sec; ii++)
                                 {
                                     if ((global_showing_messageview) || (global_showing_anygroupview))
@@ -1553,6 +1561,14 @@ public class TrifaToxService extends Service
                                     try
                                     {
                                         updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value);
+                                    }
+                                    catch(Exception e)
+                                    {
+                                    }
+
+                                    try
+                                    {
+                                        updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value);
                                     }
                                     catch(Exception e)
                                     {
@@ -1781,6 +1797,22 @@ public class TrifaToxService extends Service
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                }
+
+                try
+                {
+                    updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value);
+                }
+                catch(Exception e)
+                {
+                }
+
+                try
+                {
+                    updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value);
+                }
+                catch(Exception e)
+                {
                 }
 
                 //Log.i(TAG, "VFS:detachThread:(TrifaToxService):" + Thread.currentThread().getId() + ":" +
