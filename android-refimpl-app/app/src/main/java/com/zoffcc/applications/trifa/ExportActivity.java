@@ -48,6 +48,7 @@ import static com.zoffcc.applications.trifa.MainActivity.MAIN_VFS_NAME;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FULL_FILES_EXPORT_DIR;
+import static com.zoffcc.applications.trifa.MainActivity.clear_group_peers;
 import static com.zoffcc.applications.trifa.MainActivity.export_savedata_file_unsecure;
 import static com.zoffcc.applications.trifa.MainActivity.manually_log_out;
 
@@ -141,6 +142,8 @@ public class ExportActivity extends AppCompatActivity
         protected void onPreExecute()
         {
             manually_log_out();
+
+            clear_group_peers();
 
             dialog.setMessage("exporting ...");
             dialog.setCancelable(false);

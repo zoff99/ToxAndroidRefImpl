@@ -1701,6 +1701,8 @@ public class MainActivity extends AppCompatActivity
                             {
                                 e.printStackTrace();
                             }
+
+                            clear_group_peers();
                         }
                         else if (position == 6)
                         {
@@ -2017,6 +2019,37 @@ public class MainActivity extends AppCompatActivity
         */
 
         Log.i(TAG, "M:STARTUP:-- DONE --");
+    }
+
+    static void clear_group_peers()
+    {
+        try
+        {
+            group_message_list_activity.remove_group_all_users();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            lookup_peer_listnum_pubkey.clear();
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
+
+        try
+        {
+            // Atomically swap in an empty list
+            mid_peer_list_snapshot.set(Collections.emptyList());
+        }
+        catch (Exception e2)
+        {
+            e2.printStackTrace();
+        }
     }
 
     void upgrade_db_schema_do(int old_version, int new_version)
@@ -9131,6 +9164,8 @@ public class MainActivity extends AppCompatActivity
                 if (count_long < 0)
                 {
                     Log.e(TAG, "MID_PEERLIST:mid_peer_list_count returned error: " + count_long);
+                    // Atomically swap in an empty list
+                    mid_peer_list_snapshot.set(Collections.emptyList());
                     return;
                 }
                 int count = (int) count_long;
