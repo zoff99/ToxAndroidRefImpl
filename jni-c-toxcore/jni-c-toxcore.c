@@ -9903,6 +9903,45 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1on_1group_1dele
 #endif
 }
 
+
+/*
+* Return the total bytes sent and received by the middleware custom packets.
+* Returns a long array of size 2: [sent_bytes, recv_bytes].
+* Returns NULL if the middleware is not initialized or NGC is disabled.
+*/
+JNIEXPORT jlongArray JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1get_1network_1stats(JNIEnv *env, jobject thiz)
+{
+    TRACE_LOGGER();
+#ifndef HAVE_TOX_NGC
+    return NULL;
+#else
+    if (mid_peerlist_global == NULL)
+    {
+        return NULL;
+    }
+
+    uint64_t sent_bytes = 0;
+    uint64_t recv_bytes = 0;
+
+    mid_get_network_stats(mid_peerlist_global, &sent_bytes, &recv_bytes);
+
+    jlongArray result = (*env)->NewLongArray(env, 2);
+    if (result == NULL)
+    {
+        return NULL; // OutOfMemoryError
+    }
+
+    jlong buffer[2];
+    buffer[0] = (jlong)sent_bytes;
+    buffer[1] = (jlong)recv_bytes;
+
+    (*env)->SetLongArrayRegion(env, result, 0, 2, buffer);
+    return result;
+#endif
+}
+
+
 /*
 * Return the number of peers in the persistent middleware roster for a group.
 * This includes offline peers and LEFT tombstones.
