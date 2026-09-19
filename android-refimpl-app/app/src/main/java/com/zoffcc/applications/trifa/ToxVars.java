@@ -2039,6 +2039,117 @@ public class ToxVars
         }
     }
 
+    // --------- NETPROF ------------
+    // --------- NETPROF ------------
+    // --------- NETPROF ------------
+
+    public static enum TOX_NETPROF_PACKET_TYPE
+    {
+        /**
+         * TCP client packets.
+         */
+        TOX_NETPROF_PACKET_TYPE_TCP_CLIENT(0),
+
+        /**
+         * TCP server packets.
+         */
+        TOX_NETPROF_PACKET_TYPE_TCP_SERVER(1),
+
+        /**
+         * Combined TCP server and TCP client packets.
+         */
+        TOX_NETPROF_PACKET_TYPE_TCP(2),
+
+        /**
+         * UDP packets.
+         */
+        TOX_NETPROF_PACKET_TYPE_UDP(3);
+
+        public int value;
+
+        private TOX_NETPROF_PACKET_TYPE(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    public static enum TOX_NETPROF_DIRECTION
+    {
+        /**
+         * Outbound packets.
+         */
+        TOX_NETPROF_DIRECTION_SENT(0),
+
+        /**
+         * Inbound packets.
+         */
+        TOX_NETPROF_DIRECTION_RECV(1);
+
+        public int value;
+
+        private TOX_NETPROF_DIRECTION(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    public static enum TOX_NETPROF_PACKET_ID
+    {
+        TOX_NETPROF_PACKET_ID_ZERO(0x00),
+        TOX_NETPROF_PACKET_ID_ONE(0x01),
+        TOX_NETPROF_PACKET_ID_TWO(0x02),
+        TOX_NETPROF_PACKET_ID_TCP_DISCONNECT(0x03),
+        TOX_NETPROF_PACKET_ID_FOUR(0x04),
+        TOX_NETPROF_PACKET_ID_TCP_PONG(0x05),
+        TOX_NETPROF_PACKET_ID_TCP_OOB_SEND(0x06),
+        TOX_NETPROF_PACKET_ID_TCP_OOB_RECV(0x07),
+        TOX_NETPROF_PACKET_ID_TCP_ONION_REQUEST(0x08),
+        TOX_NETPROF_PACKET_ID_TCP_ONION_RESPONSE(0x09),
+        TOX_NETPROF_PACKET_ID_TCP_DATA(0x10),
+        TOX_NETPROF_PACKET_ID_COOKIE_REQUEST(0x18),
+        TOX_NETPROF_PACKET_ID_COOKIE_RESPONSE(0x19),
+        TOX_NETPROF_PACKET_ID_CRYPTO_HS(0x1a),
+        TOX_NETPROF_PACKET_ID_CRYPTO_DATA(0x1b),
+        TOX_NETPROF_PACKET_ID_CRYPTO(0x20),
+        TOX_NETPROF_PACKET_ID_LAN_DISCOVERY(0x21),
+        TOX_NETPROF_PACKET_ID_GC_HANDSHAKE(0x5a),
+        TOX_NETPROF_PACKET_ID_GC_LOSSLESS(0x5b),
+        TOX_NETPROF_PACKET_ID_GC_LOSSY(0x5c),
+        TOX_NETPROF_PACKET_ID_ONION_SEND_INITIAL(0x80),
+        TOX_NETPROF_PACKET_ID_ONION_SEND_1(0x81),
+        TOX_NETPROF_PACKET_ID_ONION_SEND_2(0x82),
+        TOX_NETPROF_PACKET_ID_ANNOUNCE_REQUEST_OLD(0x83),
+        TOX_NETPROF_PACKET_ID_ANNOUNCE_RESPONSE_OLD(0x84),
+        TOX_NETPROF_PACKET_ID_ONION_DATA_REQUEST(0x85),
+        TOX_NETPROF_PACKET_ID_ONION_DATA_RESPONSE(0x86),
+        TOX_NETPROF_PACKET_ID_ANNOUNCE_REQUEST(0x87),
+        TOX_NETPROF_PACKET_ID_ANNOUNCE_RESPONSE(0x88),
+        TOX_NETPROF_PACKET_ID_ONION_RECV_3(0x8c),
+        TOX_NETPROF_PACKET_ID_ONION_RECV_2(0x8d),
+        TOX_NETPROF_PACKET_ID_ONION_RECV_1(0x8e),
+        TOX_NETPROF_PACKET_ID_FORWARD_REQUEST(0x90),
+        TOX_NETPROF_PACKET_ID_FORWARDING(0x91),
+        TOX_NETPROF_PACKET_ID_FORWARD_REPLY(0x92),
+        TOX_NETPROF_PACKET_ID_DATA_SEARCH_REQUEST(0x93),
+        TOX_NETPROF_PACKET_ID_DATA_SEARCH_RESPONSE(0x94),
+        TOX_NETPROF_PACKET_ID_DATA_RETRIEVE_REQUEST(0x95),
+        TOX_NETPROF_PACKET_ID_DATA_RETRIEVE_RESPONSE(0x96),
+        TOX_NETPROF_PACKET_ID_STORE_ANNOUNCE_REQUEST(0x97),
+        TOX_NETPROF_PACKET_ID_STORE_ANNOUNCE_RESPONSE(0x98),
+        TOX_NETPROF_PACKET_ID_BOOTSTRAP_INFO(0xf0);
+
+        public int value;
+
+        private TOX_NETPROF_PACKET_ID(int value)
+        {
+            this.value = value;
+        }
+    }
+
+    // --------- NETPROF ------------
+    // --------- NETPROF ------------
+    // --------- NETPROF ------------
+
     // ---------- TOX -------------
     // ---------- TOX -------------
     // ---------- TOX -------------
