@@ -223,6 +223,7 @@ public class TrifaToxService extends Service
     static long last_start_queued_fts_ms = -1;
     static boolean need_wakeup_now = false;
     static int tox_thread_starting_up = 0;
+    static long tox_startup_timestamp = -1L;
 
     // [ADDED] WeakReferences to hold the Tox health UI views safely
     private static WeakReference<ImageView> toxHealthIconRef = null;
@@ -1491,6 +1492,8 @@ public class TrifaToxService extends Service
                 append_logger_msg(TAG + "::" + "tox main loop START");
                 tox_thread_starting_up = 1;
 
+                tox_startup_timestamp = System.currentTimeMillis();
+
                 while (!stop_me)
                 {
                     try
@@ -1758,6 +1761,7 @@ public class TrifaToxService extends Service
                 append_logger_msg(TAG + "::" + "tox main loop stop");
 
                 tox_thread_starting_up = 2;
+                tox_startup_timestamp = -1L;
 
                 // Clean up the callback when the app is fully closed
                 ConnectionManager.unregisterModernNetworkCallback(getApplicationContext());

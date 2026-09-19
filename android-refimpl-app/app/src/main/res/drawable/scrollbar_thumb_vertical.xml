@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="#80808080" /> <!-- 50% grey thumb, like the desktop scrollbar -->
+    <corners android:radius="3dp" />
+    <size android:width="6dp" />
+</shape>
