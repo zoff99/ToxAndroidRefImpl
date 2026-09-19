@@ -4917,6 +4917,12 @@ public class MainActivity extends AppCompatActivity
     public static native long tox_group_mid_offline_count(String group_id);
 
     /**
+     * Get middleware custom packet network stats.
+     * @return long array of size 2: [sent_bytes, recv_bytes], or null if unavailable.
+     */
+    public static native long[] tox_group_mid_get_network_stats();
+
+    /**
      * Call IMMEDIATELY BEFORE tox_group_leave().
      * Broadcasts a signed LEFT tombstone.
      * Returns: 1=success, 0=failure, -99=tox NULL
