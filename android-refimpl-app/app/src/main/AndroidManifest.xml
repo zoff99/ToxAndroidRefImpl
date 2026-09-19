@@ -290,6 +290,11 @@
         </activity>
 
         <activity
+            android:name=".NetProfiler"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+
+        <activity
             android:name=".AudioRoundtripActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:excludeFromRecents="true"

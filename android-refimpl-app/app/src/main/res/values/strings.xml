@@ -507,6 +507,7 @@
     <string name="layout___test_notification_sound">test Notification sound</string>
     <string name="layout___test_ringtone_sound">test Ringtone sound</string>
     <string name="layout___iobrowser_start">browse encrypted Storage</string>
+    <string name="layout___netprofiler_start">Network Profiler</string>
     <string name="layout___audio_roundtrip_test_start">Audio Latency Test</string>
     <string name="layout___report_issue">report a bug or issue</string>
     <string name="layout___export_tox_savedata_unsecure">export tox savedata *unsecure*</string>
