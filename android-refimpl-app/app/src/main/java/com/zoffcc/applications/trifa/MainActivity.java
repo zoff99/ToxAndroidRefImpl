@@ -4672,6 +4672,19 @@ public class MainActivity extends AppCompatActivity
     // --------------- Message V3 -------------
     // --------------- Message V3 -------------
 
+    // --------------- Network Profiling (netprof) -------------
+    // --------------- Network Profiling (netprof) -------------
+    // --------------- Network Profiling (netprof) -------------
+    public static native long tox_netprof_get_packet_id_count(int type, int id, int direction);
+
+    public static native long tox_netprof_get_packet_total_count(int type, int direction);
+
+    public static native long tox_netprof_get_packet_id_bytes(int type, int id, int direction);
+
+    public static native long tox_netprof_get_packet_total_bytes(int type, int direction);
+    // --------------- Network Profiling (netprof) -------------
+    // --------------- Network Profiling (netprof) -------------
+    // --------------- Network Profiling (netprof) -------------
 
     // --------------- Conference -------------
     // --------------- Conference -------------
