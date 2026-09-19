@@ -10289,6 +10289,86 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1offline_1count(
 // ------------------- new Groups -------------------
 
 
+
+
+
+// ------------------- Network Profiling (netprof) -------------------
+// ------------------- Network Profiling (netprof) -------------------
+// ------------------- Network Profiling (netprof) -------------------
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1netprof_1get_1packet_1id_1count(JNIEnv *env, jobject thiz,
+        jint type, jint id, jint direction)
+{
+    TRACE_LOGGER();
+    if (tox_global == NULL)
+    {
+        return (jlong)0;
+    }
+    uint64_t res = tox_netprof_get_packet_id_count(tox_global,
+                         (Tox_Netprof_Packet_Type)type,
+                         (uint8_t)id,
+                         (Tox_Netprof_Direction)direction);
+    return (jlong)(unsigned long long)res;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1netprof_1get_1packet_1total_1count(JNIEnv *env, jobject thiz,
+        jint type, jint direction)
+{
+    TRACE_LOGGER();
+    if (tox_global == NULL)
+    {
+        return (jlong)0;
+    }
+    uint64_t res = tox_netprof_get_packet_total_count(tox_global,
+                         (Tox_Netprof_Packet_Type)type,
+                         (Tox_Netprof_Direction)direction);
+    return (jlong)(unsigned long long)res;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1netprof_1get_1packet_1id_1bytes(JNIEnv *env, jobject thiz,
+        jint type, jint id, jint direction)
+{
+    TRACE_LOGGER();
+    if (tox_global == NULL)
+    {
+        return (jlong)0;
+    }
+    uint64_t res = tox_netprof_get_packet_id_bytes(tox_global,
+                         (Tox_Netprof_Packet_Type)type,
+                         (uint8_t)id,
+                         (Tox_Netprof_Direction)direction);
+    return (jlong)(unsigned long long)res;
+}
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1netprof_1get_1packet_1total_1bytes(JNIEnv *env, jobject thiz,
+        jint type, jint direction)
+{
+    TRACE_LOGGER();
+    if (tox_global == NULL)
+    {
+        return (jlong)0;
+    }
+    uint64_t res = tox_netprof_get_packet_total_bytes(tox_global,
+                         (Tox_Netprof_Packet_Type)type,
+                         (Tox_Netprof_Direction)direction);
+    return (jlong)(unsigned long long)res;
+}
+
+// ------------------- Network Profiling (netprof) -------------------
+// ------------------- Network Profiling (netprof) -------------------
+// ------------------- Network Profiling (netprof) -------------------
+
+
+
+
+
+
+
+
 // ------------------- AV -------------------
 // ------------------- AV -------------------
 // ------------------- AV -------------------
