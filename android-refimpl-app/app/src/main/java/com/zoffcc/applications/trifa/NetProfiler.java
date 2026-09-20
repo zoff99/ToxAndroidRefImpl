@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.zoffcc.applications.trifa.TrifaToxService.stats_time_tox_not_iterating_ms;
 import static com.zoffcc.applications.trifa.TrifaToxService.tox_startup_timestamp;
 
 /** @noinspection ALL*/
@@ -36,6 +37,7 @@ public class NetProfiler extends AppCompatActivity {
     private TextView tvSentBytes, tvSentRate, tvSentPkts;
     private TextView tvRecvBytes, tvRecvRate, tvRecvPkts;
     private TextView tvUptimeValue;
+    private TextView tvSleepValue;
     private TextView tvDeepSleepValue;
     private View viewSentHeat, viewRecvHeat;
     private TextView tvSentHeatRate, tvRecvHeatRate;
@@ -71,6 +73,7 @@ public class NetProfiler extends AppCompatActivity {
         tvRecvPkts = findViewById(R.id.tv_recv_pkts);
 
         tvUptimeValue = findViewById(R.id.tv_uptime_value);
+        tvSleepValue = findViewById(R.id.tv_sleep_value);
         tvDeepSleepValue = findViewById(R.id.tv_deepsleep_value);
 
         viewSentHeat = findViewById(R.id.view_sent_heat);
@@ -237,6 +240,8 @@ public class NetProfiler extends AppCompatActivity {
 
         long uptimeMillis = System.currentTimeMillis() - tox_startup_timestamp;
         tvUptimeValue.setText(formatUptime(uptimeMillis));
+
+        tvSleepValue.setText(formatDuration(stats_time_tox_not_iterating_ms));
 
         // --- DEEP SLEEP CALCULATION (cpuspy logic) ---
         // elapsedRealtime() includes deep sleep. uptimeMillis() does not.

@@ -224,6 +224,7 @@ public class TrifaToxService extends Service
     static boolean need_wakeup_now = false;
     static int tox_thread_starting_up = 0;
     static long tox_startup_timestamp = -1L;
+    static long stats_time_tox_not_iterating_ms = 0;
 
     // [ADDED] WeakReferences to hold the Tox health UI views safely
     private static WeakReference<ImageView> toxHealthIconRef = null;
@@ -1495,8 +1496,8 @@ public class TrifaToxService extends Service
                 tox_startup_timestamp = System.currentTimeMillis();
 
                 // [ADDED] Tracking variables for iteration vs sleep stats
-                long stats_time_not_iterating_ms = 0;
-                long stats_time_iterating_ms = 0;
+                stats_time_tox_not_iterating_ms = 0;
+                long stats_time_tox_iterating_ms = 0;
                 long stats_last_log_ms = System.currentTimeMillis();
 
                 while (!stop_me)
@@ -1602,7 +1603,7 @@ public class TrifaToxService extends Service
                                 }
 
                                 long battery_sleep_end_ms = System.currentTimeMillis();
-                                stats_time_not_iterating_ms += (battery_sleep_end_ms - battery_sleep_start_ms);
+                                stats_time_tox_not_iterating_ms += (battery_sleep_end_ms - battery_sleep_start_ms);
 
                                 append_logger_msg(TAG + "::" + "finish BATTERY SAVINGS MODE, connecting again");
 
@@ -1767,8 +1768,8 @@ public class TrifaToxService extends Service
 
 
                     long iteration_end_ms = System.currentTimeMillis();
-                    stats_time_iterating_ms += (iteration_end_ms - iteration_start_ms);
-                    long stats_total_time_ms = stats_time_iterating_ms + stats_time_not_iterating_ms;
+                    stats_time_tox_iterating_ms += (iteration_end_ms - iteration_start_ms);
+                    long stats_total_time_ms = stats_time_tox_iterating_ms + stats_time_tox_not_iterating_ms;
 
                     if ((iteration_end_ms - stats_last_log_ms) >= 60000) // Log summary every 60 seconds
                     {
@@ -1776,10 +1777,10 @@ public class TrifaToxService extends Service
 
                         double percent_not_iterating = 0.0;
                         if (stats_total_time_ms > 0) {
-                            percent_not_iterating = (stats_time_not_iterating_ms * 100.0) / stats_total_time_ms;
+                            percent_not_iterating = (stats_time_tox_not_iterating_ms * 100.0) / stats_total_time_ms;
                         }
 
-                        String human_not_iterating = formatDuration(stats_time_not_iterating_ms);
+                        String human_not_iterating = formatDuration(stats_time_tox_not_iterating_ms);
                         String human_total = formatDuration(stats_total_time_ms);
 
                         /*

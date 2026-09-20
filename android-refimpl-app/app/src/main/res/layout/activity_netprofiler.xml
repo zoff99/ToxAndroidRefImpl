@@ -70,21 +70,22 @@
                 android:orientation="vertical"
                 android:gravity="end">
 
-                <!-- Uptime -->
+                <!-- Uptime & Sleep (Compact badge) -->
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:padding="6dp"
-                    android:layout_marginBottom="4dp"
                     android:background="@drawable/bg_card_uptime">
+
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Uptime "
+                        android:text="Uptime / Sleep"
                         android:textSize="9sp"
                         android:textStyle="bold"
                         android:textColor="#00695C"/>
+
                     <TextView
                         android:id="@+id/tv_uptime_value"
                         android:layout_width="wrap_content"
@@ -93,6 +94,16 @@
                         android:textSize="13sp"
                         android:textStyle="bold"
                         android:textColor="?android:attr/textColorPrimary"/>
+
+                    <TextView
+                        android:id="@+id/tv_sleep_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00:00"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="#5E35B1"/> <!-- Purple to match deep sleep -->
+
                 </LinearLayout>
 
                 <!-- Deep Sleep -->
