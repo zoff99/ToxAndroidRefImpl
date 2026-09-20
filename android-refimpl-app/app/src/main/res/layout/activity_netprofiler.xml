@@ -25,12 +25,12 @@
             android:textStyle="bold"
             android:layout_marginBottom="16dp" />
 
-        <!-- Summary Cards -->
+        <!-- Row 1: Total Sent & Received -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginBottom="12dp"
+            android:layout_marginBottom="8dp"
             android:gravity="center_vertical">
 
             <!-- Total Sent -->
@@ -55,81 +55,71 @@
                 android:layout_weight="1"
                 android:orientation="vertical"
                 android:padding="12dp"
-                android:layout_marginEnd="6dp"
                 android:background="@drawable/bg_card_recv">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Received" android:textSize="12sp" android:textStyle="bold" android:textColor="#1B5E20"/>
                 <TextView android:id="@+id/tv_recv_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
                 <TextView android:id="@+id/tv_recv_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="#1B5E20"/>
                 <TextView android:id="@+id/tv_recv_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
             </LinearLayout>
+        </LinearLayout>
 
-            <!-- Right side badges (Uptime & Deep Sleep stacked) -->
-            <LinearLayout
+        <!-- Row 2: Uptime / Tox Sleep -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_card_uptime">
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:gravity="end">
+                android:text="Uptime / Tox Sleep"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#00695C"/>
+            <TextView
+                android:id="@+id/tv_uptime_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"/>
+            <TextView
+                android:id="@+id/tv_sleep_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="#5E35B1"/>
+        </LinearLayout>
 
-                <!-- Uptime & Sleep (Compact badge) -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="6dp"
-                    android:background="@drawable/bg_card_uptime">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Uptime / Sleep"
-                        android:textSize="9sp"
-                        android:textStyle="bold"
-                        android:textColor="#00695C"/>
-
-                    <TextView
-                        android:id="@+id/tv_uptime_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="00:00:00"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:textColor="?android:attr/textColorPrimary"/>
-
-                    <TextView
-                        android:id="@+id/tv_sleep_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="00:00:00"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:textColor="#5E35B1"/> <!-- Purple to match deep sleep -->
-
-                </LinearLayout>
-
-                <!-- Deep Sleep -->
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:padding="6dp"
-                    android:background="@drawable/bg_card_deepsleep">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sleep "
-                        android:textSize="9sp"
-                        android:textStyle="bold"
-                        android:textColor="#5E35B1"/>
-                    <TextView
-                        android:id="@+id/tv_deepsleep_value"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="00:00:00 (0.0%)"
-                        android:textSize="13sp"
-                        android:textStyle="bold"
-                        android:textColor="?android:attr/textColorPrimary"/>
-                </LinearLayout>
-            </LinearLayout>
+        <!-- Row 3: Deep Sleep -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/bg_card_deepsleep">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Deep Sleep "
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#5E35B1"/>
+            <TextView
+                android:id="@+id/tv_deepsleep_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="00:00:00 (0.0%)"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"/>
         </LinearLayout>
 
         <!-- Heat Bars -->
@@ -165,7 +155,7 @@
             android:orientation="horizontal"
             android:gravity="center_vertical"
             android:layout_marginBottom="12dp">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Packet Heat (log scale):" android:textSize="11sp" android:textStyle="bold" android:layout_marginEnd="8dp"/>
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Packet Heat:" android:textSize="11sp" android:textStyle="bold" android:layout_marginEnd="8dp"/>
             <View android:layout_width="16dp" android:layout_height="10dp" android:background="#2C2C2E" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="9sp" android:layout_marginEnd="8dp"/>
             <View android:layout_width="16dp" android:layout_height="10dp" android:background="#1A237E" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="100B" android:textSize="9sp" android:layout_marginEnd="8dp"/>
             <View android:layout_width="16dp" android:layout_height="10dp" android:background="#4CAF50" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1K" android:textSize="9sp" android:layout_marginEnd="8dp"/>
