@@ -225,6 +225,7 @@ public class TrifaToxService extends Service
     static int tox_thread_starting_up = 0;
     static long tox_startup_timestamp = -1L;
     static long stats_time_tox_not_iterating_ms = 0;
+    static long battery_sleep_start_ms = 0;
 
     // [ADDED] WeakReferences to hold the Tox health UI views safely
     private static WeakReference<ImageView> toxHealthIconRef = null;
@@ -1536,7 +1537,8 @@ public class TrifaToxService extends Service
                                 sleep_in_sec = sleep_in_sec / 10; // now in 10s of seconds!!
                                 append_logger_msg(TAG + "::" + "entering BATTERY SAVINGS MODE ... sleep for " + (10 * sleep_in_sec) + "s");
 
-                                long battery_sleep_start_ms = System.currentTimeMillis();
+                                // Mark the time we start sleeping
+                                battery_sleep_start_ms = System.currentTimeMillis();
 
                                 try
                                 {
@@ -1604,6 +1606,7 @@ public class TrifaToxService extends Service
 
                                 long battery_sleep_end_ms = System.currentTimeMillis();
                                 stats_time_tox_not_iterating_ms += (battery_sleep_end_ms - battery_sleep_start_ms);
+                                battery_sleep_start_ms = 0;
 
                                 append_logger_msg(TAG + "::" + "finish BATTERY SAVINGS MODE, connecting again");
 

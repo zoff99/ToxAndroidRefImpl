@@ -26,6 +26,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import static com.zoffcc.applications.trifa.TrifaToxService.battery_sleep_start_ms;
 import static com.zoffcc.applications.trifa.TrifaToxService.stats_time_tox_not_iterating_ms;
 import static com.zoffcc.applications.trifa.TrifaToxService.tox_startup_timestamp;
 
@@ -241,7 +242,12 @@ public class NetProfiler extends AppCompatActivity {
         long uptimeMillis = System.currentTimeMillis() - tox_startup_timestamp;
         tvUptimeValue.setText(formatUptime(uptimeMillis));
 
-        tvSleepValue.setText(formatDuration(stats_time_tox_not_iterating_ms));
+        long currently_sleeping_ms = 0;
+        if (battery_sleep_start_ms > 0)
+        {
+            currently_sleeping_ms = System.currentTimeMillis() - battery_sleep_start_ms;
+        }
+        tvSleepValue.setText(formatDuration(stats_time_tox_not_iterating_ms + currently_sleeping_ms));
 
         // --- DEEP SLEEP CALCULATION (cpuspy logic) ---
         // elapsedRealtime() includes deep sleep. uptimeMillis() does not.
