@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -35,6 +36,7 @@ public class NetProfiler extends AppCompatActivity {
     private TextView tvSentBytes, tvSentRate, tvSentPkts;
     private TextView tvRecvBytes, tvRecvRate, tvRecvPkts;
     private TextView tvUptimeValue;
+    private TextView tvDeepSleepValue;
     private View viewSentHeat, viewRecvHeat;
     private TextView tvSentHeatRate, tvRecvHeatRate;
     private RecyclerView rvPackets;
@@ -69,6 +71,7 @@ public class NetProfiler extends AppCompatActivity {
         tvRecvPkts = findViewById(R.id.tv_recv_pkts);
 
         tvUptimeValue = findViewById(R.id.tv_uptime_value);
+        tvDeepSleepValue = findViewById(R.id.tv_deepsleep_value);
 
         viewSentHeat = findViewById(R.id.view_sent_heat);
         viewRecvHeat = findViewById(R.id.view_recv_heat);
@@ -234,6 +237,20 @@ public class NetProfiler extends AppCompatActivity {
 
         long uptimeMillis = System.currentTimeMillis() - tox_startup_timestamp;
         tvUptimeValue.setText(formatUptime(uptimeMillis));
+
+        // --- DEEP SLEEP CALCULATION (cpuspy logic) ---
+        // elapsedRealtime() includes deep sleep. uptimeMillis() does not.
+        // The difference is the exact amount of time the CPU has been suspended since device boot.
+        long currentElapsed = SystemClock.elapsedRealtime();
+        long currentUptime = SystemClock.uptimeMillis();
+
+        long totalDeepSleepMs = currentElapsed - currentUptime;
+        long totalBootMs = currentElapsed;
+
+        double sleepPct = (totalBootMs > 0) ? (totalDeepSleepMs * 100.0) / totalBootMs : 0.0;
+        String humanDeepSleep = formatDuration(totalDeepSleepMs);
+
+        tvDeepSleepValue.setText(humanDeepSleep + " (" + String.format(Locale.US, "%.1f%%", sleepPct) + ")");
     }
 
     private void updateHeatBars(long sentBps, long recvBps) {
@@ -253,7 +270,6 @@ public class NetProfiler extends AppCompatActivity {
         viewSentHeat.setBackgroundColor(sentColor);
         viewRecvHeat.setBackgroundColor(recvColor);
 
-        // Using setScaleX is highly performant and avoids layout recalculation passes
         viewSentHeat.setPivotX(0);
         viewSentHeat.setScaleX(sentWidthRatio);
 
@@ -294,6 +310,31 @@ public class NetProfiler extends AppCompatActivity {
         long minutes = (totalSeconds % 3600) / 60;
         long seconds = totalSeconds % 60;
         return String.format(Locale.US, "%02d:%02d:%02d", hours, minutes, seconds);
+    }
+
+    /**
+     * Formats milliseconds into a human-readable duration string (e.g., "1d 02h 30m 15s").
+     */
+    private String formatDuration(long ms) {
+        if (ms < 0) ms = 0;
+        long seconds = ms / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        long days = hours / 24;
+
+        seconds = seconds % 60;
+        minutes = minutes % 60;
+        hours = hours % 24;
+
+        if (days > 0) {
+            return String.format(Locale.US, "%dd %02dh", days, hours);
+        } else if (hours > 0) {
+            return String.format(Locale.US, "%02dh %02dm", hours, minutes);
+        } else if (minutes > 0) {
+            return String.format(Locale.US, "%02dm %02ds", minutes, seconds);
+        } else {
+            return String.format(Locale.US, "%02ds", seconds);
+        }
     }
 
     public static float rateToHeatRatio(long bytesPerSec) {

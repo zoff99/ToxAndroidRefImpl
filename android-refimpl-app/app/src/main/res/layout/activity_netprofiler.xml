@@ -63,28 +63,61 @@
                 <TextView android:id="@+id/tv_recv_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
             </LinearLayout>
 
-            <!-- Uptime (Very compact badge) -->
+            <!-- Right side badges (Uptime & Deep Sleep stacked) -->
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="6dp"
-                android:background="@drawable/bg_card_uptime">
-                <TextView
+                android:gravity="end">
+
+                <!-- Uptime -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Uptime"
-                    android:textSize="9sp"
-                    android:textStyle="bold"
-                    android:textColor="#00695C"/>
-                <TextView
-                    android:id="@+id/tv_uptime_value"
+                    android:orientation="horizontal"
+                    android:padding="6dp"
+                    android:layout_marginBottom="4dp"
+                    android:background="@drawable/bg_card_uptime">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Uptime "
+                        android:textSize="9sp"
+                        android:textStyle="bold"
+                        android:textColor="#00695C"/>
+                    <TextView
+                        android:id="@+id/tv_uptime_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00:00"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="?android:attr/textColorPrimary"/>
+                </LinearLayout>
+
+                <!-- Deep Sleep -->
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="00:00:00"
-                    android:textSize="13sp"
-                    android:textStyle="bold"
-                    android:textColor="?android:attr/textColorPrimary"/>
+                    android:orientation="horizontal"
+                    android:padding="6dp"
+                    android:background="@drawable/bg_card_deepsleep">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Sleep "
+                        android:textSize="9sp"
+                        android:textStyle="bold"
+                        android:textColor="#5E35B1"/>
+                    <TextView
+                        android:id="@+id/tv_deepsleep_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="00:00:00 (0.0%)"
+                        android:textSize="13sp"
+                        android:textStyle="bold"
+                        android:textColor="?android:attr/textColorPrimary"/>
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
 
@@ -130,9 +163,6 @@
         </LinearLayout>
 
         <!-- Matrix Grid -->
-        <!-- nestedScrollingEnabled="false" is CRITICAL here. It forces the RecyclerView
-             to measure its full height and disables its internal scrolling, allowing
-             the parent NestedScrollView to handle scrolling the entire page. -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/rv_packets"
             android:layout_width="match_parent"

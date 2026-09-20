@@ -1494,8 +1494,15 @@ public class TrifaToxService extends Service
 
                 tox_startup_timestamp = System.currentTimeMillis();
 
+                // [ADDED] Tracking variables for iteration vs sleep stats
+                long stats_time_not_iterating_ms = 0;
+                long stats_time_iterating_ms = 0;
+                long stats_last_log_ms = System.currentTimeMillis();
+
                 while (!stop_me)
                 {
+                    long iteration_start_ms = System.currentTimeMillis(); // [ADDED] Track loop start
+
                     try
                     {
                         if (tox_iteration_interval_ms < 1)
@@ -1527,6 +1534,8 @@ public class TrifaToxService extends Service
                                 sleep_in_sec = sleep_in_sec / 1000;
                                 sleep_in_sec = sleep_in_sec / 10; // now in 10s of seconds!!
                                 append_logger_msg(TAG + "::" + "entering BATTERY SAVINGS MODE ... sleep for " + (10 * sleep_in_sec) + "s");
+
+                                long battery_sleep_start_ms = System.currentTimeMillis();
 
                                 try
                                 {
@@ -1591,6 +1600,10 @@ public class TrifaToxService extends Service
                                         break;
                                     }
                                 }
+
+                                long battery_sleep_end_ms = System.currentTimeMillis();
+                                stats_time_not_iterating_ms += (battery_sleep_end_ms - battery_sleep_start_ms);
+
                                 append_logger_msg(TAG + "::" + "finish BATTERY SAVINGS MODE, connecting again");
 
                                 update_friends_and_groups();
@@ -1750,6 +1763,31 @@ public class TrifaToxService extends Service
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
                         start_queued_filetransfers();
+                    }
+
+
+                    long iteration_end_ms = System.currentTimeMillis();
+                    stats_time_iterating_ms += (iteration_end_ms - iteration_start_ms);
+                    long stats_total_time_ms = stats_time_iterating_ms + stats_time_not_iterating_ms;
+
+                    if ((iteration_end_ms - stats_last_log_ms) >= 60000) // Log summary every 60 seconds
+                    {
+                        stats_last_log_ms = iteration_end_ms;
+
+                        double percent_not_iterating = 0.0;
+                        if (stats_total_time_ms > 0) {
+                            percent_not_iterating = (stats_time_not_iterating_ms * 100.0) / stats_total_time_ms;
+                        }
+
+                        String human_not_iterating = formatDuration(stats_time_not_iterating_ms);
+                        String human_total = formatDuration(stats_total_time_ms);
+
+                        /*
+                        append_logger_msg(TAG + "::" + "Tox_Loop_Stats: Sleeping (Not iterating): "
+                                          + human_not_iterating
+                                          + " (" + String.format("%.2f", percent_not_iterating) + "%) | Total Uptime: "
+                                          + human_total);
+                         */
                     }
                 }
                 // ------- MAIN TOX LOOP ---------------------------------------------------------------
@@ -2593,6 +2631,30 @@ public class TrifaToxService extends Service
             e.printStackTrace();
         }
         // loop through all pending outgoing 1-on-1 text messages V2 (resend the resend) --------------
+    }
+
+    /**
+     * Formats milliseconds into a human-readable duration string (e.g., "1d 02h 30m 15s").
+     */
+    private String formatDuration(long ms) {
+        long seconds = ms / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        long days = hours / 24;
+
+        seconds = seconds % 60;
+        minutes = minutes % 60;
+        hours = hours % 24;
+
+        if (days > 0) {
+            return String.format("%dd %02dh %02dm %02ds", days, hours, minutes, seconds);
+        } else if (hours > 0) {
+            return String.format("%02dh %02dm %02ds", hours, minutes, seconds);
+        } else if (minutes > 0) {
+            return String.format("%02dm %02ds", minutes, seconds);
+        } else {
+            return String.format("%02ds", seconds);
+        }
     }
 
     static void wakeup_tox_thread()
