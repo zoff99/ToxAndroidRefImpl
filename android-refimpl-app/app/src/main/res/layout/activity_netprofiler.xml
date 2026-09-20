@@ -1,137 +1,145 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp"
-    android:background="?android:attr/colorBackground">
+    android:fillViewport="true"
+    android:scrollbars="vertical"
+    android:fadeScrollbars="false"
+    android:scrollbarThumbVertical="@drawable/scrollbar_thumb_vertical"
+    android:scrollbarTrackVertical="@drawable/scrollbar_track_vertical"
+    android:scrollbarAlwaysDrawVerticalTrack="true"
+    android:scrollbarSize="6dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Network Profiler Matrix"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
-
-    <!-- Summary Cards -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginBottom="12dp"
-        android:gravity="center_vertical">
-
-        <!-- Total Sent -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:layout_marginEnd="6dp"
-            android:background="@drawable/bg_card_sent">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Sent" android:textSize="12sp" android:textStyle="bold" android:textColor="#0D47A1"/>
-            <TextView android:id="@+id/tv_sent_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
-            <TextView android:id="@+id/tv_sent_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="#0D47A1"/>
-            <TextView android:id="@+id/tv_sent_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
-        </LinearLayout>
-
-        <!-- Total Received -->
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical"
-            android:padding="12dp"
-            android:layout_marginEnd="6dp"
-            android:background="@drawable/bg_card_recv">
-            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Received" android:textSize="12sp" android:textStyle="bold" android:textColor="#1B5E20"/>
-            <TextView android:id="@+id/tv_recv_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
-            <TextView android:id="@+id/tv_recv_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="#1B5E20"/>
-            <TextView android:id="@+id/tv_recv_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
-        </LinearLayout>
-
-        <!-- Uptime (Very compact badge) -->
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="6dp"
-            android:background="@drawable/bg_card_uptime">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Uptime"
-                android:textSize="9sp"
-                android:textStyle="bold"
-                android:textColor="#00695C"/>
-            <TextView
-                android:id="@+id/tv_uptime_value"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="00:00:00"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:textColor="?android:attr/textColorPrimary"/>
-        </LinearLayout>
-    </LinearLayout>
-
-    <!-- Heat Bars -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginBottom="12dp">
+        android:padding="16dp"
+        android:background="?android:attr/colorBackground">
 
-        <!-- Sent Heat -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="Sent Heat" android:textSize="11sp" android:textStyle="bold"/>
-            <FrameLayout android:layout_width="0dp" android:layout_height="14dp" android:layout_weight="1" android:background="@drawable/bg_heat_track">
-                <View android:id="@+id/view_sent_heat" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#2C2C2E"/>
-            </FrameLayout>
-            <TextView android:id="@+id/tv_sent_heat_rate" android:layout_width="90dp" android:layout_height="wrap_content" android:gravity="end" android:text="0 B/s" android:textSize="11sp"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Network Profiler Matrix"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Summary Cards -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="12dp"
+            android:gravity="center_vertical">
+
+            <!-- Total Sent -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_card_sent">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Sent" android:textSize="12sp" android:textStyle="bold" android:textColor="#0D47A1"/>
+                <TextView android:id="@+id/tv_sent_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
+                <TextView android:id="@+id/tv_sent_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="#0D47A1"/>
+                <TextView android:id="@+id/tv_sent_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
+            </LinearLayout>
+
+            <!-- Total Received -->
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:padding="12dp"
+                android:layout_marginEnd="6dp"
+                android:background="@drawable/bg_card_recv">
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Received" android:textSize="12sp" android:textStyle="bold" android:textColor="#1B5E20"/>
+                <TextView android:id="@+id/tv_recv_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
+                <TextView android:id="@+id/tv_recv_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="#1B5E20"/>
+                <TextView android:id="@+id/tv_recv_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
+            </LinearLayout>
+
+            <!-- Uptime (Very compact badge) -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="6dp"
+                android:background="@drawable/bg_card_uptime">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Uptime"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:textColor="#00695C"/>
+                <TextView
+                    android:id="@+id/tv_uptime_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="00:00:00"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorPrimary"/>
+            </LinearLayout>
         </LinearLayout>
 
-        <!-- Recv Heat -->
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
-            <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="Recv Heat" android:textSize="11sp" android:textStyle="bold"/>
-            <FrameLayout android:layout_width="0dp" android:layout_height="14dp" android:layout_weight="1" android:background="@drawable/bg_heat_track">
-                <View android:id="@+id/view_recv_heat" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#2C2C2E"/>
-            </FrameLayout>
-            <TextView android:id="@+id/tv_recv_heat_rate" android:layout_width="90dp" android:layout_height="wrap_content" android:gravity="end" android:text="0 B/s" android:textSize="11sp"/>
+        <!-- Heat Bars -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="12dp">
+
+            <!-- Sent Heat -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginBottom="4dp">
+                <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="Sent Heat" android:textSize="11sp" android:textStyle="bold"/>
+                <FrameLayout android:layout_width="0dp" android:layout_height="14dp" android:layout_weight="1" android:background="@drawable/bg_heat_track">
+                    <View android:id="@+id/view_sent_heat" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#2C2C2E"/>
+                </FrameLayout>
+                <TextView android:id="@+id/tv_sent_heat_rate" android:layout_width="90dp" android:layout_height="wrap_content" android:gravity="end" android:text="0 B/s" android:textSize="11sp"/>
+            </LinearLayout>
+
+            <!-- Recv Heat -->
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:gravity="center_vertical">
+                <TextView android:layout_width="70dp" android:layout_height="wrap_content" android:text="Recv Heat" android:textSize="11sp" android:textStyle="bold"/>
+                <FrameLayout android:layout_width="0dp" android:layout_height="14dp" android:layout_weight="1" android:background="@drawable/bg_heat_track">
+                    <View android:id="@+id/view_recv_heat" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#2C2C2E"/>
+                </FrameLayout>
+                <TextView android:id="@+id/tv_recv_heat_rate" android:layout_width="90dp" android:layout_height="wrap_content" android:gravity="end" android:text="0 B/s" android:textSize="11sp"/>
+            </LinearLayout>
         </LinearLayout>
+
+        <!-- Legend -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="12dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Packet Heat (log scale):" android:textSize="11sp" android:textStyle="bold" android:layout_marginEnd="8dp"/>
+            <View android:layout_width="16dp" android:layout_height="10dp" android:background="#2C2C2E" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="9sp" android:layout_marginEnd="8dp"/>
+            <View android:layout_width="16dp" android:layout_height="10dp" android:background="#1A237E" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="100B" android:textSize="9sp" android:layout_marginEnd="8dp"/>
+            <View android:layout_width="16dp" android:layout_height="10dp" android:background="#4CAF50" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1K" android:textSize="9sp" android:layout_marginEnd="8dp"/>
+            <View android:layout_width="16dp" android:layout_height="10dp" android:background="#FFEB3B" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="50K" android:textSize="9sp" android:layout_marginEnd="8dp"/>
+            <View android:layout_width="16dp" android:layout_height="10dp" android:background="#F44336" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="500K" android:textSize="9sp"/>
+        </LinearLayout>
+
+        <!-- Matrix Grid -->
+        <!-- nestedScrollingEnabled="false" is CRITICAL here. It forces the RecyclerView
+             to measure its full height and disables its internal scrolling, allowing
+             the parent NestedScrollView to handle scrolling the entire page. -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_packets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:clipToPadding="false"
+            android:paddingBottom="16dp" />
+
     </LinearLayout>
-
-    <!-- Legend -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginBottom="12dp">
-        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Packet Heat (log scale):" android:textSize="11sp" android:textStyle="bold" android:layout_marginEnd="8dp"/>
-        <View android:layout_width="16dp" android:layout_height="10dp" android:background="#2C2C2E" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0" android:textSize="9sp" android:layout_marginEnd="8dp"/>
-        <View android:layout_width="16dp" android:layout_height="10dp" android:background="#1A237E" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="100B" android:textSize="9sp" android:layout_marginEnd="8dp"/>
-        <View android:layout_width="16dp" android:layout_height="10dp" android:background="#4CAF50" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="1K" android:textSize="9sp" android:layout_marginEnd="8dp"/>
-        <View android:layout_width="16dp" android:layout_height="10dp" android:background="#FFEB3B" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="50K" android:textSize="9sp" android:layout_marginEnd="8dp"/>
-        <View android:layout_width="16dp" android:layout_height="10dp" android:background="#F44336" android:layout_marginEnd="4dp"/><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="500K" android:textSize="9sp"/>
-    </LinearLayout>
-
-    <!-- Matrix Grid (this is the scrolling container) with always-visible vertical scrollbar -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_packets"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:clipToPadding="false"
-        android:paddingBottom="16dp"
-        android:scrollbars="vertical"
-        android:scrollbarStyle="outsideOverlay"
-        android:fadeScrollbars="false"
-        android:scrollbarThumbVertical="@drawable/scrollbar_thumb_vertical"
-        android:scrollbarTrackVertical="@drawable/scrollbar_track_vertical"
-        android:scrollbarAlwaysDrawVerticalTrack="true"
-        android:scrollbarSize="6dp" />
-
-</LinearLayout>
+</androidx.core.widget.NestedScrollView>
