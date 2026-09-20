@@ -436,7 +436,7 @@ public class NetProfiler extends AppCompatActivity {
                     tvName.setText("MIDDLEWARE");
                     tvTransport.setText("NGC");
                     tvBytes.setText(formatBytes(stat.sentBytes + stat.recvBytes));
-                    tvRatePkts.setText("S: " + formatBytes(stat.sentBytes) + " | R: " + formatBytes(stat.recvBytes));
+                    tvRatePkts.setText("S: " + formatBytes(stat.sentBytes) + "\n" + "R: " + formatBytes(stat.recvBytes));
                     layoutPacket.setBackgroundColor(Color.parseColor("#9C27B0"));
                     tvName.setTextColor(Color.WHITE);
                     tvTransport.setTextColor(Color.argb(180, 255, 255, 255));
@@ -448,7 +448,7 @@ public class NetProfiler extends AppCompatActivity {
                     long totalBytes = stat.sentBytes + stat.recvBytes;
                     long totalPkts = stat.sentCount + stat.recvCount;
                     tvBytes.setText(formatBytes(totalBytes));
-                    tvRatePkts.setText(formatRate(stat.bytesPerSec) + " | " + totalPkts + " pkts");
+                    tvRatePkts.setText(formatRate(stat.bytesPerSec) + "\n" + totalPkts + " pkts");
 
                     float heatRatio = rateToHeatRatio(stat.bytesPerSec);
                     int bgColor = getHeatColor(heatRatio);

@@ -44,7 +44,7 @@
                 android:background="@drawable/bg_card_sent">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Sent" android:textSize="12sp" android:textStyle="bold" android:textColor="#0D47A1"/>
                 <TextView android:id="@+id/tv_sent_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
-                <TextView android:id="@+id/tv_sent_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="#0D47A1"/>
+                <TextView android:id="@+id/tv_sent_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
                 <TextView android:id="@+id/tv_sent_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
             </LinearLayout>
 
@@ -58,7 +58,7 @@
                 android:background="@drawable/bg_card_recv">
                 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Received" android:textSize="12sp" android:textStyle="bold" android:textColor="#1B5E20"/>
                 <TextView android:id="@+id/tv_recv_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
-                <TextView android:id="@+id/tv_recv_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="#1B5E20"/>
+                <TextView android:id="@+id/tv_recv_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
                 <TextView android:id="@+id/tv_recv_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
             </LinearLayout>
         </LinearLayout>
@@ -105,7 +105,7 @@
                 android:text="00:00:00"
                 android:textSize="15sp"
                 android:textStyle="bold"
-                android:textColor="#5E35B1"/>
+                android:textColor="?android:attr/textColorPrimary"/>
 
         </LinearLayout>
 
