@@ -471,7 +471,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
+    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CPU_CYCLES_PROFILER_ENABLED -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
     --prefix="$_toolchain_"/arm-linux-androideabi/sysroot/usr \
     --disable-soname-versions --host=arm-linux-androideabi \
     --with-sysroot="$_toolchain_"/arm-linux-androideabi/sysroot \
@@ -1066,7 +1066,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
+    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CPU_CYCLES_PROFILER_ENABLED -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
     --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
     --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
     --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot \
@@ -1659,7 +1659,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
+    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CPU_CYCLES_PROFILER_ENABLED -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wl,--no-merge-exidx-entries -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
     --prefix="$_toolchain_"/x86/sysroot/usr \
     --disable-soname-versions --host=x86 \
     --with-sysroot="$_toolchain_"/x86/sysroot \
@@ -2096,7 +2096,7 @@ cd $_s_/c-toxcore/;autoreconf -fi
 rm -Rf "$_BLD_"
 mkdir -p "$_BLD_"
 cd "$_BLD_";$_s_/c-toxcore/configure \
-    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
+    CFLAGS=" -fPIC -DNDEBUG $DEBUG_TOXCORE_LOGGING -DTOX_CPU_CYCLES_PROFILER_ENABLED -DTOX_CAPABILITIES_ACTIVE -D HW_CODEC_CONFIG_TRIFA -O3 -g -Wall -Wextra -funwind-tables -Wno-deprecated-declarations -Wno-unused-parameter -Wno-unused-variable -Wno-unused-function --param=ssp-buffer-size=1 -fstack-protector-all" \
     --prefix="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot/usr \
     --disable-soname-versions --host="$AND_TOOLCHAIN_ARCH3" \
     --with-sysroot="$_toolchain_"/"$AND_TOOLCHAIN_ARCH"/sysroot \
