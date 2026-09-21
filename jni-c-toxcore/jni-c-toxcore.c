@@ -10329,6 +10329,31 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1offline_1count(
 
 
 
+// ------------------- CPU cycles Profiling -------------------
+// ------------------- CPU cycles Profiling -------------------
+// ------------------- CPU cycles Profiling -------------------
+
+
+JNIEXPORT jlong JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1get_1estimated_1cpu_1cycles(JNIEnv *env, jobject thiz)
+{
+    TRACE_LOGGER();
+    if (tox_global == NULL)
+    {
+        return (jlong)0;
+    }
+    return (jlong)(unsigned long long)tox_get_estimated_cpu_cycles();
+}
+
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1reset_1estimated_1cpu_1cycles(JNIEnv *env, jobject thiz)
+{
+    tox_reset_estimated_cpu_cycles();
+}
+
+// ------------------- CPU cycles Profiling -------------------
+// ------------------- CPU cycles Profiling -------------------
+// ------------------- CPU cycles Profiling -------------------
 
 
 // ------------------- Network Profiling (netprof) -------------------
