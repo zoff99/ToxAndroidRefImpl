@@ -260,7 +260,7 @@ public class TrifaToxService extends Service
     public static void request_wakeup(String reason)
     {
         wakeup_trigger_reason = reason;
-        TrifaToxService.need_wakeup_now = true;
+        need_wakeup_now = true;
     }
 
     // [ADDED] WeakReferences to hold the Tox health UI views safely

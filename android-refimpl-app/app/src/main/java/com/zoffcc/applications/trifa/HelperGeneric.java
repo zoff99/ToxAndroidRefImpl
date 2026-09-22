@@ -5193,10 +5193,7 @@ public class HelperGeneric
     public static void trigger_proper_wakeup_outside_tox_service_thread(String reason)
     {
         request_wakeup(reason);
-        if (TrifaToxService.trifa_service_thread != null)
-        {
-            TrifaToxService.trifa_service_thread.interrupt();
-        }
+        trigger_proper_wakeup_outside_tox_service_thread();
     }
 
     static public void trigger_proper_wakeup_outside_tox_service_thread()
