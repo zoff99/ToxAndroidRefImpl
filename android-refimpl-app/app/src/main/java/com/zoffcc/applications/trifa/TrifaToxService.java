@@ -78,6 +78,7 @@ import static com.zoffcc.applications.trifa.HelperFriend.update_friend_in_db_con
 import static com.zoffcc.applications.trifa.HelperGeneric.IPisValid;
 import static com.zoffcc.applications.trifa.HelperGeneric.append_logger_msg;
 import static com.zoffcc.applications.trifa.HelperGeneric.battery_saving_can_sleep;
+import static com.zoffcc.applications.trifa.HelperGeneric.battery_saving_must_wake_reason;
 import static com.zoffcc.applications.trifa.HelperGeneric.bootstrap_single_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytebuffer_to_hexstring;
 import static com.zoffcc.applications.trifa.HelperGeneric.bytes_to_hex;
@@ -226,6 +227,41 @@ public class TrifaToxService extends Service
     static long tox_startup_timestamp = -1L;
     static long stats_time_tox_not_iterating_ms = 0;
     static long battery_sleep_start_ms = 0;
+
+    // --- Battery-saving wakeup tracking: ring buffer of the last 5 events ---
+    public static final String[] last_wakeup_reasons = new String[5];
+    public static final long[]   last_wakeup_times   = new long[5];
+    public static int wakeup_ring_index = 0;
+
+    // Exact reason string for the pending wakeup request
+    // (replaces the information the plain boolean 'need_wakeup_now' lost)
+    public static volatile String wakeup_trigger_reason = "";
+
+    public static void recordWakeup(String reason)
+    {
+        last_wakeup_times[wakeup_ring_index] = System.currentTimeMillis();
+        last_wakeup_reasons[wakeup_ring_index] = reason;
+        wakeup_ring_index = (wakeup_ring_index + 1) % 5;
+    }
+
+    /**
+     * Replace EVERY "need_wakeup_now = true;" in the codebase with this call,
+     * passing the exact reason. Examples:
+     *   request_wakeup("PUSH_NTFY:" + topic);  // incoming push notification
+     *   request_wakeup("MSG_IN");              // friend message callback
+     *   request_wakeup("MSG_V3_IN");
+     *   request_wakeup("CALL_IN");             // incoming A/V call
+     *   request_wakeup("FT_IN");               // incoming file transfer
+     *   request_wakeup("GC_INVITE");           // group invite
+     *   request_wakeup("CONF_INVITE");
+     *   request_wakeup("ALARM");               // battery alarm fired
+     *   request_wakeup("USER_ACTION");         // manual user trigger
+     */
+    public static void request_wakeup(String reason)
+    {
+        wakeup_trigger_reason = reason;
+        TrifaToxService.need_wakeup_now = true;
+    }
 
     // [ADDED] WeakReferences to hold the Tox health UI views safely
     private static WeakReference<ImageView> toxHealthIconRef = null;
@@ -1556,20 +1592,21 @@ public class TrifaToxService extends Service
                                 {
                                 }
 
+                                String wakeup_reason = "SCHED_FULL"; // loop ran to completion = scheduled sleep finished
+
                                 for (int ii = 0; ii < sleep_in_sec; ii++)
                                 {
-                                    if ((global_showing_messageview) || (global_showing_anygroupview))
+                                    String reason = battery_saving_must_wake_reason();
+                                    if (reason != null)
                                     {
-                                        // if the user opens the message view, or any group view -> go online, to be able to send messages
+                                        wakeup_reason = reason;
+                                        if (need_wakeup_now)
+                                        {
+                                            need_wakeup_now = false;
+                                            wakeup_trigger_reason = "";
+                                        }
                                         trigger_proper_wakeup_from_tox_service_thread();
-                                        append_logger_msg(TAG + "::finish BATTERY SAVINGS MODE (Message view opened)");
-                                        break;
-                                    }
-
-                                    if (need_wakeup_now)
-                                    {
-                                        trigger_proper_wakeup_from_tox_service_thread();
-                                        append_logger_msg(TAG + "::" + "need_wakeup_now trigger 001");
+                                        append_logger_msg(TAG + "::finish BATTERY SAVINGS MODE reason=" + wakeup_reason);
                                         break;
                                     }
 
@@ -1599,6 +1636,22 @@ public class TrifaToxService extends Service
                                     }
                                     catch (Exception es)
                                     {
+                                        // attribute correctly: interrupted *because* of a state change, or truly unexpected
+                                        String r2 = battery_saving_must_wake_reason();
+                                        if (r2 != null)
+                                        {
+                                            wakeup_reason = r2;
+                                            if (need_wakeup_now)
+                                            {
+                                                need_wakeup_now = false;
+                                                wakeup_trigger_reason = "";
+                                            }
+                                        }
+                                        else
+                                        {
+                                            wakeup_reason = "INT:" + es.getClass().getSimpleName()
+                                                            + (es.getMessage() != null ? (":" + es.getMessage()) : "");
+                                        }
                                         append_logger_msg(TAG + "::" + "BATTERY_SAVINGS_MODE__finish__interrupted");
                                         break;
                                     }
@@ -1607,6 +1660,8 @@ public class TrifaToxService extends Service
                                 long battery_sleep_end_ms = System.currentTimeMillis();
                                 stats_time_tox_not_iterating_ms += (battery_sleep_end_ms - battery_sleep_start_ms);
                                 battery_sleep_start_ms = 0;
+
+                                recordWakeup(wakeup_reason); // save exact reason + timestamp into the ring buffer
 
                                 append_logger_msg(TAG + "::" + "finish BATTERY SAVINGS MODE, connecting again");
 

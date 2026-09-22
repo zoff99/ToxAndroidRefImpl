@@ -135,6 +135,32 @@
                 android:textColor="?android:attr/textColorPrimary"/>
         </LinearLayout>
 
+        <!-- Row 4: Recent Wakeups -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="8dp"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/bg_card_uptime">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Recent Sleep Wakeups (tap for details)"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#00695C"/>
+            <TextView
+                android:id="@+id/tv_wakeup_history"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No recent wakeups (tap for details)"
+                android:textSize="12sp"
+                android:textColor="?android:attr/textColorPrimary"
+                android:fontFamily="monospace"
+                android:lineSpacingExtra="2dp"/>
+        </LinearLayout>
+
         <!-- Heat Bars -->
         <LinearLayout
             android:layout_width="match_parent"

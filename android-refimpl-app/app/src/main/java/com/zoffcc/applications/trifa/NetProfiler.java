@@ -43,6 +43,7 @@ public class NetProfiler extends AppCompatActivity {
     private View viewSentHeat, viewRecvHeat, viewCpuHeat;
     private TextView tvSentHeatRate, tvRecvHeatRate, tvCpuHeatRate;
     private RecyclerView rvPackets;
+    private TextView tvWakeupHistory;
 
     private PacketAdapter adapter;
     private final List<PacketStat> packetStats = new ArrayList<>();
@@ -85,6 +86,9 @@ public class NetProfiler extends AppCompatActivity {
         tvSentHeatRate = findViewById(R.id.tv_sent_heat_rate);
         tvRecvHeatRate = findViewById(R.id.tv_recv_heat_rate);
         tvCpuHeatRate = findViewById(R.id.tv_cpu_heat_rate);
+
+        tvWakeupHistory = findViewById(R.id.tv_wakeup_history);
+        tvWakeupHistory.setOnClickListener(v -> showWakeupDetailsDialog());
 
         rvPackets = findViewById(R.id.rv_packets);
 
@@ -275,6 +279,109 @@ public class NetProfiler extends AppCompatActivity {
         String humanDeepSleep = formatDuration(totalDeepSleepMs);
 
         tvDeepSleepValue.setText(humanDeepSleep + " (" + String.format(Locale.US, "%.1f%%", sleepPct) + ")");
+
+        updateWakeupHistory();
+    }
+
+    /** Compact one-line view: specific emoji codes + relative age. */
+    private void updateWakeupHistory() {
+        long now = System.currentTimeMillis();
+        StringBuilder sb = new StringBuilder();
+        int idx = TrifaToxService.wakeup_ring_index;
+        boolean hasHistory = false;
+
+        // Read the ring buffer backwards (most recent first)
+        for (int i = 0; i < 5; i++) {
+            int readIdx = (idx - 1 - i + 5) % 5;
+            String reason = TrifaToxService.last_wakeup_reasons[readIdx];
+            long time = TrifaToxService.last_wakeup_times[readIdx];
+
+            if (reason != null && time > 0) {
+                if (hasHistory) sb.append(" ");
+                sb.append(wakeupCode(reason)).append("(").append(formatTimeAgo(now - time)).append(")");
+                hasHistory = true;
+            }
+        }
+
+        tvWakeupHistory.setText(hasHistory ? sb.toString() : "No recent wakeups (tap for details)");
+    }
+
+    /** Compact but specific code for the one-line view. */
+    private String wakeupCode(String reason) {
+        if (reason == null || reason.isEmpty()) return "?";
+
+        if (reason.startsWith("INT:")) {
+            String exc = reason.substring(4);
+            int colon = exc.indexOf(':');
+            if (colon > 0) exc = exc.substring(0, colon);
+            if (exc.length() > 10) exc = exc.substring(0, 10);
+            return "⚠️" + exc;
+        }
+        if (reason.startsWith("PUSH_NTFY")) return "🔔push";
+        if (reason.startsWith("PUSH_")) return "🔔" + reason.substring(5).toLowerCase(Locale.US);
+
+        switch (reason) {
+            case "SCHED_FULL":   return "⏰full";
+            case "UI_MSGVIEW":   return "📱msgV";
+            case "UI_GROUPVIEW": return "📱grpV";
+            case "MSG_IN":       return "💬msg";
+            case "MSG_V2_IN":    return "💬msgv2";
+            case "MSG_V3_IN":    return "💬msgv3";
+            case "CALL_IN":      return "📞call";
+            case "FT_IN":        return "📁ft";
+            case "GC_INVITE":    return "👥ginv";
+            case "CONF_INVITE":  return "👥cinv";
+            case "ALARM":        return "⏰alarm";
+            case "CALL_ACTIVE":     return "📞call";
+            case "AUDIO_GROUP":     return "🔊agrpa";
+            case "NGC_AUDIO_GROUP": return "🔊ngca";
+            case "RECENT_ACTIVITY": return "✋actvy";
+            case "RECENTLY_ONLINE": return "🟢onln";
+            case "ONLINE_TS_UNSET": return "❓onTs";
+            case "TRIG_UNKNOWN": return "❓trig";
+            default:
+                String r = reason.toLowerCase(Locale.US);
+                if (r.length() > 12) r = r.substring(0, 12);
+                return r;
+        }
+    }
+
+    /** Tap target: exact reasons with exact wall-clock timestamps. */
+    private void showWakeupDetailsDialog() {
+        long now = System.currentTimeMillis();
+        StringBuilder sb = new StringBuilder();
+        int idx = TrifaToxService.wakeup_ring_index;
+        boolean hasHistory = false;
+
+        for (int i = 0; i < 5; i++) {
+            int readIdx = (idx - 1 - i + 5) % 5;
+            String reason = TrifaToxService.last_wakeup_reasons[readIdx];
+            long time = TrifaToxService.last_wakeup_times[readIdx];
+
+            if (reason != null && time > 0) {
+                String ts = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US).format(new java.util.Date(time));
+                sb.append(ts).append("  ").append(reason).append("  (").append(formatTimeAgo(now - time)).append(" ago)\n");
+                hasHistory = true;
+            }
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Last sleep wakeups")
+                .setMessage(hasHistory ? sb.toString() : "No wakeups recorded yet")
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
+    private String formatTimeAgo(long ms) {
+        if (ms < 0) ms = 0;
+        long sec = ms / 1000;
+        if (sec < 60) return sec + "s";
+        long min = sec / 60;
+        if (min < 60) return min + "m";
+        long hr = min / 60;
+        if (hr < 24) return hr + "h";
+        long days = hr / 24;
+        return days + "d";
     }
 
     /**

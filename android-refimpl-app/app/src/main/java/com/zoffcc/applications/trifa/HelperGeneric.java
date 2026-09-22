@@ -166,10 +166,13 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILETRANSFER_SIZE_MS
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
+import static com.zoffcc.applications.trifa.TrifaToxService.need_wakeup_now;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
+import static com.zoffcc.applications.trifa.TrifaToxService.request_wakeup;
 import static com.zoffcc.applications.trifa.TrifaToxService.stop_tox_fg_done;
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
+import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_trigger_reason;
 
 public class HelperGeneric
 {
@@ -3682,6 +3685,41 @@ public class HelperGeneric
         return bitmap;
     }
 
+    /**
+     * Returns the exact reason why battery-saving sleep must end RIGHT NOW,
+     * or null if sleeping may continue.
+     * This is the precise negation of battery_saving_can_sleep() plus the
+     * need_wakeup_now trigger, so every exit path gets a correct reason AND
+     * the loop can no longer sleep through calls / audio groups / new activity.
+     */
+    static String battery_saving_must_wake_reason()
+    {
+        if (global_showing_messageview) return "UI_MSGVIEW";
+        if (global_showing_anygroupview) return "UI_GROUPVIEW";
+        if (Callstate.state != 0) return "CALL_ACTIVE";
+        if (Callstate.audio_group_active) return "AUDIO_GROUP";
+        if (Callstate.audio_ngc_group_active) return "NGC_AUDIO_GROUP";
+
+        if (need_wakeup_now)
+        {
+            String r = wakeup_trigger_reason;
+            return (r == null || r.isEmpty()) ? "TRIG_UNKNOWN" : r;
+        }
+
+        // time-based entry criteria from battery_saving_can_sleep(), re-checked:
+        if (global_self_last_went_online_timestamp == -1) return "ONLINE_TS_UNSET";
+        if ((global_self_last_went_online_timestamp + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) >= System.currentTimeMillis())
+        {
+            return "RECENTLY_ONLINE";
+        }
+        if ((global_last_activity_for_battery_savings_ts + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) >= System.currentTimeMillis())
+        {
+            return "RECENT_ACTIVITY";
+        }
+
+        return null; // still allowed to sleep
+    }
+
     static boolean battery_saving_can_sleep()
     {
         if ((last_log_battery_savings_criteria_ts + 60000) < System.currentTimeMillis())
@@ -5146,6 +5184,18 @@ public class HelperGeneric
         else
         {
             Log.i(TAG, "append_logger_msg:3:msg=" + logmsg);
+        }
+    }
+
+    /**
+     * Overloaded version that accepts a specific wakeup reason for the Network Profiler.
+     */
+    public static void trigger_proper_wakeup_outside_tox_service_thread(String reason)
+    {
+        request_wakeup(reason);
+        if (TrifaToxService.trifa_service_thread != null)
+        {
+            TrifaToxService.trifa_service_thread.interrupt();
         }
     }
 
