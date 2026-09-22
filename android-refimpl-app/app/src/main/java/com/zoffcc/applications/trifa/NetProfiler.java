@@ -313,7 +313,7 @@ public class NetProfiler extends AppCompatActivity {
             }
         }
 
-        tvWakeupHistory.setText(hasHistory ? sb.toString() : "No recent wakeups (tap for details)");
+        tvWakeupHistory.setText(hasHistory ? sb.toString() : "No recent wakeups");
     }
 
     /** Compact but specific code for the one-line view. */
