@@ -257,7 +257,10 @@ public class NetProfiler extends AppCompatActivity {
         {
             currently_sleeping_ms = System.currentTimeMillis() - battery_sleep_start_ms;
         }
-        tvSleepValue.setText(formatDuration(stats_time_tox_not_iterating_ms + currently_sleeping_ms));
+        long totalSleepMs = stats_time_tox_not_iterating_ms + currently_sleeping_ms;
+
+        // Use the new formatter that always shows seconds and includes the percentage
+        tvSleepValue.setText(formatSleepWithPercent(totalSleepMs, uptimeMillis));
 
         // --- DEEP SLEEP CALCULATION (cpuspy logic) ---
         // elapsedRealtime() includes deep sleep. uptimeMillis() does not.
@@ -272,6 +275,37 @@ public class NetProfiler extends AppCompatActivity {
         String humanDeepSleep = formatDuration(totalDeepSleepMs);
 
         tvDeepSleepValue.setText(humanDeepSleep + " (" + String.format(Locale.US, "%.1f%%", sleepPct) + ")");
+    }
+
+    /**
+     * Formats milliseconds into a human-readable duration string that ALWAYS includes seconds,
+     * and appends the percentage relative to the total uptime.
+     * Example output: "02h 15m 30s (45.2%)"
+     */
+    private String formatSleepWithPercent(long sleepMs, long uptimeMs) {
+        if (sleepMs < 0) sleepMs = 0;
+        long seconds = sleepMs / 1000;
+        long minutes = seconds / 60;
+        long hours = minutes / 60;
+        long days = hours / 24;
+
+        seconds = seconds % 60;
+        minutes = minutes % 60;
+        hours = hours % 24;
+
+        String timeStr;
+        if (days > 0) {
+            timeStr = String.format(Locale.US, "%dd %02dh %02dm %02ds", days, hours, minutes, seconds);
+        } else if (hours > 0) {
+            timeStr = String.format(Locale.US, "%02dh %02dm %02ds", hours, minutes, seconds);
+        } else if (minutes > 0) {
+            timeStr = String.format(Locale.US, "%02dm %02ds", minutes, seconds);
+        } else {
+            timeStr = String.format(Locale.US, "%02ds", seconds);
+        }
+
+        double pct = (uptimeMs > 0) ? (sleepMs * 100.0) / uptimeMs : 0.0;
+        return timeStr + " (" + String.format(Locale.US, "%.1f%%", pct) + ")";
     }
 
     private void updateHeatBars(long sentBps, long recvBps, long cpuCps) {
