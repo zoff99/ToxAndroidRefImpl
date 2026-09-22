@@ -1596,17 +1596,18 @@ public class TrifaToxService extends Service
 
                                 for (int ii = 0; ii < sleep_in_sec; ii++)
                                 {
-                                    String reason = battery_saving_must_wake_reason();
-                                    if (reason != null)
+                                    if ((global_showing_messageview) || (global_showing_anygroupview))
                                     {
-                                        wakeup_reason = reason;
-                                        if (need_wakeup_now)
-                                        {
-                                            need_wakeup_now = false;
-                                            wakeup_trigger_reason = "";
-                                        }
+                                        // if the user opens the message view, or any group view -> go online, to be able to send messages
                                         trigger_proper_wakeup_from_tox_service_thread();
-                                        append_logger_msg(TAG + "::finish BATTERY SAVINGS MODE reason=" + wakeup_reason);
+                                        append_logger_msg(TAG + "::finish BATTERY SAVINGS MODE (Message view opened)");
+                                        break;
+                                    }
+
+                                    if (need_wakeup_now)
+                                    {
+                                        trigger_proper_wakeup_from_tox_service_thread();
+                                        append_logger_msg(TAG + "::" + "need_wakeup_now trigger 001");
                                         break;
                                     }
 
@@ -1641,11 +1642,6 @@ public class TrifaToxService extends Service
                                         if (r2 != null)
                                         {
                                             wakeup_reason = r2;
-                                            if (need_wakeup_now)
-                                            {
-                                                need_wakeup_now = false;
-                                                wakeup_trigger_reason = "";
-                                            }
                                         }
                                         else
                                         {
@@ -1662,6 +1658,7 @@ public class TrifaToxService extends Service
                                 battery_sleep_start_ms = 0;
 
                                 recordWakeup(wakeup_reason); // save exact reason + timestamp into the ring buffer
+                                wakeup_trigger_reason = "";
 
                                 append_logger_msg(TAG + "::" + "finish BATTERY SAVINGS MODE, connecting again");
 
