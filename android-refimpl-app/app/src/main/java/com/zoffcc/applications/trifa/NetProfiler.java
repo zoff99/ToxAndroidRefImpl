@@ -288,17 +288,27 @@ public class NetProfiler extends AppCompatActivity {
         long now = System.currentTimeMillis();
         StringBuilder sb = new StringBuilder();
         int idx = TrifaToxService.wakeup_ring_index;
+        int maxHistory = TrifaToxService.MAX_WAKEUP_HISTORY;
         boolean hasHistory = false;
 
-        // Read the ring buffer backwards (most recent first)
-        for (int i = 0; i < 5; i++) {
-            int readIdx = (idx - 1 - i + 5) % 5;
+        for (int i = 0; i < maxHistory; i++) {
+            int readIdx = (idx - 1 - i + maxHistory) % maxHistory;
             String reason = TrifaToxService.last_wakeup_reasons[readIdx];
             long time = TrifaToxService.last_wakeup_times[readIdx];
+            long sleepDur = TrifaToxService.last_sleep_durations[readIdx];
+            long awakeDur = TrifaToxService.last_awake_durations[readIdx];
 
             if (reason != null && time > 0) {
                 if (hasHistory) sb.append(" ");
-                sb.append(wakeupCode(reason)).append("(").append(formatTimeAgo(now - time)).append(")");
+
+                String code = wakeupCode(reason);
+                String ago = formatTimeAgo(now - time);
+
+                // Format: 🔔push(2m ago) 💤20m ⚡5m
+                sb.append(code).append("(").append(ago).append(" ago)");
+                if (sleepDur > 0) sb.append(" 💤").append(formatDurationShort(sleepDur));
+                if (awakeDur > 0) sb.append(" ⚡").append(formatDurationShort(awakeDur));
+
                 hasHistory = true;
             }
         }
@@ -351,25 +361,45 @@ public class NetProfiler extends AppCompatActivity {
         long now = System.currentTimeMillis();
         StringBuilder sb = new StringBuilder();
         int idx = TrifaToxService.wakeup_ring_index;
+        int maxHistory = TrifaToxService.MAX_WAKEUP_HISTORY;
         boolean hasHistory = false;
 
-        for (int i = 0; i < 5; i++) {
-            int readIdx = (idx - 1 - i + 5) % 5;
+        for (int i = 0; i < maxHistory; i++) {
+            int readIdx = (idx - 1 - i + maxHistory) % maxHistory;
             String reason = TrifaToxService.last_wakeup_reasons[readIdx];
             long time = TrifaToxService.last_wakeup_times[readIdx];
+            long sleepDur = TrifaToxService.last_sleep_durations[readIdx];
+            long awakeDur = TrifaToxService.last_awake_durations[readIdx];
 
             if (reason != null && time > 0) {
                 String ts = new java.text.SimpleDateFormat("HH:mm:ss", Locale.US).format(new java.util.Date(time));
-                sb.append(ts).append("  ").append(reason).append("  (").append(formatTimeAgo(now - time)).append(" ago)\n");
+
+                sb.append("⏰ ").append(ts).append("  (").append(formatTimeAgo(now - time)).append(" ago)\n");
+                sb.append("   Reason: ").append(reason).append("\n");
+                if (sleepDur > 0) sb.append("   💤 Sleep duration: ").append(formatDuration(sleepDur)).append("\n");
+                if (awakeDur > 0) sb.append("   ⚡ Awake before sleep: ").append(formatDuration(awakeDur)).append("\n");
+                sb.append("\n");
                 hasHistory = true;
             }
         }
 
         new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Last sleep wakeups")
+                .setTitle("Sleep / Wake Cycle History")
                 .setMessage(hasHistory ? sb.toString() : "No wakeups recorded yet")
                 .setPositiveButton("OK", null)
                 .show();
+    }
+
+    private String formatDurationShort(long ms) {
+        if (ms < 0) ms = 0;
+        long sec = ms / 1000;
+        if (sec < 60) return sec + "s";
+        long min = sec / 60;
+        if (min < 60) return min + "m";
+        long hr = min / 60;
+        if (hr < 24) return hr + "h " + (min % 60) + "m";
+        long days = hr / 24;
+        return days + "d " + (hr % 24) + "h";
     }
 
     private String formatTimeAgo(long ms) {

@@ -229,20 +229,39 @@ public class TrifaToxService extends Service
     static long battery_sleep_start_ms = 0;
     static long battery_sleep_end_ms = 0;
 
-    // --- Battery-saving wakeup tracking: ring buffer of the last 5 events ---
-    public static final String[] last_wakeup_reasons = new String[5];
-    public static final long[]   last_wakeup_times   = new long[5];
-    public static int wakeup_ring_index = 0;
-
     // Exact reason string for the pending wakeup request
     // (replaces the information the plain boolean 'need_wakeup_now' lost)
     public static volatile String wakeup_trigger_reason = "";
 
-    public static void recordWakeup(String reason)
-    {
-        last_wakeup_times[wakeup_ring_index] = System.currentTimeMillis();
+    // --- Battery-saving wakeup tracking ---
+    public static final int MAX_WAKEUP_HISTORY = 10; // Change this to expand history later
+    public static final String[] last_wakeup_reasons = new String[MAX_WAKEUP_HISTORY];
+    public static final long[] last_wakeup_times = new long[MAX_WAKEUP_HISTORY];
+    public static final long[] last_sleep_durations = new long[MAX_WAKEUP_HISTORY];
+    public static final long[] last_awake_durations = new long[MAX_WAKEUP_HISTORY];
+    public static int wakeup_ring_index = 0;
+
+    // Tracks when the current awake period started.
+    // IMPORTANT: Initialize this right before your main `while(!stop_me)` loop starts!
+    public static volatile long last_awake_start_time_ms = 0;
+
+    public static void recordWakeup(String reason, long sleepStartMs, long sleepEndMs) {
+        long sleepDuration = sleepEndMs - sleepStartMs;
+        long awakeDuration = 0;
+
+        if (last_awake_start_time_ms > 0) {
+            awakeDuration = sleepStartMs - last_awake_start_time_ms;
+        }
+
+        last_wakeup_times[wakeup_ring_index] = sleepEndMs;
         last_wakeup_reasons[wakeup_ring_index] = reason;
-        wakeup_ring_index = (wakeup_ring_index + 1) % 5;
+        last_sleep_durations[wakeup_ring_index] = sleepDuration;
+        last_awake_durations[wakeup_ring_index] = awakeDuration;
+
+        wakeup_ring_index = (wakeup_ring_index + 1) % MAX_WAKEUP_HISTORY;
+
+        // The new awake period starts right now
+        last_awake_start_time_ms = sleepEndMs;
     }
 
     /**
@@ -1535,6 +1554,7 @@ public class TrifaToxService extends Service
 
                 // [ADDED] Tracking variables for iteration vs sleep stats
                 stats_time_tox_not_iterating_ms = 0;
+                last_awake_start_time_ms = System.currentTimeMillis();
                 long stats_time_tox_iterating_ms = 0;
                 long stats_last_log_ms = System.currentTimeMillis();
 
@@ -1665,7 +1685,7 @@ public class TrifaToxService extends Service
                                 battery_sleep_end_ms = System.currentTimeMillis();
                                 stats_time_tox_not_iterating_ms += (battery_sleep_end_ms - battery_sleep_start_ms);
 
-                                recordWakeup(wakeup_reason); // save exact reason + timestamp into the ring buffer
+                                recordWakeup(wakeup_reason, battery_sleep_start_ms, battery_sleep_end_ms); // save exact reason + timestamp into the ring buffer
                                 wakeup_trigger_reason = "";
                                 battery_sleep_start_ms = 0;
 
