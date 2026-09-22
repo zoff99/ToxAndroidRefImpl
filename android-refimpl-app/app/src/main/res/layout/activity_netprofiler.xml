@@ -20,9 +20,10 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Network Profiler Matrix"
-            android:textSize="20sp"
+            android:text="Tox Profiler"
+            android:textSize="22sp"
             android:textStyle="bold"
+            android:layout_gravity="center"
             android:layout_marginBottom="16dp" />
 
         <!-- Row 1: Total Sent & Received -->
@@ -42,7 +43,14 @@
                 android:padding="12dp"
                 android:layout_marginEnd="6dp"
                 android:background="@drawable/bg_card_sent">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Sent" android:textSize="12sp" android:textStyle="bold" android:textColor="#0D47A1"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Sent"
+                    android:textColor="#0D47A1"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
                 <TextView android:id="@+id/tv_sent_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
                 <TextView android:id="@+id/tv_sent_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
                 <TextView android:id="@+id/tv_sent_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
@@ -75,7 +83,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Uptime"
+                android:text="Tox Uptime"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:textColor="#00695C"/>
@@ -121,7 +129,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Deep Sleep "
+                android:text="OS Deep Sleep "
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:textColor="#5E35B1"/>
