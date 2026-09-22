@@ -1051,7 +1051,7 @@ public class MessageListActivity extends AppCompatActivity
         }
 
         message_list_activity = this;
-        wakeup_tox_thread();
+        wakeup_tox_thread("UI_MSGVIEW");
     }
 
     static void set_recording_pop_text_s(final String t)

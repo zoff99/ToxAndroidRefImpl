@@ -218,7 +218,7 @@ public class ConfGroupAudioService extends Service
 
                 activity_state = 1;
 
-                wakeup_tox_thread();
+                wakeup_tox_thread("AUDIO_GROUP");
 
                 try
                 {

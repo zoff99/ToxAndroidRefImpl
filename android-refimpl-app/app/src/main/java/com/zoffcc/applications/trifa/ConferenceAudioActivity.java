@@ -561,7 +561,7 @@ public class ConferenceAudioActivity extends AppCompatActivity
         activity_state = 1;
         push_to_talk_active = false;
 
-        wakeup_tox_thread();
+        wakeup_tox_thread("AUDIO_GROUP");
 
         if (Build.VERSION.SDK_INT >= 27)
         {

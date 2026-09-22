@@ -2721,7 +2721,7 @@ public class TrifaToxService extends Service
         }
     }
 
-    static void wakeup_tox_thread()
+    static void wakeup_tox_thread(String reason)
     {
         append_logger_msg(TAG + "::wakeup_tox_thread");
         // This will wakeup the tox_iterate() thread and go online as quick as possible
@@ -2730,7 +2730,7 @@ public class TrifaToxService extends Service
         {
             if (trifa_service_thread != null)
             {
-                trigger_proper_wakeup_outside_tox_service_thread();
+                trigger_proper_wakeup_outside_tox_service_thread(reason);
             }
         }
         catch (Exception e)

@@ -1776,7 +1776,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         MainActivity.group_message_list_activity = this;
-        wakeup_tox_thread();
+        wakeup_tox_thread("UI_GROUPVIEW");
         // ** DEACTIVATE ** -> NGCMID //
         /*
         try

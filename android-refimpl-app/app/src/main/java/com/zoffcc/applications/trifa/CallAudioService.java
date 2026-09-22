@@ -138,7 +138,7 @@ public class CallAudioService extends Service
             {
                 Log.i(TAG, "GAThread:starting");
                 activity_state = 1;
-                wakeup_tox_thread();
+                wakeup_tox_thread("NGC_AUDIO_GROUP");
 
                 try
                 {

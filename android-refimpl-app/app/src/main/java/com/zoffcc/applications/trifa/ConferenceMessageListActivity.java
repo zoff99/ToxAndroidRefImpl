@@ -568,7 +568,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, conf_id, null, null);
 
         MainActivity.conference_message_list_activity = this;
-        wakeup_tox_thread();
+        wakeup_tox_thread("UI_GROUPVIEW");
     }
 
     private void setUpEmojiPopup()
