@@ -4672,6 +4672,17 @@ public class MainActivity extends AppCompatActivity
     // --------------- Message V3 -------------
     // --------------- Message V3 -------------
 
+
+    // --------------- CPU cycles Profiling -------------
+    // --------------- CPU cycles Profiling -------------
+    // --------------- CPU cycles Profiling -------------
+    public static native long tox_get_estimated_cpu_cycles();
+
+    public static native void tox_reset_estimated_cpu_cycles();
+    // --------------- CPU cycles Profiling -------------
+    // --------------- CPU cycles Profiling -------------
+    // --------------- CPU cycles Profiling -------------
+
     // --------------- Network Profiling (netprof) -------------
     // --------------- Network Profiling (netprof) -------------
     // --------------- Network Profiling (netprof) -------------
