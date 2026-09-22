@@ -6,6 +6,9 @@
     android:orientation="vertical"
     android:padding="8dp"
     android:layout_margin="4dp"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackground"
     android:background="@drawable/bg_packet_box">
 
     <LinearLayout

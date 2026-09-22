@@ -454,6 +454,47 @@ public class NetProfiler extends AppCompatActivity {
         tvCpuHeatRate.setText(formatCycles(cpuCps));
     }
 
+    /**
+     * Shows a detailed popup dialog for a specific packet or the middleware box.
+     */
+    public static void showPacketDetailsDialog(android.content.Context context, PacketStat stat) {
+        StringBuilder sb = new StringBuilder();
+        String title;
+
+        if (stat.id == -1) {
+            // Middleware details
+            title = "Middleware Details";
+            sb.append("Middleware Custom Packets (NGC)\n");
+            sb.append("\n");
+            sb.append("Sent: ").append(formatBytes(stat.sentBytes)).append("\n");
+            sb.append("Recv: ").append(formatBytes(stat.recvBytes)).append("\n");
+            sb.append("Rate: ").append(formatRate(stat.bytesPerSec)).append("\n");
+            sb.append("\n");
+            sb.append("Total: ").append(formatBytes(stat.sentBytes + stat.recvBytes)).append("\n");
+        } else {
+            // Standard Packet Details
+            String hexId = String.format(Locale.US, "0x%02X", stat.id);
+            title = stat.name + " (" + stat.transport + ")";
+
+            sb.append("Transport: ").append(stat.transport).append("\n");
+            sb.append("Packet ID: ").append(hexId).append(" (").append(stat.id).append(")\n");
+            sb.append("\n");
+            sb.append("Sent: ").append(stat.sentCount).append(" pkts (").append(formatBytes(stat.sentBytes)).append(")\n");
+            sb.append("Recv: ").append(stat.recvCount).append(" pkts (").append(formatBytes(stat.recvBytes)).append(")\n");
+            sb.append("Rate: ").append(formatRate(stat.bytesPerSec)).append("\n");
+            sb.append("\n");
+            long totalBytes = stat.sentBytes + stat.recvBytes;
+            long totalPkts = stat.sentCount + stat.recvCount;
+            sb.append("Total: ").append(totalPkts).append(" pkts (").append(formatBytes(totalBytes)).append(")\n");
+        }
+
+        new androidx.appcompat.app.AlertDialog.Builder(context)
+                .setTitle(title)
+                .setMessage(sb.toString())
+                .setPositiveButton("OK", null)
+                .show();
+    }
+
     // --- Formatting & Math Helpers ---
 
     public static String formatBytes(long bytes) {
@@ -601,7 +642,9 @@ public class NetProfiler extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-            holder.bind(stats.get(position));
+            PacketStat stat = stats.get(position);
+            holder.bind(stat);
+            holder.itemView.setOnClickListener(v -> showPacketDetailsDialog(v.getContext(), stat));
         }
 
         @Override
