@@ -299,7 +299,7 @@ public class NetProfiler extends AppCompatActivity {
             long awakeDur = TrifaToxService.last_awake_durations[readIdx];
 
             if (reason != null && time > 0) {
-                if (hasHistory) sb.append(" ");
+                if (hasHistory) sb.append("\n");
 
                 String code = wakeupCode(reason);
                 String ago = formatTimeAgo(now - time);

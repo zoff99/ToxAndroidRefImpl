@@ -162,7 +162,7 @@
                 android:id="@+id/tv_wakeup_history"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="No recent wakeups (tap for details)"
+                android:text="No recent wakeups"
                 android:textSize="12sp"
                 android:textColor="?android:attr/textColorPrimary"
                 android:fontFamily="monospace"
