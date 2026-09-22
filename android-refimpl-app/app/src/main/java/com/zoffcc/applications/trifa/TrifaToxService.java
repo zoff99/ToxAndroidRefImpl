@@ -1599,7 +1599,15 @@ public class TrifaToxService extends Service
                                     if ((global_showing_messageview) || (global_showing_anygroupview))
                                     {
                                         // if the user opens the message view, or any group view -> go online, to be able to send messages
-                                        trigger_proper_wakeup_from_tox_service_thread();
+                                        if (global_showing_messageview)
+                                        {
+                                            trigger_proper_wakeup_from_tox_service_thread("UI_MSGVIEW");
+                                        }
+                                        else
+                                        {
+                                            trigger_proper_wakeup_from_tox_service_thread("UI_GROUPVIEW");
+                                        }
+
                                         append_logger_msg(TAG + "::finish BATTERY SAVINGS MODE (Message view opened)");
                                         break;
                                     }

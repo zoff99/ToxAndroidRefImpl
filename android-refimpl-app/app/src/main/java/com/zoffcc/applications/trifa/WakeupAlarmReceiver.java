@@ -63,7 +63,8 @@ public class WakeupAlarmReceiver extends BroadcastReceiver
                     if (trifa_service_thread != null)
                     {
                         append_logger_msg(TAG + "::" + "need_wakeup_now trigger 004");
-                        trigger_proper_wakeup_outside_tox_service_thread();
+                        // Pass the exact reason to the trigger method
+                        trigger_proper_wakeup_outside_tox_service_thread("SCHED_FULL");
                         TrifaToxService.write_debug_file("AlarmReceiver_interrupt");
                     }
                 }

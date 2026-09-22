@@ -5210,6 +5210,12 @@ public class HelperGeneric
         }
     }
 
+    static public void trigger_proper_wakeup_from_tox_service_thread(String reason)
+    {
+        request_wakeup(reason);
+        trigger_proper_wakeup_from_tox_service_thread();
+    }
+
     static public void trigger_proper_wakeup_from_tox_service_thread()
     {
         append_logger_msg(TAG + "::trigger_proper_wakeup_from_tox_service_thread");
