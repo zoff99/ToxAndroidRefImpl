@@ -227,6 +227,7 @@ public class TrifaToxService extends Service
     static long tox_startup_timestamp = -1L;
     static long stats_time_tox_not_iterating_ms = 0;
     static long battery_sleep_start_ms = 0;
+    static long battery_sleep_end_ms = 0;
 
     // --- Battery-saving wakeup tracking: ring buffer of the last 5 events ---
     public static final String[] last_wakeup_reasons = new String[5];
@@ -1661,12 +1662,12 @@ public class TrifaToxService extends Service
                                     }
                                 }
 
-                                long battery_sleep_end_ms = System.currentTimeMillis();
+                                battery_sleep_end_ms = System.currentTimeMillis();
                                 stats_time_tox_not_iterating_ms += (battery_sleep_end_ms - battery_sleep_start_ms);
-                                battery_sleep_start_ms = 0;
 
                                 recordWakeup(wakeup_reason); // save exact reason + timestamp into the ring buffer
                                 wakeup_trigger_reason = "";
+                                battery_sleep_start_ms = 0;
 
                                 append_logger_msg(TAG + "::" + "finish BATTERY SAVINGS MODE, connecting again");
 
