@@ -40,8 +40,8 @@ public class NetProfiler extends AppCompatActivity {
     private TextView tvUptimeValue;
     private TextView tvSleepValue;
     private TextView tvDeepSleepValue;
-    private View viewSentHeat, viewRecvHeat;
-    private TextView tvSentHeatRate, tvRecvHeatRate;
+    private View viewSentHeat, viewRecvHeat, viewCpuHeat;
+    private TextView tvSentHeatRate, tvRecvHeatRate, tvCpuHeatRate;
     private RecyclerView rvPackets;
 
     private PacketAdapter adapter;
@@ -55,6 +55,7 @@ public class NetProfiler extends AppCompatActivity {
     private long prevSentBytes = 0;
     private long prevRecvBytes = 0;
     private long prevMidBytes = 0;
+    private long prevCpuCycles = 0;
     private final Map<String, Long> prevPacketBytes = new HashMap<>();
     private long prevTimestamp = System.currentTimeMillis();
     private boolean isFirstSample = true;
@@ -79,8 +80,11 @@ public class NetProfiler extends AppCompatActivity {
 
         viewSentHeat = findViewById(R.id.view_sent_heat);
         viewRecvHeat = findViewById(R.id.view_recv_heat);
+        viewCpuHeat = findViewById(R.id.view_cpu_heat);
+
         tvSentHeatRate = findViewById(R.id.tv_sent_heat_rate);
         tvRecvHeatRate = findViewById(R.id.tv_recv_heat_rate);
+        tvCpuHeatRate = findViewById(R.id.tv_cpu_heat_rate);
 
         rvPackets = findViewById(R.id.rv_packets);
 
@@ -152,9 +156,13 @@ public class NetProfiler extends AppCompatActivity {
         long midRecvBytes = (midStats != null && midStats.length > 1) ? midStats[1] : 0;
         long midTotalBytes = midSentBytes + midRecvBytes;
 
+        long cpuCyclesRaw = MainActivity.tox_get_estimated_cpu_cycles();
+        long cpuCycles = Math.max(cpuCyclesRaw, 0);
+
         long sentBps = calculateRate(totalSentBytes, prevSentBytes, deltaTimeSec);
         long recvBps = calculateRate(totalRecvBytes, prevRecvBytes, deltaTimeSec);
         long midBps = calculateRate(midTotalBytes, prevMidBytes, deltaTimeSec);
+        long cpuCyclesPerSec = calculateRate(cpuCycles, prevCpuCycles, deltaTimeSec);
 
         List<PacketStat> newStats = new ArrayList<>();
 
@@ -177,6 +185,7 @@ public class NetProfiler extends AppCompatActivity {
         prevSentBytes = totalSentBytes;
         prevRecvBytes = totalRecvBytes;
         prevMidBytes = midTotalBytes;
+        prevCpuCycles = cpuCycles;
         prevTimestamp = currentTime;
         isFirstSample = false;
 
@@ -187,10 +196,11 @@ public class NetProfiler extends AppCompatActivity {
         final long fTotalRecvCount = totalRecvCount;
         final long fSentBps = sentBps;
         final long fRecvBps = recvBps;
+        final long fCpuCps = cpuCyclesPerSec;
 
         mainHandler.post(() -> {
             updateSummaryCards(fTotalSentBytes, fTotalSentCount, fSentBps, fTotalRecvBytes, fTotalRecvCount, fRecvBps);
-            updateHeatBars(fSentBps, fRecvBps);
+            updateHeatBars(fSentBps, fRecvBps, fCpuCps);
 
             packetStats.clear();
             packetStats.addAll(newStats);
@@ -264,22 +274,30 @@ public class NetProfiler extends AppCompatActivity {
         tvDeepSleepValue.setText(humanDeepSleep + " (" + String.format(Locale.US, "%.1f%%", sleepPct) + ")");
     }
 
-    private void updateHeatBars(long sentBps, long recvBps) {
+    private void updateHeatBars(long sentBps, long recvBps, long cpuCps) {
         float sentRatio = rateToHeatRatio(sentBps);
         float recvRatio = rateToHeatRatio(recvBps);
+        float cpuRatio = cpuToHeatRatio(cpuCps);
 
         int sentColor = getHeatColor(sentRatio);
         int recvColor = getHeatColor(recvRatio);
+        int cpuColor = getHeatColor(cpuRatio);
 
-        // Linear width based on 500KB/s max
+        // Linear width based on 500KB/s max for network
         double maxBpsLinear = 500.0 * 1024.0;
         float sentWidthRatio = (float) Math.min(Math.max(sentBps / maxBpsLinear, 0.02), 1.0);
         float recvWidthRatio = (float) Math.min(Math.max(recvBps / maxBpsLinear, 0.02), 1.0);
         if (sentBps == 0) sentWidthRatio = 0;
         if (recvBps == 0) recvWidthRatio = 0;
 
+        // Linear width based on 3 Gc/s max for CPU
+        double maxCpsLinear = 3_000_000_000.0;
+        float cpuWidthRatio = (float) Math.min(Math.max(cpuCps / maxCpsLinear, 0.02), 1.0);
+        if (cpuCps == 0) cpuWidthRatio = 0;
+
         viewSentHeat.setBackgroundColor(sentColor);
         viewRecvHeat.setBackgroundColor(recvColor);
+        viewCpuHeat.setBackgroundColor(cpuColor);
 
         viewSentHeat.setPivotX(0);
         viewSentHeat.setScaleX(sentWidthRatio);
@@ -287,8 +305,12 @@ public class NetProfiler extends AppCompatActivity {
         viewRecvHeat.setPivotX(0);
         viewRecvHeat.setScaleX(recvWidthRatio);
 
+        viewCpuHeat.setPivotX(0);
+        viewCpuHeat.setScaleX(cpuWidthRatio);
+
         tvSentHeatRate.setText(formatRate(sentBps));
         tvRecvHeatRate.setText(formatRate(recvBps));
+        tvCpuHeatRate.setText(formatCycles(cpuCps));
     }
 
     // --- Formatting & Math Helpers ---
@@ -312,6 +334,17 @@ public class NetProfiler extends AppCompatActivity {
         if (mb < 1024) return String.format(Locale.US, "%.2f MB/s", mb);
         double gb = mb / 1024.0;
         return String.format(Locale.US, "%.2f GB/s", gb);
+    }
+
+    public static String formatCycles(long cps) {
+        if (cps <= 0) return "0 c/s";
+        if (cps < 1000) return cps + " c/s";
+        double k = cps / 1000.0;
+        if (k < 1000) return String.format(Locale.US, "%.1f Kc/s", k);
+        double m = k / 1000.0;
+        if (m < 1000) return String.format(Locale.US, "%.1f Mc/s", m);
+        double g = m / 1000.0;
+        return String.format(Locale.US, "%.2f Gc/s", g);
     }
 
     public static String formatUptime(long millis) {
@@ -353,6 +386,18 @@ public class NetProfiler extends AppCompatActivity {
         double maxBps = 500.0 * 1024.0;
         double logMax = Math.log10(maxBps);
         double logVal = Math.log10(Math.max(bytesPerSec, 1.0));
+        float ratio = (float) Math.min(Math.max(logVal / logMax, 0.0), 1.0);
+        return Math.max(ratio, 0.05f);
+    }
+
+    /**
+     * Map CPU cycles per second to a 0..1 heat ratio.
+     * Uses a shifted log scale from 10 Mc/s to 10 Gc/s.
+     */
+    public static float cpuToHeatRatio(long cps) {
+        if (cps <= 10_000_000L) return 0f; // Below 10 Mc/s is essentially idle
+        double logMax = 3.0; // 10 Mc/s to 10 Gc/s is 3 decades
+        double logVal = Math.log10(cps / 10_000_000.0);
         float ratio = (float) Math.min(Math.max(logVal / logMax, 0.0), 1.0);
         return Math.max(ratio, 0.05f);
     }
