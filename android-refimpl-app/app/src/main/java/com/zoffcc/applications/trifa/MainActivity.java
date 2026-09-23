@@ -498,6 +498,7 @@ public class MainActivity extends AppCompatActivity
     static int PREF__higher_audio_quality = 1;
     static int PREF__video_call_quality = 0;
     static int PREF__X_audio_play_buffer_custom = 0;
+    static boolean PREF__X_persistent_peerlist = false;
     static int PREF__udp_enabled = 0; // 0 -> Tox TCP mode, 1 -> Tox UDP mode
     static int PREF__audiosource = 2; // 1 -> VOICE_COMMUNICATION, 2 -> VOICE_RECOGNITION
     static boolean PREF__orbot_enabled = false;
@@ -1076,6 +1077,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_show_content = settings.getBoolean("notification_show_content", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
+        PREF__X_persistent_peerlist = settings.getBoolean("X_persistent_peerlist", false);
         PREF__fps_half = settings.getBoolean("fps_half", false);
         PREF__h264_encoder_use_intra_refresh = settings.getBoolean("h264_encoder_use_intra_refresh", true);
         PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
@@ -3679,6 +3681,7 @@ public class MainActivity extends AppCompatActivity
         PREF__notification_show_content = settings.getBoolean("notification_show_content", false);
         PREF__notification = settings.getBoolean("notifications_new_message", true);
         PREF__software_echo_cancel = settings.getBoolean("software_echo_cancel", false);
+        PREF__X_persistent_peerlist = settings.getBoolean("X_persistent_peerlist", false);
         PREF__fps_half = settings.getBoolean("fps_half", false);
         PREF__h264_encoder_use_intra_refresh = settings.getBoolean("h264_encoder_use_intra_refresh", true);
         PREF__U_keep_nospam = settings.getBoolean("U_keep_nospam", false);
