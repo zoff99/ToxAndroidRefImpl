@@ -49,6 +49,7 @@
 /* MID_PEERLIST */
 #ifdef TOX_HAVE_NGCMID
 #include <tox/mid_roster.h>
+static bool tox_jni_activated_ngcmid = false;
 #endif
 // #define NGCMID_DEBUG
 /* MID_PEERLIST */
@@ -1055,7 +1056,9 @@ void update_savedata_file(const Tox *tox, const uint8_t *passphrase, size_t pass
 #ifdef TOX_HAVE_NGCMID
     if (mid_peerlist_global != NULL)
     {
-        mid_save(mid_peerlist_global, passphrase, passphrase_len);
+        if (tox_jni_activated_ngcmid) {
+            mid_save(mid_peerlist_global, passphrase, passphrase_len);
+        }
     }
 #endif
 /* MID_PEERLIST */
@@ -1450,8 +1453,10 @@ void init_tox_callbacks()
     /* MID_PEERLIST */
 #ifdef TOX_HAVE_NGCMID
     if (mid_peerlist_global != NULL) {
-        mid_set_peer_list_changed_cb(mid_peerlist_global, group_mid_peer_list_changed_cb, NULL);
-        dbg(9, "MID_PEERLIST:peer_list_changed_cb registered");
+        if (tox_jni_activated_ngcmid) {
+            mid_set_peer_list_changed_cb(mid_peerlist_global, group_mid_peer_list_changed_cb, NULL);
+            dbg(9, "MID_PEERLIST:peer_list_changed_cb registered");
+        }
     }
 #endif
    /* MID_PEERLIST */
@@ -3479,6 +3484,20 @@ Java_com_zoffcc_applications_trifa_MainActivity_init(JNIEnv *env, jobject thiz, 
 }
 
 
+JNIEXPORT void JNICALL
+Java_com_zoffcc_applications_trifa_MainActivity_ngcmidenable(JNIEnv *env, jobject thiz, jint enable)
+{
+    TRACE_LOGGER();
+    if (enable == 1)
+    {
+        tox_jni_activated_ngcmid = true;
+    }
+    else
+    {
+        tox_jni_activated_ngcmid = false;
+    }
+}
+
 // --------------- _toxfuncs_ ---------------
 // --------------- _toxfuncs_ ---------------
 // --------------- _toxfuncs_ ---------------
@@ -3854,7 +3873,10 @@ void Java_com_zoffcc_applications_trifa_MainActivity_tox_1iterate__real(JNIEnv *
     {
         return;
     }
-    mid_iterate(mid_peerlist_global, tox_global);
+
+    if (tox_jni_activated_ngcmid) {
+        mid_iterate(mid_peerlist_global, tox_global);
+    }
 #endif
     /* MID_PEERLIST */
 }
@@ -7392,7 +7414,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1set_1name(JNIE
 #ifdef TOX_HAVE_NGCMID
     if (mid_peerlist_global != NULL)
     {
-        bool unused = mid_self_set_name(mid_peerlist_global, tox_global, (uint32_t)group_number, (uint8_t *)pBytes, (size_t)plength);
+        if (tox_jni_activated_ngcmid) {
+            bool unused = mid_self_set_name(mid_peerlist_global, tox_global, (uint32_t)group_number, (uint8_t *)pBytes, (size_t)plength);
+        }
     }
 #endif
 /* MID_PEERLIST */
@@ -7414,7 +7438,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1self_1set_1name(JNIE
 #ifdef TOX_HAVE_NGCMID
     if (mid_peerlist_global != NULL)
     {
-        bool unused = mid_self_set_name(mid_peerlist_global, tox_global, (uint32_t)group_number, (uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str));
+        if (tox_jni_activated_ngcmid) {
+            bool unused = mid_self_set_name(mid_peerlist_global, tox_global, (uint32_t)group_number, (uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str));
+        }
     }
 #endif
 /* MID_PEERLIST */
@@ -7907,18 +7933,20 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mod_1kick_1peer(JNIE
 #ifdef TOX_HAVE_NGCMID
         if ((mid_peerlist_global != NULL) && (have_kicked_key))
         {
-            uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
-            Tox_Err_Group_State_Queries sq_error;
-            if (tox_group_get_chat_id(tox_global, (uint32_t)group_number, chat_id, &sq_error))
-            {
-                if (sq_error == TOX_ERR_GROUP_STATE_QUERIES_OK)
+            if (tox_jni_activated_ngcmid) {
+                uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+                Tox_Err_Group_State_Queries sq_error;
+                if (tox_group_get_chat_id(tox_global, (uint32_t)group_number, chat_id, &sq_error))
                 {
-                    bool mid_del_res = mid_delete_peer_by_identity(mid_peerlist_global,
-                                                                   chat_id,
-                                                                   kicked_identity_key);
+                    if (sq_error == TOX_ERR_GROUP_STATE_QUERIES_OK)
+                    {
+                        bool mid_del_res = mid_delete_peer_by_identity(mid_peerlist_global,
+                                                                       chat_id,
+                                                                       kicked_identity_key);
 #ifdef NGCMID_DEBUG
-                    dbg(9, "MID_PEERLIST:mod_kick_peer:deleted kicked peer from roster:res=%d", (int)mid_del_res);
+                        dbg(9, "MID_PEERLIST:mod_kick_peer:deleted kicked peer from roster:res=%d", (int)mid_del_res);
 #endif
+                    }
                 }
             }
         }
@@ -8867,11 +8895,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1new(JNIEnv *env, job
 #ifdef TOX_HAVE_NGCMID
     if ((error == TOX_ERR_GROUP_NEW_OK) && (mid_peerlist_global != NULL))
     {
+        if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-        dbg(9, "MID_PEERLIST:tox_group_new:calling mid_on_group_self_join:g=%u", res);
+            dbg(9, "MID_PEERLIST:tox_group_new:calling mid_on_group_self_join:g=%u", res);
 #endif
-        mid_on_group_self_join(mid_peerlist_global, tox_global, res,
-                               (const uint8_t *)pBytes2, (size_t)plength2);
+            mid_on_group_self_join(mid_peerlist_global, tox_global, res,
+                                (const uint8_t *)pBytes2, (size_t)plength2);
+        }
     }
 #endif
     /* MID_PEERLIST */
@@ -8902,11 +8932,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1new(JNIEnv *env, job
 #ifdef TOX_HAVE_NGCMID
     if ((error == TOX_ERR_GROUP_NEW_OK) && (mid_peerlist_global != NULL))
     {
+        if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-        dbg(9, "MID_PEERLIST:tox_group_new:calling mid_on_group_self_join:g=%u", res);
+            dbg(9, "MID_PEERLIST:tox_group_new:calling mid_on_group_self_join:g=%u", res);
 #endif
-        mid_on_group_self_join(mid_peerlist_global, tox_global, res,
-                               (const uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str));
+            mid_on_group_self_join(mid_peerlist_global, tox_global, res,
+                                (const uint8_t *)my_peer_name_str, (size_t)strlen(my_peer_name_str));
+        }
     }
 #endif
     /* MID_PEERLIST */
@@ -9486,10 +9518,12 @@ void group_peer_join_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, void 
     {
         return;
     }
+    if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-    dbg(9, "MID_PEERLIST:group_peer_join_cb:g=%u peer_id=%u", group_number, peer_id);
+        dbg(9, "MID_PEERLIST:group_peer_join_cb:g=%u peer_id=%u", group_number, peer_id);
 #endif
-    mid_on_group_peer_join(mid_peerlist_global, tox, group_number, peer_id);
+        mid_on_group_peer_join(mid_peerlist_global, tox, group_number, peer_id);
+    }
 #endif
     /* MID_PEERLIST */
 }
@@ -9517,10 +9551,13 @@ void group_peer_exit_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, Tox_G
     {
         return;
     }
+
+    if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-    dbg(9, "MID_PEERLIST:group_peer_exit_cb:g=%u peer_id=%u exit_type=%d", group_number, peer_id, (int)exit_type);
+        dbg(9, "MID_PEERLIST:group_peer_exit_cb:g=%u peer_id=%u exit_type=%d", group_number, peer_id, (int)exit_type);
 #endif
-    mid_on_group_peer_exit(mid_peerlist_global, tox, group_number, exit_type);
+        mid_on_group_peer_exit(mid_peerlist_global, tox, group_number, exit_type);
+    }
 #endif
     /* MID_PEERLIST */
 }
@@ -9558,10 +9595,13 @@ void group_custom_packet_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, c
     {
         return;
     }
+
+    if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-    dbg(9, "MID_PEERLIST:group_custom_packet_cb:g=%u peer_id=%u len=%zu", group_number, peer_id, length);
+        dbg(9, "MID_PEERLIST:group_custom_packet_cb:g=%u peer_id=%u len=%zu", group_number, peer_id, length);
 #endif
-    mid_on_group_custom_packet(mid_peerlist_global, tox, group_number, peer_id, data, length);
+        mid_on_group_custom_packet(mid_peerlist_global, tox, group_number, peer_id, data, length);
+    }
 #endif
     /* MID_PEERLIST */
 }
@@ -9650,10 +9690,13 @@ void group_peer_name_cb(Tox *tox, uint32_t group_number, uint32_t peer_id, const
     {
         return;
     }
+
+    if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-    dbg(9, "MID_PEERLIST:group_peer_name_cb:g=%u peer_id=%u", group_number, peer_id);
+        dbg(9, "MID_PEERLIST:group_peer_name_cb:g=%u peer_id=%u", group_number, peer_id);
 #endif
-    mid_on_group_peer_name(mid_peerlist_global, tox, group_number, peer_id);
+        mid_on_group_peer_name(mid_peerlist_global, tox, group_number, peer_id);
+    }
 #endif
     /* MID_PEERLIST */
 }
@@ -9684,14 +9727,17 @@ void group_moderation_cb(Tox *tox, uint32_t group_number, uint32_t source_peer_i
     {
         return;
     }
+
+    if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-    dbg(9, "MID_PEERLIST:group_moderation_cb:g=%u src=%u dst=%u type=%d", group_number, source_peer_id, target_peer_id, (int)mod_type);
+        dbg(9, "MID_PEERLIST:group_moderation_cb:g=%u src=%u dst=%u type=%d", group_number, source_peer_id, target_peer_id, (int)mod_type);
 #endif
-    bool mid_we_were_kicked = mid_on_group_moderation(mid_peerlist_global, tox, group_number, source_peer_id, target_peer_id, mod_type);
-    if (mid_we_were_kicked)
-    {
-        dbg(0, "MID_PEERLIST:we were KICKED from group %u ! middleware wiped group state", group_number);
-        /* HINT: the Java side should also clear its group reference for this group_number */
+        bool mid_we_were_kicked = mid_on_group_moderation(mid_peerlist_global, tox, group_number, source_peer_id, target_peer_id, mod_type);
+        if (mid_we_were_kicked)
+        {
+            dbg(0, "MID_PEERLIST:we were KICKED from group %u ! middleware wiped group state", group_number);
+            /* HINT: the Java side should also clear its group reference for this group_number */
+        }
     }
 #endif
     /* MID_PEERLIST */
@@ -9748,25 +9794,32 @@ void group_self_join_cb(Tox *tox, uint32_t group_number, void *user_data)
     android_tox_callback_group_self_join_cb(group_number);
     /* MID_PEERLIST */
 #ifdef TOX_HAVE_NGCMID
-#ifdef NGCMID_DEBUG
-    dbg(9, "MID_PEERLIST:group_self_join_cb:g=%u", group_number);
-#endif
-    if ((mid_peerlist_global != NULL) && (tox != NULL))
-    {
-        Tox_Err_Group_Self_Query self_name_err;
-        size_t mid_self_name_size = tox_group_self_get_name_size(tox, group_number, &self_name_err);
-        uint8_t *mid_self_name_buf = NULL;
 
-        if ((self_name_err == TOX_ERR_GROUP_SELF_QUERY_OK) && (mid_self_name_size > 0))
+    if (tox_jni_activated_ngcmid) {
+#ifdef NGCMID_DEBUG
+        dbg(9, "MID_PEERLIST:group_self_join_cb:g=%u", group_number);
+#endif
+        if ((mid_peerlist_global != NULL) && (tox != NULL))
         {
-            mid_self_name_buf = calloc(1, mid_self_name_size + 1);
-            if (mid_self_name_buf)
+            Tox_Err_Group_Self_Query self_name_err;
+            size_t mid_self_name_size = tox_group_self_get_name_size(tox, group_number, &self_name_err);
+            uint8_t *mid_self_name_buf = NULL;
+
+            if ((self_name_err == TOX_ERR_GROUP_SELF_QUERY_OK) && (mid_self_name_size > 0))
             {
-                bool name_ok = tox_group_self_get_name(tox, group_number, mid_self_name_buf, &self_name_err);
-                if (!name_ok || self_name_err != TOX_ERR_GROUP_SELF_QUERY_OK)
+                mid_self_name_buf = calloc(1, mid_self_name_size + 1);
+                if (mid_self_name_buf)
                 {
-                    free(mid_self_name_buf);
-                    mid_self_name_buf = NULL;
+                    bool name_ok = tox_group_self_get_name(tox, group_number, mid_self_name_buf, &self_name_err);
+                    if (!name_ok || self_name_err != TOX_ERR_GROUP_SELF_QUERY_OK)
+                    {
+                        free(mid_self_name_buf);
+                        mid_self_name_buf = NULL;
+                        mid_self_name_size = 0;
+                    }
+                }
+                else
+                {
                     mid_self_name_size = 0;
                 }
             }
@@ -9774,26 +9827,22 @@ void group_self_join_cb(Tox *tox, uint32_t group_number, void *user_data)
             {
                 mid_self_name_size = 0;
             }
-        }
-        else
-        {
-            mid_self_name_size = 0;
-        }
 
-        if (mid_self_name_size > TOX_MAX_NAME_LENGTH)
-        {
-            mid_self_name_size = TOX_MAX_NAME_LENGTH;
-        }
+            if (mid_self_name_size > TOX_MAX_NAME_LENGTH)
+            {
+                mid_self_name_size = TOX_MAX_NAME_LENGTH;
+            }
 
-        if (mid_self_name_buf)
-        {
-            mid_on_group_self_join(mid_peerlist_global, tox, group_number,
-                                  (const uint8_t *)mid_self_name_buf, mid_self_name_size);
-            free(mid_self_name_buf);
-        }
-        else
-        {
-            mid_on_group_self_join(mid_peerlist_global, tox, group_number, NULL, 0);
+            if (mid_self_name_buf)
+            {
+                mid_on_group_self_join(mid_peerlist_global, tox, group_number,
+                                      (const uint8_t *)mid_self_name_buf, mid_self_name_size);
+                free(mid_self_name_buf);
+            }
+            else
+            {
+                mid_on_group_self_join(mid_peerlist_global, tox, group_number, NULL, 0);
+            }
         }
     }
 #endif
@@ -9865,10 +9914,13 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1announce_1leave
     {
         return (jint)-99;
     }
+
+    if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-    dbg(9, "MID_PEERLIST:tox_group_mid_announce_leave:g=%ld", (long)group_number);
+        dbg(9, "MID_PEERLIST:tox_group_mid_announce_leave:g=%ld", (long)group_number);
 #endif
-    bool res = mid_announce_leave(mid_peerlist_global, tox_global, (int64_t)group_number);
+        bool res = mid_announce_leave(mid_peerlist_global, tox_global, (int64_t)group_number);
+    }
     return (jint)(res ? 1 : 0);
 #endif
 }
@@ -9895,10 +9947,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1on_1group_1dele
         return (jint)-99;
     }
 
+    if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-    dbg(9, "MID_PEERLIST:tox_group_mid_on_group_delete:g=%ld", (long)group_number);
+        dbg(9, "MID_PEERLIST:tox_group_mid_on_group_delete:g=%ld", (long)group_number);
 #endif
-    mid_on_group_delete(mid_peerlist_global, tox_global, (int64_t)group_number);
+        mid_on_group_delete(mid_peerlist_global, tox_global, (int64_t)group_number);
+    }
     return (jint)0;
 #endif
 }
