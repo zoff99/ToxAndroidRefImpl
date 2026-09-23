@@ -23,6 +23,14 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.StyleSpan;
+import android.widget.TextView;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
@@ -91,6 +99,156 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                 finish();
             }
         });
+    }
+
+    private static void addWarningScenario(LinearLayout container,
+                                           String title,
+                                           String likelihood,
+                                           int severityColor,
+                                           String effect)
+    {
+        LayoutInflater inflater = LayoutInflater.from(container.getContext());
+        View item = inflater.inflate(R.layout.dialog_warning_scenario_item, container, false);
+
+        item.findViewById(R.id.severity_stripe).setBackgroundColor(severityColor);
+
+        TextView titleView = item.findViewById(R.id.scenario_title);
+        titleView.setText(title);
+
+        TextView likeView = item.findViewById(R.id.scenario_likelihood);
+        likeView.setText("Likelihood: " + likelihood);
+        likeView.setTextColor(severityColor);
+
+        TextView effectView = item.findViewById(R.id.scenario_effect);
+        effectView.setText(effect);
+
+        container.addView(item);
+    }
+
+    /*
+     * Builds a richly formatted, readable warning text for the
+     * "Persistent Peerlist" confirmation dialog.
+     *
+     * Layout per scenario:
+     *   ————————————————   (separator)
+     *   Scenario title     (bold)
+     *   Likelihood: VALUE  (bold label, colored value)
+     *   effect text        (gray body)
+     */
+    @NonNull
+    private static SpannableStringBuilder build_persistent_peerlist_warning()
+    {
+        SpannableStringBuilder sb = new SpannableStringBuilder();
+
+        final int color_header = Color.parseColor("#D32F2F"); // red 700
+        final int color_negl   = Color.parseColor("#43A047"); // green 600
+        final int color_lowmod = Color.parseColor("#FB8C00"); // orange 600
+        final int color_mod    = Color.parseColor("#F4511E"); // deep orange 600
+        final int color_na     = Color.parseColor("#757575"); // grey 600
+        final int color_sep    = Color.parseColor("#BDBDBD"); // grey 400
+        final int color_body   = Color.parseColor("#424242"); // grey 800
+
+        // ---- header ----
+        append_line(sb, "PRIVACY WARNING - PERSISTENT PEERLIST",
+                    new StyleSpan(Typeface.BOLD),
+                    new ForegroundColorSpan(color_header),
+                    new RelativeSizeSpan(1.15f));
+        append_line(sb, "");
+        append_line(sb,
+                    "Enabling this makes your presence in NGC groups CRYPTOGRAPHICALLY " +
+                    "PROVABLE and PERSISTENT (30-day cache) instead of ephemeral and deniable.",
+                    new ForegroundColorSpan(color_body));
+        append_line(sb, "");
+
+        // ---- scenarios ----
+        append_separator(sb, color_sep);
+        append_scenario(sb, color_negl,
+                        "Casual user (hobby/social group)",
+                        "Negligible",
+                        "~Zero. No one is trying to prove your presence. The signatures sit unused.");
+
+        append_separator(sb, color_sep);
+        append_scenario(sb, color_lowmod,
+                        "Malicious or curious group member",
+                        "Low-Moderate",
+                        "A member can save your signed heartbeats/tombstones and later prove to a " +
+                        "third party: \"Identity X was in this group at time T.\" Without this they " +
+                        "could only say \"I saw them there\" (hearsay). This is the primary realistic threat.");
+
+        append_separator(sb, color_sep);
+        append_scenario(sb, color_lowmod,
+                        "Sensitive group, partial data leak",
+                        "Low-Moderate",
+                        "e.g. seized phone without full forensics: the persistent 30-day roster with " +
+                        "signed records could survive as evidence. The signatures make leaked data " +
+                        "self-authenticating without the original device.");
+
+        append_separator(sb, color_sep);
+        append_scenario(sb, color_mod,
+                        "Journalist / activist, group infiltrated",
+                        "Moderate",
+                        "An infiltrator can build a PROVABLE attendance log over time. The middleware " +
+                        "upgrades \"I observed them\" to \"I can mathematically prove it to others.\"");
+
+        append_separator(sb, color_sep);
+        append_scenario(sb, color_na,
+                        "State actor with full device access",
+                        "N/A - middleware irrelevant",
+                        "Keylogger / memory dump / malware already give them plaintext messages, keys, " +
+                        "screenshots and network logs. The middleware adds nothing in this scenario.");
+
+        append_separator(sb, color_sep);
+        append_line(sb, "");
+        append_line(sb,
+                    "Do you understand these trade-offs and still want to enable the Persistent Peerlist?",
+                    new StyleSpan(Typeface.BOLD),
+                    new ForegroundColorSpan(color_body));
+
+        return sb;
+    }
+
+    private static void append_line(SpannableStringBuilder sb, String text, Object... spans)
+    {
+        int start = sb.length();
+        sb.append(text);
+        int end = sb.length();
+        if (spans != null)
+        {
+            for (Object sp : spans)
+            {
+                sb.setSpan(sp, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+        }
+        sb.append("\n");
+    }
+
+    private static void append_separator(SpannableStringBuilder sb, int color)
+    {
+        int start = sb.length();
+        sb.append("————————————————————————");
+        sb.setSpan(new ForegroundColorSpan(color), start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.append("\n");
+    }
+
+    private static void append_scenario(SpannableStringBuilder sb, int likelihood_color,
+                                        String title, String likelihood, String effect)
+    {
+        // title (bold)
+        append_line(sb, title, new StyleSpan(Typeface.BOLD));
+
+        // likelihood line: bold label + bold colored value
+        int start = sb.length();
+        sb.append("Likelihood: ");
+        sb.setSpan(new StyleSpan(Typeface.BOLD), start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        start = sb.length();
+        sb.append(likelihood);
+        sb.setSpan(new StyleSpan(Typeface.BOLD), start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.setSpan(new ForegroundColorSpan(likelihood_color), start, sb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        sb.append("\n");
+
+        // effect (gray body)
+        append_line(sb, effect, new ForegroundColorSpan(Color.parseColor("#424242")));
+        sb.append("\n");
     }
 
     private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener()
@@ -234,6 +392,104 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                 {
                     e.printStackTrace();
                 }
+            }
+
+            final SwitchPreference pref_persistent_peerlist = (SwitchPreference) findPreference("X_persistent_peerlist");
+            if (pref_persistent_peerlist != null) {
+                pref_persistent_peerlist.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+                    @Override
+                    public boolean onPreferenceChange(final Preference preference, Object newValue) {
+                        boolean isChecked = (Boolean) newValue;
+
+                        if (isChecked)
+                        {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(preference.getContext());
+                            builder.setTitle("Persistent Peerlist");
+
+                            try
+                            {
+                                final Drawable d1 = new IconicsDrawable(preference.getContext()).
+                                        icon(FontAwesome.Icon.faw_exclamation_circle).
+                                        color(getResources().getColor(R.color.md_red_600)).sizeDp(100);
+                                builder.setIcon(d1);
+                            }
+                            catch (Exception e)
+                            {
+                                e.printStackTrace();
+                            }
+
+                            final View dialogView = LayoutInflater.from(preference.getContext())
+                                    .inflate(R.layout.dialog_persistent_peerlist_warning, null);
+
+                            // Cap the scroll area to 70% of the screen so the button bar
+                            // can never fall below the display edge.
+                            MaxHeightScrollView scroll = dialogView.findViewById(R.id.warning_scroll);
+                            android.util.DisplayMetrics dm = preference.getContext().getResources().getDisplayMetrics();
+                            scroll.setMaxHeight((int) (dm.heightPixels * 0.70f));
+
+                            LinearLayout container = dialogView.findViewById(R.id.scenarios_container);
+
+                            addWarningScenario(container,
+                                               "Everyday use: friends, family, hobby groups",
+                                               "Negligible",
+                                               0xFF4CAF50, // Green
+                                               "This feature provides undeniable proof that your PeerID was in the group. " +
+                                               "Without it, someone can only say 'I saw them there'. With it, they have " +
+                                               "proof they can show to others. For most people, this changes nothing." +
+                                               "\n(Note: 'you' here means your PeerID for that Group, not your real name or real identity.)");
+
+                            addWarningScenario(container,
+                                               "Activism, journalism, support group",
+                                               "Think carefully",
+                                               0xFFF44336, // Red
+                                               "In sensitive groups, the danger is someone reporting on you. " +
+                                               "Normally, an infiltrator can only say 'I saw them in the chat' " +
+                                               "(which you can deny). With this feature, they get a mathematical " +
+                                               "proof they can hand to others: 'Here is undeniable proof this PeerID " +
+                                               "was in this group.'" +
+                                               "\n(Note: 'you' means your PeerID for that Group, not your real name or real identity.)");
+
+                            addWarningScenario(container,
+                                               "State actor or high-risk target",
+                                               "Changes nothing",
+                                               0xFF9E9E9E, // Grey
+                                               "If a powerful adversary is targeting you, they don't need this " +
+                                               "feature to prove your PeerID is in a group. They likely already have " +
+                                               "spyware on your phone, can read your screen, and can see your " +
+                                               "messages. This feature doesn't make you safer, but it also " +
+                                               "doesn't give them anything they didn't already have." +
+                                               "\n(Note: 'you' means your PeerID for that Group, not your real name or real identity.)");
+
+                            builder.setView(dialogView);
+                            builder.setCancelable(true);
+
+                            final AlertDialog dialog = builder.create();
+
+                            dialogView.findViewById(R.id.btn_cancel).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();   // switch stays OFF
+                                }
+                            });
+
+                            dialogView.findViewById(R.id.btn_enable).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    dialog.dismiss();
+                                    ((SwitchPreference) preference).setChecked(true);
+                                }
+                            });
+
+                            dialog.show();
+
+                            return false;   // do not flip the switch until confirmed
+                        }
+                        else
+                        {
+                            return true;    // turning OFF needs no confirmation
+                        }
+                    }
+                });
             }
 
             pref_keepnpspam.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener()
