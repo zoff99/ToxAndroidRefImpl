@@ -1032,6 +1032,12 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
             mid_free(mid_peerlist_global);
             mid_peerlist_global = NULL;
         }
+
+        if (tox_jni_activated_ngcmid == false) {
+            // HINT: purge the savefile
+            unlink(mid_save_filename);
+        }
+
         mid_peerlist_global = mid_new(mid_save_filename, passphrase, passphrase_len);
         dbg(9, "MID_PEERLIST:mid_peerlist_global created in create_tox=%p", (void *)mid_peerlist_global);
     }
