@@ -64,6 +64,8 @@ import androidx.appcompat.widget.Toolbar;
 import static com.zoffcc.applications.trifa.HelperGeneric.IPisValid;
 import static com.zoffcc.applications.trifa.HelperGeneric.isIPPortValid;
 import static com.zoffcc.applications.trifa.HelperGeneric.is_valid_tox_public_key;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_persistent_peerlist;
+import static com.zoffcc.applications.trifa.MainActivity.ngcmidenable;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_IP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_KEYHEX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_PORT;
@@ -477,6 +479,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                                 public void onClick(View v) {
                                     dialog.dismiss();
                                     ((SwitchPreference) preference).setChecked(true);
+                                    PREF__X_persistent_peerlist = true;
+                                    ngcmidenable(1);
                                 }
                             });
 
@@ -486,6 +490,8 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                         }
                         else
                         {
+                            PREF__X_persistent_peerlist = false;
+                            ngcmidenable(0);
                             return true;    // turning OFF needs no confirmation
                         }
                     }

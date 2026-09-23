@@ -1094,6 +1094,15 @@ public class MainActivity extends AppCompatActivity
         PREF__use_native_audio_play = settings.getBoolean("X_use_native_audio_play", true);
         PREF__use_H264_hw_encoding = settings.getBoolean("use_H264_hw_encoding", false);
 
+        if (PREF__X_persistent_peerlist)
+        {
+            ngcmidenable(1);
+        }
+        else
+        {
+            ngcmidenable(0);
+        }
+
         try
         {
             if (settings.getString("X_battery_saving_timeout", "15").compareTo("15") == 0)
@@ -3699,6 +3708,15 @@ public class MainActivity extends AppCompatActivity
         PREF__tox_set_do_not_sync_av = settings.getBoolean("X_tox_set_do_not_sync_av", false);
         PREF__use_H264_hw_encoding = settings.getBoolean("use_H264_hw_encoding", false);
 
+        if (PREF__X_persistent_peerlist)
+        {
+            ngcmidenable(1);
+        }
+        else
+        {
+            ngcmidenable(0);
+        }
+
         // reset trigger for throttled saving
         update_savedata_file_wrapper_throttled_last_trigger_ts = 0;
 
@@ -4929,6 +4947,12 @@ public class MainActivity extends AppCompatActivity
     public static native long tox_group_mid_online_count(String group_id);
 
     public static native long tox_group_mid_offline_count(String group_id);
+
+    /**
+     *
+     * @param enable 1 to enable the ngc mid feature, 0 to disable
+     */
+    public static native void ngcmidenable(int enable);
 
     /**
      * Get middleware custom packet network stats.
