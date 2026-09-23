@@ -150,6 +150,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name_
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_persistent_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__audio_play_volume_percent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__ngc_video_bitrate;
@@ -1478,8 +1479,18 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         try
                         {
-                            long peer_count = tox_group_mid_online_count(group_id);
-                            long frozen_peer_count = tox_group_mid_offline_count(group_id);
+                            long peer_count = 0;
+                            long frozen_peer_count = 0;
+                            if (PREF__X_persistent_peerlist)
+                            {
+                                peer_count = tox_group_mid_online_count(group_id);
+                                frozen_peer_count = tox_group_mid_offline_count(group_id);
+                            }
+                            else
+                            {
+                                peer_count = tox_group_peer_count(conference_num);
+                                frozen_peer_count = tox_group_offline_peer_count(conference_num);
+                            }
 
                             if (peer_count > -1)
                             {
@@ -1532,141 +1543,268 @@ public class GroupMessageListActivity extends AppCompatActivity
             e.printStackTrace();
         }
 
-        // 1. Get the atomic, thread-safe snapshot from the middleware
-        List<MainActivity.MidPeerEntry> mid_peers = MainActivity.get_mid_peer_list_snapshot();
-        if (mid_peers == null || mid_peers.isEmpty())
+        if (PREF__X_persistent_peerlist)
         {
-            return;
-        }
-
-        final long conference_num = tox_group_by_groupid__wrapper(group_id);
-
-        // Get our own pubkey to flag the "self" peer
-        String self_pubkey = "";
-        try
-        {
-            self_pubkey = tox_group_self_get_public_key(conference_num);
-            if (self_pubkey == null) self_pubkey = "";
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-
-        // 2. Sort the MidPeerEntry snapshot directly before building the UI list
-        List<MainActivity.MidPeerEntry> sorted_mid_peers = new ArrayList<>(mid_peers);
-        try
-        {
-            String finalSelf_pubkey = self_pubkey;
-            Collections.sort(sorted_mid_peers, new Comparator<MainActivity.MidPeerEntry>()
+            // 1. Get the atomic, thread-safe snapshot from the middleware
+            List<MainActivity.MidPeerEntry> mid_peers = MainActivity.get_mid_peer_list_snapshot();
+            if (mid_peers == null || mid_peers.isEmpty())
             {
-                @Override
-                public int compare(MainActivity.MidPeerEntry p1, MainActivity.MidPeerEntry p2)
-                {
-                    // --- TIER 1: Myself always first ---
-                    boolean p1_self = p1.identity_key_hex != null && p1.identity_key_hex.equalsIgnoreCase(
-                            finalSelf_pubkey);
-                    boolean p2_self = p2.identity_key_hex != null && p2.identity_key_hex.equalsIgnoreCase(
-                            finalSelf_pubkey);
-                    if (p1_self && !p2_self) return -1;
-                    if (!p1_self && p2_self) return 1;
-                    if (p1_self && p2_self) return 0;
-
-                    // --- TIER 2: Online before Offline (0=NONE, 1=TCP, 2=UDP) ---
-                    boolean p1_online = (p1.connection_status != 0);
-                    boolean p2_online = (p2.connection_status != 0);
-                    if (p1_online && !p2_online) return -1;
-                    if (!p1_online && p2_online) return 1;
-
-                    // --- TIER 3: Role order (FOUNDER=0, MOD=1, USER=2, OBSERVER=3) ---
-                    if (p1.role != p2.role)
-                    {
-                        return Integer.compare(p1.role, p2.role);
-                    }
-
-                    // --- TIER 4: Alphabetical by nickname ---
-                    String name1 = p1.nickname != null ? p1.nickname : "";
-                    String name2 = p2.nickname != null ? p2.nickname : "";
-                    return name1.compareToIgnoreCase(name2);
-                }
-            });
-        }
-        catch (Exception ignored)
-        {
-        }
-
-        List<group_list_peer> group_peers_combined = new ArrayList<>();
-        int i = 0;
-
-        // 3. Iterate the sorted snapshot to build the UI list
-        for (MainActivity.MidPeerEntry entry : sorted_mid_peers)
-        {
-            // --- HIDE PERMANENTLY LEFT PEERS FROM THE UI ---
-            // The middleware keeps them for security (tombstones),
-            // but we don't need to show them in the sidebar.
-            if (entry.is_left())
-            {
-                continue;
+                return;
             }
-            // -----------------------------------------------
 
+            final long conference_num = tox_group_by_groupid__wrapper(group_id);
+
+            // Get our own pubkey to flag the "self" peer
+            String self_pubkey = "";
             try
             {
-                String peer_pubkey_temp = entry.identity_key_hex;
-                String peer_name = entry.nickname != null ? entry.nickname : "";
-                int peerrole = entry.role;
-                int connection_status = entry.connection_status;
+                self_pubkey = tox_group_self_get_public_key(conference_num);
+                if (self_pubkey == null)
+                    self_pubkey = "";
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
 
-                // Enrich with local DB data (e.g. notification settings, "_NEW_" tag)
-                GroupPeerDB peer_from_db = null;
-                try
+            // 2. Sort the MidPeerEntry snapshot directly before building the UI list
+            List<MainActivity.MidPeerEntry> sorted_mid_peers = new ArrayList<>(mid_peers);
+            try
+            {
+                String finalSelf_pubkey = self_pubkey;
+                Collections.sort(sorted_mid_peers, new Comparator<MainActivity.MidPeerEntry>()
                 {
-                    peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB()
-                            .group_identifierEq(group_id)
-                            .tox_group_peer_pubkeyEq(peer_pubkey_temp)
-                            .toList().get(0);
-                }
-                catch (Exception e)
-                {
-                    // DB miss, ignore
-                }
-
-                if (peer_from_db != null)
-                {
-                    if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis())
+                    @Override
+                    public int compare(MainActivity.MidPeerEntry p1, MainActivity.MidPeerEntry p2)
                     {
-                        peer_name = "_NEW_ " + peer_name;
+                        // --- TIER 1: Myself always first ---
+                        boolean p1_self =
+                                p1.identity_key_hex != null && p1.identity_key_hex.equalsIgnoreCase(finalSelf_pubkey);
+                        boolean p2_self =
+                                p2.identity_key_hex != null && p2.identity_key_hex.equalsIgnoreCase(finalSelf_pubkey);
+                        if (p1_self && !p2_self)
+                            return -1;
+                        if (!p1_self && p2_self)
+                            return 1;
+                        if (p1_self && p2_self)
+                            return 0;
+
+                        // --- TIER 2: Online before Offline (0=NONE, 1=TCP, 2=UDP) ---
+                        boolean p1_online = (p1.connection_status != 0);
+                        boolean p2_online = (p2.connection_status != 0);
+                        if (p1_online && !p2_online)
+                            return -1;
+                        if (!p1_online && p2_online)
+                            return 1;
+
+                        // --- TIER 3: Role order (FOUNDER=0, MOD=1, USER=2, OBSERVER=3) ---
+                        if (p1.role != p2.role)
+                        {
+                            return Integer.compare(p1.role, p2.role);
+                        }
+
+                        // --- TIER 4: Alphabetical by nickname ---
+                        String name1 = p1.nickname != null ? p1.nickname : "";
+                        String name2 = p2.nickname != null ? p2.nickname : "";
+                        return name1.compareToIgnoreCase(name2);
                     }
-                }
-
-                String role_char = ToxVars.Tox_Group_Role.value_char(peerrole);
-                String pubkey_prefix = (peer_pubkey_temp != null && peer_pubkey_temp.length() >= 6)
-                        ? peer_pubkey_temp.substring(0, 6)
-                        : (peer_pubkey_temp != null ? peer_pubkey_temp : "");
-
-                String peer_name_temp = role_char + " " + peer_name + " :" + i + ": " + pubkey_prefix;
-
-                group_list_peer glp = new group_list_peer();
-                glp.self = peer_pubkey_temp != null && peer_pubkey_temp.equalsIgnoreCase(self_pubkey);
-                glp.notification_silent = (peer_from_db != null) ? peer_from_db.notification_silent : false;
-                glp.peer_pubkey = peer_pubkey_temp;
-                glp.peer_num = i;
-                glp.peer_name = peer_name_temp;
-                glp.peer_connection_status = connection_status;
-
-                group_peers_combined.add(glp);
-                i++;
+                });
             }
             catch (Exception ignored)
             {
             }
-        }
 
-        // 4. Push to UI (already perfectly sorted by the Comparator above!)
-        for (group_list_peer peerl : group_peers_combined)
+            List<group_list_peer> group_peers_combined = new ArrayList<>();
+            int i = 0;
+
+            // 3. Iterate the sorted snapshot to build the UI list
+            for (MainActivity.MidPeerEntry entry : sorted_mid_peers)
+            {
+                // --- HIDE PERMANENTLY LEFT PEERS FROM THE UI ---
+                // The middleware keeps them for security (tombstones),
+                // but we don't need to show them in the sidebar.
+                if (entry.is_left())
+                {
+                    continue;
+                }
+                // -----------------------------------------------
+
+                try
+                {
+                    String peer_pubkey_temp = entry.identity_key_hex;
+                    String peer_name = entry.nickname != null ? entry.nickname : "";
+                    int peerrole = entry.role;
+                    int connection_status = entry.connection_status;
+
+                    // Enrich with local DB data (e.g. notification settings, "_NEW_" tag)
+                    GroupPeerDB peer_from_db = null;
+                    try
+                    {
+                        peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(
+                                group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                    }
+                    catch (Exception e)
+                    {
+                        // DB miss, ignore
+                    }
+
+                    if (peer_from_db != null)
+                    {
+                        if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) >
+                            System.currentTimeMillis())
+                        {
+                            peer_name = "_NEW_ " + peer_name;
+                        }
+                    }
+
+                    String role_char = ToxVars.Tox_Group_Role.value_char(peerrole);
+                    String pubkey_prefix = (peer_pubkey_temp != null &&
+                                            peer_pubkey_temp.length() >= 6) ? peer_pubkey_temp.substring(0, 6) : (
+                            peer_pubkey_temp != null ? peer_pubkey_temp : "");
+
+                    String peer_name_temp = role_char + " " + peer_name + " :" + i + ": " + pubkey_prefix;
+
+                    group_list_peer glp = new group_list_peer();
+                    glp.self = peer_pubkey_temp != null && peer_pubkey_temp.equalsIgnoreCase(self_pubkey);
+                    glp.notification_silent = (peer_from_db != null) ? peer_from_db.notification_silent : false;
+                    glp.peer_pubkey = peer_pubkey_temp;
+                    glp.peer_num = i;
+                    glp.peer_name = peer_name_temp;
+                    glp.peer_connection_status = connection_status;
+
+                    group_peers_combined.add(glp);
+                    i++;
+                }
+                catch (Exception ignored)
+                {
+                }
+            }
+
+            // 4. Push to UI (already perfectly sorted by the Comparator above!)
+            for (group_list_peer peerl : group_peers_combined)
+            {
+                add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status,
+                               peerl.self, peerl.notification_silent);
+            }
+        }
+        else
         {
-            add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status,
-                           peerl.self, peerl.notification_silent);
+            final long conference_num = tox_group_by_groupid__wrapper(group_id);
+            long num_peers = tox_group_peer_count(conference_num);
+            final long self_peer_id = tox_group_self_get_peer_id(conference_num);
+
+            if (num_peers > 0)
+            {
+                long[] peers = tox_group_get_peerlist(conference_num);
+                if (peers != null)
+                {
+                    List<group_list_peer> group_peers1 = new ArrayList<>();
+                    long i = 0;
+                    for (i = 0; i < num_peers; i++)
+                    {
+                        try
+                        {
+                            String peer_pubkey_temp = tox_group_peer_get_public_key(conference_num, peers[(int) i]);
+                            String peer_name = tox_group_peer_get_name(conference_num, peers[(int) i]);
+
+                            int peerrole = ToxVars.Tox_Group_Role.TOX_GROUP_ROLE_OBSERVER.value;
+                            try {
+                                peerrole = tox_group_peer_get_role(conference_num, get_group_peernum_from_peer_pubkey(group_id, peer_pubkey_temp));
+                            } catch (Exception e) { e.printStackTrace(); }
+
+                            GroupPeerDB peer_from_db = null;
+                            try {
+                                peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                            } catch (Exception e) {}
+
+                            if (peer_from_db != null) {
+                                if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis()) {
+                                    peer_name = "_NEW_ " + peer_name;
+                                }
+                            }
+
+                            String peer_name_temp = ToxVars.Tox_Group_Role.value_char(peerrole) + " " + peer_name + " :" + peers[(int) i] + ": " + peer_pubkey_temp.substring(0, 6);
+
+                            group_list_peer glp = new group_list_peer();
+                            glp.self = (peers[(int) i] == self_peer_id);
+                            glp.notification_silent = (peer_from_db != null) ? peer_from_db.notification_silent : false;
+                            glp.peer_pubkey = peer_pubkey_temp;
+                            glp.peer_num = i;
+                            glp.peer_name = peer_name_temp;
+                            glp.peer_connection_status = tox_group_peer_get_connection_status(conference_num, peers[(int) i]);
+                            group_peers1.add(glp);
+                        }
+                        catch (Exception ignored) {}
+                    }
+
+                    try {
+                        Collections.sort(group_peers1, new Comparator<group_list_peer>() {
+                            @Override
+                            public int compare(group_list_peer p1, group_list_peer p2) {
+                                return p1.peer_name.compareToIgnoreCase(p2.peer_name);
+                            }
+                        });
+                    } catch (Exception ignored) {}
+
+                    for (group_list_peer peerl : group_peers1) {
+                        add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status, peerl.self, peerl.notification_silent);
+                    }
+                }
+            }
+
+            long offline_num_peers = tox_group_offline_peer_count(conference_num);
+
+            if (offline_num_peers > 0)
+            {
+                List<group_list_peer> group_peers_offline = new ArrayList<group_list_peer>();
+                long i = 0;
+                for (i = 0; i < GC_MAX_SAVED_PEERS; i++)
+                {
+                    try
+                    {
+                        String peer_pubkey_temp = tox_group_savedpeer_get_public_key(conference_num, i);
+                        String peer_name = "zzzzzoffline " + i;
+                        GroupPeerDB peer_from_db = null;
+                        try {
+                            peer_from_db = (GroupPeerDB) orma.selectFromGroupPeerDB().group_identifierEq(group_id).tox_group_peer_pubkeyEq(peer_pubkey_temp).toList().get(0);
+                        } catch (Exception e) {}
+
+                        String peerrole = "";
+                        if (peer_from_db != null)
+                        {
+                            peer_name = peer_from_db.peer_name;
+                            if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) > System.currentTimeMillis()) {
+                                peer_name = "_NEW_ " + peer_name;
+                            }
+                            peerrole = ToxVars.Tox_Group_Role.value_char(peer_from_db.Tox_Group_Role) + " ";
+                        }
+
+                        String peer_name_temp = peerrole + peer_name + " :" + i + ": " + peer_pubkey_temp.substring(0, 6);
+
+                        group_list_peer glp3 = new group_list_peer();
+                        glp3.notification_silent = (peer_from_db != null) ? peer_from_db.notification_silent : false;
+                        glp3.peer_pubkey = peer_pubkey_temp;
+                        glp3.peer_num = i;
+                        glp3.peer_name = peer_name_temp;
+                        glp3.peer_connection_status = ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value;
+                        group_peers_offline.add(glp3);
+                    }
+                    catch (Exception ignored) {}
+                }
+
+                try {
+                    Collections.sort(group_peers_offline, new Comparator<group_list_peer>() {
+                        @Override
+                        public int compare(group_list_peer p1, group_list_peer p2) {
+                            return p1.peer_name.compareToIgnoreCase(p2.peer_name);
+                        }
+                    });
+                } catch (Exception ignored) {}
+
+                for (group_list_peer peerloffline : group_peers_offline) {
+                    add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name, peerloffline.peer_connection_status, false, peerloffline.notification_silent);
+                }
+            }
         }
     }
 
@@ -1777,17 +1915,6 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         MainActivity.group_message_list_activity = this;
         wakeup_tox_thread("UI_GROUPVIEW");
-        // ** DEACTIVATE ** -> NGCMID //
-        /*
-        try
-        {
-            update_group_all_users();
-        }
-        catch (Exception e)
-        {
-        }
-        */
-        // ** DEACTIVATE ** -> NGCMID //
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         NGC_Group_video_check_incoming_thread = new Thread()
         {
@@ -1870,9 +1997,22 @@ public class GroupMessageListActivity extends AppCompatActivity
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
 
-        // load the peerlist from middle ware initially
-        android_tox_callback_group_mid_peer_list_changed_cb(group_id);
+        if (PREF__X_persistent_peerlist)
+        {
+            // load the peerlist from middle ware initially
+            android_tox_callback_group_mid_peer_list_changed_cb(group_id);
+        }
+        else
+        {
+            try
+            {
+                update_group_all_users();
+            }
+            catch (Exception e)
+            {
+            }
 
+        }
     }
 
     static void set_recording_pop_text_s(final String t)
@@ -2579,8 +2719,6 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
     }
 
-    // ** DEACTIVATE ** -> NGCMID //
-    /*
     synchronized void update_group_all_users()
     {
         // Log.i(TAG, "update_group_all_users:** CALL");
@@ -2617,19 +2755,9 @@ public class GroupMessageListActivity extends AppCompatActivity
             thread.start();
         }
     }
-     */
 
     void update_group_all_users_real()
     {
-        // ** DEACTIVATE ** -> NGCMID //
-
-
-        // DEACTIVATE ********** DEACTIVATE
-        // DEACTIVATE ********** DEACTIVATE
-        // DEACTIVATE ********** DEACTIVATE
-
-        /*
-
         try
         {
             set_peer_count_header();
@@ -2647,7 +2775,6 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
-         */
     }
 
     synchronized void remove_group_all_users()

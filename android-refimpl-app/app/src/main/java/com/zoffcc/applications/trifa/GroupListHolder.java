@@ -54,6 +54,7 @@ import static com.zoffcc.applications.trifa.HelperGroup.group_identifier_short;
 import static com.zoffcc.applications.trifa.HelperGroup.is_group_we_left;
 import static com.zoffcc.applications.trifa.HelperGroup.set_group_group_we_left;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_persistent_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__dark_mode_pref;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
@@ -175,8 +176,18 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
 
         try
         {
-            long user_count = tox_group_mid_online_count(fl.group_identifier);
-            long offline_user_count = tox_group_mid_offline_count(fl.group_identifier);
+            long user_count = 0;
+            long offline_user_count = 0;
+            if (PREF__X_persistent_peerlist)
+            {
+                user_count = tox_group_mid_online_count(fl.group_identifier);
+                offline_user_count = tox_group_mid_offline_count(fl.group_identifier);
+            }
+            else
+            {
+                user_count = tox_group_peer_count(fl.tox_group_number);
+                offline_user_count = tox_group_offline_peer_count(fl.tox_group_number);
+            }
 
             if (user_count < 0)
             {

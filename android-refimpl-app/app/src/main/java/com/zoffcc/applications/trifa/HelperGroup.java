@@ -61,6 +61,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.io_file_copy;
 import static com.zoffcc.applications.trifa.HelperGeneric.update_savedata_file_wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.utf8_string_from_bytes_with_padding;
 import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_notification;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__X_persistent_peerlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_system_messages;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.group_message_list_activity;
@@ -878,28 +879,28 @@ public class HelperGroup
 
     static void update_group_in_groupmessagelist(final String group_identifier)
     {
-        // ** DEACTIVATE ** -> NGCMID //
-        /*
-        try
+        if (!PREF__X_persistent_peerlist)
         {
-            if (group_message_list_activity != null)
+            try
             {
-                if (group_identifier != null)
+                if (group_message_list_activity != null)
                 {
-                    if (group_message_list_activity.get_current_group_id().toLowerCase().equals(
-                            group_identifier.toLowerCase()))
+                    if (group_identifier != null)
                     {
-                        group_message_list_activity.update_group_all_users();
+                        if (group_message_list_activity.get_current_group_id().toLowerCase().equals(
+                                group_identifier.toLowerCase()))
+                        {
+                            group_message_list_activity.update_group_all_users();
+                        }
                     }
                 }
             }
+            catch (Exception e1)
+            {
+                Log.i(TAG, "update_group_in_groupmessagelist:EE1:" + e1.getMessage());
+                e1.printStackTrace();
+            }
         }
-        catch (Exception e1)
-        {
-            Log.i(TAG, "update_group_in_groupmessagelist:EE1:" + e1.getMessage());
-            e1.printStackTrace();
-        }
-         */
     }
 
     static void add_system_message_to_group_chat(final String group_identifier, final String system_message)
