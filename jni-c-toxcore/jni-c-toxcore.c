@@ -9920,8 +9920,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1announce_1leave
         dbg(9, "MID_PEERLIST:tox_group_mid_announce_leave:g=%ld", (long)group_number);
 #endif
         bool res = mid_announce_leave(mid_peerlist_global, tox_global, (int64_t)group_number);
+        return (jint)(res ? 1 : 0);
+    } else {
+        return (jint)0;
     }
-    return (jint)(res ? 1 : 0);
 #endif
 }
 
