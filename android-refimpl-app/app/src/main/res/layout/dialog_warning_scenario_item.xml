@@ -36,12 +36,14 @@
             android:textAppearance="?android:attr/textAppearanceSmall"
             android:layout_marginTop="4dp" />
 
+        <!-- CHANGED: Use Primary color + alpha for perfect light/dark contrast -->
         <TextView
             android:id="@+id/scenario_effect"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="?android:attr/textColorSecondary"
+            android:textColor="?android:attr/textColorPrimary"
+            android:alpha="0.75"
             android:layout_marginTop="6dp"
             android:lineSpacingMultiplier="1.3" />
 
