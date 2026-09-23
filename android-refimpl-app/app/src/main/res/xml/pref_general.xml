@@ -298,7 +298,7 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="X_persistent_peerlist"
-            android:summary="Shows group members even when they are offline. In exchange, the group receives verifiable notices of when you are online."
+            android:summary="Shows group members even when they are offline. In exchange, the group receives verifiable notices of when you are online.\nChange needs RESTART!"
             android:title="Persistent Peerlist (NGC Middleware)" />
 
         <EditTextPreference
