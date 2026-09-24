@@ -437,8 +437,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                                                0xFF4CAF50, // Green
                                                "This feature provides undeniable proof that your PeerID was in the group. " +
                                                "Without it, someone can only say 'I saw them there'. With it, they have " +
-                                               "proof they can show to others. For most people, this changes nothing." +
-                                               "\n(Note: 'you' here means your PeerID for that Group, not your real name or real identity.)");
+                                               "proof they can show to others. For most people, this changes nothing.");
 
                             addWarningScenario(container,
                                                "Activism, journalism, support group",
@@ -448,8 +447,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                                                "Normally, an infiltrator can only say 'I saw them in the chat' " +
                                                "(which you can deny). With this feature, they get a mathematical " +
                                                "proof they can hand to others: 'Here is undeniable proof this PeerID " +
-                                               "was in this group.'" +
-                                               "\n(Note: 'you' means your PeerID for that Group, not your real name or real identity.)");
+                                               "was in this group.'");
 
                             addWarningScenario(container,
                                                "State actor or high-risk target",
@@ -459,8 +457,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
                                                "feature to prove your PeerID is in a group. They likely already have " +
                                                "spyware on your phone, can read your screen, and can see your " +
                                                "messages. This feature doesn't make you safer, but it also " +
-                                               "doesn't give them anything they didn't already have." +
-                                               "\n(Note: 'you' means your PeerID for that Group, not your real name or real identity.)");
+                                               "doesn't give them anything they didn't already have.");
 
                             builder.setView(dialogView);
                             builder.setCancelable(true);
