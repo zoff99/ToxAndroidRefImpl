@@ -934,7 +934,6 @@ Tox *create_tox(int udp_enabled, int orbot_enabled, const char *proxy_host, uint
                 free(full_path_filename);
                 free(mid_save_filename);
                 mid_save_filename = NULL;
-                fclose(f);
                 pthread_mutex_destroy(&group_audio___mutex);
                 return NULL;
             }
