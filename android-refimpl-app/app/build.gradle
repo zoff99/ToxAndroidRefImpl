@@ -246,8 +246,8 @@ android {
         minSdkVersion 21
         //noinspection OldTargetApi
         targetSdkVersion 33
-        versionCode 10286
-        versionName "1.0.286"
+        versionCode 10287
+        versionName "1.0.287"
 
         renderscriptTargetApi 21
         renderscriptSupportModeEnabled true
