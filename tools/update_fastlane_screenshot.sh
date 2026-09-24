@@ -5,6 +5,7 @@ url_video_call_test='https://github.com/zoff99/ToxAndroidRefImpl/releases/downlo
 url_start_screen='https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/android_screen01_33.png'
 url_friend_and_group_list='https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_android_29_04.png'
 url_info_screen='https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_info_29_03.png'
+url_profiler_screen='https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/screen_shot_netprof_29_03.png'
 
 url_promo_friend_list='https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/promo_29_02.png'
 url_promo_chat_with_image='https://github.com/zoff99/ToxAndroidRefImpl/releases/download/nightly/promo_29_03.png'
@@ -28,6 +29,7 @@ wget "$url_one_on_one_chat_with_image" -O ./fastlane/metadata/android/en-US/imag
 wget "$url_video_call_test" -O ./fastlane/metadata/android/en-US/images/phoneScreenshots/107.png
 
 wget "$url_info_screen" -O ./fastlane/metadata/android/en-US/images/phoneScreenshots/121.png
+wget "$url_profiler_screen" -O ./fastlane/metadata/android/en-US/images/phoneScreenshots/131.png
 
 
 

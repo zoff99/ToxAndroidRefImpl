@@ -13,6 +13,15 @@ Tox has no central servers that can be raided, shut down, or forced to turn over
 <b>Free:</b><br>
 Tox is free software. That's free as in freedom, as well as in price. This means Tox is yours — to use, modify, and share — because Tox is developed by and for the users.<br><br>
 
+<b>new Features:</b><br>
+<br>
+* Persistent Group Peer List: Your peers and friends are persistently saved and always available when you reconnect.
+<br>
+* Tox Profiler: Your peers and friends are persistently saved and always available when you reconnect.
+<br>
+* App Exit: See the reason why the App stopped last time (in the Maintenance screen).
+
+<br>
 <b>More Information:</b><br>
 * about Tox: https://tox.zoff.cc
 <br>
