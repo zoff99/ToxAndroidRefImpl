@@ -3493,6 +3493,8 @@ JNIEXPORT void JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_ngcmidenable(JNIEnv *env, jobject thiz, jint enable)
 {
     TRACE_LOGGER();
+/* MID_PEERLIST */
+#ifdef TOX_HAVE_NGCMID
     if (enable == 1)
     {
         tox_jni_activated_ngcmid = true;
@@ -3501,6 +3503,8 @@ Java_com_zoffcc_applications_trifa_MainActivity_ngcmidenable(JNIEnv *env, jobjec
     {
         tox_jni_activated_ngcmid = false;
     }
+#endif
+/* MID_PEERLIST */
 }
 
 // --------------- _toxfuncs_ ---------------
