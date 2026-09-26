@@ -420,6 +420,7 @@ public class NetProfiler extends AppCompatActivity {
             case "RECENT_ACTIVITY": return "✋actvy";
             case "RECENTLY_ONLINE": return "🟢onln";
             case "ONLINE_TS_UNSET": return "❓onTs";
+            case "TRIG_EARLY": return "early";
             case "TRIG_UNKNOWN": return "❓trig";
             default:
                 String r = reason.toLowerCase(Locale.US);

@@ -199,7 +199,7 @@ public class HelperGeneric
     static long update_savedata_file_wrapper_last_ts = 0;
 
     // ---- battery saving sleep prevention ring buffer ----
-    static final int BATTERY_SLEEP_LOG_MAX_ENTRIES = 100;
+    static final int BATTERY_SLEEP_LOG_MAX_ENTRIES = 200;
     static String[] battery_sleep_log_ring = new String[BATTERY_SLEEP_LOG_MAX_ENTRIES];
     static int battery_sleep_log_ring_index = 0;
     static int battery_sleep_log_ring_count = 0;
@@ -3834,7 +3834,13 @@ public class HelperGeneric
         String cat = null;
         String fields = null;
 
-        if (global_showing_messageview)
+        if (need_wakeup_now)
+        {
+            cat = "WAKEUP_PENDING";
+            fields = "trig=" + ((wakeup_trigger_reason == null || wakeup_trigger_reason.isEmpty())
+                    ? "?" : wakeup_trigger_reason);
+        }
+        else if (global_showing_messageview)
         {
             cat = "UI_MSGVIEW_OPEN";
         }
@@ -5369,12 +5375,15 @@ public class HelperGeneric
         TrifaToxService.need_wakeup_now = true;
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "WAKEUP_TRIGGER_001";
-        try
+        if ((trifa_service_thread != null) && (trifa_service_thread != Thread.currentThread()))
         {
-            trifa_service_thread.interrupt();
-        }
-        catch(Exception ignored)
-        {
+            try
+            {
+                trifa_service_thread.interrupt();
+            }
+            catch (Exception ignored)
+            {
+            }
         }
     }
 
@@ -5391,12 +5400,15 @@ public class HelperGeneric
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "WAKEUP_TRIGGER_002";
 
-        try
+        if ((trifa_service_thread != null) && (trifa_service_thread != Thread.currentThread()))
         {
-            trifa_service_thread.interrupt();
-        }
-        catch(Exception ignored)
-        {
+            try
+            {
+                trifa_service_thread.interrupt();
+            }
+            catch (Exception ignored)
+            {
+            }
         }
     }
 }
