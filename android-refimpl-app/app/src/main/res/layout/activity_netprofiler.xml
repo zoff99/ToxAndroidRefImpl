@@ -208,9 +208,10 @@
 
         <!-- Row 3: Deep Sleep -->
         <LinearLayout
+            android:id="@+id/tv_os_deep_sleep_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:padding="10dp"
             android:layout_marginBottom="12dp"
             android:gravity="center_vertical"
@@ -218,7 +219,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="OS Deep Sleep "
+                android:text="OS Deep Sleep (tap for 24 hours state)"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:textColor="#5E35B1"/>

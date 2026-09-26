@@ -1,5 +1,6 @@
 package com.zoffcc.applications.trifa;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
@@ -47,6 +48,8 @@ public class NetProfiler extends AppCompatActivity {
     private RecyclerView rvPackets;
     private TextView tvWakeupHistory;
 
+    private ViewGroup tv_os_deep_sleep_container;
+
     private PacketAdapter adapter;
     private final List<PacketStat> packetStats = new ArrayList<>();
 
@@ -92,6 +95,19 @@ public class NetProfiler extends AppCompatActivity {
         tvSentHeatRate = findViewById(R.id.tv_sent_heat_rate);
         tvRecvHeatRate = findViewById(R.id.tv_recv_heat_rate);
         tvCpuHeatRate = findViewById(R.id.tv_cpu_heat_rate);
+
+        tv_os_deep_sleep_container = findViewById(R.id.tv_os_deep_sleep_container);
+        try
+        {
+            tv_os_deep_sleep_container.setOnClickListener(v -> {
+                Intent intent = new Intent(v.getContext(), HistoryChartActivity.class);
+                startActivity(intent);
+            });
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
 
         tvWakeupHistory = findViewById(R.id.tv_wakeup_history);
         tvWakeupHistory.setOnClickListener(v -> showWakeupDetailsDialog());

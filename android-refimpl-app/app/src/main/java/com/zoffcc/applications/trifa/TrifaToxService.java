@@ -156,6 +156,21 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.MainActivity.tox_util_friend_resend_message_v2;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_ASLEEP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_AWAKE_COOLDOWN;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_BOOTSTRAPPING;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_CALL_1ON1;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_CALL_GROUP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_FT_IN;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_FT_OUT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_HIGH_NETWORK_ACTIVITY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_ITERATE_TOO_FAST;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_NO_INTERNET;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_OFFLINE_IDLE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_ONLINE_TCP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_ONLINE_UDP;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_UI_FOREGROUND;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_UNKNOWN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_INIT_NAME;
@@ -245,6 +260,16 @@ public class TrifaToxService extends Service
     // Tracks when the current awake period started.
     // IMPORTANT: Initialize this right before your main `while(!stop_me)` loop starts!
     public static volatile long last_awake_start_time_ms = 0;
+
+    // [ADDED] 24-Hour Rolling History (1440 minutes)
+    public static final int HISTORY_SIZE = 1440;
+    public static final int[] app_state_history = new int[HISTORY_SIZE];
+    public static final long[] app_state_history_ts = new long[HISTORY_SIZE];
+    public static int app_state_history_count = 0;
+    public static int app_state_history_index = 0;
+    public static long app_state_last_record_ts = 0;
+    public static long last_netprof_bytes = 0; // To calculate bytes/sec
+    public static long last_netprof_ts = 0;
 
     public static void recordWakeup(String reason, long sleepStartMs, long sleepEndMs) {
         long sleepDuration = sleepEndMs - sleepStartMs;
@@ -1539,6 +1564,7 @@ public class TrifaToxService extends Service
                 String gc_health_text_init = ToxVars.TOX_GROUP_HEALTH.value_str(current_gc_health_init).replace("TOX_GROUP_HEALTH_", "");
                 append_logger_msg(TAG + "::" + "gc health initial value: " + current_gc_health_init + " (" + gc_health_text_init + ")");
 
+                long stats_last_history_ms = 0;
 
                 // [ADDED] Track when we last checked network health
                 long last_health_check_ms = 0;
@@ -1740,6 +1766,107 @@ public class TrifaToxService extends Service
                             fast_iteration_start_ms = 0;
                             fast_iteration_logged = false;
                         }
+                    }
+
+                    try
+                    {
+                        // [ADDED] Record 1-minute App State History
+                        long current_time_ms2 = System.currentTimeMillis();
+                        if ((current_time_ms2 - stats_last_history_ms) >= 60000)
+                        {
+                            stats_last_history_ms = current_time_ms2;
+
+                            // --- 2. CALCULATE NETWORK BYTES/SEC ---
+                            // Sum up all incoming/outgoing bytes from NetProfiler (UDP + TCP)
+                            long total_bytes_now = MainActivity.tox_netprof_get_packet_total_bytes(0, 0) +
+                                                   MainActivity.tox_netprof_get_packet_total_bytes(1, 0) +
+                                                   MainActivity.tox_netprof_get_packet_total_bytes(0, 1) +
+                                                   MainActivity.tox_netprof_get_packet_total_bytes(1, 1);
+
+                            long current_bytes_per_second = 0;
+                            if (last_netprof_ts > 0)
+                            {
+                                long delta_bytes = total_bytes_now - last_netprof_bytes;
+                                long delta_sec = (current_time_ms2 - last_netprof_ts) / 1000;
+                                if (delta_sec > 0 && delta_bytes > 0)
+                                {
+                                    current_bytes_per_second = delta_bytes / delta_sec;
+                                }
+                            }
+                            last_netprof_bytes = total_bytes_now;
+                            last_netprof_ts = current_time_ms2;
+
+                            // --- 3. EVALUATE STATE (Priority Order) ---
+                            int current_state = STATE_UNKNOWN.value;
+                            long now = System.currentTimeMillis();
+
+                            if (fast_iteration_logged)
+                            {
+                                current_state = STATE_ITERATE_TOO_FAST.value;
+                            }
+                            else if (Callstate.state != 0)
+                            {
+                                current_state = STATE_CALL_1ON1.value;
+                            }
+                            else if (Callstate.audio_group_active || Callstate.audio_ngc_group_active)
+                            {
+                                current_state = STATE_CALL_GROUP.value;
+                            }
+                            else if (global_last_activity_outgoung_ft_ts > 0 &&
+                                     (now - global_last_activity_outgoung_ft_ts) < 2000)
+                            {
+                                current_state = STATE_FT_OUT.value;
+                            }
+                            else if (global_last_activity_incoming_ft_ts > 0 &&
+                                     (now - global_last_activity_incoming_ft_ts) < 2000)
+                            {
+                                current_state = STATE_FT_IN.value;
+                            }
+                            else if (current_bytes_per_second > 20480)
+                            { // Threshold: ~20 KB/s
+                                current_state = STATE_HIGH_NETWORK_ACTIVITY.value;
+                            }
+                            else if (bootstrapping)
+                            {
+                                current_state = STATE_BOOTSTRAPPING.value;
+                            }
+                            else if (global_showing_messageview || global_showing_anygroupview)
+                            {
+                                current_state = STATE_UI_FOREGROUND.value;
+                            }
+                            else if (!HelperGeneric.battery_saving_can_sleep() && PREF__X_battery_saving_mode)
+                            {
+                                current_state = STATE_AWAKE_COOLDOWN.value;
+                            }
+                            else if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_UDP.value)
+                            {
+                                current_state = STATE_ONLINE_UDP.value;
+                            }
+                            else if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value)
+                            {
+                                current_state = STATE_ONLINE_TCP.value;
+                            }
+                            else if (!HAVE_INTERNET_CONNECTIVITY)
+                            {
+                                current_state = STATE_NO_INTERNET.value;
+                            }
+                            else if (global_self_connection_status == TOX_CONNECTION_NONE.value)
+                            {
+                                current_state = STATE_OFFLINE_IDLE.value;
+                            }
+
+                            // --- 4. WRITE TO RING BUFFER ---
+                            app_state_history_ts[app_state_history_index] = current_time_ms2;
+                            app_state_history[app_state_history_index] = current_state;
+                            app_state_history_index = (app_state_history_index + 1) % HISTORY_SIZE;
+                            if (app_state_history_count < HISTORY_SIZE) app_state_history_count++;
+                            app_state_last_record_ts = current_time_ms2;
+
+                            Log.i(TAG, "HHHHHHST: " + current_state);
+                        }
+                    }
+                    catch(Exception ignored)
+                    {
                     }
 
                     check_if_need_bootstrap_again();

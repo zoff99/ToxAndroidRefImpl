@@ -401,4 +401,119 @@ public class TRIFAGlobals
             return "STATUS_UNKNOWN";
         }
     }
+
+    public static enum APP_STATE
+    {
+        /** Fallback / uninitialized state. - Lowest Priority */
+        STATE_UNKNOWN(0),
+
+        /** Gap filled when battery sleep freezes the loop. */
+        STATE_ASLEEP(1),
+
+        /** Offline, sleeping/waiting for 2-min retry. */
+        STATE_OFFLINE_IDLE(2),
+
+        /** Android OS says no network. */
+        STATE_NO_INTERNET(3),
+
+        /** Idle, but inside 3-min window before sleep. */
+        STATE_AWAKE_COOLDOWN(4),
+
+        /** Connected via TCP Relay. */
+        STATE_ONLINE_TCP(5),
+
+        /** Connected directly via UDP */
+        STATE_ONLINE_UDP(6),
+
+        /** User looking at chat/group view. */
+        STATE_UI_FOREGROUND(7),
+
+        /** Processing large queue of unsent messages. */
+        STATE_RESENDING_MSGS(8),
+
+        /** Active NGC/Conference A/V call */
+        STATE_CALL_GROUP(9),
+
+        /** Active 1:1 A/V call. */
+        STATE_CALL_1ON1(10),
+
+        /** Active incoming file transfer. */
+        STATE_FT_IN(11),
+
+        /** Active outgoing file transfer. */
+        STATE_FT_OUT(12),
+
+        /** Offline, actively pinging DHT nodes. */
+        STATE_BOOTSTRAPPING(13),
+
+        /** High bytes/sec, but no active FT/Call. */
+        STATE_HIGH_NETWORK_ACTIVITY(14),
+
+        /** CPU/Radio storm (< 20ms loop). - Highest Priority */
+        STATE_ITERATE_TOO_FAST(15);
+
+        /**
+         * Holder-class workaround: an enum constructor may not reference
+         * static fields of its OWN enum class (JLS 8.9.2), because the enum
+         * constants are initialized before all other static fields.
+         * A nested class is initialized independently on first access,
+         * so reading from it inside the constructor is legal and safe.
+         */
+        private static final class PRIORITY_PALETTE
+        {
+            // index = priority value; 15 = Red (hottest), 0 = Grey (coldest)
+            static final int[] COLORS = {
+                    0xFF9E9E9E, // 0:  Grey
+                    0xFFEA80FC, // 1:  Light Magenta (Asleep slot)
+                    0xFF546E7A, // 2:  Blue Grey
+                    0xFF3F51B5, // 3:  Indigo
+                    0xFF2196F3, // 4:  Blue
+                    0xFF03A9F4, // 5:  Light Blue
+                    0xFF00BCD4, // 6:  Cyan
+                    0xFF009688, // 7:  Teal
+                    0xFF4CAF50, // 8:  Green
+                    0xFF8BC34A, // 9:  Light Green
+                    0xFFCDDC39, // 10: Lime
+                    0xFFFFEB3B, // 11: Yellow
+                    0xFFFFC107, // 12: Amber
+                    0xFFFF9800, // 13: Orange
+                    0xFFFF5722, // 14: Deep Orange
+                    0xFFFF0055  // 15: Red
+            };
+        }
+
+        public final int value;
+        public final int color;
+
+        private APP_STATE(int value)
+        {
+            this.value = value;
+            // Color is strictly derived from the priority value,
+            // read via the nested holder class (safe inside constructor).
+            this.color = PRIORITY_PALETTE.COLORS[value];
+        }
+
+        public static APP_STATE fromValue(int value)
+        {
+            for (APP_STATE state : values())
+            {
+                if (state.value == value) return state;
+            }
+            return STATE_UNKNOWN;
+        }
+
+        public static int getColorForState(int stateValue)
+        {
+            if (stateValue >= 0 && stateValue < PRIORITY_PALETTE.COLORS.length)
+            {
+                return PRIORITY_PALETTE.COLORS[stateValue];
+            }
+            return PRIORITY_PALETTE.COLORS[0]; // fallback Grey
+        }
+
+        public static String value_str(int value)
+        {
+            return fromValue(value).name();
+        }
+    }
 }
