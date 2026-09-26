@@ -215,6 +215,10 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.tcprelay_node_list;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_CONTROL.TOX_FILE_CONTROL_CANCEL;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_NETPROF_DIRECTION.TOX_NETPROF_DIRECTION_RECV;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_NETPROF_DIRECTION.TOX_NETPROF_DIRECTION_SENT;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_NETPROF_PACKET_TYPE.TOX_NETPROF_PACKET_TYPE_TCP;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_NETPROF_PACKET_TYPE.TOX_NETPROF_PACKET_TYPE_UDP;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_UNKNOWN;
 
 public class TrifaToxService extends Service
@@ -1772,16 +1776,16 @@ public class TrifaToxService extends Service
                     {
                         // [ADDED] Record 1-minute App State History
                         long current_time_ms2 = System.currentTimeMillis();
-                        if ((current_time_ms2 - stats_last_history_ms) >= 60000)
+                        if ((current_time_ms2 - stats_last_history_ms) >= (60 * 1000))
                         {
                             stats_last_history_ms = current_time_ms2;
 
                             // --- 2. CALCULATE NETWORK BYTES/SEC ---
                             // Sum up all incoming/outgoing bytes from NetProfiler (UDP + TCP)
-                            long total_bytes_now = MainActivity.tox_netprof_get_packet_total_bytes(0, 0) +
-                                                   MainActivity.tox_netprof_get_packet_total_bytes(1, 0) +
-                                                   MainActivity.tox_netprof_get_packet_total_bytes(0, 1) +
-                                                   MainActivity.tox_netprof_get_packet_total_bytes(1, 1);
+                            long total_bytes_now = MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_SENT.value) +
+                                                   MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_SENT.value) +
+                                                   MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_RECV.value) +
+                                                   MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_RECV.value);
 
                             long current_bytes_per_second = 0;
                             if (last_netprof_ts > 0)
@@ -1822,8 +1826,8 @@ public class TrifaToxService extends Service
                             {
                                 current_state = STATE_FT_IN.value;
                             }
-                            else if (current_bytes_per_second > 20480)
-                            { // Threshold: ~20 KB/s
+                            else if (current_bytes_per_second > (150 * 1024))
+                            { // Threshold: ~150 KB/s
                                 current_state = STATE_HIGH_NETWORK_ACTIVITY.value;
                             }
                             else if (bootstrapping)
