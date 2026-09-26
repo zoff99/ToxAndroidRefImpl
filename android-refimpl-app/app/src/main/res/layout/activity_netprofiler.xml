@@ -51,9 +51,50 @@
                     android:textColor="#0D47A1"
                     android:textSize="12sp"
                     android:textStyle="bold" />
-                <TextView android:id="@+id/tv_sent_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
-                <TextView android:id="@+id/tv_sent_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
-                <TextView android:id="@+id/tv_sent_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
+
+                <TextView
+                    android:id="@+id/tv_sent_bytes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 B"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_sent_tcp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TCP: 0 B"
+                    android:textSize="14sp"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/tv_sent_udp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="UDP: 0 B"
+                    android:textSize="14sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_sent_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 B/s"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/tv_sent_pkts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 pkts"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorPrimary" />
             </LinearLayout>
 
             <!-- Total Received -->
@@ -64,10 +105,58 @@
                 android:orientation="vertical"
                 android:padding="12dp"
                 android:background="@drawable/bg_card_recv">
-                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Total Received" android:textSize="12sp" android:textStyle="bold" android:textColor="#1B5E20"/>
-                <TextView android:id="@+id/tv_recv_bytes" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B" android:textSize="18sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
-                <TextView android:id="@+id/tv_recv_rate" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 B/s" android:textSize="14sp" android:textStyle="bold" android:textColor="?android:attr/textColorPrimary"/>
-                <TextView android:id="@+id/tv_recv_pkts" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="0 pkts" android:textSize="11sp" android:textColor="?android:attr/textColorSecondary"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Received"
+                    android:textColor="#1B5E20"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tv_recv_bytes"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 B"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_recv_tcp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="TCP: 0 B"
+                    android:textSize="14sp"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/tv_recv_udp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="UDP: 0 B"
+                    android:textSize="14sp"
+                    android:textColor="?android:attr/textColorPrimary"
+                    android:layout_marginBottom="4dp" />
+
+                <TextView
+                    android:id="@+id/tv_recv_rate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 B/s"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="?android:attr/textColorPrimary" />
+
+                <TextView
+                    android:id="@+id/tv_recv_pkts"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0 pkts"
+                    android:textSize="12sp"
+                    android:textColor="?android:attr/textColorPrimary" />
             </LinearLayout>
         </LinearLayout>
 

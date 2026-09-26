@@ -36,7 +36,9 @@ public class NetProfiler extends AppCompatActivity {
 
     // UI Elements
     private TextView tvSentBytes, tvSentRate, tvSentPkts;
+    private TextView tvSentTcp, tvSentUdp;
     private TextView tvRecvBytes, tvRecvRate, tvRecvPkts;
+    private TextView tvRecvTcp, tvRecvUdp;
     private TextView tvUptimeValue;
     private TextView tvSleepValue;
     private TextView tvDeepSleepValue;
@@ -70,10 +72,14 @@ public class NetProfiler extends AppCompatActivity {
         tvSentBytes = findViewById(R.id.tv_sent_bytes);
         tvSentRate = findViewById(R.id.tv_sent_rate);
         tvSentPkts = findViewById(R.id.tv_sent_pkts);
+        tvSentTcp = findViewById(R.id.tv_sent_tcp);
+        tvSentUdp = findViewById(R.id.tv_sent_udp);
 
         tvRecvBytes = findViewById(R.id.tv_recv_bytes);
         tvRecvRate = findViewById(R.id.tv_recv_rate);
         tvRecvPkts = findViewById(R.id.tv_recv_pkts);
+        tvRecvTcp = findViewById(R.id.tv_recv_tcp);
+        tvRecvUdp = findViewById(R.id.tv_recv_udp);
 
         tvUptimeValue = findViewById(R.id.tv_uptime_value);
         tvSleepValue = findViewById(R.id.tv_sleep_value);
@@ -201,9 +207,14 @@ public class NetProfiler extends AppCompatActivity {
         final long fSentBps = sentBps;
         final long fRecvBps = recvBps;
         final long fCpuCps = cpuCyclesPerSec;
+        final long fTcpSentBytes = tcpSentBytes;
+        final long fUdpSentBytes = udpSentBytes;
+        final long fTcpRecvBytes = tcpRecvBytes;
+        final long fUdpRecvBytes = udpRecvBytes;
 
         mainHandler.post(() -> {
-            updateSummaryCards(fTotalSentBytes, fTotalSentCount, fSentBps, fTotalRecvBytes, fTotalRecvCount, fRecvBps);
+            updateSummaryCards(fTotalSentBytes, fTotalSentCount, fSentBps, fTotalRecvBytes, fTotalRecvCount, fRecvBps,
+                               fTcpSentBytes, fUdpSentBytes, fTcpRecvBytes, fUdpRecvBytes);
             updateHeatBars(fSentBps, fRecvBps, fCpuCps);
 
             packetStats.clear();
@@ -244,14 +255,19 @@ public class NetProfiler extends AppCompatActivity {
         return (long) (delta / deltaTimeSec);
     }
 
-    private void updateSummaryCards(long sentBytes, long sentPkts, long sentBps, long recvBytes, long recvPkts, long recvBps) {
+    private void updateSummaryCards(long sentBytes, long sentPkts, long sentBps, long recvBytes, long recvPkts, long recvBps,
+                                    long tcpSentBytes, long udpSentBytes, long tcpRecvBytes, long udpRecvBytes) {
         tvSentBytes.setText(formatBytes(sentBytes));
         tvSentRate.setText(formatRate(sentBps));
         tvSentPkts.setText(sentPkts + " pkts");
+        tvSentTcp.setText("TCP: " + formatBytes(tcpSentBytes));
+        tvSentUdp.setText("UDP: " + formatBytes(udpSentBytes));
 
         tvRecvBytes.setText(formatBytes(recvBytes));
         tvRecvRate.setText(formatRate(recvBps));
         tvRecvPkts.setText(recvPkts + " pkts");
+        tvRecvTcp.setText("TCP: " + formatBytes(tcpRecvBytes));
+        tvRecvUdp.setText("UDP: " + formatBytes(udpRecvBytes));
 
         long uptimeMillis = System.currentTimeMillis() - tox_startup_timestamp;
         tvUptimeValue.setText(formatUptime(uptimeMillis));
