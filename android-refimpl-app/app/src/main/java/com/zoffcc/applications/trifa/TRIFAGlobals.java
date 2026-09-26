@@ -40,6 +40,7 @@ public class TRIFAGlobals
     static long global_self_last_went_online_timestamp = -1;
     static long global_self_last_went_offline_timestamp = -1;
     static long global_last_activity_for_battery_savings_ts = -1;
+    static String global_last_activity_for_battery_savings_reason = "";
     static boolean global_showing_messageview = false;
     static boolean global_showing_anygroupview = false;
     final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 100;

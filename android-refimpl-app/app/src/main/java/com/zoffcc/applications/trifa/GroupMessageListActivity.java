@@ -209,6 +209,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_reason;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.ToxVars.GC_MAX_SAVED_PEERS;
 import static com.zoffcc.applications.trifa.ToxVars.MAX_GC_PACKET_CHUNK_SIZE;
@@ -2287,6 +2288,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                         Log.i(TAG, "global_last_activity_for_battery_savings_ts:001:*PING*");
                     }
                     global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+                    global_last_activity_for_battery_savings_reason = "SEND_NGC_MSG";
+
 
                     if (message_id > -1)
                     {

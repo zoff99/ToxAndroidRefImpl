@@ -283,6 +283,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOI
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_reason;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_outgoung_ft_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
@@ -6575,6 +6576,7 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:004:*PING*");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FRIEND_READ_RECEIPT";
 
         try
         {
@@ -6653,6 +6655,8 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:005:*PING*");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FRIEND_RECEIVE_MSGV2";
+
         HelperGeneric.receive_incoming_message(1, 0, friend_number, friend_message, raw_message, raw_message_length,
                                                null, null, 0);
     }
@@ -6716,6 +6720,8 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:006:*PING*");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FRIEND_SYNC_RECEIVE_MSGV2";
+
         // Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " full rawmsg    =" + bytes_to_hex(raw_message));
         // Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " wrapped rawdata=" + bytes_to_hex(raw_data));
         final ByteBuffer raw_message_buf_wrapped = ByteBuffer.allocateDirect((int) raw_data_length);
@@ -6986,6 +6992,8 @@ public class MainActivity extends AppCompatActivity
         }
         // Log.i(TAG, "friend_message_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FRIEND_RECEIVE_MSG";
+
         HelperGeneric.receive_incoming_message(0, message_type, friend_number, friend_message, null, 0, null,
                                                msgV3hash_bin, message_timestamp);
     }
@@ -7000,6 +7008,8 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:008:*PING*:file_recv_control_cb");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FRIEND_FT_CONTROL_RECEIVE";
+
         // Log.i(TAG, "file_recv_control:" + friend_number + ":fn==" + file_number + ":" + a_TOX_FILE_CONTROL);
 
         if (a_TOX_FILE_CONTROL == TOX_FILE_CONTROL_CANCEL.value)
@@ -7103,6 +7113,8 @@ public class MainActivity extends AppCompatActivity
         //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:009:*PING*");
         //}
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FRIEND_FT_CHK_REQUEST";
+
         global_last_activity_outgoung_ft_ts = System.currentTimeMillis();
 
         // Log.i(TAG, "file_chunk_request:" + friend_number + ":" + file_number + ":" + position + ":" + length);
@@ -7512,6 +7524,8 @@ public class MainActivity extends AppCompatActivity
             Log.i(TAG, "global_last_activity_for_battery_savings_ts:010:*PING*:file_recv_cb");
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FRIEND_FT_RECEIVE";
+
         // Log.i(TAG,
         //      "file_recv:" + get_friend_name_from_num(friend_number) + ":fn==" + file_number + ":" + a_TOX_FILE_KIND +
         //      ":" + file_size + ":" + filename + ":" + filename_length);
@@ -7932,6 +7946,8 @@ public class MainActivity extends AppCompatActivity
         //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:011:*PING*");
         //}
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FRIEND_FT_CHUNK_RECEIVE";
+
         global_last_activity_outgoung_ft_ts = System.currentTimeMillis();
 
         //Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
@@ -8688,6 +8704,9 @@ public class MainActivity extends AppCompatActivity
         android_tox_callback_group_message_cb_method_wrapper(group_number, peer_id, a_TOX_MESSAGE_TYPE, message_orig,
                                                              length, message_id, false);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "NGC_RECEIVE_MSG";
+
+
     }
 
     static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length, long message_id)
@@ -8695,6 +8714,9 @@ public class MainActivity extends AppCompatActivity
         android_tox_callback_group_message_cb_method_wrapper(group_number, peer_id, a_TOX_MESSAGE_TYPE, message_orig,
                                                              length, message_id, true);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "NGC_RECEIVE_PRIV_MSG";
+
+
     }
 
     static void android_tox_callback_group_privacy_state_cb_method(long group_number, final int a_TOX_GROUP_PRIVACY_STATE)

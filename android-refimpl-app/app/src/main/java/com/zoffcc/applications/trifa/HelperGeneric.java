@@ -149,6 +149,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_INCOMI
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fis_saf;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.cache_ft_fos;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_reason;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_online_timestamp;
@@ -174,6 +175,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread
 import static com.zoffcc.applications.trifa.TrifaToxService.vfs;
 import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_trigger_reason;
 
+/** @noinspection ExtractMethodRecommender*/
 public class HelperGeneric
 {
     private static final String TAG = "trifa.Hlp.Generic";
@@ -195,6 +197,14 @@ public class HelperGeneric
     static long last_log_battery_savings_criteria_ts = -1;
     static long update_savedata_file_wrapper_throttled_last_trigger_ts = 0;
     static long update_savedata_file_wrapper_last_ts = 0;
+
+    // ---- battery saving sleep prevention ring buffer ----
+    static final int BATTERY_SLEEP_LOG_MAX_ENTRIES = 100;
+    static String[] battery_sleep_log_ring = new String[BATTERY_SLEEP_LOG_MAX_ENTRIES];
+    static int battery_sleep_log_ring_index = 0;
+    static int battery_sleep_log_ring_count = 0;
+    static String last_prevented_sleep_reason = null;
+    // ---- battery saving sleep prevention ring buffer ----
 
     public static void clearCache_s()
     {
@@ -2456,6 +2466,7 @@ public class HelperGeneric
         boolean need_call_push_url = false;
 
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "SEND_FRIEND_MSG";
 
         boolean msgv1 = true;
 
@@ -3685,6 +3696,62 @@ public class HelperGeneric
         return bitmap;
     }
 
+    static void battery_sleep_log_add(String entry)
+    {
+        try
+        {
+            long now = System.currentTimeMillis();
+            String timestamp = long_date_time_format(now);
+            String full_entry = timestamp + " | " + entry;
+
+            battery_sleep_log_ring[battery_sleep_log_ring_index] = full_entry;
+            battery_sleep_log_ring_index++;
+            if (battery_sleep_log_ring_index >= BATTERY_SLEEP_LOG_MAX_ENTRIES)
+            {
+                battery_sleep_log_ring_index = 0;
+            }
+            if (battery_sleep_log_ring_count < BATTERY_SLEEP_LOG_MAX_ENTRIES)
+            {
+                battery_sleep_log_ring_count++;
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    static String battery_sleep_log_dump()
+    {
+        try
+        {
+            StringBuilder sb = new StringBuilder();
+            int count = battery_sleep_log_ring_count;
+            int start_index = (battery_sleep_log_ring_index - count + BATTERY_SLEEP_LOG_MAX_ENTRIES) % BATTERY_SLEEP_LOG_MAX_ENTRIES;
+
+            sb.append("Sleep Log (").append(count).append("/").append(BATTERY_SLEEP_LOG_MAX_ENTRIES).append(")\n\n");
+
+            // 32 chars: fits inside the dialog on any phone without wrapping
+            String separator = "--------------------------------\n";
+
+            for (int i = count - 1; i >= 0; i--)
+            {
+                int idx = (start_index + i) % BATTERY_SLEEP_LOG_MAX_ENTRIES;
+                if (battery_sleep_log_ring[idx] != null)
+                {
+                    // every pipe-field becomes its own indented line
+                    sb.append(battery_sleep_log_ring[idx].replace("|", "\n ")).append("\n");
+                    sb.append(separator);
+                }
+            }
+            return sb.toString();
+        }
+        catch (Exception e)
+        {
+            return "ERROR dumping battery sleep log";
+        }
+    }
+
     /**
      * Returns the exact reason why battery-saving sleep must end RIGHT NOW,
      * or null if sleeping may continue.
@@ -3720,7 +3787,7 @@ public class HelperGeneric
         return null; // still allowed to sleep
     }
 
-    static boolean battery_saving_can_sleep()
+    static boolean battery_saving_can_sleep_old__XXX_UNUSED()
     {
         if ((last_log_battery_savings_criteria_ts + 60000) < System.currentTimeMillis())
         {
@@ -3741,7 +3808,7 @@ public class HelperGeneric
         }
 
         if ((!global_showing_messageview) && (!global_showing_anygroupview) && (Callstate.state == 0) &&
-            (!Callstate.audio_group_active) && (!Callstate.audio_ngc_group_active))
+            (!Callstate.audio_group_active))
         {
             if (global_self_last_went_online_timestamp != -1)
             {
@@ -3758,6 +3825,106 @@ public class HelperGeneric
         }
 
         return false;
+    }
+
+    static boolean battery_saving_can_sleep()
+    {
+        long now = System.currentTimeMillis();
+
+        String cat = null;
+        String fields = null;
+
+        if (global_showing_messageview)
+        {
+            cat = "UI_MSGVIEW_OPEN";
+        }
+        else if (global_showing_anygroupview)
+        {
+            cat = "UI_GROUPVIEW_OPEN";
+        }
+        else if (Callstate.state != 0)
+        {
+            cat = "CALL_ACTIVE";
+            fields = "state=" + Callstate.state;
+        }
+        else if (Callstate.audio_group_active)
+        {
+            cat = "AUDIO_GROUP_ACTIVE";
+        }
+        else if (Callstate.audio_ngc_group_active)
+        {
+            cat = "NGC_AUDIO_GROUP_ACTIVE";
+        }
+        else if (global_self_last_went_online_timestamp == -1)
+        {
+            cat = "NOT_YET_ONLINE";
+        }
+        else if ((global_self_last_went_online_timestamp + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) >= now)
+        {
+            cat = "RECENTLY_ONLINE";
+            fields = "elapsed=" + (now - global_self_last_went_online_timestamp) + "ms" +
+                     "|remaining=" + ((global_self_last_went_online_timestamp + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) - now) + "ms";
+        }
+        else if ((global_last_activity_for_battery_savings_ts + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) >= now)
+        {
+            cat = "RECENT_ACTIVITY";
+            fields = "elapsed=" + (now - global_last_activity_for_battery_savings_ts) + "ms" +
+                     "|remaining=" + ((global_last_activity_for_battery_savings_ts + SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE * 1000) - now) + "ms";
+            if (global_last_activity_for_battery_savings_reason != null && !global_last_activity_for_battery_savings_reason.isEmpty())
+            {
+                fields = fields + "|sub=" + global_last_activity_for_battery_savings_reason;
+            }
+        }
+
+        if (cat != null)
+        {
+            // ---------- Sleep is PREVENTED ----------
+            // Compare ONLY the category, NOT the detail string (which contains changing ms values and sub-reasons)
+            boolean reason_changed = (last_prevented_sleep_reason == null) ||
+                                     (!cat.equals(last_prevented_sleep_reason));
+            boolean time_to_log_heartbeat = (last_log_battery_savings_criteria_ts + 60000) < now;
+
+            if (reason_changed)
+            {
+                // pipe-separated SHORT fields; dump() turns each into its own line
+                String ring_entry = "BLOCKED: " + cat +
+                                    (fields != null ? "|" + fields : "") +
+                                    "|msg=" + (global_showing_messageview ? "T" : "F") +
+                                    "|grp=" + (global_showing_anygroupview ? "T" : "F") +
+                                    "|call=" + Callstate.state +
+                                    "|agrp=" + (Callstate.audio_group_active ? "T" : "F") +
+                                    "|ngc=" + (Callstate.audio_ngc_group_active ? "T" : "F") +
+                                    "|online_ago=" + (global_self_last_went_online_timestamp == -1 ? "n/a"
+                        : ((now - global_self_last_went_online_timestamp) / 1000) + "s") +
+                                    "|activity_ago=" + ((now - global_last_activity_for_battery_savings_ts) / 1000) + "s";
+
+                Log.i(TAG, "battery_saving_can_sleep:" + ring_entry.replace("|", ":")); // logcat stays 1 line
+                battery_sleep_log_add(ring_entry);
+                last_prevented_sleep_reason = cat;
+                last_log_battery_savings_criteria_ts = now;
+            }
+            else if (time_to_log_heartbeat)
+            {
+                String ring_entry = "STILL_BLKD: " + cat + (fields != null ? "|" + fields : "");
+                Log.d(TAG, "battery_saving_can_sleep:" + ring_entry.replace("|", ":"));
+                battery_sleep_log_add(ring_entry);
+                last_log_battery_savings_criteria_ts = now;
+            }
+            return false;
+        }
+        else
+        {
+            // ---------- Sleep is ALLOWED ----------
+            if (last_prevented_sleep_reason != null)
+            {
+                String ring_entry = "ALLOWED: prev=" + last_prevented_sleep_reason;
+                Log.i(TAG, "battery_saving_can_sleep:" + ring_entry.replace("|", ":"));
+                battery_sleep_log_add(ring_entry);
+                last_prevented_sleep_reason = null;
+                last_log_battery_savings_criteria_ts = now;
+            }
+            return true;
+        }
     }
 
     static void vfs__detach()
@@ -5201,6 +5368,7 @@ public class HelperGeneric
         append_logger_msg(TAG + "::trigger_proper_wakeup_outside_tox_service_thread");
         TrifaToxService.need_wakeup_now = true;
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "WAKEUP_TRIGGER_001";
         try
         {
             trifa_service_thread.interrupt();
@@ -5221,6 +5389,8 @@ public class HelperGeneric
         append_logger_msg(TAG + "::trigger_proper_wakeup_from_tox_service_thread");
         TrifaToxService.need_wakeup_now = true;
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "WAKEUP_TRIGGER_002";
+
         try
         {
             trifa_service_thread.interrupt();

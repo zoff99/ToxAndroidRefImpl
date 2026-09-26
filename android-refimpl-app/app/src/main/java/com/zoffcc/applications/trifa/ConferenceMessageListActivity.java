@@ -94,6 +94,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTIO
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_1;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TEXT_QUOTE_STRING_2;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_TYPE_TEXT;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_reason;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_my_toxid;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
@@ -758,6 +759,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                             Log.i(TAG, "global_last_activity_for_battery_savings_ts:001:*PING*");
                         }
                         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+                        global_last_activity_for_battery_savings_reason = "SEND_CONF_MSG";
 
                         if (res > -1)
                         {

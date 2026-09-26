@@ -93,6 +93,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PE
 import static com.zoffcc.applications.trifa.TRIFAGlobals.UINT32_MAX_JAVA;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_FILE_DIR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VFS_PREFIX;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_reason;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_CHAT_ID_SIZE;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_GROUP_PEER_PUBLIC_KEY_SIZE;
@@ -1628,6 +1629,7 @@ public class HelperGroup
     {
         // HINT: ok we have a group file
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FILE_RECV_NGC";
 
         try
         {
@@ -2653,6 +2655,7 @@ public class HelperGroup
         GroupDB group_temp = null;
 
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "FILE_RECV_SYNC_NGC";
 
         try
         {

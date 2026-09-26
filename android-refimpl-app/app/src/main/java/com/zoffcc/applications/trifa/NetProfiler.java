@@ -95,6 +95,27 @@ public class NetProfiler extends AppCompatActivity {
 
         tvWakeupHistory = findViewById(R.id.tv_wakeup_history);
         tvWakeupHistory.setOnClickListener(v -> showWakeupDetailsDialog());
+        try
+        {
+            if (tvWakeupHistory.getParent() instanceof android.view.View)
+            {
+                ((android.view.View) tvWakeupHistory.getParent()).setOnClickListener(v -> showWakeupDetailsDialog());
+            }
+        }
+        catch(Exception e)
+        {
+        }
+
+        tvSleepValue.setOnClickListener(v -> showSleepLogDialog());
+        try
+        {
+            if (tvSleepValue.getParent() instanceof android.view.View) {
+                ((android.view.View) tvSleepValue.getParent()).setOnClickListener(v -> showSleepLogDialog());
+            }
+        }
+        catch(Exception e)
+        {
+        }
 
         rvPackets = findViewById(R.id.rv_packets);
 
@@ -130,6 +151,41 @@ public class NetProfiler extends AppCompatActivity {
             executor.shutdownNow();
             executor = null;
         }
+    }
+
+    private void showSleepLogDialog() {
+        // Fetch the dump from HelperGeneric
+        String logDump = HelperGeneric.battery_sleep_log_dump();
+
+        // Create a ScrollView and TextView for the dialog content
+        android.widget.ScrollView scrollView = new android.widget.ScrollView(this);
+        android.widget.TextView textView = new android.widget.TextView(this);
+
+        textView.setText(logDump);
+        textView.setTypeface(android.graphics.Typeface.MONOSPACE);
+        textView.setTextSize(12); // Smaller text for better log readability
+        textView.setPadding(30, 30, 30, 30);
+        textView.setTextIsSelectable(true); // Allow user to long-press and copy text
+
+        scrollView.addView(textView);
+
+        // Build and show the dialog
+        new androidx.appcompat.app.AlertDialog.Builder(this)
+                .setTitle("Tox Sleep Prevention Log")
+                .setView(scrollView)
+                .setPositiveButton("Close", null)
+                .show();
+        /*
+                .setNeutralButton("Clear Log", (dialog, which) -> {
+            // Reset the ring buffer when user clicks "Clear"
+            for (int i = 0; i < HelperGeneric.BATTERY_SLEEP_LOG_MAX_ENTRIES; i++) {
+                HelperGeneric.battery_sleep_log_ring[i] = null;
+            }
+            HelperGeneric.battery_sleep_log_ring_index = 0;
+            HelperGeneric.battery_sleep_log_ring_count = 0;
+            android.widget.Toast.makeText(this, "Log cleared", android.widget.Toast.LENGTH_SHORT).show();
+        })
+         */
     }
 
     private void pollNetworkStats() {
