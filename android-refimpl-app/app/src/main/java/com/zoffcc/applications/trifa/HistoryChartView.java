@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -13,14 +14,14 @@ import android.widget.HorizontalScrollView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
 
 import static com.zoffcc.applications.trifa.TrifaToxService.PUSH_WARN_THRESHOLD_PER_MINUTE;
 
 public class HistoryChartView extends View
 {
+    static final String TAG = "trifa.HstChart";
+
     private static final long WINDOW_MS = 24L * 60L * 60L * 1000L;
 
     // Blank "breathing room" appended AFTER now, so the latest data is not flush
@@ -34,7 +35,7 @@ public class HistoryChartView extends View
     private static final float LANE_HEIGHT_DP = 16.0f;
 
     // Extra vertical room inside the push section for the caption band
-    private static final float PUSH_LABEL_PAD_DP = 7.0f;
+    private static final float PUSH_LABEL_PAD_DP = 10.0f;
 
     // [ADDED] small bottom margin used only by the off-screen export renderer,
     // so the last (no-internet) lane is not flush against the PNG edge.
@@ -42,7 +43,7 @@ public class HistoryChartView extends View
 
     // Push lane colors (top -> bottom): red flood, orange warning, green normal
     private static final int PUSH_COLOR_FLOOD = 0xFFFF0055;
-    private static final int PUSH_COLOR_WARN  = 0xFFFF9800;
+    private static final int PUSH_COLOR_WARN = 0xFFFF9800;
     private static final int PUSH_COLOR_NORMAL = 0xFF4CAF50;
 
     private float currentDpPerMinute = 6.0f;
@@ -61,8 +62,17 @@ public class HistoryChartView extends View
     private float touchX = -1;
     private boolean isTouching = false;
 
-    public HistoryChartView(Context context) { super(context); init(); }
-    public HistoryChartView(Context context, AttributeSet attrs) { super(context, attrs); init(); }
+    public HistoryChartView(Context context)
+    {
+        super(context);
+        init();
+    }
+
+    public HistoryChartView(Context context, AttributeSet attrs)
+    {
+        super(context, attrs);
+        init();
+    }
 
     int maxLanes = 0;
 
@@ -241,8 +251,19 @@ public class HistoryChartView extends View
         final int maxLanes = TRIFAGlobals.APP_STATE.values().length;
         float density = getResources().getDisplayMetrics().density;
 
-        // Use fixed DP height for lanes so they are tightly packed at the top
-        final float laneHeight = LANE_HEIGHT_DP * density;
+        // 1. Calculate the fixed vertical space used by captions and padding
+        float fixedVerticalPadding = (2f * PUSH_LABEL_PAD_DP * density) + (EXPORT_BOTTOM_PAD_DP * density);
+
+        // 2. Total number of horizontal lanes we need to draw (States + 3 Push + 1 No-Internet)
+        int totalLaneSlots = maxLanes + 4;
+
+        // 3. DYNAMIC LANE HEIGHT:
+        // Calculate the maximum height a lane can be without exceeding the View's actual pixel height (h)
+        float idealLaneHeight = LANE_HEIGHT_DP * density;
+        float maxAvailableLaneHeight = (h - fixedVerticalPadding) / totalLaneSlots;
+
+        // Use the ideal height, but shrink it if the screen is too short to prevent clipping
+        final float laneHeight = Math.min(idealLaneHeight, Math.max(4f * density, maxAvailableLaneHeight));
         final float squareSize = Math.max(3f, Math.min(laneHeight * 0.75f, minuteWidthPx * 0.9f));
 
         // Hour grid + labels. Lines run across the FULL span (incl. padding strip)
@@ -290,8 +311,22 @@ public class HistoryChartView extends View
         canvas.drawLine(nowX, 0, nowX, h, textPaint);
         textPaint.setColor(Color.parseColor("#DDDDDD"));
 
-        int count = TrifaToxService.app_state_history_count;
-        if (count == 0)
+        // ====================================================================
+        // PARALLEL STATE LANES: Draw each enum state independently using the
+        // new boolean[][] app_state_histories ring buffer.
+        // Drawn as individual squares per minute, exactly like the push boxes.
+        // ====================================================================
+
+        // Check if we have ANY valid timestamps in the shared TS array
+        boolean hasData = false;
+        for (int i = 0; i < TrifaToxService.HISTORY_SIZE; i++) {
+            if (TrifaToxService.app_state_history_ts[i] > 0) {
+                hasData = true;
+                break;
+            }
+        }
+
+        if (!hasData)
         {
             textPaint.setTextSize(44f);
             // Draw "No data" in the middle of the packed lanes area
@@ -300,18 +335,20 @@ public class HistoryChartView extends View
         }
         else
         {
-            int oldest = (TrifaToxService.app_state_history_index - count + TrifaToxService.HISTORY_SIZE)
-                         % TrifaToxService.HISTORY_SIZE;
-
+            int currentIndex = TrifaToxService.app_state_history_index;
             long prevTs = -1;
-            for (int i = 0; i < count; i++)
+
+            // Walk through the entire ring buffer chronologically
+            for (int offset = 0; offset < TrifaToxService.HISTORY_SIZE; offset++)
             {
-                int idx = (oldest + i) % TrifaToxService.HISTORY_SIZE;
+                int idx = (currentIndex + offset) % TrifaToxService.HISTORY_SIZE;
                 long ts = TrifaToxService.app_state_history_ts[idx];
-                int state = TrifaToxService.app_state_history[idx];
+
                 if (ts <= 0) continue;
                 if (ts < startTs) { prevTs = ts; continue; }
+                if (ts > now) break;
 
+                // 1. Fill gaps between recordings with an ASLEEP bar (exactly like the old version)
                 if (prevTs > 0 && (ts - prevTs) > 60000L)
                 {
                     drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx),
@@ -319,7 +356,15 @@ public class HistoryChartView extends View
                             TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
                 }
 
-                drawSquare(canvas, xOf(ts, startTs, minuteWidthPx), state, laneHeight, squareSize, w, maxLanes);
+                // 2. Draw individual squares for EVERY active parallel state at this minute
+                for (int s = 0; s < maxLanes; s++)
+                {
+                    if (TrifaToxService.app_state_histories[s] != null && TrifaToxService.app_state_histories[s][idx])
+                    {
+                        drawSquare(canvas, xOf(ts, startTs, minuteWidthPx), s, laneHeight, squareSize, w, maxLanes);
+                    }
+                }
+
                 prevTs = ts;
             }
 
@@ -359,11 +404,11 @@ public class HistoryChartView extends View
         }
 
         // Bucket the exact-timestamp push ring into per-minute counts
-        HashMap<Long, Integer> pushPerMinute = new HashMap<>();
+        java.util.HashMap<Long, Integer> pushPerMinute = new java.util.HashMap<>();
         if (TrifaToxService.push_history_count > 0)
         {
-            int pstart = (TrifaToxService.push_history_index - TrifaToxService.push_history_count
-                          + TrifaToxService.PUSH_HISTORY_SIZE) % TrifaToxService.PUSH_HISTORY_SIZE;
+            int pstart = (TrifaToxService.push_history_index - TrifaToxService.push_history_count +
+                          TrifaToxService.PUSH_HISTORY_SIZE) % TrifaToxService.PUSH_HISTORY_SIZE;
             for (int i = 0; i < TrifaToxService.push_history_count; i++)
             {
                 long pts = TrifaToxService.push_history_ts[(pstart + i) % TrifaToxService.PUSH_HISTORY_SIZE];
@@ -381,7 +426,7 @@ public class HistoryChartView extends View
         final float pushOrangeY = pushLanesTop + laneHeight + (laneHeight - squareSize) / 2f;
         final float pushGreenY  = pushLanesTop + (2f * laneHeight) + (laneHeight - squareSize) / 2f;
 
-        for (Map.Entry<Long, Integer> e : pushPerMinute.entrySet())
+        for (java.util.Map.Entry<Long, Integer> e : pushPerMinute.entrySet())
         {
             long minuteTs = e.getKey() * TrifaToxService.MINUTE_IN_MILLIS;
             float x = xOf(minuteTs, startTs, minuteWidthPx);
@@ -420,7 +465,7 @@ public class HistoryChartView extends View
         final float noInternetLaneTop = pushLanesTop + (3f * laneHeight);   // directly below green push lane
         final float niLabelPad        = PUSH_LABEL_PAD_DP * density;        // caption band, same as push section
         final float noInternetY       = noInternetLaneTop + niLabelPad + (laneHeight - squareSize) / 2f;
-        final int   noInternetColor   = TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.color;
+        final int noInternetColor     = TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.color;
 
         // separator between push section and no-internet lane
         canvas.drawLine(0, noInternetLaneTop, w, noInternetLaneTop, linePaint);
@@ -429,38 +474,47 @@ public class HistoryChartView extends View
         {
             String niCaption = "no internet";
             textPaint.setTextSize(11f * density);
-            // textPaint.setColor(Color.parseColor("#B0BEC5"));
             float tw = textPaint.measureText(niCaption);
             float cx = nowX - tw - (8f * density);
             if (cx < (8f * density)) cx = (8f * density);
             canvas.drawText(niCaption, cx, noInternetLaneTop + (10f * density), textPaint);
         }
 
-        // outage bars: merge contiguous no-internet minutes into one rounded rect
-        if (count > 0)
+        if (hasData)
         {
             squarePaint.setColor(noInternetColor);
             boolean ni_in_run  = false;
             float   ni_run_x1  = 0f;
             float   ni_run_x2  = 0f;
 
-            int oldest2 = (TrifaToxService.app_state_history_index - count + TrifaToxService.HISTORY_SIZE)
-                          % TrifaToxService.HISTORY_SIZE;
+            int oldest2 = (TrifaToxService.app_state_history_index - TrifaToxService.HISTORY_SIZE + TrifaToxService.HISTORY_SIZE) %
+                          TrifaToxService.HISTORY_SIZE;
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < TrifaToxService.HISTORY_SIZE; i++)
             {
                 int  idx = (oldest2 + i) % TrifaToxService.HISTORY_SIZE;
                 long ts  = TrifaToxService.app_state_history_ts[idx];
                 if (ts <= 0) continue;
-                if (ts < startTs) continue;     // older than 24h window (head of ring)
-                if (ts > now) break;            // ring is chronological
+
+                if (ts > now)
+                {
+                    break;            // ring is chronological
+                }
 
                 if (TrifaToxService.no_internet_history[idx])
                 {
+                    if (ts < startTs)
+                    {
+                        continue;     // older than 24h window (head of ring)
+                    }
+
                     float x1 = xOf(ts, startTs, minuteWidthPx);
                     float x2 = xOf(ts + TrifaToxService.MINUTE_IN_MILLIS, startTs, minuteWidthPx);
                     if (x2 > nowX) x2 = nowX;   // never draw into the right padding strip
-                    if (x2 <= x1) continue;
+                    if (x2 <= x1)
+                    {
+                        continue;
+                    }
 
                     if (!ni_in_run)
                     {
@@ -474,7 +528,6 @@ public class HistoryChartView extends View
                     }
                     else
                     {
-                        // gap (e.g. sleep gap or a connected minute) -> flush and restart
                         canvas.drawRoundRect(new RectF(ni_run_x1, noInternetY, ni_run_x2, noInternetY + squareSize), 4f, 4f, squarePaint);
                         ni_run_x1 = x1;
                         ni_run_x2 = x2;
@@ -528,6 +581,7 @@ public class HistoryChartView extends View
     private long ceilToHour(long ts) { return ((ts + 3599999L) / 3600000L) * 3600000L; }
     private long ceilToInterval(long ts, long interval) { return ((ts + interval - 1) / interval) * interval; }
 
+    /** Draws a single square for an active state lane. */
     private void drawSquare(Canvas canvas, float x, int state, float laneHeight, float squareSize, int w, int maxLanes)
     {
         if (x < -squareSize || x > w) return;
@@ -542,6 +596,7 @@ public class HistoryChartView extends View
         canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
     }
 
+    /** Draws a continuous bar spanning multiple minutes for a specific state lane (used for ASLEEP gaps). */
     private void drawBar(Canvas canvas, float x1, float x2, int state, float laneHeight, float squareSize, int w, int maxLanes)
     {
         if (x2 <= 0 || x1 >= w) return;
@@ -554,6 +609,19 @@ public class HistoryChartView extends View
         float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
 
         squarePaint.setColor(TRIFAGlobals.APP_STATE.getColorForState(s));
+        canvas.drawRoundRect(new RectF(x1, y, x2, y + squareSize), 4f, 4f, squarePaint);
+    }
+
+    /** Helper for the parallel loop to draw a bar segment without recalculating Y repeatedly. */
+    private void drawBarRect(Canvas canvas, float x1, float x2, int state, float laneHeight, float squareSize, int w, int maxLanes)
+    {
+        if (x2 <= 0 || x1 >= w) return;
+        x1 = Math.max(0, x1);
+        x2 = Math.min(w, x2);
+        int s = state;
+        if (s < 0 || s >= maxLanes) s = 0;
+
+        float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
         canvas.drawRoundRect(new RectF(x1, y, x2, y + squareSize), 4f, 4f, squarePaint);
     }
 }

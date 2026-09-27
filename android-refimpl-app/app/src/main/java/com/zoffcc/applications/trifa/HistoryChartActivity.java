@@ -3,7 +3,6 @@ package com.zoffcc.applications.trifa;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.UriPermission;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -13,7 +12,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.DocumentsContract;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -23,6 +21,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -31,10 +31,6 @@ import java.util.Locale;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.documentfile.provider.DocumentFile;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import static java.nio.file.Files.createFile;
 
 public class HistoryChartActivity extends AppCompatActivity
 {
@@ -46,7 +42,7 @@ public class HistoryChartActivity extends AppCompatActivity
     // the live pinch zoom. 3.0f * density(3) ~= 9 px per minute square -> a ~13000 px
     // wide PNG that is far sharper than any screenshot, yet small enough to never OOM.
     private static final float EXPORT_DP_PER_MINUTE = 3.0f;
-    private static final int   MAX_EXPORT_WIDTH_PX  = 30000; // hard safety clamp
+    private static final int MAX_EXPORT_WIDTH_PX = 30000; // hard safety clamp
 
     private HorizontalScrollView scrollView;
     private HistoryChartView chartView;
@@ -65,7 +61,10 @@ public class HistoryChartActivity extends AppCompatActivity
             if (chartView != null)
             {
                 chartView.invalidate();
-                if (!user_took_over) scroll_to_now();
+                if (!user_took_over)
+                {
+                    scroll_to_now();
+                }
             }
             refreshHandler.postDelayed(this, 5000);
         }
@@ -97,26 +96,35 @@ public class HistoryChartActivity extends AppCompatActivity
 
         // Chart width is WRAP_CONTENT (dictated by zoom), height MATCH_PARENT so the
         // whole screen receives scroll / pinch gestures.
-        scrollView.addView(chartView, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
+        scrollView.addView(chartView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                                                                   FrameLayout.LayoutParams.MATCH_PARENT));
 
         scrollView.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN) user_took_over = true;
+            if (event.getAction() == MotionEvent.ACTION_DOWN)
+            {
+                user_took_over = true;
+            }
             return false;
         });
 
-        rootLayout.addView(scrollView, new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT));
+        rootLayout.addView(scrollView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
+                                                                    FrameLayout.LayoutParams.MATCH_PARENT));
 
         // 2. Legend Overlay (touch-transparent) -- kept at BOTTOM-LEFT (original position).
         //    The export button lives at BOTTOM-RIGHT, so the two never collide.
-        LinearLayout legendContainer = new LinearLayout(this) {
+        LinearLayout legendContainer = new LinearLayout(this)
+        {
             @Override
-            public boolean onInterceptTouchEvent(MotionEvent ev) { return false; }
+            public boolean onInterceptTouchEvent(MotionEvent ev)
+            {
+                return false;
+            }
+
             @Override
-            public boolean onTouchEvent(MotionEvent event) { return false; }
+            public boolean onTouchEvent(MotionEvent event)
+            {
+                return false;
+            }
         };
 
         legendContainer.setOrientation(LinearLayout.VERTICAL);
@@ -127,11 +135,13 @@ public class HistoryChartActivity extends AppCompatActivity
         java.util.Arrays.sort(allStates, (a, b) -> Integer.compare(b.value, a.value));
 
         int[] statesToShow = new int[allStates.length];
-        for (int i = 0; i < allStates.length; i++) {
+        for (int i = 0; i < allStates.length; i++)
+        {
             statesToShow[i] = allStates[i].value;
         }
 
-        for (int state : statesToShow) {
+        for (int state : statesToShow)
+        {
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setGravity(Gravity.CENTER_VERTICAL);
@@ -154,8 +164,8 @@ public class HistoryChartActivity extends AppCompatActivity
             legendContainer.addView(row);
         }
 
-        FrameLayout.LayoutParams legendParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+        FrameLayout.LayoutParams legendParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                                                                             FrameLayout.LayoutParams.WRAP_CONTENT);
         legendParams.gravity = Gravity.BOTTOM | Gravity.START;   // <-- bottom-left (original)
         legendParams.bottomMargin = dp(10);
         legendParams.leftMargin = dp(10);
@@ -174,15 +184,18 @@ public class HistoryChartActivity extends AppCompatActivity
         fabExport.setBackgroundTintList(android.content.res.ColorStateList.valueOf(0xFF1976D2));
         fabExport.setImageTintList(android.content.res.ColorStateList.valueOf(Color.WHITE));
 
-        FrameLayout.LayoutParams fabParams = new FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT);
+        FrameLayout.LayoutParams fabParams = new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
+                                                                          FrameLayout.LayoutParams.WRAP_CONTENT);
         fabParams.gravity = Gravity.BOTTOM | Gravity.END;        // <-- bottom-right
         fabParams.rightMargin = dp(16);
         fabParams.bottomMargin = dp(16);
         fabExport.setLayoutParams(fabParams);
 
         fabExport.setOnClickListener(v -> onExportClicked());
-        fabExport.setOnLongClickListener(v -> { onChangeFolderClicked(); return true; });
+        fabExport.setOnLongClickListener(v -> {
+            onChangeFolderClicked();
+            return true;
+        });
 
         rootLayout.addView(fabExport, fabParams);
 
@@ -194,7 +207,10 @@ public class HistoryChartActivity extends AppCompatActivity
 
     private void onExportClicked()
     {
-        if (exporting) return;
+        if (exporting)
+        {
+            return;
+        }
         if (hasUsableTree(treeUri))
         {
             doExport(treeUri);
@@ -217,8 +233,7 @@ public class HistoryChartActivity extends AppCompatActivity
         try
         {
             Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION
-                            | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
             startActivityForResult(intent, REQ_PICK_TREE);
         }
         catch (Exception e)
@@ -232,7 +247,10 @@ public class HistoryChartActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode != REQ_PICK_TREE) return;
+        if (requestCode != REQ_PICK_TREE)
+        {
+            return;
+        }
 
         if (resultCode != Activity.RESULT_OK || data == null)
         {
@@ -250,28 +268,40 @@ public class HistoryChartActivity extends AppCompatActivity
         // take a persistable read+write permission and remember it
         try
         {
-            getContentResolver().takePersistableUriPermission(picked,
-                                                              Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+            getContentResolver().takePersistableUriPermission(picked, Intent.FLAG_GRANT_READ_URI_PERMISSION |
+                                                                      Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         }
-        catch (Exception ignored) { }
+        catch (Exception ignored)
+        {
+        }
 
         treeUri = picked;
-        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit()
-                .putString(PREF_TREE_URI, picked.toString()).apply();
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().putString(PREF_TREE_URI, picked.toString()).apply();
 
         if (pendingExport)
         {
             pendingExport = false;
-            if (hasUsableTree(treeUri)) doExport(treeUri);
-            else toast("Selected folder is not writable");
+            if (hasUsableTree(treeUri))
+            {
+                doExport(treeUri);
+            }
+            else
+            {
+                toast("Selected folder is not writable");
+            }
         }
     }
 
-    /** Render the WHOLE 24h chart at a fixed high resolution into an off-screen view,
-     *  then compress + write the PNG on a background thread (keeps the UI thread free). */
+    /**
+     * Render the WHOLE 24h chart at a fixed high resolution into an off-screen view,
+     * then compress + write the PNG on a background thread (keeps the UI thread free).
+     */
     private void doExport(final Uri tree)
     {
-        if (exporting) return;
+        if (exporting)
+        {
+            return;
+        }
         exporting = true;
 
         final Bitmap bmp;
@@ -287,7 +317,10 @@ public class HistoryChartActivity extends AppCompatActivity
                 effDp *= (float) MAX_EXPORT_WIDTH_PX / (float) w;
                 w = MAX_EXPORT_WIDTH_PX;
             }
-            if (w < 1) w = 1;
+            if (w < 1)
+            {
+                w = 1;
+            }
 
             // throw-away view: NOT attached to the window, does not disturb the live chart
             HistoryChartView exportView = new HistoryChartView(this);
@@ -317,8 +350,8 @@ public class HistoryChartActivity extends AppCompatActivity
             return;
         }
 
-        final String fileName = "trifa_holter_"
-                                + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".png";
+        final String fileName =
+                "trifa_holter_" + new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new Date()) + ".png";
 
         new Thread(() -> {
             try
@@ -359,10 +392,23 @@ public class HistoryChartActivity extends AppCompatActivity
     private Uri loadSavedTreeUri()
     {
         String s = getSharedPreferences(PREFS_NAME, MODE_PRIVATE).getString(PREF_TREE_URI, null);
-        if (s == null) return null;
+        if (s == null)
+        {
+            return null;
+        }
         Uri u;
-        try { u = Uri.parse(s); } catch (Exception e) { return null; }
-        if (hasUsableTree(u)) return u;
+        try
+        {
+            u = Uri.parse(s);
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+        if (hasUsableTree(u))
+        {
+            return u;
+        }
         // permission gone (folder removed / app updated) -> drop the stale entry
         getSharedPreferences(PREFS_NAME, MODE_PRIVATE).edit().remove(PREF_TREE_URI).apply();
         return null;
@@ -370,17 +416,28 @@ public class HistoryChartActivity extends AppCompatActivity
 
     private boolean hasUsableTree(Uri u)
     {
-        if (u == null) return false;
+        if (u == null)
+        {
+            return false;
+        }
         try
         {
             List<UriPermission> perms = getContentResolver().getPersistedUriPermissions();
-            if (perms == null) return false;
+            if (perms == null)
+            {
+                return false;
+            }
             for (UriPermission p : perms)
             {
-                if (p.getUri().equals(u) && p.isWritePermission()) return true;
+                if (p.getUri().equals(u) && p.isWritePermission())
+                {
+                    return true;
+                }
             }
         }
-        catch (Exception ignored) { }
+        catch (Exception ignored)
+        {
+        }
         return false;
     }
 
@@ -397,9 +454,20 @@ public class HistoryChartActivity extends AppCompatActivity
         return (int) (v * getResources().getDisplayMetrics().density + 0.5f);
     }
 
-    private void postUi(final String msg) { postUi(() -> toast(msg)); }
-    private void postUi(Runnable r) { refreshHandler.post(r); }
-    private void toast(String msg) { Toast.makeText(this, msg, Toast.LENGTH_LONG).show(); }
+    private void postUi(final String msg)
+    {
+        postUi(() -> toast(msg));
+    }
+
+    private void postUi(Runnable r)
+    {
+        refreshHandler.post(r);
+    }
+
+    private void toast(String msg)
+    {
+        Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+    }
 
     @Override
     protected void onResume()

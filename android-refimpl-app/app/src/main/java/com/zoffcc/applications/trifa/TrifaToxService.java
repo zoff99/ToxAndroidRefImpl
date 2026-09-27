@@ -157,21 +157,6 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_self_set_status_mes
 import static com.zoffcc.applications.trifa.MainActivity.tox_service_fg;
 import static com.zoffcc.applications.trifa.MainActivity.tox_util_friend_resend_message_v2;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ADD_BOTS_ON_STARTUP;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_ASLEEP;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_AWAKE_COOLDOWN;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_BOOTSTRAPPING;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_CALL_1ON1;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_CALL_GROUP;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_FT_IN;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_FT_OUT;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_HIGH_NETWORK_ACTIVITY;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_ITERATE_TOO_FAST;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_NO_INTERNET;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_OFFLINE_IDLE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_ONLINE_TCP;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_ONLINE_UDP;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_UI_FOREGROUND;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_UNKNOWN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_INIT_NAME;
@@ -222,6 +207,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_NETPROF_PACKET_TYPE.TOX_
 import static com.zoffcc.applications.trifa.ToxVars.TOX_NETPROF_PACKET_TYPE.TOX_NETPROF_PACKET_TYPE_UDP;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_NETWORK_HEALTH.TOX_NETWORK_HEALTH_UNKNOWN;
 
+/** @noinspection ExtractMethodRecommender*/
 public class TrifaToxService extends Service
 {
     static final String TAG = "trifa.ToxService";
@@ -278,7 +264,7 @@ public class TrifaToxService extends Service
 
     // [ADDED] 24-Hour Rolling History (1440 minutes)
     public static final int HISTORY_SIZE = 1440;
-    public static final int[] app_state_history = new int[HISTORY_SIZE];
+    public static final boolean[][] app_state_histories = new boolean[TRIFAGlobals.APP_STATE.values().length][HISTORY_SIZE];
     public static final long[] app_state_history_ts = new long[HISTORY_SIZE];
     public static int app_state_history_count = 0;
     public static int app_state_history_index = 0;
@@ -1863,72 +1849,69 @@ public class TrifaToxService extends Service
                             last_netprof_bytes = total_bytes_now;
                             last_netprof_ts = current_time_ms2;
 
-                            // --- 3. EVALUATE STATE (Priority Order) ---
-                            int current_state = STATE_UNKNOWN.value;
+                            // --- 3. EVALUATE ALL STATES INDEPENDENTLY ---
                             long now = System.currentTimeMillis();
 
-                            if (fast_iteration_logged)
-                            {
-                                current_state = STATE_ITERATE_TOO_FAST.value;
+                            // Clear ALL state tracks for this minute first to ensure clean data
+                            for (int s = 0; s < app_state_histories.length; s++) {
+                                app_state_histories[s][app_state_history_index] = false;
                             }
-                            else if (Callstate.state != 0)
-                            {
-                                current_state = STATE_CALL_1ON1.value;
+
+                            // Evaluate each state independently. Multiple states can be true simultaneously.
+                            if (fast_iteration_logged) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_ITERATE_TOO_FAST.value][app_state_history_index] = true;
                             }
-                            else if (Callstate.audio_group_active || Callstate.audio_ngc_group_active)
-                            {
-                                current_state = STATE_CALL_GROUP.value;
+
+                            if (Callstate.state != 0) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_CALL_1ON1.value][app_state_history_index] = true;
                             }
-                            else if (global_last_activity_outgoung_ft_ts > 0 &&
-                                     (now - global_last_activity_outgoung_ft_ts) < 2000)
-                            {
-                                current_state = STATE_FT_OUT.value;
+
+                            if (Callstate.audio_group_active || Callstate.audio_ngc_group_active) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_CALL_GROUP.value][app_state_history_index] = true;
                             }
-                            else if (global_last_activity_incoming_ft_ts > 0 &&
-                                     (now - global_last_activity_incoming_ft_ts) < 2000)
-                            {
-                                current_state = STATE_FT_IN.value;
+
+                            if (global_last_activity_outgoung_ft_ts > 0 &&
+                                (now - global_last_activity_outgoung_ft_ts) < 2000) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_OUT.value][app_state_history_index] = true;
                             }
-                            else if (current_bytes_per_second > (150 * 1024))
-                            { // Threshold: ~150 KB/s
-                                current_state = STATE_HIGH_NETWORK_ACTIVITY.value;
+
+                            if (global_last_activity_incoming_ft_ts > 0 &&
+                                (now - global_last_activity_incoming_ft_ts) < 2000) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_IN.value][app_state_history_index] = true;
                             }
-                            else if (bootstrapping)
-                            {
-                                current_state = STATE_BOOTSTRAPPING.value;
+
+                            if (current_bytes_per_second > (150 * 1024)) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_HIGH_NETWORK_ACTIVITY.value][app_state_history_index] = true;
                             }
-                            else if (global_showing_messageview || global_showing_anygroupview)
-                            {
-                                current_state = STATE_UI_FOREGROUND.value;
+
+                            if (bootstrapping) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_BOOTSTRAPPING.value][app_state_history_index] = true;
                             }
-                            else if (!HelperGeneric.battery_saving_can_sleep() && PREF__X_battery_saving_mode)
-                            {
-                                current_state = STATE_AWAKE_COOLDOWN.value;
+
+                            if (global_showing_messageview || global_showing_anygroupview) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_UI_FOREGROUND.value][app_state_history_index] = true;
                             }
-                            else if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_UDP.value)
-                            {
-                                current_state = STATE_ONLINE_UDP.value;
+
+                            if (!HelperGeneric.battery_saving_can_sleep() && PREF__X_battery_saving_mode) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_AWAKE_COOLDOWN.value][app_state_history_index] = true;
                             }
-                            else if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value)
-                            {
-                                current_state = STATE_ONLINE_TCP.value;
-                            }
-                            else if (!HAVE_INTERNET_CONNECTIVITY)
-                            {
-                                current_state = STATE_NO_INTERNET.value;
-                            }
-                            else if (global_self_connection_status == TOX_CONNECTION_NONE.value)
-                            {
-                                current_state = STATE_OFFLINE_IDLE.value;
+
+                            // Connection states are mutually exclusive, but we still use independent assignment
+                            if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_UDP.value) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_ONLINE_UDP.value][app_state_history_index] = true;
+                            } else if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_ONLINE_TCP.value][app_state_history_index] = true;
+                            } else if (!HAVE_INTERNET_CONNECTIVITY) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.value][app_state_history_index] = true;
+                            } else if (global_self_connection_status == TOX_CONNECTION_NONE.value) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_OFFLINE_IDLE.value][app_state_history_index] = true;
                             }
 
                             // --- 4. WRITE TO RING BUFFER ---
+                            // 1. Write timestamp to the CURRENT index
                             app_state_history_ts[app_state_history_index] = current_time_ms2;
-                            app_state_history[app_state_history_index] = current_state;
 
-                            // lock-free per-minute no-internet latch.
-                            // NOTE: compare with `!=`, never with `<`/`>`/subtraction-as-long.
-                            // `!=` is invariant under 32-bit counter rollover (see field comment).
+                            // 2. Lock-free no-internet latch (writes to the SAME CURRENT index)
                             int ec = TrifaToxService.no_internet_edge_count.get();
                             boolean cur_off = !HAVE_INTERNET_CONNECTIVITY;
                             no_internet_history[app_state_history_index] =
@@ -1936,6 +1919,7 @@ public class TrifaToxService extends Service
                             no_internet_last_ec = ec;
                             no_internet_prev_offline = cur_off;
 
+                            // 3. Advance index ONCE at the very end
                             app_state_history_index = (app_state_history_index + 1) % HISTORY_SIZE;
                             if (app_state_history_count < HISTORY_SIZE) app_state_history_count++;
                             app_state_last_record_ts = current_time_ms2;
