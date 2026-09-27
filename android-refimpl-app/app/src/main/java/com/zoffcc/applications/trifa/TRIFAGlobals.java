@@ -70,6 +70,12 @@ public class TRIFAGlobals
     final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 60 * 3; // 3 minutes
     static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
 
+    // Reconnect flaps must NOT restart the "recently online" battery-sleep cooldown.
+    // Only the very first connect, or a real outage (offline >= this value), resets
+    // global_self_last_went_online_timestamp. Observed flap outages on bad mobile links
+    // are 7-15 s; real events (sleep wake, minutes-long outages) are far above this.
+    static final long SELF_RECONNECT_COOLDOWN_MS = 60 * 1000;
+
     static int AUTO_ACCEPT_FT_MAX_IMAGE_SIZE_IN_MB = 12;
     static int AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB = 40;
     static int AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB = 200;

@@ -261,6 +261,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_TOKEN_DB_K
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_HOST;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ORBOT_PROXY_PORT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF__DB_secrect_key__user_hash;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.SELF_RECONNECT_COOLDOWN_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_PUSH_SETUP_HOWTO_URL;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_TRIFA_PUBLIC_GROUPID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_INCOMING;
@@ -6083,78 +6084,63 @@ public class MainActivity extends AppCompatActivity
         global_self_connection_status = a_TOX_CONNECTION;
         TrifaToxService.write_debug_file("CB_SELF_CONN_STATUS__cstatus:" + a_TOX_CONNECTION + "_b:" + bootstrapping);
 
-        if ((connection_status_prev == TOX_CONNECTION_NONE.value) && (a_TOX_CONNECTION != TOX_CONNECTION_NONE.value))
+        final long now_ts = System.currentTimeMillis();
+        final boolean went_offline_edge = (connection_status_prev != TOX_CONNECTION_NONE.value) &&
+                                          (a_TOX_CONNECTION == TOX_CONNECTION_NONE.value);
+        final boolean went_online_edge  = (connection_status_prev == TOX_CONNECTION_NONE.value) &&
+                                          (a_TOX_CONNECTION != TOX_CONNECTION_NONE.value);
+
+        if (went_online_edge)
         {
-            // we just went online
             append_logger_msg(TAG + "::" + "went online:self connection status=" + a_TOX_CONNECTION);
         }
-        else if ((connection_status_prev != TOX_CONNECTION_NONE.value) && (a_TOX_CONNECTION == TOX_CONNECTION_NONE.value))
+        else if (went_offline_edge)
         {
-            // we just went OFFLINE
             append_logger_msg(TAG + "::" + "went OFFLINE:self connection status=" + a_TOX_CONNECTION);
         }
 
-        if (bootstrapping)
+        if (went_offline_edge)
         {
-            Log.i(TAG, "self_connection_status:bootstrapping=true");
-
-            // we just went online
-            if (a_TOX_CONNECTION != 0)
+            // outage started: remember WHEN, but do NOT touch the online timestamp here
+            global_self_last_went_offline_timestamp = now_ts;
+            Log.i(TAG, "self_connection_status:went_offline");
+            HelperGeneric.battery_sleep_log_add("CONN_WENT_OFFLINE");
+        }
+        else if (went_online_edge)
+        {
+            long offline_duration = 0;
+            if (global_self_last_went_offline_timestamp > 0)
             {
-                Log.i(TAG, "self_connection_status:bootstrapping set to false");
-                bootstrapping = false;
-                global_self_last_went_online_timestamp = System.currentTimeMillis();
-                global_self_last_went_offline_timestamp = -1;
+                offline_duration = now_ts - global_self_last_went_offline_timestamp;
+            }
+
+            // [FIX] SINGLE WRITE RULE: reset the cooldown ONLY on the first-ever connect
+            // or after a REAL outage. Short relay flaps must NOT reset it, otherwise
+            // RECENTLY_ONLINE blocks battery sleep forever. This also replaces the old
+            // unconditional reset in the bootstrapping branch (after a sleep wake or a
+            // bootstrap re-arm the offline duration is minutes long, so the gate passes
+            // there anyway).
+            if ((global_self_last_went_online_timestamp <= 0) || (offline_duration >= SELF_RECONNECT_COOLDOWN_MS))
+            {
+                global_self_last_went_online_timestamp = now_ts;
+                Log.i(TAG, "self_connection_status:went_online (real, offline_duration=" + offline_duration + "ms)");
+                HelperGeneric.battery_sleep_log_add("CONN_WENT_ONLINE_REAL|offline_ms=" + offline_duration);
             }
             else
             {
-                // Only record the offline timestamp if we actually transitioned from online to offline
-                if (connection_status_prev != TOX_CONNECTION_NONE.value)
-                {
-                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                }
+                Log.i(TAG, "self_connection_status:reconnect flap ignored (offline_duration=" + offline_duration + "ms)");
+                HelperGeneric.battery_sleep_log_add("CONN_FLAP_IGNORED|offline_ms=" + offline_duration);
             }
-        }
-        else
-        {
-            if (a_TOX_CONNECTION != 0)
-            {
-                boolean was_offline = (connection_status_prev == TOX_CONNECTION_NONE.value);
-                if (was_offline)
-                {
-                    long offline_duration = 0;
-                    if (global_self_last_went_offline_timestamp > 0) {
-                        offline_duration = System.currentTimeMillis() - global_self_last_went_offline_timestamp;
-                    }
 
-                    // Ignore micro-drops (< 5 seconds) to prevent transport flips from resetting the battery sleep timer
-                    if (offline_duration > 5000 || global_self_last_went_online_timestamp <= 0)
-                    {
-                        global_self_last_went_online_timestamp = System.currentTimeMillis();
-                        Log.i(TAG, "self_connection_status:went_online (real, offline_duration=" + offline_duration + "ms)");
-                    }
-                    else
-                    {
-                        Log.i(TAG, "self_connection_status:ignoring short offline dip (" + offline_duration + "ms)");
-                    }
-                }
-                else
-                {
-                    // Transport change (e.g., TCP to UDP) while already online. Do not reset timer.
-                    Log.i(TAG, "self_connection_status:transport_change_while_online");
-                }
-                global_self_last_went_offline_timestamp = -1;
-            }
-            else
-            {
-                // Only record the offline timestamp if we actually transitioned from online to offline
-                if (connection_status_prev != TOX_CONNECTION_NONE.value)
-                {
-                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                    Log.i(TAG, "self_connection_status:went_offline");
-                }
-            }
+            global_self_last_went_offline_timestamp = -1;
+            bootstrapping = false; // connected again -> stop bootstrapping (old bootstrapping-branch job)
         }
+        else if (a_TOX_CONNECTION != TOX_CONNECTION_NONE.value)
+        {
+            // Transport change (change from TCP to UDP or otherwise) while already online. Do not reset timer.
+            Log.i(TAG, "self_connection_status:transport_change_while_online");
+        }
+        // else: repeated NONE callbacks while already offline -> intentionally ignored
 
         // -- notification ------------------
         // -- notification ------------------
