@@ -285,6 +285,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_recei
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_reason;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_incoming_ft_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_outgoung_ft_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_connection_status;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_self_last_went_offline_timestamp;
@@ -7954,7 +7955,7 @@ public class MainActivity extends AppCompatActivity
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "FRIEND_FT_CHUNK_RECEIVE";
 
-        global_last_activity_outgoung_ft_ts = System.currentTimeMillis();
+        global_last_activity_incoming_ft_ts = System.currentTimeMillis();
 
         //Log.i(TAG, "file_recv_chunk:" + friend_number + ":fn==" + file_number + ":position=" + position + ":length=" + length + ":data len=" + data.length + ":data=" + data);
         //Log.i(TAG, "file_recv_chunk:--START--");
