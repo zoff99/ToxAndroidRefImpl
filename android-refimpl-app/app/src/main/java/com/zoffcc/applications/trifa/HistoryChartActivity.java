@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
@@ -38,7 +37,11 @@ public class HistoryChartActivity extends AppCompatActivity
 
     private HorizontalScrollView scrollView;
     private HistoryChartView chartView;
-    private boolean user_took_over = false;
+
+    // Tracks if the user has scrolled away from the live "now" (right) edge
+    private boolean userScrolledAway = false;
+    private long targetTimestamp = 0; // The exact historical time the user is looking at
+    private boolean programmaticScroll = false;
 
     private volatile boolean exporting = false;
 
@@ -54,9 +57,20 @@ public class HistoryChartActivity extends AppCompatActivity
             if (chartView != null)
             {
                 chartView.invalidate();
-                if (!user_took_over)
+
+                if (!userScrolledAway)
                 {
                     scroll_to_now();
+                }
+                else
+                {
+                    // Keep the viewport glued to targetTimestamp: as the 24h window rolls,
+                    // that timestamp's x shrinks by minuteWidthPx/12 per 5s tick; follow it exactly.
+                    int newScrollX = (int) chartView.getXForTimestamp(targetTimestamp);
+                    int maxScroll = Math.max(0, chartView.getWidth() - scrollView.getWidth());
+                    if (newScrollX < 0) newScrollX = 0;              // target aged out of the 24h window
+                    if (newScrollX > maxScroll) newScrollX = maxScroll; // safety, cannot normally happen
+                    scrollXTo(newScrollX);
                 }
             }
             refreshHandler.postDelayed(this, 5000);
@@ -92,12 +106,23 @@ public class HistoryChartActivity extends AppCompatActivity
         scrollView.addView(chartView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                                                                    FrameLayout.LayoutParams.MATCH_PARENT));
 
-        scrollView.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_DOWN)
+        // Track if the user scrolls away from the live "now" edge
+        scrollView.getViewTreeObserver().addOnScrollChangedListener(() -> {
+            if (programmaticScroll || chartView == null) return; // our own corrections: don't re-record
+            int maxScroll = Math.max(0, chartView.getWidth() - scrollView.getWidth());
+            int currentScroll = scrollView.getScrollX();
+
+            if (currentScroll < maxScroll - 20)
             {
-                user_took_over = true;
+                userScrolledAway = true;
+                // pin to the exact timestamp currently at the left edge of the viewport
+                targetTimestamp = chartView.getTimestampAtX(currentScroll);
             }
-            return false;
+            else
+            {
+                // user manually scrolled back to the live edge -> resume live tail
+                userScrolledAway = false;
+            }
         });
 
         rootLayout.addView(scrollView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT,
@@ -107,9 +132,9 @@ public class HistoryChartActivity extends AppCompatActivity
         LinearLayout legendContainer = new LinearLayout(this)
         {
             @Override
-            public boolean onInterceptTouchEvent(MotionEvent ev) { return false; }
+            public boolean onInterceptTouchEvent(android.view.MotionEvent ev) { return false; }
             @Override
-            public boolean onTouchEvent(MotionEvent event) { return false; }
+            public boolean onTouchEvent(android.view.MotionEvent event) { return false; }
         };
 
         legendContainer.setOrientation(LinearLayout.VERTICAL);
@@ -299,10 +324,17 @@ public class HistoryChartActivity extends AppCompatActivity
         // Handle other activity results here if necessary
     }
 
+    private void scrollXTo(int x)
+    {
+        programmaticScroll = true;   // onScrollChanged fires synchronously inside scrollTo()
+        scrollView.scrollTo(x, 0);
+        programmaticScroll = false;
+    }
+
     private void scroll_to_now()
     {
         int maxScroll = Math.max(0, chartView.getWidth() - scrollView.getWidth());
-        scrollView.scrollTo(maxScroll, 0);
+        scrollXTo(maxScroll);
     }
 
     private int dp(int v)
@@ -324,7 +356,8 @@ public class HistoryChartActivity extends AppCompatActivity
     protected void onResume()
     {
         super.onResume();
-        user_took_over = false;
+        // Snap back to live "now" when the user returns to this screen
+        userScrolledAway = false;
         refreshHandler.postDelayed(refreshRunnable, 5000);
     }
 

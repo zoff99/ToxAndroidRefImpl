@@ -577,6 +577,26 @@ public class HistoryChartView extends View
         }
     }
 
+    /** Exact timestamp (ms) at a given x pixel coordinate. Same mapping as onDraw(). */
+    public long getTimestampAtX(float x)
+    {
+        int w = getWidth();
+        if (w <= 0) return System.currentTimeMillis();
+        float minuteWidthPx = w / (float) getTotalSpanMinutes();
+        long startTs = System.currentTimeMillis() - WINDOW_MS;
+        return startTs + (long) ((x / minuteWidthPx) * 60000f);   // float math, ms precision
+    }
+
+    /** Exact x pixel coordinate for a timestamp. Same mapping as onDraw(). */
+    public float getXForTimestamp(long timestamp)
+    {
+        int w = getWidth();
+        if (w <= 0) return 0f;
+        float minuteWidthPx = w / (float) getTotalSpanMinutes();
+        long startTs = System.currentTimeMillis() - WINDOW_MS;
+        return ((timestamp - startTs) / 60000f) * minuteWidthPx;   // float math, no truncation
+    }
+
     private float xOf(long ts, long startTs, float minuteWidthPx) { return (ts - startTs) / 60000f * minuteWidthPx; }
     private long ceilToHour(long ts) { return ((ts + 3599999L) / 3600000L) * 3600000L; }
     private long ceilToInterval(long ts, long interval) { return ((ts + interval - 1) / interval) * interval; }
