@@ -1,6 +1,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.HorizontalScrollView;
@@ -35,17 +37,18 @@ public class HistoryChartActivity extends AppCompatActivity
     private static final float EXPORT_DP_PER_MINUTE = 3.0f;
     private static final int MAX_EXPORT_WIDTH_PX = 30000; // hard safety clamp
 
-    private HorizontalScrollView scrollView;
+    private LockableHorizontalScrollView scrollView;
     private HistoryChartView chartView;
 
     // Tracks if the user has scrolled away from the live "now" (right) edge
     private boolean userScrolledAway = false;
     private long targetTimestamp = 0; // The exact historical time the user is looking at
     private boolean programmaticScroll = false;
+    private boolean userIsTouching = false; // Tracks if the user's finger(s) are currently on the screen
 
     private volatile boolean exporting = false;
 
-    // Our new reusable exporter instance
+    // Our reusable exporter instance
     private DocumentExporter exporter;
 
     private final Handler refreshHandler = new Handler(Looper.getMainLooper());
@@ -62,10 +65,11 @@ public class HistoryChartActivity extends AppCompatActivity
                 {
                     scroll_to_now();
                 }
-                else
+                else if (!userIsTouching)
                 {
                     // Keep the viewport glued to targetTimestamp: as the 24h window rolls,
                     // that timestamp's x shrinks by minuteWidthPx/12 per 5s tick; follow it exactly.
+                    // We ONLY do this if the user is NOT actively touching the screen.
                     int newScrollX = (int) chartView.getXForTimestamp(targetTimestamp);
                     int maxScroll = Math.max(0, chartView.getWidth() - scrollView.getWidth());
                     if (newScrollX < 0) newScrollX = 0;              // target aged out of the 24h window
@@ -96,7 +100,7 @@ public class HistoryChartActivity extends AppCompatActivity
         FrameLayout rootLayout = new FrameLayout(this);
         rootLayout.setBackgroundColor(0xFF121212);
 
-        scrollView = new HorizontalScrollView(this);
+        scrollView = new LockableHorizontalScrollView(this);
         scrollView.setBackgroundColor(0xFF121212);
 
         chartView = new HistoryChartView(this);
@@ -106,9 +110,48 @@ public class HistoryChartActivity extends AppCompatActivity
         scrollView.addView(chartView, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT,
                                                                    FrameLayout.LayoutParams.MATCH_PARENT));
 
-        // Track if the user scrolls away from the live "now" edge
+        // Intercept touch events to know when the user's fingers are on the screen
+        scrollView.setOnTouchListener((v, event) -> {
+            int action = event.getActionMasked();
+
+            if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN)
+            {
+                userIsTouching = true;
+            }
+            else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)
+            {
+                userIsTouching = false;
+
+                // Post to the message queue so we calculate the timestamp AFTER
+                // the HorizontalScrollView finishes any fling or edge-snap animations.
+                scrollView.post(() -> {
+                    if (chartView != null)
+                    {
+                        int maxScroll = Math.max(0, chartView.getWidth() - scrollView.getWidth());
+                        int currentScroll = scrollView.getScrollX();
+                        if (currentScroll < maxScroll - 20)
+                        {
+                            userScrolledAway = true;
+                            targetTimestamp = chartView.getTimestampAtX(currentScroll);
+                        }
+                        else
+                        {
+                            userScrolledAway = false;
+                        }
+                    }
+                });
+            }
+            // Note: we intentionally ignore ACTION_POINTER_UP (one finger lifts, another remains)
+            // so userIsTouching stays true until the VERY LAST finger leaves the screen.
+
+            return false;
+        });
+
+        // Track if the user scrolls away from the live "now" edge.
+        // Only ignore OUR OWN corrections; user pans and pinch-commit scrolls must update the anchor.
         scrollView.getViewTreeObserver().addOnScrollChangedListener(() -> {
-            if (programmaticScroll || chartView == null) return; // our own corrections: don't re-record
+            if (programmaticScroll || chartView == null) return;
+
             int maxScroll = Math.max(0, chartView.getWidth() - scrollView.getWidth());
             int currentScroll = scrollView.getScrollX();
 
@@ -132,9 +175,9 @@ public class HistoryChartActivity extends AppCompatActivity
         LinearLayout legendContainer = new LinearLayout(this)
         {
             @Override
-            public boolean onInterceptTouchEvent(android.view.MotionEvent ev) { return false; }
+            public boolean onInterceptTouchEvent(MotionEvent ev) { return false; }
             @Override
-            public boolean onTouchEvent(android.view.MotionEvent event) { return false; }
+            public boolean onTouchEvent(MotionEvent event) { return false; }
         };
 
         legendContainer.setOrientation(LinearLayout.VERTICAL);
@@ -318,7 +361,8 @@ public class HistoryChartActivity extends AppCompatActivity
     {
         super.onActivityResult(requestCode, resultCode, data);
         // Let the exporter handle the SAF result. If it returns true, we are done.
-        if (exporter.handleActivityResult(requestCode, resultCode, data)) {
+        if (exporter.handleActivityResult(requestCode, resultCode, data))
+        {
             return;
         }
         // Handle other activity results here if necessary
@@ -373,5 +417,34 @@ public class HistoryChartActivity extends AppCompatActivity
     {
         finish();
         return true;
+    }
+
+    /**
+     * HorizontalScrollView that physically refuses to intercept or scroll while
+     * multiple fingers are on the screen. This kills the "fight" between the
+     * native scroll fling/interception and the pinch-zoom gesture.
+     */
+    public static class LockableHorizontalScrollView extends HorizontalScrollView
+    {
+        public LockableHorizontalScrollView(Context context)
+        {
+            super(context);
+        }
+
+        @Override
+        public boolean onInterceptTouchEvent(MotionEvent ev)
+        {
+            // Never steal the gesture while pinching
+            if (ev.getPointerCount() > 1) return false;
+            return super.onInterceptTouchEvent(ev);
+        }
+
+        @Override
+        public boolean onTouchEvent(MotionEvent ev)
+        {
+            // While pinching, consume silently (no scrolling, no fling velocity buildup)
+            if (ev.getPointerCount() > 1) return true;
+            return super.onTouchEvent(ev);
+        }
     }
 }

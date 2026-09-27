@@ -6,10 +6,10 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.HorizontalScrollView;
 
 import java.text.SimpleDateFormat;
@@ -37,7 +37,7 @@ public class HistoryChartView extends View
     // Extra vertical room inside the push section for the caption band
     private static final float PUSH_LABEL_PAD_DP = 10.0f;
 
-    // [ADDED] small bottom margin used only by the off-screen export renderer,
+    // small bottom margin used only by the off-screen export renderer,
     // so the last (no-internet) lane is not flush against the PNG edge.
     private static final float EXPORT_BOTTOM_PAD_DP = 8.0f;
 
@@ -48,6 +48,11 @@ public class HistoryChartView extends View
 
     private float currentDpPerMinute = 6.0f;
 
+    // --- Matrix zoom state (visual-only during the gesture, committed on release) ---
+    private boolean isZooming = false;
+    private float liveScaleFactor = 1f;
+    private float livePivotX = 0f;
+
     private final Paint squarePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
     private final Paint linePaint = new Paint();
     private final Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -56,7 +61,6 @@ public class HistoryChartView extends View
     private final SimpleDateFormat hourFmt = new SimpleDateFormat("HH", Locale.US);
 
     private ScaleGestureDetector scaleGestureDetector;
-    private float lastRawX = 0f;
 
     // Touch marker variables
     private float touchX = -1;
@@ -85,7 +89,8 @@ public class HistoryChartView extends View
 
         maxLanes = TRIFAGlobals.APP_STATE.values().length;
         yLane = new int[maxLanes];
-        for (int i = 0; i < maxLanes; i++) {
+        for (int i = 0; i < maxLanes; i++)
+        {
             yLane[i] = i; // Enum value == Y-lane
         }
 
@@ -93,10 +98,9 @@ public class HistoryChartView extends View
         scaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
     }
 
-    // ===================== [ADDED] public API for the off-screen exporter =====================
+    // ===================== public API for the off-screen exporter =====================
 
-    /** Set the horizontal resolution (dp per minute) used by the NEXT measure/draw.
-     *  Used by the exporter to render at a fixed zoom independent of the live pinch state. */
+    /** Set the horizontal resolution (dp per minute) used by the NEXT measure/draw. */
     public void setDpPerMinute(float dp)
     {
         this.currentDpPerMinute = dp;
@@ -108,9 +112,7 @@ public class HistoryChartView extends View
         return 1440 + RIGHT_PAD_MINUTES;
     }
 
-    /** Exact pixel height of the *content* (all state lanes + push caption + 3 push lanes +
-     *  no-internet caption + 1 no-internet lane + bottom pad). The exporter sizes its bitmap
-     *  to this so the PNG contains no empty black space below the chart. */
+    /** Exact pixel height of the *content* (all lanes + captions + bottom pad). */
     public int getContentHeightPx()
     {
         float density = getResources().getDisplayMetrics().density;
@@ -121,7 +123,7 @@ public class HistoryChartView extends View
         return Math.max(1, (int) Math.ceil(bottom));
     }
 
-    // ==========================================================================================
+    // ==================================================================================
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
@@ -137,98 +139,129 @@ public class HistoryChartView extends View
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    // Catch multi-touch early so the HorizontalScrollView never steals the pinch gesture
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev)
+    {
+        if (ev.getPointerCount() > 1)
+        {
+            if (getParent() != null)
+            {
+                getParent().requestDisallowInterceptTouchEvent(true);
+            }
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event)
     {
         scaleGestureDetector.onTouchEvent(event);
 
+        // While pinch-zooming we own the gesture completely
         if (scaleGestureDetector.isInProgress())
+        {
+            return true;
+        }
+
+        int action = event.getActionMasked();
+        if (action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_MOVE)
+        {
+            touchX = event.getX();
+            isTouching = true;
+            invalidate();
+        }
+        else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL)
         {
             isTouching = false;
             invalidate();
-            return true;
         }
-
-        switch (event.getActionMasked())
-        {
-            case MotionEvent.ACTION_DOWN:
-                lastRawX = event.getRawX();
-                touchX = event.getX();
-                isTouching = true;
-                invalidate();
-                return true;
-
-            case MotionEvent.ACTION_MOVE:
-                if (event.getPointerCount() == 1)
-                {
-                    float currentRawX = event.getRawX();
-                    float dx = lastRawX - currentRawX;
-
-                    if (getParent() instanceof HorizontalScrollView)
-                    {
-                        ((HorizontalScrollView) getParent()).scrollBy((int) dx, 0);
-                    }
-                    lastRawX = currentRawX;
-
-                    touchX = event.getX();
-                    isTouching = true;
-                    invalidate();
-                    return true;
-                }
-                break;
-
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_CANCEL:
-                isTouching = false;
-                touchX = -1;
-                invalidate();
-                break;
-        }
-
         return true;
     }
 
+    /**
+     * Matrix-based pinch zoom.
+     * During the gesture we ONLY scale the canvas (zero layout passes, zero ScrollView fights).
+     * On release we commit the new dpPerMinute once and re-anchor the scroll position
+     * AFTER the new width has been laid out (OnGlobalLayoutListener), which eliminates
+     * the huge horizontal jump that happened when the anchor was applied too early.
+     */
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener
     {
-        @Override
-        public boolean onScale(ScaleGestureDetector detector)
-        {
-            float oldDp = currentDpPerMinute;
-            currentDpPerMinute *= detector.getScaleFactor();
-            currentDpPerMinute = Math.max(MIN_DP_PER_MINUTE, Math.min(MAX_DP_PER_MINUTE, currentDpPerMinute));
-
-            if (currentDpPerMinute != oldDp)
-            {
-                float density = getResources().getDisplayMetrics().density;
-                float oldPxPerMin = oldDp * density;
-                float newPxPerMin = currentDpPerMinute * density;
-                float focusX = detector.getFocusX();
-                float timeAtFocus = focusX / oldPxPerMin;
-                float newFocusX = timeAtFocus * newPxPerMin;
-                final int scrollDelta = (int) (newFocusX - focusX);
-
-                requestLayout();
-                post(() -> {
-                    if (getParent() instanceof HorizontalScrollView)
-                    {
-                        ((HorizontalScrollView) getParent()).scrollBy(scrollDelta, 0);
-                    }
-                });
-            }
-            return true;
-        }
+        private float startDp = 0f;
 
         @Override
         public boolean onScaleBegin(ScaleGestureDetector detector)
         {
+            isZooming = true;
+            startDp = currentDpPerMinute;
+            liveScaleFactor = 1f;
             if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(true);
+            return true;
+        }
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector)
+        {
+            float newScale = liveScaleFactor * detector.getScaleFactor();
+            float projectedDp = startDp * newScale;
+
+            // clamp visually during the gesture
+            if (projectedDp < MIN_DP_PER_MINUTE) newScale = MIN_DP_PER_MINUTE / startDp;
+            else if (projectedDp > MAX_DP_PER_MINUTE) newScale = MAX_DP_PER_MINUTE / startDp;
+
+            liveScaleFactor = newScale;
+            livePivotX = detector.getFocusX();
+
+            invalidate(); // redraw with matrix, NO requestLayout()
             return true;
         }
 
         @Override
         public void onScaleEnd(ScaleGestureDetector detector)
         {
-            if (getParent() != null) getParent().requestDisallowInterceptTouchEvent(false);
+            isZooming = false;
+            float oldDp = startDp;
+            float newDp = startDp * liveScaleFactor;
+            newDp = Math.max(MIN_DP_PER_MINUTE, Math.min(MAX_DP_PER_MINUTE, newDp));
+
+            // The pivot is the fixed point of the matrix scale, so its content coord
+            // equals its view coord. Capture the anchor WITH THE PRE-COMMIT MAPPING
+            // (width and dpPerMinute are still the old ones here - exactly what was drawn).
+            final long anchorTs = getTimestampAtX(livePivotX);
+
+            float scrollNow = 0f;
+            if (getParent() instanceof HorizontalScrollView)
+            {
+                scrollNow = ((HorizontalScrollView) getParent()).getScrollX();
+            }
+            final float focusScreenX = livePivotX - scrollNow;   // where the pivot sits on screen
+
+            // commit the zoom
+            liveScaleFactor = 1f;
+            currentDpPerMinute = newDp;
+            requestLayout();
+
+            // Apply the anchor AFTER the new width has been measured + laid out.
+            // This guarantees fresh widths for the clamp (no stale-width jump)
+            // and runs after any internal HorizontalScrollView adjustment.
+            getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener()
+            {
+                @Override
+                public void onGlobalLayout()
+                {
+                    getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    if (!(getParent() instanceof HorizontalScrollView)) return;
+                    HorizontalScrollView sv = (HorizontalScrollView) getParent();
+
+                    float newX = getXForTimestamp(anchorTs) - focusScreenX;
+                    int maxScroll = Math.max(0, getWidth() - sv.getWidth());   // FRESH width
+                    int target = (int) newX;
+                    if (target < 0) target = 0;
+                    if (target > maxScroll) target = maxScroll;
+                    sv.scrollTo(target, 0);
+                }
+            });
         }
     }
 
@@ -242,6 +275,14 @@ public class HistoryChartView extends View
         final int h = getHeight();
         if (w == 0 || h == 0) return;
 
+        // Apply visual matrix zoom during the pinch gesture
+        boolean applyMatrix = isZooming && liveScaleFactor != 1f;
+        if (applyMatrix)
+        {
+            canvas.save();
+            canvas.scale(liveScaleFactor, 1f, livePivotX, 0f);
+        }
+
         final long now = System.currentTimeMillis();
         final long startTs = now - WINDOW_MS;                 // left edge = 24h ago
         final long endTs = startTs + (WINDOW_MS + RIGHT_PAD_MINUTES * 60000L); // right edge = now + pad
@@ -251,23 +292,19 @@ public class HistoryChartView extends View
         final int maxLanes = TRIFAGlobals.APP_STATE.values().length;
         float density = getResources().getDisplayMetrics().density;
 
-        // 1. Calculate the fixed vertical space used by captions and padding
+        // 1. Fixed vertical space used by captions and padding
         float fixedVerticalPadding = (2f * PUSH_LABEL_PAD_DP * density) + (EXPORT_BOTTOM_PAD_DP * density);
 
-        // 2. Total number of horizontal lanes we need to draw (States + 3 Push + 1 No-Internet)
+        // 2. Total number of horizontal lanes (States + 3 Push + 1 No-Internet)
         int totalLaneSlots = maxLanes + 4;
 
-        // 3. DYNAMIC LANE HEIGHT:
-        // Calculate the maximum height a lane can be without exceeding the View's actual pixel height (h)
+        // 3. DYNAMIC LANE HEIGHT: shrink lanes if the screen is too short (prevents clipping)
         float idealLaneHeight = LANE_HEIGHT_DP * density;
         float maxAvailableLaneHeight = (h - fixedVerticalPadding) / totalLaneSlots;
-
-        // Use the ideal height, but shrink it if the screen is too short to prevent clipping
         final float laneHeight = Math.min(idealLaneHeight, Math.max(4f * density, maxAvailableLaneHeight));
         final float squareSize = Math.max(3f, Math.min(laneHeight * 0.75f, minuteWidthPx * 0.9f));
 
         // Hour grid + labels. Lines run across the FULL span (incl. padding strip)
-        // so the blank area reads as a ruler; labels only up to "now".
         for (long hh = ceilToHour(startTs); hh <= endTs; hh += 3600000L)
         {
             float x = (hh - startTs) / 60000f * minuteWidthPx;
@@ -284,16 +321,19 @@ public class HistoryChartView extends View
         else if (currentDpPerMinute >= 15) gridIntervalMs = 300000L; // 5 mins
         else if (currentDpPerMinute >= 5) gridIntervalMs = 900000L;  // 15 mins
 
-        if (gridIntervalMs < 3600000L) {
+        if (gridIntervalMs < 3600000L)
+        {
             Paint subGridPaint = new Paint();
             subGridPaint.setColor(Color.parseColor("#2A2A2A"));
             subGridPaint.setStrokeWidth(1f);
-            for (long t = ceilToInterval(startTs, gridIntervalMs); t <= endTs; t += gridIntervalMs) {
+            for (long t = ceilToInterval(startTs, gridIntervalMs); t <= endTs; t += gridIntervalMs)
+            {
                 if (t % 3600000L == 0) continue;
                 float x = (t - startTs) / 60000f * minuteWidthPx;
                 canvas.drawLine(x, 0, x, h, subGridPaint);
 
-                if ((currentDpPerMinute >= 20) && (t <= now)) {
+                if ((currentDpPerMinute >= 20) && (t <= now))
+                {
                     String subLabel = new SimpleDateFormat("mm", Locale.US).format(new Date(t));
                     textPaint.setTextSize(20f);
                     textPaint.setColor(Color.parseColor("#666666"));
@@ -304,23 +344,21 @@ public class HistoryChartView extends View
             }
         }
 
-        // NOW marker: drawn at the TRUE now position (left of the right edge),
-        // so the latest data has breathing room to its right.
+        // NOW marker: drawn at the TRUE now position (left of the right edge)
         final float nowX = xOf(now, startTs, minuteWidthPx);
         textPaint.setColor(Color.WHITE);
         canvas.drawLine(nowX, 0, nowX, h, textPaint);
         textPaint.setColor(Color.parseColor("#DDDDDD"));
 
         // ====================================================================
-        // PARALLEL STATE LANES: Draw each enum state independently using the
-        // new boolean[][] app_state_histories ring buffer.
-        // Drawn as individual squares per minute, exactly like the push boxes.
+        // PARALLEL STATE LANES: one independent track per APP_STATE.
+        // Individual squares per minute (like the push boxes) + ASLEEP gap bars.
         // ====================================================================
-
-        // Check if we have ANY valid timestamps in the shared TS array
         boolean hasData = false;
-        for (int i = 0; i < TrifaToxService.HISTORY_SIZE; i++) {
-            if (TrifaToxService.app_state_history_ts[i] > 0) {
+        for (int i = 0; i < TrifaToxService.HISTORY_SIZE; i++)
+        {
+            if (TrifaToxService.app_state_history_ts[i] > 0)
+            {
                 hasData = true;
                 break;
             }
@@ -329,7 +367,6 @@ public class HistoryChartView extends View
         if (!hasData)
         {
             textPaint.setTextSize(44f);
-            // Draw "No data" in the middle of the packed lanes area
             canvas.drawText("No data yet - waiting for first sample ...", 60, (maxLanes * laneHeight) / 2f, textPaint);
             textPaint.setTextSize(30f);
         }
@@ -338,7 +375,7 @@ public class HistoryChartView extends View
             int currentIndex = TrifaToxService.app_state_history_index;
             long prevTs = -1;
 
-            // Walk through the entire ring buffer chronologically
+            // Walk the ring buffer chronologically
             for (int offset = 0; offset < TrifaToxService.HISTORY_SIZE; offset++)
             {
                 int idx = (currentIndex + offset) % TrifaToxService.HISTORY_SIZE;
@@ -348,7 +385,7 @@ public class HistoryChartView extends View
                 if (ts < startTs) { prevTs = ts; continue; }
                 if (ts > now) break;
 
-                // 1. Fill gaps between recordings with an ASLEEP bar (exactly like the old version)
+                // 1. Fill gaps between recordings with an ASLEEP bar
                 if (prevTs > 0 && (ts - prevTs) > 60000L)
                 {
                     drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx),
@@ -378,19 +415,17 @@ public class HistoryChartView extends View
 
         // ====================================================================
         // Push notification section: 3 lanes at the very bottom.
-        //   top    = RED    -> flood  (count >= PUSH_FLOOD_THRESHOLD_PER_MINUTE)
-        //   middle = ORANGE -> warning (count >= PUSH_WARN_THRESHOLD_PER_MINUTE)
-        //   bottom = GREEN  -> normal  (count >= 1)
-        // One square per minute, colored by how many pushes arrived in that minute.
+        //   top    = RED    -> flood
+        //   middle = ORANGE -> warning
+        //   bottom = GREEN  -> normal
         // ====================================================================
         final float pushSectionTop = maxLanes * laneHeight;          // separator position
         final float labelPad = PUSH_LABEL_PAD_DP * density;          // caption band height
         final float pushLanesTop = pushSectionTop + labelPad;        // 3 lanes start below caption
 
-        // subtle separator line between the state lanes and the push section
         canvas.drawLine(0, pushSectionTop, w, pushSectionTop, linePaint);
 
-        // caption, right-aligned to the NOW edge so it sits just left of the padding strip
+        // caption, right-aligned to the NOW edge
         {
             String pushCaption = "push/min   green<" + PUSH_WARN_THRESHOLD_PER_MINUTE +
                                  "   orange>=" + PUSH_WARN_THRESHOLD_PER_MINUTE +
@@ -455,22 +490,17 @@ public class HistoryChartView extends View
             canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
         }
 
-
         // ====================================================================
         // No-Internet lane: ONE lane below the 3 push lanes.
-        // Shows, independent of state priority, every minute where the OS had
-        // no connectivity. Consecutive minutes are merged into outage bars.
-        // Color is tied to STATE_NO_INTERNET.color so it matches the state block.
+        // Consecutive minutes are merged into outage bars.
         // ====================================================================
-        final float noInternetLaneTop = pushLanesTop + (3f * laneHeight);   // directly below green push lane
-        final float niLabelPad        = PUSH_LABEL_PAD_DP * density;        // caption band, same as push section
+        final float noInternetLaneTop = pushLanesTop + (3f * laneHeight);
+        final float niLabelPad        = PUSH_LABEL_PAD_DP * density;
         final float noInternetY       = noInternetLaneTop + niLabelPad + (laneHeight - squareSize) / 2f;
-        final int noInternetColor     = TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.color;
+        final int   noInternetColor   = TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.color;
 
-        // separator between push section and no-internet lane
         canvas.drawLine(0, noInternetLaneTop, w, noInternetLaneTop, linePaint);
 
-        // caption, right-anchored to "now" so it stays visible in the default view
         {
             String niCaption = "no internet";
             textPaint.setTextSize(11f * density);
@@ -483,38 +513,28 @@ public class HistoryChartView extends View
         if (hasData)
         {
             squarePaint.setColor(noInternetColor);
-            boolean ni_in_run  = false;
-            float   ni_run_x1  = 0f;
-            float   ni_run_x2  = 0f;
+            boolean ni_in_run = false;
+            float ni_run_x1 = 0f;
+            float ni_run_x2 = 0f;
 
             int oldest2 = (TrifaToxService.app_state_history_index - TrifaToxService.HISTORY_SIZE + TrifaToxService.HISTORY_SIZE) %
                           TrifaToxService.HISTORY_SIZE;
 
             for (int i = 0; i < TrifaToxService.HISTORY_SIZE; i++)
             {
-                int  idx = (oldest2 + i) % TrifaToxService.HISTORY_SIZE;
-                long ts  = TrifaToxService.app_state_history_ts[idx];
+                int idx = (oldest2 + i) % TrifaToxService.HISTORY_SIZE;
+                long ts = TrifaToxService.app_state_history_ts[idx];
                 if (ts <= 0) continue;
-
-                if (ts > now)
-                {
-                    break;            // ring is chronological
-                }
+                if (ts > now) break;            // ring is chronological
 
                 if (TrifaToxService.no_internet_history[idx])
                 {
-                    if (ts < startTs)
-                    {
-                        continue;     // older than 24h window (head of ring)
-                    }
+                    if (ts < startTs) continue; // older than 24h window (head of ring)
 
                     float x1 = xOf(ts, startTs, minuteWidthPx);
                     float x2 = xOf(ts + TrifaToxService.MINUTE_IN_MILLIS, startTs, minuteWidthPx);
                     if (x2 > nowX) x2 = nowX;   // never draw into the right padding strip
-                    if (x2 <= x1)
-                    {
-                        continue;
-                    }
+                    if (x2 <= x1) continue;
 
                     if (!ni_in_run)
                     {
@@ -549,14 +569,18 @@ public class HistoryChartView extends View
             }
         }
 
-        // Touch Marker
-        if (isTouching && touchX >= 0 && touchX <= w) {
+        // Restore canvas BEFORE drawing UI overlays so they don't get stretched
+        if (applyMatrix) canvas.restore();
+
+        // Touch Marker (drawn unstretched, hidden while pinch-zooming)
+        if (isTouching && !isZooming && touchX >= 0 && touchX <= w)
+        {
             Paint markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             markerPaint.setColor(Color.WHITE);
             markerPaint.setStrokeWidth(2f);
             canvas.drawLine(touchX, 0, touchX, h, markerPaint);
 
-            long timeAtTouch = startTs + (long)((touchX / minuteWidthPx) * 60000f);
+            long timeAtTouch = startTs + (long) ((touchX / minuteWidthPx) * 60000f);
             String timeStr = new SimpleDateFormat("HH:mm:ss", Locale.US).format(new Date(timeAtTouch));
 
             Paint badgePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -608,7 +632,6 @@ public class HistoryChartView extends View
         int s = state;
         if (s < 0 || s >= maxLanes) s = 0;
 
-        // Draw tightly packed starting from y=0 (top of screen)
         // Highest priority (15) -> y=0. Lowest priority (0) -> y=15*laneHeight
         float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
 
@@ -616,7 +639,7 @@ public class HistoryChartView extends View
         canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
     }
 
-    /** Draws a continuous bar spanning multiple minutes for a specific state lane (used for ASLEEP gaps). */
+    /** Draws a continuous bar spanning multiple minutes (used for ASLEEP gaps). */
     private void drawBar(Canvas canvas, float x1, float x2, int state, float laneHeight, float squareSize, int w, int maxLanes)
     {
         if (x2 <= 0 || x1 >= w) return;
@@ -625,23 +648,9 @@ public class HistoryChartView extends View
         int s = state;
         if (s < 0 || s >= maxLanes) s = 0;
 
-        // Draw tightly packed starting from y=0 (top of screen)
         float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
 
         squarePaint.setColor(TRIFAGlobals.APP_STATE.getColorForState(s));
-        canvas.drawRoundRect(new RectF(x1, y, x2, y + squareSize), 4f, 4f, squarePaint);
-    }
-
-    /** Helper for the parallel loop to draw a bar segment without recalculating Y repeatedly. */
-    private void drawBarRect(Canvas canvas, float x1, float x2, int state, float laneHeight, float squareSize, int w, int maxLanes)
-    {
-        if (x2 <= 0 || x1 >= w) return;
-        x1 = Math.max(0, x1);
-        x2 = Math.min(w, x2);
-        int s = state;
-        if (s < 0 || s >= maxLanes) s = 0;
-
-        float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
         canvas.drawRoundRect(new RectF(x1, y, x2, y + squareSize), 4f, 4f, squarePaint);
     }
 }
