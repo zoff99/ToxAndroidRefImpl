@@ -36,6 +36,7 @@ import androidx.core.app.NotificationCompat;
 import static com.zoffcc.applications.trifa.HelperGeneric.append_logger_msg;
 import static com.zoffcc.applications.trifa.HelperGeneric.trigger_proper_wakeup_outside_tox_service_thread;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
+import static com.zoffcc.applications.trifa.TrifaToxService.record_push_notification;
 import static com.zoffcc.applications.trifa.TrifaToxService.trifa_service_thread;
 
 public class MyExternReceiver extends BroadcastReceiver
@@ -166,8 +167,9 @@ public class MyExternReceiver extends BroadcastReceiver
                         append_logger_msg(TAG + "::" + "need_wakeup_now trigger 002");
                         // Pass the exact reason to the trigger method
                         trigger_proper_wakeup_outside_tox_service_thread("PUSH_NTFY");
-
                     }
+
+                    record_push_notification("PUSH_NTFY");
                 }
                 catch (Exception e)
                 {

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+/** @noinspection ExtractMethodRecommender*/
 public class HistoryChartActivity extends AppCompatActivity
 {
     private HorizontalScrollView scrollView;

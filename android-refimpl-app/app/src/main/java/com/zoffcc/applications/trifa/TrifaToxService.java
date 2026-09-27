@@ -261,6 +261,13 @@ public class TrifaToxService extends Service
     public static final long[] last_awake_durations = new long[MAX_WAKEUP_HISTORY];
     public static int wakeup_ring_index = 0;
 
+    // [ADDED] Push notification event history (exact timestamps), own ring buffer
+    public static final int PUSH_HISTORY_SIZE = 2048;
+    public static final long[] push_history_ts = new long[PUSH_HISTORY_SIZE];
+    public static int push_history_index = 0;
+    public static int push_history_count = 0;
+    public static long push_flood_last_log_ts = 0;
+
     // Tracks when the current awake period started.
     // IMPORTANT: Initialize this right before your main `while(!stop_me)` loop starts!
     public static volatile long last_awake_start_time_ms = 0;
@@ -464,6 +471,32 @@ public class TrifaToxService extends Service
         iconView.setImageResource(iconRes);
         textView.setText(displayText);
         textView.setTextColor(textColor);
+    }
+
+    /**
+     * Records ONE incoming push notification with its exact timestamp.
+     * Ring is chronological, so flood scanning can stop early.
+     */
+    public static synchronized void record_push_notification(String reason)
+    {
+        long now = System.currentTimeMillis();
+        push_history_ts[push_history_index] = now;
+        push_history_index = (push_history_index + 1) % PUSH_HISTORY_SIZE;
+        if (push_history_count < PUSH_HISTORY_SIZE) push_history_count++;
+
+        // --- flood detection: >= 10 pushes within 60 seconds ---
+        int recent = 0;
+        for (int i = 1; i <= push_history_count; i++)
+        {
+            int idx = (push_history_index - i + PUSH_HISTORY_SIZE) % PUSH_HISTORY_SIZE;
+            if ((now - push_history_ts[idx]) <= 60000) recent++;
+            else break; // chronological ring -> safe to stop
+        }
+        if ((recent >= 10) && ((now - push_flood_last_log_ts) > 60000))
+        {
+            push_flood_last_log_ts = now;
+            HelperGeneric.battery_sleep_log_add("PUSH_FLOOD:count=" + recent + " in 60s|reason=" + reason);
+        }
     }
 
     @Override

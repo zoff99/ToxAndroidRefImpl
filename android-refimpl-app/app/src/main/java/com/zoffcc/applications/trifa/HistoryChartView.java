@@ -270,6 +270,32 @@ public class HistoryChartView extends View
                     TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
         }
 
+        // [ADDED] Push notification lane: separate lane at the very bottom,
+        // one square per push at its EXACT timestamp (floods become a solid streak)
+        final float pushLaneTop = maxLanes * laneHeight; // directly below STATE_UNKNOWN lane
+        final float pushLaneY = pushLaneTop + (laneHeight - squareSize) / 2f;
+
+        // subtle separator line between state lanes and push lane
+        canvas.drawLine(0, pushLaneTop, w, pushLaneTop, linePaint);
+
+        if (TrifaToxService.push_history_count > 0)
+        {
+            squarePaint.setColor(0xFFFF4081); // pink/magenta = push
+            int pstart = (TrifaToxService.push_history_index - TrifaToxService.push_history_count
+                          + TrifaToxService.PUSH_HISTORY_SIZE) % TrifaToxService.PUSH_HISTORY_SIZE;
+            for (int i = 0; i < TrifaToxService.push_history_count; i++)
+            {
+                long pts = TrifaToxService.push_history_ts[(pstart + i) % TrifaToxService.PUSH_HISTORY_SIZE];
+                if (pts <= 0) continue;
+                if (pts < startTs) continue;   // older than 24h window
+                if (pts > now) break;          // ring is chronological
+                float x = xOf(pts, startTs, minuteWidthPx);
+                if (x < -squareSize || x > w) continue;
+                canvas.drawRoundRect(new RectF(x, pushLaneY, x + squareSize, pushLaneY + squareSize),
+                                     4f, 4f, squarePaint);
+            }
+        }
+
         // Touch Marker
         if (isTouching && touchX >= 0 && touchX <= w) {
             Paint markerPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
