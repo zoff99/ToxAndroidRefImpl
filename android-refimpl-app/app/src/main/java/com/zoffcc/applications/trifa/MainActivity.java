@@ -6108,22 +6108,51 @@ public class MainActivity extends AppCompatActivity
             }
             else
             {
-                global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                // Only record the offline timestamp if we actually transitioned from online to offline
+                if (connection_status_prev != TOX_CONNECTION_NONE.value)
+                {
+                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                }
             }
         }
         else
         {
             if (a_TOX_CONNECTION != 0)
             {
-                global_self_last_went_online_timestamp = System.currentTimeMillis();
-                global_self_last_went_offline_timestamp = -1;
+                boolean was_offline = (connection_status_prev == TOX_CONNECTION_NONE.value);
+                if (was_offline)
+                {
+                    long offline_duration = 0;
+                    if (global_self_last_went_offline_timestamp > 0) {
+                        offline_duration = System.currentTimeMillis() - global_self_last_went_offline_timestamp;
+                    }
 
-                Log.i(TAG, "self_connection_status:went_online");
-                // TODO: stop any active calls
+                    // Ignore micro-drops (< 5 seconds) to prevent transport flips from resetting the battery sleep timer
+                    if (offline_duration > 5000 || global_self_last_went_online_timestamp <= 0)
+                    {
+                        global_self_last_went_online_timestamp = System.currentTimeMillis();
+                        Log.i(TAG, "self_connection_status:went_online (real, offline_duration=" + offline_duration + "ms)");
+                    }
+                    else
+                    {
+                        Log.i(TAG, "self_connection_status:ignoring short offline dip (" + offline_duration + "ms)");
+                    }
+                }
+                else
+                {
+                    // Transport change (e.g., TCP to UDP) while already online. Do not reset timer.
+                    Log.i(TAG, "self_connection_status:transport_change_while_online");
+                }
+                global_self_last_went_offline_timestamp = -1;
             }
             else
             {
-                global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                // Only record the offline timestamp if we actually transitioned from online to offline
+                if (connection_status_prev != TOX_CONNECTION_NONE.value)
+                {
+                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                    Log.i(TAG, "self_connection_status:went_offline");
+                }
             }
         }
 
