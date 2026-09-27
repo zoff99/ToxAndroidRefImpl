@@ -331,6 +331,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_USER_STATUS.TOX_USER_STA
 import static com.zoffcc.applications.trifa.TrifaToxService.TOX_SERVICE_STARTED;
 import static com.zoffcc.applications.trifa.TrifaToxService.attachToxGcHealthUIViews;
 import static com.zoffcc.applications.trifa.TrifaToxService.attachToxHealthUIViews;
+import static com.zoffcc.applications.trifa.TrifaToxService.battery_sleep_start_ms;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.manually_logged_out;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -791,16 +792,21 @@ public class MainActivity extends AppCompatActivity
             TextView toxHealthText = findViewById(R.id.tox_health_text);
             attachToxHealthUIViews(toxHealthIcon, toxHealthText);
 
-            // [ADDED] Set initial health state
-            int current_health_init = tox_self_get_network_health();
-            updateToxHealthUI(current_health_init);
+            if (battery_sleep_start_ms == 0)
+            {
+                int current_health_init = tox_self_get_network_health();
+                updateToxHealthUI(current_health_init);
+            }
 
             ImageView toxGcHealthIcon = findViewById(R.id.tox_gc_health_icon);
             TextView toxGcHealthText = findViewById(R.id.tox_gc_health_text);
             attachToxGcHealthUIViews(toxGcHealthIcon, toxGcHealthText);
 
-            int current_gc_health_init = tox_group_get_health();
-            updateToxGcHealthUI(current_gc_health_init);
+            if (battery_sleep_start_ms == 0)
+            {
+                int current_gc_health_init = tox_group_get_health();
+                updateToxGcHealthUI(current_gc_health_init);
+            }
         }
         catch(Exception e)
         {
@@ -4950,13 +4956,13 @@ public class MainActivity extends AppCompatActivity
     public static native long tox_group_mid_offline_count(String group_id);
 
     /**
-     *
      * @param enable 1 to enable the ngc mid feature, 0 to disable
      */
     public static native void ngcmidenable(int enable);
 
     /**
      * Get middleware custom packet network stats.
+     *
      * @return long array of size 2: [sent_bytes, recv_bytes], or null if unavailable.
      */
     public static native long[] tox_group_mid_get_network_stats();

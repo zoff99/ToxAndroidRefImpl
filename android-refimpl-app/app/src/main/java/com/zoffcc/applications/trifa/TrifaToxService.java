@@ -1684,6 +1684,9 @@ public class TrifaToxService extends Service
                             global_self_last_went_offline_timestamp = System.currentTimeMillis();
                             global_self_connection_status = TOX_CONNECTION_NONE.value;
 
+                            try { updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+                            try { updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+
                             long sleep_in_sec = BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
                             // add some random value, so that the sleep is not always exactly the same
                             sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
@@ -1716,6 +1719,8 @@ public class TrifaToxService extends Service
                             }
                             else
                             {
+                                try { updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+                                try { updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
                                 try
                                 {
                                     Thread.sleep(sleep_in_sec * 1000); // android OS freezes CPU here
@@ -1768,6 +1773,7 @@ public class TrifaToxService extends Service
                                       "|trig=" + wakeup_trigger_reason;
                         append_logger_msg(TAG + "::" + info);
                         HelperGeneric.battery_sleep_log_add(info);
+                        battery_sleep_start_ms = 0;
                     }
 
                     try
