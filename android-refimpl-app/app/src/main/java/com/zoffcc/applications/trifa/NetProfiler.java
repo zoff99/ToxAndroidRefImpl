@@ -2,6 +2,7 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,6 +20,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +38,11 @@ import static com.zoffcc.applications.trifa.TrifaToxService.tox_startup_timestam
 /** @noinspection ALL*/
 public class NetProfiler extends AppCompatActivity {
     private static final String TAG = "trifa.NetProfiler";
+
+    // Exporter configuration
+    private static final int REQ_EXPORT_TREE = 0x52;
+    private static final String PREF_EXPORT_TREE_URI = "netprofiler_export_tree_uri";
+    private DocumentExporter documentExporter;
 
     // UI Elements
     private TextView tvSentBytes, tvSentRate, tvSentPkts;
@@ -70,6 +79,9 @@ public class NetProfiler extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_netprofiler);
+
+        // Initialize the reusable exporter
+        documentExporter = new DocumentExporter(this, PREF_EXPORT_TREE_URI, REQ_EXPORT_TREE);
 
         // Bind views
         tvSentBytes = findViewById(R.id.tv_sent_bytes);
@@ -144,6 +156,15 @@ public class NetProfiler extends AppCompatActivity {
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        // Let the exporter handle the SAF result
+        if (documentExporter != null) {
+            documentExporter.handleActivityResult(requestCode, resultCode, data);
+        }
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         startPolling();
@@ -169,15 +190,45 @@ public class NetProfiler extends AppCompatActivity {
         }
     }
 
+    private String getTimestamp() {
+        return new java.text.SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(new java.util.Date());
+    }
+
+    private void exportTextFile(String fileName, String content) {
+        documentExporter.ensureDirectory(() -> {
+            new Thread(() -> {
+                try {
+                    Uri fileUri = documentExporter.createFileUri(fileName, "text/plain");
+                    if (fileUri == null) {
+                        runOnUiThread(() -> Toast.makeText(this, "Export failed: cannot create file", Toast.LENGTH_SHORT).show());
+                        return;
+                    }
+                    try (OutputStream os = getContentResolver().openOutputStream(fileUri, "w")) {
+                        if (os == null) {
+                            runOnUiThread(() -> Toast.makeText(this, "Export failed: cannot open stream", Toast.LENGTH_SHORT).show());
+                            return;
+                        }
+                        os.write(content.getBytes(StandardCharsets.UTF_8));
+                        os.flush();
+                    }
+                    runOnUiThread(() -> Toast.makeText(this, "Saved: " + fileName, Toast.LENGTH_SHORT).show());
+                } catch (Exception e) {
+                    runOnUiThread(() -> Toast.makeText(this, "Export failed: " + e.getMessage(), Toast.LENGTH_SHORT).show());
+                }
+            }, "netprofiler-export").start();
+        }, error -> runOnUiThread(() -> Toast.makeText(this, error, Toast.LENGTH_SHORT).show()));
+    }
+
     private void showSleepLogDialog() {
         // Fetch the dump from HelperGeneric
         String logDump = HelperGeneric.battery_sleep_log_dump();
+        boolean hasData = logDump != null && !logDump.trim().isEmpty();
 
         // Create a ScrollView and TextView for the dialog content
         android.widget.ScrollView scrollView = new android.widget.ScrollView(this);
         android.widget.TextView textView = new android.widget.TextView(this);
 
-        textView.setText(logDump);
+        textView.setText(hasData ? logDump : "No log entries available.");
         textView.setTypeface(android.graphics.Typeface.MONOSPACE);
         textView.setTextSize(12); // Smaller text for better log readability
         textView.setPadding(30, 30, 30, 30);
@@ -186,22 +237,19 @@ public class NetProfiler extends AppCompatActivity {
         scrollView.addView(textView);
 
         // Build and show the dialog
-        new androidx.appcompat.app.AlertDialog.Builder(this)
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Tox Sleep Prevention Log")
                 .setView(scrollView)
-                .setPositiveButton("Close", null)
-                .show();
-        /*
-                .setNeutralButton("Clear Log", (dialog, which) -> {
-            // Reset the ring buffer when user clicks "Clear"
-            for (int i = 0; i < HelperGeneric.BATTERY_SLEEP_LOG_MAX_ENTRIES; i++) {
-                HelperGeneric.battery_sleep_log_ring[i] = null;
-            }
-            HelperGeneric.battery_sleep_log_ring_index = 0;
-            HelperGeneric.battery_sleep_log_ring_count = 0;
-            android.widget.Toast.makeText(this, "Log cleared", android.widget.Toast.LENGTH_SHORT).show();
-        })
-         */
+                .setPositiveButton("Close", null);
+
+        if (hasData) {
+            builder.setNeutralButton("Export Log", (dialog, which) -> {
+                String fileName = "tox_sleep_log_" + getTimestamp() + ".txt";
+                exportTextFile(fileName, logDump);
+            });
+        }
+
+        builder.show();
     }
 
     private void pollNetworkStats() {
@@ -472,11 +520,21 @@ public class NetProfiler extends AppCompatActivity {
             }
         }
 
-        new androidx.appcompat.app.AlertDialog.Builder(this)
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(this)
                 .setTitle("Sleep / Wake Cycle History")
-                .setMessage(hasHistory ? sb.toString() : "No wakeups recorded yet")
-                .setPositiveButton("OK", null)
-                .show();
+                .setPositiveButton("OK", null);
+
+        if (hasHistory) {
+            builder.setMessage(sb.toString());
+            builder.setNeutralButton("Export Log", (dialog, which) -> {
+                String fileName = "tox_wakeup_history_" + getTimestamp() + ".txt";
+                exportTextFile(fileName, sb.toString());
+            });
+        } else {
+            builder.setMessage("No wakeups recorded yet");
+        }
+
+        builder.show();
     }
 
     private String formatDurationShort(long ms) {
