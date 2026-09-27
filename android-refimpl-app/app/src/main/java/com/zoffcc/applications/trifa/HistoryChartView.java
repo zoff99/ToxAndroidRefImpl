@@ -23,6 +23,10 @@ public class HistoryChartView extends View
 {
     private static final long WINDOW_MS = 24L * 60L * 60L * 1000L;
 
+    // Blank "breathing room" appended AFTER now, so the latest data is not flush
+    // against the right edge. The view is widened by this many minutes.
+    private static final int RIGHT_PAD_MINUTES = 5;
+
     private static final float MIN_DP_PER_MINUTE = 2.0f;
     private static final float MAX_DP_PER_MINUTE = 60.0f;
 
@@ -80,8 +84,9 @@ public class HistoryChartView extends View
     {
         float density = getResources().getDisplayMetrics().density;
 
-        // 1. Calculate dynamic width based on current zoom level
-        int wantedWidthPx = (int) (1440 * currentDpPerMinute * density);
+        // 1. Width covers the 24h window PLUS the right padding strip
+        int totalSpanMinutes = 1440 + RIGHT_PAD_MINUTES;
+        int wantedWidthPx = (int) (totalSpanMinutes * currentDpPerMinute * density);
         widthMeasureSpec = MeasureSpec.makeMeasureSpec(wantedWidthPx, MeasureSpec.EXACTLY);
 
         // 2. Let the height be dictated by the parent (MATCH_PARENT) so it fills the screen
@@ -194,8 +199,10 @@ public class HistoryChartView extends View
         if (w == 0 || h == 0) return;
 
         final long now = System.currentTimeMillis();
-        final long startTs = now - WINDOW_MS;
-        final float minuteWidthPx = w / 1440f;
+        final long startTs = now - WINDOW_MS;                 // left edge = 24h ago
+        final long endTs = startTs + (WINDOW_MS + RIGHT_PAD_MINUTES * 60000L); // right edge = now + pad
+        final int totalSpanMinutes = 1440 + RIGHT_PAD_MINUTES;
+        final float minuteWidthPx = w / (float) totalSpanMinutes;
 
         final int maxLanes = TRIFAGlobals.APP_STATE.values().length;
         float density = getResources().getDisplayMetrics().density;
@@ -204,12 +211,16 @@ public class HistoryChartView extends View
         final float laneHeight = LANE_HEIGHT_DP * density;
         final float squareSize = Math.max(3f, Math.min(laneHeight * 0.75f, minuteWidthPx * 0.9f));
 
-        // Hour grid + labels (spans full screen height for visual guidance)
-        for (long hh = ceilToHour(startTs); hh <= now; hh += 3600000L)
+        // Hour grid + labels. Lines run across the FULL span (incl. padding strip)
+        // so the blank area reads as a ruler; labels only up to "now".
+        for (long hh = ceilToHour(startTs); hh <= endTs; hh += 3600000L)
         {
             float x = (hh - startTs) / 60000f * minuteWidthPx;
             canvas.drawLine(x, 0, x, h, linePaint);
-            canvas.drawText(hourFmt.format(new Date(hh)) + ":00", x + 6, 36, textPaint);
+            if (hh <= now)
+            {
+                canvas.drawText(hourFmt.format(new Date(hh)) + ":00", x + 6, 36, textPaint);
+            }
         }
 
         // Dynamic sub-gridlines based on zoom level
@@ -222,12 +233,12 @@ public class HistoryChartView extends View
             Paint subGridPaint = new Paint();
             subGridPaint.setColor(Color.parseColor("#2A2A2A"));
             subGridPaint.setStrokeWidth(1f);
-            for (long t = ceilToInterval(startTs, gridIntervalMs); t <= now; t += gridIntervalMs) {
+            for (long t = ceilToInterval(startTs, gridIntervalMs); t <= endTs; t += gridIntervalMs) {
                 if (t % 3600000L == 0) continue;
                 float x = (t - startTs) / 60000f * minuteWidthPx;
                 canvas.drawLine(x, 0, x, h, subGridPaint);
 
-                if (currentDpPerMinute >= 20) {
+                if ((currentDpPerMinute >= 20) && (t <= now)) {
                     String subLabel = new SimpleDateFormat("mm", Locale.US).format(new Date(t));
                     textPaint.setTextSize(20f);
                     textPaint.setColor(Color.parseColor("#666666"));
@@ -238,9 +249,11 @@ public class HistoryChartView extends View
             }
         }
 
-        // NOW marker (spans full screen height)
+        // NOW marker: drawn at the TRUE now position (left of the right edge),
+        // so the latest data has breathing room to its right.
+        final float nowX = xOf(now, startTs, minuteWidthPx);
         textPaint.setColor(Color.WHITE);
-        canvas.drawLine(w - 2, 0, w - 2, h, textPaint);
+        canvas.drawLine(nowX, 0, nowX, h, textPaint);
         textPaint.setColor(Color.parseColor("#DDDDDD"));
 
         int count = TrifaToxService.app_state_history_count;
@@ -276,15 +289,16 @@ public class HistoryChartView extends View
                 prevTs = ts;
             }
 
+            // trailing asleep bar ends at "now", not at the right edge
             if (prevTs > 0 && (now - prevTs) > 60000L)
             {
-                drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx), w,
+                drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx), nowX,
                         TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
             }
         }
 
         // ====================================================================
-        // [ADDED] Push notification section: 3 lanes at the very bottom.
+        // Push notification section: 3 lanes at the very bottom.
         //   top    = RED    -> flood  (count >= PUSH_FLOOD_THRESHOLD_PER_MINUTE)
         //   middle = ORANGE -> warning (count >= PUSH_WARN_THRESHOLD_PER_MINUTE)
         //   bottom = GREEN  -> normal  (count >= 1)
@@ -297,7 +311,7 @@ public class HistoryChartView extends View
         // subtle separator line between the state lanes and the push section
         canvas.drawLine(0, pushSectionTop, w, pushSectionTop, linePaint);
 
-        // caption, right-aligned so it is visible at "now"
+        // caption, right-aligned to the NOW edge so it sits just left of the padding strip
         {
             String pushCaption = "push/min   green<" + PUSH_WARN_THRESHOLD_PER_MINUTE +
                                  "   orange>=" + PUSH_WARN_THRESHOLD_PER_MINUTE +
@@ -305,7 +319,7 @@ public class HistoryChartView extends View
             textPaint.setTextSize(11f * density);
             textPaint.setColor(Color.parseColor("#B0BEC5"));
             float tw = textPaint.measureText(pushCaption);
-            float cx = w - tw - (8f * density);
+            float cx = nowX - tw - (8f * density);
             if (cx < (8f * density)) cx = (8f * density);
             canvas.drawText(pushCaption, cx, pushSectionTop + (10f * density), textPaint);
         }
@@ -337,7 +351,7 @@ public class HistoryChartView extends View
         {
             long minuteTs = e.getKey() * TrifaToxService.MINUTE_IN_MILLIS;
             float x = xOf(minuteTs, startTs, minuteWidthPx);
-            if (x < -squareSize || x > w) continue;
+            if (x < -squareSize || x > nowX) continue; // never draw into the padding strip
 
             int c = e.getValue();
             int color;
