@@ -186,6 +186,35 @@
                 android:textStyle="bold"
                 android:textColor="?android:attr/textColorPrimary"/>
 
+            <!-- NEW: Tox Network Average -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tox network average"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="#00695C"
+                android:layout_marginTop="6dp"/>
+
+            <TextView
+                android:id="@+id/tv_net_avg_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="send: 0 B/s\nrecv: 0 B/s"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"/>
+
+            <TextView
+                android:id="@+id/tv_net_24h_value"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="24hrs: 0 B"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="?android:attr/textColorPrimary"/>
+            <!-- END NEW -->
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -56,6 +56,8 @@ public class NetProfiler extends AppCompatActivity {
     private TextView tvSentHeatRate, tvRecvHeatRate, tvCpuHeatRate;
     private RecyclerView rvPackets;
     private TextView tvWakeupHistory;
+    private TextView tvNetAvgValue;
+    private TextView tvNet24hValue;
 
     private ViewGroup tv_os_deep_sleep_container;
 
@@ -99,6 +101,8 @@ public class NetProfiler extends AppCompatActivity {
         tvUptimeValue = findViewById(R.id.tv_uptime_value);
         tvSleepValue = findViewById(R.id.tv_sleep_value);
         tvDeepSleepValue = findViewById(R.id.tv_deepsleep_value);
+        tvNetAvgValue = findViewById(R.id.tv_net_avg_value);
+        tvNet24hValue = findViewById(R.id.tv_net_24h_value);
 
         viewSentHeat = findViewById(R.id.view_sent_heat);
         viewRecvHeat = findViewById(R.id.view_recv_heat);
@@ -391,6 +395,28 @@ public class NetProfiler extends AppCompatActivity {
 
         long uptimeMillis = System.currentTimeMillis() - tox_startup_timestamp;
         tvUptimeValue.setText(formatUptime(uptimeMillis));
+
+        // Calculate Network Averages & 24h Estimate ---
+        double uptimeSec = uptimeMillis / 1000.0;
+        long avgSentBps = 0;
+        long avgRecvBps = 0;
+        long total24hBytes = 0;
+
+        if (uptimeSec > 0) {
+            avgSentBps = (long) (sentBytes / uptimeSec);
+            avgRecvBps = (long) (recvBytes / uptimeSec);
+
+            long totalNetBytes = sentBytes + recvBytes;
+            // (total bytes / ms since start) * ms in 24 hours (86400000)
+            total24hBytes = (long) ((double) totalNetBytes / uptimeMillis * 86400000.0);
+        }
+
+        // formatRate handles B/s -> KB/s -> MB/s -> GB/s automatically
+        tvNetAvgValue.setText("send: " + formatRate(avgSentBps) + "\nrecv: " + formatRate(avgRecvBps));
+
+        // formatBytes handles B -> KB -> MB -> GB automatically
+        tvNet24hValue.setText("24hrs: " + formatBytes(total24hBytes));
+        // -------------------------------------------------------
 
         long currently_sleeping_ms = 0;
         if (battery_sleep_start_ms > 0)
