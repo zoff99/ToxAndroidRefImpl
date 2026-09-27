@@ -43,7 +43,7 @@ public class TRIFAGlobals
     static String global_last_activity_for_battery_savings_reason = "";
     static boolean global_showing_messageview = false;
     static boolean global_showing_anygroupview = false;
-    final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 50;
+    final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 5;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
     static String global_notification_token = null;
@@ -62,6 +62,9 @@ public class TRIFAGlobals
 
     final static String TRIFA_GITHUB_REPO_URL = "https://github.com/zoff99/ToxAndroidRefImpl";
     final static String TRIFA_GITHUB_NEW_ISSUE_URL = TRIFA_GITHUB_REPO_URL + "/issues/new";
+
+    final static int FAST_ITERATION_THRESHOLD_MS = 15;
+    final static int FAST_ITERATION_THRESHOLD_DURATION_MS = 5000;
 
     static volatile boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_MIN_INTERVAL_SECS = 60; // 60 seconds

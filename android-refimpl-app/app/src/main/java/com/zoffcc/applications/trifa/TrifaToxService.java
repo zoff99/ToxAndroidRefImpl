@@ -162,6 +162,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_INIT_NAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_INIT_STATUSMSG;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ECHOBOT_TOXID;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FAST_ITERATION_THRESHOLD_DURATION_MS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.FAST_ITERATION_THRESHOLD_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOGFRIEND_ON_STARTUP_DONE_DB_KEY;
@@ -1785,8 +1787,8 @@ public class TrifaToxService extends Service
                         HelperGeneric.battery_sleep_log_add(info);
                     }
 
-                    // [ADDED] Check for sustained fast iteration (< 20ms)
-                    if (tox_iteration_interval_ms < 20)
+                    // [ADDED] Check for sustained fast iteration (< xx ms)
+                    if (tox_iteration_interval_ms < FAST_ITERATION_THRESHOLD_MS)
                     {
                         if (fast_iteration_start_ms == 0)
                         {
@@ -1795,8 +1797,8 @@ public class TrifaToxService extends Service
                         else
                         {
                             long fast_duration_ms = System.currentTimeMillis() - fast_iteration_start_ms;
-                            // Trigger warning if it stays < 20ms for 5 continuous seconds
-                            if (fast_duration_ms >= 5000 && !fast_iteration_logged)
+                            // Trigger warning if it stays < xx ms for yy continuous seconds
+                            if (fast_duration_ms >= FAST_ITERATION_THRESHOLD_DURATION_MS && !fast_iteration_logged)
                             {
                                 String info = "FAST_ITER_WARNING: interval=" + tox_iteration_interval_ms + "ms sustained for " + fast_duration_ms + "ms";
                                 append_logger_msg(TAG + "::" + info);
