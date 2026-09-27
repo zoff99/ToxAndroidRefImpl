@@ -443,7 +443,7 @@ public class TRIFAGlobals
         /** Active outgoing file transfer. */
         STATE_FT_OUT(12),
 
-        /** Offline, actively pinging DHT nodes. */
+        /** bootstraping. */
         STATE_BOOTSTRAPPING(13),
 
         /** High bytes/sec, but no active FT/Call. */
