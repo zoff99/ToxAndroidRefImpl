@@ -156,7 +156,7 @@
         <item>2</item>
     </string-array>
 
-    <string name="holter_export_tooltip">Export chart as high-res image</string>
+    <string name="stats_export_tooltip">Export chart as high-res image</string>
 
     <string name="pref_title_udp_enabled">enable UDP</string>
     <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
