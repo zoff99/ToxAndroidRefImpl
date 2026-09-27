@@ -263,6 +263,8 @@ public class TrifaToxService extends Service
 
     // [ADDED] Push notification event history (exact timestamps), own ring buffer
     public static final int PUSH_HISTORY_SIZE = 2048;
+    public static final int PUSH_FLOOD_THRESHOLD_PER_MINUTE = 10;
+    public static final int MINUTE_IN_MILLIS = 60 * 1000;
     public static final long[] push_history_ts = new long[PUSH_HISTORY_SIZE];
     public static int push_history_index = 0;
     public static int push_history_count = 0;
@@ -484,15 +486,15 @@ public class TrifaToxService extends Service
         push_history_index = (push_history_index + 1) % PUSH_HISTORY_SIZE;
         if (push_history_count < PUSH_HISTORY_SIZE) push_history_count++;
 
-        // --- flood detection: >= 10 pushes within 60 seconds ---
+        // --- flood detection: >= x pushes within 60 seconds ---
         int recent = 0;
         for (int i = 1; i <= push_history_count; i++)
         {
             int idx = (push_history_index - i + PUSH_HISTORY_SIZE) % PUSH_HISTORY_SIZE;
-            if ((now - push_history_ts[idx]) <= 60000) recent++;
+            if ((now - push_history_ts[idx]) <= MINUTE_IN_MILLIS) recent++;
             else break; // chronological ring -> safe to stop
         }
-        if ((recent >= 10) && ((now - push_flood_last_log_ts) > 60000))
+        if ((recent >= PUSH_FLOOD_THRESHOLD_PER_MINUTE) && ((now - push_flood_last_log_ts) > MINUTE_IN_MILLIS))
         {
             push_flood_last_log_ts = now;
             HelperGeneric.battery_sleep_log_add("PUSH_FLOOD:count=" + recent + " in 60s|reason=" + reason);
@@ -1809,7 +1811,7 @@ public class TrifaToxService extends Service
                     {
                         // [ADDED] Record 1-minute App State History
                         long current_time_ms2 = System.currentTimeMillis();
-                        if ((current_time_ms2 - stats_last_history_ms) >= (60 * 1000))
+                        if ((current_time_ms2 - stats_last_history_ms) >= MINUTE_IN_MILLIS)
                         {
                             stats_last_history_ms = current_time_ms2;
 
