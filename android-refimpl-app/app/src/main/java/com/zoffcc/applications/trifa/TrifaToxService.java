@@ -51,6 +51,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.core.app.ServiceCompat;
 import androidx.core.content.ContextCompat;
@@ -284,6 +285,23 @@ public class TrifaToxService extends Service
     public static long app_state_last_record_ts = 0;
     public static long last_netprof_bytes = 0; // To calculate bytes/sec
     public static long last_netprof_ts = 0;
+
+    // 24h per-minute "no internet" track, independent of state priority.
+    // Owned (written) ONLY by the tox-loop thread at sample time.
+    public static final boolean[] no_internet_history = new boolean[HISTORY_SIZE];
+
+    // The ONLY thing ConnectionManager touches: a monotonic count of
+    // "became-offline" transitions. incrementAndGet()/get() are atomic,
+    // so this replaces the cross-thread lock entirely.
+    public static final AtomicInteger no_internet_edge_count = new AtomicInteger(0);
+
+    // Tox-loop-thread-private bookkeeping (single writer => no sync needed).
+    // MUST stay int: two's-complement subtraction is exact mod 2^32, so even a
+    // future refactor from `!=` to `cur - prev` survives the MAX->MIN rollover.
+    // Do NOT widen to long before subtracting -- sign extension breaks the
+    // modular identity and the first overflow would silently drop an edge.
+    static int no_internet_last_ec = 0;
+    static boolean no_internet_prev_offline = false;
 
     public static void recordWakeup(String reason, long sleepStartMs, long sleepEndMs) {
         long sleepDuration = sleepEndMs - sleepStartMs;
@@ -1635,6 +1653,9 @@ public class TrifaToxService extends Service
                 long fast_iteration_start_ms = 0;
                 boolean fast_iteration_logged = false;
 
+                no_internet_last_ec = no_internet_edge_count.get();
+                no_internet_prev_offline = !HAVE_INTERNET_CONNECTIVITY;
+
                 while (!stop_me)
                 {
                     long iteration_start_ms = System.currentTimeMillis(); // [ADDED] Track loop start
@@ -1898,11 +1919,20 @@ public class TrifaToxService extends Service
                             // --- 4. WRITE TO RING BUFFER ---
                             app_state_history_ts[app_state_history_index] = current_time_ms2;
                             app_state_history[app_state_history_index] = current_state;
+
+                            // lock-free per-minute no-internet latch.
+                            // NOTE: compare with `!=`, never with `<`/`>`/subtraction-as-long.
+                            // `!=` is invariant under 32-bit counter rollover (see field comment).
+                            int ec = TrifaToxService.no_internet_edge_count.get();
+                            boolean cur_off = !HAVE_INTERNET_CONNECTIVITY;
+                            no_internet_history[app_state_history_index] =
+                                    no_internet_prev_offline || cur_off || (ec != no_internet_last_ec);
+                            no_internet_last_ec = ec;
+                            no_internet_prev_offline = cur_off;
+
                             app_state_history_index = (app_state_history_index + 1) % HISTORY_SIZE;
                             if (app_state_history_count < HISTORY_SIZE) app_state_history_count++;
                             app_state_last_record_ts = current_time_ms2;
-
-                            Log.i(TAG, "HHHHHHST: " + current_state);
                         }
                     }
                     catch(Exception ignored)

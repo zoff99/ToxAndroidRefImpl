@@ -20,8 +20,15 @@ import androidx.core.content.ContextCompat;
 import java.lang.ref.WeakReference;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.append_logger_msg;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.APP_STATE.STATE_NO_INTERNET;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
+import static com.zoffcc.applications.trifa.TrifaToxService.HISTORY_SIZE;
+import static com.zoffcc.applications.trifa.TrifaToxService.app_state_history;
+import static com.zoffcc.applications.trifa.TrifaToxService.app_state_history_count;
+import static com.zoffcc.applications.trifa.TrifaToxService.app_state_history_index;
+import static com.zoffcc.applications.trifa.TrifaToxService.app_state_history_ts;
 import static com.zoffcc.applications.trifa.TrifaToxService.bootstrap_me;
+import static com.zoffcc.applications.trifa.TrifaToxService.no_internet_history;
 
 public class ConnectionManager extends BroadcastReceiver
 {
@@ -120,6 +127,19 @@ public class ConnectionManager extends BroadcastReceiver
             if (haveInternetOrNull != null)
             {
                 HAVE_INTERNET_CONNECTIVITY = haveInternetOrNull;
+
+                try
+                {
+                    // [LOCK-FREE] do NOT write the ring here. Just count the
+                    // "became-offline" edge; the tox loop folds it into the slot.
+                    if (oldConnectivity && !HAVE_INTERNET_CONNECTIVITY)
+                    {
+                        TrifaToxService.no_internet_edge_count.incrementAndGet();
+                    }
+                }
+                catch(Exception ignored)
+                {
+                }
             }
 
             if (oldState != newState)

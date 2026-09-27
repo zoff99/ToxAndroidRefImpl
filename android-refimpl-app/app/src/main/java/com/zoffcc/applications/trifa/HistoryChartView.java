@@ -34,7 +34,11 @@ public class HistoryChartView extends View
     private static final float LANE_HEIGHT_DP = 16.0f;
 
     // Extra vertical room inside the push section for the caption band
-    private static final float PUSH_LABEL_PAD_DP = 13.0f;
+    private static final float PUSH_LABEL_PAD_DP = 7.0f;
+
+    // [ADDED] small bottom margin used only by the off-screen export renderer,
+    // so the last (no-internet) lane is not flush against the PNG edge.
+    private static final float EXPORT_BOTTOM_PAD_DP = 8.0f;
 
     // Push lane colors (top -> bottom): red flood, orange warning, green normal
     private static final int PUSH_COLOR_FLOOD = 0xFFFF0055;
@@ -78,6 +82,36 @@ public class HistoryChartView extends View
         setClickable(true);
         scaleGestureDetector = new ScaleGestureDetector(getContext(), new ScaleListener());
     }
+
+    // ===================== [ADDED] public API for the off-screen exporter =====================
+
+    /** Set the horizontal resolution (dp per minute) used by the NEXT measure/draw.
+     *  Used by the exporter to render at a fixed zoom independent of the live pinch state. */
+    public void setDpPerMinute(float dp)
+    {
+        this.currentDpPerMinute = dp;
+    }
+
+    /** Total horizontal span in minutes (24h window + right padding strip). */
+    public static int getTotalSpanMinutes()
+    {
+        return 1440 + RIGHT_PAD_MINUTES;
+    }
+
+    /** Exact pixel height of the *content* (all state lanes + push caption + 3 push lanes +
+     *  no-internet caption + 1 no-internet lane + bottom pad). The exporter sizes its bitmap
+     *  to this so the PNG contains no empty black space below the chart. */
+    public int getContentHeightPx()
+    {
+        float density = getResources().getDisplayMetrics().density;
+        float laneHeight = LANE_HEIGHT_DP * density;
+        float labelPad = PUSH_LABEL_PAD_DP * density;
+        int lanes = (maxLanes > 0) ? maxLanes : TRIFAGlobals.APP_STATE.values().length;
+        float bottom = (lanes + 4f) * laneHeight + 2f * labelPad + EXPORT_BOTTOM_PAD_DP * density;
+        return Math.max(1, (int) Math.ceil(bottom));
+    }
+
+    // ==========================================================================================
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
@@ -374,6 +408,92 @@ public class HistoryChartView extends View
 
             squarePaint.setColor(color);
             canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
+        }
+
+
+        // ====================================================================
+        // No-Internet lane: ONE lane below the 3 push lanes.
+        // Shows, independent of state priority, every minute where the OS had
+        // no connectivity. Consecutive minutes are merged into outage bars.
+        // Color is tied to STATE_NO_INTERNET.color so it matches the state block.
+        // ====================================================================
+        final float noInternetLaneTop = pushLanesTop + (3f * laneHeight);   // directly below green push lane
+        final float niLabelPad        = PUSH_LABEL_PAD_DP * density;        // caption band, same as push section
+        final float noInternetY       = noInternetLaneTop + niLabelPad + (laneHeight - squareSize) / 2f;
+        final int   noInternetColor   = TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.color;
+
+        // separator between push section and no-internet lane
+        canvas.drawLine(0, noInternetLaneTop, w, noInternetLaneTop, linePaint);
+
+        // caption, right-anchored to "now" so it stays visible in the default view
+        {
+            String niCaption = "no internet";
+            textPaint.setTextSize(11f * density);
+            // textPaint.setColor(Color.parseColor("#B0BEC5"));
+            float tw = textPaint.measureText(niCaption);
+            float cx = nowX - tw - (8f * density);
+            if (cx < (8f * density)) cx = (8f * density);
+            canvas.drawText(niCaption, cx, noInternetLaneTop + (10f * density), textPaint);
+        }
+
+        // outage bars: merge contiguous no-internet minutes into one rounded rect
+        if (count > 0)
+        {
+            squarePaint.setColor(noInternetColor);
+            boolean ni_in_run  = false;
+            float   ni_run_x1  = 0f;
+            float   ni_run_x2  = 0f;
+
+            int oldest2 = (TrifaToxService.app_state_history_index - count + TrifaToxService.HISTORY_SIZE)
+                          % TrifaToxService.HISTORY_SIZE;
+
+            for (int i = 0; i < count; i++)
+            {
+                int  idx = (oldest2 + i) % TrifaToxService.HISTORY_SIZE;
+                long ts  = TrifaToxService.app_state_history_ts[idx];
+                if (ts <= 0) continue;
+                if (ts < startTs) continue;     // older than 24h window (head of ring)
+                if (ts > now) break;            // ring is chronological
+
+                if (TrifaToxService.no_internet_history[idx])
+                {
+                    float x1 = xOf(ts, startTs, minuteWidthPx);
+                    float x2 = xOf(ts + TrifaToxService.MINUTE_IN_MILLIS, startTs, minuteWidthPx);
+                    if (x2 > nowX) x2 = nowX;   // never draw into the right padding strip
+                    if (x2 <= x1) continue;
+
+                    if (!ni_in_run)
+                    {
+                        ni_in_run = true;
+                        ni_run_x1 = x1;
+                        ni_run_x2 = x2;
+                    }
+                    else if (x1 <= ni_run_x2 + 1f)
+                    {
+                        ni_run_x2 = x2;         // contiguous -> extend the bar
+                    }
+                    else
+                    {
+                        // gap (e.g. sleep gap or a connected minute) -> flush and restart
+                        canvas.drawRoundRect(new RectF(ni_run_x1, noInternetY, ni_run_x2, noInternetY + squareSize), 4f, 4f, squarePaint);
+                        ni_run_x1 = x1;
+                        ni_run_x2 = x2;
+                    }
+                }
+                else
+                {
+                    if (ni_in_run)
+                    {
+                        canvas.drawRoundRect(new RectF(ni_run_x1, noInternetY, ni_run_x2, noInternetY + squareSize), 4f, 4f, squarePaint);
+                        ni_in_run = false;
+                    }
+                }
+            }
+
+            if (ni_in_run)
+            {
+                canvas.drawRoundRect(new RectF(ni_run_x1, noInternetY, ni_run_x2, noInternetY + squareSize), 4f, 4f, squarePaint);
+            }
         }
 
         // Touch Marker
