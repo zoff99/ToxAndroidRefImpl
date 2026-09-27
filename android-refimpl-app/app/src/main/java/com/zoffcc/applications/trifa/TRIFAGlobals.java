@@ -21,8 +21,6 @@ package com.zoffcc.applications.trifa;
 
 import android.graphics.Color;
 
-import com.zoffcc.applications.sorm.BootstrapNodeEntryDB;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,7 +41,7 @@ public class TRIFAGlobals
     static String global_last_activity_for_battery_savings_reason = "";
     static boolean global_showing_messageview = false;
     static boolean global_showing_anygroupview = false;
-    final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 5;
+    final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 100;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
     static String global_notification_token = null;
@@ -72,6 +70,7 @@ public class TRIFAGlobals
             1000 * 60 * 2; // bootstrap again after 2 minutes offline
     final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 60 * 3; // 3 minutes
     static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
+    final static int HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES = 140;
 
     // Reconnect flaps must NOT restart the "recently online" battery-sleep cooldown.
     // Only the very first connect, or a real outage (offline >= this value), resets

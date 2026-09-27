@@ -166,6 +166,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.FAST_ITERATION_THRESHOL
 import static com.zoffcc.applications.trifa.TRIFAGlobals.FAST_ITERATION_THRESHOLD_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.GROUP_ID_LENGTH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.HAVE_INTERNET_CONNECTIVITY;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOGFRIEND_ON_STARTUP_DONE_DB_KEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOGFRIEND_TOXID_DB_KEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_INIT_NAME;
@@ -1882,7 +1883,7 @@ public class TrifaToxService extends Service
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_IN.value][app_state_history_index] = true;
                             }
 
-                            if (current_bytes_per_second > (150 * 1024)) {
+                            if (current_bytes_per_second > (HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES * 1024)) {
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_HIGH_NETWORK_ACTIVITY.value][app_state_history_index] = true;
                             }
 
