@@ -43,7 +43,7 @@ public class TRIFAGlobals
     static String global_last_activity_for_battery_savings_reason = "";
     static boolean global_showing_messageview = false;
     static boolean global_showing_anygroupview = false;
-    final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 100;
+    final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 50;
     static int global_tox_self_status = ToxVars.TOX_USER_STATUS.TOX_USER_STATUS_NONE.value;
 
     static String global_notification_token = null;
