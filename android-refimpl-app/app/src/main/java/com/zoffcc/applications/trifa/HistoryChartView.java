@@ -13,7 +13,11 @@ import android.widget.HorizontalScrollView;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+
+import static com.zoffcc.applications.trifa.TrifaToxService.PUSH_WARN_THRESHOLD_PER_MINUTE;
 
 public class HistoryChartView extends View
 {
@@ -24,6 +28,14 @@ public class HistoryChartView extends View
 
     // Fixed height per lane to pack them tightly at the top
     private static final float LANE_HEIGHT_DP = 16.0f;
+
+    // Extra vertical room inside the push section for the caption band
+    private static final float PUSH_LABEL_PAD_DP = 13.0f;
+
+    // Push lane colors (top -> bottom): red flood, orange warning, green normal
+    private static final int PUSH_COLOR_FLOOD = 0xFFFF0055;
+    private static final int PUSH_COLOR_WARN  = 0xFFFF9800;
+    private static final int PUSH_COLOR_NORMAL = 0xFF4CAF50;
 
     private float currentDpPerMinute = 6.0f;
 
@@ -188,7 +200,7 @@ public class HistoryChartView extends View
         final int maxLanes = TRIFAGlobals.APP_STATE.values().length;
         float density = getResources().getDisplayMetrics().density;
 
-        // [FIXED] Use fixed DP height for lanes so they are tightly packed at the top
+        // Use fixed DP height for lanes so they are tightly packed at the top
         final float laneHeight = LANE_HEIGHT_DP * density;
         final float squareSize = Math.max(3f, Math.min(laneHeight * 0.75f, minuteWidthPx * 0.9f));
 
@@ -238,49 +250,70 @@ public class HistoryChartView extends View
             // Draw "No data" in the middle of the packed lanes area
             canvas.drawText("No data yet - waiting for first sample ...", 60, (maxLanes * laneHeight) / 2f, textPaint);
             textPaint.setTextSize(30f);
-            return;
         }
-
-        int oldest = (TrifaToxService.app_state_history_index - count + TrifaToxService.HISTORY_SIZE)
-                     % TrifaToxService.HISTORY_SIZE;
-
-        long prevTs = -1;
-        for (int i = 0; i < count; i++)
+        else
         {
-            int idx = (oldest + i) % TrifaToxService.HISTORY_SIZE;
-            long ts = TrifaToxService.app_state_history_ts[idx];
-            int state = TrifaToxService.app_state_history[idx];
-            if (ts <= 0) continue;
-            if (ts < startTs) { prevTs = ts; continue; }
+            int oldest = (TrifaToxService.app_state_history_index - count + TrifaToxService.HISTORY_SIZE)
+                         % TrifaToxService.HISTORY_SIZE;
 
-            if (prevTs > 0 && (ts - prevTs) > 60000L)
+            long prevTs = -1;
+            for (int i = 0; i < count; i++)
             {
-                drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx),
-                        xOf(ts, startTs, minuteWidthPx),
-                        TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
+                int idx = (oldest + i) % TrifaToxService.HISTORY_SIZE;
+                long ts = TrifaToxService.app_state_history_ts[idx];
+                int state = TrifaToxService.app_state_history[idx];
+                if (ts <= 0) continue;
+                if (ts < startTs) { prevTs = ts; continue; }
+
+                if (prevTs > 0 && (ts - prevTs) > 60000L)
+                {
+                    drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx),
+                            xOf(ts, startTs, minuteWidthPx),
+                            TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
+                }
+
+                drawSquare(canvas, xOf(ts, startTs, minuteWidthPx), state, laneHeight, squareSize, w, maxLanes);
+                prevTs = ts;
             }
 
-            drawSquare(canvas, xOf(ts, startTs, minuteWidthPx), state, laneHeight, squareSize, w, maxLanes);
-            prevTs = ts;
+            if (prevTs > 0 && (now - prevTs) > 60000L)
+            {
+                drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx), w,
+                        TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
+            }
         }
 
-        if (prevTs > 0 && (now - prevTs) > 60000L)
+        // ====================================================================
+        // [ADDED] Push notification section: 3 lanes at the very bottom.
+        //   top    = RED    -> flood  (count >= PUSH_FLOOD_THRESHOLD_PER_MINUTE)
+        //   middle = ORANGE -> warning (count >= PUSH_WARN_THRESHOLD_PER_MINUTE)
+        //   bottom = GREEN  -> normal  (count >= 1)
+        // One square per minute, colored by how many pushes arrived in that minute.
+        // ====================================================================
+        final float pushSectionTop = maxLanes * laneHeight;          // separator position
+        final float labelPad = PUSH_LABEL_PAD_DP * density;          // caption band height
+        final float pushLanesTop = pushSectionTop + labelPad;        // 3 lanes start below caption
+
+        // subtle separator line between the state lanes and the push section
+        canvas.drawLine(0, pushSectionTop, w, pushSectionTop, linePaint);
+
+        // caption, right-aligned so it is visible at "now"
         {
-            drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx), w,
-                    TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
+            String pushCaption = "push/min   green<" + PUSH_WARN_THRESHOLD_PER_MINUTE +
+                                 "   orange>=" + PUSH_WARN_THRESHOLD_PER_MINUTE +
+                                 "   red>=" + TrifaToxService.PUSH_FLOOD_THRESHOLD_PER_MINUTE + " \u25BC";
+            textPaint.setTextSize(11f * density);
+            textPaint.setColor(Color.parseColor("#B0BEC5"));
+            float tw = textPaint.measureText(pushCaption);
+            float cx = w - tw - (8f * density);
+            if (cx < (8f * density)) cx = (8f * density);
+            canvas.drawText(pushCaption, cx, pushSectionTop + (10f * density), textPaint);
         }
 
-        // [ADDED] Push notification lane: separate lane at the very bottom,
-        // one square per push at its EXACT timestamp (floods become a solid streak)
-        final float pushLaneTop = maxLanes * laneHeight; // directly below STATE_UNKNOWN lane
-        final float pushLaneY = pushLaneTop + (laneHeight - squareSize) / 2f;
-
-        // subtle separator line between state lanes and push lane
-        canvas.drawLine(0, pushLaneTop, w, pushLaneTop, linePaint);
-
+        // Bucket the exact-timestamp push ring into per-minute counts
+        HashMap<Long, Integer> pushPerMinute = new HashMap<>();
         if (TrifaToxService.push_history_count > 0)
         {
-            squarePaint.setColor(0xFFFF4081); // pink/magenta = push
             int pstart = (TrifaToxService.push_history_index - TrifaToxService.push_history_count
                           + TrifaToxService.PUSH_HISTORY_SIZE) % TrifaToxService.PUSH_HISTORY_SIZE;
             for (int i = 0; i < TrifaToxService.push_history_count; i++)
@@ -289,11 +322,44 @@ public class HistoryChartView extends View
                 if (pts <= 0) continue;
                 if (pts < startTs) continue;   // older than 24h window
                 if (pts > now) break;          // ring is chronological
-                float x = xOf(pts, startTs, minuteWidthPx);
-                if (x < -squareSize || x > w) continue;
-                canvas.drawRoundRect(new RectF(x, pushLaneY, x + squareSize, pushLaneY + squareSize),
-                                     4f, 4f, squarePaint);
+                long minuteBucket = pts / TrifaToxService.MINUTE_IN_MILLIS;
+                Integer c = pushPerMinute.get(minuteBucket);
+                pushPerMinute.put(minuteBucket, (c == null) ? 1 : (c + 1));
             }
+        }
+
+        // Y positions of the 3 push lanes (red top, orange middle, green bottom)
+        final float pushRedY    = pushLanesTop + (laneHeight - squareSize) / 2f;
+        final float pushOrangeY = pushLanesTop + laneHeight + (laneHeight - squareSize) / 2f;
+        final float pushGreenY  = pushLanesTop + (2f * laneHeight) + (laneHeight - squareSize) / 2f;
+
+        for (Map.Entry<Long, Integer> e : pushPerMinute.entrySet())
+        {
+            long minuteTs = e.getKey() * TrifaToxService.MINUTE_IN_MILLIS;
+            float x = xOf(minuteTs, startTs, minuteWidthPx);
+            if (x < -squareSize || x > w) continue;
+
+            int c = e.getValue();
+            int color;
+            float y;
+            if (c >= TrifaToxService.PUSH_FLOOD_THRESHOLD_PER_MINUTE)
+            {
+                color = PUSH_COLOR_FLOOD;
+                y = pushRedY;
+            }
+            else if (c >= PUSH_WARN_THRESHOLD_PER_MINUTE)
+            {
+                color = PUSH_COLOR_WARN;
+                y = pushOrangeY;
+            }
+            else
+            {
+                color = PUSH_COLOR_NORMAL;
+                y = pushGreenY;
+            }
+
+            squarePaint.setColor(color);
+            canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
         }
 
         // Touch Marker
@@ -334,7 +400,7 @@ public class HistoryChartView extends View
         int s = state;
         if (s < 0 || s >= maxLanes) s = 0;
 
-        // [FIXED] Draw tightly packed starting from y=0 (top of screen)
+        // Draw tightly packed starting from y=0 (top of screen)
         // Highest priority (15) -> y=0. Lowest priority (0) -> y=15*laneHeight
         float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
 
@@ -350,7 +416,7 @@ public class HistoryChartView extends View
         int s = state;
         if (s < 0 || s >= maxLanes) s = 0;
 
-        // [FIXED] Draw tightly packed starting from y=0 (top of screen)
+        // Draw tightly packed starting from y=0 (top of screen)
         float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
 
         squarePaint.setColor(TRIFAGlobals.APP_STATE.getColorForState(s));

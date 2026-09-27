@@ -264,6 +264,7 @@ public class TrifaToxService extends Service
     // [ADDED] Push notification event history (exact timestamps), own ring buffer
     public static final int PUSH_HISTORY_SIZE = 2048;
     public static final int PUSH_FLOOD_THRESHOLD_PER_MINUTE = 10;
+    public static final int PUSH_WARN_THRESHOLD_PER_MINUTE = 5;
     public static final int MINUTE_IN_MILLIS = 60 * 1000;
     public static final long[] push_history_ts = new long[PUSH_HISTORY_SIZE];
     public static int push_history_index = 0;
