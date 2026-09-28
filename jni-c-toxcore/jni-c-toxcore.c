@@ -5238,6 +5238,10 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message_1size(JNIEnv *env, jobject thiz)
 {
     TRACE_LOGGER();
+    if(tox_global == NULL)
+    {
+        return (jlong)0;
+    }
     long long l = (long long)tox_self_get_status_message_size(tox_global);
     return (jlong)(unsigned long long)l;
 }
@@ -5275,6 +5279,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1control(JNIEnv *env, 
         jlong file_number, jint control)
 {
     TRACE_LOGGER();
+    if(tox_global == NULL)
+    {
+        return (jint)-1;
+    }
     TOX_ERR_FILE_CONTROL error;
     bool res = tox_file_control(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (TOX_FILE_CONTROL)control,
                                 &error);
@@ -6388,6 +6396,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1delete(JNIEnv *
         jlong conference_number)
 {
     TRACE_LOGGER();
+    if(tox_global == NULL)
+    {
+        return (jint)-1;
+    }
     TOX_ERR_CONFERENCE_DELETE error;
     bool res = tox_conference_delete(tox_global, (uint32_t)conference_number, &error);
 
@@ -7116,6 +7128,10 @@ JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1conference_1get_1chatlist_1size(JNIEnv *env, jobject thiz)
 {
     TRACE_LOGGER();
+    if(tox_global == NULL)
+    {
+        return (jlong)(unsigned long long)0;
+    }
     size_t res = tox_conference_get_chatlist_size(tox_global);
     // dbg(9, "tox_conference_get_chatlist_size=%d", (int)res);
     return (jlong)(unsigned long long)res;
@@ -8259,6 +8275,11 @@ JNIEXPORT jlongArray JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1get_1grouplist(JNIEnv *env, jobject thiz)
 {
     TRACE_LOGGER();
+    if(tox_global == NULL)
+    {
+        return NULL;
+    }
+
     uint32_t numgroups = tox_group_get_number_groups(tox_global);
     size_t memsize = (numgroups * sizeof(uint32_t));
     uint32_t *groups_list = malloc(memsize);

@@ -4,6 +4,10 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1control(JNIEnv *env, 
         jlong file_number, jint control)
 {
     TRACE_LOGGER();
+    if(tox_global == NULL)
+    {
+        return (jint)-1;
+    }
     TOX_ERR_FILE_CONTROL error;
     bool res = tox_file_control(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (TOX_FILE_CONTROL)control,
                                 &error);
