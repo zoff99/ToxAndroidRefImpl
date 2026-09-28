@@ -1861,7 +1861,7 @@ public class TrifaToxService extends Service
                             if (delta_ms > 0 && delta_bytes > 0) {
                                 long current_bytes_per_second = (delta_bytes * 1000) / delta_ms;
 
-                                Log.i(TAG, "NNNNNNNN: " + current_bytes_per_second + " " + delta_bytes + " " + delta_ms);
+                                // Log.i(TAG, "NNNNNNNN: " + current_bytes_per_second + " " + delta_bytes + " " + delta_ms);
                                 // If threshold is reached at ANY time, latch it to true for the 1-minute window
                                 if (current_bytes_per_second > (HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES * 1024)) {
                                     high_network_activity_this_minute = true;
