@@ -4,6 +4,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1seek(JNIEnv *env, job
         jlong file_number, jlong position)
 {
     TRACE_LOGGER();
+    if (tox_global == NULL) {
+        return -98;
+    }
     TOX_ERR_FILE_SEEK error;
     bool res = tox_file_seek(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (uint64_t)position, &error);
 

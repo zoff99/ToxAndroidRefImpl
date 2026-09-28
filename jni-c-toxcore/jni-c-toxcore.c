@@ -5250,6 +5250,9 @@ JNIEXPORT jstring JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1self_1get_1status_1message(JNIEnv *env, jobject thiz)
 {
     TRACE_LOGGER();
+    if (tox_global == NULL) {
+        return NULL;
+    }
     size_t length = tox_self_get_status_message_size(tox_global);
 
     // HIGH SECURITY FIX: Reject the operation if the status message size exceeds TOX_MAX_STATUS_MESSAGE_LENGTH.
@@ -5343,6 +5346,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1seek(JNIEnv *env, job
         jlong file_number, jlong position)
 {
     TRACE_LOGGER();
+    if (tox_global == NULL) {
+        return -98;
+    }
     TOX_ERR_FILE_SEEK error;
     bool res = tox_file_seek(tox_global, (uint32_t)friend_number, (uint32_t)file_number, (uint64_t)position, &error);
 
@@ -5397,6 +5403,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1get_1file_1id(JNIEnv 
         jlong file_number, jobject file_id_buffer)
 {
     TRACE_LOGGER();
+    if (tox_global == NULL) {
+        return -4;
+    }
     uint8_t *file_id_buffer_c = NULL;
     long capacity = 0;
 
@@ -5455,6 +5464,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send(JNIEnv *env, job
         jlong kind, jlong file_size, jobject file_id_buffer, jstring file_name, jlong filename_length)
 {
     TRACE_LOGGER();
+    if (tox_global == NULL) {
+        return -23;
+    }
     uint8_t *file_id_buffer_c = NULL;
     long capacity = 0;
 
@@ -5517,6 +5529,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv *e
         jlong file_number, jlong position, jobject data_buffer, jlong data_length)
 {
     TRACE_LOGGER();
+    if (tox_global == NULL) {
+        return -24;
+    }
     uint8_t *data_buffer_c = NULL;
     long capacity = 0;
 

@@ -4,6 +4,9 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1file_1send_1chunk(JNIEnv *e
         jlong file_number, jlong position, jobject data_buffer, jlong data_length)
 {
     TRACE_LOGGER();
+    if (tox_global == NULL) {
+        return -24;
+    }
     uint8_t *data_buffer_c = NULL;
     long capacity = 0;
 
