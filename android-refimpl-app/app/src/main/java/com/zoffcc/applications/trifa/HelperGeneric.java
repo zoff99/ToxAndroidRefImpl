@@ -3900,6 +3900,7 @@ public class HelperGeneric
                                     "|call=" + Callstate.state +
                                     "|agrp=" + (Callstate.audio_group_active ? "T" : "F") +
                                     "|ngc=" + (Callstate.audio_ngc_group_active ? "T" : "F") +
+                                    "|conn=" + global_self_connection_status +
                                     "|online_ago=" + (global_self_last_went_online_timestamp == -1 ? "n/a"
                         : ((now - global_self_last_went_online_timestamp) / 1000) + "s") +
                                     "|activity_ago=" + ((now - global_last_activity_for_battery_savings_ts) / 1000) + "s";
