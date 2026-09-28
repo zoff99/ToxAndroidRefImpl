@@ -25,6 +25,7 @@ static void t_normal(void) {
     TEST_ASSERT(ret != NULL);
     TEST_ASSERT(tox_mock_get_all_tcp_relays_called);
     TEST_ASSERT(tox_mock_safe_string_called);
+    TEST_ASSERT(mock_DeleteLocalRef_count == 1);
 
     TEST_END();
 }

@@ -29,6 +29,7 @@ static void t_normal_ip_returned(void) {
     TEST_EQUAL_LONG(3, tox_mock_last_friend_get_connection_ip_friend_number);
     TEST_ASSERT(tox_mock_safe_string_called);
     TEST_ASSERT(tox_mock_safe_string_last_length > 0);
+    TEST_ASSERT(mock_DeleteLocalRef_count == 1);
 
     TEST_END();
 }

@@ -35,6 +35,7 @@ static void t_valid_friend(void) {
     TEST_EQUAL_LONG(3, tox_mock_last_friend_get_name_friend_number);
     TEST_ASSERT(tox_mock_safe_string_called);
     TEST_EQUAL_SIZE(5, tox_mock_safe_string_last_length);
+    TEST_ASSERT(mock_DeleteLocalRef_count == 1);
 
     TEST_END();
 }
@@ -82,6 +83,9 @@ static void t_excessive_name_size(void) {
     NOTE("mocked friend name size is 1000");
 
     TEST_ASSERT(tox_mock_safe_string_last_length <= TOX_MAX_NAME_LENGTH);
+
+    TEST_ASSERT(!tox_mock_safe_string_called); // VLA guard prevented c_safe_string_from_java
+    TEST_ASSERT(!tox_mock_friend_get_name_called);
 
     TEST_END();
 }

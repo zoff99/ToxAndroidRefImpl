@@ -53,6 +53,7 @@ static void t_normal_status_returned(void) {
     TEST_ASSERT(tox_mock_self_get_status_message_called);
     TEST_ASSERT(tox_mock_safe_string_called);
     TEST_EQUAL_SIZE(9, tox_mock_safe_string_last_length);
+    TEST_ASSERT(mock_DeleteLocalRef_count == 1);
 
     TEST_END();
 }
@@ -100,7 +101,8 @@ static void t_excessive_status_size_must_be_bounded(void) {
     NOTE("mocked status message size is 2000");
 
     TEST_ASSERT(tox_mock_safe_string_last_length <= TOX_MAX_STATUS_MESSAGE_LENGTH);
-
+    TEST_ASSERT(!tox_mock_safe_string_called); // VLA guard prevented c_safe_string_from_java
+    TEST_ASSERT(!tox_mock_self_get_status_message_called);
     TEST_END();
 }
 

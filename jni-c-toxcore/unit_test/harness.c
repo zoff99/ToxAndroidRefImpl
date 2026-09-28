@@ -210,6 +210,8 @@ int harness_result(void) {
 static const char* jni_mock_string = "mock";
 static bool jni_mock_string_null = false;
 
+int mock_DeleteLocalRef_count = 0;
+
 static const char* mock_GetStringUTFChars(JNIEnv* env, jstring str, jboolean* isCopy) {
     (void)env;
 
@@ -391,6 +393,7 @@ static void mock_DeleteLocalRef(JNIEnv* env, jobject localRef) {
     (void)env;
     (void)localRef;
     mock_DeleteLocalRef_called = true;
+    mock_DeleteLocalRef_count++;
 }
 
 void mock_CallStaticVoidMethod_fn(JNIEnv* env, jclass clazz, jmethodID methodID, ...) {
@@ -656,6 +659,9 @@ JNIEnv* jni_getenv(void) {
 
 void tox_mock_reset(void) {
     tox_global = (Tox*)&tox_mock_dummy_tox;
+
+    mock_DeleteLocalRef_called = false;
+    mock_DeleteLocalRef_count = 0;
 
     /* lossless */
     tox_mock_lossless_called = false;

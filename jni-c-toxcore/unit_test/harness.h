@@ -437,6 +437,8 @@ extern bool mock_ExceptionClear_called;
 
 extern bool mock_DeleteLocalRef_called;
 
+extern int mock_DeleteLocalRef_count;
+
 /* Mock function implementations to be wired into your mock JNIEnv */
 jstring mock_NewStringUTF_fn(JNIEnv* env, const char* str);
 jbyteArray mock_NewByteArray_fn(JNIEnv* env, jsize length);
