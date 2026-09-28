@@ -66,6 +66,11 @@ public class HistoryChartView extends View
     private float touchX = -1;
     private boolean isTouching = false;
 
+    // --- EXPORT FLAG ---
+    // Set this to true before drawing to an off-screen bitmap for PNG export.
+    // This changes the boxes to be solid, and sharp-cornered.
+    public boolean isExporting = false;
+
     public HistoryChartView(Context context)
     {
         super(context);
@@ -296,17 +301,38 @@ public class HistoryChartView extends View
 
         // 1. Fixed vertical space used by captions and padding
         float fixedVerticalPadding = (2f * PUSH_LABEL_PAD_DP * density) + (EXPORT_BOTTOM_PAD_DP * density);
-
+        int transportLanesCount = ConnectionManager.NetworkTransportType.values().length;
         // 2. Total number of horizontal lanes (States + 3 Push + Transport Lanes)
-        int totalLaneSlots = maxLanes + 3 + ConnectionManager.NetworkTransportType.values().length;
-
+        int totalLaneSlots = maxLanes + 3 + transportLanesCount;
         // 3. DYNAMIC LANE HEIGHT: shrink lanes if the screen is too short (prevents clipping)
         float idealLaneHeight = LANE_HEIGHT_DP * density;
         float maxAvailableLaneHeight = (h - fixedVerticalPadding) / totalLaneSlots;
         final float laneHeight = Math.min(idealLaneHeight, Math.max(4f * density, maxAvailableLaneHeight));
+
+        // REGULAR DISPLAY: Small squares with gaps
         final float squareSize = Math.max(3f, Math.min(laneHeight * 0.75f, minuteWidthPx * 0.9f));
 
-        // Hour grid + labels. Lines run across the FULL span (incl. padding strip)
+        // --- EXPORT vs REGULAR DISPLAY ---
+        // REGULAR DISPLAY: small rounded squares with gaps (unchanged).
+        // EXPORT: tall, sharp-cornered blocks, but WITH tiny gaps between minutes
+        //         so the segmented look is preserved in the PNG.
+        final float drawW;
+        final float drawH;
+        final float cornerRadius;
+        if (isExporting) {
+            // Tiny gap between blocks: at least 2px, otherwise 10% of the minute cell
+            final float gap = Math.max(2f, minuteWidthPx * 0.1f);
+            drawW = minuteWidthPx - gap;
+            drawH = Math.max(4f * density, laneHeight * 0.85f);
+            cornerRadius = 0f;
+        } else {
+            drawW = squareSize;
+            drawH = squareSize;
+            cornerRadius = 4f;
+        }
+        // ------------------------------
+
+        // Hour grid + labels
         for (long hh = ceilToHour(startTs); hh <= endTs; hh += 3600000L)
         {
             float x = (hh - startTs) / 60000f * minuteWidthPx;
@@ -392,7 +418,7 @@ public class HistoryChartView extends View
                 {
                     drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx),
                             xOf(ts, startTs, minuteWidthPx),
-                            TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
+                            TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, drawH, cornerRadius, w, maxLanes);
                 }
 
                 // 2. Draw individual squares for EVERY active parallel state at this minute
@@ -400,7 +426,7 @@ public class HistoryChartView extends View
                 {
                     if (TrifaToxService.app_state_histories[s] != null && TrifaToxService.app_state_histories[s][idx])
                     {
-                        drawSquare(canvas, xOf(ts, startTs, minuteWidthPx), s, laneHeight, squareSize, w, maxLanes);
+                        drawSquare(canvas, xOf(ts, startTs, minuteWidthPx), s, laneHeight, drawW, drawH, cornerRadius, w, maxLanes);
                     }
                 }
 
@@ -411,7 +437,7 @@ public class HistoryChartView extends View
             if (prevTs > 0 && (now - prevTs) > 60000L)
             {
                 drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx), nowX,
-                        TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, squareSize, w, maxLanes);
+                        TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, drawH, cornerRadius, w, maxLanes);
             }
         }
 
@@ -459,15 +485,15 @@ public class HistoryChartView extends View
         }
 
         // Y positions of the 3 push lanes (red top, orange middle, green bottom)
-        final float pushRedY    = pushLanesTop + (laneHeight - squareSize) / 2f;
-        final float pushOrangeY = pushLanesTop + laneHeight + (laneHeight - squareSize) / 2f;
-        final float pushGreenY  = pushLanesTop + (2f * laneHeight) + (laneHeight - squareSize) / 2f;
+        final float pushRedY    = pushLanesTop + (laneHeight - drawH) / 2f;
+        final float pushOrangeY = pushLanesTop + laneHeight + (laneHeight - drawH) / 2f;
+        final float pushGreenY  = pushLanesTop + (2f * laneHeight) + (laneHeight - drawH) / 2f;
 
         for (java.util.Map.Entry<Long, Integer> e : pushPerMinute.entrySet())
         {
             long minuteTs = e.getKey() * TrifaToxService.MINUTE_IN_MILLIS;
             float x = xOf(minuteTs, startTs, minuteWidthPx);
-            if (x < -squareSize || x > nowX) continue; // never draw into the padding strip
+            if (x < -drawW || x > nowX) continue; // never draw into the padding strip
 
             int c = e.getValue();
             int color;
@@ -489,7 +515,7 @@ public class HistoryChartView extends View
             }
 
             squarePaint.setColor(color);
-            canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
+            canvas.drawRoundRect(new RectF(x, y, x + drawW, y + drawH), cornerRadius, cornerRadius, squarePaint);
         }
 
         // ====================================================================
@@ -529,7 +555,7 @@ public class HistoryChartView extends View
                 if (ts > now) break;
 
                 float x = xOf(ts, startTs, minuteWidthPx);
-                if (x < -squareSize || x > nowX) continue;
+                if (x < -drawW || x > nowX) continue;
 
                 // Iterate through all defined transport types
                 for (ConnectionManager.NetworkTransportType type : ConnectionManager.NetworkTransportType.values())
@@ -540,12 +566,11 @@ public class HistoryChartView extends View
                     if (arrayIndex < TrifaToxService.app_transport_histories.length &&
                         TrifaToxService.app_transport_histories[arrayIndex][idx])
                     {
-                        // Sort by .value: 0 is bottom lane, maxTransportValue is top lane
-                        float y = transportLanesTop + ((maxTransportValue - type.value) * laneHeight) + (laneHeight - squareSize) / 2f;
+                        float y = transportLanesTop + ((maxTransportValue - type.value) * laneHeight) + (laneHeight - drawH) / 2f;
 
                         // Use the color embedded in the enum
                         squarePaint.setColor(type.color);
-                        canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
+                        canvas.drawRoundRect(new RectF(x, y, x + drawW, y + drawH), cornerRadius, cornerRadius, squarePaint);
                     }
                 }
             }
@@ -607,22 +632,21 @@ public class HistoryChartView extends View
     private long ceilToHour(long ts) { return ((ts + 3599999L) / 3600000L) * 3600000L; }
     private long ceilToInterval(long ts, long interval) { return ((ts + interval - 1) / interval) * interval; }
 
-    /** Draws a single square for an active state lane. */
-    private void drawSquare(Canvas canvas, float x, int state, float laneHeight, float squareSize, int w, int maxLanes)
+    /** Draws a single box for an active state lane. */
+    private void drawSquare(Canvas canvas, float x, int state, float laneHeight, float boxW, float boxH, float cornerRadius, int w, int maxLanes)
     {
-        if (x < -squareSize || x > w) return;
+        if (x < -boxW || x > w) return;
         int s = state;
         if (s < 0 || s >= maxLanes) s = 0;
 
-        // Highest priority (15) -> y=0. Lowest priority (0) -> y=15*laneHeight
-        float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
+        float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - boxH) / 2f;
 
         squarePaint.setColor(TRIFAGlobals.APP_STATE.getColorForState(s));
-        canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
+        canvas.drawRoundRect(new RectF(x, y, x + boxW, y + boxH), cornerRadius, cornerRadius, squarePaint);
     }
 
     /** Draws a continuous bar spanning multiple minutes (used for ASLEEP gaps). */
-    private void drawBar(Canvas canvas, float x1, float x2, int state, float laneHeight, float squareSize, int w, int maxLanes)
+    private void drawBar(Canvas canvas, float x1, float x2, int state, float laneHeight, float boxH, float cornerRadius, int w, int maxLanes)
     {
         if (x2 <= 0 || x1 >= w) return;
         x1 = Math.max(0, x1);
@@ -630,9 +654,9 @@ public class HistoryChartView extends View
         int s = state;
         if (s < 0 || s >= maxLanes) s = 0;
 
-        float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - squareSize) / 2f;
+        float y = ((maxLanes - 1) - s) * laneHeight + (laneHeight - boxH) / 2f;
 
         squarePaint.setColor(TRIFAGlobals.APP_STATE.getColorForState(s));
-        canvas.drawRoundRect(new RectF(x1, y, x2, y + squareSize), 4f, 4f, squarePaint);
+        canvas.drawRoundRect(new RectF(x1, y, x2, y + boxH), cornerRadius, cornerRadius, squarePaint);
     }
 }

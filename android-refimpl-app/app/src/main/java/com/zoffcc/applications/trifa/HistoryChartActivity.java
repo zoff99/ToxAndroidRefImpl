@@ -34,8 +34,11 @@ public class HistoryChartActivity extends AppCompatActivity
     private static final String PREF_TREE_URI_KEY = "stats_export_tree_uri";
 
     // Fixed horizontal resolution for the EXPORT image (dp per minute)
-    private static final float EXPORT_DP_PER_MINUTE = 3.0f;
-    private static final int MAX_EXPORT_WIDTH_PX = 30000; // hard safety clamp
+    // [CHANGED] Increased so the boxes are much wider and look more square.
+    private static final float EXPORT_DP_PER_MINUTE = 13.0f;
+
+    // [CHANGED] Increased the hard safety clamp to 70k so the wider image doesn't get artificially shrunk back down.
+    private static final int MAX_EXPORT_WIDTH_PX = 70000;
 
     private LockableHorizontalScrollView scrollView;
     private HistoryChartView chartView;
@@ -281,6 +284,10 @@ public class HistoryChartActivity extends AppCompatActivity
 
                 HistoryChartView exportView = new HistoryChartView(this);
                 exportView.setDpPerMinute(effDp);
+
+                // [ADDED] Enable export mode for sharp, full-width boxes
+                exportView.isExporting = true;
+
                 int contentH = exportView.getContentHeightPx();
 
                 int wSpec = View.MeasureSpec.makeMeasureSpec(w, View.MeasureSpec.EXACTLY);
@@ -292,6 +299,9 @@ public class HistoryChartActivity extends AppCompatActivity
                 bmp.eraseColor(0xFF121212);
                 Canvas c = new Canvas(bmp);
                 exportView.draw(c);
+
+                // [ADDED] Reset flag (good practice, even for a temporary view)
+                exportView.isExporting = false;
             }
             catch (OutOfMemoryError oom)
             {
