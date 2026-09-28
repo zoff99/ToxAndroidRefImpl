@@ -463,6 +463,7 @@ int toxpk_hex_to_bin(uint8_t* bin, const char* hex);
 void xnet_pack_u32(uint8_t* dst, uint32_t value);
 jstring c_safe_string_from_java(const char* str, size_t length);
 bool tox_messagev3_get_new_message_id(uint8_t* buffer);
+uint8_t* jni_get_utf8_safe(JNIEnv *env, jstring jstr, size_t max_len, size_t *out_len, jint *out_err);
 
 /* =========================================================
  * Macros used by the real jni-c-toxcore.c code

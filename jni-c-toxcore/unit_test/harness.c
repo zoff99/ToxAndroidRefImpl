@@ -1328,3 +1328,41 @@ bool tox_file_get_file_id(
 
     return tox_mock_file_get_file_id_return;
 }
+
+/* =========================================================
+ * Mocked Helper Implementations (Required by Extractor)
+ * ========================================================= */
+
+/**
+ * Mock implementation of jni_get_utf8_safe for unit testing.
+ * In our mock environment, a 'jstring' is simply a casted 'const char*'.
+ */
+uint8_t* jni_get_utf8_safe(JNIEnv *env, jstring jstr, size_t max_len, size_t *out_len, jint *out_err) {
+    (void)env;
+    *out_err = 0;
+    *out_len = 0;
+
+    if (jstr == NULL) {
+        *out_err = -4;
+        return NULL;
+    }
+
+    const char *s = (const char *)jstr;
+    size_t len = strlen(s);
+
+    if (len > max_len) {
+        *out_err = -2; // Too long
+        return NULL;
+    }
+
+    uint8_t* result = (uint8_t*)malloc(len + 1);
+    if (result == NULL) {
+        *out_err = -4; // OOM
+        return NULL;
+    }
+
+    memcpy(result, s, len + 1);
+    *out_len = len;
+    return result;
+}
+
