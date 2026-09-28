@@ -162,12 +162,9 @@ public class MyExternReceiver extends BroadcastReceiver
                 {
                     Log.i(TAG, "MyExternReceiver:" + "onReceive");
 
-                    if (trifa_service_thread != null)
-                    {
-                        append_logger_msg(TAG + "::" + "need_wakeup_now trigger 002");
-                        // Pass the exact reason to the trigger method
-                        trigger_proper_wakeup_outside_tox_service_thread("PUSH_NTFY");
-                    }
+                    append_logger_msg(TAG + "::" + "need_wakeup_now trigger 002");
+                    // Pass the exact reason to the trigger method
+                    trigger_proper_wakeup_outside_tox_service_thread("PUSH_NTFY");
 
                     record_push_notification("PUSH_NTFY");
                 }
