@@ -70,7 +70,8 @@ public class TRIFAGlobals
             1000 * 60 * 2; // bootstrap again after 2 minutes offline
     final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 60 * 4; // 4 minutes
     static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
-    final static int HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES = 140;
+    final static int HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES = 100;
+    final static int NETWORK_SPEED_SAMPLE_EVERY_SECONDS = 20;
 
     // Reconnect flaps must NOT restart the "recently online" battery-sleep cooldown.
     // Only the very first connect, or a real outage (offline >= this value), resets

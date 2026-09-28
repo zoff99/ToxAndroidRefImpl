@@ -173,6 +173,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_INIT_NAME;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_INIT_STATUSMSG;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MAX_TEXTMSG_RESEND_COUNT_OLDMSG_VERSION;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.NETWORK_SPEED_SAMPLE_EVERY_SECONDS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_IP;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_KEYHEX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.PREF_KEY_CUSTOM_BOOTSTRAP_TCP_PORT;
@@ -274,6 +275,9 @@ public class TrifaToxService extends Service
     public static long app_state_last_record_ts = 0;
     public static long last_netprof_bytes = 0; // To calculate bytes/sec
     public static long last_netprof_ts = 0;
+    public static long last_netprof_check_ms = 0; // Throttle network checks to x seconds intervals
+    public static volatile boolean high_network_activity_this_minute = false; // Latch for 1-minute window
+
 
     // 24h per-minute "no internet" track, independent of state priority.
     // Owned (written) ONLY by the tox-loop thread at sample time.
@@ -1840,6 +1844,35 @@ public class TrifaToxService extends Service
                         }
                     }
 
+                    // --- CONTINUOUS NETWORK BURST DETECTION (Checked every x seconds) ---
+                    long current_time_ms_net = System.currentTimeMillis();
+                    if ((current_time_ms_net - last_netprof_check_ms) >= (NETWORK_SPEED_SAMPLE_EVERY_SECONDS * 1000)) {
+                        last_netprof_check_ms = current_time_ms_net;
+
+                        long total_bytes_now = MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_SENT.value) +
+                                               MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_SENT.value) +
+                                               MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_RECV.value) +
+                                               MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_RECV.value);
+
+                        if (last_netprof_ts > 0) {
+                            long delta_bytes = total_bytes_now - last_netprof_bytes;
+                            long delta_ms = current_time_ms_net - last_netprof_ts;
+
+                            if (delta_ms > 0 && delta_bytes > 0) {
+                                long current_bytes_per_second = (delta_bytes * 1000) / delta_ms;
+
+                                Log.i(TAG, "NNNNNNNN: " + current_bytes_per_second + " " + delta_bytes + " " + delta_ms);
+                                // If threshold is reached at ANY time, latch it to true for the 1-minute window
+                                if (current_bytes_per_second > (HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES * 1024)) {
+                                    high_network_activity_this_minute = true;
+                                }
+                            }
+                        }
+                        // Keep the old value for the next sample period
+                        last_netprof_bytes = total_bytes_now;
+                        last_netprof_ts = current_time_ms_net;
+                    }
+
                     try
                     {
                         // [ADDED] Record 1-minute App State History
@@ -1848,26 +1881,6 @@ public class TrifaToxService extends Service
                         {
                             long window_start = stats_last_history_ms;
                             stats_last_history_ms = current_time_ms2;
-
-                            // --- 2. CALCULATE NETWORK BYTES/SEC ---
-                            // Sum up all incoming/outgoing bytes from NetProfiler (UDP + TCP)
-                            long total_bytes_now = MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_SENT.value) +
-                                                   MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_SENT.value) +
-                                                   MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_RECV.value) +
-                                                   MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_RECV.value);
-
-                            long current_bytes_per_second = 0;
-                            if (last_netprof_ts > 0)
-                            {
-                                long delta_bytes = total_bytes_now - last_netprof_bytes;
-                                long delta_sec = (current_time_ms2 - last_netprof_ts) / 1000;
-                                if (delta_sec > 0 && delta_bytes > 0)
-                                {
-                                    current_bytes_per_second = delta_bytes / delta_sec;
-                                }
-                            }
-                            last_netprof_bytes = total_bytes_now;
-                            last_netprof_ts = current_time_ms2;
 
                             // --- 3. EVALUATE ALL STATES INDEPENDENTLY ---
                             long now = System.currentTimeMillis();
@@ -1898,9 +1911,11 @@ public class TrifaToxService extends Service
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_IN.value][app_state_history_index] = true;
                             }
 
-                            if (current_bytes_per_second > (HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES * 1024)) {
+                            if (high_network_activity_this_minute) {
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_HIGH_NETWORK_ACTIVITY.value][app_state_history_index] = true;
                             }
+                            // Reset the latch for the next 1-minute window
+                            high_network_activity_this_minute = false;
 
                             int bootstrap_ec = bootstrap_me_real_edge_count.get();
                             if (bootstrap_ec != last_bootstrap_me_real_ec) {
