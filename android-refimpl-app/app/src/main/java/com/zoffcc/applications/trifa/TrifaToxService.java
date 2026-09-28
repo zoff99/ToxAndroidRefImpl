@@ -1841,6 +1841,7 @@ public class TrifaToxService extends Service
                         long current_time_ms2 = System.currentTimeMillis();
                         if ((current_time_ms2 - stats_last_history_ms) >= MINUTE_IN_MILLIS)
                         {
+                            long window_start = stats_last_history_ms;
                             stats_last_history_ms = current_time_ms2;
 
                             // --- 2. CALCULATE NETWORK BYTES/SEC ---
@@ -1884,13 +1885,11 @@ public class TrifaToxService extends Service
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_CALL_GROUP.value][app_state_history_index] = true;
                             }
 
-                            if (global_last_activity_outgoung_ft_ts > 0 &&
-                                (now - global_last_activity_outgoung_ft_ts) < 2000) {
+                            if (global_last_activity_outgoung_ft_ts > window_start) {
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_OUT.value][app_state_history_index] = true;
                             }
 
-                            if (global_last_activity_incoming_ft_ts > 0 &&
-                                (now - global_last_activity_incoming_ft_ts) < 2000) {
+                            if (global_last_activity_incoming_ft_ts > window_start) {
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_IN.value][app_state_history_index] = true;
                             }
 
