@@ -785,15 +785,24 @@ void tox_mock_reset(void) {
 
     /* c_safe_string_from_java mocks */
     mock_jni_env_ptr = jni_mock_env();
-    TrifaToxService_class = NULL;
-    safe_string_method = NULL;
+
+    // --- CHANGED: Provide sane defaults so c_safe_string_from_java succeeds by default ---
+    TrifaToxService_class = (jclass)0xDEADBEEF;
+    safe_string_method = (jmethodID)0xCAFEBABE;
+
     mock_NewStringUTF_called = false;
     mock_NewStringUTF_return = NULL;
     mock_NewByteArray_called = false;
-    mock_NewByteArray_return = NULL;
+
+    // --- CHANGED: Provide a dummy array so NewByteArray doesn't return NULL (OOM) ---
+    mock_NewByteArray_return = (jbyteArray)0x12345678;
+
     mock_SetByteArrayRegion_called = false;
     mock_CallStaticObjectMethod_called = false;
-    mock_CallStaticObjectMethod_return = NULL;
+
+    // --- CHANGED: Provide a dummy jstring so CallStaticObjectMethod succeeds ---
+    mock_CallStaticObjectMethod_return = (jobject)0x87654321;
+
     mock_ExceptionCheck_called = false;
     mock_ExceptionCheck_return = JNI_FALSE;
     mock_ExceptionClear_called = false;
