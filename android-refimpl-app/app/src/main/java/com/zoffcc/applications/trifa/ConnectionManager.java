@@ -78,22 +78,40 @@ public class ConnectionManager extends BroadcastReceiver
     }
 
     // [ADDED] Independent network transport type.
-    // Do NOT mix this with InternetConnectivityState.
     public enum NetworkTransportType
     {
         NO_NET(0, "no_net"),
-        MOBILE_NET(1, "mobile_net"),
-        WIFI_NET(2, "wifi_net"),
-        FALLBACK_ASSUME_CONNECTED(3, "fallback_assume_connected"),
-        MOBILE_BAD(4, "mobile_bad");
+        MOBILE_BAD(1, "mobile_bad"),
+        FALLBACK_ASSUME_CONNECTED(2, "fallback_assume_connected"),
+        MOBILE_NET(3, "mobile_net"),
+        WIFI_NET(4, "wifi_net");
+
+        /**
+         * Holder-class workaround: an enum constructor may not reference
+         * static fields of its OWN enum class (JLS 8.9.2).
+         */
+        private static final class TRANSPORT_PALETTE
+        {
+            static final int[] COLORS = {
+                    0xFF9E9E9E, // 0: NO_NET (Neutral Grey)
+                    0xFFFF5252, // 1: MOBILE_BAD (Bright Red)
+                    0xFFFF9800, // 2: FALLBACK_ASSUME_CONNECTED (Vivid Orange)
+                    0xFFCDDC39, // 3: MOBILE_NET (Lime / Yellow-Green)
+                    0xFF00E676  // 4: WIFI_NET (Vibrant Teal-Green)
+            };
+        }
 
         public final int value;
         public final String text;
+        public final int color;
 
         NetworkTransportType(int value, String text)
         {
             this.value = value;
             this.text = text;
+            this.color = (value >= 0 && value < TRANSPORT_PALETTE.COLORS.length)
+                    ? TRANSPORT_PALETTE.COLORS[value]
+                    : 0xFF888888; // fallback grey
         }
 
         public static NetworkTransportType fromInt(int value)
@@ -105,8 +123,25 @@ public class ConnectionManager extends BroadcastReceiver
                     return t;
                 }
             }
-
             return NO_NET;
+        }
+
+        public static int getColorForState(int stateValue)
+        {
+            if (stateValue >= 0 && stateValue < TRANSPORT_PALETTE.COLORS.length)
+            {
+                return TRANSPORT_PALETTE.COLORS[stateValue];
+            }
+            return 0xFF888888;
+        }
+
+        public static int getMaxValue()
+        {
+            int max = 0;
+            for (NetworkTransportType t : values()) {
+                if (t.value > max) max = t.value;
+            }
+            return max;
         }
     }
 

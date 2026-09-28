@@ -119,7 +119,9 @@ public class HistoryChartView extends View
         float laneHeight = LANE_HEIGHT_DP * density;
         float labelPad = PUSH_LABEL_PAD_DP * density;
         int lanes = (maxLanes > 0) ? maxLanes : TRIFAGlobals.APP_STATE.values().length;
-        float bottom = (lanes + 4f) * laneHeight + 2f * labelPad + EXPORT_BOTTOM_PAD_DP * density;
+        int transportLanes = ConnectionManager.NetworkTransportType.values().length;
+        // lanes + 3 push + transport lanes
+        float bottom = (lanes + 3f + transportLanes) * laneHeight + 2f * labelPad + EXPORT_BOTTOM_PAD_DP * density;
         return Math.max(1, (int) Math.ceil(bottom));
     }
 
@@ -295,8 +297,8 @@ public class HistoryChartView extends View
         // 1. Fixed vertical space used by captions and padding
         float fixedVerticalPadding = (2f * PUSH_LABEL_PAD_DP * density) + (EXPORT_BOTTOM_PAD_DP * density);
 
-        // 2. Total number of horizontal lanes (States + 3 Push + 1 No-Internet)
-        int totalLaneSlots = maxLanes + 4;
+        // 2. Total number of horizontal lanes (States + 3 Push + Transport Lanes)
+        int totalLaneSlots = maxLanes + 3 + ConnectionManager.NetworkTransportType.values().length;
 
         // 3. DYNAMIC LANE HEIGHT: shrink lanes if the screen is too short (prevents clipping)
         float idealLaneHeight = LANE_HEIGHT_DP * density;
@@ -491,81 +493,61 @@ public class HistoryChartView extends View
         }
 
         // ====================================================================
-        // No-Internet lane: ONE lane below the 3 push lanes.
-        // Consecutive minutes are merged into outage bars.
+        // Network State section: lanes below the 3 push lanes.
+        // Sorted strictly by NetworkTransportType enum .value (0 at bottom, max at top).
         // ====================================================================
-        final float noInternetLaneTop = pushLanesTop + (3f * laneHeight);
-        final float niLabelPad        = PUSH_LABEL_PAD_DP * density;
-        final float noInternetY       = noInternetLaneTop + niLabelPad + (laneHeight - squareSize) / 2f;
-        final int   noInternetColor   = TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.color;
+        final int maxTransportValue = ConnectionManager.NetworkTransportType.getMaxValue();
 
-        canvas.drawLine(0, noInternetLaneTop, w, noInternetLaneTop, linePaint);
+        final float transportSectionTop = pushLanesTop + (3f * laneHeight);
+        final float transportLabelPad   = PUSH_LABEL_PAD_DP * density;
+        final float transportLanesTop   = transportSectionTop + transportLabelPad;
+
+        canvas.drawLine(0, transportSectionTop, w, transportSectionTop, linePaint);
 
         {
-            String niCaption = "no internet";
+            String transportCaption = "network state";
             textPaint.setTextSize(11f * density);
-            float tw = textPaint.measureText(niCaption);
+            textPaint.setColor(Color.parseColor("#B0BEC5"));
+            float tw = textPaint.measureText(transportCaption);
             float cx = nowX - tw - (8f * density);
             if (cx < (8f * density)) cx = (8f * density);
-            canvas.drawText(niCaption, cx, noInternetLaneTop + (10f * density), textPaint);
+            canvas.drawText(transportCaption, cx, transportSectionTop + (10f * density), textPaint);
+            textPaint.setColor(Color.parseColor("#DDDDDD"));
         }
 
         if (hasData)
         {
-            squarePaint.setColor(noInternetColor);
-            boolean ni_in_run = false;
-            float ni_run_x1 = 0f;
-            float ni_run_x2 = 0f;
-
-            int oldest2 = (TrifaToxService.app_state_history_index - TrifaToxService.HISTORY_SIZE + TrifaToxService.HISTORY_SIZE) %
+            int oldest3 = (TrifaToxService.app_state_history_index - TrifaToxService.HISTORY_SIZE + TrifaToxService.HISTORY_SIZE) %
                           TrifaToxService.HISTORY_SIZE;
 
             for (int i = 0; i < TrifaToxService.HISTORY_SIZE; i++)
             {
-                int idx = (oldest2 + i) % TrifaToxService.HISTORY_SIZE;
+                int idx = (oldest3 + i) % TrifaToxService.HISTORY_SIZE;
                 long ts = TrifaToxService.app_state_history_ts[idx];
                 if (ts <= 0) continue;
-                if (ts > now) break;            // ring is chronological
+                if (ts < startTs) continue;
+                if (ts > now) break;
 
-                if (TrifaToxService.no_internet_history[idx])
+                float x = xOf(ts, startTs, minuteWidthPx);
+                if (x < -squareSize || x > nowX) continue;
+
+                // Iterate through all defined transport types
+                for (ConnectionManager.NetworkTransportType type : ConnectionManager.NetworkTransportType.values())
                 {
-                    if (ts < startTs) continue; // older than 24h window (head of ring)
+                    int arrayIndex = type.value;
 
-                    float x1 = xOf(ts, startTs, minuteWidthPx);
-                    float x2 = xOf(ts + TrifaToxService.MINUTE_IN_MILLIS, startTs, minuteWidthPx);
-                    if (x2 > nowX) x2 = nowX;   // never draw into the right padding strip
-                    if (x2 <= x1) continue;
+                    // Safety check to prevent out-of-bounds if array sizing mismatches
+                    if (arrayIndex < TrifaToxService.app_transport_histories.length &&
+                        TrifaToxService.app_transport_histories[arrayIndex][idx])
+                    {
+                        // Sort by .value: 0 is bottom lane, maxTransportValue is top lane
+                        float y = transportLanesTop + ((maxTransportValue - type.value) * laneHeight) + (laneHeight - squareSize) / 2f;
 
-                    if (!ni_in_run)
-                    {
-                        ni_in_run = true;
-                        ni_run_x1 = x1;
-                        ni_run_x2 = x2;
-                    }
-                    else if (x1 <= ni_run_x2 + 1f)
-                    {
-                        ni_run_x2 = x2;         // contiguous -> extend the bar
-                    }
-                    else
-                    {
-                        canvas.drawRoundRect(new RectF(ni_run_x1, noInternetY, ni_run_x2, noInternetY + squareSize), 4f, 4f, squarePaint);
-                        ni_run_x1 = x1;
-                        ni_run_x2 = x2;
+                        // Use the color embedded in the enum
+                        squarePaint.setColor(type.color);
+                        canvas.drawRoundRect(new RectF(x, y, x + squareSize, y + squareSize), 4f, 4f, squarePaint);
                     }
                 }
-                else
-                {
-                    if (ni_in_run)
-                    {
-                        canvas.drawRoundRect(new RectF(ni_run_x1, noInternetY, ni_run_x2, noInternetY + squareSize), 4f, 4f, squarePaint);
-                        ni_in_run = false;
-                    }
-                }
-            }
-
-            if (ni_in_run)
-            {
-                canvas.drawRoundRect(new RectF(ni_run_x1, noInternetY, ni_run_x2, noInternetY + squareSize), 4f, 4f, squarePaint);
             }
         }
 

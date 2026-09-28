@@ -269,6 +269,7 @@ public class TrifaToxService extends Service
     // [ADDED] 24-Hour Rolling History (1440 minutes)
     public static final int HISTORY_SIZE = 1440;
     public static final boolean[][] app_state_histories = new boolean[TRIFAGlobals.APP_STATE.values().length][HISTORY_SIZE];
+    public static final boolean[][] app_transport_histories = new boolean[ConnectionManager.NetworkTransportType.values().length][HISTORY_SIZE];
     public static final long[] app_state_history_ts = new long[HISTORY_SIZE];
     public static int app_state_history_count = 0;
     public static int app_state_history_index = 0;
@@ -1941,6 +1942,31 @@ public class TrifaToxService extends Service
                             } else if (global_self_connection_status == TOX_CONNECTION_NONE.value) {
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_OFFLINE_IDLE.value][app_state_history_index] = true;
                             }
+
+                            // --- CAPTURE NETWORK TRANSPORT LATCHES ---
+                            // Trip the latch for the CURRENT state.
+                            // This solves the "stayed in the same state for 3 minutes straight" problem.
+                            ConnectionManager.trip_latch_for_current_state();
+
+                            // Clear all transport tracks for this minute first
+                            for (int t = 0; t < app_transport_histories.length; t++) {
+                                app_transport_histories[t][app_state_history_index] = false;
+                            }
+
+                            // Read the latches into the transport history array
+                            app_transport_histories[ConnectionManager.NetworkTransportType.WIFI_NET.value][app_state_history_index] = ConnectionManager.latch_wifi_net;
+                            app_transport_histories[ConnectionManager.NetworkTransportType.MOBILE_NET.value][app_state_history_index] = ConnectionManager.latch_mobile_net;
+                            app_transport_histories[ConnectionManager.NetworkTransportType.MOBILE_BAD.value][app_state_history_index] = ConnectionManager.latch_mobile_bad;
+                            app_transport_histories[ConnectionManager.NetworkTransportType.NO_NET.value][app_state_history_index] = ConnectionManager.latch_no_net;
+                            app_transport_histories[ConnectionManager.NetworkTransportType.FALLBACK_ASSUME_CONNECTED.value][app_state_history_index] = ConnectionManager.latch_fallback;
+
+                            // Reset the latches for the next 1-minute window
+                            ConnectionManager.latch_wifi_net = false;
+                            ConnectionManager.latch_mobile_net = false;
+                            ConnectionManager.latch_mobile_bad = false;
+                            ConnectionManager.latch_no_net = false;
+                            ConnectionManager.latch_fallback = false;
+                            // -----------------------------------------
 
                             // --- 4. WRITE TO RING BUFFER ---
                             // 1. Write timestamp to the CURRENT index
