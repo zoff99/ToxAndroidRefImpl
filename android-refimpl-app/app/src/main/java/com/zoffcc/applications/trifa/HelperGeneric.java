@@ -166,6 +166,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_HASH_LENGTH;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MAX_FILETRANSFER_SIZE_MSGV2;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_MESSAGE_TYPE.TOX_MESSAGE_TYPE_HIGH_LEVEL_ACK;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_PUBLIC_KEY_SIZE;
+import static com.zoffcc.applications.trifa.TrifaToxService.MINUTE_IN_MILLIS;
 import static com.zoffcc.applications.trifa.TrifaToxService.is_tox_started;
 import static com.zoffcc.applications.trifa.TrifaToxService.need_wakeup_now;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -3888,7 +3889,7 @@ public class HelperGeneric
             // Compare ONLY the category, NOT the detail string (which contains changing ms values and sub-reasons)
             boolean reason_changed = (last_prevented_sleep_reason == null) ||
                                      (!cat.equals(last_prevented_sleep_reason));
-            boolean time_to_log_heartbeat = (last_log_battery_savings_criteria_ts + 60000) < now;
+            boolean time_to_log_heartbeat = (last_log_battery_savings_criteria_ts + MINUTE_IN_MILLIS) < now;
 
             if (reason_changed)
             {
