@@ -1799,6 +1799,11 @@ public class TrifaToxService extends Service
                         HelperGeneric.battery_sleep_log_add(info);
                     }
 
+                    // HINT: always reset the values on every loop ----------
+                    need_wakeup_now = false;
+                    trifa_service_thread = null;
+                    // HINT: always reset the values on every loop ----------
+
                     // [ADDED] Check for sustained fast iteration (< xx ms)
                     if (tox_iteration_interval_ms < FAST_ITERATION_THRESHOLD_MS)
                     {
