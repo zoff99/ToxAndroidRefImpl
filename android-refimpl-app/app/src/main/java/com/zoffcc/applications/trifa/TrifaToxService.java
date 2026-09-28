@@ -292,6 +292,14 @@ public class TrifaToxService extends Service
     static int no_internet_last_ec = 0;
     static boolean no_internet_prev_offline = false;
 
+    // Tracks how many times bootstrap_me__real() has been entered.
+    // The tox-loop samples this once per minute and records STATE_BOOTSTRAPPING
+    // if the value changed since the previous sample.
+    public static final AtomicInteger bootstrap_me_real_edge_count = new AtomicInteger(0);
+
+    // Tox-loop-thread-private bookkeeping for bootstrap history.
+    static int last_bootstrap_me_real_ec = 0;
+
     public static void recordWakeup(String reason, long sleepStartMs, long sleepEndMs) {
         long sleepDuration = sleepEndMs - sleepStartMs;
         long awakeDuration = 0;
@@ -1401,6 +1409,9 @@ public class TrifaToxService extends Service
 
                 load_and_add_all_friends();
 
+                // HINT: keep this before the first bootstrapping, to also record that
+                last_bootstrap_me_real_ec = bootstrap_me_real_edge_count.get();
+
                 // --------------- bootstrap ---------------
                 // --------------- bootstrap ---------------
                 // --------------- bootstrap ---------------
@@ -1887,8 +1898,10 @@ public class TrifaToxService extends Service
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_HIGH_NETWORK_ACTIVITY.value][app_state_history_index] = true;
                             }
 
-                            if (bootstrapping) {
+                            int bootstrap_ec = bootstrap_me_real_edge_count.get();
+                            if (bootstrap_ec != last_bootstrap_me_real_ec) {
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_BOOTSTRAPPING.value][app_state_history_index] = true;
+                                last_bootstrap_me_real_ec = bootstrap_ec;
                             }
 
                             if (global_showing_messageview || global_showing_anygroupview) {
@@ -2500,6 +2513,15 @@ public class TrifaToxService extends Service
     static void bootstrap_me__real()
     {
         Log.i(TAG, "bootstrap_me");
+
+        bootstrap_me_real_edge_count.incrementAndGet();
+
+        append_logger_msg(TAG + "::" + "bootstrap_me__real() [actual]");
+        HelperGeneric.battery_sleep_log_add(
+                "BOOTSTRAP_REAL:" +
+                "|conn=" + global_self_connection_status +
+                "|net=" + (HAVE_INTERNET_CONNECTIVITY ? "Y" : "N"));
+
 
         bootstap_from_custom_nodes();
 
