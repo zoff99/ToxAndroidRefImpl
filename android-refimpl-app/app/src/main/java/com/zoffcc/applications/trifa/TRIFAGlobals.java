@@ -68,7 +68,7 @@ public class TRIFAGlobals
     final static int TOX_BOOTSTRAP_MIN_INTERVAL_SECS = 60; // 60 seconds
     final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =
             1000 * 60 * 2; // bootstrap again after 2 minutes offline
-    final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 60 * 3; // 3 minutes
+    final static int SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE = 60 * 4; // 4 minutes
     static long BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = 15 * 1000 * 60; // 15 minutes default
     final static int HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES = 140;
 
