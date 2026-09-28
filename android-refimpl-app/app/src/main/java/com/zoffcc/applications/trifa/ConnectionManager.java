@@ -77,6 +77,99 @@ public class ConnectionManager extends BroadcastReceiver
         }
     }
 
+    // [ADDED] Independent network transport type.
+    // Do NOT mix this with InternetConnectivityState.
+    public enum NetworkTransportType
+    {
+        NO_NET(0, "no_net"),
+        MOBILE_NET(1, "mobile_net"),
+        WIFI_NET(2, "wifi_net"),
+        FALLBACK_ASSUME_CONNECTED(3, "fallback_assume_connected"),
+        MOBILE_BAD(4, "mobile_bad");
+
+        public final int value;
+        public final String text;
+
+        NetworkTransportType(int value, String text)
+        {
+            this.value = value;
+            this.text = text;
+        }
+
+        public static NetworkTransportType fromInt(int value)
+        {
+            for (NetworkTransportType t : values())
+            {
+                if (t.value == value)
+                {
+                    return t;
+                }
+            }
+
+            return NO_NET;
+        }
+    }
+
+    public static volatile NetworkTransportType CURRENT_NETWORK_TRANSPORT_TYPE = NetworkTransportType.FALLBACK_ASSUME_CONNECTED;
+    public static volatile int CURRENT_NETWORK_TRANSPORT_TYPE_INT = NetworkTransportType.FALLBACK_ASSUME_CONNECTED.value;
+    public static volatile String CURRENT_NETWORK_TRANSPORT_TYPE_TEXT = NetworkTransportType.FALLBACK_ASSUME_CONNECTED.text;
+
+    // =====================================================================
+    // --- 1-MINUTE HISTORY LATCHES (TRIPWIRES) ---
+    // These flip to true the microsecond a state is touched, and are reset
+    // by the TrifaToxService sampler every 60 seconds.
+    // =====================================================================
+    public static volatile boolean latch_wifi_net = false;
+    public static volatile boolean latch_mobile_net = false;
+    public static volatile boolean latch_mobile_bad = false;
+    public static volatile boolean latch_no_net = false;
+    public static volatile boolean latch_fallback = false;
+
+    private static void set_latch(NetworkTransportType type) {
+        switch (type) {
+            case WIFI_NET: latch_wifi_net = true; break;
+            case MOBILE_NET: latch_mobile_net = true; break;
+            case MOBILE_BAD: latch_mobile_bad = true; break;
+            case NO_NET: latch_no_net = true; break;
+            case FALLBACK_ASSUME_CONNECTED: latch_fallback = true; break;
+        }
+    }
+
+    // [ADDED] Call this from TrifaToxService right before reading the latches.
+    // This solves the "stayed in the same state for 3 minutes straight" edge case.
+    public static void trip_latch_for_current_state() {
+        synchronized (ConnectionManager.class) {
+            set_latch(CURRENT_NETWORK_TRANSPORT_TYPE);
+        }
+    }
+    // =====================================================================
+
+    // [ADDED] Internal helper to update transport type.
+    private static void set_network_transport_type_internal(NetworkTransportType newState)
+    {
+        synchronized (ConnectionManager.class)
+        {
+            // [ADDED] Trip the latches for BOTH the old and new states.
+            // This guarantees that if we switch mid-minute, BOTH are recorded as active.
+            set_latch(CURRENT_NETWORK_TRANSPORT_TYPE);
+            set_latch(newState);
+
+            if (CURRENT_NETWORK_TRANSPORT_TYPE == newState)
+            {
+                return;
+            }
+
+            CURRENT_NETWORK_TRANSPORT_TYPE = newState;
+            CURRENT_NETWORK_TRANSPORT_TYPE_INT = newState.value;
+            CURRENT_NETWORK_TRANSPORT_TYPE_TEXT = newState.text;
+
+            Log.i(TAG, "NET_CHANGE:network transport type changed: " + newState.text);
+
+            append_logger_msg(TAG + "::" +
+                              "network_transport_type=" + newState.text);
+        }
+    }
+
     // [ADDED] Current state as enum.
     public static volatile InternetConnectivityState CURRENT_INTERNET_CONNECTIVITY_STATE =
             InternetConnectivityState.UNREGISTERED;
@@ -177,6 +270,50 @@ public class ConnectionManager extends BroadcastReceiver
         {
             append_logger_msg(TAG + "::" + "bootstrap_me()");
             bootstrap_me(false);
+        }
+    }
+
+    // [ADDED] Legacy helper.
+    // On old Android versions we cannot detect validated/unvalidated the same way.
+    // This is only a best-effort transport mapping.
+    private static void set_transport_from_legacy_active_info(NetworkInfo activeInfo)
+    {
+        if (activeInfo == null)
+        {
+            set_network_transport_type_internal(NetworkTransportType.NO_NET);
+            return;
+        }
+
+        int type = activeInfo.getType();
+        boolean connected = activeInfo.isConnected();
+
+        if (type == ConnectivityManager.TYPE_WIFI)
+        {
+            if (connected)
+            {
+                set_network_transport_type_internal(NetworkTransportType.WIFI_NET);
+            }
+            else
+            {
+                set_network_transport_type_internal(NetworkTransportType.NO_NET);
+            }
+        }
+        else if (type == ConnectivityManager.TYPE_MOBILE)
+        {
+            if (connected)
+            {
+                set_network_transport_type_internal(NetworkTransportType.MOBILE_NET);
+            }
+            else
+            {
+                // Legacy approximation:
+                // mobile interface present, but not connected/usability unknown.
+                set_network_transport_type_internal(NetworkTransportType.MOBILE_BAD);
+            }
+        }
+        else
+        {
+            set_network_transport_type_internal(NetworkTransportType.FALLBACK_ASSUME_CONNECTED);
         }
     }
 
@@ -350,6 +487,8 @@ public class ConnectionManager extends BroadcastReceiver
 
             if (cm == null)
             {
+                set_network_transport_type_internal(NetworkTransportType.FALLBACK_ASSUME_CONNECTED);
+
                 // If we cannot get ConnectivityManager, fall back to "assume connected".
                 set_internet_conn_state_internal(
                         InternetConnectivityState.ERROR_FALLBACK_ASSUME_CONNECTED,
@@ -363,6 +502,8 @@ public class ConnectionManager extends BroadcastReceiver
             {
                 NetworkInfo activeInfo = cm.getActiveNetworkInfo();
                 boolean connected = (activeInfo != null) && activeInfo.isConnected();
+
+                set_transport_from_legacy_active_info(activeInfo);
 
                 set_internet_conn_state_internal(
                         connected ?
@@ -413,6 +554,7 @@ public class ConnectionManager extends BroadcastReceiver
                     // No matching network available.
                     Log.i(TAG, "onUnavailable");
                     set_internet_conn_state_internal(InternetConnectivityState.LOST, false, false);
+                    set_network_transport_type_internal(NetworkTransportType.NO_NET);
                 }
             };
 
@@ -427,6 +569,8 @@ public class ConnectionManager extends BroadcastReceiver
         {
             e.printStackTrace();
             Log.i(TAG, "registerModernNetworkCallback:EE:" + e.getMessage());
+
+            set_network_transport_type_internal(NetworkTransportType.FALLBACK_ASSUME_CONNECTED);
 
             // Preserve existing design: if in doubt, assume connectivity.
             set_internet_conn_state_internal(
@@ -448,6 +592,7 @@ public class ConnectionManager extends BroadcastReceiver
             if (context == null)
             {
                 set_internet_conn_state_internal(InternetConnectivityState.UNREGISTERED, false, true);
+                set_network_transport_type_internal(NetworkTransportType.NO_NET);
                 return;
             }
 
@@ -463,6 +608,7 @@ public class ConnectionManager extends BroadcastReceiver
 
             // Force-notify as requested on unregistering.
             set_internet_conn_state_internal(InternetConnectivityState.UNREGISTERED, false, true);
+            set_network_transport_type_internal(NetworkTransportType.NO_NET);
 
             append_logger_msg(TAG + "::" + "Modern NetworkCallback unregistered.");
         }
@@ -474,6 +620,7 @@ public class ConnectionManager extends BroadcastReceiver
             modernNetworkCallback = null;
 
             set_internet_conn_state_internal(InternetConnectivityState.UNREGISTERED, false, true);
+            set_network_transport_type_internal(NetworkTransportType.NO_NET);
         }
     }
 
@@ -488,6 +635,7 @@ public class ConnectionManager extends BroadcastReceiver
 
             if (cm == null)
             {
+                set_network_transport_type_internal(NetworkTransportType.FALLBACK_ASSUME_CONNECTED);
                 set_internet_conn_state_internal(
                         InternetConnectivityState.ERROR_FALLBACK_ASSUME_CONNECTED,
                         true,
@@ -501,6 +649,8 @@ public class ConnectionManager extends BroadcastReceiver
                 boolean connected = (activeInfo != null) && activeInfo.isConnected();
 
                 append_logger_msg(TAG + "::" + source + " old fallback activeInfo=" + activeInfo);
+
+                set_transport_from_legacy_active_info(activeInfo);
 
                 set_internet_conn_state_internal(
                         connected ?
@@ -518,6 +668,7 @@ public class ConnectionManager extends BroadcastReceiver
             {
                 append_logger_msg(TAG + "::" + source + " activeNetwork=null");
                 set_internet_conn_state_internal(InternetConnectivityState.LOST, false, false);
+                set_network_transport_type_internal(NetworkTransportType.NO_NET);
                 return;
             }
 
@@ -527,6 +678,7 @@ public class ConnectionManager extends BroadcastReceiver
             {
                 append_logger_msg(TAG + "::" + source + " caps=null");
                 set_internet_conn_state_internal(InternetConnectivityState.LOST, false, false);
+                set_network_transport_type_internal(NetworkTransportType.NO_NET);
                 return;
             }
 
@@ -546,6 +698,30 @@ public class ConnectionManager extends BroadcastReceiver
             {
                 set_internet_conn_state_internal(InternetConnectivityState.UNVALIDATED, false, false);
             }
+
+            // [ADDED] Determine transport type.
+            // MOBILE_BAD is used ONLY when we are on cellular/mobile transport,
+            // but the network is not validated / not usable.
+            if (caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR))
+            {
+                if (hasInternet && isValidated)
+                {
+                    set_network_transport_type_internal(NetworkTransportType.MOBILE_NET);
+                }
+                else
+                {
+                    set_network_transport_type_internal(NetworkTransportType.MOBILE_BAD);
+                }
+            }
+            else if (caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI))
+            {
+                set_network_transport_type_internal(NetworkTransportType.WIFI_NET);
+            }
+            else
+            {
+                set_network_transport_type_internal(NetworkTransportType.FALLBACK_ASSUME_CONNECTED);
+            }
+            // ---------------------------------------
         }
         catch (Exception e)
         {
@@ -557,6 +733,7 @@ public class ConnectionManager extends BroadcastReceiver
                     InternetConnectivityState.ERROR_FALLBACK_ASSUME_CONNECTED,
                     true,
                     false);
+            set_network_transport_type_internal(NetworkTransportType.FALLBACK_ASSUME_CONNECTED);
         }
     }
 
