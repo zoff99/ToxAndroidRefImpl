@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.app.ApplicationExitInfo;
 import android.app.ProgressDialog;
@@ -58,9 +59,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URLEncoder;
@@ -93,6 +96,7 @@ import okhttp3.Response;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_tcprelay_nodes_into_db;
 import static com.zoffcc.applications.trifa.BootstrapNodeEntryDB.insert_default_udp_nodes_into_db;
 import static com.zoffcc.applications.trifa.HelperGeneric.delete_vfs_file;
+import static com.zoffcc.applications.trifa.HelperGeneric.display_toast;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_trifa_build_str;
 import static com.zoffcc.applications.trifa.HelperGeneric.import_toxsave_file_unsecure;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format_for_filename;
@@ -107,6 +111,7 @@ import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_CHATS_EXPOR
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_ENC_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.SelectLanguageActivity_ID;
+import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_frame_played;
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_pkt_incoming;
 import static com.zoffcc.applications.trifa.MainActivity.debug__audio_play_buf01;
@@ -174,6 +179,13 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     private static final String RECENT_EMOJIS = "recent-emojis";
     //
     // ----------------------------------------------------
+
+    private static final int REQUEST_CODE_SAVEDATA_EXPORT = 4501;
+    private static final String PREFS_KEY_SAVEDATA_EXPORT = "savedata_export_dir";
+
+    // Hold the active exporter instance so onActivityResult can forward the result to it
+    @SuppressLint("StaticFieldLeak")
+    private static DocumentExporter exporter = null;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -506,6 +518,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         });
 
         final Context this_context = this;
+        final Activity this_activity = this;
 
         button_export_savedata.setOnClickListener(new View.OnClickListener()
         {
@@ -514,7 +527,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
             {
                 try
                 {
-                    export_savedata_unsecure(this_context);
+                    export_savedata_unsecure(this_activity);
                 }
                 catch (Exception e)
                 {
@@ -1283,18 +1296,6 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         return "Tombstone text extraction is only supported on Android 12 (API 31) or higher.";
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
     public static void shareFirstTombstoneData(Context c) {
         int totalTombstones = getTombstoneCount(c);
 
@@ -1592,7 +1593,142 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         super.onPause();
     }
 
-    public static void export_savedata_unsecure(final Context context)
+    public static void export_savedata_unsecure(final Activity activity) {
+        final String fileName = "unsecure_export_savedata.tox";
+        final String tempFilePath = SD_CARD_FILES_EXPORT_DIR + "/" + fileName;
+
+        try {
+            if (exporter == null) {
+                exporter = new DocumentExporter(activity, PREFS_KEY_SAVEDATA_EXPORT, REQUEST_CODE_SAVEDATA_EXPORT);
+            }
+
+            // Check if a valid directory is already saved and has permissions
+            final boolean hasDir = exporter.hasDirectorySelected();
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Export Tox Savedata");
+
+            if (hasDir) {
+                builder.setMessage("Tox Savedata File will be exported unencrypted to the previously selected folder.");
+
+                builder.setPositiveButton("Export", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Just export using the existing directory
+                        runExport(activity, exporter, tempFilePath, fileName, false);
+                    }
+                });
+
+                builder.setNeutralButton("Change directory & Export", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Force the folder picker to open, then export
+                        runExport(activity, exporter, tempFilePath, fileName, true);
+                    }
+                });
+            } else {
+                builder.setMessage("Tox Savedata File will be exported unencrypted. Please select a destination folder.");
+
+                builder.setPositiveButton("Select Folder & Export", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Open folder picker, then export
+                        runExport(activity, exporter, tempFilePath, fileName, false);
+                    }
+                });
+            }
+
+            builder.setNegativeButton("Cancel", null);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Helper method to handle the actual export logic, preventing code duplication.
+     */
+    private static void runExport(final Activity activity, final DocumentExporter exporter, final String tempFilePath, final String fileName, final boolean forceChange) {
+        Runnable onSuccess = new Runnable() {
+            @Override
+            public void run() {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            // Step A: Let the native code write to the hardcoded location
+                            export_savedata_file_unsecure("_", tempFilePath);
+
+                            // Step B: Verify the file was actually created
+                            File tempFile = new File(tempFilePath);
+                            if (!tempFile.exists() || tempFile.length() == 0) {
+                                showError(activity, "Failed to generate savedata file.");
+                                return;
+                            }
+
+                            // Step C: Create the destination file in the user-selected SAF directory
+                            Uri destUri = exporter.createFileUri(fileName, "application/octet-stream");
+                            if (destUri == null) {
+                                showError(activity, "Failed to create destination file in selected folder.");
+                                return;
+                            }
+
+                            // Step D: Copy the file contents from the hardcoded path to the SAF Uri
+                            InputStream in = null;
+                            OutputStream out = null;
+                            try {
+                                in = new FileInputStream(tempFile);
+                                out = activity.getContentResolver().openOutputStream(destUri);
+
+                                byte[] buffer = new byte[8192];
+                                int bytesRead;
+                                while ((bytesRead = in.read(buffer)) != -1) {
+                                    out.write(buffer, 0, bytesRead);
+                                }
+                                out.flush();
+
+                                // Step E: SUCCESS! Clean up the temporary unencrypted file immediately
+                                tempFile.delete();
+
+                                showSuccess(activity, "Savedata exported successfully.");
+                            } finally {
+                                // Ensure streams are closed even if an exception occurs
+                                if (in != null) try { in.close(); } catch (Exception ignored) {}
+                                if (out != null) try { out.close(); } catch (Exception ignored) {}
+                            }
+                        } catch (final Exception e) {
+                            e.printStackTrace();
+                            showError(activity, "Export failed: " + e.getMessage());
+                        }
+                    }
+                }).start();
+            }
+        };
+
+        DocumentExporter.ErrorCallback onError = new DocumentExporter.ErrorCallback() {
+            @Override
+            public void onError(String message) {
+                showError(activity, "Export cancelled or failed: " + message);
+            }
+        };
+
+        // If forceChange is true, we bypass the saved directory check and force the picker
+        if (forceChange) {
+            exporter.changeDirectory(onSuccess, onError);
+        } else {
+            exporter.ensureDirectory(onSuccess, onError);
+        }
+    }
+
+    // --- Helper methods to safely show Toasts from background threads ---
+
+    private static void showError(final Activity activity, final String message) {
+        display_toast(message, false, 800);
+    }
+
+    private static void showSuccess(final Activity activity, final String message) {
+        display_toast(message, false, 800);
+    }
+
+    public static void export_savedata_unsecure___OLD_UNUSED(final Context context)
     {
         // create directory in case it does not exist yet
         try
@@ -1978,6 +2114,7 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
         return ret.toString();
     }
 
+    @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
         super.onActivityResult(requestCode, resultCode, data);
@@ -2096,6 +2233,19 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 catch (Exception e)
                 {
                     e.printStackTrace();
+                }
+            }
+        }
+        else if (requestCode == REQUEST_CODE_SAVEDATA_EXPORT)
+        {
+            if (exporter != null)
+            {
+                try
+                {
+                    exporter.handleActivityResult(requestCode, resultCode, data);
+                }
+                catch(Exception ignored)
+                {
                 }
             }
         }

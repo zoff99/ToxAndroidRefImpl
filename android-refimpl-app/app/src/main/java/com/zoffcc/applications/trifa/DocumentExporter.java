@@ -46,6 +46,10 @@ public class DocumentExporter {
         this.treeUri = loadSavedTreeUri();
     }
 
+    public boolean hasDirectorySelected() {
+        return hasUsableTree(treeUri);
+    }
+
     /**
      * Ensures a writable directory is selected.
      * If already selected, runs onSuccess immediately on the UI thread.
