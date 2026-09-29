@@ -7130,6 +7130,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_chunk_request_cb_method(long friend_number, long file_number, long position, long length)
     {
+        long t1 = System.nanoTime() / 1_000_000;
+
         //if (PREF__X_battery_saving_mode)
         //{
         //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:009:*PING*");
@@ -7151,6 +7153,8 @@ public class MainActivity extends AppCompatActivity
             if (ft == null)
             {
                 Log.i(TAG, "file_chunk_request:ft=NULL");
+                long t2 = System.nanoTime() / 1_000_000;
+                if ((t2 - t1) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_CALLBACK:part=file_chunk_request_1|dur=" + (t2 - t1) + "ms");
                 return;
             }
 
@@ -7520,6 +7524,9 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
             Log.i(TAG, "file_chunk_request:EE1:" + e.getMessage());
         }
+        Log.i(TAG, "file_chunk_request:ft=NULL");
+        long t2 = System.nanoTime() / 1_000_000;
+        if ((t2 - t1) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_CALLBACK:part=file_chunk_request_2|dur=" + (t2 - t1) + "ms");
     }
 
     static void android_tox_callback_file_recv_cb_method(long friend_number, long file_number, int a_TOX_FILE_KIND, long file_size, String filename, long filename_length)
@@ -7963,6 +7970,8 @@ public class MainActivity extends AppCompatActivity
 
     static void android_tox_callback_file_recv_chunk_cb_method(long friend_number, long file_number, long position, byte[] data, long length)
     {
+        long t1 = System.nanoTime() / 1_000_000;
+
         //if (PREF__X_battery_saving_mode)
         //{
         //    Log.i(TAG, "global_last_activity_for_battery_savings_ts:011:*PING*");
@@ -7985,6 +7994,8 @@ public class MainActivity extends AppCompatActivity
 
             if (f == null)
             {
+                long t2 = System.nanoTime() / 1_000_000;
+                if ((t2 - t1) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_CALLBACK:part=file_recv_chunk_1|dur=" + (t2 - t1) + "ms");
                 return;
             }
 
@@ -8015,6 +8026,8 @@ public class MainActivity extends AppCompatActivity
         catch (Exception e)
         {
             e.printStackTrace();
+            long t2 = System.nanoTime() / 1_000_000;
+            if ((t2 - t1) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_CALLBACK:part=file_recv_chunk_2|dur=" + (t2 - t1) + "ms");
             return;
         }
 
@@ -8187,6 +8200,9 @@ public class MainActivity extends AppCompatActivity
                 Log.i(TAG, "file_recv_chunk:EE1:" + e.getMessage());
             }
         }
+
+        long t2 = System.nanoTime() / 1_000_000;
+        if ((t2 - t1) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_CALLBACK:part=file_recv_chunk_3|dur=" + (t2 - t1) + "ms");
     }
 
     // void test(int i)
