@@ -1171,13 +1171,16 @@ public class TrifaToxService extends Service
             long slept_ms = end - start;
             if (slept_ms < 0) slept_ms = 0;
             stats_time_tox_not_iterating_ms = stats_time_tox_not_iterating_ms + slept_ms;
+
             recordWakeup(reason, start, end);
-            // If you added the sleep-interval ring for the chart, write it HERE too,
+
+            // [ADDED] Write to the sleep-interval ring for the chart,
             // so exception-interrupted sleeps also reach the chart:
-            // sleep_history_start[sleep_history_index] = start;
-            // sleep_history_end[sleep_history_index] = end;
-            // sleep_history_index = (sleep_history_index + 1) % SLEEP_HISTORY_SIZE;
-            // if (sleep_history_count < SLEEP_HISTORY_SIZE) sleep_history_count++;
+            sleep_history_start[sleep_history_index] = start;
+            sleep_history_end[sleep_history_index] = end;
+            sleep_history_index = (sleep_history_index + 1) % SLEEP_HISTORY_SIZE;
+            if (sleep_history_count < SLEEP_HISTORY_SIZE) sleep_history_count++;
+
             HelperGeneric.battery_sleep_log_add(
                     (ended_early ? "SLEEP_EXIT_EARLY:" : "SLEEP_EXIT_FULL:") +
                     reason + "|slept_ms=" + slept_ms);
