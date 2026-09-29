@@ -1152,6 +1152,50 @@ public class TrifaToxService extends Service
         }
     }
 
+    /**
+     * Closes and records the OPEN battery-sleep interval (if any).
+     * Invariant: battery_sleep_start_ms != 0  <=>  interval open and NOT yet recorded.
+     * Safe to call from the normal single-exit path AND from the LOOP_EXCEPT catch.
+     * Never throws, and always closes the interval (finally).
+     */
+    static void record_sleep_interval_now(String reason, boolean ended_early)
+    {
+        long start = battery_sleep_start_ms;
+        if (start <= 0)
+        {
+            return; // no open interval -> nothing to record (pre-sleep or already recorded)
+        }
+        try
+        {
+            long end = System.currentTimeMillis();
+            long slept_ms = end - start;
+            if (slept_ms < 0) slept_ms = 0;
+            stats_time_tox_not_iterating_ms = stats_time_tox_not_iterating_ms + slept_ms;
+            recordWakeup(reason, start, end);
+            // If you added the sleep-interval ring for the chart, write it HERE too,
+            // so exception-interrupted sleeps also reach the chart:
+            // sleep_history_start[sleep_history_index] = start;
+            // sleep_history_end[sleep_history_index] = end;
+            // sleep_history_index = (sleep_history_index + 1) % SLEEP_HISTORY_SIZE;
+            // if (sleep_history_count < SLEEP_HISTORY_SIZE) sleep_history_count++;
+            HelperGeneric.battery_sleep_log_add(
+                    (ended_early ? "SLEEP_EXIT_EARLY:" : "SLEEP_EXIT_FULL:") +
+                    reason + "|slept_ms=" + slept_ms);
+            append_logger_msg(TAG + "::" + "finish BATTERY SAVINGS MODE reason=" + reason +
+                              " slept_ms=" + slept_ms);
+        }
+        catch (Throwable t)
+        {
+            // recording must never kill the loop; best-effort marker in the log
+            try { HelperGeneric.battery_sleep_log_add("SLEEP_RECORD_FAIL:" + t); } catch (Throwable ignored) {}
+        }
+        finally
+        {
+            // interval is CLOSED no matter what happened above -> no double record possible
+            battery_sleep_start_ms = 0;
+        }
+    }
+
     void tox_thread_start_fg()
     {
         Log.i(TAG, "tox_thread_start_fg");
@@ -1749,25 +1793,8 @@ public class TrifaToxService extends Service
                             }
 
                             // ---- SINGLE EXIT: every path is recorded ----
-                            battery_sleep_end_ms = System.currentTimeMillis();
-                            long slept_ms = battery_sleep_end_ms - battery_sleep_start_ms;
-                            stats_time_tox_not_iterating_ms = stats_time_tox_not_iterating_ms + slept_ms;
-
-                            recordWakeup(wakeup_reason, battery_sleep_start_ms, battery_sleep_end_ms);
-                            // [ADDED] remember the real sleep interval for the chart
-                            sleep_history_start[sleep_history_index] = battery_sleep_start_ms;
-                            sleep_history_end[sleep_history_index] = battery_sleep_end_ms;
-                            sleep_history_index = (sleep_history_index + 1) % SLEEP_HISTORY_SIZE;
-                            if (sleep_history_count < SLEEP_HISTORY_SIZE) sleep_history_count++;
-
-                            HelperGeneric.battery_sleep_log_add(
-                                    (ended_early ? "SLEEP_EXIT_EARLY:" : "SLEEP_EXIT_FULL:") +
-                                    wakeup_reason + "|slept_ms=" + slept_ms);
-                            append_logger_msg(TAG + "::" + "finish BATTERY SAVINGS MODE reason=" + wakeup_reason +
-                                              " slept_ms=" + slept_ms);
-
+                            record_sleep_interval_now(wakeup_reason, ended_early);
                             wakeup_trigger_reason = "";
-                            battery_sleep_start_ms = 0;
                             need_wakeup_now = false;
                             trifa_service_thread = null;
 
@@ -1799,13 +1826,23 @@ public class TrifaToxService extends Service
                     }
                     catch (Exception e)
                     {
+                        // Marker != 0  => exception hit AFTER sleep began but BEFORE (or during)
+                        // recording -> close and record the (possibly partial) interval now,
+                        // so the slept time is never lost.
+                        // Marker == 0  => exception hit either BEFORE sleep started (nothing
+                        // to record) or AFTER recording (already recorded) -> do nothing.
+                        if (battery_sleep_start_ms != 0)
+                        {
+                            record_sleep_interval_now("LOOP_EXCEPT", true);
+                        }
+
                         String r3 = battery_saving_must_wake_reason();
                         String info = "LOOP_EXCEPT:" + ((r3 != null) ? r3 : "UNKNOWN") +
                                       "|need_wakeup=" + need_wakeup_now +
                                       "|trig=" + wakeup_trigger_reason;
                         append_logger_msg(TAG + "::" + info);
                         HelperGeneric.battery_sleep_log_add(info);
-                        battery_sleep_start_ms = 0;
+                        battery_sleep_start_ms = 0; // belt & braces (helper already cleared it)
                     }
 
                     try
