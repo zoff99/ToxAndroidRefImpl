@@ -1801,9 +1801,9 @@ public class TrifaToxService extends Service
                             need_wakeup_now = false;
                             trifa_service_thread = null;
 
-                            long t0 = System.currentTimeMillis();
+                            long t0 = System.nanoTime() / 1_000_000;
                             update_friends_and_groups();
-                            long t1 = System.currentTimeMillis();
+                            long t1 = System.nanoTime() / 1_000_000;
                             if ((t1 - t0) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=update_friends_and_groups|dur=" + (t1 - t0) + "ms");
 
 
@@ -1813,14 +1813,14 @@ public class TrifaToxService extends Service
                             global_self_last_went_offline_timestamp = System.currentTimeMillis();
                             tox_notification_change_wrapper(TOX_CONNECTION_a, "");
 
-                            long t2 = System.currentTimeMillis();
+                            long t2 = System.nanoTime() / 1_000_000;
                             bootstrap_me(true);
-                            long t3 = System.currentTimeMillis();
+                            long t3 = System.nanoTime() / 1_000_000;
                             if ((t3 - t2) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=bootstrap_me|dur=" + (t3 - t2) + "ms");
 
-                            long t4 = System.currentTimeMillis();
+                            long t4 = System.nanoTime() / 1_000_000;
                             tox_iterate();
-                            long t5 = System.currentTimeMillis();
+                            long t5 = System.nanoTime() / 1_000_000;
                             if ((t5 - t4) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=tox_iterate_post_sleep|dur=" + (t5 - t4) + "ms");
 
                             check_if_still_bootstrapping();
@@ -1947,7 +1947,7 @@ public class TrifaToxService extends Service
                         long current_time_ms2 = System.currentTimeMillis();
                         if ((current_time_ms2 - stats_last_history_ms) >= MINUTE_IN_MILLIS)
                         {
-                            long t_hist_start = System.currentTimeMillis();
+                            long t_hist_start = System.nanoTime() / 1_000_000;
 
                             long window_start = stats_last_history_ms;
                             stats_last_history_ms = current_time_ms2;
@@ -2054,7 +2054,7 @@ public class TrifaToxService extends Service
                             if (app_state_history_count < HISTORY_SIZE) app_state_history_count++;
                             app_state_last_record_ts = current_time_ms2;
 
-                            long t_hist_end = System.currentTimeMillis();
+                            long t_hist_end = System.nanoTime() / 1_000_000;
                             if ((t_hist_end - t_hist_start) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=1min_history_record|dur=" + (t_hist_end - t_hist_start) + "ms");
                         }
                     }
@@ -2062,14 +2062,14 @@ public class TrifaToxService extends Service
                     {
                     }
 
-                    long t_bs = System.currentTimeMillis();
+                    long t_bs = System.nanoTime() / 1_000_000;
                     check_if_need_bootstrap_again();
-                    long t_bs_end = System.currentTimeMillis();
+                    long t_bs_end = System.nanoTime() / 1_000_000;
                     if ((t_bs_end - t_bs) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=check_if_need_bootstrap_again|dur=" + (t_bs_end - t_bs) + "ms");
 
-                    long t_iter = System.currentTimeMillis();
+                    long t_iter = System.nanoTime() / 1_000_000;
                     MainActivity.tox_iterate();
-                    long t_iter_end = System.currentTimeMillis();
+                    long t_iter_end = System.nanoTime() / 1_000_000;
                     if ((t_iter_end - t_iter) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=tox_iterate_main|dur=" + (t_iter_end - t_iter) + "ms");
 
                     // [ADDED] Check network health every 3 seconds
@@ -2077,7 +2077,7 @@ public class TrifaToxService extends Service
                     if ((current_time_ms - last_health_check_ms) >= 3000)
                     {
                         last_health_check_ms = current_time_ms;
-                        long t_hc = System.currentTimeMillis();
+                        long t_hc = System.nanoTime() / 1_000_000;
 
                         try
                         {
@@ -2120,7 +2120,7 @@ public class TrifaToxService extends Service
                             append_logger_msg(TAG + "::" + "error checking network health: " + e.getMessage());
                         }
 
-                        long t_hc_end = System.currentTimeMillis();
+                        long t_hc_end = System.nanoTime() / 1_000_000;
                         if ((t_hc_end - t_hc) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=health_check|dur=" + (t_hc_end - t_hc) + "ms");
                     }
 
@@ -2192,16 +2192,16 @@ public class TrifaToxService extends Service
 
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
-                        long t_msg = System.currentTimeMillis();
+                        long t_msg = System.nanoTime() / 1_000_000;
                         send_or_resend_pending_messages();
-                        long t_msg_end = System.currentTimeMillis();
+                        long t_msg_end = System.nanoTime() / 1_000_000;
                         if ((t_msg_end - t_msg) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=send_or_resend_pending_messages|dur=" + (t_msg_end - t_msg) + "ms");
                     }
                     if (global_self_connection_status != TOX_CONNECTION_NONE.value)
                     {
-                        long t_ft = System.currentTimeMillis();
+                        long t_ft = System.nanoTime() / 1_000_000;
                         start_queued_filetransfers();
-                        long t_ft_end = System.currentTimeMillis();
+                        long t_ft_end = System.nanoTime() / 1_000_000;
                         if ((t_ft_end - t_ft) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=start_queued_filetransfers|dur=" + (t_ft_end - t_ft) + "ms");
                     }
 
