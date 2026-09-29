@@ -3,6 +3,7 @@ package com.zoffcc.applications.trifa;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.os.Looper;
 import androidx.documentfile.provider.DocumentFile;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Reusable helper class for exporting files using the Android Storage Access Framework (SAF).
@@ -147,6 +149,18 @@ public class DocumentExporter {
             return true;
         }
 
+        // --- SAFE RELEASE LOGIC ---
+        // Only release the old URI if no other exporter instance is still using it
+        if (treeUri != null && !treeUri.equals(picked)) {
+            if (!isUriUsedByOtherExporters(treeUri, prefsKey)) {
+                try {
+                    activity.getContentResolver().releasePersistableUriPermission(treeUri,
+                                                                                  Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                } catch (Exception ignored) {}
+            }
+        }
+        // --------------------------
+
         try {
             activity.getContentResolver().takePersistableUriPermission(picked,
                                                                        Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -191,6 +205,32 @@ public class DocumentExporter {
             for (UriPermission p : perms) {
                 if (p.getUri().equals(u) && p.isWritePermission()) {
                     return true;
+                }
+            }
+        } catch (Exception ignored) {}
+        return false;
+    }
+
+    /**
+     * Checks if the given URI is currently saved in the preferences of any OTHER DocumentExporter instance.
+     * This prevents us from accidentally revoking a folder permission that is still in use by another part of the app.
+     */
+    private boolean isUriUsedByOtherExporters(Uri uriToCheck, String currentPrefsKey) {
+        if (uriToCheck == null) return false;
+        String uriString = uriToCheck.toString();
+
+        try {
+            SharedPreferences prefs = activity.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+            Map<String, ?> allEntries = prefs.getAll();
+
+            for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+                String key = entry.getKey();
+                // Skip the current exporter's key, as it's about to be overwritten
+                if (key.equals(currentPrefsKey)) continue;
+
+                Object value = entry.getValue();
+                if (value instanceof String && value.equals(uriString)) {
+                    return true; // Found it in another exporter's prefs
                 }
             }
         } catch (Exception ignored) {}
