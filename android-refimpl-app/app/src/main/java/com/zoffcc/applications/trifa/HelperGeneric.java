@@ -200,7 +200,7 @@ public class HelperGeneric
     static long update_savedata_file_wrapper_last_ts = 0;
 
     // ---- battery saving sleep prevention ring buffer ----
-    static final int BATTERY_SLEEP_LOG_MAX_ENTRIES = 200;
+    static final int BATTERY_SLEEP_LOG_MAX_ENTRIES = 300;
     static String[] battery_sleep_log_ring = new String[BATTERY_SLEEP_LOG_MAX_ENTRIES];
     static int battery_sleep_log_ring_index = 0;
     static int battery_sleep_log_ring_count = 0;
