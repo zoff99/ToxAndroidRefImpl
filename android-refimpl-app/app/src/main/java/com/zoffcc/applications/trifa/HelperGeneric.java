@@ -2665,7 +2665,7 @@ public class HelperGeneric
                 //      "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
 
                 long t2 = System.nanoTime() / 1_000_000;
-                if ((t2 - t1) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_SAVEFILE:part=toxsave|dur=" + (t2 - t1) + "ms");
+                if ((t2 - t1) > 2000) HelperGeneric.battery_sleep_log_add("SLOW_SAVEFILE:part=toxsave|dur=" + (t2 - t1) + "ms");
             }
             catch (InterruptedException e)
             {
