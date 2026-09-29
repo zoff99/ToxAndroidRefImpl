@@ -262,6 +262,15 @@ public class TrifaToxService extends Service
     public static int push_history_count = 0;
     public static long push_flood_last_log_ts = 0;
 
+    // [ADDED] Ring buffer of REAL battery-sleep intervals (start/end ms).
+    // Written ONLY by the tox-loop thread at sleep exit. The chart uses this
+    // to draw magenta ASLEEP bars only for actual sleeps, never for missing samples.
+    public static final int SLEEP_HISTORY_SIZE = 512;
+    public static final long[] sleep_history_start = new long[SLEEP_HISTORY_SIZE];
+    public static final long[] sleep_history_end = new long[SLEEP_HISTORY_SIZE];
+    public static int sleep_history_index = 0;
+    public static int sleep_history_count = 0;
+
     // Tracks when the current awake period started.
     // IMPORTANT: Initialize this right before your main `while(!stop_me)` loop starts!
     public static volatile long last_awake_start_time_ms = 0;
@@ -278,7 +287,6 @@ public class TrifaToxService extends Service
     public static long last_netprof_ts = 0;
     public static long last_netprof_check_ms = 0; // Throttle network checks to x seconds intervals
     public static volatile boolean high_network_activity_this_minute = false; // Latch for 1-minute window
-
 
     // 24h per-minute "no internet" track, independent of state priority.
     // Owned (written) ONLY by the tox-loop thread at sample time.
@@ -1746,6 +1754,12 @@ public class TrifaToxService extends Service
                             stats_time_tox_not_iterating_ms = stats_time_tox_not_iterating_ms + slept_ms;
 
                             recordWakeup(wakeup_reason, battery_sleep_start_ms, battery_sleep_end_ms);
+                            // [ADDED] remember the real sleep interval for the chart
+                            sleep_history_start[sleep_history_index] = battery_sleep_start_ms;
+                            sleep_history_end[sleep_history_index] = battery_sleep_end_ms;
+                            sleep_history_index = (sleep_history_index + 1) % SLEEP_HISTORY_SIZE;
+                            if (sleep_history_count < SLEEP_HISTORY_SIZE) sleep_history_count++;
+
                             HelperGeneric.battery_sleep_log_add(
                                     (ended_early ? "SLEEP_EXIT_EARLY:" : "SLEEP_EXIT_FULL:") +
                                     wakeup_reason + "|slept_ms=" + slept_ms);

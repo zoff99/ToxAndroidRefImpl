@@ -401,7 +401,6 @@ public class HistoryChartView extends View
         else
         {
             int currentIndex = TrifaToxService.app_state_history_index;
-            long prevTs = -1;
 
             // Walk the ring buffer chronologically
             for (int offset = 0; offset < TrifaToxService.HISTORY_SIZE; offset++)
@@ -410,18 +409,12 @@ public class HistoryChartView extends View
                 long ts = TrifaToxService.app_state_history_ts[idx];
 
                 if (ts <= 0) continue;
-                if (ts < startTs) { prevTs = ts; continue; }
+                if (ts < startTs) continue;
                 if (ts > now) break;
 
-                // 1. Fill gaps between recordings with an ASLEEP bar
-                if (prevTs > 0 && (ts - prevTs) > 60000L)
-                {
-                    drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx),
-                            xOf(ts, startTs, minuteWidthPx),
-                            TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, drawH, cornerRadius, w, maxLanes);
-                }
-
-                // 2. Draw individual squares for EVERY active parallel state at this minute
+                // Draw individual squares for EVERY active parallel state at this minute.
+                // NOTE: missing samples are NO LONGER painted as ASLEEP.
+                // Real sleeps are drawn separately from the sleep-interval ring below.
                 for (int s = 0; s < maxLanes; s++)
                 {
                     if (TrifaToxService.app_state_histories[s] != null && TrifaToxService.app_state_histories[s][idx])
@@ -429,15 +422,44 @@ public class HistoryChartView extends View
                         drawSquare(canvas, xOf(ts, startTs, minuteWidthPx), s, laneHeight, drawW, drawH, cornerRadius, w, maxLanes);
                     }
                 }
+            }
+        }
 
-                prevTs = ts;
+        // ====================================================================
+        // ASLEEP lane: magenta bars ONLY for real, recorded battery sleeps.
+        // Gaps WITHOUT a sleep record (stalled loop, startup, ...) stay blank.
+        // ====================================================================
+        {
+            int sCount = TrifaToxService.sleep_history_count;
+            int sFirst = (TrifaToxService.sleep_history_index - sCount + TrifaToxService.SLEEP_HISTORY_SIZE) % TrifaToxService.SLEEP_HISTORY_SIZE;
+            for (int i = 0; i < sCount; i++)
+            {
+                int sIdx = (sFirst + i) % TrifaToxService.SLEEP_HISTORY_SIZE;
+                long sStart = TrifaToxService.sleep_history_start[sIdx];
+                long sEnd = TrifaToxService.sleep_history_end[sIdx];
+                if (sStart <= 0 || sEnd <= sStart) continue;
+                if (sEnd < startTs) continue;   // older than 24h window
+                if (sStart > now) break;        // ring is chronological
+
+                float x1 = xOf(sStart, startTs, minuteWidthPx);
+                float x2 = xOf(sEnd, startTs, minuteWidthPx);
+                if (x2 > nowX) x2 = nowX;       // never draw into the padding strip
+                if (x2 <= x1) continue;
+
+                drawBar(canvas, x1, x2, TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, drawH, cornerRadius, w, maxLanes);
             }
 
-            // trailing asleep bar ends at "now", not at the right edge
-            if (prevTs > 0 && (now - prevTs) > 60000L)
+            // Sleep currently IN PROGRESS (tox loop frozen right now):
+            // live bar from sleep start up to the NOW marker.
+            long liveSleepStart = TrifaToxService.battery_sleep_start_ms;
+            if ((liveSleepStart > 0) && (liveSleepStart <= now))
             {
-                drawBar(canvas, xOf(prevTs + 60000L, startTs, minuteWidthPx), nowX,
-                        TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, drawH, cornerRadius, w, maxLanes);
+                float x1 = xOf(liveSleepStart, startTs, minuteWidthPx);
+                if (x1 < 0) x1 = 0;
+                if (nowX > x1)
+                {
+                    drawBar(canvas, x1, nowX, TRIFAGlobals.APP_STATE.STATE_ASLEEP.value, laneHeight, drawH, cornerRadius, w, maxLanes);
+                }
             }
         }
 
