@@ -2653,6 +2653,8 @@ public class HelperGeneric
             //update_savedata_file_wrapper_last_ts = System.currentTimeMillis();
             try
             {
+                long t1 = System.nanoTime() / 1_000_000;
+
                 MainActivity.semaphore_tox_savedata.acquire();
                 long start_timestamp = System.currentTimeMillis();
                 MainActivity.update_savedata_file(TrifaSetPatternActivity.bytesToString(
@@ -2661,6 +2663,9 @@ public class HelperGeneric
                 MainActivity.semaphore_tox_savedata.release();
                 // Log.i(TAG,
                 //      "update_savedata_file() took:" + (((float) (end_timestamp - start_timestamp)) / 1000f) + "s");
+
+                long t2 = System.nanoTime() / 1_000_000;
+                if ((t2 - t1) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_SAVEFILE:part=toxsave|dur=" + (t2 - t1) + "ms");
             }
             catch (InterruptedException e)
             {
