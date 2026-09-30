@@ -10016,7 +10016,7 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1on_1group_1dele
 
         (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
 
-        mid_on_group_chat_delete(mid_peerlist_global, (int64_t)chat_id);
+        mid_on_group_chat_delete(mid_peerlist_global, chat_id);
     }
     return (jint)0;
 #endif
