@@ -4981,7 +4981,7 @@ public class MainActivity extends AppCompatActivity
      * Wipes middleware state for this group.
      * Returns: 0=success, -99=tox NULL
      */
-    public static native int tox_group_mid_on_group_delete(long group_number);
+    public static native int tox_group_mid_on_group_delete(String group_id);
 
     /**
      * Returns the number of peers in the persistent middleware roster.

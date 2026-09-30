@@ -64,6 +64,7 @@ import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_leave;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_mid_announce_leave;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_mid_offline_count;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_mid_on_group_delete;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_mid_online_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_offline_peer_count;
 import static com.zoffcc.applications.trifa.MainActivity.tox_group_peer_count;
@@ -480,6 +481,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
 
                     tox_group_mid_announce_leave(group_num);
                     tox_group_leave(group_num, "bye");
+                    tox_group_mid_on_group_delete(f2.group_identifier);
                     update_savedata_file_wrapper(); // after deleteing a conference
                 }
 
