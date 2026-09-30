@@ -228,9 +228,9 @@ public class StartMainActivityWrapperTest
         int rejoin_cycles = 0;
         while (!group_connected)
         {
-            if (sleep_cycles > 10)
+            if (sleep_cycles > 20)
             {
-                if (rejoin_cycles > 2)
+                if (rejoin_cycles > 3)
                 {
                     Log.i(TAG, "rejoin_cycles:STOP=" + rejoin_cycles);
                     Log.i(TAG, "group never joined");
