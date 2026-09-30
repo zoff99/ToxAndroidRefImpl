@@ -39,6 +39,8 @@ public class TRIFAGlobals
     static long global_self_last_went_offline_timestamp = -1;
     static long global_last_activity_for_battery_savings_ts = -1;
     static String global_last_activity_for_battery_savings_reason = "";
+    static long global_last_activity_for_FRIEND_MSG_INCOMING_ts = -1;
+    static long global_last_activity_for_GROUP_MSG_INCOMING_ts = -1;
     static boolean global_showing_messageview = false;
     static boolean global_showing_anygroupview = false;
     final static int TOX_MIN_NORMAL_ITERATE_DELTA_MS = 100;
@@ -440,26 +442,31 @@ public class TRIFAGlobals
         /** Processing large queue of unsent messages. */
         STATE_RESENDING_MSGS(8),
 
+        STATE_FRIEND_MSG_INCOMING(9),
+
+        STATE_GROUP_MSG_INCOMING(10),
+
+
         /** Active NGC/Conference A/V call */
-        STATE_CALL_GROUP(9),
+        STATE_CALL_GROUP(11),
 
         /** Active 1:1 A/V call. */
-        STATE_CALL_1ON1(10),
+        STATE_CALL_1ON1(12),
 
         /** Active incoming file transfer. */
-        STATE_FT_IN(11),
+        STATE_FT_IN(13),
 
         /** Active outgoing file transfer. */
-        STATE_FT_OUT(12),
+        STATE_FT_OUT(14),
 
         /** bootstraping. */
-        STATE_BOOTSTRAPPING(13),
+        STATE_BOOTSTRAPPING(15),
 
         /** High bytes/sec, but no active FT/Call. */
-        STATE_HIGH_NETWORK_ACTIVITY(14),
+        STATE_HIGH_NETWORK_ACTIVITY(16),
 
         /** CPU/Radio storm (< 20ms loop). - Highest Priority */
-        STATE_ITERATE_TOO_FAST(15);
+        STATE_ITERATE_TOO_FAST(17);
 
         /**
          * Holder-class workaround: an enum constructor may not reference
@@ -470,7 +477,7 @@ public class TRIFAGlobals
          */
         private static final class PRIORITY_PALETTE
         {
-            // index = priority value; 15 = Red (hottest), 0 = Grey (coldest)
+            // index = priority value; 16 = Red (hottest), 0 = Grey (coldest)
             static final int[] COLORS = {
                     0xFF9E9E9E, // 0:  Grey
                     0xFFEA80FC, // 1:  Light Magenta (Asleep slot)
@@ -481,13 +488,15 @@ public class TRIFAGlobals
                     0xFF00BCD4, // 6:  Cyan
                     0xFF009688, // 7:  Teal
                     0xFF4CAF50, // 8:  Green
-                    0xFF8BC34A, // 9:  Light Green
-                    0xFFCDDC39, // 10: Lime
-                    0xFFFFEB3B, // 11: Yellow
-                    0xFFFFC107, // 12: Amber
-                    0xFFFF9800, // 13: Orange
-                    0xFFFF5722, // 14: Deep Orange
-                    0xFFFF0055  // 15: Red
+                    0xFF4CAF50, // 9:  Green STATE_FRIEND_MSG_INCOMING
+                    0xFFCDDC39, // 10: Green STATE_GROUP_MSG_INCOMING
+                    0xFF8BC34A, // 11: Light Green
+                    0xFFCDDC39, // 12: Lime
+                    0xFFFFEB3B, // 13: Yellow
+                    0xFFFFC107, // 14: Amber
+                    0xFFFF9800, // 15: Orange
+                    0xFFFF5722, // 15: Deep Orange
+                    0xFFFF0055  // 16: Red
             };
         }
 

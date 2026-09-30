@@ -189,6 +189,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTS
 import static com.zoffcc.applications.trifa.TRIFAGlobals.USE_MAX_NUMBER_OF_BOOTSTRAP_TCP_RELAYS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrap_node_list;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_FRIEND_MSG_INCOMING_ts;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_GROUP_MSG_INCOMING_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_reason;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_incoming_ft_ts;
@@ -1979,6 +1981,14 @@ public class TrifaToxService extends Service
 
                             if (global_last_activity_incoming_ft_ts > window_start) {
                                 app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_IN.value][app_state_history_index] = true;
+                            }
+
+                            if (global_last_activity_for_FRIEND_MSG_INCOMING_ts > window_start) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_FRIEND_MSG_INCOMING.value][app_state_history_index] = true;
+                            }
+
+                            if (global_last_activity_for_GROUP_MSG_INCOMING_ts > window_start) {
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_GROUP_MSG_INCOMING.value][app_state_history_index] = true;
                             }
 
                             if (high_network_activity_this_minute) {

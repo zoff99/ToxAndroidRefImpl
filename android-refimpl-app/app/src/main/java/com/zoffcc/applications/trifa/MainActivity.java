@@ -284,6 +284,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOI
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_received;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_FRIEND_MSG_INCOMING_ts;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_GROUP_MSG_INCOMING_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_reason;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_for_battery_savings_ts;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_last_activity_incoming_ft_ts;
@@ -6599,6 +6601,7 @@ public class MainActivity extends AppCompatActivity
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "FRIEND_READ_RECEIPT";
+        global_last_activity_for_FRIEND_MSG_INCOMING_ts = System.currentTimeMillis();
 
         try
         {
@@ -6678,6 +6681,7 @@ public class MainActivity extends AppCompatActivity
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "FRIEND_RECEIVE_MSGV2";
+        global_last_activity_for_FRIEND_MSG_INCOMING_ts = System.currentTimeMillis();
 
         HelperGeneric.receive_incoming_message(1, 0, friend_number, friend_message, raw_message, raw_message_length,
                                                null, null, 0);
@@ -6743,6 +6747,7 @@ public class MainActivity extends AppCompatActivity
         }
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "FRIEND_SYNC_RECEIVE_MSGV2";
+        global_last_activity_for_FRIEND_MSG_INCOMING_ts = System.currentTimeMillis();
 
         // Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " full rawmsg    =" + bytes_to_hex(raw_message));
         // Log.i(TAG, "friend_sync_message_v2_cb:fn=" + friend_number + " wrapped rawdata=" + bytes_to_hex(raw_data));
@@ -7015,6 +7020,7 @@ public class MainActivity extends AppCompatActivity
         // Log.i(TAG, "friend_message_cb::IN:fn=" + get_friend_name_from_num(friend_number) + " len=" + length);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "FRIEND_RECEIVE_MSG";
+        global_last_activity_for_FRIEND_MSG_INCOMING_ts = System.currentTimeMillis();
 
         HelperGeneric.receive_incoming_message(0, message_type, friend_number, friend_message, null, 0, null,
                                                msgV3hash_bin, message_timestamp);
@@ -8743,8 +8749,7 @@ public class MainActivity extends AppCompatActivity
                                                              length, message_id, false);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "NGC_RECEIVE_MSG";
-
-
+        global_last_activity_for_GROUP_MSG_INCOMING_ts = System.currentTimeMillis();
     }
 
     static void android_tox_callback_group_private_message_cb_method(long group_number, long peer_id, int a_TOX_MESSAGE_TYPE, String message_orig, long length, long message_id)
@@ -8753,7 +8758,7 @@ public class MainActivity extends AppCompatActivity
                                                              length, message_id, true);
         global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
         global_last_activity_for_battery_savings_reason = "NGC_RECEIVE_PRIV_MSG";
-
+        global_last_activity_for_GROUP_MSG_INCOMING_ts = System.currentTimeMillis();
 
     }
 
