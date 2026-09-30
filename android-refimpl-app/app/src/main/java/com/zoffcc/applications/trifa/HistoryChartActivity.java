@@ -185,7 +185,7 @@ public class HistoryChartActivity extends AppCompatActivity
 
         legendContainer.setOrientation(LinearLayout.VERTICAL);
         legendContainer.setBackgroundColor(0xDD121212);
-        legendContainer.setPadding(15, 15, 15, 15);
+        legendContainer.setPadding(dp(6), dp(6), dp(6), dp(6)); // Tighter container padding
 
         TRIFAGlobals.APP_STATE[] allStates = TRIFAGlobals.APP_STATE.values();
         java.util.Arrays.sort(allStates, (a, b) -> Integer.compare(b.value, a.value));
@@ -196,16 +196,17 @@ public class HistoryChartActivity extends AppCompatActivity
             statesToShow[i] = allStates[i].value;
         }
 
+        int boxSize = dp(10); // Smaller color boxes to match the text
         for (int state : statesToShow)
         {
             LinearLayout row = new LinearLayout(this);
             row.setOrientation(LinearLayout.HORIZONTAL);
             row.setGravity(Gravity.CENTER_VERTICAL);
-            row.setPadding(0, 4, 0, 4);
+            row.setPadding(0, 0, 0, 0); // Removed vertical padding to pack tightly
 
             View box = new View(this);
-            LinearLayout.LayoutParams boxParams = new LinearLayout.LayoutParams(24, 24);
-            boxParams.rightMargin = 12;
+            LinearLayout.LayoutParams boxParams = new LinearLayout.LayoutParams(boxSize, boxSize);
+            boxParams.rightMargin = dp(6);
             box.setLayoutParams(boxParams);
             box.setBackgroundColor(TRIFAGlobals.APP_STATE.getColorForState(state));
 
@@ -213,7 +214,8 @@ public class HistoryChartActivity extends AppCompatActivity
             String name = TRIFAGlobals.APP_STATE.value_str(state).replace("STATE_", "").replace("_", " ");
             label.setText(name);
             label.setTextColor(Color.parseColor("#DDDDDD"));
-            label.setTextSize(11f);
+            label.setTextSize(9f); // Smaller font
+            label.setIncludeFontPadding(false); // Removes extra hidden vertical font padding
 
             row.addView(box);
             row.addView(label);
