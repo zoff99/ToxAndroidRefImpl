@@ -66,8 +66,11 @@ public class DetectHeadset
             AudioDeviceInfo[] audioDeviceInfos = myAudioManager.getDevices(AudioManager.GET_DEVICES_INPUTS);
             for (int i = 0; i < audioDeviceInfos.length; i++)
             {
-                if (audioDeviceInfos[i].getType() == AudioDeviceInfo.TYPE_BLUETOOTH_SCO ||
-                    audioDeviceInfos[i].getType() == AudioDeviceInfo.TYPE_WIRED_HEADSET)
+                int type = audioDeviceInfos[i].getType();
+                if (type == AudioDeviceInfo.TYPE_BLUETOOTH_SCO ||
+                    type == AudioDeviceInfo.TYPE_WIRED_HEADSET ||
+                    type == AudioDeviceInfo.TYPE_USB_DEVICE ||
+                    type == AudioDeviceInfo.TYPE_USB_HEADSET)
                 {
                     return true;
                 }

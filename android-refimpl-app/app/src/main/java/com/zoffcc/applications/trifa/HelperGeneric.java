@@ -4994,6 +4994,8 @@ public class HelperGeneric
                 Boolean result = null;
                 ArrayList<Integer> targetTypes = new ArrayList<>();
                 targetTypes.add(AudioDeviceInfo.TYPE_WIRED_HEADSET);
+                targetTypes.add(AudioDeviceInfo.TYPE_USB_DEVICE);
+                targetTypes.add(AudioDeviceInfo.TYPE_USB_HEADSET);
                 List<AudioDeviceInfo> devices = manager.getAvailableCommunicationDevices();
                 for (Integer targetType : targetTypes)
                 {
