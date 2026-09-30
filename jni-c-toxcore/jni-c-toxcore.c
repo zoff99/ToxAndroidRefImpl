@@ -9979,16 +9979,12 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1announce_1leave
  * Returns: 0 on success, -99 if tox is NULL.
  */
 JNIEXPORT jint JNICALL
-Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1on_1group_1delete(JNIEnv *env, jobject thiz, jlong group_number)
+Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1on_1group_1delete(JNIEnv *env, jobject thiz, jobject group_id)
 {
     TRACE_LOGGER();
 #ifndef HAVE_TOX_NGC
     return (jint)-99;
 #else
-    if (tox_global == NULL)
-    {
-        return (jint)-99;
-    }
     if (mid_peerlist_global == NULL)
     {
         return (jint)-99;
@@ -9996,9 +9992,31 @@ Java_com_zoffcc_applications_trifa_MainActivity_tox_1group_1mid_1on_1group_1dele
 
     if (tox_jni_activated_ngcmid) {
 #ifdef NGCMID_DEBUG
-        dbg(9, "MID_PEERLIST:tox_group_mid_on_group_delete:g=%ld", (long)group_number);
+        dbg(9, "MID_PEERLIST:mid_on_group_chat_delete");
 #endif
-        mid_on_group_delete(mid_peerlist_global, tox_global, (int64_t)group_number);
+
+        const char *group_id_str = (*env)->GetStringUTFChars(env, (jstring)group_id, NULL);
+        if (group_id_str == NULL)
+        {
+            return (jlong)-98;
+        }
+
+        if (strlen(group_id_str) != (TOX_GROUP_CHAT_ID_SIZE * 2))
+        {
+            (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+            return (jlong)-97;
+        }
+
+        uint8_t chat_id[TOX_GROUP_CHAT_ID_SIZE];
+        if (sodium_hex2bin(chat_id, TOX_GROUP_CHAT_ID_SIZE, group_id_str, (TOX_GROUP_CHAT_ID_SIZE * 2), NULL, NULL, NULL) != 0)
+        {
+            (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+            return (jlong)-96;
+        }
+
+        (*env)->ReleaseStringUTFChars(env, (jstring)group_id, group_id_str);
+
+        mid_on_group_chat_delete(mid_peerlist_global, (int64_t)chat_id);
     }
     return (jint)0;
 #endif
