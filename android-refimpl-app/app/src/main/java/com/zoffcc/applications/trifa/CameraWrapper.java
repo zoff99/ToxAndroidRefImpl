@@ -42,6 +42,9 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__camera_get_previe
 import static com.zoffcc.applications.trifa.MainActivity.PREF__fps_half;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__set_fps;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__video_cam_resolution;
+import static com.zoffcc.applications.trifa.MainActivity.yv12Rotate180_native;
+import static com.zoffcc.applications.trifa.MainActivity.yv12Rotate270_native;
+import static com.zoffcc.applications.trifa.MainActivity.yv12Rotate90_native;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
@@ -1210,85 +1213,19 @@ public class CameraWrapper
 
     public static byte[] YV12rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
-        // Rotate the Y luma
-        int i = 0;
-        for (int x = 0; x < imageWidth; x++)
-        {
-            for (int y = imageHeight - 1; y >= 0; y--)
-            {
-                output[i++] = data[y * imageWidth + x];
-            }
-        }
-        final int size = imageWidth * imageHeight;
-        final int colorSize = size / 4;
-        final int colorHeight = colorSize / imageWidth;
-        // Rotate the U and V color components
-        for (int x = 0; x < imageWidth / 2; x++)
-        {
-            for (int y = colorHeight - 1; y >= 0; y--)
-            {
-                //V
-                output[i + colorSize] = data[colorSize + size + (imageWidth * y) + x + (imageWidth / 2)];
-                output[i + colorSize + 1] = data[colorSize + size + (imageWidth * y) + x];
-                //U
-                output[i++] = data[size + (imageWidth * y) + x + (imageWidth / 2)];
-                output[i++] = data[size + (imageWidth * y) + x];
-            }
-        }
+        yv12Rotate90_native(data, output, imageWidth, imageHeight);
         return output;
     }
 
     public static byte[] YV12rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
-        int count = 0;
-        final int size = imageWidth * imageHeight;
-        for (int i = size - 1; i >= 0; i--)
-        {
-            output[count++] = data[i];
-        }
-        final int midColorSize = size / 4;
-        //U
-        for (int i = size + midColorSize - 1; i >= size; i--)
-        {
-            output[count++] = data[i];
-        }
-        //V
-        for (int i = data.length - 1; i >= imageWidth * imageHeight + midColorSize; i--)
-        {
-            output[count++] = data[i];
-        }
+        yv12Rotate180_native(data, output, imageWidth, imageHeight);
         return output;
     }
 
     public static byte[] YV12rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
-        // Rotate the Y luma
-        int i = 0;
-        for (int x = imageWidth - 1; x >= 0; x--)
-        {
-            for (int y = 0; y < imageHeight; y++)
-            {
-                output[i++] = data[y * imageWidth + x];
-            }
-        }
-
-        // Rotate the U and V color components
-        final int size = imageWidth * imageHeight;
-        final int colorSize = size / 4;
-        final int colorHeight = colorSize / imageWidth;
-
-        for (int x = 0; x < imageWidth / 2; x++)
-        {
-            for (int y = 0; y < colorHeight; y++)
-            {
-                //V
-                output[i + colorSize] = data[colorSize + size + (imageWidth * y) - x + (imageWidth / 2) - 1];
-                output[i + colorSize + 1] = data[colorSize + size + (imageWidth * y) - x + imageWidth - 1];
-                //U
-                output[i++] = data[size + (imageWidth * y) - x + (imageWidth / 2) - 1];
-                output[i++] = data[size + (imageWidth * y) - x + imageWidth - 1];
-            }
-        }
+        yv12Rotate270_native(data, output, imageWidth, imageHeight);
         return output;
     }
 

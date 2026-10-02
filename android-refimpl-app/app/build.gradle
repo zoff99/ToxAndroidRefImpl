@@ -54,6 +54,13 @@ android {
         ndkVersion "20.1.5948944"
     }
 
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            // version "3.10.2"
+        }
+    }
+
     sourceSets {
         main {
             jniLibs.srcDirs = ['nativelibs']
@@ -249,10 +256,6 @@ android {
         versionCode 10299
         versionName "1.0.299"
 
-        renderscriptTargetApi 21
-        renderscriptSupportModeEnabled true
-        // renderscriptSupportModeBlasEnabled true
-
         // Enabling multidex support
         multiDexEnabled true
 
@@ -261,6 +264,10 @@ android {
         buildConfigField "String", "GitHash", "\"${getGitHash()}\""
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         testInstrumentationRunnerArguments useTestStorageService: 'true'
+
+        ndk {
+            abiFilters 'x86', 'x86_64', 'armeabi-v7a', 'arm64-v8a'
+        }
     }
 
     buildTypes {

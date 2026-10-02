@@ -49,11 +49,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 import android.provider.DocumentsContract;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
-import android.renderscript.Type;
 import android.util.Log;
 import android.util.Size;
 import android.view.KeyEvent;
@@ -163,6 +158,7 @@ import static com.zoffcc.applications.trifa.MainActivity.SelectFriendSingleActiv
 import static com.zoffcc.applications.trifa.MainActivity.android_tox_callback_group_mid_peer_list_changed_cb;
 import static com.zoffcc.applications.trifa.MainActivity.audio_out_buffer_mult;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
+import static com.zoffcc.applications.trifa.MainActivity.convertYUVtoRGB_native;
 import static com.zoffcc.applications.trifa.MainActivity.lookup_peer_listnum_pubkey;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.MainActivity.mid_peer_list_snapshot;
@@ -287,12 +283,6 @@ public class GroupMessageListActivity extends AppCompatActivity
     static long ngc_audio_packet_last_incoming_ts = -1L;
     static Bitmap ngc_video_frame_image = null;
     static Bitmap ngc_own_video_frame_image = null;
-    static Allocation ngc_alloc_in = null;
-    static Allocation ngc_own_alloc_in = null;
-    static Allocation ngc_alloc_out = null;
-    static Allocation ngc_own_alloc_out = null;
-    static ScriptIntrinsicYuvToRGB ngc_yuvToRgb = null;
-    static ScriptIntrinsicYuvToRGB ngc_own_yuvToRgb = null;
     static boolean attachemnt_instead_of_send = true;
     static ActionMode amode = null;
     static MenuItem amode_save_menu_item = null;
@@ -302,6 +292,10 @@ public class GroupMessageListActivity extends AppCompatActivity
     static long update_group_all_users_last_trigger_ts = 0;
     //
     static long last_processed_camera_frame = -1;
+
+    // Add these for the native conversion
+    static int[] ngc_rgbPixels = null;
+    static int[] ngc_own_rgbPixels = null;
 
     private CameraDevice mCameraDevice;
     private CameraCaptureSession mCaptureSession;
@@ -344,20 +338,6 @@ public class GroupMessageListActivity extends AppCompatActivity
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         ngc_video_frame_image = Bitmap.createBitmap(ngc_frame_width_px, ngc_frame_height_px, Bitmap.Config.ARGB_8888);
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
-
-        if (1 == 2 + 2)
-        {
-            RenderScript rs = RenderScript.create(this);
-            ngc_yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
-            Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(ngc_frame_width_px).setY(
-                    ngc_frame_height_px);
-            yuvType.setYuvFormat(ImageFormat.YV12);
-            ngc_alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
-            Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(ngc_frame_width_px).setY(
-                    ngc_frame_height_px);
-            ngc_alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
-        }
-        //
         //
         final int ngc_own_frame_width_px = 480;
         final int ngc_own_frame_height_px = 640;
@@ -365,19 +345,10 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_own_video_frame_image = Bitmap.createBitmap(ngc_own_frame_width_px, ngc_own_frame_height_px,
                                                         Bitmap.Config.ARGB_8888);
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
-
-        if (1 == 2 + 2)
-        {
-            RenderScript own_rs = RenderScript.create(this);
-            ngc_own_yuvToRgb = ScriptIntrinsicYuvToRGB.create(own_rs, Element.U8_4(own_rs));
-            Type.Builder own_yuvType = new Type.Builder(own_rs, Element.U8(own_rs)).setX(ngc_own_frame_width_px).setY(
-                    ngc_own_frame_height_px);
-            own_yuvType.setYuvFormat(ImageFormat.YV12);
-            ngc_own_alloc_in = Allocation.createTyped(own_rs, own_yuvType.create(), Allocation.USAGE_SCRIPT);
-            Type.Builder own_rgbaType = new Type.Builder(own_rs, Element.RGBA_8888(own_rs)).setX(
-                    ngc_own_frame_width_px).setY(ngc_own_frame_height_px);
-            ngc_own_alloc_out = Allocation.createTyped(own_rs, own_rgbaType.create(), Allocation.USAGE_SCRIPT);
-        }
+        //
+        // Pre-allocate reusable RGB pixel arrays for native conversion
+        ngc_rgbPixels = new int[480 * 640];
+        ngc_own_rgbPixels = new int[480 * 640];
         //
         //
         sending_video_to_group = false;
@@ -3215,11 +3186,13 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     buf3[0] = YUV420rotate90(buf4, buf3[0], 640, 480);
                                 }
                                 //
-                                ngc_own_alloc_in.copyFrom(buf3[0]);
-                                ngc_own_yuvToRgb.setInput(ngc_own_alloc_in);
-                                ngc_own_yuvToRgb.forEach(ngc_own_alloc_out);
-                                ngc_own_alloc_out.copyTo(ngc_own_video_frame_image);
+                                // Native YUV to RGB conversion for own video.
+                                // buf3[0] is tightly packed 480x640 YV12 after the Java rotation.
+                                // We pass logical width=480, height=640, and tight strides (480, 240, 240).
+                                convertYUVtoRGB_native(buf3[0], ngc_own_rgbPixels, 480, 640, 480, 240, 240);
+                                ngc_own_video_frame_image.setPixels(ngc_own_rgbPixels, 0, 480, 0, 0, 480, 640);
                                 ngc_video_own_view.setBitmap(ngc_own_video_frame_image);
+
                                 final int y_bytes_ = 640 * 480;
                                 final int uv_bytes_ = (640 / 2) * (480 / 2);
                                 System.arraycopy(buf3[0], 0, y_buf__, 0, y_bytes_);
@@ -3335,7 +3308,16 @@ public class GroupMessageListActivity extends AppCompatActivity
             if (bigEnough.size() > 0)
             {
                 if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
-                return choices[0]; // Collections.min(bigEnough, new CompareSizesByArea());
+                // Find the smallest size that's still >= requested dimensions
+                Size smallest = bigEnough.get(0);
+                for (Size option : bigEnough)
+                {
+                    if (option.getWidth() * option.getHeight() < smallest.getWidth() * smallest.getHeight())
+                    {
+                        smallest = option;
+                    }
+                }
+                return smallest;
             }
             else
             {
@@ -3534,7 +3516,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     final int y_bytes2_decoder = h2_decoder * w2_decoder;
                                     final int u_bytes2_decoder = (h2_decoder_uv * w2_decoder_uv);
                                     final int v_bytes2_decoder = (h2_decoder_uv * w2_decoder_uv);
-
+                                    /*
                                     ByteBuffer yuv_frame_data_buf = ByteBuffer.allocateDirect(
                                             y_bytes2_decoder + u_bytes2_decoder + v_bytes2_decoder);
                                     yuv_frame_data_buf.rewind();
@@ -3544,10 +3526,21 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     yuv_frame_data_buf.put(v_buf2, 0, v_bytes2_decoder);
                                     //
                                     yuv_frame_data_buf.rewind();
-                                    ngc_alloc_in.copyFrom(yuv_frame_data_buf.array());
-                                    ngc_yuvToRgb.setInput(ngc_alloc_in);
-                                    ngc_yuvToRgb.forEach(ngc_alloc_out);
-                                    ngc_alloc_out.copyTo(ngc_video_frame_image);
+                                     */
+                                    // Native YUV to RGB conversion for incoming video.
+                                    // Construct a flat byte array to exactly match the memory layout
+                                    // that RenderScript's copyFrom expected.
+                                    final int totalBytes = y_bytes2_decoder + u_bytes2_decoder + v_bytes2_decoder;
+                                    byte[] yuvData = new byte[totalBytes];
+                                    System.arraycopy(y_buf2, 0, yuvData, 0, y_bytes2_decoder);
+                                    System.arraycopy(u_buf2, 0, yuvData, y_bytes2_decoder, u_bytes2_decoder);
+                                    System.arraycopy(v_buf2, 0, yuvData, y_bytes2_decoder + u_bytes2_decoder, v_bytes2_decoder);
+
+                                    // We pass logical width=480, height=640, but use the ACTUAL decoder strides
+                                    // (w2_decoder, w2_decoder_uv) so the native function skips the padding exactly
+                                    // as the original data layout intended.
+                                    convertYUVtoRGB_native(yuvData, ngc_rgbPixels, 480, 640, w2_decoder, w2_decoder_uv, w2_decoder_uv);
+                                    ngc_video_frame_image.setPixels(ngc_rgbPixels, 0, 480, 0, 0, 480, 640);
                                     ngc_video_view.setBitmap(ngc_video_frame_image);
                                 }
                                 ngc_video_frame_last_incoming_ts = System.currentTimeMillis();
@@ -3678,7 +3671,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     final int y_bytes2_decoder = h2_decoder * w2_decoder;
                                     final int u_bytes2_decoder = (h2_decoder_uv * w2_decoder_uv);
                                     final int v_bytes2_decoder = (h2_decoder_uv * w2_decoder_uv);
-
+                                    /*
                                     ByteBuffer yuv_frame_data_buf = ByteBuffer.allocateDirect(
                                             y_bytes2_decoder + u_bytes2_decoder + v_bytes2_decoder);
                                     yuv_frame_data_buf.rewind();
@@ -3688,10 +3681,21 @@ public class GroupMessageListActivity extends AppCompatActivity
                                     yuv_frame_data_buf.put(v_buf2, 0, v_bytes2_decoder);
                                     //
                                     yuv_frame_data_buf.rewind();
-                                    ngc_alloc_in.copyFrom(yuv_frame_data_buf.array());
-                                    ngc_yuvToRgb.setInput(ngc_alloc_in);
-                                    ngc_yuvToRgb.forEach(ngc_alloc_out);
-                                    ngc_alloc_out.copyTo(ngc_video_frame_image);
+                                     */
+                                    // Native YUV to RGB conversion for incoming video.
+                                    // Construct a flat byte array to exactly match the memory layout
+                                    // that RenderScript's copyFrom expected.
+                                    final int totalBytes = y_bytes2_decoder + u_bytes2_decoder + v_bytes2_decoder;
+                                    byte[] yuvData = new byte[totalBytes];
+                                    System.arraycopy(y_buf2, 0, yuvData, 0, y_bytes2_decoder);
+                                    System.arraycopy(u_buf2, 0, yuvData, y_bytes2_decoder, u_bytes2_decoder);
+                                    System.arraycopy(v_buf2, 0, yuvData, y_bytes2_decoder + u_bytes2_decoder, v_bytes2_decoder);
+
+                                    // We pass logical width=480, height=640, but use the ACTUAL decoder strides
+                                    // (w2_decoder, w2_decoder_uv) so the native function skips the padding exactly
+                                    // as the original data layout intended.
+                                    convertYUVtoRGB_native(yuvData, ngc_rgbPixels, 480, 640, w2_decoder, w2_decoder_uv, w2_decoder_uv);
+                                    ngc_video_frame_image.setPixels(ngc_rgbPixels, 0, 480, 0, 0, 480, 640);
                                     ngc_video_view.setBitmap(ngc_video_frame_image);
                                 }
                                 ngc_video_frame_last_incoming_ts = System.currentTimeMillis();

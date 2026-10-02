@@ -129,11 +129,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.RecyclerView;
-import android.renderscript.Allocation;
-import android.renderscript.Element;
-import android.renderscript.RenderScript;
-import android.renderscript.ScriptIntrinsicYuvToRGB;
-import android.renderscript.Type;
 import info.guardianproject.iocipher.FileInputStream;
 import info.guardianproject.iocipher.FileOutputStream;
 import info.guardianproject.iocipher.VirtualFileSystem;
@@ -600,13 +595,48 @@ public class MainActivity extends AppCompatActivity
     static List<Long> selected_group_messages_incoming_file = new ArrayList<Long>();
     //
     // YUV conversion -------
-    static ScriptIntrinsicYuvToRGB yuvToRgb = null;
-    static Allocation alloc_in = null;
-    static Allocation alloc_out = null;
     static Bitmap video_frame_image = null;
     static boolean video_frame_image_valid = false;
     static int buffer_size_in_bytes = 0;
     // YUV conversion -------
+
+    // Bridge variables: saved in Part 2, used in Part 3 (replaces RenderScript's internal state)
+    static int current_logical_width = 0;
+    static int current_logical_height = 0;
+    static int current_yStride = 0;
+    static int current_uStride = 0;
+    static int current_vStride = 0;
+
+    // Pure Java YUV to RGB Lookup Tables (BT.601 Standard)
+    private static final int[] Y_BASE = new int[256];
+    private static final int[] V_TO_R = new int[256];
+    private static final int[] U_TO_G = new int[256];
+    private static final int[] V_TO_G = new int[256];
+    private static final int[] U_TO_B = new int[256];
+
+    static {
+        for (int i = 0; i < 256; i++) {
+            int c = i - 16;
+            int d = i - 128;
+            int e = i - 128;
+
+            Y_BASE[i] = (298 * c + 128) >> 8;
+            V_TO_R[i] = (359 * e + 128) >> 8;  // 1.402 * e
+            U_TO_G[i] = (-88 * d + 128) >> 8;  // -0.344 * d
+            V_TO_G[i] = (-183 * e + 128) >> 8; // -0.714 * e
+            U_TO_B[i] = (454 * d + 128) >> 8;  // 1.772 * d
+        } // <-- Fixed typo here
+    }
+
+    private static int clamp(int val) {
+        return (val < 0) ? 0 : ((val > 255) ? 255 : val);
+    }
+
+    // Reusable pixel array to prevent Garbage Collection pauses
+    static int[] rgbPixels = null;
+    // YUV conversion -------
+
+
 
     // ---- lookup cache ----
     static Map<String, Long> cache_pubkey_fnum = new HashMap<String, Long>();
@@ -4475,36 +4505,42 @@ public class MainActivity extends AppCompatActivity
 
         /*
          * YUV420 frame with width * height
-         *
-         * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
-         * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
-         * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
          */
-        int y_layer_size = (int) Math.max(frame_width_px1, Math.abs(ystride)) * frame_height_px1;
-        int u_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(ustride)) * (frame_height_px1 / 2);
-        int v_layer_size = (int) Math.max((frame_width_px1 / 2), Math.abs(vstride)) * (frame_height_px1 / 2);
-        int frame_width_px = (int) Math.max(frame_width_px1, Math.abs(ystride));
-        int frame_height_px = (int) frame_height_px1;
-        buffer_size_in_bytes = y_layer_size + v_layer_size + u_layer_size;
+        int yStride = (int) Math.max(frame_width_px1, Math.abs(ystride));
+        int uStride = (int) Math.max((frame_width_px1 / 2), Math.abs(ustride));
+        int vStride = (int) Math.max((frame_width_px1 / 2), Math.abs(vstride));
+
+        // SAVE TO STATIC VARIABLES so Part 3 can access them
+        current_logical_width = frame_width_px1;
+        current_logical_height = frame_height_px1;
+        current_yStride = yStride;
+        current_uStride = uStride;
+        current_vStride = vStride;
+
+        int y_layer_size = yStride * frame_height_px1;
+        int u_layer_size = uStride * (frame_height_px1 / 2);
+        int v_layer_size = vStride * (frame_height_px1 / 2);
+
+        int frame_width_px = yStride;
+        int frame_height_px = frame_height_px1;
+
+        // Total size is identical whether it's Y-V-U or Y-U-V
+        buffer_size_in_bytes = y_layer_size + u_layer_size + v_layer_size;
         Log.i(TAG, "YUV420 frame w1=" + frame_width_px1 + " h1=" + frame_height_px1 + " bytes=" + buffer_size_in_bytes);
         Log.i(TAG, "YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" + buffer_size_in_bytes);
         Log.i(TAG, "YUV420 frame ystride=" + ystride + " ustride=" + ustride + " vstride=" + vstride);
+
         video_buffer_1 = ByteBuffer.allocateDirect(buffer_size_in_bytes);
         set_JNI_video_buffer(video_buffer_1, frame_width_px, frame_height_px);
-        RenderScript rs = RenderScript.create(context_s);
-        yuvToRgb = ScriptIntrinsicYuvToRGB.create(rs, Element.U8_4(rs));
-        // --------- works !!!!! ---------
-        // --------- works !!!!! ---------
-        // --------- works !!!!! ---------
-        Type.Builder yuvType = new Type.Builder(rs, Element.U8(rs)).setX(frame_width_px).setY(frame_height_px);
-        yuvType.setYuvFormat(ImageFormat.YV12);
-        alloc_in = Allocation.createTyped(rs, yuvType.create(), Allocation.USAGE_SCRIPT);
-        Type.Builder rgbaType = new Type.Builder(rs, Element.RGBA_8888(rs)).setX(frame_width_px).setY(frame_height_px);
-        alloc_out = Allocation.createTyped(rs, rgbaType.create(), Allocation.USAGE_SCRIPT);
-        // --------- works !!!!! ---------
-        // --------- works !!!!! ---------
-        // --------- works !!!!! ---------
-        video_frame_image = Bitmap.createBitmap(frame_width_px, frame_height_px, Bitmap.Config.ARGB_8888);
+
+        // Pre-allocate the reusable RGB pixel array based on LOGICAL dimensions
+        int logicalPixelCount = frame_width_px1 * frame_height_px1;
+        if (rgbPixels == null || rgbPixels.length < logicalPixelCount) {
+            rgbPixels = new int[logicalPixelCount];
+        }
+
+        // Create Bitmap with LOGICAL dimensions for clean UI rendering
+        video_frame_image = Bitmap.createBitmap(frame_width_px1, frame_height_px1, Bitmap.Config.ARGB_8888);
 
         if (video_frame_image == null)
         {
@@ -4527,6 +4563,17 @@ public class MainActivity extends AppCompatActivity
     {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
     }
+
+
+    // -------- yuv_converter native methods --------
+    static native void convertYUVtoRGB_native(byte[] yuvData, int[] rgbOut, int width, int height, int yStride, int uStride, int vStride);
+
+    static native void yv12Rotate90_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight);
+    static native void yv12Rotate180_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight);
+    static native void yv12Rotate270_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight);
+    // -------- yuv_converter native methods --------
+
+
 
     // -------- native methods --------
     // -------- native methods --------
@@ -5300,15 +5347,20 @@ public class MainActivity extends AppCompatActivity
                 return;
             }
 
-            if ((video_frame_image_valid == true) && (video_frame_image != null))
-            {
-                if (!video_frame_image.isRecycled())
-                {
-                    alloc_in.copyFrom(video_buffer_1.array());
-                    yuvToRgb.setInput(alloc_in);
-                    yuvToRgb.forEach(alloc_out);
-                    alloc_out.copyTo(video_frame_image);
-                }
+            if (video_frame_image_valid && video_frame_image != null && !video_frame_image.isRecycled()) {
+                byte[] data = video_buffer_1.array();
+
+                int width = current_logical_width;
+                int height = current_logical_height;
+                int yStride = current_yStride;
+                int uStride = current_uStride;
+                int vStride = current_vStride;
+
+                // Call the native C++ function (blazing fast with NEON SIMD)
+                convertYUVtoRGB_native(data, rgbPixels, width, height, yStride, uStride, vStride);
+
+                // Push to Bitmap
+                video_frame_image.setPixels(rgbPixels, 0, width, 0, 0, width, height);
             }
 
             //Log.i("semaphore_01","release:06");
@@ -9464,6 +9516,17 @@ public class MainActivity extends AppCompatActivity
         {
             native_lib_loaded = false;
             Log.i(TAG, "loadLibrary jni-c-toxcore failed!");
+            e.printStackTrace();
+        }
+
+        try
+        {
+            System.loadLibrary("yuv_converter");
+            Log.i(TAG, "successfully loaded yuv_converter library");
+        }
+        catch(Exception e)
+        {
+            Log.i(TAG, "loadLibrary yuv_converter failed!");
             e.printStackTrace();
         }
 
