@@ -59,7 +59,7 @@ import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 
 public class CallAudioService extends Service
 {
-    static final String TAG = "trifa.GAService";
+    static final String TAG = "trifa.AudioService";
     static int ONGOING_CALL_AUDIO_NOTIFICATION_ID = 886614;
     public static final String ACTION_MUTE = "com.zoffcc.applications.trifa.ACTION_MUTE";
     public static final String ACTION_STOP = "com.zoffcc.applications.trifa.ACTION_STOP";
