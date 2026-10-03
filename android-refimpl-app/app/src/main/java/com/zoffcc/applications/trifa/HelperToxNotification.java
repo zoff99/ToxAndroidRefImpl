@@ -24,8 +24,8 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
-import android.os.Build;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -37,7 +37,6 @@ import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.nmn3;
 import static com.zoffcc.applications.trifa.MainActivity.notification_view;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONNECTION_STATUS_MANUAL_LOGOUT;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.TOX_SERVICE_NOTIFICATION_TEXT_COLOR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.bootstrapping;
 import static com.zoffcc.applications.trifa.TrifaToxService.manually_logged_out;
 
@@ -46,89 +45,57 @@ public class HelperToxNotification
     private static final String TAG = "trifa.Hlp.ToxNoti";
     static int ONGOING_NOTIFICATION_ID = 1030;
 
+    // Helper method to get the correct text color for Dark/Light mode
+    private static int getSystemTextColor(Context c) {
+        int nightModeFlags = c.getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK;
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES) {
+            return Color.WHITE; // Standard light text for Dark Mode
+        } else {
+            return Color.parseColor("#DE000000"); // Standard Material dark text (87% opacity) for Light Mode
+        }
+    }
+
     static Notification tox_notification_setup(Context c, NotificationManager nmn2)
     {
         Log.i(TAG, "tox_notification_setup:start");
-        Notification notification2 = null;
 
         Intent notificationIntent = new Intent(c, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
-        // -- notification ------------------
-        // -- notification ------------------
-        nmn2 = (NotificationManager) c.getSystemService(NOTIFICATION_SERVICE);
-
+        // Keep your exact custom layout so icons retain their perfect shapes and colors
         notification_view = new RemoteViews(c.getPackageName(), R.layout.custom_notification);
         Log.i(TAG, "contentView=" + notification_view);
+
         notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-        try
-        {
-            notification_view.setTextColor(R.id.title, Color.parseColor(TOX_SERVICE_NOTIFICATION_TEXT_COLOR));
-        }
-        catch (Exception e_text_color)
-        {
+
+        // Apply dynamic system text color for Dark/Light mode compatibility
+        try {
+            notification_view.setTextColor(R.id.title, getSystemTextColor(c));
+        } catch (Exception e_text_color) {
             Log.i(TAG, "e_text_color:EE01:" + e_text_color.getMessage());
         }
 
-        if (PREF__orbot_enabled)
-        {
-            notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE  [Tor Proxy]");
+        if (PREF__orbot_enabled) {
+            notification_view.setTextViewText(R.id.title, "Tox Service: OFFLINE  [Tor Proxy]");
+        } else {
+            notification_view.setTextViewText(R.id.title, "Tox Service: OFFLINE");
         }
-        else
-        {
-            notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE");
-        }
-
         notification_view.setTextViewText(R.id.text, "");
 
-        NotificationCompat.Builder b = null;
-        Notification.Builder b_new = null;
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
-            b_new = new Notification.Builder(c, MainActivity.channelId_toxservice);
-            b = null;
-        }
-        else
-        {
-            b_new = null;
-            b = new NotificationCompat.Builder(c);
-        }
+        // Modern NotificationCompat Builder (Automatically handles API 26+ Channels)
+        NotificationCompat.Builder b = new NotificationCompat.Builder(c, MainActivity.channelId_toxservice)
+                .setSmallIcon(R.drawable.circle_red_notification)
+                .setCustomContentView(notification_view)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle()) // Wraps your custom view in the modern system header
+                .setOngoing(true) // Permanent foreground service notification
+                .setOnlyAlertOnce(true)
+                .setSilent(true) // Prevents sound/vibration spam on modern Android
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setContentIntent(pendingIntent);
 
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
-        {
-            b_new.setContent(notification_view);
-            b_new.setOnlyAlertOnce(false);
-            try
-            {
-                b_new.setSound(null, null);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-            b_new.setContentIntent(pendingIntent);
-            b_new.setSmallIcon(R.drawable.circle_red_notification);
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            {
-                b_new.setColor(Color.parseColor("#ff0000"));
-            }
-            notification2 = b_new.build();
-        }
-        else
-        {
-            b.setContent(notification_view);
-            b.setOnlyAlertOnce(false);
-            b.setContentIntent(pendingIntent);
-            b.setSmallIcon(R.drawable.circle_red_notification);
-            if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            {
-                b.setColor(Color.parseColor("#ff0000"));
-            }
-            notification2 = b.build();
-        }
-        // -- notification ------------------
-        // -- notification ------------------
+        Notification notification2 = b.build();
 
         Log.i(TAG, "tox_notification_setup:end");
         return notification2;
@@ -137,19 +104,13 @@ public class HelperToxNotification
     static void tox_notification_cancel(Context c)
     {
         Log.i(TAG, "tox_notification_cancel:start");
-
-        try
-        {
-            // remove the notification
+        try {
             NotificationManager nmn2 = (NotificationManager) c.getSystemService(NOTIFICATION_SERVICE);
             nmn2.cancel(ONGOING_NOTIFICATION_ID);
             Log.i(TAG, "tox_notification_cancel:OK");
-        }
-        catch (Exception e3)
-        {
+        } catch (Exception e3) {
             e3.printStackTrace();
         }
-
         Log.i(TAG, "tox_notification_cancel:end");
     }
 
@@ -157,246 +118,83 @@ public class HelperToxNotification
     {
         Log.i(TAG, "tox_notification_change:start");
 
-        Notification notification2 = null;
-        NotificationCompat.Builder b = null;
-        Notification.Builder b_new = null;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            Log.i(TrifaToxService.TAG,
-                  "change_notification_fg:SDK:" + Build.VERSION.SDK_INT + " -> O:" + Build.VERSION_CODES.O);
-            b_new = new Notification.Builder(c, MainActivity.channelId_toxservice);
-            b = null;
-        }
-        else
-        {
-            b_new = null;
-            b = new NotificationCompat.Builder(c);
-        }
         Intent notificationIntent = new Intent(c, MainActivity.class);
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            b_new.setOnlyAlertOnce(false);
-            try
-            {
-                b_new.setSound(null, null);
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-        }
-        else
-        {
-            b.setOnlyAlertOnce(false);
-        }
         PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
+
+        // Re-apply text color in case the system theme changed while running
+        try {
+            notification_view.setTextColor(R.id.title, getSystemTextColor(c));
+        } catch (Exception ignored) {}
 
         if ((manually_logged_out) || (a_TOXCONNECTION == CONNECTION_STATUS_MANUAL_LOGOUT))
         {
-            // HINT: manually logged out
             notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            {
-                b_new.setSmallIcon(R.drawable.circle_manuallyoffline_notification);
+            notification_view.setTextViewText(R.id.title, "Tox Service: OFFLINE manually");
+        }
+        else if (bootstrapping)
+        {
+            Log.i(TrifaToxService.TAG, "change_notification_fg:bootstrapping=true");
+            notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
+            if (PREF__orbot_enabled) {
+                notification_view.setTextViewText(R.id.title, "Tox Service: Bootstrapping [Tor Proxy] " + message);
+            } else {
+                notification_view.setTextViewText(R.id.title, "Tox Service: Bootstrapping " + message);
             }
-            else
-            {
-                b.setSmallIcon(R.drawable.circle_manuallyoffline_notification);
+        }
+        else if (a_TOXCONNECTION == 0)
+        {
+            notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+            if (PREF__orbot_enabled) {
+                notification_view.setTextViewText(R.id.title, "Tox Service: OFFLINE [Tor Proxy] " + message);
+            } else {
+                notification_view.setTextViewText(R.id.title, "Tox Service: OFFLINE " + message);
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-            {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                {
-                    b_new.setColor(Color.parseColor("#ff0000"));
-                }
-                else
-                {
-                    b.setColor(Color.parseColor("#ff0000"));
-                }
-            }
-            notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE manually");
+        }
+        else if (PREF__orbot_enabled)
+        {
+            notification_view.setImageViewResource(R.id.image, R.drawable.circle_torproxy);
+            notification_view.setTextViewText(R.id.title, "Tox Service: ONLINE [Tor Proxy] " + message);
+        }
+        else if (a_TOXCONNECTION == 1)
+        {
+            notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+            notification_view.setTextViewText(R.id.title, "Tox Service: ONLINE [TCP] " + message);
         }
         else
         {
-            if (bootstrapping)
-            {
-                Log.i(TrifaToxService.TAG, "change_notification_fg:bootstrapping=true");
-                notification_view.setImageViewResource(R.id.image, R.drawable.circle_orange);
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                {
-                    b_new.setSmallIcon(R.drawable.circle_orange_notification);
-                }
-                else
-                {
-                    b.setSmallIcon(R.drawable.circle_orange_notification);
-                }
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    {
-                        b_new.setColor(Color.parseColor("#ffce00"));
-                    }
-                    else
-                    {
-                        b.setColor(Color.parseColor("#ffce00"));
-                    }
-                }
-                if (PREF__orbot_enabled)
-                {
-                    notification_view.setTextViewText(R.id.title,
-                                                      "Tox Service: " + "Bootstrapping [Tor Proxy]" + " " + message);
-                }
-                else
-                {
-                    notification_view.setTextViewText(R.id.title, "Tox Service: " + "Bootstrapping" + " " + message);
-                }
-            }
-            else
-            {
-                Log.i(TrifaToxService.TAG, "change_notification_fg:bootstrapping=FALSE");
-                if (a_TOXCONNECTION == 0)
-                {
-                    notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                    {
-                        b_new.setSmallIcon(R.drawable.circle_red_notification);
-                    }
-                    else
-                    {
-                        b.setSmallIcon(R.drawable.circle_red_notification);
-                    }
-
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                    {
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        {
-                            b_new.setColor(Color.parseColor("#ff0000"));
-                        }
-                        else
-                        {
-                            b.setColor(Color.parseColor("#ff0000"));
-                        }
-                    }
-                    if (PREF__orbot_enabled)
-                    {
-                        notification_view.setTextViewText(R.id.title,
-                                                          "Tox Service: " + "OFFLINE [Tor Proxy]" + " " + message);
-                    }
-                    else
-                    {
-                        notification_view.setTextViewText(R.id.title, "Tox Service: " + "OFFLINE" + " " + message);
-                    }
-                }
-                else
-                {
-                    if (PREF__orbot_enabled)
-                    {
-                        notification_view.setImageViewResource(R.id.image, R.drawable.circle_torproxy);
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                        {
-                            b_new.setSmallIcon(R.drawable.circle_torproxy_notification);
-                        }
-                        else
-                        {
-                            b.setSmallIcon(R.drawable.circle_torproxy_notification);
-                        }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                        {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            {
-                                b_new.setColor(Color.parseColor("#7c16ae"));
-                            }
-                            else
-                            {
-                                b.setColor(Color.parseColor("#7c16ae"));
-                            }
-                        }
-                        notification_view.setTextViewText(R.id.title,
-                                                          "Tox Service: " + "ONLINE [Tor Proxy]" + " " + message);
-                    }
-                    else
-                    {
-                        if (a_TOXCONNECTION == 1)
-                        {
-                            notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            {
-                                b_new.setSmallIcon(R.drawable.circle_green_notification);
-                            }
-                            else
-                            {
-                                b.setSmallIcon(R.drawable.circle_green_notification);
-                            }
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                            {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                                {
-                                    b_new.setColor(Color.parseColor("#04b431"));
-                                }
-                                else
-                                {
-                                    b.setColor(Color.parseColor("#04b431"));
-                                }
-                            }
-                            notification_view.setTextViewText(R.id.title,
-                                                              "Tox Service: " + "ONLINE [TCP]" + " " + message);
-                            // get_network_connections();
-                        }
-                        else // if (a_TOXCONNECTION__f == 2)
-                        {
-                            notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                            {
-                                b_new.setSmallIcon(R.drawable.circle_green_notification);
-                            }
-                            else
-                            {
-                                b.setSmallIcon(R.drawable.circle_green_notification);
-                            }
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-                            {
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-                                {
-                                    b_new.setColor(Color.parseColor("#04b431"));
-                                }
-                                else
-                                {
-                                    b.setColor(Color.parseColor("#04b431"));
-                                }
-                            }
-                            notification_view.setTextViewText(R.id.title,
-                                                              "Tox Service: " + "ONLINE [UDP]" + " " + message);
-                            // get_network_connections();
-                        }
-                    }
-                }
-            }
+            notification_view.setImageViewResource(R.id.image, R.drawable.circle_green);
+            notification_view.setTextViewText(R.id.title, "Tox Service: ONLINE [UDP] " + message);
         }
 
         notification_view.setTextViewText(R.id.text, "");
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-        {
-            b_new.setContentIntent(pendingIntent);
-            b_new.setContent(notification_view);
-            notification2 = b_new.build();
-        }
-        else
-        {
-            b.setContentIntent(pendingIntent);
-            b.setContent(notification_view);
-            notification2 = b.build();
-        }
-        try
-        {
-            nmn2.notify(ONGOING_NOTIFICATION_ID, notification2);
-        }
-        catch(Exception ignored)
-        {
+        // Build using modern NotificationCompat (No more messy SDK version branching!)
+        NotificationCompat.Builder b = new NotificationCompat.Builder(c, MainActivity.channelId_toxservice)
+                .setSmallIcon(getSmallIconForState(a_TOXCONNECTION))
+                .setCustomContentView(notification_view)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
+                .setOngoing(true)
+                .setOnlyAlertOnce(true)
+                .setSilent(true)
+                .setCategory(NotificationCompat.CATEGORY_SERVICE)
+                .setPriority(NotificationCompat.PRIORITY_LOW)
+                .setContentIntent(pendingIntent);
+
+        try {
+            nmn2.notify(ONGOING_NOTIFICATION_ID, b.build());
+        } catch(Exception ignored) {
         }
         Log.i(TAG, "tox_notification_change:end");
+    }
+
+    // Helper to keep the switch statement clean
+    private static int getSmallIconForState(int a_TOXCONNECTION) {
+        if (manually_logged_out || a_TOXCONNECTION == CONNECTION_STATUS_MANUAL_LOGOUT) return R.drawable.circle_manuallyoffline_notification;
+        if (bootstrapping) return R.drawable.circle_orange_notification;
+        if (a_TOXCONNECTION == 0) return R.drawable.circle_red_notification;
+        if (PREF__orbot_enabled) return R.drawable.circle_torproxy_notification;
+        return R.drawable.circle_green_notification; // TCP or UDP
     }
 
     static void tox_notification_change_wrapper(int a_TOXCONNECTION, final String message)
@@ -405,51 +203,27 @@ public class HelperToxNotification
         final int a_TOXCONNECTION_f = a_TOXCONNECTION;
         final Context static_context = context_s;
 
-        try
-        {
-            Thread t = new Thread()
-            {
+        try {
+            Thread t = new Thread() {
                 @Override
-                public void run()
-                {
+                public void run() {
                     long counter = 0;
-
-                    while (MainActivity.tox_service_fg == null)
-                    {
+                    while (MainActivity.tox_service_fg == null) {
                         counter++;
-
-                        if (counter > 10)
-                        {
-                            break;
-                        }
-
-                        // Log.i(TAG, "change_notification:sleep");
-
-                        try
-                        {
-                            Thread.sleep(100);
-                        }
-                        catch (Exception e)
-                        {
-                            // e.printStackTrace();
-                        }
+                        if (counter > 10) break;
+                        try { Thread.sleep(100); } catch (Exception ignored) {}
                     }
 
-                    try
-                    {
+                    try {
                         tox_notification_change(static_context, nmn3, a_TOXCONNECTION_f, message);
                         Log.i(TAG, "tox_notification_change_wrapper:DONE");
-                    }
-                    catch (Exception e)
-                    {
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
             };
             t.start();
-        }
-        catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
             Log.i(TAG, "tox_notification_change_wrapper:EE01:" + e.getMessage());
         }
