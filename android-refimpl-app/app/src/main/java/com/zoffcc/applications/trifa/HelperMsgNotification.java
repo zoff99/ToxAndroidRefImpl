@@ -19,14 +19,12 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.media.RingtoneManager;
-import android.net.Uri;
 import android.util.Log;
 
 import java.util.HashSet;
@@ -154,98 +152,66 @@ public class HelperMsgNotification
                         {
                             Notification_new_message_last_shown_timestamp = System.currentTimeMillis();
                             Intent notificationIntent = new Intent(context_s, StartMainActivityWrapper.class);
-                            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                            notificationIntent.setAction(
-                                    "com.zoffcc.applications.trifa." + (long) (Math.random() * 100000));
+                            notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                             notificationIntent.putExtra("CLEAR_NEW_MESSAGE_NOTIFICATION", "1");
-                            PendingIntent pendingIntent = PendingIntent.getActivity(context_s, 0, notificationIntent,
-                                                                                    PendingIntent.FLAG_IMMUTABLE);
-                            // -- notification ------------------
-                            // -- notification -----------------
-                            NotificationCompat.Builder b;
 
+                            // FIX: Replaced the Math.random() action hack with a proper unique request code.
+                            // This is the official Android way to force a PendingIntent to update without memory leaks.
+                            int requestCode = (int) (System.currentTimeMillis() % 100000);
+                            PendingIntent pendingIntent = PendingIntent.getActivity(
+                                    context_s,
+                                    requestCode,
+                                    notificationIntent,
+                                    PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
+                            );
+
+                            // Determine the correct channel for Android O+
+                            String channelId = MainActivity.channelId_newmessage_silent; // Safe fallback for pre-O
                             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O)
                             {
-                                if ((PREF__notification_sound) && (PREF__notification_vibrate))
-                                {
-                                    b = new NotificationCompat.Builder(context_s,
-                                                                       MainActivity.channelId_newmessage_sound_and_vibrate);
+                                if (PREF__notification_sound && PREF__notification_vibrate) {
+                                    channelId = MainActivity.channelId_newmessage_sound_and_vibrate;
+                                } else if (PREF__notification_sound) {
+                                    channelId = MainActivity.channelId_newmessage_sound;
+                                } else if (PREF__notification_vibrate) {
+                                    channelId = MainActivity.channelId_newmessage_vibrate;
                                 }
-                                else if ((PREF__notification_sound) && (!PREF__notification_vibrate))
-                                {
-                                    b = new NotificationCompat.Builder(context_s,
-                                                                       MainActivity.channelId_newmessage_sound);
-                                }
-                                else if ((!PREF__notification_sound) && (PREF__notification_vibrate))
-                                {
-                                    b = new NotificationCompat.Builder(context_s,
-                                                                       MainActivity.channelId_newmessage_vibrate);
-                                }
-                                else
-                                {
-                                    b = new NotificationCompat.Builder(context_s,
-                                                                       MainActivity.channelId_newmessage_silent);
-                                }
-                            }
-                            else
-                            {
-                                b = new NotificationCompat.Builder(context_s);
                             }
 
-                            b.setContentIntent(pendingIntent);
-                            b.setSmallIcon(R.drawable.circle_orange);
-                            b.setLights(Color.parseColor("#ffce00"), 500, 500);
-                            Uri default_notification_sound = RingtoneManager.getDefaultUri(
-                                    RingtoneManager.TYPE_NOTIFICATION);
+                            NotificationCompat.Builder b = new NotificationCompat.Builder(context_s, channelId);
 
-                            if (PREF__notification_sound)
+                            // Pre-O manual sound/vibrate/lights
+                            if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.O)
                             {
-                                b.setSound(default_notification_sound);
+                                b.setLights(Color.parseColor("#ffce00"), 500, 500);
+                                if (PREF__notification_sound) {
+                                    b.setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+                                }
+                                if (PREF__notification_vibrate) {
+                                    b.setVibrate(new long[]{100, 300});
+                                }
                             }
 
-                            if (PREF__notification_vibrate)
-                            {
-                                long[] vibrate_pattern = {100, 300};
-                                b.setVibrate(vibrate_pattern);
-                            }
+                            // Determine Title and Text based on privacy preferences
+                            String title = "TRIfA";
+                            String text = context_s.getString(R.string.MainActivity_notification_new_message2);
 
                             if (PREF__notification_show_content)
                             {
-                                if ((nf_title != null) && (!nf_title.isEmpty()))
-                                {
-                                    b.setContentTitle(nf_title);
-                                }
-                                else
-                                {
-                                    b.setContentTitle("TRIfA");
-                                }
-                            }
-                            else
-                            {
-                                b.setContentTitle("TRIfA");
+                                if (nf_title != null && !nf_title.isEmpty()) title = nf_title;
+                                if (nf_text != null && !nf_text.isEmpty()) text = nf_text;
                             }
 
-                            b.setAutoCancel(true);
+                            b.setSmallIcon(R.drawable.circle_orange) // Kept your exact icon!
+                                    .setContentTitle(title)
+                                    .setContentText(text)
+                                    .setAutoCancel(true)
+                                    .setContentIntent(pendingIntent)
+                                    .setCategory(NotificationCompat.CATEGORY_MESSAGE) // Tells Android this is a chat message
+                                    .setPriority(NotificationCompat.PRIORITY_HIGH) // Ensures heads-up popup on older devices
+                                    .setStyle(new NotificationCompat.BigTextStyle().bigText(text)); // FIX: Expands beautifully for long messages!
 
-                            if (PREF__notification_show_content)
-                            {
-                                if ((nf_text != null) && (!nf_text.isEmpty()))
-                                {
-                                    b.setContentText(nf_text);
-                                }
-                                else
-                                {
-                                    b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
-                                }
-                            }
-                            else
-                            {
-                                b.setContentText(context_s.getString(R.string.MainActivity_notification_new_message2));
-                            }
-                            Notification notification3 = b.build();
-                            MainActivity.nmn3.notify(Notification_new_message_ID, notification3);
-                            // -- notification ------------------
-                            // -- notification ------------------
+                            MainActivity.nmn3.notify(Notification_new_message_ID, b.build());
                         }
                     }
                 }
