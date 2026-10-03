@@ -118,7 +118,7 @@ public class HelperToxNotification
         Log.i(TAG, "tox_notification_cancel:end");
     }
 
-    static void tox_notification_change(Context c, NotificationManager nmn2, int a_TOXCONNECTION, String message)
+    static void tox_notification_change(Context c, NotificationManager nmn2, int a_TOXCONNECTION, String message, final boolean battery_saving_mode_active)
     {
         Log.i(TAG, "tox_notification_change:start");
 
@@ -149,10 +149,14 @@ public class HelperToxNotification
         else if (a_TOXCONNECTION == 0)
         {
             notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
+            String offline_text = "OFFLINE";
+            if (battery_saving_mode_active) {
+                offline_text = "Battery Saving";
+            }
             if (PREF__orbot_enabled) {
-                notification_view.setTextViewText(R.id.title, "Tox Service: OFFLINE [Tor Proxy] " + message);
+                notification_view.setTextViewText(R.id.title, "Tox Service: " + offline_text + " [Tor Proxy] " + message);
             } else {
-                notification_view.setTextViewText(R.id.title, "Tox Service: OFFLINE " + message);
+                notification_view.setTextViewText(R.id.title, "Tox Service: " + offline_text + " " + message);
             }
         }
         else if (PREF__orbot_enabled)
@@ -203,6 +207,11 @@ public class HelperToxNotification
 
     static void tox_notification_change_wrapper(int a_TOXCONNECTION, final String message)
     {
+        tox_notification_change_wrapper(a_TOXCONNECTION, message, false);
+    }
+
+    static void tox_notification_change_wrapper(int a_TOXCONNECTION, final String message, final boolean battery_saving_mode_active)
+    {
         Log.i(TAG, "tox_notification_change_wrapper:start");
         final int a_TOXCONNECTION_f = a_TOXCONNECTION;
         final Context static_context = context_s;
@@ -220,7 +229,7 @@ public class HelperToxNotification
 
                     try
                     {
-                        tox_notification_change(static_context, nmn3, a_TOXCONNECTION_f, message);
+                        tox_notification_change(static_context, nmn3, a_TOXCONNECTION_f, message, battery_saving_mode_active);
                         Log.i(TAG, "tox_notification_change_wrapper:DONE");
                     }
                     catch (Exception e)

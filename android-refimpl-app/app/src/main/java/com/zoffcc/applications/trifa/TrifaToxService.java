@@ -1486,7 +1486,7 @@ public class TrifaToxService extends Service
                     Log.i(TAG, "bootrapping:set to true[1]");
                     try
                     {
-                        tox_notification_change(context_s, nmn2, 0, ""); // set notification to "bootstrapping"
+                        tox_notification_change(context_s, nmn2, 0, "", false); // set notification to "bootstrapping"
                     }
                     catch (Exception e)
                     {
@@ -1722,13 +1722,13 @@ public class TrifaToxService extends Service
                 {
                     long iteration_start_ms = System.currentTimeMillis(); // [ADDED] Track loop start
 
+                    if (tox_iteration_interval_ms < 2)
+                    {
+                        tox_iteration_interval_ms = 2;
+                    }
+
                     try
                     {
-                        if (tox_iteration_interval_ms < 2)
-                        {
-                            tox_iteration_interval_ms = 2;
-                        }
-
                         if ((PREF__X_battery_saving_mode) && (battery_saving_can_sleep()))
                         {
                             need_wakeup_now = false;
@@ -1740,7 +1740,7 @@ public class TrifaToxService extends Service
                             append_logger_msg(TAG + "::" + "setting alarm ...");
                             set_alarm_for_battery_saving_sleep();
 
-                            tox_notification_change_wrapper(TOX_CONNECTION_NONE.value, "");
+                            tox_notification_change_wrapper(TOX_CONNECTION_NONE.value, "", true);
                             set_all_friends_offline();
                             set_all_conferences_inactive();
                             global_self_last_went_offline_timestamp = System.currentTimeMillis();
@@ -1847,6 +1847,8 @@ public class TrifaToxService extends Service
                                       "|trig=" + wakeup_trigger_reason;
                         append_logger_msg(TAG + "::" + info);
                         HelperGeneric.battery_sleep_log_add(info);
+                        int TOX_CONNECTION_a = tox_self_get_connection_status();
+                        tox_notification_change_wrapper(TOX_CONNECTION_a, "");
                         battery_sleep_start_ms = 0; // belt & braces (helper already cleared it)
                     }
 
@@ -2530,7 +2532,7 @@ public class TrifaToxService extends Service
                         Log.i(TAG, "bootrapping:set to true[2]");
                         try
                         {
-                            tox_notification_change(context_s, nmn2, TOX_CONNECTION_NONE.value, "");
+                            tox_notification_change(context_s, nmn2, TOX_CONNECTION_NONE.value, "", false);
                         }
                         catch (Exception e)
                         {
