@@ -1723,7 +1723,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             notification_channel_call_audio_play_service.setSound(null, audioAttributes);
             notification_channel_call_audio_play_service.enableVibration(false);
-
             nmn3.createNotificationChannel(notification_channel_call_audio_play_service);
         }
         try
@@ -1824,7 +1823,6 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             else
             {
-                // --- CRITICAL FIX ---
                 // If the CallAudioService is running, it is handling the audio in the background.
                 // Restarting the audio system here will kill the AudioRecording thread,
                 // release the microphone (making the green dot disappear), and break outgoing audio.

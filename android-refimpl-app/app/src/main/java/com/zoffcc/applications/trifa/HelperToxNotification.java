@@ -63,10 +63,8 @@ public class HelperToxNotification
         notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(c, 0, notificationIntent, PendingIntent.FLAG_IMMUTABLE);
 
-        // Keep your exact custom layout so icons retain their perfect shapes and colors
         notification_view = new RemoteViews(c.getPackageName(), R.layout.custom_notification);
         Log.i(TAG, "contentView=" + notification_view);
-
         notification_view.setImageViewResource(R.id.image, R.drawable.circle_red);
 
         // Apply dynamic system text color for Dark/Light mode compatibility
@@ -104,13 +102,19 @@ public class HelperToxNotification
     static void tox_notification_cancel(Context c)
     {
         Log.i(TAG, "tox_notification_cancel:start");
-        try {
+
+        try
+        {
+            // remove the notification
             NotificationManager nmn2 = (NotificationManager) c.getSystemService(NOTIFICATION_SERVICE);
             nmn2.cancel(ONGOING_NOTIFICATION_ID);
             Log.i(TAG, "tox_notification_cancel:OK");
-        } catch (Exception e3) {
+        }
+        catch (Exception e3)
+        {
             e3.printStackTrace();
         }
+
         Log.i(TAG, "tox_notification_cancel:end");
     }
 
@@ -214,16 +218,21 @@ public class HelperToxNotification
                         try { Thread.sleep(100); } catch (Exception ignored) {}
                     }
 
-                    try {
+                    try
+                    {
                         tox_notification_change(static_context, nmn3, a_TOXCONNECTION_f, message);
                         Log.i(TAG, "tox_notification_change_wrapper:DONE");
-                    } catch (Exception e) {
+                    }
+                    catch (Exception e)
+                    {
                         e.printStackTrace();
                     }
                 }
             };
             t.start();
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             e.printStackTrace();
             Log.i(TAG, "tox_notification_change_wrapper:EE01:" + e.getMessage());
         }
