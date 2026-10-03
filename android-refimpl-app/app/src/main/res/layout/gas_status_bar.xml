@@ -1,86 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="horizontal">
+    android:layout_height="64dp"
+    android:orientation="horizontal"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:background="?android:attr/colorBackground"
+    android:gravity="center_vertical">
 
+    <!-- Compact Album Art (Reduced to 40dp to clear vast horizontal text room) -->
     <ImageView
         android:id="@+id/status_bar_album_art"
-        android:layout_width="@dimen/status_bar_album_art"
-        android:layout_height="@dimen/status_bar_album_art"
-        android:padding="2dp"
-        android:gravity="center"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:scaleType="centerCrop"
+        android:background="?android:attr/colorPrimaryDark"
         android:src="@drawable/i_emoji_google_1f601" />
 
+    <!-- Hidden icon, kept for compatibility -->
     <ImageView
         android:id="@+id/status_bar_icon"
-        android:layout_width="@dimen/status_bar_album_art"
-        android:layout_height="@dimen/status_bar_album_art"
-        android:background="@drawable/status_bg"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:visibility="gone"
         android:scaleType="center"
-        android:src="@mipmap/ic_launcher"
-        android:visibility="gone" />
+        android:src="@mipmap/ic_launcher" />
 
+    <!-- Maximized Metadata Content Block (Tight margins to prevent clipping) -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
         android:layout_weight="1"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="4dp"
         android:orientation="vertical"
-        android:paddingLeft="@dimen/status_bar_button_info_container_padding_left">
+        android:gravity="center_vertical">
 
+        <!-- Micro-typography for Time tracker to save vertical clearance -->
         <Chronometer
             android:id="@+id/status_bar_chrono1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/text_size_small" />
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="10sp"
+            android:letterSpacing="0.02"
+            android:textStyle="normal" />
 
         <TextView
             android:id="@+id/status_bar_track_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="1dp"
             android:text="Track Name"
-            android:textSize="@dimen/text_size_small"
-            android:textStyle="normal"/>
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:singleLine="true"
+            android:ellipsize="marquee" />
 
         <TextView
             android:id="@+id/status_bar_artist_name"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Artist Name" />
-
+            android:layout_marginTop="0dp"
+            android:text="Artist Name"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="11sp"
+            android:singleLine="true"
+            android:ellipsize="end" />
     </LinearLayout>
 
+    <!-- Compact Action Buttons Block (Slimmed down to 32dp to save horizontal space) -->
     <ImageButton
         android:id="@+id/status_bar_play"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
-        android:contentDescription="Pause"
-        android:padding="13dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:background="@android:color/transparent"
+        android:contentDescription="Mute/Play"
+        android:padding="4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/about_icon_google_play" />
-
-    <ImageView
-        android:id="@+id/status_bar_dummy1"
-        android:layout_width="15dp"
-        android:layout_height="wrap_content"
-        android:contentDescription=""
-        android:src="@null" />
+        android:src="@drawable/about_icon_google_play"
+        android:tint="?android:attr/textColorPrimary" />
 
     <ImageButton
         android:id="@+id/status_bar_stop"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="6dp"
+        android:background="@android:color/transparent"
         android:contentDescription="Stop"
-        android:padding="13dp"
+        android:padding="4dp"
         android:scaleType="fitCenter"
-        android:src="@drawable/about_icon_instagram" />
-
-    <ImageView
-        android:id="@+id/status_bar_dummy1b"
-        android:layout_width="5dp"
-        android:layout_height="wrap_content"
-        android:contentDescription=""
-        android:src="@null" />
+        android:src="@drawable/about_icon_instagram"
+        android:tint="?android:attr/textColorPrimary" />
 
 </LinearLayout>

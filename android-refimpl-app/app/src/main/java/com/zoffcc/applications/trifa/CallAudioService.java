@@ -31,10 +31,16 @@ import android.content.pm.ServiceInfo;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.os.SystemClock;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.widget.RemoteViews;
 
 import com.mikepenz.google_material_typeface_library.GoogleMaterial;
@@ -43,11 +49,13 @@ import com.zoffcc.applications.nativeaudio.NativeAudio;
 
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.ServiceCompat;
+import androidx.media.app.NotificationCompat.MediaStyle;
 
 import static com.zoffcc.applications.trifa.CallingActivity.callactivity_handler_s;
 import static com.zoffcc.applications.trifa.CallingActivity.mute_button;
 import static com.zoffcc.applications.trifa.CallingActivity.stop_active_call;
 import static com.zoffcc.applications.trifa.CallingActivity.trifa_is_MicrophoneMute;
+import static com.zoffcc.applications.trifa.GroupMessageListActivity.init_native_audio_stuff;
 import static com.zoffcc.applications.trifa.HelperFriend.main_get_friend;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_by_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.drawableToBitmap;
@@ -66,8 +74,9 @@ public class CallAudioService extends Service
     public static final int ACTION_MUTE_ID = 112128;
     public static final int ACTION_STOP_ID = 112129;
     static boolean running = false;
-    static Thread GAThread = null;
+    static Thread AudioCallThread = null;
     static NotificationManager nm3 = null;
+    static MediaSessionCompat mediaSession;
     static CallAudioService ga_service = null;
     static int activity_state = 0;
     static notification_and_builder noti_and_builder = null;
@@ -116,12 +125,66 @@ public class CallAudioService extends Service
 
         context_gas_static = this;
 
+        // 1. Request Audio Focus ONCE and hold it
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build();
+            AudioFocusRequest focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT)
+                    .setAudioAttributes(audioAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
+                        @Override
+                        public void onAudioFocusChange(int focusChange) {
+                            Log.i(TAG, "AUDIO_FOCUS: focusChange=" + focusChange);
+                        }
+                    })
+                    .build();
+            int result = audioManager.requestAudioFocus(focusRequest);
+            Log.i(TAG, "AUDIO_FOCUS: Service requestAudioFocus result=" + result);
+        } else {
+            int result = audioManager.requestAudioFocus(focusChangeListener, AudioManager.STREAM_VOICE_CALL,
+                                                        AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
+            Log.i(TAG, "AUDIO_FOCUS: Service requestAudioFocus (legacy) result=" + result);
+        }
+
+        // 2. Setup MediaSession for hardware volume buttons
+        mediaSession = new MediaSessionCompat(this, "ToxCallSession");
+        mediaSession.setCallback(new MediaSessionCompat.Callback() {
+            @Override
+            public boolean onMediaButtonEvent(Intent mediaButtonIntent) {
+                Log.i(TAG, "MEDIA_SESSION: onMediaButtonEvent received");
+                if (Intent.ACTION_MEDIA_BUTTON.equals(mediaButtonIntent.getAction())) {
+                    KeyEvent event = mediaButtonIntent.getParcelableExtra(Intent.EXTRA_KEY_EVENT);
+                    if (event != null && event.getAction() == KeyEvent.ACTION_DOWN) {
+                        Log.i(TAG, "MEDIA_SESSION: KeyEvent keyCode=" + event.getKeyCode());
+                        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                        if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_UP) {
+                            audioManager.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL,
+                                                            AudioManager.ADJUST_RAISE, AudioManager.FLAG_SHOW_UI);
+                            return true;
+                        } else if (event.getKeyCode() == KeyEvent.KEYCODE_VOLUME_DOWN) {
+                            audioManager.adjustStreamVolume(AudioManager.STREAM_VOICE_CALL,
+                                                            AudioManager.ADJUST_LOWER, AudioManager.FLAG_SHOW_UI);
+                            return true;
+                        }
+                    }
+                }
+                return super.onMediaButtonEvent(mediaButtonIntent);
+            }
+        });
+        mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                              MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        mediaSession.setActive(true);
+
         nm3 = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         noti_and_builder = buildNotification(global_gas_status);
         int type = 0;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
         {
-            type = ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE;
+            type = ServiceInfo.FOREGROUND_SERVICE_TYPE_PHONE_CALL;
         }
         ServiceCompat.startForeground(this,
                                       ONGOING_CALL_AUDIO_NOTIFICATION_ID,
@@ -131,14 +194,14 @@ public class CallAudioService extends Service
         Log.i(TAG, "onCreate:thread:1");
 
         running = true;
-        GAThread = new Thread()
+        AudioCallThread = new Thread()
         {
             @Override
             public void run()
             {
                 Log.i(TAG, "GAThread:starting");
                 activity_state = 1;
-                wakeup_tox_thread("NGC_AUDIO_GROUP");
+                wakeup_tox_thread("CALL_ACTIVE");
 
                 try
                 {
@@ -202,9 +265,16 @@ public class CallAudioService extends Service
         };
 
         Log.i(TAG, "onCreate:thread:2");
-        GAThread.start();
+        AudioCallThread.start();
         Log.i(TAG, "onCreate:thread:3");
     }
+
+    private AudioManager.OnAudioFocusChangeListener focusChangeListener = new AudioManager.OnAudioFocusChangeListener() {
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            Log.i(TAG, "AUDIO_FOCUS: focusChange=" + focusChange);
+        }
+    };
 
     @Override
     public boolean onUnbind(Intent intent)
@@ -226,6 +296,12 @@ public class CallAudioService extends Service
     public void onDestroy()
     {
         Log.i(TAG, "onDestroy");
+        Log.i(TAG, "SERVICE: onDestroy called");
+        if (mediaSession != null) {
+            mediaSession.setActive(false);
+            mediaSession.release();
+            Log.i(TAG, "MEDIA_SESSION: Released");
+        }
         super.onDestroy();
     }
 
@@ -322,7 +398,8 @@ public class CallAudioService extends Service
 
         b.setContentTitle("...");
         b.setShowWhen(false);
-        b.setStyle(new androidx.media.app.NotificationCompat.MediaStyle());
+        // b.setStyle(new androidx.media.app.NotificationCompat.MediaStyle());
+        b.setStyle(new NotificationCompat.DecoratedCustomViewStyle());
         b.setColor(getResources().getColor(R.color.colorPrimary));
         b.setSmallIcon(R.mipmap.ic_launcher);
         b.setLargeIcon((Bitmap) null);
@@ -391,11 +468,26 @@ public class CallAudioService extends Service
     public static void stop_me(boolean cancel_toxav_call)
     {
         running = false;
+
         try
         {
-            if (GAThread != null)
+            if (mediaSession != null) {
+                mediaSession.setActive(false);
+                mediaSession.release();
+                mediaSession = null;
+                Log.i(TAG, "MEDIA_SESSION: Released in stop_me()");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (AudioCallThread != null)
             {
-                GAThread.join();
+                AudioCallThread.join();
             }
         }
         catch (Exception e)

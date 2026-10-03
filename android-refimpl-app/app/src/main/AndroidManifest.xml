@@ -58,6 +58,7 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS"/>
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_PHONE_CALL" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <!--<uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>-->
     <uses-permission android:name="android.permission.RAISED_THREAD_PRIORITY" />
@@ -378,11 +379,8 @@
         <service
             android:name=".CallAudioService"
             android:enabled="true"
-            android:foregroundServiceType="specialUse"
+            android:foregroundServiceType="phoneCall"
             android:exported="false">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="watchdog service" />
         </service>
 
         <receiver android:name=".ConfGroupAudioService$ButtonReceiver" android:enabled="true">

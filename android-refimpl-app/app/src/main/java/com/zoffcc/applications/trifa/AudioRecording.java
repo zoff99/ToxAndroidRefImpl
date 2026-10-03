@@ -19,9 +19,12 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.SystemClock;
 import android.util.Log;
 
@@ -87,7 +90,6 @@ public class AudioRecording extends Thread
         finished = false;
 
         audio_manager_s.setMicrophoneMute(false);
-        audio_manager_s.requestAudioFocus(null, AudioManager.STREAM_VOICE_CALL, AudioManager.AUDIOFOCUS_GAIN);
         start();
     }
 

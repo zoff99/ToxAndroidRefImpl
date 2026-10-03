@@ -47,6 +47,7 @@ import android.os.Handler;
 import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.View;
@@ -1714,8 +1715,15 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             channelId = "trifa_call_audio_play";
             notification_channel_call_audio_play_service = new NotificationChannel(channelId, channelName, importance);
             notification_channel_call_audio_play_service.setDescription(channelId);
-            notification_channel_call_audio_play_service.setSound(null, null);
+
+            android.media.AudioAttributes audioAttributes = new android.media.AudioAttributes.Builder()
+                    .setUsage(android.media.AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(android.media.AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build();
+
+            notification_channel_call_audio_play_service.setSound(null, audioAttributes);
             notification_channel_call_audio_play_service.enableVibration(false);
+
             nmn3.createNotificationChannel(notification_channel_call_audio_play_service);
         }
         try
@@ -1816,8 +1824,20 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             else
             {
-                Log.i(TAG, "restart_audio_system__normal_call:005:preset_TRUE");
-                HelperGeneric.restart_audio_system();
+                // --- CRITICAL FIX ---
+                // If the CallAudioService is running, it is handling the audio in the background.
+                // Restarting the audio system here will kill the AudioRecording thread,
+                // release the microphone (making the green dot disappear), and break outgoing audio.
+                if (!CallAudioService.running)
+                {
+                    Log.i(TAG, "restart_audio_system__normal_call:005:preset_TRUE");
+                    HelperGeneric.restart_audio_system();
+                }
+                else
+                {
+                    Log.i(TAG, "restart_audio_system__normal_call: SKIPPED (CallAudioService is running)");
+                }
+                // --------------------
             }
         }
 
@@ -2179,6 +2199,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         mContentView.setVisibility(View.INVISIBLE);
     }
 
+    /*
     private void requestAudioFocus()
     {
         //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
@@ -2204,6 +2225,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         //                                              AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
         //        }
     }
+    */
 
     @Override
     public void onSensorChanged(SensorEvent event)
