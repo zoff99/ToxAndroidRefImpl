@@ -466,7 +466,7 @@ public class TRIFAGlobals
         STATE_HIGH_NETWORK_ACTIVITY(16),
 
         /** CPU/Radio storm (< 20ms loop). - Highest Priority */
-        STATE_ITERATE_TOO_FAST(17);
+        STATE_ITERATE_FAST(17);
 
         /**
          * Holder-class workaround: an enum constructor may not reference

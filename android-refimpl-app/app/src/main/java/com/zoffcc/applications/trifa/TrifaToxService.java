@@ -1966,7 +1966,7 @@ public class TrifaToxService extends Service
 
                             // Evaluate each state independently. Multiple states can be true simultaneously.
                             if (fast_iteration_logged) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_ITERATE_TOO_FAST.value][app_state_history_index] = true;
+                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_ITERATE_FAST.value][app_state_history_index] = true;
                             }
 
                             if (Callstate.state != 0) {
