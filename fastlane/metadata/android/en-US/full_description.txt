@@ -17,7 +17,7 @@ Tox is free software. That's free as in freedom, as well as in price. This means
 <br>
 * Persistent Group Peer List: Your peers and friends are persistently saved and always available when you reconnect.
 <br>
-* Tox Profiler: Your peers and friends are persistently saved and always available when you reconnect.
+* Tox Profiler: Show extensive Debugging information of the Application.
 <br>
 * App Exit: See the reason why the App stopped last time (in the Maintenance screen).
 
