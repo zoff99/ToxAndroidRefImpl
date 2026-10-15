@@ -29,6 +29,17 @@
             android:layout_marginLeft="0dp"
             android:paddingLeft="0dp" />
 
+        <ImageButton
+            android:id="@+id/gallery_btn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_gallery"
+            android:layout_gravity="center_vertical"
+            android:contentDescription="Media Gallery"
+            android:scaleType="centerInside"
+            android:padding="0dp" />
+
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search_view_messages"
             android:layout_width="match_parent"

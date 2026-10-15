@@ -99,6 +99,14 @@ public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPag
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            // --- VFS Indicator Logic ---
+            android.widget.TextView vfsIndicator = itemView.findViewById(R.id.vfs_indicator);
+            if (msg.direction != TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+                vfsIndicator.setVisibility(android.view.View.VISIBLE);
+            } else {
+                vfsIndicator.setVisibility(android.view.View.GONE);
+            }
         }
     }
 }

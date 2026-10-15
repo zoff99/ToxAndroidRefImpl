@@ -271,6 +271,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     ImageButton ml_button_01 = null;
     ImageButton ml_button_recaudio = null;
     ImageButton audio_rec_popup_button = null;
+    ImageButton group_gallery_btn = null;
     static TextView audio_rec_popup_time = null;
     static ViewGroup audio_rec_popup_container = null;
     static boolean ml_is_recording = false;
@@ -494,6 +495,14 @@ public class GroupMessageListActivity extends AppCompatActivity
         audio_rec_popup_button = findViewById(R.id.audio_rec_popup_button);
         audio_rec_popup_time = findViewById(R.id.audio_rec_popup_time);
         audio_rec_popup_container = findViewById(R.id.audio_rec_popup_container);
+
+        group_gallery_btn = findViewById(R.id.group_gallery_btn);
+        group_gallery_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                open_group_media_gallery(v);
+            }
+        });
 
         audio_rec_popup_container.setVisibility(View.GONE);
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
@@ -4426,5 +4435,16 @@ public class GroupMessageListActivity extends AppCompatActivity
             e.printStackTrace();
         }
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+    }
+
+    public void open_group_media_gallery(View v) {
+        if ((group_id == null) || (group_id.equals("-1")))
+        {
+            return;
+        }
+
+        Intent intent = new Intent(this, MediaGalleryActivity.class);
+        intent.putExtra("group_identifier", group_id);
+        startActivity(intent);
     }
 }

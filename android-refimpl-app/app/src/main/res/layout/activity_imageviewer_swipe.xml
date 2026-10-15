@@ -9,4 +9,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ImageButton
+        android:id="@+id/btn_share"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:background="@drawable/bg_share_button"
+        android:foreground="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_share"
+        android:contentDescription="Share"
+        android:tint="#FFFFFF"
+        android:padding="10dp"
+        android:scaleType="fitCenter" />
+
 </FrameLayout>

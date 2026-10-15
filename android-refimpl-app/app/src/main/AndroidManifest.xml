@@ -296,6 +296,11 @@
         </activity>
 
         <activity
+            android:name=".MediaGalleryActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">
+        </activity>
+
+        <activity
             android:name=".HistoryChartActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden">

@@ -175,6 +175,7 @@ public class MessageListActivity extends AppCompatActivity
     ImageButton ml_attach_button_01 = null;
     ImageButton ml_button_recaudio = null;
     ImageButton audio_rec_popup_button = null;
+    ImageButton gallery_btn = null;
     static TextView audio_rec_popup_time = null;
     static ViewGroup audio_rec_popup_container = null;
     static boolean ml_is_recording = false;
@@ -262,6 +263,14 @@ public class MessageListActivity extends AppCompatActivity
         messageSearchView = (SearchView) findViewById(R.id.search_view_messages);
         messageSearchView.setQueryHint(getString(R.string.messages_search_default_text));
         messageSearchView.setIconifiedByDefault(true);
+
+        gallery_btn = findViewById(R.id.gallery_btn);
+        gallery_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                open_media_gallery(v);
+            }
+        });
 
         spinner_filter_msgs = (CustomSpinner) findViewById(R.id.spinner_filter_msgs);
         ArrayList<String> own_online_status_string_values = new ArrayList<String>(Arrays.asList("all", "files"));
@@ -2568,5 +2577,15 @@ public class MessageListActivity extends AppCompatActivity
         catch (Exception ignored)
         {
         }
+    }
+
+    public void open_media_gallery(View v)
+    {
+        if (friendnum == -1) return;
+
+        String pubkey = tox_friend_get_public_key__wrapper(friendnum);
+        Intent intent = new Intent(this, MediaGalleryActivity.class);
+        intent.putExtra("friend_pubkey", pubkey);
+        startActivity(intent);
     }
 }
