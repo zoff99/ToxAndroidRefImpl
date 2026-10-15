@@ -367,6 +367,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 {
                                     Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
                                     intent.putExtra("image_filename", message2.filename_fullpath);
+                                    intent.putExtra("friend_pubkey", message2.tox_friendpubkey);
                                     v.getContext().startActivity(intent);
                                 }
                                 catch (Exception e)

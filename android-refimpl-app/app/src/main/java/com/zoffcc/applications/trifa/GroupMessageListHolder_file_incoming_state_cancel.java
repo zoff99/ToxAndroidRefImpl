@@ -723,6 +723,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
                             {
                                 Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
                                 intent.putExtra("image_filename", message_.filename_fullpath);
+                                intent.putExtra("group_identifier", message_.group_identifier);
                                 v.getContext().startActivity(intent);
                             }
                             catch (Exception e)

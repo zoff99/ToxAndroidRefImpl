@@ -248,15 +248,17 @@ public class GroupMessageListHolder_file_outgoing_state_cancel extends RecyclerV
                                 DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
                                 String fileName = documentFile.getName();
 
-                                Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
                                 intent.putExtra("image_filename", uri.toString());
+                                intent.putExtra("group_identifier", message.group_identifier);
                                 intent.putExtra("storage_frame_work", "1");
                                 v.getContext().startActivity(intent);
                             }
                             else
                             {
-                                Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
                                 intent.putExtra("image_filename", message.filename_fullpath);
+                                intent.putExtra("group_identifier", message.group_identifier);
                                 v.getContext().startActivity(intent);
                             }
                         }

@@ -315,15 +315,17 @@ public class MessageListHolder_file_outgoing_state_cancel extends RecyclerView.V
                                     DocumentFile documentFile = DocumentFile.fromSingleUri(context, uri);
                                     String fileName = documentFile.getName();
 
-                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
                                     intent.putExtra("image_filename", uri.toString());
+                                    intent.putExtra("friend_pubkey", message.tox_friendpubkey);
                                     intent.putExtra("storage_frame_work", "1");
                                     v.getContext().startActivity(intent);
                                 }
                                 else
                                 {
-                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity_SD.class);
+                                    Intent intent = new Intent(v.getContext(), ImageviewerActivity.class);
                                     intent.putExtra("image_filename", message.filename_fullpath);
+                                    intent.putExtra("friend_pubkey", message.tox_friendpubkey);
                                     v.getContext().startActivity(intent);
                                 }
                             }
