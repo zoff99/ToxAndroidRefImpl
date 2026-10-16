@@ -1679,6 +1679,17 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                     @Override
                     public void run() {
                         try {
+                            // === Ensure the directory exists before native fopen ===
+                            File exportDir = new File(SD_CARD_FILES_EXPORT_DIR);
+                            if (!exportDir.exists()) {
+                                boolean created = exportDir.mkdirs();
+                                if (!created && !exportDir.exists()) {
+                                    showError(activity, "Failed to create export directory.");
+                                    return;
+                                }
+                            }
+                            // ==========================================================
+
                             // Step A: Let the native code write to the hardcoded location
                             export_savedata_file_unsecure("_", tempFilePath);
 
