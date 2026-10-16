@@ -181,11 +181,15 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
     // ----------------------------------------------------
 
     private static final int REQUEST_CODE_SAVEDATA_EXPORT = 4501;
+    private static final int REQUEST_CODE_SAVEDATA_IMPORT = 4572;
     private static final String PREFS_KEY_SAVEDATA_EXPORT = "savedata_export_dir";
 
     // Hold the active exporter instance so onActivityResult can forward the result to it
     @SuppressLint("StaticFieldLeak")
     private static DocumentExporter exporter = null;
+
+    @SuppressLint("StaticFieldLeak")
+    private static DocumentImporter importer = null;
 
     @SuppressLint("SetTextI18n")
     @Override
@@ -665,31 +669,52 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 {
                     AlertDialog.Builder builder = new AlertDialog.Builder(this_context);
                     builder.setTitle("Import Tox Savedata");
-                    builder.setMessage("Tox Savedata File will be imported unencrypted from this location:" + "\n\n" +
-                                       MainActivity.SD_CARD_FILES_EXPORT_DIR + "/" + "I_WANT_TO_IMPORT_savedata.tox");
+                    builder.setMessage("Select a Tox Savedata file to import. This will wipe all current data and replace it with the imported save.");
 
-                    builder.setPositiveButton("Yes, I want to wipe all data and import",
+                    builder.setPositiveButton("Select File & Import",
                                               new DialogInterface.OnClickListener()
                                               {
                                                   public void onClick(DialogInterface dialog, int id)
                                                   {
-
-                                                      final Thread import_thread = new Thread()
+                                                      if (importer == null)
                                                       {
-                                                          @Override
-                                                          public void run()
-                                                          {
-                                                              try
-                                                              {
-                                                                  import_toxsave_file_unsecure(this_context);
-                                                              }
-                                                              catch (Exception ignored)
-                                                              {
-                                                              }
-                                                          }
-                                                      };
-                                                      import_thread.start();
-                                                      return;
+                                                          importer = new DocumentImporter(MaintenanceActivity.this, REQUEST_CODE_SAVEDATA_IMPORT);
+                                                      }
+
+                                                      final String destDir = MainActivity.SD_CARD_FILES_EXPORT_DIR;
+                                                      final String destFileName = "I_WANT_TO_IMPORT_savedata.tox";
+
+                                                      importer.importFile(destDir, destFileName, "application/octet-stream",
+                                                                          new DocumentImporter.ImportCallback()
+                                                                          {
+                                                                              @Override
+                                                                              public void onSuccess()
+                                                                              {
+                                                                                  // File has been copied to destDir/destFileName via SAF
+                                                                                  // Now run the actual import on a background thread
+                                                                                  final Thread import_thread = new Thread()
+                                                                                  {
+                                                                                      @Override
+                                                                                      public void run()
+                                                                                      {
+                                                                                          try
+                                                                                          {
+                                                                                              import_toxsave_file_unsecure(this_context);
+                                                                                          }
+                                                                                          catch (Exception ignored)
+                                                                                          {
+                                                                                          }
+                                                                                      }
+                                                                                  };
+                                                                                  import_thread.start();
+                                                                              }
+
+                                                                              @Override
+                                                                              public void onError(String message)
+                                                                              {
+                                                                                  display_toast("Import failed: " + message, false, 800);
+                                                                              }
+                                                                          });
                                                   }
                                               });
                     builder.setNegativeButton("Cancel", null);
@@ -2243,6 +2268,19 @@ public class MaintenanceActivity extends AppCompatActivity implements StrongBuil
                 try
                 {
                     exporter.handleActivityResult(requestCode, resultCode, data);
+                }
+                catch(Exception ignored)
+                {
+                }
+            }
+        }
+        else if (requestCode == REQUEST_CODE_SAVEDATA_IMPORT)
+        {
+            if (importer != null)
+            {
+                try
+                {
+                    importer.handleActivityResult(requestCode, resultCode, data);
                 }
                 catch(Exception ignored)
                 {
