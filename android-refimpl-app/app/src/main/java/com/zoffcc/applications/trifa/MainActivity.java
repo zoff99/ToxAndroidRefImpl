@@ -53,8 +53,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -62,8 +65,11 @@ import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RemoteViews;
@@ -380,6 +386,8 @@ public class MainActivity extends AppCompatActivity
     static boolean native_lib_loaded = false;
     static boolean native_audio_lib_loaded = false;
     static String app_files_directory = "";
+    static EditText main_search_edittext = null;
+    ImageView main_search_icon = null;
     // static boolean stop_me = false;
     // static Thread ToxServiceThread = null;
     static Semaphore semaphore_videoout_bitmap = new Semaphore(1);
@@ -795,6 +803,79 @@ public class MainActivity extends AppCompatActivity
         Log.i(TAG, "M:STARTUP:setContentView start");
         setContentView(R.layout.activity_main);
         Log.i(TAG, "M:STARTUP:setContentView end");
+
+        try {
+            main_search_edittext = (EditText) findViewById(R.id.main_search_edittext);
+            main_search_icon = (ImageView) findViewById(R.id.main_search_icon);
+
+            final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String saved_filter = prefs.getString("MAIN_SEARCH_FILTER", "");
+
+            // Restore filter on startup
+            if (saved_filter != null && !saved_filter.isEmpty()) {
+                main_search_edittext.setText(saved_filter);
+                main_search_edittext.setVisibility(View.VISIBLE);
+                if (MainActivity.friend_list_fragment != null && MainActivity.friend_list_fragment.adapter != null) {
+                    MainActivity.friend_list_fragment.adapter.setFilter(saved_filter);
+                }
+            } else {
+                main_search_edittext.setVisibility(View.GONE);
+            }
+
+            // Handle Search Icon Click
+            main_search_icon.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (main_search_edittext.getVisibility() == View.VISIBLE) {
+                        main_search_edittext.setVisibility(View.GONE);
+                        main_search_edittext.setText("");
+                    } else {
+                        main_search_edittext.setVisibility(View.VISIBLE);
+                        main_search_edittext.requestFocus();
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (imm != null) {
+                            imm.showSoftInput(main_search_edittext, InputMethodManager.SHOW_IMPLICIT);
+                        }
+                    }
+                }
+            });
+
+            // Handle Keyboard "Done" Action
+            main_search_edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+                        if (imm != null) {
+                            imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+                        }
+                        return true;
+                    }
+                    return false;
+                }
+            });
+
+            // Handle Text Changes for Filtering and Saving
+            main_search_edittext.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    String filterStr = s.toString();
+                    prefs.edit().putString("MAIN_SEARCH_FILTER", filterStr).apply();
+                    if (MainActivity.friend_list_fragment != null && MainActivity.friend_list_fragment.adapter != null) {
+                        MainActivity.friend_list_fragment.adapter.setFilter(filterStr);
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
 
         try
         {

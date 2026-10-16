@@ -244,7 +244,22 @@
                             android:layout_height="0dp"
                             android:layout_weight="1" />
 
-                        <!-- [ADDED] Search Icon -->
+                        <EditText
+                            android:id="@+id/main_search_edittext"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1"
+                            android:hint="Filter..."
+                            android:visibility="gone"
+                            android:singleLine="true"
+                            android:imeOptions="actionDone"
+                            android:inputType="text"
+                            android:background="@android:color/transparent"
+                            android:paddingLeft="4dp"
+                            android:paddingRight="4dp"
+                            android:textColorHint="@android:color/darker_gray"
+                            tools:ignore="HardcodedText" />
+
                         <ImageView
                             android:id="@+id/main_search_icon"
                             android:layout_width="60dp"

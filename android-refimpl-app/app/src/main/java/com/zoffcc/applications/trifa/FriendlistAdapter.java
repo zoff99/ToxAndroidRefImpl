@@ -30,6 +30,7 @@ import com.zoffcc.applications.sorm.ConferenceDB;
 import com.zoffcc.applications.sorm.FriendList;
 import com.zoffcc.applications.sorm.GroupDB;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,12 +47,15 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
 
     private final List<CombinedFriendsAndConferences> friendlistitems;
     private Context context;
+    private List<CombinedFriendsAndConferences> all_items;
+    private String current_filter = "";
 
     public FriendlistAdapter(Context context, List<CombinedFriendsAndConferences> items)
     {
         // Log.i(TAG, "FriendlistAdapter");
 
         this.friendlistitems = items;
+        this.all_items = new ArrayList<>();
         this.context = context;
     }
 
@@ -176,19 +180,15 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         }
     }
 
-    public void add_item(CombinedFriendsAndConferences new_item)
-    {
-        // Log.i(TAG, "add_item:" + new_item + ":" + this.friendlistitems.size());
-
-        try
-        {
-            this.friendlistitems.add(new_item);
-            // TODO: use "notifyItemInserted" !!
-            this.notifyDataSetChanged();
-            // Log.i(TAG, "add_item:002:" + this.friendlistitems.size());
+    public void add_item(CombinedFriendsAndConferences new_item) {
+        try {
+            this.all_items.add(new_item);
+            if (matchesFilter(new_item)) {
+                this.friendlistitems.add(new_item);
+                this.notifyItemInserted(this.friendlistitems.size() - 1);
+            }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
             Log.i(TAG, "add_item:EE:" + e.getMessage());
         }
@@ -196,81 +196,58 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
 
     public void clear_items()
     {
+        this.all_items.clear();
         this.friendlistitems.clear();
         this.notifyDataSetChanged();
     }
 
-    public boolean update_item(CombinedFriendsAndConferences new_item_combined, int is_friend)
-    {
-        // Log.i(TAG, "update_item:" + new_item);
+    public boolean update_item(CombinedFriendsAndConferences new_item_combined, int is_friend) {
         boolean found_item = false;
-
-        try
-        {
-            Iterator it = this.friendlistitems.iterator();
-            while (it.hasNext())
-            {
+        try {
+            Iterator it = this.all_items.iterator(); // Changed from friendlistitems to all_items
+            while (it.hasNext()) {
                 CombinedFriendsAndConferences f_combined = (CombinedFriendsAndConferences) it.next();
-
-                if (is_friend == COMBINED_IS_FRIEND)
-                {
-                    if (f_combined.is_friend == COMBINED_IS_FRIEND)
-                    {
+                if (is_friend == COMBINED_IS_FRIEND) {
+                    if (f_combined.is_friend == COMBINED_IS_FRIEND) {
                         FriendList f = f_combined.friend_item;
                         FriendList new_item = new_item_combined.friend_item;
-
-                        if (f.tox_public_key_string.compareTo(new_item.tox_public_key_string) == 0)
-                        {
+                        if (f.tox_public_key_string.compareTo(new_item.tox_public_key_string) == 0) {
                             found_item = true;
-                            int pos = this.friendlistitems.indexOf(f_combined);
-                            this.friendlistitems.set(pos, new_item_combined);
-                            this.notifyItemChanged(pos);
+                            f_combined.friend_item = new_item; // Update the internal item directly
                             break;
                         }
                     }
-                }
-                else if (is_friend == COMBINED_IS_GROUP)
-                {
-                    if (f_combined.is_friend == COMBINED_IS_GROUP)
-                    {
+                } else if (is_friend == COMBINED_IS_GROUP) {
+                    if (f_combined.is_friend == COMBINED_IS_GROUP) {
                         GroupDB f = f_combined.group_item;
                         GroupDB new_item = new_item_combined.group_item;
-
-                        if (f.group_identifier.compareTo(new_item.group_identifier) == 0)
-                        {
+                        if (f.group_identifier.compareTo(new_item.group_identifier) == 0) {
                             found_item = true;
-                            int pos = this.friendlistitems.indexOf(f_combined);
-                            this.friendlistitems.set(pos, new_item_combined);
-                            this.notifyItemChanged(pos);
+                            f_combined.group_item = new_item;
                             break;
                         }
                     }
-                }
-                else // is conference
-                {
-                    if (f_combined.is_friend == COMBINED_IS_CONFERENCE)
-                    {
+                } else { // is conference
+                    if (f_combined.is_friend == COMBINED_IS_CONFERENCE) {
                         ConferenceDB f = f_combined.conference_item;
                         ConferenceDB new_item = new_item_combined.conference_item;
-
-                        if (f.conference_identifier.compareTo(new_item.conference_identifier) == 0)
-                        {
+                        if (f.conference_identifier.compareTo(new_item.conference_identifier) == 0) {
                             found_item = true;
-                            int pos = this.friendlistitems.indexOf(f_combined);
-                            this.friendlistitems.set(pos, new_item_combined);
-                            this.notifyItemChanged(pos);
+                            f_combined.conference_item = new_item;
                             break;
                         }
                     }
                 }
             }
         }
-        catch (Exception e)
-        {
+        catch (Exception e) {
             e.printStackTrace();
             Log.i(TAG, "update_item:EE:" + e.getMessage());
         }
 
+        if (found_item) {
+            filterList(); // Re-apply filter after an item changes (e.g., a friend renames themselves)
+        }
         return found_item;
     }
 
@@ -279,5 +256,45 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
     {
         // set fastscroller bluble text
         return " ";
+    }
+
+    public void setFilter(String filter) {
+        this.current_filter = filter;
+        filterList();
+    }
+
+    private void filterList() {
+        this.friendlistitems.clear();
+        if (this.current_filter == null || this.current_filter.isEmpty()) {
+            this.friendlistitems.addAll(this.all_items);
+        } else {
+            for (CombinedFriendsAndConferences item : this.all_items) {
+                if (matchesFilter(item)) {
+                    this.friendlistitems.add(item);
+                }
+            }
+        }
+        this.notifyDataSetChanged();
+    }
+
+    private boolean matchesFilter(CombinedFriendsAndConferences row) {
+        if (current_filter == null || current_filter.isEmpty()) return true;
+        String lowerFilter = current_filter.toLowerCase();
+        if (row.is_friend == COMBINED_IS_FRIEND) {
+            if (row.friend_item != null) {
+                if (row.friend_item.name != null && row.friend_item.name.toLowerCase().contains(lowerFilter)) return true;
+                if (row.friend_item.alias_name != null && row.friend_item.alias_name.toLowerCase().contains(lowerFilter)) return true;
+            }
+        } else if (row.is_friend == COMBINED_IS_CONFERENCE) {
+            if (row.conference_item != null) {
+                if (row.conference_item.name != null && row.conference_item.name.toLowerCase().contains(lowerFilter)) return true;
+            }
+        } else if (row.is_friend == COMBINED_IS_GROUP) {
+            if (row.group_item != null) {
+                if (row.group_item.name != null && row.group_item.name.toLowerCase().contains(lowerFilter)) return true;
+                if (row.group_item.topic != null && row.group_item.topic.toLowerCase().contains(lowerFilter)) return true;
+            }
+        }
+        return false;
     }
 }
