@@ -1,6 +1,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -13,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -52,6 +54,9 @@ public class MediaGalleryActivity extends AppCompatActivity {
                 long t2 = m2.sent_timestamp;
                 // If timestamps are equal, use ms if available or id
                 if (t1 == t2) {
+                    if (m1.sent_timestamp_ms != m2.sent_timestamp_ms) {
+                        return Long.compare(m2.sent_timestamp_ms, m1.sent_timestamp_ms);
+                    }
                     return Long.compare(m2.id, m1.id);
                 }
                 return Long.compare(t2, t1); // Descending
@@ -80,7 +85,14 @@ public class MediaGalleryActivity extends AppCompatActivity {
                         m.sent_timestamp = gm.sent_timestamp;
                         m.sent_timestamp_ms = 0;
                         m.direction = gm.direction;
-                        if (gm.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+
+                        boolean is_uri = gm.filename_fullpath.startsWith("content://") || gm.filename_fullpath.startsWith("file://");
+                        if (is_uri) {
+                            m.setfile_uri(gm.filename_fullpath);
+                            if (gm.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+                                m.storage_frame_work = true;
+                            }
+                        } else if (gm.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
                             if (gm.filename_fullpath.contains(MainActivity.SD_CARD_FILES_OUTGOING_WRAPPER_DIR)) {
                                 m.storage_frame_work = true;
                                 m.setfile_uri(gm.filename_fullpath);
@@ -107,7 +119,13 @@ public class MediaGalleryActivity extends AppCompatActivity {
                         m.direction = m_orig.direction;
                         m.storage_frame_work = m_orig.storage_frame_work;
 
-                        if (m.storage_frame_work) {
+                        boolean is_uri = m_orig.filename_fullpath.startsWith("content://") || m_orig.filename_fullpath.startsWith("file://");
+                        if (is_uri) {
+                            m.setfile_uri(m_orig.filename_fullpath);
+                            if (m.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+                                m.storage_frame_work = true;
+                            }
+                        } else if (m.storage_frame_work) {
                             m.setfile_uri(m_orig.filename_fullpath);
                         }
 
@@ -121,17 +139,45 @@ public class MediaGalleryActivity extends AppCompatActivity {
     }
 
     private boolean isImage(String path) {
+        if (path == null) return false;
         try {
-            String mimeType = URLConnection.guessContentTypeFromName(path.toLowerCase());
-            return mimeType != null && mimeType.startsWith("image/");
+            String lower = path.toLowerCase(Locale.US);
+
+            // Fast extension check (helps with URIs that have extensions at the end)
+            if (lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg") ||
+                lower.endsWith(".gif") || lower.endsWith(".bmp") || lower.endsWith(".webp") ||
+                lower.endsWith(".heic") || lower.endsWith(".heif")) {
+                return true;
+            }
+
+            // MIME type from name
+            String mimeType = URLConnection.guessContentTypeFromName(lower);
+            if (mimeType != null && mimeType.startsWith("image/")) {
+                return true;
+            }
+
+            // Content resolver for URIs (Crucial for SAF files)
+            if (lower.startsWith("content://")) {
+                try {
+                    String type = getContentResolver().getType(Uri.parse(path));
+                    if (type != null && type.startsWith("image/")) {
+                        return true;
+                    }
+                } catch (Exception ignored) {}
+            }
         } catch (Exception e) {
-            return false;
+            e.printStackTrace();
         }
+        return false;
     }
 
     public void openImageInViewer(Message_for_img msg) {
         Intent intent = new Intent(this, ImageviewerActivity.class);
         intent.putExtra("image_filename", msg.filename_fullpath);
+
+        if (msg.getfile_uri() != null && !msg.getfile_uri().isEmpty()) {
+            intent.putExtra("file_uri", msg.getfile_uri());
+        }
 
         if (msg.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
             if (msg.storage_frame_work) {

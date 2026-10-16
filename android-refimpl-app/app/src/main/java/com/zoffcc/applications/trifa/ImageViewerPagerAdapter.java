@@ -9,7 +9,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import com.github.chrisbanes.photoview.PhotoView;
-import com.zoffcc.applications.sorm.Message;
 import java.util.List;
 
 public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPagerAdapter.ImageViewHolder> {
@@ -58,43 +57,57 @@ public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPag
 
             try {
                 RequestOptions req_options = new RequestOptions();
+                String path = msg.filename_fullpath;
+                String uriStr = msg.getfile_uri();
+                if (uriStr == null || uriStr.isEmpty()) uriStr = path;
+
+                // Strictly check if it is an actual URI scheme
+                boolean is_uri = uriStr.startsWith("content://") || uriStr.startsWith("file://");
 
                 if (msg.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
-
-                    if (msg.storage_frame_work)
-                    {
-                        Uri uri = Uri.parse(msg.getfile_uri());
-                        // Outgoing file via storage framework
+                    if (is_uri) {
+                        // SAF / Content URI outgoing file
                         GlideApp.with(activity)
-                                .load(uri)
+                                .load(Uri.parse(uriStr))
                                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                 .skipMemoryCache(false)
                                 .apply(req_options)
                                 .placeholder(R.drawable.round_loading_animation)
+                                .error(R.drawable.round_loading_animation)
                                 .into(photoView);
-                    }
-                    else
-                    {
-                        // Outgoing file stored on real SD card
-                        java.io.File f2 = new java.io.File(msg.filename_fullpath);
+                    } else {
+                        // Raw local file path outgoing file (Fixes the StringUri crash)
                         GlideApp.with(activity)
-                                .load(f2)
+                                .load(new java.io.File(path))
                                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                 .skipMemoryCache(false)
                                 .apply(req_options)
                                 .placeholder(R.drawable.round_loading_animation)
+                                .error(R.drawable.round_loading_animation)
                                 .into(photoView);
                     }
                 } else {
-                    // Encrypted VFS file
-                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(msg.filename_fullpath);
-                    GlideApp.with(activity)
-                            .load(f2)
-                            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                            .skipMemoryCache(false)
-                            .apply(req_options)
-                            .placeholder(R.drawable.round_loading_animation)
-                            .into(photoView);
+                    if (is_uri) {
+                        // Rare case: incoming URI
+                        GlideApp.with(activity)
+                                .load(Uri.parse(uriStr))
+                                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                .skipMemoryCache(false)
+                                .apply(req_options)
+                                .placeholder(R.drawable.round_loading_animation)
+                                .error(R.drawable.round_loading_animation)
+                                .into(photoView);
+                    } else {
+                        // Encrypted VFS incoming file
+                        GlideApp.with(activity)
+                                .load(new info.guardianproject.iocipher.File(path))
+                                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                .skipMemoryCache(false)
+                                .apply(req_options)
+                                .placeholder(R.drawable.round_loading_animation)
+                                .error(R.drawable.round_loading_animation)
+                                .into(photoView);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -102,10 +115,12 @@ public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPag
 
             // --- VFS Indicator Logic ---
             android.widget.TextView vfsIndicator = itemView.findViewById(R.id.vfs_indicator);
-            if (msg.direction != TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
-                vfsIndicator.setVisibility(android.view.View.VISIBLE);
-            } else {
-                vfsIndicator.setVisibility(android.view.View.GONE);
+            if (vfsIndicator != null) {
+                if (msg.direction != TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+                    vfsIndicator.setVisibility(android.view.View.VISIBLE);
+                } else {
+                    vfsIndicator.setVisibility(android.view.View.GONE);
+                }
             }
         }
     }

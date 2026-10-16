@@ -4,11 +4,11 @@ import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.zoffcc.applications.sorm.Message;
 import java.util.List;
 
 public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryAdapter.GalleryViewHolder> {
@@ -33,7 +33,6 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryAdapte
         Message_for_img msg = imageMessages.get(position);
         holder.bind(msg, activity);
 
-        // Handle click to open full viewer
         holder.itemView.setOnClickListener(v -> {
             activity.openImageInViewer(msg);
         });
@@ -46,61 +45,83 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryAdapte
 
     static class GalleryViewHolder extends RecyclerView.ViewHolder {
         SquareImageView imageView;
+        TextView vfsIndicator;
 
         public GalleryViewHolder(@NonNull View itemView) {
             super(itemView);
             imageView = itemView.findViewById(R.id.gallery_image);
+            vfsIndicator = itemView.findViewById(R.id.vfs_indicator);
         }
 
         void bind(Message_for_img msg, MediaGalleryActivity activity) {
             if (msg == null || msg.filename_fullpath == null) {
                 imageView.setImageResource(R.drawable.round_loading_animation);
+                if (vfsIndicator != null) vfsIndicator.setVisibility(View.GONE);
                 return;
             }
 
             try {
-                RequestOptions req_options = new RequestOptions();
+                RequestOptions req_options = new RequestOptions().centerCrop();
+                String path = msg.filename_fullpath;
+                String uriStr = msg.getfile_uri();
+                if (uriStr == null || uriStr.isEmpty()) uriStr = path;
+
+                // Strictly check if it is an actual URI scheme
+                boolean is_uri = uriStr.startsWith("content://") || uriStr.startsWith("file://");
 
                 if (msg.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
-                    if (msg.storage_frame_work) {
-                        Uri uri = Uri.parse(msg.getfile_uri());
+                    if (is_uri) {
                         GlideApp.with(activity)
-                                .load(uri)
+                                .load(Uri.parse(uriStr))
                                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                 .skipMemoryCache(false)
                                 .apply(req_options)
                                 .placeholder(R.drawable.round_loading_animation)
+                                .error(R.drawable.round_loading_animation)
                                 .into(imageView);
                     } else {
-                        java.io.File f2 = new java.io.File(msg.filename_fullpath);
+                        // Raw local file path outgoing file
                         GlideApp.with(activity)
-                                .load(f2)
+                                .load(new java.io.File(path))
                                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                 .skipMemoryCache(false)
                                 .apply(req_options)
                                 .placeholder(R.drawable.round_loading_animation)
+                                .error(R.drawable.round_loading_animation)
                                 .into(imageView);
                     }
                 } else {
-                    info.guardianproject.iocipher.File f2 = new info.guardianproject.iocipher.File(msg.filename_fullpath);
-                    GlideApp.with(activity)
-                            .load(f2)
-                            .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
-                            .skipMemoryCache(false)
-                            .apply(req_options)
-                            .placeholder(R.drawable.round_loading_animation)
-                            .into(imageView);
+                    if (is_uri) {
+                        GlideApp.with(activity)
+                                .load(Uri.parse(uriStr))
+                                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                .skipMemoryCache(false)
+                                .apply(req_options)
+                                .placeholder(R.drawable.round_loading_animation)
+                                .error(R.drawable.round_loading_animation)
+                                .into(imageView);
+                    } else {
+                        GlideApp.with(activity)
+                                .load(new info.guardianproject.iocipher.File(path))
+                                .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
+                                .skipMemoryCache(false)
+                                .apply(req_options)
+                                .placeholder(R.drawable.round_loading_animation)
+                                .error(R.drawable.round_loading_animation)
+                                .into(imageView);
+                    }
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                imageView.setImageResource(R.drawable.round_loading_animation);
             }
 
-            // --- VFS Indicator Logic ---
-            android.widget.TextView vfsIndicator = itemView.findViewById(R.id.vfs_indicator);
-            if (msg.direction != TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
-                vfsIndicator.setVisibility(android.view.View.VISIBLE);
-            } else {
-                vfsIndicator.setVisibility(android.view.View.GONE);
+            if (vfsIndicator != null) {
+                if (msg.direction != TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+                    vfsIndicator.setVisibility(View.VISIBLE);
+                } else {
+                    vfsIndicator.setVisibility(View.GONE);
+                }
             }
         }
     }

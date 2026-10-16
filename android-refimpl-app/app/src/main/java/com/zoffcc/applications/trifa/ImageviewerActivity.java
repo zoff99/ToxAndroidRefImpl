@@ -1,5 +1,6 @@
 package com.zoffcc.applications.trifa;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import com.zoffcc.applications.sorm.Message;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -20,7 +22,6 @@ public class ImageviewerActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.ImageviewerActy";
 
-    // Class-level variables to access them in the share button listener
     private List<Message_for_img> imageMessages = new ArrayList<>();
     private LinearLayoutManager layoutManager;
 
@@ -36,6 +37,7 @@ public class ImageviewerActivity extends AppCompatActivity
         String image_filename = null;
         String friend_pubkey = null;
         String group_identifier = null;
+        String file_uri_extra = null;
         boolean storage_frame_work = false;
 
         try
@@ -43,6 +45,7 @@ public class ImageviewerActivity extends AppCompatActivity
             image_filename = getIntent().getStringExtra("image_filename");
             friend_pubkey = getIntent().getStringExtra("friend_pubkey");
             group_identifier = getIntent().getStringExtra("group_identifier");
+            file_uri_extra = getIntent().getStringExtra("file_uri");
 
             String temp = getIntent().getStringExtra("storage_frame_work");
             if (temp != null && temp.equals("1")) {
@@ -72,37 +75,30 @@ public class ImageviewerActivity extends AppCompatActivity
 
                 for (int i = 0; i < allGroupMessages.size(); i++) {
                     GroupMessage gm = allGroupMessages.get(i);
-                    if (gm.filename_fullpath != null) {
-                        boolean is_image = false;
-                        try {
-                            String mimeType = URLConnection.guessContentTypeFromName(gm.filename_fullpath.toLowerCase());
-                            if (mimeType != null && mimeType.startsWith("image/")) {
-                                is_image = true;
+                    if (gm.filename_fullpath != null && isImage(gm.filename_fullpath)) {
+                        Message_for_img m = new Message_for_img();
+                        m.filename_fullpath = gm.filename_fullpath;
+                        m.id = gm.id;
+                        m.sent_timestamp = gm.sent_timestamp;
+                        m.sent_timestamp_ms = 0;
+                        m.direction = gm.direction;
+
+                        boolean is_uri = gm.filename_fullpath.startsWith("content://") || gm.filename_fullpath.startsWith("file://");
+                        if (is_uri) {
+                            m.setfile_uri(gm.filename_fullpath);
+                            if (gm.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+                                m.storage_frame_work = true;
                             }
-                        } catch (Exception e) {
-                            // Ignore
+                        } else if (gm.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+                            if (gm.filename_fullpath.contains(MainActivity.SD_CARD_FILES_OUTGOING_WRAPPER_DIR)) {
+                                m.storage_frame_work = true;
+                                m.setfile_uri(gm.filename_fullpath);
+                            }
                         }
 
-                        if (is_image) {
-                            Message_for_img m = new Message_for_img();
-                            m.filename_fullpath = gm.filename_fullpath;
-                            m.id = gm.id;
-                            m.sent_timestamp = gm.sent_timestamp;
-                            m.sent_timestamp_ms = 0;
-                            m.direction = gm.direction;
-
-                            // Check if it's an outgoing SAF file
-                            if (gm.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
-                                if (gm.filename_fullpath.contains(MainActivity.SD_CARD_FILES_OUTGOING_WRAPPER_DIR)) {
-                                    m.storage_frame_work = true;
-                                    m.setfile_uri(gm.filename_fullpath);
-                                }
-                            }
-
-                            imageMessages.add(m);
-                            if (gm.filename_fullpath.equals(image_filename)) {
-                                currentImageIndex = imageMessages.size() - 1;
-                            }
+                        imageMessages.add(m);
+                        if (gm.filename_fullpath.equals(image_filename)) {
+                            currentImageIndex = imageMessages.size() - 1;
                         }
                     }
                 }
@@ -118,34 +114,28 @@ public class ImageviewerActivity extends AppCompatActivity
 
                 for (int i = 0; i < allMessages.size(); i++) {
                     Message m = allMessages.get(i);
-                    if (m.filename_fullpath != null) {
-                        boolean is_image = false;
-                        try {
-                            String mimeType = URLConnection.guessContentTypeFromName(m.filename_fullpath.toLowerCase());
-                            if (mimeType != null && mimeType.startsWith("image/")) {
-                                is_image = true;
+                    if (m.filename_fullpath != null && isImage(m.filename_fullpath)) {
+                        Message_for_img m2 = new Message_for_img();
+                        m2.filename_fullpath = m.filename_fullpath;
+                        m2.id = m.id;
+                        m2.sent_timestamp = m.sent_timestamp;
+                        m2.sent_timestamp_ms = m.sent_timestamp_ms;
+                        m2.direction = m.direction;
+                        m2.storage_frame_work = m.storage_frame_work;
+
+                        boolean is_uri = m.filename_fullpath.startsWith("content://") || m.filename_fullpath.startsWith("file://");
+                        if (is_uri) {
+                            m2.setfile_uri(m.filename_fullpath);
+                            if (m.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
+                                m2.storage_frame_work = true;
                             }
-                        } catch (Exception e) {
-                            // Ignore
+                        } else if (m.storage_frame_work) {
+                            m2.setfile_uri(m.filename_fullpath);
                         }
 
-                        if (is_image) {
-                            Message_for_img m2 = new Message_for_img();
-                            m2.filename_fullpath = m.filename_fullpath;
-                            m2.id = m.id;
-                            m2.sent_timestamp = m.sent_timestamp;
-                            m2.sent_timestamp_ms = m.sent_timestamp_ms;
-                            m2.direction = m.direction;
-                            m2.storage_frame_work = m.storage_frame_work;
-
-                            if (m.storage_frame_work) {
-                                m2.setfile_uri(m.filename_fullpath);
-                            }
-
-                            imageMessages.add(m2);
-                            if (m.filename_fullpath.equals(image_filename)) {
-                                currentImageIndex = imageMessages.size() - 1;
-                            }
+                        imageMessages.add(m2);
+                        if (m.filename_fullpath.equals(image_filename)) {
+                            currentImageIndex = imageMessages.size() - 1;
                         }
                     }
                 }
@@ -159,9 +149,16 @@ public class ImageviewerActivity extends AppCompatActivity
             Message_for_img singleImg = new Message_for_img();
             singleImg.filename_fullpath = image_filename;
             singleImg.storage_frame_work = storage_frame_work;
-            if (storage_frame_work) {
-                singleImg.setfile_uri(image_filename);
+
+            if (storage_frame_work || (file_uri_extra != null && !file_uri_extra.isEmpty())) {
+                singleImg.setfile_uri(file_uri_extra != null ? file_uri_extra : image_filename);
+                singleImg.storage_frame_work = true;
             }
+
+            if (image_filename.startsWith("content://")) {
+                singleImg.direction = TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value;
+            }
+
             imageMessages.add(singleImg);
             currentImageIndex = 0;
         }
@@ -194,20 +191,67 @@ public class ImageviewerActivity extends AppCompatActivity
         });
     }
 
+    private boolean isImage(String path) {
+        if (path == null) return false;
+        try {
+            String lower = path.toLowerCase(Locale.US);
+
+            // Fast extension check (helps with URIs that have extensions at the end)
+            if (lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg") ||
+                lower.endsWith(".gif") || lower.endsWith(".bmp") || lower.endsWith(".webp") ||
+                lower.endsWith(".heic") || lower.endsWith(".heif")) {
+                return true;
+            }
+
+            // MIME type from name
+            String mimeType = URLConnection.guessContentTypeFromName(lower);
+            if (mimeType != null && mimeType.startsWith("image/")) {
+                return true;
+            }
+
+            // Content resolver for URIs (Crucial for SAF files)
+            if (lower.startsWith("content://")) {
+                try {
+                    String type = getContentResolver().getType(Uri.parse(path));
+                    if (type != null && type.startsWith("image/")) {
+                        return true;
+                    }
+                } catch (Exception ignored) {}
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
     private void shareImage(Message_for_img msg) {
         try {
             android.content.Intent shareIntent = new android.content.Intent(android.content.Intent.ACTION_SEND);
-
             android.net.Uri shareUri = null;
-            String mimeType = "image/*"; // Default fallback
+            String mimeType = "image/*";
+
+            String path = msg.filename_fullpath;
+            String uriStr = msg.getfile_uri();
+            if (uriStr == null || uriStr.isEmpty()) uriStr = path;
+
+            // Strictly check if the strings are actual URI schemes
+            boolean is_uri = uriStr != null && (uriStr.startsWith("content://") || uriStr.startsWith("file://"));
+            boolean path_is_uri = path != null && (path.startsWith("content://") || path.startsWith("file://"));
 
             if (msg.direction == TRIFAGlobals.TRIFA_FT_DIRECTION.TRIFA_FT_DIRECTION_OUTGOING.value) {
-                if (msg.storage_frame_work && msg.getfile_uri() != null) {
-                    // Outgoing file via Storage Access Framework (SAF)
-                    shareUri = android.net.Uri.parse(msg.getfile_uri());
-                } else if (msg.filename_fullpath != null) {
-                    // Outgoing file stored on local disk
-                    java.io.File file = new java.io.File(msg.filename_fullpath);
+                if (is_uri || path_is_uri) {
+                    // FIX: It's a SAF / content URI. Do NOT wrap in java.io.File!
+                    String actualUriStr = is_uri ? uriStr : path;
+                    shareUri = android.net.Uri.parse(actualUriStr);
+
+                    // Try to get MIME type from ContentResolver
+                    try {
+                        String type = getContentResolver().getType(shareUri);
+                        if (type != null) mimeType = type;
+                    } catch (Exception ignored) {}
+                } else if (path != null) {
+                    // It's a real local file path
+                    java.io.File file = new java.io.File(path);
                     if (file.exists()) {
                         shareUri = androidx.core.content.FileProvider.getUriForFile(
                                 this,
@@ -215,7 +259,7 @@ public class ImageviewerActivity extends AppCompatActivity
                                 file
                         );
 
-                        // Robust MIME type detection (more reliable than getFileExtensionFromUrl)
+                        // MIME type detection for local file
                         String fileName = file.getName();
                         int lastDotIndex = fileName.lastIndexOf('.');
                         if (lastDotIndex > 0) {
@@ -229,12 +273,12 @@ public class ImageviewerActivity extends AppCompatActivity
                     }
                 }
             } else {
-                // Incoming file stored in encrypted VFS
-                if (msg.filename_fullpath != null) {
-                    shareUri = android.net.Uri.parse(IOCipherContentProvider.FILES_URI + msg.filename_fullpath);
+                // Incoming file (VFS)
+                if (path != null && !path_is_uri) {
+                    shareUri = android.net.Uri.parse(IOCipherContentProvider.FILES_URI + path);
 
                     // MIME type detection for VFS
-                    String fileName = msg.filename_fullpath;
+                    String fileName = path;
                     int lastDotIndex = fileName.lastIndexOf('.');
                     if (lastDotIndex > 0) {
                         String ext = fileName.substring(lastDotIndex + 1).toLowerCase();
@@ -244,6 +288,13 @@ public class ImageviewerActivity extends AppCompatActivity
                             mimeType = detectedMimeType;
                         }
                     }
+                } else if (path_is_uri) {
+                    // Rare case: incoming URI
+                    shareUri = android.net.Uri.parse(path);
+                    try {
+                        String type = getContentResolver().getType(shareUri);
+                        if (type != null) mimeType = type;
+                    } catch (Exception ignored) {}
                 }
             }
 
@@ -251,8 +302,7 @@ public class ImageviewerActivity extends AppCompatActivity
                 shareIntent.setType(mimeType);
                 shareIntent.putExtra(android.content.Intent.EXTRA_STREAM, shareUri);
 
-                // FIX for Share Sheet Previews:
-                // Explicitly set ClipData so the system UI can read the URI to generate the thumbnail
+                // FIX for Share Sheet Previews: Explicitly set ClipData so system UI can read the URI
                 shareIntent.setClipData(android.content.ClipData.newRawUri("", shareUri));
 
                 // Grant read permission to the receiving app
