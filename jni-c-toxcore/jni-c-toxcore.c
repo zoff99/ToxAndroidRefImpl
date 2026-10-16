@@ -4159,6 +4159,10 @@ JNIEXPORT void JNICALL Java_com_zoffcc_applications_trifa_MainActivity_exit(JNIE
 JNIEXPORT jlong JNICALL
 Java_com_zoffcc_applications_trifa_MainActivity_tox_1iteration_1interval(JNIEnv *env, jobject thiz)
 {
+    if(tox_global == NULL)
+    {
+        return (jlong)50;
+    }
     //***// HINT: thats just too much output // TRACE_LOGGER();
     long long l = (long long)tox_iteration_interval(tox_global);
     // dbg(9, "tox_iteration_interval=%lld", (long long)l);
