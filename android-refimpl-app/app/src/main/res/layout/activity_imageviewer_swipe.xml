@@ -31,7 +31,7 @@
         android:layout_gravity="bottom"
         android:orientation="vertical"
         android:padding="12dp"
-        android:background="#99000000">
+        android:background="#4D000000">
 
         <TextView
             android:id="@+id/tv_filename"
@@ -40,7 +40,8 @@
             android:textColor="#FFFFFF"
             android:textSize="14sp"
             android:maxLines="2"
-            android:ellipsize="middle"
+            android:ellipsize="end"
+            android:breakStrategy="high_quality"
             android:fontFamily="sans-serif-medium" />
 
         <TextView
