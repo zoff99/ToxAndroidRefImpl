@@ -530,7 +530,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
             if (gainprocessing_active == 1)
             {
 
-#if 1
+#if 0
                 // TODO: make this better? faster?
                 // --------------------------------------------------
                 // increase GAIN manually and rather slow:
