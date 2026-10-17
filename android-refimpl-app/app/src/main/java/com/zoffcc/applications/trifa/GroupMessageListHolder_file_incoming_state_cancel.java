@@ -793,14 +793,38 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
             ft_preview_image.getLayoutParams().height = (int)dp2px(55);
 
+            // Defer heavy audio init to background thread
+            final String audioPath = message_.filename_fullpath;
+            final me.jagar.chatvoiceplayerlibrary.vVoicePlayerView playerRef = ft_audio_player;
+
+            // Tag prevents stale updates when ViewHolder is recycled
+            playerRef.setTag(audioPath);
+
+            // Show lightweight placeholder state immediately (no I/O)
+            // playerRef.resetToIdleState();
+
             if (VFS_ENCRYPT)
             {
-                ft_audio_player.refreshPlayer(message_.filename_fullpath);
-                ft_audio_player.refreshVisualizer();
-            }
+                // Offload to background thread
+                java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+                    try {
+                        // Only proceed if this ViewHolder hasn't been recycled
+                        if (audioPath.equals(playerRef.getTag())) {
+                            playerRef.refreshPlayer(audioPath);
+                            playerRef.refreshVisualizer();
 
-            // ft_audio_player.setViewBackgroundColor(peer_color_bg);
-            // ft_audio_player.setBackgroundColor(peer_color_bg);
+                            // Post UI update back to main thread
+                            playerRef.post(() -> {
+                                if (audioPath.equals(playerRef.getTag())) {
+                                    // playerRef.onDataReady(); // Notify visualizer is loaded
+                                }
+                            });
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Group Audio init failed", e);
+                    }
+                });
+            }
         }
         else // ---- not an image or a video ----
         {
@@ -885,6 +909,8 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
     void DetachedFromWindow(boolean release)
     {
+        ft_audio_player.setTag(null);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             // since we need MediaDataSource which is only available on Android M and higher
