@@ -374,39 +374,9 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                             rec_buf_pointer_next, (int) nextSize);
 #endif
 
-        SLAndroidSimpleBufferQueueState state;
-        (*bq)->GetState(bq, &state);
-
-        if (state.count < 1)
-        {
-            (*bq)->Enqueue(bq, nextBuffer,
-                                    (SLuint32) nextSize);
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                "bqRecorderCallback:Enqueue:more_buffers");
-
-            (*bq)->GetState(bq, &state);
-
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                "bqRecorderCallback:EB:real_buffer_count=%d", state.count);
-
-            rec_buf_pointer_next++;
-            if (rec_buf_pointer_next >= num_rec_bufs)
-            {
-                rec_buf_pointer_next = 0;
-            }
-
-            rec_buf_pointer_start++;
-            if (rec_buf_pointer_start >= num_rec_bufs)
-            {
-                rec_buf_pointer_start = 0;
-            }
-
-            nextBuffer = (int8_t *) audio_rec_buffer[rec_buf_pointer_next];
-            nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
-
-        }
-
-        // enque the next buffer
+        // FIX: Always enqueue exactly ONE buffer per callback invocation
+        // The buffer queue consumes one buffer between callbacks,
+        // so we refill one to maintain steady-state depth.
         SLresult result = (*bq)->Enqueue(bq, nextBuffer, (SLuint32) nextSize);
         if (result != SL_RESULT_SUCCESS)
         {
@@ -415,6 +385,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
         }
         (void) result;
 
+        // Advance next pointer exactly once per enqueue
         rec_buf_pointer_next++;
         if (rec_buf_pointer_next >= num_rec_bufs)
         {
@@ -693,6 +664,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
         }
 
+        // Advance start pointer exactly once per processed buffer
         rec_buf_pointer_start++;
         if (rec_buf_pointer_start >= num_rec_bufs)
         {
