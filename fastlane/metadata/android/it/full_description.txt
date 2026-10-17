@@ -13,6 +13,16 @@ Tox non ha server centrali che possono essere razziati, arrestati o costretti a 
 <b>Libero:</b><br>
 Tox è un software libero.È libero come in libertà, oltre che gratuito nel prezzo. Ciò significa che Tox è tuo — da usare, modificare e condividere — perché Tox è sviluppato da e per gli utenti.<br><br>
 
+<b>Nuove funzionalità:</b><br>
+
+<br>
+* Elenco peer di gruppo permanente: i tuoi peer e i tuoi amici vengono salvati in modo permanente e sono sempre disponibili quando ti riconnetti.
+<br>
+* Tox Profiler: i tuoi peer e i tuoi amici vengono salvati in modo permanente e sono sempre disponibili quando ti riconnetti.
+<br>
+* Chiusura dell'app: scopri il motivo per cui l'app si è arrestata l'ultima volta (nella schermata di manutenzione).
+
+<br>
 <b>Ulteriori informazioni:</b><br>
 * Su Tox: https://tox.zoff.cc
 <br>
