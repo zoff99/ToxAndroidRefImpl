@@ -705,6 +705,19 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
     }
     SLAndroidSimpleBufferQueueState state5;
     (*bq)->GetState(bq, &state5);
+
+
+    // Log queue depth on every consume event
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "bqPlayerCallback:queue_depth=%d", (int)state5.count);
+
+    if (state5.count == 0)
+    {
+        __android_log_print(ANDROID_LOG_WARN, LOGTAG,
+                            "bqPlayerCallback:UNDERRUN detected! queue empty");
+    }
+
+
     if (state5.count < 1)
     {
        // (*bq)->Enqueue(bq, empty_buffer, (SLuint32) empty_play_buffer_size);
@@ -1365,6 +1378,12 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_set_1JNI_1audio_1buffe
     audio_play_buffer_size[num] = (long) capacity;
 }
 
+static int play_call_count = 0;
+static int underrun_count = 0;
+static int overrun_warning_count = 0;
+static int min_queue_depth = 999;
+static int max_queue_depth = 0;
+
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env, jclass clazz, jint bufnum)
 {
     if (playing_state == _SHUTDOWN)
@@ -1387,6 +1406,9 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     int8_t *nextBuffer = (int8_t *) audio_play_buffer[bufnum];
     int nextSize = audio_play_buffer_size[bufnum];
     empty_play_buffer_size = nextSize;
+
+    SLAndroidSimpleBufferQueueState state_before;
+    (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state_before);
 
 #ifdef DEBUG_NATIVE_AUDIO_DEEP
     uint64_t t1 = current_time_monotonic_default();
@@ -1512,6 +1534,42 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     {
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,"PlayPCM16:nextSize==0");
     }
+
+    // Check queue depth AFTER enqueue
+    SLAndroidSimpleBufferQueueState state_after;
+    (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state_after);
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "PlayPCM16:queue before=%d after=%d bufsize=%d",
+                        (int)state_before.count, (int)state_after.count, nextSize);
+
+    if (state_before.count >= 3)
+    {
+        __android_log_print(ANDROID_LOG_WARN, LOGTAG,
+                            "PlayPCM16:OVERRUN warning! queue nearly full at %d",
+                            (int)state_before.count);
+    }
+
+    play_call_count++;
+
+    if (state_before.count < min_queue_depth) min_queue_depth = state_before.count;
+    if (state_after.count > max_queue_depth) max_queue_depth = state_after.count;
+    if (state_before.count == 0) underrun_count++;
+    if (state_before.count >= 3) overrun_warning_count++;
+
+    // Log summary every 250 calls (~10 seconds at 25fps)
+    if (play_call_count % 250 == 0)
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                            "PlayPCM16:STATS calls=%d underruns=%d overruns=%d min_q=%d max_q=%d",
+                            play_call_count, underrun_count, overrun_warning_count,
+                            min_queue_depth, max_queue_depth);
+
+        // Reset for next window
+        min_queue_depth = 999;
+        max_queue_depth = 0;
+    }
+
     return 0;
 }
 
