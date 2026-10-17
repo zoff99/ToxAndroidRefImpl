@@ -454,4 +454,7 @@
     <string name="pref_title_use_H264_hw_encoding">Encodage matériel H.264</string>
     <string name="pref_description_use_H264_hw_encoding">Utiliser l\'accélération matérielle pour l\'encodage vidéo H.264</string>
     <string name="pref_title_allow_push_server_sunup">Autoriser le serveur Mozilla Sunup</string>
+    <string name="stats_export_tooltip">Exporter tableau comme image de haute résolution</string>
+    <string name="layout___toxprofiler_start">Profileur de Tox</string>
+    <string name="layout___delete_messages_files_only">Supprimer uniquement les messages et les fichiers</string>
 </resources>
