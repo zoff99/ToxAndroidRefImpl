@@ -1440,10 +1440,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 
         if (player_state_current != _PLAYING)
         {
-            (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
-                                            (SLuint32) nextSize);
-            (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
-                                            (SLuint32) nextSize);
+            (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, (SLuint32) nextSize);
+            (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, (SLuint32) nextSize);
             __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                                 "PlayPCM16:SetPlayState:A:SL_PLAYSTATE_PLAYING:Enqueue:2 frames");
             (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);

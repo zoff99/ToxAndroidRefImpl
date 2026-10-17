@@ -230,40 +230,34 @@ public class CallAudioService extends Service
                 try
                 {
                     Log.i(TAG, "Videocall_audio_play_thread_service:starting ...");
-                    int delta = 0;
                     final int sleep_millis = NativeAudio.n_buf_iterate_ms; // "x" ms is what native audio wants
-                    int sleep_millis_current = sleep_millis;
                     running = true;
-                    long d1 = 0;
                     int res = 0;
+                    long nextWakeTime = SystemClock.uptimeMillis();
 
                     while (running)
                     {
-                        d1 = SystemClock.uptimeMillis();
-
                         res = MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
-                                                                 NativeAudio.sampling_rate, 0);
+                                                                       NativeAudio.sampling_rate, 0);
                         if (res == -1)
                         {
-                            Thread.sleep(1);
-                            res = MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
+                            MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
                                                                            NativeAudio.sampling_rate, 1);
-                            // Log.i(TAG, "jni_iterate_videocall_audio:res=" + res);
+                            Thread.sleep(sleep_millis);
                         }
 
-                        delta = (int) (SystemClock.uptimeMillis() - d1);
-
-                        sleep_millis_current = sleep_millis - delta;
-                        if (sleep_millis_current < 1)
+                        // Fixed-rate sleep
+                        nextWakeTime += sleep_millis;
+                        long now = SystemClock.uptimeMillis();
+                        long sleepTime = nextWakeTime - now;
+                        if ((sleepTime > 0) && (sleepTime < 100))
                         {
-                            sleep_millis_current = 1;
+                            Thread.sleep(sleepTime);
                         }
-                        else if (sleep_millis_current > sleep_millis + 5)
+                        else
                         {
-                            sleep_millis_current = sleep_millis + 5;
+                            nextWakeTime = now;
                         }
-
-                        Thread.sleep(sleep_millis_current - 1, (1000000 - 1000)); // sleep
                     }
                 }
                 catch (Exception e)
