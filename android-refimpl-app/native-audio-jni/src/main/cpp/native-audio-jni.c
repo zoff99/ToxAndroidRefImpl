@@ -158,6 +158,7 @@ __attribute__((unused)) static const uint8_t empty_buffer[20000];
 long audio_play_buffer_size[4]; // always set to array depth of `audio_play_buffers_in_queue_max` !!!
 int empty_play_buffer_size =
         1920 * 2; // to be changed later, we dont know the incoming audio setup yet
+const int queue_buffers_max_play = 4;
 int audio_play_buffers_in_queue = 0;
 int audio_play_buffers_curbuf_index = 0;
 #define _STOPPED 0
@@ -706,11 +707,6 @@ void bqPlayerCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
     SLAndroidSimpleBufferQueueState state5;
     (*bq)->GetState(bq, &state5);
 
-
-    // Log queue depth on every consume event
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "bqPlayerCallback:queue_depth=%d", (int)state5.count);
-
     if (state5.count == 0)
     {
         __android_log_print(ANDROID_LOG_WARN, LOGTAG,
@@ -816,12 +812,11 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
     }
 
     // configure audio source
-    const int queue_buffers_max = 4;
     SLDataLocator_AndroidSimpleBufferQueue loc_bufq = {SL_DATALOCATOR_ANDROIDSIMPLEBUFFERQUEUE,
-                                                       (SLuint32) queue_buffers_max};
+                                                       (SLuint32) queue_buffers_max_play};
     __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                         "createBufferQueueAudioPlayer:start:buffers for queue=%d",
-                        queue_buffers_max);
+                        queue_buffers_max_play);
 
     SLDataFormat_PCM format_pcm = {SL_DATAFORMAT_PCM, (SLuint32) channels, SL_SAMPLINGRATE_44_1,
                                    SL_PCMSAMPLEFORMAT_FIXED_16, SL_PCMSAMPLEFORMAT_FIXED_16,
@@ -1463,9 +1458,8 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
         if (player_state_current != _PLAYING)
         {
             (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, (SLuint32) nextSize);
-            (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, (SLuint32) nextSize);
             __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                                "PlayPCM16:SetPlayState:A:SL_PLAYSTATE_PLAYING:Enqueue:2 frames");
+                                "PlayPCM16:SetPlayState:A:SL_PLAYSTATE_PLAYING:Enqueue:1 frames");
             (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
             player_state_current = _PLAYING;
 
@@ -1539,11 +1533,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     SLAndroidSimpleBufferQueueState state_after;
     (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state_after);
 
-    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                        "PlayPCM16:queue before=%d after=%d bufsize=%d",
-                        (int)state_before.count, (int)state_after.count, nextSize);
-
-    if (state_before.count >= 3)
+    if (state_before.count >= queue_buffers_max_play)
     {
         __android_log_print(ANDROID_LOG_WARN, LOGTAG,
                             "PlayPCM16:OVERRUN warning! queue nearly full at %d",
@@ -1555,7 +1545,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
     if (state_before.count < min_queue_depth) min_queue_depth = state_before.count;
     if (state_after.count > max_queue_depth) max_queue_depth = state_after.count;
     if (state_before.count == 0) underrun_count++;
-    if (state_before.count >= 3) overrun_warning_count++;
+    if (state_before.count >= queue_buffers_max_play) overrun_warning_count++;
 
     // Log summary every 250 calls (~10 seconds at 25fps)
     if (play_call_count % 250 == 0)
