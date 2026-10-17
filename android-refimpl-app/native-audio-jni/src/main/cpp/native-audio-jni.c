@@ -401,6 +401,9 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
             // uint64_t recording_overall_t1 = current_time_monotonic_default();
 
+            // ── FIX: Corrected processing order: AEC first, then NS ──
+            // AEC must operate on the raw/unmodified mic signal to accurately
+            // estimate the echo path. NS after AEC cleans residual echo + noise.
             if (filteraudio_used)
             {
 #ifdef WEBRTC_AEC
@@ -434,20 +437,12 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 #endif
                         for (int x = 0; x < split_factor; x++)
                         {
-                            short const *const tmp1[] = {
-                                    pcm_buf_record_resampled + (x * sample_count_split_downsampled),
-                                    0};
-                            short *const tmp2[] = {
-                                    pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
-                                    0};
-                            WebRtcNsx_Process(nsxInst,
-                                              tmp1,
-                                              1,
-                                              tmp2);
+                            // ── STEP 1: AEC on raw resampled mic signal ──
+                            // No NS before AEC — AEC needs unmodified near-end
                             int32_t res = WebRtcAecm_Process(
                                     webrtc_aecmInst,
                                     pcm_buf_record_resampled + (x * sample_count_split_downsampled),
-                                    pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
+                                    NULL,
                                     pcm_buf_out_resampled + (x * sample_count_split_downsampled),
                                     sample_count_split_downsampled,
                                     (int16_t)audio_aec_delay
@@ -457,6 +452,20 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 #ifdef WEBRTC_DEBUGGING
                             printf("WebRtcAecm_Process:res=%d\n", res);
 #endif
+
+                            // ── STEP 2: NS on AEC output to clean residual echo + noise ──
+                            short const *const tmp1[] = {
+                                    pcm_buf_out_resampled + (x * sample_count_split_downsampled),
+                                    0};
+                            short *const tmp2[] = {
+                                    pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
+                                    0};
+                            WebRtcNsx_Process(nsxInst, tmp1, 1, tmp2);
+
+                            // Copy NS output back to out buffer for upsampling
+                            memcpy(pcm_buf_out_resampled + (x * sample_count_split_downsampled),
+                                   pcm_buf_fltrd_resampled + (x * sample_count_split_downsampled),
+                                   sample_count_split_downsampled * sizeof(int16_t));
                         }
                         // upsample back to 48khz
                         upsample_16000_to_48000_basic(pcm_buf_out_resampled,
