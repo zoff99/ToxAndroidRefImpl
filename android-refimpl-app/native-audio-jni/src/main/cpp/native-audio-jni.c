@@ -1023,8 +1023,8 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         // } AecmConfig;
         // ----------------------------------------------------------
         AecmConfig config;
-        config.echoMode = AecmTrue;
-        config.cngMode = 2;
+        config.echoMode = 4;
+        config.cngMode = AecmFalse;
         WebRtcAecm_set_config(webrtc_aecmInst, config);
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcAecm_Init:res=%d sampleRate=%d",
