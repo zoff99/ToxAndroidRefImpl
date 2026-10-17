@@ -11037,7 +11037,7 @@ uint32_t videocall_audio_any_have_sample_count_in_buffer_count(uint32_t sample_c
     return ret;
 }
 
-void videocall_audio_add_buffer(const int16_t *pcm, uint32_t num_samples)
+void videocall_audio_add_buffer__OLD_UNUSED(const int16_t *pcm, uint32_t num_samples)
 {
     uint32_t peernumber = 0;
 
@@ -11055,6 +11055,40 @@ void videocall_audio_add_buffer(const int16_t *pcm, uint32_t num_samples)
             global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber),
             global_group_audio_peerbuffers_buffer_start_pos + peernumber,
             global_group_audio_peerbuffers_buffer_end_pos + peernumber);
+}
+
+void videocall_audio_add_buffer(const int16_t *pcm, uint32_t num_samples)
+{
+    uint32_t peernumber = 0;
+    size_t write_bytes = (size_t)(num_samples * 2);
+    size_t *rptr = global_group_audio_peerbuffers_buffer_start_pos + peernumber;
+    size_t *wptr = global_group_audio_peerbuffers_buffer_end_pos + peernumber;
+    void *buf = global_group_audio_peerbuffers_buffer + (GROUPAUDIO_PCM_BUFFER_SIZE_SAMPLES * peernumber);
+
+    size_t bytes_free = Pipe_getFree(rptr, wptr);
+
+    if (write_bytes > bytes_free)
+    {
+        // Drop oldest samples to make room. Advance read pointer by the deficit.
+        // This preserves all recent data and only discards the oldest portion.
+        size_t bytes_to_drop = write_bytes - bytes_free;
+
+        // Align to sample boundary (2 bytes per int16_t)
+        bytes_to_drop = (bytes_to_drop + 1) & ~(size_t)1;
+
+        // Clamp to total used bytes (never drop more than exists)
+        size_t used = Pipe_getUsed(rptr, wptr);
+        if (bytes_to_drop > used)
+        {
+            bytes_to_drop = used;
+        }
+
+        // Advance read pointer using existing Pipe function
+        Pipe_updateIndex(rptr, bytes_to_drop);
+    }
+
+    // Now guaranteed to have enough space. Pipe_write will succeed fully.
+    Pipe_write((const char *)pcm, write_bytes, buf, rptr, wptr);
 }
 
 void videocall_audio_read_buffer(uint32_t num_samples, int16_t *ret_buffer)
