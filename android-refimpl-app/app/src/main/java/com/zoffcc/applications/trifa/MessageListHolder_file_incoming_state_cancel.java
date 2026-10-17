@@ -57,6 +57,7 @@ import java.net.URLConnection;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import info.guardianproject.iocipher.File;
+import me.jagar.chatvoiceplayerlibrary.vVoicePlayerView;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_if_incoming_file_was_exported;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.open_local_file;
@@ -479,10 +480,37 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 resize_viewgroup(ft_preview_container, 55);
                 resize_view(ft_preview_image, 1);
 
+                // Defer heavy init to background, only update UI reference
+                final String audioPath = message2.filename_fullpath;
+                final vVoicePlayerView playerRef = ft_audio_player;
+
+                // Tag prevents stale updates when ViewHolder is recycled
+                playerRef.setTag(audioPath);
+
+                // Show lightweight placeholder state immediately
+                // playerRef.resetToIdleState(); // New method: instant UI reset, no I/O
+
                 if (VFS_ENCRYPT)
                 {
-                    ft_audio_player.refreshPlayer(message2.filename_fullpath);
-                    ft_audio_player.refreshVisualizer();
+                    // Offload to background thread
+                    java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+                        try {
+                            // Only proceed if this ViewHolder hasn't been recycled
+                            if (audioPath.equals(playerRef.getTag())) {
+                                playerRef.refreshPlayer(audioPath);
+                                playerRef.refreshVisualizer();
+
+                                // Post UI update back to main thread
+                                playerRef.post(() -> {
+                                    if (audioPath.equals(playerRef.getTag())) {
+                                        // playerRef.onDataReady(); // Notify visualizer is loaded
+                                    }
+                                });
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Audio init failed", e);
+                        }
+                    });
                 }
             }
             else // ---- not an image or a video ----
@@ -724,6 +752,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
     void DetachedFromWindow(boolean release)
     {
+        ft_audio_player.setTag(null);
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
         {
             // since we need MediaDataSource which is only available on Android M and higher
