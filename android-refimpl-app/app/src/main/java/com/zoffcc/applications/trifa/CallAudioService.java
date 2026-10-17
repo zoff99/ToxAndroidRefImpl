@@ -265,16 +265,16 @@ public class CallAudioService extends Service
                         // Advance wake time by FIXED interval regardless of how long production took
                         nextWakeTime += sleep_millis;
 
-                        // Rate monitoring (unchanged)
-                        framesProduced++;
-                        if (framesProduced % 25 == 0)
-                        {
-                            long elapsed = SystemClock.uptimeMillis() - windowStart;
-                            float actualRate = framesProduced / (elapsed / 1000.0f);
-                            Log.i(TAG, "RATE_CHECK: actual=" + actualRate + " target=" + (1000.0f / sleep_millis));
-                            framesProduced = 0;
-                            windowStart = SystemClock.uptimeMillis();
-                        }
+//                        // Rate monitoring (unchanged)
+//                        framesProduced++;
+//                        if (framesProduced % 25 == 0)
+//                        {
+//                            long elapsed = SystemClock.uptimeMillis() - windowStart;
+//                            float actualRate = framesProduced / (elapsed / 1000.0f);
+//                            Log.i(TAG, "RATE_CHECK: actual=" + actualRate + " target=" + (1000.0f / sleep_millis));
+//                            framesProduced = 0;
+//                            windowStart = SystemClock.uptimeMillis();
+//                        }
                     }
                 }
                 catch (Exception e)
