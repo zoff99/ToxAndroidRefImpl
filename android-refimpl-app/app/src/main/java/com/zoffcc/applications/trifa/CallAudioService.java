@@ -234,29 +234,46 @@ public class CallAudioService extends Service
                     running = true;
                     int res = 0;
                     long nextWakeTime = SystemClock.uptimeMillis();
+                    int framesProduced = 0;
+                    long windowStart = nextWakeTime;
 
                     while (running)
                     {
-                        res = MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
-                                                                       NativeAudio.sampling_rate, 0);
-                        if (res == -1)
-                        {
-                            MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
-                                                                           NativeAudio.sampling_rate, 1);
-                            Thread.sleep(sleep_millis);
-                        }
-
-                        // Fixed-rate sleep
-                        nextWakeTime += sleep_millis;
+                        // Sleep FIRST to establish even cadence, then produce
                         long now = SystemClock.uptimeMillis();
                         long sleepTime = nextWakeTime - now;
-                        if ((sleepTime > 0) && (sleepTime < 100))
+                        if (sleepTime > 0)
                         {
                             Thread.sleep(sleepTime);
                         }
                         else
                         {
+                            // Behind schedule — skip sleep but don't accumulate debt
                             nextWakeTime = now;
+                        }
+
+                        // Produce AFTER waking (latency variance doesn't affect next wake time)
+                        res = MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
+                                                                       NativeAudio.sampling_rate, 0);
+                        if (res == -1)
+                        {
+                            // Send silence instead of sleeping again
+                            res = MainActivity.jni_iterate_videocall_audio(0, sleep_millis, NativeAudio.channel_count,
+                                                                           NativeAudio.sampling_rate, 1);
+                        }
+
+                        // Advance wake time by FIXED interval regardless of how long production took
+                        nextWakeTime += sleep_millis;
+
+                        // Rate monitoring (unchanged)
+                        framesProduced++;
+                        if (framesProduced % 25 == 0)
+                        {
+                            long elapsed = SystemClock.uptimeMillis() - windowStart;
+                            float actualRate = framesProduced / (elapsed / 1000.0f);
+                            Log.i(TAG, "RATE_CHECK: actual=" + actualRate + " target=" + (1000.0f / sleep_millis));
+                            framesProduced = 0;
+                            windowStart = SystemClock.uptimeMillis();
                         }
                     }
                 }
