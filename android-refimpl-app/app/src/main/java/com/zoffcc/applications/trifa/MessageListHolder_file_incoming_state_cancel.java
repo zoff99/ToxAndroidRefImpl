@@ -489,7 +489,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 playerRef.setTag(audioPath);
 
                 // Show lightweight placeholder state immediately
-                // playerRef.resetToIdleState(); // New method: instant UI reset, no I/O
+                playerRef.resetToIdleState(); // New method: instant UI reset, no I/O
 
                 if (VFS_ENCRYPT)
                 {
@@ -504,7 +504,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 // Post UI update back to main thread
                                 playerRef.post(() -> {
                                     if (audioPath.equals(playerRef.getTag())) {
-                                        // playerRef.onDataReady(); // Notify visualizer is loaded
+                                        playerRef.onDataReady(); // Notify visualizer is loaded
                                     }
                                 });
                             }

@@ -802,7 +802,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
             playerRef.setTag(audioPath);
 
             // Show lightweight placeholder state immediately (no I/O)
-            // playerRef.resetToIdleState();
+            playerRef.resetToIdleState();
 
             if (VFS_ENCRYPT)
             {
@@ -817,7 +817,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
                             // Post UI update back to main thread
                             playerRef.post(() -> {
                                 if (audioPath.equals(playerRef.getTag())) {
-                                    // playerRef.onDataReady(); // Notify visualizer is loaded
+                                    playerRef.onDataReady(); // Notify visualizer is loaded
                                 }
                             });
                         }

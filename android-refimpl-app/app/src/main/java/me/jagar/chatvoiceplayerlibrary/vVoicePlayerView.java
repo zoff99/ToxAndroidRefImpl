@@ -618,6 +618,64 @@ import info.guardianproject.iocipher.RandomAccessFile;
         }
     }
 
+        /**
+         * Instant UI reset without any I/O or MediaPlayer operations.
+         * Called on the main thread during ViewHolder bind to show a lightweight
+         * placeholder state while heavy audio init happens on a background thread.
+         */
+        public void resetToIdleState() {
+            // Reset play/pause buttons to initial state
+            imgPause.setVisibility(View.GONE);
+            imgPlay.setVisibility(View.VISIBLE);
+            pb_play.setVisibility(GONE);
+
+            // Reset seekbars
+            seekBar.setProgress(0);
+            seekBar.setMax(100);
+            if (seekbarV.getVisibility() == VISIBLE) {
+                seekbarV.setProgress(0);
+                seekbarV.setMax(100);
+                seekbarV.updatePlayerPercent(0);
+            }
+
+            // Reset time display
+            txtProcess.setText("00:00:00/00:00:00");
+
+            // Stop and release any existing MediaPlayer immediately
+            // This is safe because we're about to reinitialize on bg thread
+            if (mediaPlayer != null) {
+                try {
+                    if (mediaPlayer.isPlaying()) {
+                        mediaPlayer.stop();
+                    }
+                    mediaPlayer.reset();
+                    mediaPlayer.release();
+                } catch (Exception e) {
+                    Log.i("vVoicePlayerView", "resetToIdleState:cleanup:" + e.getMessage());
+                }
+                mediaPlayer = null;
+            }
+        }
+
+        /**
+         * Called on the main thread after background refreshPlayer/refreshVisualizer
+         * completes successfully. Signals that waveform data and MediaPlayer are ready.
+         * Currently a no-op since refreshPlayer's OnPreparedListener already updates UI,
+         * but provides a hook for future visual transitions (e.g., fade-in).
+         */
+        public void onDataReady() {
+            // The OnPreparedListener in refreshPlayer() already sets:
+            //   - seekBar max/progress
+            //   - txtProcess duration text
+            //   - play/pause visibility
+            // The refreshVisualizer() call already populated the waveform.
+            //
+            // This method exists as a synchronization point so the holder can
+            // verify the tag still matches before considering the item "loaded".
+            // Future enhancement: add a subtle fade-in animation here.
+            invalidate();
+        }
+
     public ProgressBar getPlayProgressbar(){
         return pb_play;
     }
