@@ -1,8 +1,30 @@
+/**
+ * [TRIfA], Java part of Tox Reference Implementation for Android
+ * Copyright (C) 2026 Zoff <zoff@zoff.cc>
+ * <p>
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * version 2 as published by the Free Software Foundation.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+ * Boston, MA  02110-1301, USA.
+ */
+
 package com.zoffcc.applications.trifa;
 
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.ImageButton;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
@@ -10,8 +32,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.zoffcc.applications.sorm.GroupMessage;
 import com.zoffcc.applications.sorm.Message;
+
 import java.net.URLConnection;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -25,6 +50,10 @@ public class ImageviewerActivity extends AppCompatActivity
     private List<Message_for_img> imageMessages = new ArrayList<>();
     private LinearLayoutManager layoutManager;
 
+    // Bottom info views
+    private TextView tvFilename;
+    private TextView tvDatetime;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -33,6 +62,10 @@ public class ImageviewerActivity extends AppCompatActivity
 
         RecyclerView recyclerView = findViewById(R.id.recycler_view);
         ImageButton btnShare = findViewById(R.id.btn_share);
+
+        // Initialize bottom info views
+        tvFilename = findViewById(R.id.tv_filename);
+        tvDatetime = findViewById(R.id.tv_datetime);
 
         String image_filename = null;
         String friend_pubkey = null;
@@ -178,20 +211,91 @@ public class ImageviewerActivity extends AppCompatActivity
 
         layoutManager.scrollToPositionWithOffset(currentImageIndex, 0);
 
-        // --- Share Button Logic ---
-        btnShare.setOnClickListener(v -> {
-            int currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
-            if (currentPosition == RecyclerView.NO_POSITION) {
-                currentPosition = layoutManager.findFirstVisibleItemPosition();
-            }
-            if (currentPosition >= 0 && currentPosition < imageMessages.size()) {
-                Message_for_img msg = imageMessages.get(currentPosition);
-                shareImage(msg);
+        // Show info for initial image
+        updateBottomInfo(currentImageIndex);
+
+        // Update info when user swipes to a different image
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener()
+        {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState)
+            {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE)
+                {
+                    int pos = layoutManager.findFirstCompletelyVisibleItemPosition();
+                    if (pos == RecyclerView.NO_POSITION)
+                    {
+                        pos = layoutManager.findFirstVisibleItemPosition();
+                    }
+                    if (pos != RecyclerView.NO_POSITION)
+                    {
+                        updateBottomInfo(pos);
+                    }
+                }
             }
         });
+
+        // --- Share Button Logic ---
+        btnShare.setOnClickListener(v ->
+                                    {
+                                        int currentPosition = layoutManager.findFirstCompletelyVisibleItemPosition();
+                                        if (currentPosition == RecyclerView.NO_POSITION)
+                                        {
+                                            currentPosition = layoutManager.findFirstVisibleItemPosition();
+                                        }
+                                        if (currentPosition >= 0 && currentPosition < imageMessages.size())
+                                        {
+                                            Message_for_img msg = imageMessages.get(currentPosition);
+                                            shareImage(msg);
+                                        }
+                                    });
     }
 
-    private boolean isImage(String path) {
+    /**
+     * Updates the bottom filename and date/time display.
+     * Called on initial load and after each swipe settles.
+     */
+    private void updateBottomInfo(int position)
+    {
+        if (position < 0 || position >= imageMessages.size())
+        {
+            tvFilename.setText("");
+            tvDatetime.setText("");
+            return;
+        }
+
+        Message_for_img msg = imageMessages.get(position);
+
+        // Filename: extract just the name from full path
+        String displayName = msg.filename_fullpath;
+        if (displayName != null)
+        {
+            int lastSep = Math.max(displayName.lastIndexOf('/'), displayName.lastIndexOf('\\'));
+            if (lastSep >= 0 && lastSep < displayName.length() - 1)
+            {
+                displayName = displayName.substring(lastSep + 1);
+            }
+        }
+        else
+        {
+            displayName = "";
+        }
+        tvFilename.setText(displayName);
+
+        long timestampMs = msg.sent_timestamp;
+        if (timestampMs > 0)
+        {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            tvDatetime.setText(sdf.format(new Date(timestampMs)));
+        }
+        else
+        {
+            tvDatetime.setText("");
+        }
+    }
+
+    private boolean isImage(String path)
+    {
         if (path == null) return false;
         try {
             String lower = path.toLowerCase(Locale.US);

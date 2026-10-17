@@ -23,4 +23,36 @@
         android:padding="10dp"
         android:scaleType="fitCenter" />
 
+    <!-- Bottom info bar with filename and date/time -->
+    <LinearLayout
+        android:id="@+id/bottom_info_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:orientation="vertical"
+        android:padding="12dp"
+        android:background="#99000000">
+
+        <TextView
+            android:id="@+id/tv_filename"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:maxLines="2"
+            android:ellipsize="middle"
+            android:fontFamily="sans-serif-medium" />
+
+        <TextView
+            android:id="@+id/tv_datetime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textColor="#CCFFFFFF"
+            android:textSize="12sp"
+            android:maxLines="1"
+            android:fontFamily="sans-serif" />
+
+    </LinearLayout>
+
 </FrameLayout>
