@@ -404,6 +404,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 diskCacheStrategy(DiskCacheStrategy.RESOURCE).
                                 skipMemoryCache(false).
                                 priority(Priority.LOW).
+                                override((int) dp2px(150), (int) dp2px(150)).
                                 placeholder(R.drawable.round_loading_animation).
                                 into(ft_preview_image);
                         // Log.i(TAG, "glide:img:002");

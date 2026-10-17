@@ -11,6 +11,8 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
 import java.util.List;
 
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+
 public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryAdapter.GalleryViewHolder> {
 
     private List<Message_for_img> imageMessages;
@@ -76,6 +78,7 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryAdapte
                                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                 .skipMemoryCache(false)
                                 .apply(req_options)
+                                .override((int) dp2px(150), (int) dp2px(150))
                                 .placeholder(R.drawable.round_loading_animation)
                                 .error(R.drawable.round_loading_animation)
                                 .into(imageView);
@@ -86,6 +89,7 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryAdapte
                                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                 .skipMemoryCache(false)
                                 .apply(req_options)
+                                .override((int) dp2px(150), (int) dp2px(150))
                                 .placeholder(R.drawable.round_loading_animation)
                                 .error(R.drawable.round_loading_animation)
                                 .into(imageView);
@@ -97,6 +101,7 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryAdapte
                                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                 .skipMemoryCache(false)
                                 .apply(req_options)
+                                .override((int) dp2px(150), (int) dp2px(150))
                                 .placeholder(R.drawable.round_loading_animation)
                                 .error(R.drawable.round_loading_animation)
                                 .into(imageView);
@@ -106,6 +111,7 @@ public class MediaGalleryAdapter extends RecyclerView.Adapter<MediaGalleryAdapte
                                 .diskCacheStrategy(DiskCacheStrategy.RESOURCE)
                                 .skipMemoryCache(false)
                                 .apply(req_options)
+                                .override((int) dp2px(150), (int) dp2px(150))
                                 .placeholder(R.drawable.round_loading_animation)
                                 .error(R.drawable.round_loading_animation)
                                 .into(imageView);
