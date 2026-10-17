@@ -206,9 +206,21 @@ public class CallAudioService extends Service
                 try
                 {
                     this.setName("t_va_call_play");
-                    android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-                    // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-                    android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+                    try {
+                        // 1. Attempt to set to the absolute highest audio priority (-19)
+                        android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+
+                        // 2. Immediately read it back to verify if the OS allowed it
+                        int currentPriority = android.os.Process.getThreadPriority(android.os.Process.myTid());
+                        Log.d("AudioDiagnostics", "Verified Thread Priority is now: " + currentPriority);
+
+                        if (currentPriority != android.os.Process.THREAD_PRIORITY_URGENT_AUDIO) {
+                            Log.w("AudioDiagnostics", "OS downgraded priority! Lowering fallback to standard AUDIO (-16).");
+                            android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO);
+                        }
+                    } catch (Exception e) {
+                        Log.e("AudioDiagnostics", "Failed to set thread priority", e);
+                    }
                 }
                 catch (Exception e)
                 {
