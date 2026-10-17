@@ -439,4 +439,7 @@
     <string name="pref_title_allow_push_server_sunup">Permitir el Servidor Mozilla Sunup</string>
     <string name="pref_description_allow_push_server_sunup">ADVERTENCIA: Autorizar el servidor Sunup de Mozilla para recibir notificaciones push puede provocar la filtración de tus metadatos de marcas de tiempo cuando recibas notificaciones push, en caso de que un amigo se suscriba con tu token de notificaciones push. Sunup de Mozilla NO utiliza contraseñas NI autenticación. Quedas advertido.</string>
     <string name="layout___share_crash_report">compartir informe de fallo (!puede contener datos privados!)</string>
+    <string name="stats_export_tooltip">Exportar gráfico como imagen de alta resolución</string>
+    <string name="layout___toxprofiler_start">Perfilador de Tox</string>
+    <string name="layout___delete_messages_files_only">Borrar solamente mensajes y archivos</string>
 </resources>
