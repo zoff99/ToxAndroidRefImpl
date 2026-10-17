@@ -23,36 +23,62 @@
         android:padding="10dp"
         android:scaleType="fitCenter" />
 
-    <!-- Bottom info bar with filename and date/time -->
+    <!-- Bottom info bar with filename, date/time, and info button -->
     <LinearLayout
         android:id="@+id/bottom_info_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
-        android:orientation="vertical"
-        android:padding="12dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:paddingEnd="4dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
         android:background="#4D000000">
 
-        <TextView
-            android:id="@+id/tv_filename"
-            android:layout_width="match_parent"
+        <!-- Text column: filename + datetime stacked vertically -->
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:textColor="#FFFFFF"
-            android:textSize="14sp"
-            android:maxLines="2"
-            android:ellipsize="end"
-            android:breakStrategy="high_quality"
-            android:fontFamily="sans-serif-medium" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_datetime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:textColor="#CCFFFFFF"
-            android:textSize="12sp"
-            android:maxLines="1"
-            android:fontFamily="sans-serif" />
+            <TextView
+                android:id="@+id/tv_filename"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:maxLines="2"
+                android:ellipsize="end"
+                android:breakStrategy="high_quality"
+                android:fontFamily="sans-serif-medium" />
+
+            <TextView
+                android:id="@+id/tv_datetime"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="#CCFFFFFF"
+                android:textSize="12sp"
+                android:maxLines="1"
+                android:fontFamily="sans-serif" />
+
+        </LinearLayout>
+
+        <!-- Info button on bottom right -->
+        <ImageButton
+            android:id="@+id/btn_info"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_info_details"
+            android:contentDescription="File details"
+            android:tint="#FFFFFF"
+            android:scaleType="centerInside"
+            android:padding="8dp" />
 
     </LinearLayout>
 
