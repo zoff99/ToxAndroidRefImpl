@@ -94,6 +94,7 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.TOXURL_PATTERN;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_CHATCOLOR;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
+import static com.zoffcc.applications.trifa.TrifaToxService.MESSAGE_AUDIO_EXECUTOR;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener
@@ -806,7 +807,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
             if (VFS_ENCRYPT)
             {
                 // Offload to background thread
-                java.util.concurrent.Executors.newSingleThreadExecutor().execute(() -> {
+                MESSAGE_AUDIO_EXECUTOR.execute(() -> {
                     try {
                         // Only proceed if this ViewHolder hasn't been recycled
                         if (audioPath.equals(playerRef.getTag())) {

@@ -242,6 +242,10 @@ public class TrifaToxService extends Service
     static long battery_sleep_start_ms = 0;
     static long battery_sleep_end_ms = 0;
 
+    // Shared thread pool - avoids creating new threads per bind
+    static final java.util.concurrent.ExecutorService MESSAGE_AUDIO_EXECUTOR =
+            java.util.concurrent.Executors.newFixedThreadPool(2);
+
     // Exact reason string for the pending wakeup request
     // (replaces the information the plain boolean 'need_wakeup_now' lost)
     public static volatile String wakeup_trigger_reason = "";
