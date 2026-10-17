@@ -234,6 +234,7 @@
                     android:text="Video delay: 0 ms"
                     android:textColor="@color/md_green_600"
                     android:textSize="14sp"
+                    android:visibility="gone"
                     android:textStyle="bold" />
 
                 <LinearLayout
@@ -242,6 +243,7 @@
                     android:layout_gravity="center"
                     android:background="@null"
                     android:elevation="2dp"
+                    android:visibility="gone"
                     android:orientation="vertical">
 
                     <SeekBar

@@ -184,8 +184,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     static View box_right_volumeslider_01 = null;
     static SeekBar volume_slider_seekbar_01 = null;
     View box_right_video_add_delay_slider_01 = null;
-    static SeekBar video_add_delay_slider_seekbar_01 = null;
-    static TextView video_add_delay_slider_infotext_01 = null;
+    // static SeekBar video_add_delay_slider_seekbar_01 = null;
+    // static TextView video_add_delay_slider_infotext_01 = null;
     BarLevelDrawable audio_bar_in_v = null;
     BarLevelDrawable audio_bar_out_v = null;
     static int activity_state = 0;
@@ -354,8 +354,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         video_box_right_top_01.setVisibility(View.INVISIBLE);
 
         volume_slider_seekbar_01 = (SeekBar) findViewById(R.id.volume_slider_seekbar);
-        video_add_delay_slider_seekbar_01 = (SeekBar) findViewById(R.id.video_add_delay_slider_seekbar);
-        video_add_delay_slider_infotext_01 = (TextView) findViewById(R.id.video_add_delay_slider_infotext);
+//        video_add_delay_slider_seekbar_01 = (SeekBar) findViewById(R.id.video_add_delay_slider_seekbar);
+//        video_add_delay_slider_infotext_01 = (TextView) findViewById(R.id.video_add_delay_slider_infotext);
 
         box_right_volumeslider_01 = (View) findViewById(R.id.video_box_right_volumeslider_01);
         box_right_volumeslider_01.setVisibility(View.VISIBLE);
@@ -447,117 +447,117 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         box_right_video_add_delay_slider_01.setAlpha(slider_alpha);
 
 
-        video_add_delay_slider_seekbar_01.setOnTouchListener(new View.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                // Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:action:" + event.getAction());
-
-                if (event.getAction() == MotionEvent.ACTION_UP)
-                {
-                    try
-                    {
-                        box_right_video_add_delay_slider_01.setAlpha(slider_alpha);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
-                    }
-                }
-                else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
-                         (event.getAction() == MotionEvent.ACTION_CANCEL))
-                {
-                    try
-                    {
-                        box_right_video_add_delay_slider_01.setAlpha(1.0f);
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
-                    }
-                }
-                return false;
-            }
-        });
-
-
-        video_add_delay_slider_seekbar_01.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
-        {
-            @Override
-            public void onProgressChanged(SeekBar s, int progress_value, boolean from_user)
-            {
-                if ((progress_value >= 0) && (progress_value <= 100))
-                {
-                    try
-                    {
-                        PREF__video_play_delay_ms = progress_value * 5;
-                        try
-                        {
-                            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
-                                                       -PREF__video_play_delay_ms);
-                            Log.i(TAG, "play_delay_ms=" + -PREF__video_play_delay_ms + ":res=" + res);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.i(TAG, "TOXAV_DECODER_VIDEO_ADD_DELAY_MS:EE:" + e.getMessage());
-                        }
-
-                        try
-                        {
-                            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
-                                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value,
-                                                       GLOBAL_AV_BUFFER_MS);
-                            Log.i(TAG,
-                                  "TOXAV_DECODER_VIDEO_BUFFER_MS:001 set to ms=" + GLOBAL_AV_BUFFER_MS + ":res=" + res);
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.i(TAG, "TOXAV_DECODER_VIDEO_BUFFER_MS:EE:" + e.getMessage());
-                        }
-
-                        video_add_delay_slider_infotext_01.setText(
-                                getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " ms");
-
-                        SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
-                                getApplicationContext());
-
-                        settings_cs1.edit().putInt(GLOBAL_PLAY_DELAY_SETTING_NAME, PREF__video_play_delay_ms).apply();
-                        Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
-
-                        if (PREF__video_play_delay_ms > 490)
-                        {
-                        }
-                        else if (PREF__video_play_delay_ms < 0)
-                        {
-                        }
-                        else
-                        {
-                        }
-                    }
-                    catch (Exception ee)
-                    {
-                        ee.printStackTrace();
-                        Log.i(TAG, "pref:set:PREF__video_play_delay_ms:EE:" + ee.getMessage());
-                    }
-                }
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar)
-            {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar)
-            {
-            }
-        });
+//        video_add_delay_slider_seekbar_01.setOnTouchListener(new View.OnTouchListener()
+//        {
+//            @Override
+//            public boolean onTouch(View v, MotionEvent event)
+//            {
+//                // Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:action:" + event.getAction());
+//
+//                if (event.getAction() == MotionEvent.ACTION_UP)
+//                {
+//                    try
+//                    {
+//                        box_right_video_add_delay_slider_01.setAlpha(slider_alpha);
+//                    }
+//                    catch (Exception e)
+//                    {
+//                        e.printStackTrace();
+//                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
+//                    }
+//                }
+//                else if ((event.getAction() == MotionEvent.ACTION_DOWN) ||
+//                         (event.getAction() == MotionEvent.ACTION_CANCEL))
+//                {
+//                    try
+//                    {
+//                        box_right_video_add_delay_slider_01.setAlpha(1.0f);
+//                    }
+//                    catch (Exception e)
+//                    {
+//                        e.printStackTrace();
+//                        Log.i(TAG, "volume_slider_seekbar_01.setOnTouchListener:touch:001:EE:" + e.getMessage());
+//                    }
+//                }
+//                return false;
+//            }
+//        });
+//
+//
+//        video_add_delay_slider_seekbar_01.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
+//        {
+//            @Override
+//            public void onProgressChanged(SeekBar s, int progress_value, boolean from_user)
+//            {
+////                if ((progress_value >= 0) && (progress_value <= 100))
+////                {
+////                    try
+////                    {
+////                        // PREF__video_play_delay_ms = progress_value * 5;
+////                        try
+////                        {
+////                            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+////                                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_ADD_DELAY_MS.value,
+////                                                       -PREF__video_play_delay_ms);
+////                            Log.i(TAG, "play_delay_ms=" + -PREF__video_play_delay_ms + ":res=" + res);
+////                        }
+////                        catch (Exception e)
+////                        {
+////                            e.printStackTrace();
+////                            Log.i(TAG, "TOXAV_DECODER_VIDEO_ADD_DELAY_MS:EE:" + e.getMessage());
+////                        }
+////
+////                        try
+////                        {
+////                            int res = toxav_option_set(tox_friend_by_public_key__wrapper(Callstate.friend_pubkey),
+////                                                       ToxVars.TOXAV_OPTIONS_OPTION.TOXAV_DECODER_VIDEO_BUFFER_MS.value,
+////                                                       GLOBAL_AV_BUFFER_MS);
+////                            Log.i(TAG,
+////                                  "TOXAV_DECODER_VIDEO_BUFFER_MS:001 set to ms=" + GLOBAL_AV_BUFFER_MS + ":res=" + res);
+////                        }
+////                        catch (Exception e)
+////                        {
+////                            e.printStackTrace();
+////                            Log.i(TAG, "TOXAV_DECODER_VIDEO_BUFFER_MS:EE:" + e.getMessage());
+////                        }
+////
+////                        video_add_delay_slider_infotext_01.setText(
+////                                getString(R.string.CallingActivity_23) + " " + PREF__video_play_delay_ms + " ms");
+////
+////                        SharedPreferences settings_cs1 = PreferenceManager.getDefaultSharedPreferences(
+////                                getApplicationContext());
+////
+////                        settings_cs1.edit().putInt(GLOBAL_PLAY_DELAY_SETTING_NAME, PREF__video_play_delay_ms).apply();
+////                        Log.i(TAG, "pref:set:PREF__video_play_delay_ms=" + PREF__video_play_delay_ms);
+////
+////                        if (PREF__video_play_delay_ms > 490)
+////                        {
+////                        }
+////                        else if (PREF__video_play_delay_ms < 0)
+////                        {
+////                        }
+////                        else
+////                        {
+////                        }
+////                    }
+////                    catch (Exception ee)
+////                    {
+////                        ee.printStackTrace();
+////                        Log.i(TAG, "pref:set:PREF__video_play_delay_ms:EE:" + ee.getMessage());
+////                    }
+////                }
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar)
+//            {
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar)
+//            {
+//            }
+//        });
 
 
         try
@@ -2473,8 +2473,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         CallingActivity.right_top_text_4.setVisibility(View.VISIBLE);
                         CallingActivity.box_right_volumeslider_01.setVisibility(View.VISIBLE);
 
-                        CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.VISIBLE);
-                        CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.VISIBLE);
+//                        CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.VISIBLE);
+//                        CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.VISIBLE);
                         CallingActivity.video_box_aec.setVisibility(View.VISIBLE);
                         CallingActivity.video_speaker_aec.setVisibility(View.VISIBLE);
                     }
@@ -2507,8 +2507,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             CallingActivity.right_top_text_4.setVisibility(View.INVISIBLE);
                             CallingActivity.box_right_volumeslider_01.setVisibility(View.VISIBLE);
 
-                            CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
-                            CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
+//                            CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
+//                            CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_box_aec.setVisibility(View.VISIBLE);
                             CallingActivity.video_speaker_aec.setVisibility(View.VISIBLE);
 
@@ -2518,8 +2518,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                             CallingActivity.video_box_left_top_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_box_right_top_01.setVisibility(View.INVISIBLE);
                             CallingActivity.box_right_volumeslider_01.setVisibility(View.INVISIBLE);
-                            CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
-                            CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
+//                            CallingActivity.video_add_delay_slider_infotext_01.setVisibility(View.INVISIBLE);
+//                            CallingActivity.video_add_delay_slider_seekbar_01.setVisibility(View.INVISIBLE);
                             CallingActivity.video_box_aec.setVisibility(View.INVISIBLE);
                             CallingActivity.video_speaker_aec.setVisibility(View.INVISIBLE);
                         }
@@ -2638,8 +2638,8 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         Log.i(TAG, "TOXAV_DECODER_VIDEO_BUFFER_MS:EE:" + e.getMessage());
                     }
 
-                    video_add_delay_slider_infotext_01.setText(
-                            context_s.getString(R.string.CallingActivity_0) + " " + PREF__video_play_delay_ms + " ms");
+//                    video_add_delay_slider_infotext_01.setText(
+//                            context_s.getString(R.string.CallingActivity_0) + " " + PREF__video_play_delay_ms + " ms");
                 }
                 catch (Exception e)
                 {
@@ -2648,14 +2648,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                 try
                 {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-                    {
-                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 5), true);
-                    }
-                    else
-                    {
-                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 5));
-                    }
+//                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+//                    {
+//                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 5), true);
+//                    }
+//                    else
+//                    {
+//                        video_add_delay_slider_seekbar_01.setProgress((PREF__video_play_delay_ms / 5));
+//                    }
                 }
                 catch (Exception ee)
                 {
