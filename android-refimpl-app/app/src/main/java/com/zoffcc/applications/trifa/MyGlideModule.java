@@ -22,6 +22,8 @@ package com.zoffcc.applications.trifa;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Registry;
 import com.bumptech.glide.annotation.GlideModule;
@@ -40,20 +42,23 @@ public final class MyGlideModule extends AppGlideModule
     //}
 
     @Override
-    public void registerComponents(Context context, Glide glide, Registry registry)
-    {
+    public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
         super.registerComponents(context, glide, registry);
         Log.i(TAG, "registerComponents");
-        //
-        // -- old: migrate away from this --
-        registry.prepend(info.guardianproject.iocipher.File.class, java.io.FileInputStream.class,
-                         new com.zoffcc.applications.trifa.FileLoader2.StreamFactory());
-        // -- old: migrate away from this --
-        //
-        // -- new --
-        registry.prepend(info.guardianproject.iocipher.FileInputStream.class, java.io.InputStream.class,
+
+        // NEW: Register iocipher.File -> InputStream loader
+        // This replaces the old FileInputStream-based loader.
+        // Using File as the model type gives us stable path/length for cache keys,
+        // and lets VFSDataFetcher open the stream safely on Glide's worker thread.
+        registry.prepend(info.guardianproject.iocipher.File.class, java.io.InputStream.class,
                          new GlideVFSLoader.Factory());
-        // -- new --
+
+        // LEGACY: Keep old FileInputStream loader temporarily
+        // Remove this once all callers have been migrated to load(info.guardianproject.iocipher.File)
+        // instead of load(new java.io.FileInputStream(...)).
+        // NOTE: The old FileLoader2 still has the broken FD-based cache key.
+        registry.prepend(info.guardianproject.iocipher.FileInputStream.class, java.io.InputStream.class,
+                         new com.zoffcc.applications.trifa.FileLoader2.StreamFactory());
     }
 
     // Disable manifest parsing to avoid adding similar modules twice.
