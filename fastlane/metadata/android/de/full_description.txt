@@ -10,9 +10,19 @@ Alles, was Sie mit Tox tun, wird mit Open-Source-Bibliotheken verschlüsselt. Di
 <b>Verteilt:</b><br>
 Tox hat keine zentralen Server, die überfallen, heruntergefahren oder gezwungen werden können, Daten zu übergeben - das Netzwerk besteht aus seinen Benutzern. Verabschieden Sie sich von Serverausfällen!<br><br>
 
-<b>Kostenlos:</b><br>
+<b>Frei:</b><br>
 Tox ist freie Software. Das ist kostenlos, sowohl in der Freiheit als auch im Preis. Dies bedeutet, dass Tox Ihnen gehört - zum Verwenden, Ändern und Teilen -, da Tox von und für die Benutzer entwickelt wurde.<br><br>
 
+<b>Neue Funktionen:</b><br>
+
+<br>
+* Permanente Peer-Liste: Ihre Peers und Freunde werden dauerhaft gespeichert und sind bei jeder erneuten Verbindung verfügbar.
+<br>
+* Tox Profiler: Ihre Peers und Freunde werden dauerhaft gespeichert und sind bei jeder erneuten Verbindung verfügbar.
+<br>
+* App-Beenden: Sehen Sie sich den Grund an, warum die App beim letzten Mal beendet wurde (im Wartungsbildschirm).
+
+<br>
 <b>Weitere Informationen:</b><br>
 * Über Tox: https://tox.zoff.cc
 <br>
