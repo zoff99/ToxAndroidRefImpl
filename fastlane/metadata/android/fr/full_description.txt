@@ -13,6 +13,15 @@ Tox n’a pas de serveurs centraux qui peuvent être attaqués, arrêtés ou for
 <b>Libre :</b><br>
 Tox est un logiciel libre. C’est libre comme dans liberté, ainsi que dans le prix. Cela signifie que Tox est à vous – à utiliser, modifier et partager – car Tox est développé par et pour les utilisateurs.<br><br>
 
+<b>Nouvelles fonctionnalités :</b><br>
+<br>
+* Liste permanente des pairs du groupe : vos pairs et vos amis sont enregistrés de manière permanente et restent toujours disponibles lorsque vous vous reconnectez.
+<br>
+* Profileur de Tox : vos pairs et vos amis sont enregistrés de manière permanente et restent toujours disponibles lorsque vous vous reconnectez.
+<br>
+* Fermeture de l'application : consultez la raison pour laquelle l'application s'est arrêtée la dernière fois (dans l'écran « Maintenance »).
+
+<br>
 <b>Plus d’informations :</b><br>
 * À propos de Tox : https://tox.zoff.cc
 <br<
