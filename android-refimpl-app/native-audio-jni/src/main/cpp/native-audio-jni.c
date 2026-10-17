@@ -1670,93 +1670,86 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
 
     rec_buf_pointer_start = 0;
     rec_buf_pointer_next = 0;
-    int nextSize = 0;
-    short *nextBuffer = NULL;
-    nextBuffer = (short *) audio_rec_buffer[rec_buf_pointer_next];
-    nextSize = audio_rec_buffer_size[rec_buf_pointer_next];
 
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A001:max_num_bufs=%d,bs=%d,bn=%d",
                         (int) num_rec_bufs, (int) rec_buf_pointer_start,
                         (int) rec_buf_pointer_next);
 
-    if (nextSize > 0)
+    // Validate we have at least 2 buffers for initial queue priming
+    if (num_rec_bufs < 2)
     {
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A002x");
-
-        if (recorderBufferQueue == NULL)
-        {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:01");
-            return -2;
-        }
-
-        // in case already recording, stop recording and clear buffer queue
-        SLresult result;
-        result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
-        result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
-
-        // enqueue buffers ----------------
-        SLAndroidSimpleBufferQueueState state;
-        result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer,
-                                                 (SLuint32) nextSize);
-
-        (*recorderBufferQueue)->GetState(recorderBufferQueue, &state);
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "bqRecorderCallback:Enqueue:more_buffers:%d", state.count);
-
-        rec_buf_pointer_next++;
-        if (rec_buf_pointer_next >= num_rec_bufs)
-        {
-            rec_buf_pointer_next = 0;
-        }
-
-        rec_buf_pointer_start++;
-        if (rec_buf_pointer_start >= num_rec_bufs)
-        {
-            rec_buf_pointer_start = 0;
-        }
-        // enqueue buffers ----------------
-
-        // enqueue buffers ----------------
-        result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer,
-                                                 (SLuint32) nextSize);
-        (*recorderBufferQueue)->GetState(recorderBufferQueue, &state);
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "bqRecorderCallback:Enqueue:more_buffers:%d", state.count);
-
-        rec_buf_pointer_next++;
-        if (rec_buf_pointer_next >= num_rec_bufs)
-        {
-            rec_buf_pointer_next = 0;
-        }
-
-        rec_buf_pointer_start++;
-        if (rec_buf_pointer_start >= num_rec_bufs)
-        {
-            rec_buf_pointer_start = 0;
-        }
-        // enqueue buffers ----------------
-
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "StartREC:A003:ENQU-01:max_num_bufs=%d,bs=%d,bn=%d",
-                            (int) num_rec_bufs, (int) rec_buf_pointer_start,
-                            (int) rec_buf_pointer_next);
-
-
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:SET:002:_RECORDING");
-        rec_state = _RECORDING;
-
-        // start recording
-        result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_RECORDING);
-
-        if (SL_RESULT_SUCCESS != result)
-        {
-            __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:03");
-            return -2;
-        }
-
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:088");
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:num_rec_bufs=%d < 2", (int) num_rec_bufs);
+        return -3;
     }
 
+    int nextSize0 = audio_rec_buffer_size[0];
+    int nextSize1 = audio_rec_buffer_size[1];
+    short *nextBuffer0 = (short *) audio_rec_buffer[0];
+    short *nextBuffer1 = (short *) audio_rec_buffer[1];
+
+    if ((nextSize0 <= 0) || (nextSize1 <= 0) || (nextBuffer0 == NULL) || (nextBuffer1 == NULL))
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:A002x:ERR:invalid buffer sizes or null pointers");
+        return -2;
+    }
+
+    if (recorderBufferQueue == NULL)
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:01");
+        return -2;
+    }
+
+    // In case already recording, stop recording and clear buffer queue
+    SLresult result;
+    result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_STOPPED);
+    (void) result;
+    result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
+    (void) result;
+
+    // ── Enqueue buffer 0 ──
+    result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer0, (SLuint32) nextSize0);
+    if (result != SL_RESULT_SUCCESS)
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:Enqueue:buf0:ERR:result=%d", (int) result);
+        return -2;
+    }
+
+    // Advance pointers after first enqueue
+    rec_buf_pointer_next = 1;
+    rec_buf_pointer_start = 1;
+
+    // ── Enqueue buffer 1 ──
+    result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer1, (SLuint32) nextSize1);
+    if (result != SL_RESULT_SUCCESS)
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:Enqueue:buf1:ERR:result=%d", (int) result);
+        return -2;
+    }
+
+    // Advance pointers after second enqueue
+    rec_buf_pointer_next = 2 % num_rec_bufs;
+    rec_buf_pointer_start = 2 % num_rec_bufs;
+
+    SLAndroidSimpleBufferQueueState state;
+    (*recorderBufferQueue)->GetState(recorderBufferQueue, &state);
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG,
+                        "StartREC:A003:ENQU-01:max_num_bufs=%d,bs=%d,bn=%d,queue_count=%d",
+                        (int) num_rec_bufs, (int) rec_buf_pointer_start,
+                        (int) rec_buf_pointer_next, (int) state.count);
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:SET:002:_RECORDING");
+    rec_state = _RECORDING;
+
+    // Start recording
+    result = (*recorderRecord)->SetRecordState(recorderRecord, SL_RECORDSTATE_RECORDING);
+    if (SL_RESULT_SUCCESS != result)
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "StartREC:ERR:03");
+        rec_state = _STOPPED;
+        return -2;
+    }
+
+    __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:088");
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:099");
 
     return 0;
