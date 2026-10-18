@@ -189,7 +189,8 @@ public class NativeAudio
         if (!microphone_muted)
         {
             // Log.i(TAG, "rec_buffer_ready:002");
-            new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num).execute();
+            new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num)
+                    .executeOnExecutor(android.os.AsyncTask.SERIAL_EXECUTOR);
         }
     }
 
