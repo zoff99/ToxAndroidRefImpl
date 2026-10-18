@@ -1014,7 +1014,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_createBufferQueueAudio
         // Noise Suppression
         //
         nsxInst = WebRtcNsx_Create();
-        int res1 = WebRtcNsx_Init(nsxInst, sampleRate); // only at 16kHz MONO
+        int res1 = WebRtcNsx_Init(nsxInst, sampleRate / 3); // only at 16kHz MONO
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "WebRtcNsx_Init:res=%d",
                             res1);
