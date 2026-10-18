@@ -402,7 +402,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 
             // uint64_t recording_overall_t1 = current_time_monotonic_default();
 
-            // ── FIX: Corrected processing order: AEC first, then NS ──
+            // FIX: Corrected processing order: AEC first, then NS
             // AEC must operate on the raw/unmodified mic signal to accurately
             // estimate the echo path. NS after AEC cleans residual echo + noise.
             if (filteraudio_used)
@@ -438,7 +438,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
 #endif
                         for (int x = 0; x < split_factor; x++)
                         {
-                            // ── STEP 1: AEC on raw resampled mic signal ──
+                            // STEP 1: AEC on raw resampled mic signal
                             // No NS before AEC — AEC needs unmodified near-end
                             int32_t res = WebRtcAecm_Process(
                                     webrtc_aecmInst,
@@ -454,7 +454,7 @@ void bqRecorderCallback(SLAndroidSimpleBufferQueueItf bq, void *context)
                             printf("WebRtcAecm_Process:res=%d\n", res);
 #endif
 
-                            // ── STEP 2: NS on AEC output to clean residual echo + noise ──
+                            // STEP 2: NS on AEC output to clean residual echo + noise
                             short const *const tmp1[] = {
                                     pcm_buf_out_resampled + (x * sample_count_split_downsampled),
                                     0};
@@ -1381,19 +1381,27 @@ static int max_queue_depth = 0;
 
 jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env, jclass clazz, jint bufnum)
 {
+    // Fast-path rejection BEFORE locking (simple int read, no OpenSL ES access)
     if (playing_state == _SHUTDOWN)
     {
         audio_out_vu_value = 0.0f;
         return -1;
     }
 
-    if (bqPlayerPlay == NULL)
+    // LOCK: Protect ALL OpenSL ES interface dereferences below
+    if (play_buffer_queued_count_mutex_valid == 1)
     {
-        return -2;
+        pthread_mutex_lock(&play_buffer_queued_count_mutex);
     }
 
-    if (bqPlayerBufferQueue == NULL)
+    // Re-check under lock: shutdownEngine may have set _SHUTDOWN between
+    // the fast-path check above and acquiring the lock
+    if (playing_state == _SHUTDOWN || bqPlayerPlay == NULL || bqPlayerBufferQueue == NULL)
     {
+        if (play_buffer_queued_count_mutex_valid == 1)
+        {
+            pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+        }
         audio_out_vu_value = 0.0f;
         return -2;
     }
@@ -1414,6 +1422,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 
     if (nextSize > 0)
     {
+        // Volume adjustment (operates on local buffer pointer, no OpenSL ES access)
         float damping_factor = 1;
         // ------------ change PCM volume here ------------
         if((native_audio_play_volume_percent_c < 100) && (native_audio_play_volume_percent_c > 0))
@@ -1457,16 +1466,23 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
 
         if (player_state_current != _PLAYING)
         {
+            // Cold start path: enqueue + start playback
             (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, (SLuint32) nextSize);
             __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                                 "PlayPCM16:SetPlayState:A:SL_PLAYSTATE_PLAYING:Enqueue:1 frames");
             (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_PLAYING);
             player_state_current = _PLAYING;
 
+            // UNLOCK before heavy AEC processing
+            // AEC does not touch any OpenSL ES interface, so it's safe outside the lock.
+            // This prevents blocking shutdownEngine during DSP work.
+            if (play_buffer_queued_count_mutex_valid == 1)
+            {
+                pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+            }
+
             if (filteraudio_used)
             {
-                //pass_audio_output(filteraudio, (const int16_t *) nextBuffer,
-                //                  (unsigned int) (nextSize / 2));
 #ifdef WEBRTC_AEC
                 if (aec_active == 1)
                 {
@@ -1508,11 +1524,12 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
                 }
 #endif
             }
+            // NOTE: mutex is already unlocked here, do NOT unlock again below
         }
         else
         {
-            (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer,
-                                            (SLuint32) nextSize);
+            // Warm path: just enqueue, check/restart if needed
+            (*bqPlayerBufferQueue)->Enqueue(bqPlayerBufferQueue, nextBuffer, (SLuint32) nextSize);
             SLuint32 pState;
             (*bqPlayerPlay)->GetPlayState(bqPlayerPlay, &pState);
             if (pState != SL_PLAYSTATE_PLAYING)
@@ -1522,16 +1539,43 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_PlayPCM16(JNIEnv *env,
                 __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                                     "PlayPCM16:SetPlayState:B:SL_PLAYSTATE_PLAYING");
             }
+
+            // UNLOCK after all OpenSL ES calls in warm path
+            if (play_buffer_queued_count_mutex_valid == 1)
+            {
+                pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+            }
         }
     }
     else
     {
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG,"PlayPCM16:nextSize==0");
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "PlayPCM16:nextSize==0");
+
+        // UNLOCK for zero-size path
+        if (play_buffer_queued_count_mutex_valid == 1)
+        {
+            pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+        }
     }
 
-    // Check queue depth AFTER enqueue
+    // Stats logging: re-acquire lock briefly to read queue state safely
     SLAndroidSimpleBufferQueueState state_after;
-    (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state_after);
+    if (play_buffer_queued_count_mutex_valid == 1)
+    {
+        pthread_mutex_lock(&play_buffer_queued_count_mutex);
+    }
+    if (bqPlayerBufferQueue != NULL)
+    {
+        (*bqPlayerBufferQueue)->GetState(bqPlayerBufferQueue, &state_after);
+    }
+    else
+    {
+        state_after.count = 0;
+    }
+    if (play_buffer_queued_count_mutex_valid == 1)
+    {
+        pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+    }
 
     if (state_before.count >= queue_buffers_max_play)
     {
@@ -1733,7 +1777,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
     result = (*recorderBufferQueue)->Clear(recorderBufferQueue);
     (void) result;
 
-    // ── Enqueue buffer 0 ──
+    // Enqueue buffer 0
     result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer0, (SLuint32) nextSize0);
     if (result != SL_RESULT_SUCCESS)
     {
@@ -1745,7 +1789,7 @@ jint Java_com_zoffcc_applications_nativeaudio_NativeAudio_StartREC(JNIEnv *env, 
     rec_buf_pointer_next = 1;
     rec_buf_pointer_start = 1;
 
-    // ── Enqueue buffer 1 ──
+    // Enqueue buffer 1
     result = (*recorderBufferQueue)->Enqueue(recorderBufferQueue, nextBuffer1, (SLuint32) nextSize1);
     if (result != SL_RESULT_SUCCESS)
     {
@@ -1838,44 +1882,23 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
 {
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "shutdownEngine");
 
-    if (filteraudio_used)
+    // LOCK FIRST: Prevent PlayPCM16 from accessing any OpenSL ES interface
+    // while we are destroying them. This must cover ALL Destroy calls below.
+    if (play_buffer_queued_count_mutex_valid == 1)
     {
-        // filteraudio
-        filteraudio_used = false;
-        // webrtc
-#ifdef WEBRTC_AEC
-        WebRtcAecm_Free(webrtc_aecmInst);
-        webrtc_aecmInst = NULL;
-        WebRtcNsx_Free(nsxInst);
-        WebRtcAgc_Free(agcInst);
-        nsxInst = NULL;
-        free(pcm_buf_resampled);
-        pcm_buf_resampled = NULL;
-        free(pcm_buf_out_resampled);
-        pcm_buf_out_resampled = NULL;
-        ma_resampler_uninit(&miniaudio_downsample_resampler, NULL);
-        ma_resampler_uninit(&miniaudio_upsample_resampler, NULL);
-#endif
-        rnnoise_destroy(RNNoise_sts);
-
-#ifdef USE_WEIGHTS_FILE
-        if (RNNoise_model != NULL)
-        {
-            rnnoise_model_free(RNNoise_model);
-            RNNoise_model = NULL;
-        }
-#endif
+        pthread_mutex_lock(&play_buffer_queued_count_mutex);
     }
 
+    // Set shutdown state UNDER LOCK so PlayPCM16 sees it atomically
     playing_state = _SHUTDOWN;
     __android_log_print(ANDROID_LOG_INFO, LOGTAG, "rec_state:SET:002:_SHUTDOWN");
     rec_state = _SHUTDOWN;
+    player_state_current = _STOPPED;
 
-    // set the player's state
+    // Stop player UNDER LOCK
     if (bqPlayerPlay != NULL)
     {
-        SLresult result;
-        result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
+        SLresult result = (*bqPlayerPlay)->SetPlayState(bqPlayerPlay, SL_PLAYSTATE_STOPPED);
         (void) result;
         __android_log_print(ANDROID_LOG_INFO, LOGTAG,
                             "player_state:res_009=%d SL_RESULT_SUCCESS=%d STOPPED",
@@ -1886,8 +1909,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         __android_log_print(ANDROID_LOG_INFO, LOGTAG, "player_state:bqPlayerPlay==NULL");
     }
 
-    player_state_current = _STOPPED;
-
+    // Clear buffer queue UNDER LOCK
     if (bqPlayerBufferQueue != NULL)
     {
         SLAndroidSimpleBufferQueueState state;
@@ -1899,18 +1921,12 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         (*bqPlayerBufferQueue)->Clear(bqPlayerBufferQueue);
     }
 
-    if (play_buffer_queued_count_mutex_valid == 1)
-    {
-        pthread_mutex_lock(&play_buffer_queued_count_mutex);
-    }
     audio_play_buffers_in_queue = 0;
     audio_play_buffers_curbuf_index = 0;
-    if (play_buffer_queued_count_mutex_valid == 1)
-    {
-        pthread_mutex_unlock(&play_buffer_queued_count_mutex);
-    }
 
-    // destroy buffer queue audio player object, and invalidate all associated interfaces
+    // Destroy buffer queue audio player object UNDER LOCK
+    // After Destroy, bqPlayerPlay/bqPlayerBufferQueue are INVALID.
+    // PlayPCM16 cannot dereference them because we hold the lock.
     if (bqPlayerObject != NULL)
     {
         (*bqPlayerObject)->Destroy(bqPlayerObject);
@@ -1922,15 +1938,14 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         bqPlayerVolume = NULL;
     }
 
-    // destroy output mix object, and invalidate all associated interfaces
+    // Destroy output mix object UNDER LOCK
     if (outputMixObject != NULL)
     {
         (*outputMixObject)->Destroy(outputMixObject);
         outputMixObject = NULL;
-        // outputMixEnvironmentalReverb = NULL;
     }
 
-    // destroy audio recorder object, and invalidate all associated interfaces
+    // Destroy audio recorder object UNDER LOCK
     if (recorderObject != NULL)
     {
         (*recorderObject)->Destroy(recorderObject);
@@ -1939,7 +1954,7 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         recorderBufferQueue = NULL;
     }
 
-    // destroy engine object, and invalidate all associated interfaces
+    // Destroy engine object UNDER LOCK
     if (engineObject != NULL)
     {
         (*engineObject)->Destroy(engineObject);
@@ -1947,16 +1962,51 @@ void Java_com_zoffcc_applications_nativeaudio_NativeAudio_shutdownEngine(JNIEnv 
         engineEngine = NULL;
     }
 
+    // UNLOCK: All OpenSL ES objects are now destroyed and pointers nulled
     if (play_buffer_queued_count_mutex_valid == 1)
     {
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "shutdownEngine:pthread_mutex_destroy");
+        pthread_mutex_unlock(&play_buffer_queued_count_mutex);
+    }
+
+    // Free DSP resources OUTSIDE the lock (no OpenSL ES access, safe to take time)
+    if (filteraudio_used)
+    {
+        filteraudio_used = false;
+#ifdef WEBRTC_AEC
+        WebRtcAecm_Free(webrtc_aecmInst);
+        webrtc_aecmInst = NULL;
+        WebRtcNsx_Free(nsxInst);
+        nsxInst = NULL;
+        WebRtcAgc_Free(agcInst);
+        agcInst = NULL;
+        free(pcm_buf_resampled);
+        pcm_buf_resampled = NULL;
+        free(pcm_buf_out_resampled);
+        pcm_buf_out_resampled = NULL;
+        ma_resampler_uninit(&miniaudio_downsample_resampler, NULL);
+        ma_resampler_uninit(&miniaudio_upsample_resampler, NULL);
+#endif
+        rnnoise_destroy(RNNoise_sts);
+        RNNoise_sts = NULL;
+
+#ifdef USE_WEIGHTS_FILE
+        if (RNNoise_model != NULL)
+        {
+            rnnoise_model_free(RNNoise_model);
+            RNNoise_model = NULL;
+        }
+#endif
+    }
+
+    // Destroy mutex LAST, after all threads are guaranteed stopped
+    if (play_buffer_queued_count_mutex_valid == 1)
+    {
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "shutdownEngine:pthread_mutex_destroy");
         pthread_mutex_destroy(&play_buffer_queued_count_mutex);
     }
     else
     {
-        __android_log_print(ANDROID_LOG_INFO, LOGTAG,
-                            "shutdownEngine:mutex already destroyed");
+        __android_log_print(ANDROID_LOG_INFO, LOGTAG, "shutdownEngine:mutex already destroyed");
     }
     play_buffer_queued_count_mutex_valid = 0;
 }
