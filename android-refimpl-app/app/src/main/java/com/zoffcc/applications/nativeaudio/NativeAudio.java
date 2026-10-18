@@ -54,6 +54,36 @@ public class NativeAudio
     public static boolean native_audio_engine_down = false;
     public static Semaphore semaphore_audioprocessing_02 = new Semaphore(1);
 
+    private static final java.util.concurrent.ExecutorService AUDIO_SEND_EXECUTOR =
+            new java.util.concurrent.ThreadPoolExecutor(
+                    1,                // core pool size
+                    1,                // max pool size
+                    0L, java.util.concurrent.TimeUnit.MILLISECONDS,
+                    new java.util.concurrent.LinkedBlockingQueue<Runnable>(10)
+                    {
+                        // bounded to 10 tasks
+                        @Override
+                        public boolean offer(Runnable e) {
+                            // When queue is full, drop the OLDEST task and accept the new one.
+                            // This keeps the most recent audio frame and discards stale ones.
+                            if (size() >= 10) {
+                                poll(); // remove oldest
+                            }
+                            return super.offer(e);
+                        }
+                    },
+                    new java.util.concurrent.ThreadFactory()
+                    {
+                        @Override
+                        public Thread newThread(Runnable r) {
+                            Thread t = new Thread(r, "audio-send-worker");
+                            t.setDaemon(true);
+                            t.setPriority(Thread.MAX_PRIORITY);
+                            return t;
+                        }
+                    }
+            );
+
     /**
      * problem switching to audio only
      * <p>
@@ -188,9 +218,12 @@ public class NativeAudio
         // TODO: workaround. sometimes mute button does not mute mic? find a real fix
         if (!microphone_muted)
         {
-            // Log.i(TAG, "rec_buffer_ready:002");
-            new AudioRecording.send_audio_frame_to_toxcore_from_native(rec_buffer_num)
-                    .executeOnExecutor(android.os.AsyncTask.SERIAL_EXECUTOR);
+            try {
+                // Log.i(TAG, "rec_buffer_ready:002");
+                AUDIO_SEND_EXECUTOR.execute(new AudioRecording.SendAudioFrameTask(rec_buffer_num));
+            } catch (java.util.concurrent.RejectedExecutionException e) {
+                Log.w(TAG, "Audio send task rejected, dropping frame " + rec_buffer_num);
+            }
         }
     }
 

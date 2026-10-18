@@ -260,19 +260,18 @@ public class AudioRecording extends Thread
         stopped = true;
     }
 
-    public static class send_audio_frame_to_toxcore_from_native extends AsyncTask<Void, Void, String>
+    public static class SendAudioFrameTask implements Runnable
     {
-        int audio_send_res = 0;
-        int bufnum_ = 0;
+        private int audio_send_res = 0;
+        private final int bufnum_;
 
-        public send_audio_frame_to_toxcore_from_native(int bufnum)
+        public SendAudioFrameTask(int bufnum)
         {
-            bufnum_ = bufnum;
-            // Log.i(TAG, "send_audio_frame_to_toxcore_from_native:bufnum=" + bufnum);
+            this.bufnum_ = bufnum;
         }
 
         @Override
-        protected String doInBackground(Void... voids)
+        public void run()
         {
 /*
             try
@@ -424,17 +423,6 @@ public class AudioRecording extends Thread
                 Log.i(TAG, "send_audio_frame_to_toxcore_from_native:EE6:" + e.getMessage());
             }
 
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(String result)
-        {
-        }
-
-        @Override
-        protected void onPreExecute()
-        {
         }
     }
 }
