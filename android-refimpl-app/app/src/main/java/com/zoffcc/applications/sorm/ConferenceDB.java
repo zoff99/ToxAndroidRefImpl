@@ -10,9 +10,12 @@ import com.zoffcc.applications.sorm.Log;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import static com.zoffcc.applications.sorm.OrmaDatabase.*;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONFERENCE_TYPE.TOX_CONFERENCE_TYPE_TEXT;
 
 
 @Table
@@ -20,31 +23,34 @@ public class ConferenceDB
 {
     private static final String TAG = "DB.ConferenceDB";
     @PrimaryKey
-    public String conference_identifier;
+    public String conference_identifier = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String who_invited__tox_public_key_string;
+    public String who_invited__tox_public_key_string = "";
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public String name;
+    public String name = ""; // saved for backup, when conference is offline!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long peer_count;
+    public long peer_count = -1;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long own_peer_number;
+    public long own_peer_number = -1;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public int kind;
+    public int kind = TOX_CONFERENCE_TYPE_TEXT.value;
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public long tox_conference_number;
+    public long tox_conference_number = -1; // this changes often!!
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean conference_active;
+    public boolean conference_active = false; // is this conference active now? are we invited?
 
     @Column(indexed = true, helpers = Column.Helpers.ALL)
-    public boolean notification_silent;
+    public boolean notification_silent = false; // show notifications for this conference?
+
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    public boolean pinned = false;
 
     public static ConferenceDB deep_copy(ConferenceDB in)
     {
@@ -58,6 +64,7 @@ public class ConferenceDB
         out.tox_conference_number = in.tox_conference_number;
         out.conference_active = in.conference_active;
         out.notification_silent = in.notification_silent;
+        out.pinned = in.pinned;
 
         return out;
     }
@@ -65,7 +72,7 @@ public class ConferenceDB
     @Override
     public String toString()
     {
-        return "conference_identifier=" + conference_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number + ", kind=" + kind + ", tox_conference_number=" + tox_conference_number + ", conference_active=" + conference_active + ", notification_silent=" + notification_silent;
+        return "conference_identifier=" + conference_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number + ", kind=" + kind + ", tox_conference_number=" + tox_conference_number + ", conference_active=" + conference_active + ", notification_silent=" + notification_silent + ", pinned=" + pinned;
     }
 
 
@@ -80,15 +87,70 @@ public class ConferenceDB
     List<OrmaBindvar> bind_set_vars = new ArrayList<>();
     int bind_set_count = 0;
 
+    private String sanitizeColumnName(String input)
+    {
+        if (input == null) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < input.length(); i++)
+        {
+            char c = input.charAt(i);
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9') || c == '_' || c == '-')
+            {
+                sb.append(c);
+            }
+            else
+            {
+                sb.append('_');
+            }
+        }
+        return sb.toString();
+    }
+
     public List<ConferenceDB> toList()
     {
+        return toList(null);
+    }
+
+    public List<ConferenceDB> toList(String[] columns)
+    {
         List<ConferenceDB> list = new ArrayList<>();
+        orma_global_sqltolist_lock.lock();
+        PreparedStatement statement = null;
+        boolean selectAll = (columns == null || columns.length == 0);
+        Set<String> selectedCols = new LinkedHashSet<>();
+        if (!selectAll) {
+            for (String c : columns) {
+                if (c == null || c.length() == 0) continue;
+                selectedCols.add(sanitizeColumnName(c.toLowerCase()));
+            }
+            if (selectedCols.isEmpty()) selectAll = true;
+        }
         try
         {
+            if (!selectAll)
+            {
+                StringBuilder cols = new StringBuilder();
+                boolean firstColumn = true;
+                for (String col : selectedCols)
+                {
+                    if (!firstColumn) cols.append(", ");
+                    cols.append("\"").append(col).append("\"");
+                    firstColumn = false;
+                }
+                if (this.sql_start != null && this.sql_start.contains("*"))
+                {
+                    this.sql_start = this.sql_start.replace("*", cols.toString());
+                }
+                else
+                {
+                    this.sql_start = "SELECT " + cols.toString() + " FROM \"" + this.getClass().getSimpleName() + "\"";
+                }
+            }
+
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
             final long t1 = System.currentTimeMillis();
-            PreparedStatement statement = sqldb.prepareStatement(sql);
+            statement = sqldb.prepareStatement(sql);
             if (!set_bindvars_where(statement, bind_where_count, bind_where_vars))
             {
                 try
@@ -113,15 +175,16 @@ public class ConferenceDB
             while (rs.next())
             {
                 ConferenceDB out = new ConferenceDB();
-                out.conference_identifier = rs.getString("conference_identifier");
-                out.who_invited__tox_public_key_string = rs.getString("who_invited__tox_public_key_string");
-                out.name = rs.getString("name");
-                out.peer_count = rs.getLong("peer_count");
-                out.own_peer_number = rs.getLong("own_peer_number");
-                out.kind = rs.getInt("kind");
-                out.tox_conference_number = rs.getLong("tox_conference_number");
-                out.conference_active = rs.getBoolean("conference_active");
-                out.notification_silent = rs.getBoolean("notification_silent");
+                if (selectAll || selectedCols.contains("conference_identifier".toLowerCase())) out.conference_identifier = rs.getString("conference_identifier");
+                if (selectAll || selectedCols.contains("who_invited__tox_public_key_string".toLowerCase())) out.who_invited__tox_public_key_string = rs.getString("who_invited__tox_public_key_string");
+                if (selectAll || selectedCols.contains("name".toLowerCase())) out.name = rs.getString("name");
+                if (selectAll || selectedCols.contains("peer_count".toLowerCase())) out.peer_count = rs.getLong("peer_count");
+                if (selectAll || selectedCols.contains("own_peer_number".toLowerCase())) out.own_peer_number = rs.getLong("own_peer_number");
+                if (selectAll || selectedCols.contains("kind".toLowerCase())) out.kind = rs.getInt("kind");
+                if (selectAll || selectedCols.contains("tox_conference_number".toLowerCase())) out.tox_conference_number = rs.getLong("tox_conference_number");
+                if (selectAll || selectedCols.contains("conference_active".toLowerCase())) out.conference_active = rs.getBoolean("conference_active");
+                if (selectAll || selectedCols.contains("notification_silent".toLowerCase())) out.notification_silent = rs.getBoolean("notification_silent");
+                if (selectAll || selectedCols.contains("pinned".toLowerCase())) out.pinned = rs.getBoolean("pinned");
 
                 list.add(out);
             }
@@ -132,6 +195,13 @@ public class ConferenceDB
                 {
                     Log.i(TAG, "long running (" + (t4 - t3)+ " ms) fetch=" + sql);
                 }
+            }
+            try
+            {
+                rs.close();
+            }
+            catch (Exception ignored)
+            {
             }
 
             try
@@ -144,7 +214,19 @@ public class ConferenceDB
         }
         catch (Exception e)
         {
+            Log.i(TAG, "ERR:toList:001:" + e.getMessage());
             e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+            orma_global_sqltolist_lock.unlock();
         }
 
         return list;
@@ -155,23 +237,25 @@ public class ConferenceDB
     {
         long ret = -1;
 
+        orma_global_sqlinsert_lock.lock();
+        PreparedStatement insert_pstmt = null;
         try
         {
             String insert_pstmt_sql = null;
-            PreparedStatement insert_pstmt = null;
 
             // @formatter:off
-            insert_pstmt_sql ="insert into " + this.getClass().getSimpleName() +
+            insert_pstmt_sql ="insert into \"" + this.getClass().getSimpleName() + "\"" +
                     "("
-                    + "conference_identifier"
-                    + ",who_invited__tox_public_key_string"
-                    + ",name"
-                    + ",peer_count"
-                    + ",own_peer_number"
-                    + ",kind"
-                    + ",tox_conference_number"
-                    + ",conference_active"
-                    + ",notification_silent"
+                    + "\"conference_identifier\""
+                    + ",\"who_invited__tox_public_key_string\""
+                    + ",\"name\""
+                    + ",\"peer_count\""
+                    + ",\"own_peer_number\""
+                    + ",\"kind\""
+                    + ",\"tox_conference_number\""
+                    + ",\"conference_active\""
+                    + ",\"notification_silent\""
+                    + ",\"pinned\""
                     + ")" +
                     "values" +
                     "("
@@ -184,6 +268,7 @@ public class ConferenceDB
                     + ",?7"
                     + ",?8"
                     + ",?9"
+                    + ",?10"
                     + ")";
 
             insert_pstmt = sqldb.prepareStatement(insert_pstmt_sql);
@@ -198,6 +283,7 @@ public class ConferenceDB
             insert_pstmt.setLong(7, this.tox_conference_number);
             insert_pstmt.setBoolean(8, this.conference_active);
             insert_pstmt.setBoolean(9, this.notification_silent);
+            insert_pstmt.setBoolean(10, this.pinned);
             // @formatter:on
 
             if (ORMA_TRACE)
@@ -254,7 +340,19 @@ public class ConferenceDB
         catch (Exception e)
         {
             orma_semaphore_lastrowid_on_insert.release();
+            Log.i(TAG, "ERR:insert:001:" + e.getMessage());
             throw new RuntimeException(e);
+        }
+        finally
+        {
+            try
+            {
+                insert_pstmt.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+            orma_global_sqlinsert_lock.unlock();
         }
 
         return ret;
@@ -268,11 +366,13 @@ public class ConferenceDB
 
     public void execute()
     {
+        orma_global_sqlexecute_lock.lock();
+        PreparedStatement statement = null;
         try
         {
             final String sql = this.sql_start + " " + this.sql_set + " " + this.sql_where;
             log_bindvars_where_and_set(sql, bind_where_count, bind_where_vars, bind_set_count, bind_set_vars);
-            PreparedStatement statement = sqldb.prepareStatement(sql);
+            statement = sqldb.prepareStatement(sql);
             if (!set_bindvars_where_and_set(statement, bind_where_count, bind_where_vars, bind_set_count, bind_set_vars))
             {
                 try
@@ -282,6 +382,7 @@ public class ConferenceDB
                 catch (Exception ignored)
                 {
                 }
+                orma_semaphore_lastrowid_on_insert.release();
                 return;
             }
             statement.executeUpdate();
@@ -295,8 +396,19 @@ public class ConferenceDB
         }
         catch (Exception e2)
         {
+            Log.i(TAG, "ERR:execute:001:" + e2.getMessage());
             e2.printStackTrace();
-            Log.i(TAG, "EE1:" + e2.getMessage());
+        }
+        finally
+        {
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+            orma_global_sqlexecute_lock.unlock();
         }
     }
 
@@ -304,13 +416,15 @@ public class ConferenceDB
     {
         int ret = 0;
 
+        orma_global_sqlcount_lock.lock();
+        PreparedStatement statement = null;
         try
         {
-            this.sql_start = "SELECT count(*) as count FROM " + this.getClass().getSimpleName();
+            this.sql_start = "SELECT count(*) as count FROM \"" + this.getClass().getSimpleName() + "\"";
 
             final String sql = this.sql_start + " " + this.sql_where + " " + this.sql_orderby + " " + this.sql_limit;
             log_bindvars_where(sql, bind_where_count, bind_where_vars);
-            PreparedStatement statement = sqldb.prepareStatement(sql);
+            statement = sqldb.prepareStatement(sql);
             if (!set_bindvars_where(statement, bind_where_count, bind_where_vars))
             {
                 try
@@ -327,6 +441,13 @@ public class ConferenceDB
             {
                 ret = rs.getInt("count");
             }
+            try
+            {
+                rs.close();
+            }
+            catch (Exception ignored)
+            {
+            }
 
             try
             {
@@ -338,7 +459,19 @@ public class ConferenceDB
         }
         catch (Exception e)
         {
+            Log.i(TAG, "ERR:count:001:" + e.getMessage());
             e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                statement.close();
+            }
+            catch (Exception ignored)
+            {
+            }
+            orma_global_sqlcount_lock.unlock();
         }
 
         return ret;
@@ -372,7 +505,7 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " conference_identifier=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"conference_identifier\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, conference_identifier));
         bind_set_count++;
         return this;
@@ -388,7 +521,7 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " who_invited__tox_public_key_string=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"who_invited__tox_public_key_string\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, who_invited__tox_public_key_string));
         bind_set_count++;
         return this;
@@ -404,7 +537,7 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " name=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"name\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, name));
         bind_set_count++;
         return this;
@@ -420,7 +553,7 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " peer_count=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"peer_count\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count));
         bind_set_count++;
         return this;
@@ -436,7 +569,7 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " own_peer_number=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"own_peer_number\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number));
         bind_set_count++;
         return this;
@@ -452,7 +585,7 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " kind=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"kind\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind));
         bind_set_count++;
         return this;
@@ -468,7 +601,7 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " tox_conference_number=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"tox_conference_number\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number));
         bind_set_count++;
         return this;
@@ -484,7 +617,7 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " conference_active=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"conference_active\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, conference_active));
         bind_set_count++;
         return this;
@@ -500,8 +633,24 @@ public class ConferenceDB
         {
             this.sql_set = this.sql_set + " , ";
         }
-        this.sql_set = this.sql_set + " notification_silent=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        this.sql_set = this.sql_set + " \"notification_silent\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, notification_silent));
+        bind_set_count++;
+        return this;
+    }
+
+    public ConferenceDB pinned(boolean pinned)
+    {
+        if (this.sql_set.equals(""))
+        {
+            this.sql_set = " set ";
+        }
+        else
+        {
+            this.sql_set = this.sql_set + " , ";
+        }
+        this.sql_set = this.sql_set + " \"pinned\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
         bind_set_count++;
         return this;
     }
@@ -510,7 +659,7 @@ public class ConferenceDB
     // ----------------- Eq/Gt/Lt funcs ----------------- //
     public ConferenceDB conference_identifierEq(String conference_identifier)
     {
-        this.sql_where = this.sql_where + " and conference_identifier=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"conference_identifier\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, conference_identifier));
         bind_where_count++;
         return this;
@@ -518,7 +667,7 @@ public class ConferenceDB
 
     public ConferenceDB conference_identifierNotEq(String conference_identifier)
     {
-        this.sql_where = this.sql_where + " and conference_identifier<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"conference_identifier\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, conference_identifier));
         bind_where_count++;
         return this;
@@ -526,19 +675,19 @@ public class ConferenceDB
 
     public ConferenceDB conference_identifierIsNull()
     {
-        this.sql_where = this.sql_where + " and conference_identifier IS NULL ";
+        this.sql_where = this.sql_where + " and \"conference_identifier\" IS NULL ";
         return this;
     }
 
     public ConferenceDB conference_identifierIsNotNull()
     {
-        this.sql_where = this.sql_where + " and conference_identifier IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"conference_identifier\" IS NOT NULL ";
         return this;
     }
 
     public ConferenceDB conference_identifierLike(String conference_identifier)
     {
-        this.sql_where = this.sql_where + " and conference_identifier LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
+        this.sql_where = this.sql_where + " and \"conference_identifier\" LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, conference_identifier));
         bind_where_count++;
         return this;
@@ -546,7 +695,7 @@ public class ConferenceDB
 
     public ConferenceDB conference_identifierNotLike(String conference_identifier)
     {
-        this.sql_where = this.sql_where + " and conference_identifier NOT LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
+        this.sql_where = this.sql_where + " and \"conference_identifier\" NOT LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, conference_identifier));
         bind_where_count++;
         return this;
@@ -554,7 +703,7 @@ public class ConferenceDB
 
     public ConferenceDB who_invited__tox_public_key_stringEq(String who_invited__tox_public_key_string)
     {
-        this.sql_where = this.sql_where + " and who_invited__tox_public_key_string=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"who_invited__tox_public_key_string\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, who_invited__tox_public_key_string));
         bind_where_count++;
         return this;
@@ -562,7 +711,7 @@ public class ConferenceDB
 
     public ConferenceDB who_invited__tox_public_key_stringNotEq(String who_invited__tox_public_key_string)
     {
-        this.sql_where = this.sql_where + " and who_invited__tox_public_key_string<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"who_invited__tox_public_key_string\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, who_invited__tox_public_key_string));
         bind_where_count++;
         return this;
@@ -570,19 +719,19 @@ public class ConferenceDB
 
     public ConferenceDB who_invited__tox_public_key_stringIsNull()
     {
-        this.sql_where = this.sql_where + " and who_invited__tox_public_key_string IS NULL ";
+        this.sql_where = this.sql_where + " and \"who_invited__tox_public_key_string\" IS NULL ";
         return this;
     }
 
     public ConferenceDB who_invited__tox_public_key_stringIsNotNull()
     {
-        this.sql_where = this.sql_where + " and who_invited__tox_public_key_string IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"who_invited__tox_public_key_string\" IS NOT NULL ";
         return this;
     }
 
     public ConferenceDB who_invited__tox_public_key_stringLike(String who_invited__tox_public_key_string)
     {
-        this.sql_where = this.sql_where + " and who_invited__tox_public_key_string LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
+        this.sql_where = this.sql_where + " and \"who_invited__tox_public_key_string\" LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, who_invited__tox_public_key_string));
         bind_where_count++;
         return this;
@@ -590,7 +739,7 @@ public class ConferenceDB
 
     public ConferenceDB who_invited__tox_public_key_stringNotLike(String who_invited__tox_public_key_string)
     {
-        this.sql_where = this.sql_where + " and who_invited__tox_public_key_string NOT LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
+        this.sql_where = this.sql_where + " and \"who_invited__tox_public_key_string\" NOT LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, who_invited__tox_public_key_string));
         bind_where_count++;
         return this;
@@ -598,7 +747,7 @@ public class ConferenceDB
 
     public ConferenceDB nameEq(String name)
     {
-        this.sql_where = this.sql_where + " and name=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"name\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, name));
         bind_where_count++;
         return this;
@@ -606,7 +755,7 @@ public class ConferenceDB
 
     public ConferenceDB nameNotEq(String name)
     {
-        this.sql_where = this.sql_where + " and name<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"name\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, name));
         bind_where_count++;
         return this;
@@ -614,19 +763,19 @@ public class ConferenceDB
 
     public ConferenceDB nameIsNull()
     {
-        this.sql_where = this.sql_where + " and name IS NULL ";
+        this.sql_where = this.sql_where + " and \"name\" IS NULL ";
         return this;
     }
 
     public ConferenceDB nameIsNotNull()
     {
-        this.sql_where = this.sql_where + " and name IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"name\" IS NOT NULL ";
         return this;
     }
 
     public ConferenceDB nameLike(String name)
     {
-        this.sql_where = this.sql_where + " and name LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
+        this.sql_where = this.sql_where + " and \"name\" LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, name));
         bind_where_count++;
         return this;
@@ -634,7 +783,7 @@ public class ConferenceDB
 
     public ConferenceDB nameNotLike(String name)
     {
-        this.sql_where = this.sql_where + " and name NOT LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
+        this.sql_where = this.sql_where + " and \"name\" NOT LIKE ?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ESCAPE '\\' ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_String, name));
         bind_where_count++;
         return this;
@@ -642,7 +791,7 @@ public class ConferenceDB
 
     public ConferenceDB peer_countEq(long peer_count)
     {
-        this.sql_where = this.sql_where + " and peer_count=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"peer_count\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count));
         bind_where_count++;
         return this;
@@ -650,7 +799,7 @@ public class ConferenceDB
 
     public ConferenceDB peer_countNotEq(long peer_count)
     {
-        this.sql_where = this.sql_where + " and peer_count<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"peer_count\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count));
         bind_where_count++;
         return this;
@@ -658,7 +807,7 @@ public class ConferenceDB
 
     public ConferenceDB peer_countLt(long peer_count)
     {
-        this.sql_where = this.sql_where + " and peer_count<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"peer_count\"<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count));
         bind_where_count++;
         return this;
@@ -666,7 +815,7 @@ public class ConferenceDB
 
     public ConferenceDB peer_countLe(long peer_count)
     {
-        this.sql_where = this.sql_where + " and peer_count<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"peer_count\"<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count));
         bind_where_count++;
         return this;
@@ -674,7 +823,7 @@ public class ConferenceDB
 
     public ConferenceDB peer_countGt(long peer_count)
     {
-        this.sql_where = this.sql_where + " and peer_count>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"peer_count\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count));
         bind_where_count++;
         return this;
@@ -682,7 +831,7 @@ public class ConferenceDB
 
     public ConferenceDB peer_countGe(long peer_count)
     {
-        this.sql_where = this.sql_where + " and peer_count>=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"peer_count\">=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count));
         bind_where_count++;
         return this;
@@ -690,7 +839,7 @@ public class ConferenceDB
 
     public ConferenceDB peer_countBetween(long peer_count1, long peer_count2)
     {
-        this.sql_where = this.sql_where + " and peer_count>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and peer_count<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"peer_count\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and peer_count<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count1));
         bind_where_count++;
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, peer_count2));
@@ -700,19 +849,19 @@ public class ConferenceDB
 
     public ConferenceDB peer_countIsNull()
     {
-        this.sql_where = this.sql_where + " and peer_count IS NULL ";
+        this.sql_where = this.sql_where + " and \"peer_count\" IS NULL ";
         return this;
     }
 
     public ConferenceDB peer_countIsNotNull()
     {
-        this.sql_where = this.sql_where + " and peer_count IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"peer_count\" IS NOT NULL ";
         return this;
     }
 
     public ConferenceDB own_peer_numberEq(long own_peer_number)
     {
-        this.sql_where = this.sql_where + " and own_peer_number=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number));
         bind_where_count++;
         return this;
@@ -720,7 +869,7 @@ public class ConferenceDB
 
     public ConferenceDB own_peer_numberNotEq(long own_peer_number)
     {
-        this.sql_where = this.sql_where + " and own_peer_number<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number));
         bind_where_count++;
         return this;
@@ -728,7 +877,7 @@ public class ConferenceDB
 
     public ConferenceDB own_peer_numberLt(long own_peer_number)
     {
-        this.sql_where = this.sql_where + " and own_peer_number<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\"<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number));
         bind_where_count++;
         return this;
@@ -736,7 +885,7 @@ public class ConferenceDB
 
     public ConferenceDB own_peer_numberLe(long own_peer_number)
     {
-        this.sql_where = this.sql_where + " and own_peer_number<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\"<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number));
         bind_where_count++;
         return this;
@@ -744,7 +893,7 @@ public class ConferenceDB
 
     public ConferenceDB own_peer_numberGt(long own_peer_number)
     {
-        this.sql_where = this.sql_where + " and own_peer_number>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number));
         bind_where_count++;
         return this;
@@ -752,7 +901,7 @@ public class ConferenceDB
 
     public ConferenceDB own_peer_numberGe(long own_peer_number)
     {
-        this.sql_where = this.sql_where + " and own_peer_number>=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\">=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number));
         bind_where_count++;
         return this;
@@ -760,7 +909,7 @@ public class ConferenceDB
 
     public ConferenceDB own_peer_numberBetween(long own_peer_number1, long own_peer_number2)
     {
-        this.sql_where = this.sql_where + " and own_peer_number>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and own_peer_number<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and own_peer_number<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number1));
         bind_where_count++;
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, own_peer_number2));
@@ -770,19 +919,19 @@ public class ConferenceDB
 
     public ConferenceDB own_peer_numberIsNull()
     {
-        this.sql_where = this.sql_where + " and own_peer_number IS NULL ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\" IS NULL ";
         return this;
     }
 
     public ConferenceDB own_peer_numberIsNotNull()
     {
-        this.sql_where = this.sql_where + " and own_peer_number IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"own_peer_number\" IS NOT NULL ";
         return this;
     }
 
     public ConferenceDB kindEq(int kind)
     {
-        this.sql_where = this.sql_where + " and kind=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"kind\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind));
         bind_where_count++;
         return this;
@@ -790,7 +939,7 @@ public class ConferenceDB
 
     public ConferenceDB kindNotEq(int kind)
     {
-        this.sql_where = this.sql_where + " and kind<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"kind\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind));
         bind_where_count++;
         return this;
@@ -798,7 +947,7 @@ public class ConferenceDB
 
     public ConferenceDB kindLt(int kind)
     {
-        this.sql_where = this.sql_where + " and kind<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"kind\"<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind));
         bind_where_count++;
         return this;
@@ -806,7 +955,7 @@ public class ConferenceDB
 
     public ConferenceDB kindLe(int kind)
     {
-        this.sql_where = this.sql_where + " and kind<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"kind\"<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind));
         bind_where_count++;
         return this;
@@ -814,7 +963,7 @@ public class ConferenceDB
 
     public ConferenceDB kindGt(int kind)
     {
-        this.sql_where = this.sql_where + " and kind>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"kind\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind));
         bind_where_count++;
         return this;
@@ -822,7 +971,7 @@ public class ConferenceDB
 
     public ConferenceDB kindGe(int kind)
     {
-        this.sql_where = this.sql_where + " and kind>=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"kind\">=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind));
         bind_where_count++;
         return this;
@@ -830,7 +979,7 @@ public class ConferenceDB
 
     public ConferenceDB kindBetween(int kind1, int kind2)
     {
-        this.sql_where = this.sql_where + " and kind>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and kind<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"kind\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and kind<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind1));
         bind_where_count++;
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Int, kind2));
@@ -840,19 +989,19 @@ public class ConferenceDB
 
     public ConferenceDB kindIsNull()
     {
-        this.sql_where = this.sql_where + " and kind IS NULL ";
+        this.sql_where = this.sql_where + " and \"kind\" IS NULL ";
         return this;
     }
 
     public ConferenceDB kindIsNotNull()
     {
-        this.sql_where = this.sql_where + " and kind IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"kind\" IS NOT NULL ";
         return this;
     }
 
     public ConferenceDB tox_conference_numberEq(long tox_conference_number)
     {
-        this.sql_where = this.sql_where + " and tox_conference_number=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number));
         bind_where_count++;
         return this;
@@ -860,7 +1009,7 @@ public class ConferenceDB
 
     public ConferenceDB tox_conference_numberNotEq(long tox_conference_number)
     {
-        this.sql_where = this.sql_where + " and tox_conference_number<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number));
         bind_where_count++;
         return this;
@@ -868,7 +1017,7 @@ public class ConferenceDB
 
     public ConferenceDB tox_conference_numberLt(long tox_conference_number)
     {
-        this.sql_where = this.sql_where + " and tox_conference_number<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\"<?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number));
         bind_where_count++;
         return this;
@@ -876,7 +1025,7 @@ public class ConferenceDB
 
     public ConferenceDB tox_conference_numberLe(long tox_conference_number)
     {
-        this.sql_where = this.sql_where + " and tox_conference_number<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\"<=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number));
         bind_where_count++;
         return this;
@@ -884,7 +1033,7 @@ public class ConferenceDB
 
     public ConferenceDB tox_conference_numberGt(long tox_conference_number)
     {
-        this.sql_where = this.sql_where + " and tox_conference_number>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number));
         bind_where_count++;
         return this;
@@ -892,7 +1041,7 @@ public class ConferenceDB
 
     public ConferenceDB tox_conference_numberGe(long tox_conference_number)
     {
-        this.sql_where = this.sql_where + " and tox_conference_number>=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\">=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number));
         bind_where_count++;
         return this;
@@ -900,7 +1049,7 @@ public class ConferenceDB
 
     public ConferenceDB tox_conference_numberBetween(long tox_conference_number1, long tox_conference_number2)
     {
-        this.sql_where = this.sql_where + " and tox_conference_number>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and tox_conference_number<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\">?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " and tox_conference_number<?" + (BINDVAR_OFFSET_WHERE + 1 + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number1));
         bind_where_count++;
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, tox_conference_number2));
@@ -910,19 +1059,19 @@ public class ConferenceDB
 
     public ConferenceDB tox_conference_numberIsNull()
     {
-        this.sql_where = this.sql_where + " and tox_conference_number IS NULL ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\" IS NULL ";
         return this;
     }
 
     public ConferenceDB tox_conference_numberIsNotNull()
     {
-        this.sql_where = this.sql_where + " and tox_conference_number IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"tox_conference_number\" IS NOT NULL ";
         return this;
     }
 
     public ConferenceDB conference_activeEq(boolean conference_active)
     {
-        this.sql_where = this.sql_where + " and conference_active=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"conference_active\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, conference_active));
         bind_where_count++;
         return this;
@@ -930,7 +1079,7 @@ public class ConferenceDB
 
     public ConferenceDB conference_activeNotEq(boolean conference_active)
     {
-        this.sql_where = this.sql_where + " and conference_active<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"conference_active\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, conference_active));
         bind_where_count++;
         return this;
@@ -938,19 +1087,19 @@ public class ConferenceDB
 
     public ConferenceDB conference_activeIsNull()
     {
-        this.sql_where = this.sql_where + " and conference_active IS NULL ";
+        this.sql_where = this.sql_where + " and \"conference_active\" IS NULL ";
         return this;
     }
 
     public ConferenceDB conference_activeIsNotNull()
     {
-        this.sql_where = this.sql_where + " and conference_active IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"conference_active\" IS NOT NULL ";
         return this;
     }
 
     public ConferenceDB notification_silentEq(boolean notification_silent)
     {
-        this.sql_where = this.sql_where + " and notification_silent=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"notification_silent\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, notification_silent));
         bind_where_count++;
         return this;
@@ -958,7 +1107,7 @@ public class ConferenceDB
 
     public ConferenceDB notification_silentNotEq(boolean notification_silent)
     {
-        this.sql_where = this.sql_where + " and notification_silent<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        this.sql_where = this.sql_where + " and \"notification_silent\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
         bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, notification_silent));
         bind_where_count++;
         return this;
@@ -966,13 +1115,41 @@ public class ConferenceDB
 
     public ConferenceDB notification_silentIsNull()
     {
-        this.sql_where = this.sql_where + " and notification_silent IS NULL ";
+        this.sql_where = this.sql_where + " and \"notification_silent\" IS NULL ";
         return this;
     }
 
     public ConferenceDB notification_silentIsNotNull()
     {
-        this.sql_where = this.sql_where + " and notification_silent IS NOT NULL ";
+        this.sql_where = this.sql_where + " and \"notification_silent\" IS NOT NULL ";
+        return this;
+    }
+
+    public ConferenceDB pinnedEq(boolean pinned)
+    {
+        this.sql_where = this.sql_where + " and \"pinned\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
+        bind_where_count++;
+        return this;
+    }
+
+    public ConferenceDB pinnedNotEq(boolean pinned)
+    {
+        this.sql_where = this.sql_where + " and \"pinned\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
+        bind_where_count++;
+        return this;
+    }
+
+    public ConferenceDB pinnedIsNull()
+    {
+        this.sql_where = this.sql_where + " and \"pinned\" IS NULL ";
+        return this;
+    }
+
+    public ConferenceDB pinnedIsNotNull()
+    {
+        this.sql_where = this.sql_where + " and \"pinned\" IS NOT NULL ";
         return this;
     }
 
@@ -988,7 +1165,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " conference_identifier ASC ";
+        this.sql_orderby = this.sql_orderby + " \"conference_identifier\" ASC ";
         return this;
     }
 
@@ -1002,7 +1179,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " conference_identifier DESC ";
+        this.sql_orderby = this.sql_orderby + " \"conference_identifier\" DESC ";
         return this;
     }
 
@@ -1016,7 +1193,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " who_invited__tox_public_key_string ASC ";
+        this.sql_orderby = this.sql_orderby + " \"who_invited__tox_public_key_string\" ASC ";
         return this;
     }
 
@@ -1030,7 +1207,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " who_invited__tox_public_key_string DESC ";
+        this.sql_orderby = this.sql_orderby + " \"who_invited__tox_public_key_string\" DESC ";
         return this;
     }
 
@@ -1044,7 +1221,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " name ASC ";
+        this.sql_orderby = this.sql_orderby + " \"name\" ASC ";
         return this;
     }
 
@@ -1058,7 +1235,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " name DESC ";
+        this.sql_orderby = this.sql_orderby + " \"name\" DESC ";
         return this;
     }
 
@@ -1072,7 +1249,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " peer_count ASC ";
+        this.sql_orderby = this.sql_orderby + " \"peer_count\" ASC ";
         return this;
     }
 
@@ -1086,7 +1263,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " peer_count DESC ";
+        this.sql_orderby = this.sql_orderby + " \"peer_count\" DESC ";
         return this;
     }
 
@@ -1100,7 +1277,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " own_peer_number ASC ";
+        this.sql_orderby = this.sql_orderby + " \"own_peer_number\" ASC ";
         return this;
     }
 
@@ -1114,7 +1291,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " own_peer_number DESC ";
+        this.sql_orderby = this.sql_orderby + " \"own_peer_number\" DESC ";
         return this;
     }
 
@@ -1128,7 +1305,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " kind ASC ";
+        this.sql_orderby = this.sql_orderby + " \"kind\" ASC ";
         return this;
     }
 
@@ -1142,7 +1319,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " kind DESC ";
+        this.sql_orderby = this.sql_orderby + " \"kind\" DESC ";
         return this;
     }
 
@@ -1156,7 +1333,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " tox_conference_number ASC ";
+        this.sql_orderby = this.sql_orderby + " \"tox_conference_number\" ASC ";
         return this;
     }
 
@@ -1170,7 +1347,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " tox_conference_number DESC ";
+        this.sql_orderby = this.sql_orderby + " \"tox_conference_number\" DESC ";
         return this;
     }
 
@@ -1184,7 +1361,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " conference_active ASC ";
+        this.sql_orderby = this.sql_orderby + " \"conference_active\" ASC ";
         return this;
     }
 
@@ -1198,7 +1375,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " conference_active DESC ";
+        this.sql_orderby = this.sql_orderby + " \"conference_active\" DESC ";
         return this;
     }
 
@@ -1212,7 +1389,7 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " notification_silent ASC ";
+        this.sql_orderby = this.sql_orderby + " \"notification_silent\" ASC ";
         return this;
     }
 
@@ -1226,11 +1403,41 @@ public class ConferenceDB
         {
             this.sql_orderby = this.sql_orderby + " , ";
         }
-        this.sql_orderby = this.sql_orderby + " notification_silent DESC ";
+        this.sql_orderby = this.sql_orderby + " \"notification_silent\" DESC ";
+        return this;
+    }
+
+    public ConferenceDB orderByPinnedAsc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"pinned\" ASC ";
+        return this;
+    }
+
+    public ConferenceDB orderByPinnedDesc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"pinned\" DESC ";
         return this;
     }
 
 
+    // =========== CUSTOM USER CODE START ===========
+    // =========== CUSTOM USER CODE END ===========
 
 }
 

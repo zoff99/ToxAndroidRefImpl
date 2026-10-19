@@ -48,6 +48,9 @@ public class ConferenceDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public boolean notification_silent = false; // show notifications for this conference?
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    public boolean pinned = false;
+
     public static ConferenceDB deep_copy(ConferenceDB in)
     {
         ConferenceDB out = new ConferenceDB();
@@ -60,6 +63,7 @@ public class ConferenceDB
         out.tox_conference_number = in.tox_conference_number;
         out.conference_active = in.conference_active;
         out.notification_silent = in.notification_silent;
+        out.pinned = in.pinned;
 
         return out;
     }
@@ -67,7 +71,7 @@ public class ConferenceDB
     @Override
     public String toString()
     {
-        return "conference_identifier=" + conference_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number + ", kind=" + kind + ", tox_conference_number=" + tox_conference_number + ", conference_active=" + conference_active + ", notification_silent=" + notification_silent;
+        return "conference_identifier=" + conference_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number + ", kind=" + kind + ", tox_conference_number=" + tox_conference_number + ", conference_active=" + conference_active + ", notification_silent=" + notification_silent + ", pinned=" + pinned;
     }
 
 
@@ -179,6 +183,7 @@ public class ConferenceDB
                 if (selectAll || selectedCols.contains("tox_conference_number".toLowerCase())) out.tox_conference_number = rs.getLong("tox_conference_number");
                 if (selectAll || selectedCols.contains("conference_active".toLowerCase())) out.conference_active = rs.getBoolean("conference_active");
                 if (selectAll || selectedCols.contains("notification_silent".toLowerCase())) out.notification_silent = rs.getBoolean("notification_silent");
+                if (selectAll || selectedCols.contains("pinned".toLowerCase())) out.pinned = rs.getBoolean("pinned");
 
                 list.add(out);
             }
@@ -249,6 +254,7 @@ public class ConferenceDB
                     + ",\"tox_conference_number\""
                     + ",\"conference_active\""
                     + ",\"notification_silent\""
+                    + ",\"pinned\""
                     + ")" +
                     "values" +
                     "("
@@ -261,6 +267,7 @@ public class ConferenceDB
                     + ",?7"
                     + ",?8"
                     + ",?9"
+                    + ",?10"
                     + ")";
 
             insert_pstmt = sqldb.prepareStatement(insert_pstmt_sql);
@@ -275,6 +282,7 @@ public class ConferenceDB
             insert_pstmt.setLong(7, this.tox_conference_number);
             insert_pstmt.setBoolean(8, this.conference_active);
             insert_pstmt.setBoolean(9, this.notification_silent);
+            insert_pstmt.setBoolean(10, this.pinned);
             // @formatter:on
 
             if (ORMA_TRACE)
@@ -626,6 +634,22 @@ public class ConferenceDB
         }
         this.sql_set = this.sql_set + " \"notification_silent\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, notification_silent));
+        bind_set_count++;
+        return this;
+    }
+
+    public ConferenceDB pinned(boolean pinned)
+    {
+        if (this.sql_set.equals(""))
+        {
+            this.sql_set = " set ";
+        }
+        else
+        {
+            this.sql_set = this.sql_set + " , ";
+        }
+        this.sql_set = this.sql_set + " \"pinned\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
         bind_set_count++;
         return this;
     }
@@ -1100,6 +1124,34 @@ public class ConferenceDB
         return this;
     }
 
+    public ConferenceDB pinnedEq(boolean pinned)
+    {
+        this.sql_where = this.sql_where + " and \"pinned\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
+        bind_where_count++;
+        return this;
+    }
+
+    public ConferenceDB pinnedNotEq(boolean pinned)
+    {
+        this.sql_where = this.sql_where + " and \"pinned\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
+        bind_where_count++;
+        return this;
+    }
+
+    public ConferenceDB pinnedIsNull()
+    {
+        this.sql_where = this.sql_where + " and \"pinned\" IS NULL ";
+        return this;
+    }
+
+    public ConferenceDB pinnedIsNotNull()
+    {
+        this.sql_where = this.sql_where + " and \"pinned\" IS NOT NULL ";
+        return this;
+    }
+
 
     // ----------------- OrderBy funcs ------------------ //
     public ConferenceDB orderByConference_identifierAsc()
@@ -1351,6 +1403,34 @@ public class ConferenceDB
             this.sql_orderby = this.sql_orderby + " , ";
         }
         this.sql_orderby = this.sql_orderby + " \"notification_silent\" DESC ";
+        return this;
+    }
+
+    public ConferenceDB orderByPinnedAsc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"pinned\" ASC ";
+        return this;
+    }
+
+    public ConferenceDB orderByPinnedDesc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"pinned\" DESC ";
         return this;
     }
 

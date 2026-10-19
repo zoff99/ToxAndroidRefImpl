@@ -54,6 +54,9 @@ public class GroupDB
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public boolean notification_silent = false; // show notifications for this conference?
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    public boolean pinned = false;
+
     public static GroupDB deep_copy(GroupDB in)
     {
         GroupDB out = new GroupDB();
@@ -68,6 +71,7 @@ public class GroupDB
         out.group_active = in.group_active;
         out.group_we_left = in.group_we_left;
         out.notification_silent = in.notification_silent;
+        out.pinned = in.pinned;
 
         return out;
     }
@@ -75,7 +79,7 @@ public class GroupDB
     @Override
     public String toString()
     {
-        return "group_identifier=" + group_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", topic=" + topic + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number + ", privacy_state=" + privacy_state + ", tox_group_number=" + tox_group_number + ", group_active=" + group_active + ", group_we_left=" + group_we_left + ", notification_silent=" + notification_silent;
+        return "group_identifier=" + group_identifier + ", who_invited__tox_public_key_string=" + who_invited__tox_public_key_string + ", name=" + name + ", topic=" + topic + ", peer_count=" + peer_count + ", own_peer_number=" + own_peer_number + ", privacy_state=" + privacy_state + ", tox_group_number=" + tox_group_number + ", group_active=" + group_active + ", group_we_left=" + group_we_left + ", notification_silent=" + notification_silent + ", pinned=" + pinned;
     }
 
 
@@ -189,6 +193,7 @@ public class GroupDB
                 if (selectAll || selectedCols.contains("group_active".toLowerCase())) out.group_active = rs.getBoolean("group_active");
                 if (selectAll || selectedCols.contains("group_we_left".toLowerCase())) out.group_we_left = rs.getBoolean("group_we_left");
                 if (selectAll || selectedCols.contains("notification_silent".toLowerCase())) out.notification_silent = rs.getBoolean("notification_silent");
+                if (selectAll || selectedCols.contains("pinned".toLowerCase())) out.pinned = rs.getBoolean("pinned");
 
                 list.add(out);
             }
@@ -261,6 +266,7 @@ public class GroupDB
                     + ",\"group_active\""
                     + ",\"group_we_left\""
                     + ",\"notification_silent\""
+                    + ",\"pinned\""
                     + ")" +
                     "values" +
                     "("
@@ -275,6 +281,7 @@ public class GroupDB
                     + ",?9"
                     + ",?10"
                     + ",?11"
+                    + ",?12"
                     + ")";
 
             insert_pstmt = sqldb.prepareStatement(insert_pstmt_sql);
@@ -291,6 +298,7 @@ public class GroupDB
             insert_pstmt.setBoolean(9, this.group_active);
             insert_pstmt.setBoolean(10, this.group_we_left);
             insert_pstmt.setBoolean(11, this.notification_silent);
+            insert_pstmt.setBoolean(12, this.pinned);
             // @formatter:on
 
             if (ORMA_TRACE)
@@ -674,6 +682,22 @@ public class GroupDB
         }
         this.sql_set = this.sql_set + " \"notification_silent\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, notification_silent));
+        bind_set_count++;
+        return this;
+    }
+
+    public GroupDB pinned(boolean pinned)
+    {
+        if (this.sql_set.equals(""))
+        {
+            this.sql_set = " set ";
+        }
+        else
+        {
+            this.sql_set = this.sql_set + " , ";
+        }
+        this.sql_set = this.sql_set + " \"pinned\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
         bind_set_count++;
         return this;
     }
@@ -1220,6 +1244,34 @@ public class GroupDB
         return this;
     }
 
+    public GroupDB pinnedEq(boolean pinned)
+    {
+        this.sql_where = this.sql_where + " and \"pinned\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
+        bind_where_count++;
+        return this;
+    }
+
+    public GroupDB pinnedNotEq(boolean pinned)
+    {
+        this.sql_where = this.sql_where + " and \"pinned\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
+        bind_where_count++;
+        return this;
+    }
+
+    public GroupDB pinnedIsNull()
+    {
+        this.sql_where = this.sql_where + " and \"pinned\" IS NULL ";
+        return this;
+    }
+
+    public GroupDB pinnedIsNotNull()
+    {
+        this.sql_where = this.sql_where + " and \"pinned\" IS NOT NULL ";
+        return this;
+    }
+
 
     // ----------------- OrderBy funcs ------------------ //
     public GroupDB orderByGroup_identifierAsc()
@@ -1527,6 +1579,34 @@ public class GroupDB
             this.sql_orderby = this.sql_orderby + " , ";
         }
         this.sql_orderby = this.sql_orderby + " \"notification_silent\" DESC ";
+        return this;
+    }
+
+    public GroupDB orderByPinnedAsc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"pinned\" ASC ";
+        return this;
+    }
+
+    public GroupDB orderByPinnedDesc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"pinned\" DESC ";
         return this;
     }
 

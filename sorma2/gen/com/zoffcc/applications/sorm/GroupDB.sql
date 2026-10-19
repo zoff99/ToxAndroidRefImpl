@@ -10,5 +10,6 @@ CREATE TABLE IF NOT EXISTS "GroupDB" (
   "group_active" BOOLEAN,
   "group_we_left" BOOLEAN,
   "notification_silent" BOOLEAN,
+  "pinned" BOOLEAN,
   PRIMARY KEY("group_identifier" )
 );

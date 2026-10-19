@@ -23,5 +23,6 @@ CREATE TABLE IF NOT EXISTS "FriendList" (
   "ip_addr_str" TEXT,
   "capabilities" INTEGER,
   "msgv3_capability" INTEGER,
+  "pinned" BOOLEAN,
   PRIMARY KEY("tox_public_key_string" )
 );

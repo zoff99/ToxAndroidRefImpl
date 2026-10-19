@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean INSANE_TRACE_LOGGING = false; // set "false" for release builds
-    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10242; // increase for database schema changes
+    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10243; // increase for database schema changes
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
@@ -3239,6 +3239,12 @@ public class MainActivity extends AppCompatActivity
         if (new_version == 10242) {
             run_multi_sql("ALTER TABLE Filetransfer ADD COLUMN transfer_start_ts INTEGER DEFAULT 0");
             run_multi_sql("CREATE INDEX `index_transfer_start_ts_on_Filetransfer` ON `Filetransfer` (`transfer_start_ts`)");
+        }
+
+        if (new_version == 10243) {
+            run_multi_sql("ALTER TABLE FriendList ADD COLUMN pinned BOOLEAN DEFAULT 0");
+            run_multi_sql("ALTER TABLE ConferenceDB ADD COLUMN pinned BOOLEAN DEFAULT 0");
+            run_multi_sql("ALTER TABLE GroupDB ADD COLUMN pinned BOOLEAN DEFAULT 0");
         }
     }
 

@@ -180,6 +180,10 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         }
     }
 
+    public CombinedFriendsAndConferences getItem(int position) {
+        return this.friendlistitems.get(position);
+    }
+
     public void add_item(CombinedFriendsAndConferences new_item) {
         try {
             this.all_items.add(new_item);
@@ -296,5 +300,61 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
             }
         }
         return false;
+    }
+
+    public void move_item_to_end(CombinedFriendsAndConferences item) {
+        try {
+            this.all_items.remove(item);
+            this.all_items.add(item);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void sort_items()
+    {
+        try
+        {
+            java.util.Comparator<CombinedFriendsAndConferences> comparator = new java.util.Comparator<CombinedFriendsAndConferences>()
+            {
+                @Override
+                public int compare(CombinedFriendsAndConferences o1, CombinedFriendsAndConferences o2)
+                {
+                    boolean p1 = false, p2 = false;
+
+                    if (o1.is_friend == COMBINED_IS_FRIEND) p1 = o1.friend_item.pinned;
+                    else if (o1.is_friend == COMBINED_IS_CONFERENCE) p1 = o1.conference_item.pinned;
+                    else if (o1.is_friend == COMBINED_IS_GROUP) p1 = o1.group_item.pinned;
+
+                    if (o2.is_friend == COMBINED_IS_FRIEND) p2 = o2.friend_item.pinned;
+                    else if (o2.is_friend == COMBINED_IS_CONFERENCE) p2 = o2.conference_item.pinned;
+                    else if (o2.is_friend == COMBINED_IS_GROUP) p2 = o2.group_item.pinned;
+
+                    if (p1 && !p2) return -1;  // o1 pinned, o2 not → o1 first
+                    if (!p1 && p2) return 1;   // o2 pinned, o1 not → o2 first
+                    return 0;                   // both same → keep original order
+                }
+            };
+
+            java.util.Collections.sort(this.all_items, comparator);
+
+            // Rebuild the visible filtered list
+            this.friendlistitems.clear();
+            if (this.current_filter == null || this.current_filter.isEmpty()) {
+                this.friendlistitems.addAll(this.all_items);
+            } else {
+                for (CombinedFriendsAndConferences item : this.all_items) {
+                    if (matchesFilter(item)) {
+                        this.friendlistitems.add(item);
+                    }
+                }
+            }
+
+            this.notifyDataSetChanged();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
     }
 }

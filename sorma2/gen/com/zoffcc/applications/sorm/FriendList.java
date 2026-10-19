@@ -93,6 +93,9 @@ public class FriendList
     @Column(indexed = true, helpers = Column.Helpers.ALL)
     public long msgv3_capability = 0;
 
+    @Column(indexed = true, helpers = Column.Helpers.ALL)
+    public boolean pinned = false;
+
     public static FriendList deep_copy(FriendList in)
     {
         FriendList out = new FriendList();
@@ -120,6 +123,7 @@ public class FriendList
         out.ip_addr_str = in.ip_addr_str;
         out.capabilities = in.capabilities;
         out.msgv3_capability = in.msgv3_capability;
+        out.pinned = in.pinned;
 
         return out;
     }
@@ -127,7 +131,7 @@ public class FriendList
     @Override
     public String toString()
     {
-        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", alias_name=" + alias_name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_CONNECTION_real=" + TOX_CONNECTION_real + ", TOX_CONNECTION_on_off=" + TOX_CONNECTION_on_off + ", TOX_CONNECTION_on_off_real=" + TOX_CONNECTION_on_off_real + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename + ", avatar_ftid_hex=" + avatar_ftid_hex + ", avatar_update=" + avatar_update + ", avatar_update_timestamp=" + avatar_update_timestamp + ", notification_silent=" + notification_silent + ", sort=" + sort + ", last_online_timestamp=" + last_online_timestamp + ", last_online_timestamp_real=" + last_online_timestamp_real + ", added_timestamp=" + added_timestamp + ", is_relay=" + is_relay + ", push_url=" + push_url + ", ip_addr_str=" + ip_addr_str + ", capabilities=" + capabilities + ", msgv3_capability=" + msgv3_capability;
+        return "tox_public_key_string=" + tox_public_key_string + ", name=" + name + ", alias_name=" + alias_name + ", status_message=" + status_message + ", TOX_CONNECTION=" + TOX_CONNECTION + ", TOX_CONNECTION_real=" + TOX_CONNECTION_real + ", TOX_CONNECTION_on_off=" + TOX_CONNECTION_on_off + ", TOX_CONNECTION_on_off_real=" + TOX_CONNECTION_on_off_real + ", TOX_USER_STATUS=" + TOX_USER_STATUS + ", avatar_pathname=" + avatar_pathname + ", avatar_filename=" + avatar_filename + ", avatar_ftid_hex=" + avatar_ftid_hex + ", avatar_update=" + avatar_update + ", avatar_update_timestamp=" + avatar_update_timestamp + ", notification_silent=" + notification_silent + ", sort=" + sort + ", last_online_timestamp=" + last_online_timestamp + ", last_online_timestamp_real=" + last_online_timestamp_real + ", added_timestamp=" + added_timestamp + ", is_relay=" + is_relay + ", push_url=" + push_url + ", ip_addr_str=" + ip_addr_str + ", capabilities=" + capabilities + ", msgv3_capability=" + msgv3_capability + ", pinned=" + pinned;
     }
 
 
@@ -254,6 +258,7 @@ public class FriendList
                 if (selectAll || selectedCols.contains("ip_addr_str".toLowerCase())) out.ip_addr_str = rs.getString("ip_addr_str");
                 if (selectAll || selectedCols.contains("capabilities".toLowerCase())) out.capabilities = rs.getLong("capabilities");
                 if (selectAll || selectedCols.contains("msgv3_capability".toLowerCase())) out.msgv3_capability = rs.getLong("msgv3_capability");
+                if (selectAll || selectedCols.contains("pinned".toLowerCase())) out.pinned = rs.getBoolean("pinned");
 
                 list.add(out);
             }
@@ -339,6 +344,7 @@ public class FriendList
                     + ",\"ip_addr_str\""
                     + ",\"capabilities\""
                     + ",\"msgv3_capability\""
+                    + ",\"pinned\""
                     + ")" +
                     "values" +
                     "("
@@ -366,6 +372,7 @@ public class FriendList
                     + ",?22"
                     + ",?23"
                     + ",?24"
+                    + ",?25"
                     + ")";
 
             insert_pstmt = sqldb.prepareStatement(insert_pstmt_sql);
@@ -395,6 +402,7 @@ public class FriendList
             insert_pstmt.setString(22, this.ip_addr_str);
             insert_pstmt.setLong(23, this.capabilities);
             insert_pstmt.setLong(24, this.msgv3_capability);
+            insert_pstmt.setBoolean(25, this.pinned);
             // @formatter:on
 
             if (ORMA_TRACE)
@@ -986,6 +994,22 @@ public class FriendList
         }
         this.sql_set = this.sql_set + " \"msgv3_capability\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
         bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Long, msgv3_capability));
+        bind_set_count++;
+        return this;
+    }
+
+    public FriendList pinned(boolean pinned)
+    {
+        if (this.sql_set.equals(""))
+        {
+            this.sql_set = " set ";
+        }
+        else
+        {
+            this.sql_set = this.sql_set + " , ";
+        }
+        this.sql_set = this.sql_set + " \"pinned\"=?" + (BINDVAR_OFFSET_SET + bind_set_count) + " ";
+        bind_set_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
         bind_set_count++;
         return this;
     }
@@ -2312,6 +2336,34 @@ public class FriendList
         return this;
     }
 
+    public FriendList pinnedEq(boolean pinned)
+    {
+        this.sql_where = this.sql_where + " and \"pinned\"=?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
+        bind_where_count++;
+        return this;
+    }
+
+    public FriendList pinnedNotEq(boolean pinned)
+    {
+        this.sql_where = this.sql_where + " and \"pinned\"<>?" + (BINDVAR_OFFSET_WHERE + bind_where_count) + " ";
+        bind_where_vars.add(new OrmaBindvar(BINDVAR_TYPE_Boolean, pinned));
+        bind_where_count++;
+        return this;
+    }
+
+    public FriendList pinnedIsNull()
+    {
+        this.sql_where = this.sql_where + " and \"pinned\" IS NULL ";
+        return this;
+    }
+
+    public FriendList pinnedIsNotNull()
+    {
+        this.sql_where = this.sql_where + " and \"pinned\" IS NOT NULL ";
+        return this;
+    }
+
 
     // ----------------- OrderBy funcs ------------------ //
     public FriendList orderByTox_public_key_stringAsc()
@@ -2983,6 +3035,34 @@ public class FriendList
             this.sql_orderby = this.sql_orderby + " , ";
         }
         this.sql_orderby = this.sql_orderby + " \"msgv3_capability\" DESC ";
+        return this;
+    }
+
+    public FriendList orderByPinnedAsc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"pinned\" ASC ";
+        return this;
+    }
+
+    public FriendList orderByPinnedDesc()
+    {
+        if (this.sql_orderby.equals(""))
+        {
+            this.sql_orderby = " order by ";
+        }
+        else
+        {
+            this.sql_orderby = this.sql_orderby + " , ";
+        }
+        this.sql_orderby = this.sql_orderby + " \"pinned\" DESC ";
         return this;
     }
 

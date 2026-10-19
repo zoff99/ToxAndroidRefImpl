@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS "ConferenceDB" (
   "tox_conference_number" INTEGER,
   "conference_active" BOOLEAN,
   "notification_silent" BOOLEAN,
+  "pinned" BOOLEAN,
   PRIMARY KEY("conference_identifier" )
 );

@@ -21,6 +21,10 @@ package com.zoffcc.applications.trifa;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,13 +39,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
+import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ONE_HOUR_IN_MS;
@@ -95,10 +104,109 @@ public class FriendListFragment extends Fragment
         adapter.clear_items(); // clears friends AND conferences!!
         adapter.notifyDataSetChanged();
 
-        MainActivity.friend_list_fragment = this;
+        friend_list_fragment = this;
         // -------------------------------------------
         // -------------------------------------------
         // -------------------------------------------
+
+        ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+
+            // colors + icons used during the swipe
+            private final Paint backgroundPaint = new Paint();
+            // replace these with your own R.drawable.ic_pin / R.drawable.ic_unpin if you have them
+            private final Drawable pinIcon = ContextCompat.getDrawable(getContext(), android.R.drawable.star_big_on);
+            private final Drawable unpinIcon = ContextCompat.getDrawable(getContext(), android.R.drawable.ic_menu_close_clear_cancel);
+
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
+                int position = viewHolder.getBindingAdapterPosition();
+                if (position == RecyclerView.NO_POSITION) return;
+
+                CombinedFriendsAndConferences cfac = adapter.getItem(position);
+                if (cfac == null) return;
+
+                final boolean newPinnedState = (swipeDir == ItemTouchHelper.RIGHT);
+
+                try {
+                    if (cfac.is_friend == COMBINED_IS_FRIEND) {
+                        cfac.friend_item.pinned = newPinnedState;
+                        orma.updateFriendList()
+                                .tox_public_key_stringEq(cfac.friend_item.tox_public_key_string)
+                                .pinned(newPinnedState).execute();
+                    } else if (cfac.is_friend == COMBINED_IS_CONFERENCE) {
+                        cfac.conference_item.pinned = newPinnedState;
+                        orma.updateConferenceDB()
+                                .conference_identifierEq(cfac.conference_item.conference_identifier)
+                                .pinned(newPinnedState).execute();
+                    } else if (cfac.is_friend == COMBINED_IS_GROUP) {
+                        cfac.group_item.pinned = newPinnedState;
+                        orma.updateGroupDB()
+                                .group_identifierEq(cfac.group_item.group_identifier)
+                                .pinned(newPinnedState).execute();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                if (newPinnedState) {
+                    // PIN: move it to the top
+                    adapter.sort_items();
+                } else {
+                    // UNPIN: rebuild the whole list, otherwise it wont return to its normal position
+                    if (friend_list_fragment != null) {
+                        friend_list_fragment.add_all_friends_clear(0);
+                    }
+                }
+            }
+
+            @Override
+            public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
+                                    float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
+                    View itemView = viewHolder.itemView;
+                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
+                    int margin = (int) (16 * itemView.getContext().getResources().getDisplayMetrics().density);
+
+                    if (dX > 0) {
+                        // swiping RIGHT -> green background + pin icon
+                        backgroundPaint.setColor(Color.parseColor("#388E3C"));
+                        c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(),
+                                   dX, (float) itemView.getBottom(), backgroundPaint);
+
+                        if (pinIcon != null) {
+                            int iconTop = itemView.getTop() + (int) (height - pinIcon.getIntrinsicHeight()) / 2;
+                            int iconLeft = itemView.getLeft() + margin;
+                            int iconRight = iconLeft + pinIcon.getIntrinsicWidth();
+                            int iconBottom = iconTop + pinIcon.getIntrinsicHeight();
+                            pinIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+                            pinIcon.draw(c);
+                        }
+                    } else if (dX < 0) {
+                        // swiping LEFT -> red background + unpin icon
+                        backgroundPaint.setColor(Color.parseColor("#D32F2F"));
+                        c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
+                                   (float) itemView.getRight(), (float) itemView.getBottom(), backgroundPaint);
+
+                        if (unpinIcon != null) {
+                            int iconTop = itemView.getTop() + (int) (height - unpinIcon.getIntrinsicHeight()) / 2;
+                            int iconRight = itemView.getRight() - margin;
+                            int iconLeft = iconRight - unpinIcon.getIntrinsicWidth();
+                            int iconBottom = iconTop + unpinIcon.getIntrinsicHeight();
+                            unpinIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
+                            unpinIcon.draw(c);
+                        }
+                    }
+                }
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);
+        itemTouchHelper.attachToRecyclerView(listingsView);
 
         return view1;
     }
@@ -109,7 +217,7 @@ public class FriendListFragment extends Fragment
         super.onActivityCreated(savedInstanceState);
         Log.i(TAG, "onActivityCreated");
 
-        MainActivity.friend_list_fragment = this;
+        friend_list_fragment = this;
     }
 
     @Override
@@ -545,7 +653,7 @@ public class FriendListFragment extends Fragment
             }
         }
 
-        MainActivity.friend_list_fragment = this;
+        friend_list_fragment = this;
     }
 
     void add_all_friends_clear_real(final int delay)
@@ -845,6 +953,10 @@ public class FriendListFragment extends Fragment
                                     }
                                 }
                                 // ------------- add groups -------------
+
+                                // ===== SORT: pinned items to the top =====
+                                adapter.sort_items();
+                                // ===== SORT: pinned items to the top =====
                             }
                             catch (Exception e)
                             {

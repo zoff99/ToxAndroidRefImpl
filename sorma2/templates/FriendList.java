@@ -113,6 +113,9 @@ public class FriendList
     @Column(indexed = true, defaultExpr = "0", helpers = Column.Helpers.ALL)
     long msgv3_capability = 0;
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    boolean pinned = false;
+
     // ______@@SORMA_END@@______
 
     @Override

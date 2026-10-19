@@ -61,5 +61,8 @@ public class ConferenceDB
     @Nullable
     boolean notification_silent = false; // show notifications for this conference?
 
+    @Column(indexed = true, defaultExpr = "false", helpers = Column.Helpers.ALL)
+    boolean pinned = false;
+
     // ______@@SORMA_END@@______
 }
