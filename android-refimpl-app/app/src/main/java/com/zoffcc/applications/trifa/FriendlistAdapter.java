@@ -20,12 +20,20 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.l4digital.fastscroll.FastScroller;
+import com.mikepenz.fontawesome_typeface_library.FontAwesome;
+import com.mikepenz.iconics.IconicsDrawable;
 import com.zoffcc.applications.sorm.ConferenceDB;
 import com.zoffcc.applications.sorm.FriendList;
 import com.zoffcc.applications.sorm.GroupDB;
@@ -39,16 +47,27 @@ import androidx.recyclerview.widget.RecyclerView;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_SEPARATOR;
+import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
+import static com.zoffcc.applications.trifa.HelperGeneric.is_nightmode_active;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_friendlist;
 
 public class FriendlistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
     private static final String TAG = "trifa.FriendlistAdapter";
 
+    private static final int VIEW_TYPE_SEPARATOR = 1000;
+
     private final List<CombinedFriendsAndConferences> friendlistitems;
     private Context context;
     private List<CombinedFriendsAndConferences> all_items;
     private String current_filter = "";
+
+    public static class SeparatorViewHolder extends RecyclerView.ViewHolder {
+        public SeparatorViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
 
     public FriendlistAdapter(Context context, List<CombinedFriendsAndConferences> items)
     {
@@ -67,6 +86,9 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         View view = null;
         switch (viewType)
         {
+            case VIEW_TYPE_SEPARATOR:
+                return new SeparatorViewHolder(buildPinnedSeparatorView(parent.getContext()));
+
             case CombinedFriendsAndConferences_model.ITEM_IS_FRIEND:
                 if (PREF__compact_friendlist)
                 {
@@ -116,7 +138,11 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
     {
         CombinedFriendsAndConferences my_item = this.friendlistitems.get(position);
 
-        if (my_item.is_friend == COMBINED_IS_FRIEND)
+        if (my_item.is_friend == COMBINED_IS_SEPARATOR)
+        {
+            return VIEW_TYPE_SEPARATOR;
+        }
+        else if (my_item.is_friend == COMBINED_IS_FRIEND)
         {
             return CombinedFriendsAndConferences_model.ITEM_IS_FRIEND;
         }
@@ -134,6 +160,10 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position)
     {
         // Log.i(TAG, "onBindViewHolder:position=" + position);
+
+        if (holder instanceof SeparatorViewHolder) {
+            return;
+        }
 
         try
         {
@@ -278,6 +308,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
                 }
             }
         }
+        insertPinnedSeparator();
         this.notifyDataSetChanged();
     }
 
@@ -309,6 +340,90 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private boolean isPinned(CombinedFriendsAndConferences item) {
+        if (item == null) return false;
+        if (item.is_friend == COMBINED_IS_FRIEND)
+            return item.friend_item != null && item.friend_item.pinned;
+        if (item.is_friend == COMBINED_IS_CONFERENCE)
+            return item.conference_item != null && item.conference_item.pinned;
+        if (item.is_friend == COMBINED_IS_GROUP)
+            return item.group_item != null && item.group_item.pinned;
+        return false;
+    }
+
+    private void insertPinnedSeparator() {
+        // defensive: remove any existing separator first
+        for (int i = this.friendlistitems.size() - 1; i >= 0; i--) {
+            if (this.friendlistitems.get(i).is_friend == COMBINED_IS_SEPARATOR) {
+                this.friendlistitems.remove(i);
+            }
+        }
+
+        // find the boundary: first NON-pinned item that comes after at least one pinned item
+        int pinnedSeen = 0;
+        for (int i = 0; i < this.friendlistitems.size(); i++) {
+            CombinedFriendsAndConferences it = this.friendlistitems.get(i);
+            if (isPinned(it)) {
+                pinnedSeen++;
+            } else {
+                if (pinnedSeen > 0) {
+                    CombinedFriendsAndConferences sep = new CombinedFriendsAndConferences();
+                    sep.is_friend = COMBINED_IS_SEPARATOR;
+                    this.friendlistitems.add(i, sep);   // insert right below the pinned block
+                    return;
+                }
+            }
+        }
+        // no separator if there are no pinned items, or if ALL items are pinned
+    }
+
+    private View buildPinnedSeparatorView(Context ctx) {
+        boolean dark = is_nightmode_active(ctx);
+
+        int lineColor = dark ? Color.parseColor("#4A4A4A") : Color.parseColor("#DDDDDD");
+        int accent    = dark ? Color.parseColor("#9E9E9E") : Color.parseColor("#8A8A8A");
+
+        LinearLayout row = new LinearLayout(ctx);
+        row.setOrientation(LinearLayout.HORIZONTAL);
+        row.setGravity(Gravity.CENTER_VERTICAL);
+        row.setPadding((int) dp2px(16), (int) dp2px(12), (int) dp2px(16), (int) dp2px(12));
+
+        // left line
+        View leftLine = new View(ctx);
+        leftLine.setBackgroundColor(lineColor);
+        row.addView(leftLine, new LinearLayout.LayoutParams(0, (int) dp2px(1), 1f));
+
+        // centered "PINNED" label with a pin icon
+        TextView label = new TextView(ctx);
+        label.setText("Pinned");
+        label.setTextSize(11f);
+        label.setTextColor(accent);
+        label.setTypeface(label.getTypeface(), Typeface.BOLD);
+        label.setAllCaps(true);
+        try {
+            Drawable pin = new IconicsDrawable(ctx)
+                    .icon(FontAwesome.Icon.faw_thumbtack)
+                    .color(accent)
+                    .sizeDp(11);
+            label.setCompoundDrawablesWithIntrinsicBounds(pin, null, null, null);
+            label.setCompoundDrawablePadding((int)dp2px(6));
+        } catch (Exception ignored) {
+        }
+
+        LinearLayout.LayoutParams labelLp = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        labelLp.leftMargin = (int)dp2px(12);
+        labelLp.rightMargin = (int)dp2px(12);
+        row.addView(label, labelLp);
+
+        // right line
+        View rightLine = new View(ctx);
+        rightLine.setBackgroundColor(lineColor);
+        row.addView(rightLine, new LinearLayout.LayoutParams(0, (int)dp2px(1), 1f));
+
+        return row;
     }
 
     public void sort_items()
@@ -350,6 +465,7 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
                 }
             }
 
+            insertPinnedSeparator();
             this.notifyDataSetChanged();
         }
         catch (Exception e)

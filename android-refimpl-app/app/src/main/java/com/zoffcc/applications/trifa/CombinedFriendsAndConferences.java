@@ -26,7 +26,7 @@ import com.zoffcc.applications.sorm.GroupDB;
 public class CombinedFriendsAndConferences
 {
     long id = -1; // primary key for lookup // TODO: unsed now!!!!!
-    int is_friend = COMBINED_IS_FRIEND; // 0 -> Friend, 1 -> Conference, 2 -> group
+    int is_friend = COMBINED_IS_FRIEND; // 0 -> Friend, 1 -> Conference, 2 -> group, 3 -> seperator
 
     FriendList friend_item = null;
     ConferenceDB conference_item = null;
@@ -35,6 +35,7 @@ public class CombinedFriendsAndConferences
     final static int COMBINED_IS_FRIEND = 0;
     final static int COMBINED_IS_CONFERENCE = 1;
     final static int COMBINED_IS_GROUP = 2;
+    final static int COMBINED_IS_SEPARATOR = 3;
 
     @Override
     public String toString()

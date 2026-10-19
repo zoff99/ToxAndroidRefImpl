@@ -50,6 +50,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_FRIEND;
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_GROUP;
+import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_SEPARATOR;
 import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS;
@@ -162,6 +163,20 @@ public class FriendListFragment extends Fragment
                         friend_list_fragment.add_all_friends_clear(0);
                     }
                 }
+            }
+
+            @Override
+            public int getMovementFlags(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder) {
+                int position = viewHolder.getBindingAdapterPosition();
+                if (position != RecyclerView.NO_POSITION) {
+                    CombinedFriendsAndConferences cfac = adapter.getItem(position);
+                    if (cfac != null && cfac.is_friend == COMBINED_IS_SEPARATOR) {
+                        // 0, 0 means NO drag and NO swipe allowed for the separator
+                        return makeMovementFlags(0, 0);
+                    }
+                }
+                // For all other items, use the default LEFT | RIGHT we defined in the constructor
+                return super.getMovementFlags(recyclerView, viewHolder);
             }
 
             @Override
