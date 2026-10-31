@@ -166,36 +166,15 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIconDrawable(R.drawable.about_icon_github);
             aboutPage.addItem(el2);
             //  --------------------------------
-            //  --------------------------------
-            //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.gfx.android.orma");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/gfx/Android-Orma"));
+            el2.setTitle("com.mikepenz:materialdrawer");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mikepenz/MaterialDrawer"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
-            el2.setTitle("info.guardianproject.iocipher:IOCipher");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/guardianproject/IOCipher"));
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle("com.l4digital.fastscroll:fastscroll");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/L4Digital/FastScroll"));
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle("com.github.bumptech.glide");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bumptech/glide"));
-            el2.setIntent(link2);
-            aboutPage.addItem(el2);
-            //  --------------------------------
-            //  --------------------------------
-            el2 = new Element();
-            el2.setTitle("info.guardianproject.netcipher");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/guardianproject/NetCipher"));
+            el2.setTitle("com.mikepenz:google-material-typeface");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mikepenz/Android-Iconics"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
@@ -205,13 +184,11 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
-            //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.mikepenz:google-material-typeface");
+            el2.setTitle("com.mikepenz:material-design-iconic-typeface");
             link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/mikepenz/Android-Iconics"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
-            //  --------------------------------
             //  --------------------------------
             el2 = new Element();
             el2.setTitle("com.google.zxing:core");
@@ -219,13 +196,35 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
-            //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.hotchemi:permissionsdispatcher");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/permissions-dispatcher/PermissionsDispatcher"));
+            el2.setTitle("com.github.piasy:rxandroidaudio");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Piasy/RxAndroidAudio"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.daimajia.swipelayout:library");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/daimajia/AndroidSwipeLayout"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.zoff99:pkgs_guardianprojectIOCipher");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zoff99/pkgs_guardianprojectIOCipher"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.zoff99:pkgs_zoffccAndroidJDBC");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zoff99/pkgs_zoffccAndroidJDBC"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.zoff99:pkgs_hotchemiPermissionsdispatcher");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zoff99/pkgs_hotchemiPermissionsdispatcher"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
             el2.setTitle("com.github.angads25:filepicker");
@@ -233,6 +232,11 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("io.github.l4digital:fastscroll");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/L4Digital/FastScroll"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
             el2.setTitle("com.vanniktech:emoji-google");
@@ -240,6 +244,23 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.bumptech.glide:glide");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/bumptech/glide"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.zoff99:pkgs_ToxAndroidRefImpl");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zoff99/pkgs_ToxAndroidRefImpl"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("info.guardianproject.netcipher");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/guardianproject/NetCipher"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
             el2.setTitle("com.google.code.gson");
@@ -247,13 +268,11 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
-            //  --------------------------------
             el2 = new Element();
             el2.setTitle("com.github.medyo:android-about-page");
             link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/medyo/android-about-page"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
-            //  --------------------------------
             //  --------------------------------
             el2 = new Element();
             el2.setTitle("de.hdodenhof:circleimageview");
@@ -261,13 +280,17 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
-            //  --------------------------------
             el2 = new Element();
-            el2.setTitle("com.github.armcha:AutoLinkTextView");
-            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/armcha/AutoLinkTextView"));
+            el2.setTitle("me.zhanghai.android.patternlock:library");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zhanghai/PatternLock"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.zoff99:pkgs_armchaAutoLinkTextView");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zoff99/pkgs_armchaAutoLinkTextView"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
             //  --------------------------------
             el2 = new Element();
             el2.setTitle("com.squareup.okhttp3");
@@ -275,10 +298,27 @@ public class Aboutpage extends AppCompatActivity implements Logging.AsyncRespons
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
-            //  --------------------------------
             el2 = new Element();
             el2.setTitle("com.daimajia.numberprogressbar");
             link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/daimajia/NumberProgressBar"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.lawloretienne:discreteslider");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/lawloretienne/DiscreteSlider"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("com.github.YarikSOffice:lingver");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/YarikSOffice/lingver"));
+            el2.setIntent(link2);
+            aboutPage.addItem(el2);
+            //  --------------------------------
+            el2 = new Element();
+            el2.setTitle("id.zelory:compressor");
+            link2 = new Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/zetbaitsu/Compressor"));
             el2.setIntent(link2);
             aboutPage.addItem(el2);
             //  --------------------------------
