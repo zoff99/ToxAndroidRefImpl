@@ -123,7 +123,6 @@ dependencyVerification {
         'com.github.bumptech.glide:disklrucache:5.0.7:disklrucache-5.0.7.aar:509f94cbe85e3aa393c019b026ac904e2eece355a52795e355d82e3e774b2419',
         'com.github.bumptech.glide:gifdecoder:5.0.7:gifdecoder-5.0.7.aar:df9e4620e87b68b719ef8af3d100324a144bfc88f43518af9a013674109fe078',
         'com.github.bumptech.glide:glide:5.0.7:glide-5.0.7.aar:b44c31734740de23217b926bb7fc8cff598dcd2da211e7e865a4aeffcdb17f61',
-        'com.github.chrisbanes:PhotoView:2.3.0:PhotoView-2.3.0.aar:6c8989f2945d50ab38b3e0300064f1f8d2d75bbcae1434fe535d9fb6898e9ad6',
         'com.github.lawloretienne:discreteslider:0.0.9:discreteslider-0.0.9.aar:2a5b1a28060d20e070ff8ee2c9538e4427e04d56467453813b5efa05ea9390d1',
         'com.github.medyo:android-about-page:1.2.4:android-about-page-1.2.4.aar:15108c8bdedf5975d2aa60604107017109a4ad3640e0e95fa97fd438d347eb5c',
         'com.github.piasy:rxandroidaudio:1.7.0:rxandroidaudio-1.7.0.aar:70f93bd866b5dff068744211a441c463196a323a84e0fce5aa917fe9d8228ccc',
