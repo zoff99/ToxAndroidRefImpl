@@ -242,6 +242,8 @@ public class ImageviewerActivity extends AppCompatActivity
 
         layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setClipChildren(false);
+        recyclerView.setClipToPadding(false);
 
         PagerSnapHelper snapHelper = new PagerSnapHelper();
         snapHelper.attachToRecyclerView(recyclerView);
