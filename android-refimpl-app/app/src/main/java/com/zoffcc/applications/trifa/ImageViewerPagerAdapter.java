@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
-import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.List;
 
@@ -29,20 +28,6 @@ public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPag
     @Override
     public ImageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_imageviewer_page, parent, false);
-
-        // Swap PhotoView with our robust GestureImageView
-        ViewGroup container = (ViewGroup) view;
-        View oldPhotoView = view.findViewById(R.id.photo_view);
-        if (oldPhotoView != null) {
-            ViewGroup.LayoutParams params = oldPhotoView.getLayoutParams();
-            int index = container.indexOfChild(oldPhotoView);
-            container.removeView(oldPhotoView);
-
-            GestureImageView newImageView = new GestureImageView(parent.getContext());
-            newImageView.setId(R.id.photo_view); // Keep the same ID for findViewById
-            container.addView(newImageView, index, params);
-        }
-
         return new ImageViewHolder(view);
     }
 
