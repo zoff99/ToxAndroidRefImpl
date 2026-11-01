@@ -38,6 +38,24 @@ public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPag
     }
 
     @Override
+    public void onViewRecycled(@NonNull ImageViewHolder holder) {
+        super.onViewRecycled(holder);
+        // Reset transformations immediately when the view is fully swiped away and recycled
+        if (holder.photoView != null) {
+            holder.photoView.resetState();
+        }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(@NonNull ImageViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        // Reset when the view is fully swiped away and detached
+        if (holder.photoView != null) {
+            holder.photoView.resetState();
+        }
+    }
+
+    @Override
     public int getItemCount() {
         return imageMessages != null ? imageMessages.size() : 0;
     }
@@ -53,6 +71,9 @@ public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPag
         }
 
         void bind(Message_for_img msg, ImageviewerActivity activity) {
+            // Reset any previous zoom/pan/rotation when this ViewHolder is bound
+            photoView.resetState();
+
             if (msg == null || msg.filename_fullpath == null) {
                 photoView.setImageResource(R.drawable.round_loading_animation);
                 if (vfsIndicator != null) vfsIndicator.setVisibility(View.GONE);

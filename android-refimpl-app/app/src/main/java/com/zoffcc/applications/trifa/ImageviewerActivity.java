@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -269,9 +270,26 @@ public class ImageviewerActivity extends AppCompatActivity
                     {
                         pos = layoutManager.findFirstVisibleItemPosition();
                     }
+
                     if (pos != RecyclerView.NO_POSITION)
                     {
                         updateBottomInfo(pos);
+
+                        // --- FORCE RESET OTHER PAGES ---
+                        // Loop through all children currently in the RecyclerView's memory.
+                        // If a child is NOT the current page, reset its zoom/rotation.
+                        for (int i = 0; i < recyclerView.getChildCount(); i++) {
+                            View child = recyclerView.getChildAt(i);
+                            int childPos = recyclerView.getChildAdapterPosition(child);
+
+                            if (childPos != pos) {
+                                GestureImageView img = child.findViewById(R.id.photo_view);
+                                if (img != null) {
+                                    img.resetState();
+                                }
+                            }
+                        }
+                        // -------------------------------
                     }
                 }
             }

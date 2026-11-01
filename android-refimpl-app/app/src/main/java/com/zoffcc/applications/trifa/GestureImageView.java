@@ -517,7 +517,6 @@ public class GestureImageView extends AppCompatImageView {
         float cos = Math.abs((float) Math.cos(theta));
         float sin = Math.abs((float) Math.sin(theta));
 
-        // Correct AABB width for rotated rectangle
         float boundW = w * cos + h * sin;
 
         float left = panX - boundW / 2f;
@@ -559,5 +558,20 @@ public class GestureImageView extends AppCompatImageView {
         // Hard clamp so the image cannot be dragged off-screen
         panX = Math.max(minPanX, Math.min(maxPanX, panX));
         panY = Math.max(minPanY, Math.min(maxPanY, panY));
+    }
+
+    public void resetState() {
+        stopFling();
+        zoom = 1f;
+        currentAngle = 0f;
+        if (viewWidth > 0 && viewHeight > 0) {
+            panX = viewWidth / 2f;
+            panY = viewHeight / 2f;
+        } else {
+            panX = 0f;
+            panY = 0f;
+        }
+        updateMatrix();
+        invalidate(); // Force redraw
     }
 }
