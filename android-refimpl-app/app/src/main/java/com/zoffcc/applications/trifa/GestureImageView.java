@@ -8,8 +8,10 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
+import android.view.VelocityTracker;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
+import android.widget.OverScroller;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
@@ -38,6 +40,15 @@ public class GestureImageView extends AppCompatImageView {
     private float doubleTapFocalX, doubleTapFocalY;
     private float doubleTapImgX, doubleTapImgY;
 
+    // --- FLING VARIABLES ---
+    private OverScroller scroller;
+    private VelocityTracker velocityTracker;
+    private boolean isFlinging = false;
+    private static final int MIN_FLING_VELOCITY = 800; // pixels per second
+
+    // --- SWIPE INTERCEPT VARIABLE ---
+    private boolean isCurrentGestureConsumable = true;
+
     public GestureImageView(Context context) {
         super(context);
         init();
@@ -50,9 +61,15 @@ public class GestureImageView extends AppCompatImageView {
 
     private void init() {
         setScaleType(ImageView.ScaleType.MATRIX);
+
+        // Initialize Fling components
+        scroller = new OverScroller(getContext(), new DecelerateInterpolator());
+        velocityTracker = VelocityTracker.obtain();
+
         gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onDoubleTap(MotionEvent e) {
+                stopFling(); // Stop any ongoing fling on double tap
                 float targetZoom = (zoom > 1.5f) ? 1.0f : 2.5f;
 
                 doubleTapFocalX = e.getX();
@@ -84,6 +101,7 @@ public class GestureImageView extends AppCompatImageView {
     @Override
     public void setImageDrawable(@Nullable Drawable drawable) {
         super.setImageDrawable(drawable);
+        stopFling(); // CRITICAL: Stop fling when a new image is loaded/recycled
         if (drawable != null && viewWidth > 0) {
             setupBaseScale();
         }
@@ -123,22 +141,118 @@ public class GestureImageView extends AppCompatImageView {
         setImageMatrix(matrix);
     }
 
+    // --- FLING HELPER METHODS ---
+    private void stopFling() {
+        if (isFlinging) {
+            isFlinging = false;
+            scroller.abortAnimation();
+        }
+    }
+
+    private void startFling(float velocityX, float velocityY) {
+        // Only allow flinging if zoomed in or rotated enough to have pannable area
+        boolean canPan = (canScrollHorizontally(1) || canScrollHorizontally(-1) ||
+                          canScrollVertically(1) || canScrollVertically(-1));
+
+        if (!canPan) return;
+
+        isFlinging = true;
+        // OverScroller expects integers for coordinates and velocities
+        scroller.fling(
+                (int) panX, (int) panY,
+                (int) velocityX, (int) velocityY,
+                Integer.MIN_VALUE, Integer.MAX_VALUE,
+                Integer.MIN_VALUE, Integer.MAX_VALUE
+        );
+        postInvalidateOnAnimation();
+    }
+
+    /**
+     * Called every frame while flinging to update position and check bounds
+     */
+    private void computeFling() {
+        if (!isFlinging) return;
+
+        if (scroller.computeScrollOffset()) {
+            float oldPanX = panX;
+            float oldPanY = panY;
+
+            panX = scroller.getCurrX();
+            panY = scroller.getCurrY();
+
+            // Apply our strict boundary clamping
+            clampPan();
+
+            // If clamping changed the values significantly, we hit an edge.
+            // Stop the fling so it doesn't grind against the boundary.
+            if (Math.abs(panX - oldPanX) > 0.1f || Math.abs(panY - oldPanY) > 0.1f) {
+                // We didn't hit an edge, continue
+                updateMatrix();
+                postInvalidateOnAnimation();
+            } else {
+                // Hit an edge, stop flinging
+                stopFling();
+            }
+        } else {
+            // Fling finished naturally
+            isFlinging = false;
+        }
+    }
+
+    @Override
+    public void computeScroll() {
+        super.computeScroll();
+        computeFling();
+    }
+
+    // Added vertical scroll check for fling validation
+    @Override
+    public boolean canScrollVertically(int direction) {
+        if (zoom <= 1.01f) return false;
+
+        if (imageWidth <= 0 || imageHeight <= 0) return false;
+        float w = imageWidth * baseScale * zoom;
+        float h = imageHeight * baseScale * zoom;
+
+        float theta = (float) Math.toRadians(currentAngle);
+        float cos = Math.abs((float) Math.cos(theta));
+        float sin = Math.abs((float) Math.sin(theta));
+
+        float boundH = w * sin + h * cos;
+
+        float top = panY - boundH / 2f;
+        float bottom = panY + boundH / 2f;
+
+        if (direction < 0) return top < -1f;
+        if (direction > 0) return bottom > viewHeight + 1f;
+
+        return false;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         gestureDetector.onTouchEvent(event);
+
+        // Track velocity for fling
+        velocityTracker.addMovement(event);
+
         int action = event.getActionMasked();
 
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
+                stopFling(); // CRITICAL: Stop fling immediately on touch
                 activePointerId = event.getPointerId(0);
                 lastTouchX = event.getX();
                 lastTouchY = event.getY();
                 isTwoFingerGesture = false;
+                isCurrentGestureConsumable = true; // Reset on new touch
                 break;
             }
 
             case MotionEvent.ACTION_POINTER_DOWN: {
+                stopFling(); // Stop fling on multi-touch
                 isTwoFingerGesture = true;
+                isCurrentGestureConsumable = true; // 2-finger gestures are always consumed
                 float x0 = event.getX(0), y0 = event.getY(0);
                 float x1 = event.getX(1), y1 = event.getY(1);
 
@@ -199,14 +313,29 @@ public class GestureImageView extends AppCompatImageView {
 
                     clampPan();
                     updateMatrix();
+                    isCurrentGestureConsumable = true;
                 } else if (!isTwoFingerGesture && activePointerId != -1) {
                     int pointerIndex = event.findPointerIndex(activePointerId);
                     if (pointerIndex != -1) {
                         float x = event.getX(pointerIndex);
                         float y = event.getY(pointerIndex);
 
-                        panX += (x - lastTouchX);
-                        panY += (y - lastTouchY);
+                        float dx = x - lastTouchX;
+                        float dy = y - lastTouchY;
+
+                        // Determine if we can pan in the direction of the gesture
+                        if (Math.abs(dx) > Math.abs(dy)) {
+                            // Horizontal dominant swipe
+                            isCurrentGestureConsumable = (dx < 0) ? canScrollHorizontally(1) : canScrollHorizontally(-1);
+                        } else if (Math.abs(dy) > 0) {
+                            // Vertical dominant swipe
+                            isCurrentGestureConsumable = (dy < 0) ? canScrollVertically(1) : canScrollVertically(-1);
+                        } else {
+                            isCurrentGestureConsumable = true;
+                        }
+
+                        panX += dx;
+                        panY += dy;
                         lastTouchX = x;
                         lastTouchY = y;
 
@@ -222,8 +351,18 @@ public class GestureImageView extends AppCompatImageView {
                 if (isTwoFingerGesture) {
                     isTwoFingerGesture = false;
                     snapToNearestRightAngle();
+                } else if (activePointerId != -1) {
+                    // Calculate fling velocity on single-finger release
+                    velocityTracker.computeCurrentVelocity(1000);
+                    float vx = velocityTracker.getXVelocity(activePointerId);
+                    float vy = velocityTracker.getYVelocity(activePointerId);
+
+                    if (Math.abs(vx) > MIN_FLING_VELOCITY || Math.abs(vy) > MIN_FLING_VELOCITY) {
+                        startFling(vx, vy);
+                    }
                 }
                 activePointerId = -1;
+                velocityTracker.clear();
                 break;
             }
 
@@ -251,12 +390,13 @@ public class GestureImageView extends AppCompatImageView {
         }
 
         // Handle RecyclerView Swiping vs Panning
-        boolean canPan = (canScrollHorizontally(1) || canScrollHorizontally(-1));
         boolean isZoomedOrRotated = (zoom > 1.01f || Math.abs(currentAngle % 360) > 5f);
 
-        if (isZoomedOrRotated && canPan) {
+        // Only consume the event if zoomed/rotated AND we are allowed to pan in the current swipe direction
+        if (isZoomedOrRotated && isCurrentGestureConsumable) {
             getParent().requestDisallowInterceptTouchEvent(true);
         } else {
+            // Give control back to RecyclerView so it can swipe to the next/prev page
             getParent().requestDisallowInterceptTouchEvent(false);
         }
 
@@ -355,7 +495,9 @@ public class GestureImageView extends AppCompatImageView {
         if (normAngle > 180) normAngle -= 360;
         if (normAngle < -180) normAngle += 360;
 
-        if (Math.abs(normAngle) > 5f) return true; // Rotated, consume all horizontal to allow panning
+        // Rotated, consume all horizontal to allow panning (handled dynamically in onTouchEvent now)
+        // if (Math.abs(normAngle) > 5f) return true;
+
         if (zoom <= 1.01f) return false; // Let parent (RecyclerView) scroll
 
         RectF rect = getDisplayRect();
@@ -375,6 +517,7 @@ public class GestureImageView extends AppCompatImageView {
         float cos = Math.abs((float) Math.cos(theta));
         float sin = Math.abs((float) Math.sin(theta));
 
+        // Correct AABB width for rotated rectangle
         float boundW = w * cos + h * sin;
 
         float left = panX - boundW / 2f;
