@@ -59,6 +59,9 @@ public class GestureImageView extends AppCompatImageView {
     private float doubleTapFocalX, doubleTapFocalY;
     private float doubleTapImgX, doubleTapImgY;
 
+    // --- EDGE PADDING ---
+    private static final float EDGE_PADDING_DP = 100f; // density independent pixels
+
     // --- FLING VARIABLES ---
     private OverScroller scroller;
     private VelocityTracker velocityTracker;
@@ -239,11 +242,15 @@ public class GestureImageView extends AppCompatImageView {
 
         float boundH = w * sin + h * cos;
 
+        // If the image fits vertically, no scrolling needed
+        if (boundH < viewHeight) return false;
+
+        float edgePaddingPx = HelperGeneric.dp2px(EDGE_PADDING_DP);
         float top = panY - boundH / 2f;
         float bottom = panY + boundH / 2f;
 
-        if (direction < 0) return top < -1f;
-        if (direction > 0) return bottom > viewHeight + 1f;
+        if (direction < 0) return top < edgePaddingPx - 1f;
+        if (direction > 0) return bottom > (viewHeight - edgePaddingPx) + 1f;
 
         return false;
     }
@@ -521,8 +528,12 @@ public class GestureImageView extends AppCompatImageView {
 
         RectF rect = getDisplayRect();
         if (rect != null) {
-            if (direction < 0) return rect.left < -1f;
-            if (direction > 0) return rect.right > viewWidth + 1f;
+            // If the image fits horizontally, no scrolling needed
+            if ((rect.right - rect.left) < viewWidth) return false;
+
+            float edgePaddingPx = HelperGeneric.dp2px(EDGE_PADDING_DP);
+            if (direction < 0) return rect.left < edgePaddingPx - 1f;
+            if (direction > 0) return rect.right > (viewWidth - edgePaddingPx) + 1f;
         }
         return false;
     }
@@ -558,23 +569,25 @@ public class GestureImageView extends AppCompatImageView {
         float boundW = w * cos + h * sin;
         float boundH = w * sin + h * cos;
 
+        float edgePaddingPx = HelperGeneric.dp2px(EDGE_PADDING_DP);
+
         float minPanX, maxPanX;
         if (boundW < viewWidth) {
             minPanX = maxPanX = viewWidth / 2f; // Center horizontally if smaller than view
         } else {
-            minPanX = viewWidth - boundW / 2f;
-            maxPanX = boundW / 2f;
+            minPanX = viewWidth - boundW / 2f - edgePaddingPx;
+            maxPanX = boundW / 2f + edgePaddingPx;
         }
 
         float minPanY, maxPanY;
         if (boundH < viewHeight) {
             minPanY = maxPanY = viewHeight / 2f; // Center vertically if smaller than view
         } else {
-            minPanY = viewHeight - boundH / 2f;
-            maxPanY = boundH / 2f;
+            minPanY = viewHeight - boundH / 2f - edgePaddingPx;
+            maxPanY = boundH / 2f + edgePaddingPx;
         }
 
-        // Hard clamp so the image cannot be dragged off-screen
+        // Hard clamp so the image cannot be dragged off-screen (with padding allowance)
         panX = Math.max(minPanX, Math.min(maxPanX, panX));
         panY = Math.max(minPanY, Math.min(maxPanY, panY));
     }
