@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.DownsampleStrategy;
 import com.bumptech.glide.request.RequestOptions;
 
 import java.util.List;
@@ -18,6 +19,11 @@ public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPag
 
     private List<Message_for_img> imageMessages;
     private ImageviewerActivity activity;
+
+    // --- CONFIGURABLE RESOLUTION LIMIT ---
+    // Change this value to increase/decrease zoom sharpness and memory usage.
+    // 2048 uses ~16MB RAM per image. 4096 uses ~64MB RAM.
+    private static final int MAX_IMAGE_RESOLUTION_PX = 2048;
 
     public ImageViewerPagerAdapter(ImageviewerActivity activity, List<Message_for_img> imageMessages) {
         this.activity = activity;
@@ -83,7 +89,10 @@ public class ImageViewerPagerAdapter extends RecyclerView.Adapter<ImageViewerPag
             photoView.setImageResource(R.drawable.round_loading_animation);
 
             try {
-                RequestOptions req_options = new RequestOptions();
+                // Compromise: Load up to the configured limit for crisp zooming, but cap memory to prevent OOMs
+                RequestOptions req_options = new RequestOptions()
+                        .override(MAX_IMAGE_RESOLUTION_PX, MAX_IMAGE_RESOLUTION_PX)
+                        .downsample(DownsampleStrategy.CENTER_INSIDE);
                 String path = msg.filename_fullpath;
                 String uriStr = msg.getfile_uri();
                 if (uriStr == null || uriStr.isEmpty()) uriStr = path;
