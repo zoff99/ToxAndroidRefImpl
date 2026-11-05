@@ -28,6 +28,7 @@ import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.VelocityTracker;
+import android.view.ViewConfiguration;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.OverScroller;
@@ -35,6 +36,7 @@ import android.widget.OverScroller;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
+/** @noinspection FieldCanBeLocal*/
 public class GestureImageView extends AppCompatImageView {
 
     private Matrix matrix = new Matrix();
@@ -68,8 +70,11 @@ public class GestureImageView extends AppCompatImageView {
     private boolean isFlinging = false;
     private static final int MIN_FLING_VELOCITY = 800; // pixels per second
 
-    // --- SWIPE INTERCEPT VARIABLE ---
-    private boolean isCurrentGestureConsumable = true;
+    // --- SWIPE INTERCEPT VARIABLES ---
+    private boolean isGestureLockedToChild = false;
+    private boolean isGestureDirectionDetermined = false;
+    private float downX, downY;
+    private int touchSlop;
 
     public GestureImageView(Context context) {
         super(context);
@@ -87,6 +92,7 @@ public class GestureImageView extends AppCompatImageView {
         // Initialize Fling components
         scroller = new OverScroller(getContext(), new DecelerateInterpolator());
         velocityTracker = VelocityTracker.obtain();
+        touchSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
 
         gestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
@@ -270,15 +276,24 @@ public class GestureImageView extends AppCompatImageView {
                 activePointerId = event.getPointerId(0);
                 lastTouchX = event.getX();
                 lastTouchY = event.getY();
+                downX = lastTouchX;
+                downY = lastTouchY;
                 isTwoFingerGesture = false;
-                isCurrentGestureConsumable = true; // Reset on new touch
+
+                isGestureLockedToChild = false;
+                isGestureDirectionDetermined = false;
+
+                // Initially block parent from intercepting so we can measure the first few moves
+                getParent().requestDisallowInterceptTouchEvent(true);
                 break;
             }
 
             case MotionEvent.ACTION_POINTER_DOWN: {
                 stopFling(); // Stop fling on multi-touch
                 isTwoFingerGesture = true;
-                isCurrentGestureConsumable = true; // 2-finger gestures are always consumed
+                isGestureLockedToChild = true; // Multi-touch is always consumed by us
+                isGestureDirectionDetermined = true;
+
                 float x0 = event.getX(0), y0 = event.getY(0);
                 float x1 = event.getX(1), y1 = event.getY(1);
 
@@ -339,7 +354,7 @@ public class GestureImageView extends AppCompatImageView {
 
                     clampPan();
                     updateMatrix();
-                    isCurrentGestureConsumable = true;
+                    isGestureLockedToChild = true;
                 } else if (!isTwoFingerGesture && activePointerId != -1) {
                     int pointerIndex = event.findPointerIndex(activePointerId);
                     if (pointerIndex != -1) {
@@ -349,25 +364,54 @@ public class GestureImageView extends AppCompatImageView {
                         float dx = x - lastTouchX;
                         float dy = y - lastTouchY;
 
+                        float totalDx = x - downX;
+                        float totalDy = y - downY;
+
                         // Determine if we can pan in the direction of the gesture
-                        if (Math.abs(dx) > Math.abs(dy)) {
-                            // Horizontal dominant swipe
-                            isCurrentGestureConsumable = (dx < 0) ? canScrollHorizontally(1) : canScrollHorizontally(-1);
-                        } else if (Math.abs(dy) > 0) {
-                            // Vertical dominant swipe
-                            isCurrentGestureConsumable = (dy < 0) ? canScrollVertically(1) : canScrollVertically(-1);
-                        } else {
-                            isCurrentGestureConsumable = true;
+                        // Determine gesture direction ONLY ONCE after moving past touch slop
+                        if (!isGestureDirectionDetermined) {
+                            if (Math.abs(totalDx) > touchSlop || Math.abs(totalDy) > touchSlop) {
+                                isGestureDirectionDetermined = true;
+
+                                boolean isZoomedOrRotated = (zoom > 1.01f || Math.abs(currentAngle % 360) > 5f);
+
+                                if (!isZoomedOrRotated) {
+                                    isGestureLockedToChild = false; // Let RecyclerView handle page swipe
+                                } else {
+                                    if (Math.abs(totalDx) > Math.abs(totalDy)) {
+                                        // Horizontal dominant swipe
+                                        boolean canScroll = (totalDx < 0) ? canScrollHorizontally(1) : canScrollHorizontally(-1);
+                                        isGestureLockedToChild = canScroll;
+                                    } else {
+                                        // Vertical dominant swipe
+                                        // Vertical swipe - always allow panning if zoomed/rotated
+                                        isGestureLockedToChild = true;
+                                    }
+                                }
+                            }
                         }
 
-                        panX += dx;
-                        panY += dy;
+                        // Only pan the image if we locked the gesture to this view
+                        if (isGestureLockedToChild) {
+                            panX += dx;
+                            panY += dy;
+                            clampPan();
+                            updateMatrix();
+                        }
+
                         lastTouchX = x;
                         lastTouchY = y;
-
-                        clampPan();
-                        updateMatrix();
                     }
+                }
+
+                // Handle RecyclerView Swiping vs Panning
+                // Apply the lock state to the parent
+                if (!isGestureDirectionDetermined) {
+                    getParent().requestDisallowInterceptTouchEvent(true);
+                } else {
+                    // Only consume the event if we are locked to the child (zoomed/rotated AND allowed to pan)
+                    // Give control back to RecyclerView so it can swipe to the next/prev page otherwise
+                    getParent().requestDisallowInterceptTouchEvent(isGestureLockedToChild || isTwoFingerGesture);
                 }
                 break;
             }
@@ -384,11 +428,16 @@ public class GestureImageView extends AppCompatImageView {
                     float vy = velocityTracker.getYVelocity(activePointerId);
 
                     if (Math.abs(vx) > MIN_FLING_VELOCITY || Math.abs(vy) > MIN_FLING_VELOCITY) {
-                        startFling(vx, vy);
+                        // Only fling if we were actually panning the image
+                        if (isGestureLockedToChild) {
+                            startFling(vx, vy);
+                        }
                     }
                 }
                 activePointerId = -1;
                 velocityTracker.clear();
+                isGestureLockedToChild = false;
+                isGestureDirectionDetermined = false;
                 break;
             }
 
@@ -410,20 +459,10 @@ public class GestureImageView extends AppCompatImageView {
                 if (isTwoFingerGesture && event.getPointerCount() == 2) {
                     isTwoFingerGesture = false;
                     snapToNearestRightAngle();
+                    // Keep isGestureLockedToChild = true since it was a multi-touch gesture
                 }
                 break;
             }
-        }
-
-        // Handle RecyclerView Swiping vs Panning
-        boolean isZoomedOrRotated = (zoom > 1.01f || Math.abs(currentAngle % 360) > 5f);
-
-        // Only consume the event if zoomed/rotated AND we are allowed to pan in the current swipe direction
-        if (isZoomedOrRotated && isCurrentGestureConsumable) {
-            getParent().requestDisallowInterceptTouchEvent(true);
-        } else {
-            // Give control back to RecyclerView so it can swipe to the next/prev page
-            getParent().requestDisallowInterceptTouchEvent(false);
         }
 
         return true;
