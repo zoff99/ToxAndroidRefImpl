@@ -61,6 +61,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.add_quote_group_message_text;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_if_incoming_file_was_exported;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.try_to_share_incoming_encrypted_file;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
@@ -71,6 +72,7 @@ import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.string_is_in_list;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
@@ -643,7 +645,14 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         {
             ft_export_button_container.setVisibility(View.VISIBLE);
             ft_export_button.setVisibility(View.VISIBLE);
-            ft_share_button.setVisibility(View.GONE);
+            if (PREF__allow_open_encrypted_file_via_intent)
+            {
+                ft_share_button.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                ft_share_button.setVisibility(View.GONE);
+            }
             ft_export_button.setImageResource(android.R.drawable.ic_menu_save);
         }
         catch(Exception e)
@@ -896,6 +905,25 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         {
 
         }
+
+        ft_share_button.setOnTouchListener(new View.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                if (event.getAction() == MotionEvent.ACTION_UP)
+                {
+                    try
+                    {
+                        try_to_share_incoming_encrypted_file(message_, v.getContext());
+                    }
+                    catch (Exception ignored)
+                    {
+                    }
+                }
+                return true;
+            }
+        });
 
         imageView.setVisibility(View.VISIBLE);
 

@@ -23,11 +23,12 @@ import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
 import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
 import com.zoffcc.applications.sorm.FileDB;
 import com.zoffcc.applications.sorm.Filetransfer;
@@ -42,7 +43,6 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Random;
-import java.util.concurrent.ExecutionException;
 
 import androidx.core.content.FileProvider;
 
@@ -57,6 +57,7 @@ import static com.zoffcc.applications.trifa.HelperMessage.set_message_state_from
 import static com.zoffcc.applications.trifa.HelperMessage.update_message_in_db_filetransfer_kind;
 import static com.zoffcc.applications.trifa.HelperMessage.update_single_message_from_messge_id;
 import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_all_upto;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_image;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__auto_accept_video;
@@ -1302,6 +1303,190 @@ public class HelperFiletransfer
         {
             e.printStackTrace();
             Log.i(TAG, "save_group_incoming_file:EE");
+        }
+    }
+
+    /**
+     * Safely attempts to share an INCOMING file from either a Message or GroupMessage.
+     * This method is strictly for incoming files stored in the TRIfA encrypted VFS (IOCipher).
+     * It does NOT fall back to standard file:// or content:// URIs.
+     *
+     * This method is heavily guarded with try-catch blocks to prevent any crashes
+     * from missing files, invalid URIs, missing content providers, or null contexts.
+     *
+     * @param msgObj  The message object (can be com.zoffcc.applications.sorm.Message or GroupMessage)
+     * @param context The context used to start the share intent and resolve MIME types
+     */
+    public static void try_to_share_incoming_encrypted_file(Object msgObj, android.content.Context context)
+    {
+        if (!PREF__allow_open_encrypted_file_via_intent)
+        {
+            return;
+        }
+
+        // ULTIMATE WRAPPER: Guarantees this method will NEVER crash the app
+        try
+        {
+            // 1. Validate context
+            if (context == null)
+            {
+                Log.e(TAG, "ShareFile: Context is null, cannot share file.");
+                return;
+            }
+
+            // 2. Extract fields safely using instanceof since Message and GroupMessage
+            // do not share a common interface for these fields.
+            String filename_fullpath = null;
+            int direction = -1;
+
+            try
+            {
+                if (msgObj instanceof Message m)
+                {
+                    filename_fullpath = m.filename_fullpath;
+                    direction = m.direction;
+                }
+                else if (msgObj instanceof com.zoffcc.applications.sorm.GroupMessage gm)
+                {
+                    filename_fullpath = gm.filename_fullpath;
+                    direction = gm.direction;
+                }
+                else
+                {
+                    Log.e(TAG, "ShareFile: Unknown message object type: "
+                               + (msgObj != null ? msgObj.getClass().getName() : "null"));
+                    return;
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "ShareFile: Error extracting fields from message object", e);
+                return;
+            }
+
+            // 3. Validate that we actually have a path
+            if (filename_fullpath == null || filename_fullpath.isEmpty())
+            {
+                Log.e(TAG, "ShareFile: filename_fullpath is null or empty.");
+                Toast.makeText(context, "File path is missing.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            android.net.Uri shareUri = null;
+            String mimeType = "application/octet-stream"; // Safe default fallback
+
+            // 4. Build the Share URI strictly for INCOMING VFS files
+            try
+            {
+                // Since these holders are strictly for INCOMING files, they are stored in the
+                // encrypted IOCipher VFS. We MUST prepend the IOCipher Content Provider URI.
+                // We do NOT fall back to standard file:// or content:// URIs for incoming files.
+                String vfsUriString = IOCipherContentProvider.FILES_URI + filename_fullpath;
+                shareUri = android.net.Uri.parse(vfsUriString);
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "ShareFile: Failed to parse VFS URI", e);
+            }
+
+            // 5. If we failed to build a URI, abort
+            if (shareUri == null)
+            {
+                Toast.makeText(context, "Cannot share: Invalid VFS file URI.", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // 6. Attempt to detect MIME type
+            try
+            {
+                // First, try to get it from the ContentResolver (works for our IOCipher content:// URIs)
+                String resolvedType = context.getContentResolver().getType(shareUri);
+                if (resolvedType != null && !resolvedType.isEmpty())
+                {
+                    mimeType = resolvedType;
+                }
+                else
+                {
+                    // Fallback: extract extension from the filename
+                    String fileName = filename_fullpath;
+                    int lastSlash = Math.max(fileName.lastIndexOf('/'), fileName.lastIndexOf('\\'));
+                    if (lastSlash >= 0) fileName = fileName.substring(lastSlash + 1);
+
+                    int lastDotIndex = fileName.lastIndexOf('.');
+                    if (lastDotIndex > 0)
+                    {
+                        String ext = fileName.substring(lastDotIndex + 1).toLowerCase();
+                        android.webkit.MimeTypeMap myMime = android.webkit.MimeTypeMap.getSingleton();
+                        String detectedMimeType = myMime.getMimeTypeFromExtension(ext);
+                        if (detectedMimeType != null)
+                        {
+                            mimeType = detectedMimeType;
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "ShareFile: Error detecting MIME type, using fallback.", e);
+                // mimeType remains "application/octet-stream"
+            }
+
+            // 7. Build the Share Intent
+            android.content.Intent shareIntent = new android.content.Intent(android.content.Intent.ACTION_SEND);
+            shareIntent.setType(mimeType);
+            shareIntent.putExtra(android.content.Intent.EXTRA_STREAM, shareUri);
+
+            // Explicitly set ClipData so system UI (Android 10+) can read the URI
+            try
+            {
+                shareIntent.setClipData(android.content.ClipData.newRawUri("", shareUri));
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "ShareFile: Failed to set ClipData", e);
+            }
+
+            // Grant read permission to the receiving app
+            shareIntent.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+            // 8. Create and launch the Chooser
+            try
+            {
+                android.content.Intent chooser = android.content.Intent.createChooser(shareIntent, "Share File");
+                // Also grant permission to the chooser itself to ensure smooth handoff
+                chooser.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                // Ensure we start it as a new task if context is not an Activity
+                if (!(context instanceof android.app.Activity))
+                {
+                    chooser.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
+
+                context.startActivity(chooser);
+            }
+            catch (android.content.ActivityNotFoundException e)
+            {
+                Log.e(TAG, "ShareFile: No app found to handle share intent.", e);
+                Toast.makeText(context, "No app available to share this file.", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e)
+            {
+                Log.e(TAG, "ShareFile: Failed to start share chooser.", e);
+                Toast.makeText(context, "Error sharing file.", Toast.LENGTH_SHORT).show();
+            }
+        }
+        catch (Exception e)
+        {
+            // Ultimate fallback catch to guarantee this method NEVER crashes the app
+            Log.e(TAG, "ShareFile: CRITICAL: Unhandled exception in try_to_share_file", e);
+            try
+            {
+                if (context != null)
+                {
+                    Toast.makeText(context, "Critical error sharing file.", Toast.LENGTH_SHORT).show();
+                }
+            }
+            catch (Exception ignored) {}
         }
     }
 }

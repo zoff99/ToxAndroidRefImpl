@@ -62,6 +62,7 @@ import me.jagar.chatvoiceplayerlibrary.vVoicePlayerView;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_if_incoming_file_was_exported;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.open_local_file;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.share_local_file;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.try_to_share_incoming_encrypted_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
@@ -549,7 +550,14 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             else
             {
                 ft_export_button.setImageResource(android.R.drawable.ic_menu_set_as);
+            }
+            if (PREF__allow_open_encrypted_file_via_intent)
+            {
                 ft_share_button.setVisibility(View.VISIBLE);
+            }
+            else
+            {
+                ft_share_button.setVisibility(View.GONE);
             }
 
             ft_export_button.setOnTouchListener(new View.OnTouchListener()
@@ -641,7 +649,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                     {
                         try
                         {
-                            try_to_share_file(message2, export_filename_with_path, v.getContext());
+                            try_to_share_incoming_encrypted_file(message2, v.getContext());
                         }
                         catch (Exception ignored)
                         {
@@ -657,14 +665,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
         HelperGeneric.fill_friend_avatar_icon(m, context, img_avatar);
         HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
-    }
-
-    public void try_to_share_file(Message message2, String export_filename_with_path, final Context c)
-    {
-        if (export_filename_with_path != null)
-        {
-            share_local_file(export_filename_with_path, c);
-        }
     }
 
     public void try_to_open_file(Message message2, String export_filename_with_path)
