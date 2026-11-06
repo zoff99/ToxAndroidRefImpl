@@ -77,7 +77,7 @@ jobs:
              cd /home/runner/work
              du -s *|sort -n
 
-      - name: Load the vcan module
+      - name: install deps for fake webcam
         run: |
           kernel="$(uname -r)"
           if (( ${kernel%%.*} < 7 )); then
