@@ -26,12 +26,14 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
 import com.zoffcc.applications.sorm.FileDB;
 import com.zoffcc.applications.sorm.Filetransfer;
+import com.zoffcc.applications.sorm.GroupMessage;
 import com.zoffcc.applications.sorm.Message;
 import com.zoffcc.applications.trifa.MessageListActivity.outgoing_file_wrapped;
 
@@ -86,6 +88,7 @@ import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_
 import static com.zoffcc.applications.trifa.ToxVars.TOX_FILE_KIND.TOX_FILE_KIND_FTV2;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
+/** @noinspection ExtractMethodRecommender*/
 public class HelperFiletransfer
 {
     private static final String TAG = "trifa.Hlp.Filetransfer";
@@ -1487,6 +1490,233 @@ public class HelperFiletransfer
                 }
             }
             catch (Exception ignored) {}
+        }
+    }
+
+    /**
+     * Safely attempts to open an INCOMING file from either a Message or GroupMessage using an external app.
+     * This method is strictly for incoming files stored in the TRIfA encrypted VFS (IOCipher).
+     * It sets up the touch listener on the provided view and shows a confirmation dialog before launching the external viewer.
+     *
+     * Heavily guarded with try-catch blocks to prevent any crashes from missing files,
+     * invalid URIs, missing apps, or bad contexts.
+     *
+     * @param msgObj         The message object (can be com.zoffcc.applications.sorm.Message or GroupMessage)
+     * @param ft_preview_image The view to attach the OnTouchListener to
+     */
+    public static void try_to_open_incoming_encrypted_file(final Object msgObj, final View ft_preview_image)
+    {
+        if (PREF__allow_open_encrypted_file_via_intent)
+        {
+            ft_preview_image.setOnTouchListener(new View.OnTouchListener()
+            {
+                @Override
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    if (event.getAction() == MotionEvent.ACTION_UP)
+                    {
+                        // CRITICAL: Call performClick to satisfy Android Lint and ensure Accessibility services work
+                        v.performClick();
+
+                        try
+                        {
+                            final Context context = v.getContext();
+
+                            // 1. Validate context
+                            if (context == null)
+                            {
+                                Log.e(TAG, "OpenFile: Context is null, cannot open file.");
+                                return true;
+                            }
+
+                            // 2. Extract fields safely using instanceof
+                            String filename_fullpath = null;
+
+                            try
+                            {
+                                if (msgObj instanceof com.zoffcc.applications.sorm.Message)
+                                {
+                                    filename_fullpath = ((com.zoffcc.applications.sorm.Message) msgObj).filename_fullpath;
+                                }
+                                else if (msgObj instanceof com.zoffcc.applications.sorm.GroupMessage)
+                                {
+                                    filename_fullpath = ((com.zoffcc.applications.sorm.GroupMessage) msgObj).filename_fullpath;
+                                }
+                                else
+                                {
+                                    Log.e(TAG, "OpenFile: Unknown message object type.");
+                                    return true;
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Log.e(TAG, "OpenFile: Error extracting fields from message object", e);
+                                return true;
+                            }
+
+                            // 3. Validate that we actually have a path
+                            if (filename_fullpath == null || filename_fullpath.isEmpty())
+                            {
+                                Toast.makeText(context, "File path is missing.", Toast.LENGTH_SHORT).show();
+                                return true;
+                            }
+
+                            // 4. Build the VFS URI strictly for INCOMING files
+                            final android.net.Uri uri;
+                            try
+                            {
+                                String baseUriStr = IOCipherContentProvider.FILES_URI.toString();
+                                if (!baseUriStr.endsWith("/")) {
+                                    baseUriStr += "/";
+                                }
+
+                                String pathStr = filename_fullpath;
+                                if (pathStr.startsWith("/")) {
+                                    pathStr = pathStr.substring(1);
+                                }
+
+                                // CRITICAL FIX: Remove ANY double slashes inside the path itself
+                                pathStr = pathStr.replaceAll("/+", "/");
+
+                                String finalUriStr = baseUriStr + pathStr;
+                                uri = android.net.Uri.parse(finalUriStr);
+                            }
+                            catch (Exception e)
+                            {
+                                Log.e(TAG, "OpenFile: Failed to build clean VFS URI", e);
+                                Toast.makeText(context, "Invalid file URI.", Toast.LENGTH_SHORT).show();
+                                return true;
+                            }
+
+                            // 5. Extract clean filename for the Dialog title
+                            String filename_without_path = filename_fullpath;
+                            try
+                            {
+                                int lastSlash = Math.max(filename_fullpath.lastIndexOf('/'), filename_fullpath.lastIndexOf('\\'));
+                                if (lastSlash >= 0 && lastSlash < filename_fullpath.length() - 1)
+                                {
+                                    filename_without_path = filename_fullpath.substring(lastSlash + 1);
+                                }
+                            }
+                            catch (Exception ignored) {}
+
+                            // 6. Detect MIME type so the system knows which app to open
+                            String mimeType = "application/octet-stream";
+                            try
+                            {
+                                String resolvedType = context.getContentResolver().getType(uri);
+                                if (resolvedType != null && !resolvedType.isEmpty())
+                                {
+                                    mimeType = resolvedType;
+                                }
+                                else
+                                {
+                                    int lastDotIndex = filename_without_path.lastIndexOf('.');
+                                    if (lastDotIndex > 0)
+                                    {
+                                        String ext = filename_without_path.substring(lastDotIndex + 1).toLowerCase();
+                                        android.webkit.MimeTypeMap myMime = android.webkit.MimeTypeMap.getSingleton();
+                                        String detectedMimeType = myMime.getMimeTypeFromExtension(ext);
+                                        if (detectedMimeType != null) mimeType = detectedMimeType;
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                Log.e(TAG, "OpenFile: Error detecting MIME type, using fallback.", e);
+                            }
+
+                            final String finalMimeType = mimeType;
+                            final String finalFilename = filename_without_path;
+
+                            // 7. Show confirmation dialog before opening
+                            try
+                            {
+                                new android.app.AlertDialog.Builder(context)
+                                        .setIcon(android.R.drawable.ic_menu_view) // Safe standard icon
+                                        .setTitle(finalFilename)
+                                        .setNeutralButton("View", new android.content.DialogInterface.OnClickListener()
+                                        {
+                                            @Override
+                                            public void onClick(android.content.DialogInterface dialog, int which)
+                                            {
+                                                try
+                                                {
+                                                    android.content.Intent viewIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+                                                    viewIntent.setDataAndType(uri, finalMimeType);
+                                                    viewIntent.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                                                    // CRITICAL FIX: Attach ClipData so permissions are granted reliably
+                                                    viewIntent.setClipData(android.content.ClipData.newRawUri("", uri));
+
+                                                    // Ensure we start it as a new task if context is not an Activity
+                                                    if (!(context instanceof android.app.Activity))
+                                                    {
+                                                        viewIntent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                                                    }
+
+                                                    // Let the Android system handle the resolution natively.
+                                                    // If a default app is set, it opens directly. If multiple apps exist,
+                                                    // the system shows the native "Open with" dialog (with "Just once" / "Always").
+                                                    context.startActivity(viewIntent);
+                                                }
+                                                catch (android.content.ActivityNotFoundException e)
+                                                {
+                                                    Toast.makeText(context, "No app found to open this file type.",
+                                                                   Toast.LENGTH_LONG).show();
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    Log.e(TAG, "OpenFile: Failed to start view intent", e);
+                                                    Toast.makeText(context, "Error opening file.",
+                                                                   Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        })
+                                        .setNegativeButton("Cancel", null)
+                                        .show();
+                            }
+                            catch (Exception e)
+                            {
+                                // Fallback: If AlertDialog fails (e.g., bad context window token), try to open directly
+                                Log.e(TAG, "OpenFile: Dialog failed, attempting direct open.", e);
+                                try
+                                {
+                                    android.content.Intent viewIntent = new android.content.Intent(android.content.Intent.ACTION_VIEW);
+                                    viewIntent.setDataAndType(uri, finalMimeType);
+                                    viewIntent.addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                                    viewIntent.setClipData(android.content.ClipData.newRawUri("", uri));
+
+                                    if (!(context instanceof android.app.Activity))
+                                    {
+                                        viewIntent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    }
+
+                                    context.startActivity(viewIntent);
+                                }
+                                catch (Exception ex)
+                                {
+                                    Toast.makeText(context, "Cannot open file.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            // Ultimate fallback catch to guarantee this method NEVER crashes the app
+                            Log.e(TAG, "OpenFile: CRITICAL: Unhandled exception in try_to_open_file", e);
+                            try
+                            {
+                                if (v.getContext() != null)
+                                {
+                                    Toast.makeText(v.getContext(), "Critical error opening file.", Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                            catch (Exception ignored) {}
+                        }
+                    }
+                    return true;
+                }
+            });
         }
     }
 }

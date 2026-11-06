@@ -61,6 +61,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import static com.zoffcc.applications.trifa.GroupMessageListActivity.add_quote_group_message_text;
 import static com.zoffcc.applications.trifa.GroupMessageListFragment.group_search_messages_text;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_if_incoming_file_was_exported;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.try_to_open_incoming_encrypted_file;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.try_to_share_incoming_encrypted_file;
 import static com.zoffcc.applications.trifa.HelperFriend.add_friend_real;
 import static com.zoffcc.applications.trifa.HelperGeneric.darkenColor;
@@ -787,6 +788,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
                     color(Color.parseColor("#AA000000")).sizeDp(50);
 
             ft_preview_image.setImageDrawable(d4);
+            try_to_open_incoming_encrypted_file(message_, ft_preview_image);
         }
         else if (is_audio) // ---- an audio file ----
         {
@@ -844,6 +846,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
                     color(Color.parseColor("#AA000000")).sizeDp(50);
 
             ft_preview_image.setImageDrawable(d3);
+            try_to_open_incoming_encrypted_file(message_, ft_preview_image);
         }
 
         try

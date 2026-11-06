@@ -22,13 +22,11 @@ package com.zoffcc.applications.trifa;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
@@ -39,7 +37,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -56,12 +53,10 @@ import java.net.URLConnection;
 
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
-import info.guardianproject.iocipher.File;
 import me.jagar.chatvoiceplayerlibrary.vVoicePlayerView;
 
 import static com.zoffcc.applications.trifa.HelperFiletransfer.check_if_incoming_file_was_exported;
-import static com.zoffcc.applications.trifa.HelperFiletransfer.open_local_file;
-import static com.zoffcc.applications.trifa.HelperFiletransfer.share_local_file;
+import static com.zoffcc.applications.trifa.HelperFiletransfer.try_to_open_incoming_encrypted_file;
 import static com.zoffcc.applications.trifa.HelperFiletransfer.try_to_share_incoming_encrypted_file;
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
@@ -455,7 +450,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                                 into(ft_preview_image);
                     }
 
-                    try_to_open_file(message2, export_filename_with_path);
+                    try_to_open_incoming_encrypted_file(message2, ft_preview_image);
                 }
                 catch (Exception e)
                 {
@@ -536,7 +531,7 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                         placeholder(R.drawable.round_loading_animation).
                         into(ft_preview_image);
 
-                try_to_open_file(message2, export_filename_with_path);
+                try_to_open_incoming_encrypted_file(message2, ft_preview_image);
             }
 
             ft_export_button_container.setVisibility(View.VISIBLE);
@@ -665,85 +660,6 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
 
         HelperGeneric.fill_friend_avatar_icon(m, context, img_avatar);
         HelperGeneric.set_avatar_img_height_in_chat(img_avatar);
-    }
-
-    public void try_to_open_file(Message message2, String export_filename_with_path)
-    {
-        if ((PREF__allow_open_encrypted_file_via_intent) && (export_filename_with_path == null))
-        {
-            ft_preview_image.setOnTouchListener(new View.OnTouchListener()
-            {
-                @Override
-                public boolean onTouch(View v, MotionEvent event)
-                {
-                    if (event.getAction() == MotionEvent.ACTION_UP)
-                    {
-                        try
-                        {
-                            final Uri uri = Uri.parse(IOCipherContentProvider.FILES_URI + message2.filename_fullpath);
-
-                            //Log.i(TAG, "view_file:" + IOCipherContentProvider.FILES_URI +
-                            //           message2.filename_fullpath);
-
-                            File file = new File(message2.filename_fullpath);
-                            String filename_without_path = file.getName();
-
-                            new AlertDialog.Builder(v.getContext()).setIcon(R.mipmap.ic_launcher).
-                                    setTitle(filename_without_path).
-                                    setNeutralButton("View", new DialogInterface.OnClickListener()
-                                    {
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which)
-                                        {
-                                            try
-                                            {
-                                                Intent sendIntent = new Intent(Intent.ACTION_VIEW, uri);
-                                                v.getContext().startActivity(sendIntent);
-                                            }
-                                            catch (ActivityNotFoundException e)
-                                            {
-                                                Toast.makeText(context, "Can not handle this file",
-                                                               Toast.LENGTH_LONG).show();
-                                                // Log.e(TAG, "No relevant Activity found", e);
-                                            }
-                                        }
-                                    }).show();
-                        }
-                        catch (Exception e)
-                        {
-                            e.printStackTrace();
-                            Log.i(TAG, "open_attachment_intent:EE:" + e.getMessage());
-                        }
-                    }
-                    else
-                    {
-                    }
-                    return true;
-                }
-            });
-        }
-        else
-        {
-            if (export_filename_with_path == null)
-            {
-                ft_preview_image.setOnTouchListener(null);
-            }
-            else
-            {
-                ft_preview_image.setOnTouchListener(new View.OnTouchListener()
-                {
-                    @Override
-                    public boolean onTouch(View v, MotionEvent event)
-                    {
-                        if (event.getAction() == MotionEvent.ACTION_UP)
-                        {
-                            open_local_file(export_filename_with_path, v.getContext());
-                        }
-                        return true;
-                    }
-                });
-            }
-        }
     }
 
     @Override
