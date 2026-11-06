@@ -84,7 +84,6 @@ jobs:
            sudo apt-get update
             sudo apt-get install --yes "linux-modules-extra-${kernel}"
           fi
-          sudo modprobe vcan
 
       - name: install deps for fake webcam
         run: |
