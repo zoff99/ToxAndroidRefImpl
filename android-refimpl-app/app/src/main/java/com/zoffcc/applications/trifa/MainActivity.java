@@ -4655,9 +4655,9 @@ public class MainActivity extends AppCompatActivity
     // -------- yuv_converter native methods --------
     static native void convertYUVtoRGB_native(byte[] yuvData, int[] rgbOut, int width, int height, int yStride, int uStride, int vStride);
 
-    static native void yv12Rotate90_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight);
-    static native void yv12Rotate180_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight);
-    static native void yv12Rotate270_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight);
+    static native void yv12Rotate90_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight, int yStride, int uStride, int vStride);
+    static native void yv12Rotate180_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight, int yStride, int uStride, int vStride);
+    static native void yv12Rotate270_native(byte[] srcData, byte[] dstData, int imageWidth, int imageHeight, int yStride, int uStride, int vStride);
     // -------- yuv_converter native methods --------
 
 

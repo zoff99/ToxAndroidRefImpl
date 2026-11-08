@@ -65,6 +65,10 @@ public class CameraWrapper
     private CameraPreviewCallback mCameraPreviewCallback;
     // private byte[] mImageCallbackBuffer = new byte[(CameraWrapper.IMAGE_WIDTH * CameraWrapper.IMAGE_HEIGHT) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2)) + ((CameraWrapper.IMAGE_WIDTH / 2) * (CameraWrapper.IMAGE_HEIGHT / 2))];
     static Camera.Size camera_preview_size2 = null;
+    // FIX: Store actual hardware strides independently per plane
+    static int camera_y_stride = 0;
+    static int camera_u_stride = 0;
+    static int camera_v_stride = 0;
     int video_send_res = 0;
     boolean use_frame = true;
     static long camera_preview_call_back_ts_first_frame = -1;
@@ -624,6 +628,11 @@ public class CameraWrapper
                         }
                         else
                         {
+                            // FIX: Retrieve stored independent strides for all rotation calls
+                            int ys = camera_y_stride;
+                            int us = camera_u_stride;
+                            int vs = camera_v_stride;
+
                             if (CameraWrapper.camera_video_rotate_angle == 90)
                             {
                                 if (PREF__camera_get_preview_format.equals("YV12"))
@@ -636,8 +645,9 @@ public class CameraWrapper
                                     {
                                         data_new = new byte[data.length];
                                     }
+                                    // FIX: Pass independent strides to native rotation
                                     data_new = YV12rotate90(data, data_new, camera_preview_size2.width,
-                                                            camera_preview_size2.height);
+                                                            camera_preview_size2.height, ys, us, vs);
                                 }
                                 else
                                 {
@@ -649,8 +659,9 @@ public class CameraWrapper
                                     {
                                         data_new = new byte[data.length];
                                     }
+                                    // FIX: Pass yStride to NV21 rotation
                                     data_new = NV21rotate90(data, data_new, camera_preview_size2.width,
-                                                            camera_preview_size2.height);
+                                                            camera_preview_size2.height, ys);
                                 }
 
                                 MainActivity.video_buffer_2.rewind();
@@ -695,8 +706,9 @@ public class CameraWrapper
                                     {
                                         data_new = new byte[data.length];
                                     }
+                                    // FIX: Pass independent strides to native rotation
                                     data_new = YV12rotate270(data, data_new, camera_preview_size2.width,
-                                                             camera_preview_size2.height);
+                                                             camera_preview_size2.height, ys, us, vs);
                                 }
                                 else
                                 {
@@ -708,8 +720,9 @@ public class CameraWrapper
                                     {
                                         data_new = new byte[data.length];
                                     }
+                                    // FIX: Pass yStride to NV21 rotation
                                     data_new = NV21rotate270(data, data_new, camera_preview_size2.width,
-                                                             camera_preview_size2.height);
+                                                             camera_preview_size2.height, ys);
                                 }
 
                                 MainActivity.video_buffer_2.rewind();
@@ -752,8 +765,9 @@ public class CameraWrapper
                                     {
                                         data_new = new byte[data.length];
                                     }
+                                    // FIX: Pass independent strides to native rotation
                                     data_new = YV12rotate180(data, data_new, camera_preview_size2.width,
-                                                             camera_preview_size2.height);
+                                                             camera_preview_size2.height, ys, us, vs);
                                 }
                                 else
                                 {
@@ -765,8 +779,9 @@ public class CameraWrapper
                                     {
                                         data_new = new byte[data.length];
                                     }
+                                    // FIX: Pass yStride to NV21 rotation
                                     data_new = NV21rotate180(data, data_new, camera_preview_size2.width,
-                                                             camera_preview_size2.height);
+                                                             camera_preview_size2.height, ys);
                                 }
 
 
@@ -990,48 +1005,41 @@ public class CameraWrapper
                         Log.i(TAG, "onPreviewFrame:ImageFormat.NV21=" + ImageFormat.NV21);
                         Log.i(TAG, "onPreviewFrame:actual_preview_format=" + actual_preview_format);
                         Log.i(TAG, "onPreviewFrame:buffer size=" + data.length);
-                        int stride = (int) Math.ceil(camera_preview_size2.width / 16.0) * 16;
-                        int y_size = stride * camera_preview_size2.height;
-                        int c_stride = (int) Math.ceil((stride / 2) / 16.0) * 16;
-                        int c_size = c_stride * camera_preview_size2.height / 2;
-                        int size = y_size + c_size * 2;
-                        int cr_offset = y_size;
-                        int cb_offset = y_size + c_size;
-                        Log.i(TAG, "onPreviewFrame:stride=" + stride);
-                        Log.i(TAG, "onPreviewFrame:y_size=" + y_size);
-                        Log.i(TAG, "onPreviewFrame:c_stride=" + c_stride);
-                        Log.i(TAG, "onPreviewFrame:c_size=" + c_size);
-                        Log.i(TAG, "onPreviewFrame:size=" + size);
-                        Log.i(TAG, "onPreviewFrame:cr_offset=" + cr_offset);
-                        Log.i(TAG, "onPreviewFrame:cb_offset=" + cb_offset);
+
+                        // FIX: Camera1 delivers TIGHTLY PACKED data (no hardware stride padding).
+                        // Y stride = width, U stride = width/2, V stride = width/2.
+                        // Do NOT use ceil(width/16)*16 — that is for hardware buffers, not callback data.
+                        int yStride = camera_preview_size2.width;
+                        int uStride = (camera_preview_size2.width + 1) / 2;  // round up for odd widths
+                        int vStride = (camera_preview_size2.width + 1) / 2;
+
+                        int y_size = yStride * camera_preview_size2.height;
+                        int u_size = uStride * (camera_preview_size2.height / 2);
+                        int v_size = vStride * (camera_preview_size2.height / 2);
+                        int total_size = y_size + u_size + v_size;
+
+                        Log.i(TAG, "onPreviewFrame:yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride);
+                        Log.i(TAG, "onPreviewFrame:y_size=" + y_size + " u_size=" + u_size + " v_size=" + v_size);
+                        Log.i(TAG, "onPreviewFrame:total_size=" + total_size + " data.length=" + data.length);
+
+                        // Store strides for use by rotation functions
+                        camera_y_stride = yStride;
+                        camera_u_stride = uStride;
+                        camera_v_stride = vStride;
 
                         if (MainActivity.video_buffer_2 != null)
                         {
-                            // video_buffer_2.clear();
                             MainActivity.video_buffer_2 = null;
                         }
 
-                        /*
-                         * YUV420 frame with width * height
-                         *
-                         * @param y Luminosity plane. Size = MAX(width, abs(ystride)) * height.
-                         * @param u U chroma plane. Size = MAX(width/2, abs(ustride)) * (height/2).
-                         * @param v V chroma plane. Size = MAX(width/2, abs(vstride)) * (height/2).
-                         */
-                        int y_layer_size = y_size; // (int) camera_preview_size2.width * camera_preview_size2.height;
-                        int u_layer_size = c_size;// (int) (camera_preview_size2.width / 2) * (camera_preview_size2.height / 2);
-                        int v_layer_size = c_size;// (int) (camera_preview_size2.width / 2) * (camera_preview_size2.height / 2);
-                        int frame_width_px = (int) camera_preview_size2.width;
-                        int frame_height_px = (int) camera_preview_size2.height;
-                        int buffer_size_in_bytes2 = y_layer_size + v_layer_size + u_layer_size;
-                        Log.i(TAG, "onPreviewFrame:YUV420 frame w1=" + camera_preview_size2.width + " h1=" +
-                                   camera_preview_size2.height + " bytes=" + buffer_size_in_bytes2);
-                        Log.i(TAG,
-                              "onPreviewFrame:YUV420 frame w=" + frame_width_px + " h=" + frame_height_px + " bytes=" +
-                              buffer_size_in_bytes2);
+                        int frame_width_px = camera_preview_size2.width;
+                        int frame_height_px = camera_preview_size2.height;
+                        int buffer_size_in_bytes2 = total_size;
+                        Log.i(TAG, "onPreviewFrame:YUV420 frame w=" + frame_width_px + " h=" + frame_height_px +
+                                   " bytes=" + buffer_size_in_bytes2);
+
                         MainActivity.video_buffer_2 = ByteBuffer.allocateDirect((2 * buffer_size_in_bytes2) + 1);
-                        MainActivity.set_JNI_video_buffer2(MainActivity.video_buffer_2, camera_preview_size2.width,
-                                                           camera_preview_size2.height);
+                        MainActivity.set_JNI_video_buffer2(MainActivity.video_buffer_2, frame_width_px, frame_height_px);
                     }
                     catch (Exception e2)
                     {
@@ -1057,82 +1065,47 @@ public class CameraWrapper
         }
     }
 
-    public static byte[] NV21rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    // FIX: Output is tightly packed with stride = imageHeight (rotated width)
+    public static byte[] NV21rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight, int inputStride)
     {
-        // Rotate the Y luma
+        // After 90° CW: output is imageHeight × imageWidth, tightly packed
+        int outW = imageHeight;
+        int outH = imageWidth;
+
+        // Rotate the Y luma: read with inputStride, write tightly packed
         int i = 0;
         for (int x = 0; x < imageWidth; x++)
         {
             for (int y = imageHeight - 1; y >= 0; y--)
             {
-                output[i++] = data[y * imageWidth + x];
+                output[i++] = data[y * inputStride + x];
             }
         }
-        // Rotate the U and V color components
-        int size = imageWidth * imageHeight;
-        i = size * 3 / 2 - 1;
+
+        // Rotate the U and V color components (NV21 = interleaved VUVU)
+        int yInPlaneSize = inputStride * imageHeight;
+        int halfW = imageWidth / 2;
+        int halfH = imageHeight / 2;
+        // Output UV starts after tightly-packed Y plane (outW * outH bytes)
+        i = outW * outH + (outW * outH / 2) - 1;
         for (int x = imageWidth - 1; x > 0; x = x - 2)
         {
-            for (int y = 0; y < imageHeight / 2; y++)
+            for (int y = 0; y < halfH; y++)
             {
-                output[i--] = data[size + (y * imageWidth) + x];
-                output[i--] = data[size + (y * imageWidth) + (x - 1)];
+                output[i--] = data[yInPlaneSize + (y * inputStride) + x];
+                output[i--] = data[yInPlaneSize + (y * inputStride) + (x - 1)];
             }
         }
         return output;
     }
 
-    public static byte[] YUV420flipHorizontal(byte[] data, int imageWidth, int imageHeight)
-    {
-        // TODO: optimize me, make me faster!
-
-        // Flip the Y luma
-        byte tmp = 0;
-        int x2 = 0;
-        int temp2 = 0;
-        for (int x = 0; x < (imageWidth / 2); x++)
-        {
-            x2 = imageWidth - x - 1;
-            for (int y = 0; y < imageHeight; y++)
-            {
-                temp2 = y * imageWidth;
-                tmp = data[temp2 + x];
-                data[temp2 + x] = data[temp2 + x2];
-                data[temp2 + x2] = tmp;
-            }
-        }
-
-        // Flip the U and V color components
-        tmp = 0;
-        x2 = 0;
-        temp2 = 0;
-        int y_size = imageWidth * imageHeight;
-        int yu_size = y_size + (y_size / 4);
-        int uv_width = imageWidth / 2;
-        int uv_height = imageHeight / 2;
-        for (int x = 0; x < (uv_width / 2); x++)
-        {
-            x2 = uv_width - x - 1;
-            for (int y = 0; y < uv_height; y++)
-            {
-                // U layer
-                temp2 = y * uv_width;
-                tmp = data[y_size + temp2 + x];
-                data[y_size + temp2 + x] = data[y_size + temp2 + x2];
-                data[y_size + temp2 + x2] = tmp;
-                // V layer
-                temp2 = y * uv_width;
-                tmp = data[yu_size + temp2 + x];
-                data[yu_size + temp2 + x] = data[yu_size + temp2 + x2];
-                data[yu_size + temp2 + x2] = tmp;
-            }
-        }
-
-        return data;
-    }
-
+    // FIX: Output is tightly packed with stride = imageHeight (rotated width)
     public static byte[] YUV420rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
+        // After 90° CW: output is imageHeight × imageWidth, tightly packed
+        int outW = imageHeight;
+        int outH = imageWidth;
+
         // Rotate the Y luma
         int i = 0;
         for (int x = 0; x < imageWidth; x++)
@@ -1145,9 +1118,9 @@ public class CameraWrapper
 
         // Rotate the U and V color components
         int size = imageWidth * imageHeight;
-        i = size;
+        int outSize = outW * outH;
+        int uv = outSize / 4;
         int j = size;
-        int uv = size / 4;
         for (int x = 0; x < (imageWidth / 2); x++)
         {
             for (int y = (imageHeight / 2) - 1; y >= 0; y--)
@@ -1155,217 +1128,95 @@ public class CameraWrapper
                 try
                 {
                     output[i] = data[j + (y * (imageWidth / 2) + x)];
-                    output[i + uv] = data[j + uv + (y * (imageWidth / 2) + x)];
+                    output[i + uv] = data[j + (imageWidth * imageHeight / 4) + (y * (imageWidth / 2) + x)];
                 }
-                catch (Exception e)
-                {
-                    //Log.i(TAG, "iiiiiii:i=" + i + " j=" + j + " uv=" + uv + " y=" + y + " x=" + x + " imageWidth=" +
-                    //           imageWidth);
-                    //e.printStackTrace();
-                }
+                catch (Exception e) {}
                 i++;
             }
         }
         return output;
     }
 
-    public static byte[] NV21rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    // FIX: Output is tightly packed with stride = imageWidth (dimensions unchanged)
+    public static byte[] NV21rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight, int inputStride)
     {
+        // 180°: dimensions unchanged, output tightly packed with stride = imageWidth
         int count = 0;
-        for (int i = imageWidth * imageHeight - 1; i >= 0; i--)
+        int yInPlaneSize = inputStride * imageHeight;
+        for (int y = imageHeight - 1; y >= 0; y--)
         {
-            output[count] = data[i];
-            count++;
+            int srcRow = y * inputStride;
+            for (int x = imageWidth - 1; x >= 0; x--)
+            {
+                output[count++] = data[srcRow + x];
+            }
         }
-        for (int i = imageWidth * imageHeight * 3 / 2 - 1; i >= imageWidth * imageHeight; i -= 2)
+        // UV plane: input UV starts at yInPlaneSize, read with inputStride
+        for (int y = (imageHeight / 2) - 1; y >= 0; y--)
         {
-            output[count++] = data[i - 1];
-            output[count++] = data[i];
+            int srcUVRow = yInPlaneSize + y * inputStride;
+            for (int x = imageWidth - 1; x > 0; x -= 2)
+            {
+                output[count++] = data[srcUVRow + x - 1];
+                output[count++] = data[srcUVRow + x];
+            }
         }
         return output;
     }
 
-    public static byte[] NV21rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    // FIX: Output is tightly packed with stride = imageHeight (rotated width)
+    public static byte[] NV21rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight, int inputStride)
     {
-        // Rotate the Y luma
+        // After 270° CW: output is imageHeight × imageWidth, tightly packed
+        int outW = imageHeight;
+        int outH = imageWidth;
+
+        // Rotate the Y luma: read with inputStride, write tightly packed
         int i = 0;
         for (int x = imageWidth - 1; x >= 0; x--)
         {
             for (int y = 0; y < imageHeight; y++)
             {
-                output[i++] = data[y * imageWidth + x];
+                output[i++] = data[y * inputStride + x];
             }
         }
 
         // Rotate the U and V color components
-        i = imageWidth * imageHeight;
-        int uvHeight = imageHeight / 2;
+        int yInPlaneSize = inputStride * imageHeight;
+        int halfW = imageWidth / 2;
+        int halfH = imageHeight / 2;
+        // Output UV starts after tightly-packed Y plane
+        i = outW * outH;
         for (int x = imageWidth - 1; x >= 0; x -= 2)
         {
-            for (int y = imageHeight; y < uvHeight + imageHeight; y++)
+            for (int y = 0; y < halfH; y++)
             {
-                output[i++] = data[y * imageWidth + x - 1];
-                output[i++] = data[y * imageWidth + x];
+                output[i++] = data[yInPlaneSize + (y * inputStride) + x - 1];
+                output[i++] = data[yInPlaneSize + (y * inputStride) + x];
             }
         }
         return output;
     }
 
-    public static byte[] YV12rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    // YV12 wrappers pass strides to native; native writes tightly-packed output
+    public static byte[] YV12rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight,
+                                      int yStride, int uStride, int vStride)
     {
-        yv12Rotate90_native(data, output, imageWidth, imageHeight);
+        yv12Rotate90_native(data, output, imageWidth, imageHeight, yStride, uStride, vStride);
         return output;
     }
 
-    public static byte[] YV12rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    public static byte[] YV12rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight,
+                                       int yStride, int uStride, int vStride)
     {
-        yv12Rotate180_native(data, output, imageWidth, imageHeight);
+        yv12Rotate180_native(data, output, imageWidth, imageHeight, yStride, uStride, vStride);
         return output;
     }
 
-    public static byte[] YV12rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight)
+    public static byte[] YV12rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight,
+                                       int yStride, int uStride, int vStride)
     {
-        yv12Rotate270_native(data, output, imageWidth, imageHeight);
+        yv12Rotate270_native(data, output, imageWidth, imageHeight, yStride, uStride, vStride);
         return output;
     }
-
-    static byte[] YUV_420_888toNV21_x(byte[] input, int imageWidth, int imageHeight)
-    {
-        int width = imageWidth;
-        int height = imageHeight;
-        int ySize = width * height;
-        int uvSize = width * height / 4;
-
-        byte[] nv21 = new byte[ySize + uvSize * 2];
-
-        int ySize1 = imageWidth * imageHeight;
-        int uSize1 = ySize / 4;
-        int vSize1 = ySize / 4;
-
-        ByteBuffer yBuffer = ByteBuffer.allocateDirect(ySize1);
-        ByteBuffer uBuffer = ByteBuffer.allocateDirect(uSize1);
-        ByteBuffer vBuffer = ByteBuffer.allocateDirect(vSize1);
-        yBuffer.put(input, 0, ySize1);
-        uBuffer.put(input, ySize1, uSize1);
-        vBuffer.put(input, ySize1 + uSize1, vSize1);
-
-        yBuffer.rewind();
-        uBuffer.rewind();
-        vBuffer.rewind();
-
-        int rowStride = width;
-        int pos = 0;
-        yBuffer.get(nv21, 0, ySize);
-        pos += ySize;
-        rowStride = width / 2;
-        int pixelStride = 1;
-
-        for (int row = 0; row < height / 2; row++)
-        {
-            for (int col = 0; col < width / 2; col++)
-            {
-                int vuPos = col * pixelStride + row * rowStride;
-                try
-                {
-                    nv21[pos++] = vBuffer.get(vuPos);
-                    nv21[pos++] = uBuffer.get(vuPos);
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-        return nv21;
-    }
-
-    static byte[] YUV_420_888toNV21(Image image)
-    {
-
-        int width = image.getWidth();
-        int height = image.getHeight();
-        // Log.i(TAG, "iiiiii:" + width + " " + height);
-        int ySize = width * height;
-        int uvSize = width * height / 4;
-
-        byte[] nv21 = new byte[ySize + uvSize * 2];
-
-        ByteBuffer yBuffer = image.getPlanes()[0].getBuffer(); // Y
-        ByteBuffer uBuffer = image.getPlanes()[1].getBuffer(); // U
-        ByteBuffer vBuffer = image.getPlanes()[2].getBuffer(); // V
-        yBuffer.rewind();
-        uBuffer.rewind();
-        vBuffer.rewind();
-
-        int rowStride = image.getPlanes()[0].getRowStride();
-        assert (image.getPlanes()[0].getPixelStride() == 1);
-
-        int pos = 0;
-
-        if (rowStride == width)
-        { // likely
-            yBuffer.get(nv21, 0, ySize);
-            pos += ySize;
-        }
-        else
-        {
-            long yBufferPos = -rowStride; // not an actual position
-            for (; pos < ySize; pos += width)
-            {
-                yBufferPos += rowStride;
-                yBuffer.position((int) yBufferPos);
-                yBuffer.get(nv21, pos, width);
-            }
-        }
-
-        rowStride = image.getPlanes()[2].getRowStride();
-        int pixelStride = image.getPlanes()[2].getPixelStride();
-
-        assert (rowStride == image.getPlanes()[1].getRowStride());
-        assert (pixelStride == image.getPlanes()[1].getPixelStride());
-
-        if (pixelStride == 2 && rowStride == width && uBuffer.get(0) == vBuffer.get(1))
-        {
-            // maybe V an U planes overlap as per NV21, which means vBuffer[1] is alias of uBuffer[0]
-            byte savePixel = vBuffer.get(1);
-            try
-            {
-                vBuffer.put(1, (byte) ~savePixel);
-                if (uBuffer.get(0) == (byte) ~savePixel)
-                {
-                    vBuffer.put(1, savePixel);
-                    vBuffer.position(0);
-                    uBuffer.position(0);
-                    vBuffer.get(nv21, ySize, 1);
-                    uBuffer.get(nv21, ySize + 1, uBuffer.remaining());
-
-                    return nv21; // shortcut
-                }
-            }
-            catch (ReadOnlyBufferException ex)
-            {
-                // unfortunately, we cannot check if vBuffer and uBuffer overlap
-            }
-
-            // unfortunately, the check failed. We must save U and V pixel by pixel
-            vBuffer.put(1, savePixel);
-        }
-
-        // other optimizations could check if (pixelStride == 1) or (pixelStride == 2),
-        // but performance gain would be less significant
-
-        for (int row = 0; row < height / 2; row++)
-        {
-            for (int col = 0; col < width / 2; col++)
-            {
-                int vuPos = col * pixelStride + row * rowStride;
-                nv21[pos++] = vBuffer.get(vuPos);
-                nv21[pos++] = uBuffer.get(vuPos);
-            }
-        }
-
-        return nv21;
-    }
-
 }
