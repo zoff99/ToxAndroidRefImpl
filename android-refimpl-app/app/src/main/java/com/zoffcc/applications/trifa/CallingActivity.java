@@ -2795,16 +2795,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         BUFFER_DEQUEUE_FEEDER_TIMEOUT_US); // This method will return immediately if timeoutUs == 0
                 if (inputBufferIndex >= 0)
                 {
-                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "feed_h264_encoder:inputBufferIndex=" + inputBufferIndex + " queuing buf.length=" + buf.length + " ptsUsec=" + computePresentationTime(pts)); }
+                    int validLength = frame_width_px * frame_height_px * 3 / 2;
+                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "feed_h264_encoder:inputBufferIndex=" + inputBufferIndex + " queuing validLength=" + validLength + " buf.length=" + buf.length + " ptsUsec=" + computePresentationTime(pts)); }
                     /* Get input buffer and fill it with our input */
                     ByteBuffer inputBuffer = mEncoder.getInputBuffer(inputBufferIndex);
                     inputBuffer.clear();
-                    inputBuffer.put(buf);
+                    inputBuffer.put(buf, 0, validLength);
                     /* Enqueue buffer */
                     // Log.d(TAG, "feed_h264_encoder:Enqueued input index: " + inputBufferIndex);
 
                     final long ptsUsec = computePresentationTime(pts);
-                    mEncoder.queueInputBuffer(inputBufferIndex, 0, buf.length, ptsUsec, 0);
+                    mEncoder.queueInputBuffer(inputBufferIndex, 0, validLength, ptsUsec, 0);
                 }
                 else
                 {
