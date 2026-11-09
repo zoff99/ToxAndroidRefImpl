@@ -2768,6 +2768,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     public static void feed_h264_encoder(final byte[] buf, int frame_width_px, int frame_height_px, long pts)
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "feed_h264_encoder:buf.length=" + (buf != null ? buf.length : 0) + " frame_width_px=" + frame_width_px + " frame_height_px=" + frame_height_px + " pts=" + pts); }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
         {
 /*
@@ -2794,6 +2795,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                         BUFFER_DEQUEUE_FEEDER_TIMEOUT_US); // This method will return immediately if timeoutUs == 0
                 if (inputBufferIndex >= 0)
                 {
+                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "feed_h264_encoder:inputBufferIndex=" + inputBufferIndex + " queuing buf.length=" + buf.length + " ptsUsec=" + computePresentationTime(pts)); }
                     /* Get input buffer and fill it with our input */
                     ByteBuffer inputBuffer = mEncoder.getInputBuffer(inputBufferIndex);
                     inputBuffer.clear();
@@ -2804,9 +2806,14 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     final long ptsUsec = computePresentationTime(pts);
                     mEncoder.queueInputBuffer(inputBufferIndex, 0, buf.length, ptsUsec, 0);
                 }
+                else
+                {
+                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "feed_h264_encoder:inputBufferIndex < 0 (no free buffer)"); }
+                }
             }
             catch (Exception e)
             {
+                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "feed_h264_encoder:Get free buffer failed exception=" + e.getMessage()); }
                 Log.d(TAG, "feed_h264_encoder:Get free buffer failed");
             }
         }
@@ -2818,6 +2825,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
     public static h264_encoder_output_data fetch_from_h264_encoder()
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "fetch_from_h264_encoder:start mEncoder=" + (mEncoder != null)); }
         h264_encoder_output_data ret = new h264_encoder_output_data();
         ret.data = null;
         ret.data_len = 0;
@@ -2832,6 +2840,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             {
                 if (mEncoder == null)
                 {
+                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "fetch_from_h264_encoder:mEncoder is null, returning empty"); }
                     return ret;
                 }
                 encoderStatus = mEncoder.dequeueOutputBuffer(info,
@@ -2840,6 +2849,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             catch (Exception e)
             {
                 // e.printStackTrace();
+                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "fetch_from_h264_encoder:exception=" + e.getMessage()); }
                 return ret;
             }
 
@@ -2851,6 +2861,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             }
             else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED)
             {
+                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "fetch_from_h264_encoder:INFO_OUTPUT_FORMAT_CHANGED"); }
                 // not expected for an encoder
                 // Log.d(TAG, "fetch_from_h264_encoder:old_format: " + video_encoder_format);
                 final MediaFormat newFormat = mEncoder.getOutputFormat();
@@ -2901,6 +2912,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                     if ((info.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)
                     {
+                        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "fetch_from_h264_encoder:got BUFFER_FLAG_CODEC_CONFIG (SPS/PPS) len=" + ret.data_len); }
                         // Codec config info.  Only expected on first packet.  One way to
                         // handle this is to manually stuff the data into the MediaFormat
                         // and pass that to configure().  We do that here to exercise the API.
@@ -2922,6 +2934,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     mEncoder.releaseOutputBuffer(encoderStatus, false);
                     ret.data = arr_h264_enc;
                     ret.pts = (info.presentationTimeUs / 1000);
+                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "fetch_from_h264_encoder:returning data_len=" + ret.data_len + " has_sps_pps=" + (ret.sps_pps != null) + " pts=" + ret.pts + " flags=" + info.flags); }
                     return ret;
                 }
             }
@@ -2939,11 +2952,13 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
      */
     private static long computePresentationTime(long ts)
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "computePresentationTime:ts=" + ts + " returning=" + ((System.currentTimeMillis() * 1000) + 10)); }
         return (System.currentTimeMillis() * 1000) + 10;
     }
 
     static void reconfigure_h264_encoder(int bitrate_bits_per_second, int width, int height)
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "reconfigure_h264_encoder:bitrate=" + bitrate_bits_per_second + " width=" + width + " height=" + height + " video_encoder_width=" + video_encoder_width + " video_encoder_height=" + video_encoder_height + " v_bitrate_bits_per_second=" + v_bitrate_bits_per_second); }
         if ((video_encoder_width == width) && (video_encoder_height == height) &&
             (v_bitrate_bits_per_second != bitrate_bits_per_second))
         {
@@ -2956,15 +2971,21 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
                     v_bitrate_bits_per_second = bitrate_bits_per_second;
                     if (bitrate_bits_per_second >= 150)
                     {
+                        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "reconfigure_h264_encoder:changing bitrate only to " + v_bitrate_bits_per_second); }
                         Bundle bitrate_new = new Bundle();
                         video_encoder_format.setInteger(MediaFormat.KEY_BIT_RATE, v_bitrate_bits_per_second);
                         bitrate_new.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, v_bitrate_bits_per_second);
                         mEncoder.setParameters(bitrate_new);
                     }
                 }
+                else
+                {
+                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "reconfigure_h264_encoder:skipping bitrate change (too soon)"); }
+                }
             }
             catch (Exception e)
             {
+                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "reconfigure_h264_encoder:exception changing bitrate=" + e.getMessage()); }
             }
         }
         else
@@ -2972,12 +2993,17 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
             if ((video_encoder_width != width) || (video_encoder_height != height) ||
                 (v_bitrate_bits_per_second != bitrate_bits_per_second))
             {
+                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "reconfigure_h264_encoder:recreating encoder with w=" + width + " h=" + height + " bitrate=" + bitrate_bits_per_second); }
                 releaseEncoder();
                 video_encoder_width = width;
                 video_encoder_height = height;
                 v_bitrate_bits_per_second = bitrate_bits_per_second;
                 // Log.d(TAG, "reconfigure_h264_encoder:vbrate: " + v_bitrate_bits_per_second);
                 prepareEncoder();
+            }
+            else
+            {
+                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "reconfigure_h264_encoder:no change needed"); }
             }
         }
     }
@@ -2987,6 +3013,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
      */
     static void prepareEncoder()
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "prepareEncoder:video_encoder_width=" + video_encoder_width + " video_encoder_height=" + video_encoder_height + " v_bitrate_bits_per_second=" + v_bitrate_bits_per_second); }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
 
@@ -3163,6 +3190,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
             mEncoder.configure(video_encoder_format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             mEncoder.start();
+            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "prepareEncoder:mEncoder.configure and start done selectedColorFormat=" + selectedColorFormat); }
 
         }
     }
@@ -3172,6 +3200,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
      */
     private static void drainEncoder()
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "drainEncoder:start mEncoder=" + (mEncoder != null)); }
         final int TIMEOUT_USEC = 0;
         Log.d(TAG, "drainEncoder:start");
 
@@ -3249,6 +3278,7 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
      */
     private static void releaseEncoder()
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "releaseEncoder:start mEncoder=" + (mEncoder != null)); }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2)
         {
             Log.d(TAG, "releaseEncoder:start ...");
@@ -3283,10 +3313,12 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
 
                 mEncoder = null;
                 Log.d(TAG, "releaseEncoder:SUCCESS");
+                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "releaseEncoder:SUCCESS"); }
             }
             else
             {
                 Log.d(TAG, "releaseEncoder:already released");
+                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "releaseEncoder:already released"); }
             }
         }
     }
