@@ -5039,6 +5039,7 @@ public class HelperGeneric
     // VIDEO SENDING - ENCODING -------------------------------------------------------
     static void save_sps_pps_nal(byte[] sps_pps_nal_unit_bytes, int length)
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "save_sps_pps_nal:length=" + length + " sps_pps_nal_unit_bytes=" + (sps_pps_nal_unit_bytes != null)); }
         if (sps_pps_nal_unit_bytes != null)
         {
             global_sps_pps_nal_unit_bytes = Arrays.copyOf(sps_pps_nal_unit_bytes, length);
@@ -5047,6 +5048,7 @@ public class HelperGeneric
 
     static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:buf2.length=" + (buf2 != null ? buf2.length : 0) + " frame_width_px=" + frame_width_px + " frame_height_px=" + frame_height_px + " capture_ts=" + capture_ts); }
         // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--START--:");
         // long s_time_a = System.currentTimeMillis();
 
@@ -5092,6 +5094,7 @@ public class HelperGeneric
 
                         if (MainActivity.PREF__camera_get_preview_format.equals("YV12"))
                         {
+                            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:new_thread:YV12:paddedWidth=" + paddedWidth + " paddedBufSize=" + paddedBufSize); }
                             // FIX: Allocate buffer with padded size for H264 encoder
                             if (buf_video_send_frame == null)
                             {
@@ -5117,6 +5120,7 @@ public class HelperGeneric
                         }
                         else // (PREF__camera_get_preview_format == "NV21")
                         {
+                            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:new_thread:NV21:paddedWidth=" + paddedWidth + " paddedBufSize=" + paddedBufSize); }
                             // FIX: Allocate buffer with padded size for H264 encoder
                             if (buf_video_send_frame == null)
                             {
@@ -5266,6 +5270,7 @@ public class HelperGeneric
 
                                     //Log.i(TAG, "V:AGE:" + Callstate.delay_add + " : " + video_frame_age + " : " +
                                     //           ((int) (System.currentTimeMillis() - video_frame_age)));
+                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:new_thread2:calling toxav_video_send_frame_h264_age w=" + frame_width_px + " h=" + frame_height_px + " data_length=" + data_length + " age=" + ((int) (System.currentTimeMillis() - video_frame_age) + Callstate.delay_add)); }
                                     // Log.i(TAG, "toxav_video_send_frame_h264_age:--START--");
                                     // long s_time_send = System.currentTimeMillis();
                                     MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
@@ -5330,6 +5335,7 @@ public class HelperGeneric
     public static byte[] YV12totoNV12(byte[] input, byte[] output, int width, int height,
                                       int yStride, int uStride, int vStride, int outputPaddedWidth)
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "YV12totoNV12:width=" + width + " height=" + height + " yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " outputPaddedWidth=" + outputPaddedWidth + " input.length=" + (input != null ? input.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         final int halfW = width / 2;
         final int halfH = height / 2;
         final int yInSize = yStride * height;
@@ -5376,6 +5382,7 @@ public class HelperGeneric
     // Reads interleaved VU from stride-padded input rows, writes interleaved UV contiguously.
     public static byte[] NV21toNV12(byte[] input, byte[] output, int width, int height, int yStride, int outputPaddedWidth)
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "NV21toNV12:width=" + width + " height=" + height + " yStride=" + yStride + " outputPaddedWidth=" + outputPaddedWidth + " input.length=" + (input != null ? input.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         final int halfW = width / 2;
         final int halfH = height / 2;
         final int yInSize = yStride * height;
@@ -5415,6 +5422,7 @@ public class HelperGeneric
 
     static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px, long capture_ts)
     {
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "toxav_video_send_frame_wrapper:buf.length=" + (buf != null ? buf.length : 0) + " frame_width_px=" + frame_width_px + " frame_height_px=" + frame_height_px + " capture_ts=" + capture_ts); }
         if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
             (Callstate.video_out_codec == VIDEO_CODEC_H264))
         {
@@ -5432,6 +5440,7 @@ public class HelperGeneric
 
                 if (buf_out != null)
                 {
+                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "toxav_video_send_frame_wrapper:jj=" + jj + " buf_out.length=" + buf_out.length + " h264_out_data.data_len=" + h264_out_data.data_len); }
                     if (global_sps_pps_nal_unit_bytes != null)
                     {
                         if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
