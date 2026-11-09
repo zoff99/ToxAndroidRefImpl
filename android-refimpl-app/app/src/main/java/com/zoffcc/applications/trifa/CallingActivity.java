@@ -2750,6 +2750,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
         }
     }
 
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
     // ------------ H264 EN-coder ------------
     // ------------ H264 EN-coder ------------
     // ------------ H264 EN-coder ------------
@@ -3291,6 +3294,9 @@ public class CallingActivity extends AppCompatActivity implements CameraWrapper.
     // ------------ H264 EN-coder ------------
     // ------------ H264 EN-coder ------------
     // ------------ H264 EN-coder ------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
 
     static void stop_ringtone()
     {

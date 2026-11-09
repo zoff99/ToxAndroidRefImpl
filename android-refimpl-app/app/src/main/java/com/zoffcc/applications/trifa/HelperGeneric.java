@@ -3145,435 +3145,6 @@ public class HelperGeneric
         }
     }
 
-    static void save_sps_pps_nal(byte[] sps_pps_nal_unit_bytes, int length)
-    {
-        if (sps_pps_nal_unit_bytes != null)
-        {
-            global_sps_pps_nal_unit_bytes = Arrays.copyOf(sps_pps_nal_unit_bytes, length);
-        }
-    }
-
-    static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
-    {
-        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--START--:");
-        // long s_time_a = System.currentTimeMillis();
-
-/*
-        try
-        {
-            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
-            // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
-            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-*/
-
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
-            (Callstate.video_out_codec == VIDEO_CODEC_H264))
-        {
-            final long video_frame_age = capture_ts;
-
-            if (java_video_encoder_first_frame_in == 1)
-            {
-                Callstate.java_video_encoder_first_frame_in = 0;
-                Callstate.java_video_encoder_delay_start_ts = System.currentTimeMillis();
-            }
-
-            // FIX: Hardware H264 encoders require stride aligned to 64 bytes.
-            // In portrait mode (480 wide), unaligned stride causes diagonal grey lines.
-            // Pad width to next multiple of 64 and use padded size for encoder input.
-            final int paddedWidth = (frame_width_px + 63) & ~63;
-            final int paddedBufSize = paddedWidth * frame_height_px * 3 / 2;
-
-            final Thread new_thread = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--START--:");
-                        // long s_time = System.currentTimeMillis();
-
-                        if (MainActivity.PREF__camera_get_preview_format.equals("YV12"))
-                        {
-                            // FIX: Allocate buffer with padded size for H264 encoder
-                            if (buf_video_send_frame == null)
-                            {
-                                buf_video_send_frame = new byte[paddedBufSize];
-                            }
-                            else if (buf_video_send_frame.length < paddedBufSize)
-                            {
-                                buf_video_send_frame = new byte[paddedBufSize];
-                            }
-                            // FIX: After rotation, buf2 is tightly packed with swapped dimensions.
-                            // Use frame_width_px/frame_height_px as strides (they are the POST-rotation dims).
-                            // For 90°/270° rotation these are already swapped by the caller.
-                            // For 0°/180° they match the original camera dims.
-                            int convYStride = frame_width_px;
-                            int convUStride = (frame_width_px + 1) / 2;
-                            int convVStride = (frame_width_px + 1) / 2;
-                            // FIX: Pass paddedWidth so output rows are 64-aligned for H264 encoder
-                            buf_video_send_frame = YV12totoNV12(buf2, buf_video_send_frame, frame_width_px,
-                                                                frame_height_px, convYStride, convUStride, convVStride,
-                                                                paddedWidth);
-                            // FIX: Tell encoder the padded width so it reads rows correctly
-                            feed_h264_encoder(buf_video_send_frame, paddedWidth, frame_height_px, video_frame_age);
-                        }
-                        else // (PREF__camera_get_preview_format == "NV21")
-                        {
-                            // FIX: Allocate buffer with padded size for H264 encoder
-                            if (buf_video_send_frame == null)
-                            {
-                                buf_video_send_frame = new byte[paddedBufSize];
-                            }
-                            else if (buf_video_send_frame.length < paddedBufSize)
-                            {
-                                buf_video_send_frame = new byte[paddedBufSize];
-                            }
-                            // FIX: Same — use post-rotation width as stride
-                            int convYStride = frame_width_px;
-                            // FIX: Pass paddedWidth so output rows are 64-aligned for H264 encoder
-                            buf_video_send_frame = NV21toNV12(buf2, buf_video_send_frame, frame_width_px,
-                                                              frame_height_px, convYStride, paddedWidth);
-                            // FIX: Tell encoder the padded width so it reads rows correctly
-                            feed_h264_encoder(buf_video_send_frame, paddedWidth, frame_height_px, video_frame_age);
-                        }
-
-                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
-                    }
-                    catch (Exception e)
-                    {
-                        // e.printStackTrace();
-                    }
-                }
-            };
-            new_thread.start();
-
-            final Thread new_thread2 = new Thread()
-            {
-                @Override
-                public void run()
-                {
-                    try
-                    {
-                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:fetch:--START--:");
-                        // long s_time = System.currentTimeMillis();
-
-                        for (int jj = 0; jj < 2; jj++)
-                        {
-                            CallingActivity.h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
-
-                            if (h264_out_data != null)
-                            {
-                                if (h264_out_data.sps_pps != null)
-                                {
-                                    save_sps_pps_nal(h264_out_data.sps_pps, h264_out_data.data_len);
-                                }
-
-                                if (h264_out_data.data != null)
-                                {
-                                    MainActivity.video_buffer_2.rewind();
-                                    long data_length = 0;
-
-                                    if (global_sps_pps_nal_unit_bytes != null)
-                                    {
-                                        if (send_sps_pps_every_x_frames_current >= send_sps_pps_every_x_frames)
-                                        {
-                                            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
-                                            if (h264_out_data.sps_pps == null)
-                                            {
-                                                // only add sps/pps if this NALU does not contain it already
-                                                MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
-                                                data_length = data_length + global_sps_pps_nal_unit_bytes.length;
-                                            }
-                                            send_sps_pps_every_x_frames_current = 0;
-
-                                            if (set_vdelay_every_x_frames_current >= set_vdelay_every_x_frames)
-                                            {
-                                                set_vdelay_every_x_frames_current = 0;
-
-                                                video_frame_age_values[video_frame_age_values_cur_index] = (int) (
-                                                        System.currentTimeMillis() - video_frame_age);
-                                                video_frame_age_values_cur_index++;
-                                                if (video_frame_age_values_cur_index >=
-                                                    video_frame_age_values_cur_index_count)
-                                                {
-                                                    video_frame_age_values_cur_index = 0;
-                                                }
-
-                                                video_frame_age_mean = 0;
-                                                for (int kk = 0; kk < video_frame_age_values_cur_index_count; kk++)
-                                                {
-                                                    video_frame_age_mean =
-                                                            video_frame_age_mean + video_frame_age_values[kk];
-                                                }
-
-                                                video_frame_age_mean = video_frame_age_mean / 10;
-
-                                                if (1 == 1)
-                                                {
-                                                    toxav_option_set(friendnum,
-                                                                     TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS.value,
-                                                                     video_frame_age_mean + Callstate.delay_add);
-                                                }
-                                                else
-                                                {
-                                                    toxav_option_set(friendnum,
-                                                                     TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS.value,
-                                                                     Callstate.java_video_encoder_delay);
-                                                }
-                                            }
-
-                                            set_vdelay_every_x_frames_current++;
-
-                                        }
-
-                                        send_sps_pps_every_x_frames_current++;
-                                    }
-
-                                    MainActivity.video_buffer_2.put(h264_out_data.data, 0, h264_out_data.data_len);
-                                    data_length = data_length + h264_out_data.data_len;
-
-                                    // Log.i(TAG,
-                                    //      "H264:video_frame_age=" + (System.currentTimeMillis() - video_frame_age));
-
-                                    if (Callstate.java_video_encoder_delay_set == 0)
-                                    {
-                                        Callstate.java_video_encoder_delay = (System.currentTimeMillis() -
-                                                                              Callstate.java_video_encoder_delay_start_ts);
-
-
-                                        if ((Callstate.java_video_encoder_delay < 3) ||
-                                            (Callstate.java_video_encoder_delay > 300))
-                                        {
-                                            Callstate.java_video_encoder_delay = 120;
-                                        }
-
-                                        Callstate.java_video_encoder_delay_set = 1;
-                                        //Log.i(TAG,
-                                        //      "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms");
-                                    }
-
-                                    //Log.i(TAG,
-                                    //      "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms " +
-                                    //      ((int) (System.currentTimeMillis() - h264_out_data.pts)) + " ms");
-
-                                    //Log.i(TAG, "java_video_encoder_delay=" +
-                                    //           (int) (System.currentTimeMillis() - video_frame_age) + " ms");
-
-
-                                    Callstate.delay_add = (int) (System.currentTimeMillis() - h264_out_data.pts);
-                                    if ((Callstate.delay_add < 1) || (Callstate.delay_add > 25))
-                                    {
-                                        Callstate.delay_add = 10;
-                                    }
-
-                                    //Log.i(TAG, "V:AGE:" + Callstate.delay_add + " : " + video_frame_age + " : " +
-                                    //           ((int) (System.currentTimeMillis() - video_frame_age)));
-                                    // Log.i(TAG, "toxav_video_send_frame_h264_age:--START--");
-                                    // long s_time_send = System.currentTimeMillis();
-                                    MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
-                                                                                 frame_height_px, data_length,
-                                                                                 (int) (System.currentTimeMillis() -
-                                                                                        video_frame_age) +
-                                                                                 Callstate.delay_add);
-
-                                    // Log.i(TAG, "toxav_video_send_frame_h264_age:--END--:" + (System.currentTimeMillis() - s_time_send) + "ms");
-                                }
-                                else
-                                {
-                                    // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:buf_out==null:#" + jj);
-                                }
-                            }
-                        }
-
-                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:fetch:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
-
-                    }
-                    catch (Exception e)
-                    {
-                        // e.printStackTrace();
-                    }
-                }
-            };
-            new_thread2.start();
-
-            try
-            {
-                new_thread.join();
-            }
-            catch (Exception e)
-            {
-                e.printStackTrace();
-            }
-
-            if (1 == 1)
-            {
-                try
-                {
-                    new_thread2.join();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-            }
-
-            // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--END--:" + (System.currentTimeMillis() - s_time_a) + "ms");
-
-            return 0;
-        }
-        else
-        {
-            return MainActivity.toxav_video_send_frame_uv_reversed(friendnum, frame_width_px, frame_height_px);
-        }
-    }
-
-    // FIX: Added outputPaddedWidth parameter for H264 encoder stride alignment (64-byte boundary).
-    // Output Y and UV rows are written with outputPaddedWidth stride, padding bytes zeroed.
-    public static byte[] YV12totoNV12(byte[] input, byte[] output, int width, int height,
-                                      int yStride, int uStride, int vStride, int outputPaddedWidth)
-    {
-        final int halfW = width / 2;
-        final int halfH = height / 2;
-        final int yInSize = yStride * height;
-        // FIX: YV12 layout is Y-V-U, so V plane starts at yInSize, U plane starts after V
-        final int vInSize = vStride * halfH;
-        final int vInStart = yInSize;           // V comes FIRST in YV12
-        final int uInStart = yInSize + vInSize; // U comes SECOND in YV12
-
-        // FIX: Copy Y plane row by row with padded output stride, zero padding bytes
-        for (int row = 0; row < height; row++)
-        {
-            System.arraycopy(input, row * yStride, output, row * outputPaddedWidth, width);
-            for (int pad = width; pad < outputPaddedWidth; pad++)
-            {
-                output[row * outputPaddedWidth + pad] = 0;
-            }
-        }
-
-        // FIX: Interleave U then V into NV12 output with padded UV stride, zero padding bytes
-        int outPos = outputPaddedWidth * height;
-        int uvPaddedWidth = outputPaddedWidth; // UV row stride matches Y row stride
-        for (int row = 0; row < halfH; row++)
-        {
-            int uRowStart = uInStart + row * uStride;
-            int vRowStart = vInStart + row * vStride;
-            int rowStartOut = outPos;
-            for (int col = 0; col < halfW; col++)
-            {
-                output[outPos++] = input[uRowStart + col]; // Cb (U) first for NV12
-                output[outPos++] = input[vRowStart + col]; // Cr (V) second for NV12
-            }
-            // Zero padding bytes in UV output row
-            int uvRowEnd = rowStartOut + uvPaddedWidth;
-            while (outPos < uvRowEnd)
-            {
-                output[outPos++] = 0;
-            }
-        }
-        return output;
-    }
-
-    // FIX: Added outputPaddedWidth parameter for H264 encoder stride alignment (64-byte boundary).
-    // Input is stride-padded NV21. Output rows use outputPaddedWidth stride, padding bytes zeroed.
-    // Reads interleaved VU from stride-padded input rows, writes interleaved UV contiguously.
-    public static byte[] NV21toNV12(byte[] input, byte[] output, int width, int height, int yStride, int outputPaddedWidth)
-    {
-        final int halfW = width / 2;
-        final int halfH = height / 2;
-        final int yInSize = yStride * height;
-
-        // FIX: Copy Y plane row by row with padded output stride, zero padding bytes
-        for (int row = 0; row < height; row++)
-        {
-            System.arraycopy(input, row * yStride, output, row * outputPaddedWidth, width);
-            for (int pad = width; pad < outputPaddedWidth; pad++)
-            {
-                output[row * outputPaddedWidth + pad] = 0;
-            }
-        }
-
-        // FIX: Swap VU->UV with padded UV stride, zero padding bytes
-        int outPos = outputPaddedWidth * height;
-        int uvPaddedWidth = outputPaddedWidth; // UV row stride matches Y row stride
-        for (int row = 0; row < halfH; row++)
-        {
-            int uvRowStart = yInSize + row * yStride; // UV rows use same stride as Y in NV21
-            int rowStartOut = outPos;
-            for (int col = 0; col < halfW; col++)
-            {
-                int srcPair = uvRowStart + col * 2;
-                output[outPos++] = input[srcPair + 1]; // Cb (U) - was at odd position in NV21
-                output[outPos++] = input[srcPair];     // Cr (V) - was at even position in NV21
-            }
-            // Zero padding bytes in UV output row
-            int uvRowEnd = rowStartOut + uvPaddedWidth;
-            while (outPos < uvRowEnd)
-            {
-                output[outPos++] = 0;
-            }
-        }
-        return output;
-    }
-
-    static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px, long capture_ts)
-    {
-        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
-            (Callstate.video_out_codec == VIDEO_CODEC_H264))
-        {
-            feed_h264_encoder(buf, frame_width_px, frame_height_px, capture_ts);
-
-            for (int jj = 0; jj < 2; jj++)
-            {
-                CallingActivity.h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
-                byte[] buf_out = h264_out_data.data;
-
-                if (h264_out_data.sps_pps != null)
-                {
-                    save_sps_pps_nal(h264_out_data.sps_pps, h264_out_data.data_len);
-                }
-
-                if (buf_out != null)
-                {
-                    if (global_sps_pps_nal_unit_bytes != null)
-                    {
-                        if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
-                        {
-                            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:2");
-                            MainActivity.video_buffer_2.rewind();
-                            MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
-                            MainActivity.toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
-                                                                     global_sps_pps_nal_unit_bytes.length);
-                            send_sps_pps_every_x_frames_current = 0;
-                        }
-
-                        send_sps_pps_every_x_frames_current++;
-                    }
-
-                    MainActivity.video_buffer_2.rewind();
-                    MainActivity.video_buffer_2.put(buf_out, 0, h264_out_data.data_len);
-                    MainActivity.toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
-                                                             h264_out_data.data_len);
-                }
-                else
-                {
-                    // Log.i(TAG, "toxav_video_send_frame_wrapper:buf_out==null");
-                }
-            }
-
-            return 0;
-        }
-        else
-        {
-            return MainActivity.toxav_video_send_frame(friendnum, frame_width_px, frame_height_px);
-        }
-    }
-
     static void import_toxsave_file_unsecure(final Context context)
     {
         MainActivity.global_stop_tox();
@@ -5461,4 +5032,440 @@ public class HelperGeneric
             }
         }
     }
+
+
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    static void save_sps_pps_nal(byte[] sps_pps_nal_unit_bytes, int length)
+    {
+        if (sps_pps_nal_unit_bytes != null)
+        {
+            global_sps_pps_nal_unit_bytes = Arrays.copyOf(sps_pps_nal_unit_bytes, length);
+        }
+    }
+
+    static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
+    {
+        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--START--:");
+        // long s_time_a = System.currentTimeMillis();
+
+/*
+        try
+        {
+            android.os.Process.setThreadPriority(Thread.MAX_PRIORITY);
+            // android.os.Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+            // android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_URGENT_AUDIO);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+*/
+
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
+            (Callstate.video_out_codec == VIDEO_CODEC_H264))
+        {
+            final long video_frame_age = capture_ts;
+
+            if (java_video_encoder_first_frame_in == 1)
+            {
+                Callstate.java_video_encoder_first_frame_in = 0;
+                Callstate.java_video_encoder_delay_start_ts = System.currentTimeMillis();
+            }
+
+            // FIX: Hardware H264 encoders require stride aligned to 64 bytes.
+            // In portrait mode (480 wide), unaligned stride causes diagonal grey lines.
+            // Pad width to next multiple of 64 and use padded size for encoder input.
+            final int paddedWidth = (frame_width_px + 63) & ~63;
+            final int paddedBufSize = paddedWidth * frame_height_px * 3 / 2;
+
+            final Thread new_thread = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--START--:");
+                        // long s_time = System.currentTimeMillis();
+
+                        if (MainActivity.PREF__camera_get_preview_format.equals("YV12"))
+                        {
+                            // FIX: Allocate buffer with padded size for H264 encoder
+                            if (buf_video_send_frame == null)
+                            {
+                                buf_video_send_frame = new byte[paddedBufSize];
+                            }
+                            else if (buf_video_send_frame.length < paddedBufSize)
+                            {
+                                buf_video_send_frame = new byte[paddedBufSize];
+                            }
+                            // FIX: After rotation, buf2 is tightly packed with swapped dimensions.
+                            // Use frame_width_px/frame_height_px as strides (they are the POST-rotation dims).
+                            // For 90°/270° rotation these are already swapped by the caller.
+                            // For 0°/180° they match the original camera dims.
+                            int convYStride = frame_width_px;
+                            int convUStride = (frame_width_px + 1) / 2;
+                            int convVStride = (frame_width_px + 1) / 2;
+                            // FIX: Pass paddedWidth so output rows are 64-aligned for H264 encoder
+                            buf_video_send_frame = YV12totoNV12(buf2, buf_video_send_frame, frame_width_px,
+                                                                frame_height_px, convYStride, convUStride, convVStride,
+                                                                paddedWidth);
+                            // FIX: Tell encoder the padded width so it reads rows correctly
+                            feed_h264_encoder(buf_video_send_frame, paddedWidth, frame_height_px, video_frame_age);
+                        }
+                        else // (PREF__camera_get_preview_format == "NV21")
+                        {
+                            // FIX: Allocate buffer with padded size for H264 encoder
+                            if (buf_video_send_frame == null)
+                            {
+                                buf_video_send_frame = new byte[paddedBufSize];
+                            }
+                            else if (buf_video_send_frame.length < paddedBufSize)
+                            {
+                                buf_video_send_frame = new byte[paddedBufSize];
+                            }
+                            // FIX: Same — use post-rotation width as stride
+                            int convYStride = frame_width_px;
+                            // FIX: Pass paddedWidth so output rows are 64-aligned for H264 encoder
+                            buf_video_send_frame = NV21toNV12(buf2, buf_video_send_frame, frame_width_px,
+                                                              frame_height_px, convYStride, paddedWidth);
+                            // FIX: Tell encoder the padded width so it reads rows correctly
+                            feed_h264_encoder(buf_video_send_frame, paddedWidth, frame_height_px, video_frame_age);
+                        }
+
+                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
+                    }
+                    catch (Exception e)
+                    {
+                        // e.printStackTrace();
+                    }
+                }
+            };
+            new_thread.start();
+
+            final Thread new_thread2 = new Thread()
+            {
+                @Override
+                public void run()
+                {
+                    try
+                    {
+                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:fetch:--START--:");
+                        // long s_time = System.currentTimeMillis();
+
+                        for (int jj = 0; jj < 2; jj++)
+                        {
+                            CallingActivity.h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
+
+                            if (h264_out_data != null)
+                            {
+                                if (h264_out_data.sps_pps != null)
+                                {
+                                    save_sps_pps_nal(h264_out_data.sps_pps, h264_out_data.data_len);
+                                }
+
+                                if (h264_out_data.data != null)
+                                {
+                                    MainActivity.video_buffer_2.rewind();
+                                    long data_length = 0;
+
+                                    if (global_sps_pps_nal_unit_bytes != null)
+                                    {
+                                        if (send_sps_pps_every_x_frames_current >= send_sps_pps_every_x_frames)
+                                        {
+                                            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:1");
+                                            if (h264_out_data.sps_pps == null)
+                                            {
+                                                // only add sps/pps if this NALU does not contain it already
+                                                MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
+                                                data_length = data_length + global_sps_pps_nal_unit_bytes.length;
+                                            }
+                                            send_sps_pps_every_x_frames_current = 0;
+
+                                            if (set_vdelay_every_x_frames_current >= set_vdelay_every_x_frames)
+                                            {
+                                                set_vdelay_every_x_frames_current = 0;
+
+                                                video_frame_age_values[video_frame_age_values_cur_index] = (int) (
+                                                        System.currentTimeMillis() - video_frame_age);
+                                                video_frame_age_values_cur_index++;
+                                                if (video_frame_age_values_cur_index >=
+                                                    video_frame_age_values_cur_index_count)
+                                                {
+                                                    video_frame_age_values_cur_index = 0;
+                                                }
+
+                                                video_frame_age_mean = 0;
+                                                for (int kk = 0; kk < video_frame_age_values_cur_index_count; kk++)
+                                                {
+                                                    video_frame_age_mean =
+                                                            video_frame_age_mean + video_frame_age_values[kk];
+                                                }
+
+                                                video_frame_age_mean = video_frame_age_mean / 10;
+
+                                                if (1 == 1)
+                                                {
+                                                    toxav_option_set(friendnum,
+                                                                     TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS.value,
+                                                                     video_frame_age_mean + Callstate.delay_add);
+                                                }
+                                                else
+                                                {
+                                                    toxav_option_set(friendnum,
+                                                                     TOXAV_CLIENT_VIDEO_CAPTURE_DELAY_MS.value,
+                                                                     Callstate.java_video_encoder_delay);
+                                                }
+                                            }
+
+                                            set_vdelay_every_x_frames_current++;
+
+                                        }
+
+                                        send_sps_pps_every_x_frames_current++;
+                                    }
+
+                                    MainActivity.video_buffer_2.put(h264_out_data.data, 0, h264_out_data.data_len);
+                                    data_length = data_length + h264_out_data.data_len;
+
+                                    // Log.i(TAG,
+                                    //      "H264:video_frame_age=" + (System.currentTimeMillis() - video_frame_age));
+
+                                    if (Callstate.java_video_encoder_delay_set == 0)
+                                    {
+                                        Callstate.java_video_encoder_delay = (System.currentTimeMillis() -
+                                                                              Callstate.java_video_encoder_delay_start_ts);
+
+
+                                        if ((Callstate.java_video_encoder_delay < 3) ||
+                                            (Callstate.java_video_encoder_delay > 300))
+                                        {
+                                            Callstate.java_video_encoder_delay = 120;
+                                        }
+
+                                        Callstate.java_video_encoder_delay_set = 1;
+                                        //Log.i(TAG,
+                                        //      "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms");
+                                    }
+
+                                    //Log.i(TAG,
+                                    //      "java_video_encoder_delay=" + Callstate.java_video_encoder_delay + " ms " +
+                                    //      ((int) (System.currentTimeMillis() - h264_out_data.pts)) + " ms");
+
+                                    //Log.i(TAG, "java_video_encoder_delay=" +
+                                    //           (int) (System.currentTimeMillis() - video_frame_age) + " ms");
+
+
+                                    Callstate.delay_add = (int) (System.currentTimeMillis() - h264_out_data.pts);
+                                    if ((Callstate.delay_add < 1) || (Callstate.delay_add > 25))
+                                    {
+                                        Callstate.delay_add = 10;
+                                    }
+
+                                    //Log.i(TAG, "V:AGE:" + Callstate.delay_add + " : " + video_frame_age + " : " +
+                                    //           ((int) (System.currentTimeMillis() - video_frame_age)));
+                                    // Log.i(TAG, "toxav_video_send_frame_h264_age:--START--");
+                                    // long s_time_send = System.currentTimeMillis();
+                                    MainActivity.toxav_video_send_frame_h264_age(friendnum, frame_width_px,
+                                                                                 frame_height_px, data_length,
+                                                                                 (int) (System.currentTimeMillis() -
+                                                                                        video_frame_age) +
+                                                                                 Callstate.delay_add);
+
+                                    // Log.i(TAG, "toxav_video_send_frame_h264_age:--END--:" + (System.currentTimeMillis() - s_time_send) + "ms");
+                                }
+                                else
+                                {
+                                    // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:buf_out==null:#" + jj);
+                                }
+                            }
+                        }
+
+                        // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:fetch:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
+
+                    }
+                    catch (Exception e)
+                    {
+                        // e.printStackTrace();
+                    }
+                }
+            };
+            new_thread2.start();
+
+            try
+            {
+                new_thread.join();
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            if (1 == 1)
+            {
+                try
+                {
+                    new_thread2.join();
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
+
+            // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:all:--END--:" + (System.currentTimeMillis() - s_time_a) + "ms");
+
+            return 0;
+        }
+        else
+        {
+            return MainActivity.toxav_video_send_frame_uv_reversed(friendnum, frame_width_px, frame_height_px);
+        }
+    }
+
+    // FIX: Added outputPaddedWidth parameter for H264 encoder stride alignment (64-byte boundary).
+    // Output Y and UV rows are written with outputPaddedWidth stride, padding bytes zeroed.
+    public static byte[] YV12totoNV12(byte[] input, byte[] output, int width, int height,
+                                      int yStride, int uStride, int vStride, int outputPaddedWidth)
+    {
+        final int halfW = width / 2;
+        final int halfH = height / 2;
+        final int yInSize = yStride * height;
+        // FIX: YV12 layout is Y-V-U, so V plane starts at yInSize, U plane starts after V
+        final int vInSize = vStride * halfH;
+        final int vInStart = yInSize;           // V comes FIRST in YV12
+        final int uInStart = yInSize + vInSize; // U comes SECOND in YV12
+
+        // FIX: Copy Y plane row by row with padded output stride, zero padding bytes
+        for (int row = 0; row < height; row++)
+        {
+            System.arraycopy(input, row * yStride, output, row * outputPaddedWidth, width);
+            for (int pad = width; pad < outputPaddedWidth; pad++)
+            {
+                output[row * outputPaddedWidth + pad] = 0;
+            }
+        }
+
+        // FIX: Interleave U then V into NV12 output with padded UV stride, zero padding bytes
+        int outPos = outputPaddedWidth * height;
+        int uvPaddedWidth = outputPaddedWidth; // UV row stride matches Y row stride
+        for (int row = 0; row < halfH; row++)
+        {
+            int uRowStart = uInStart + row * uStride;
+            int vRowStart = vInStart + row * vStride;
+            int rowStartOut = outPos;
+            for (int col = 0; col < halfW; col++)
+            {
+                output[outPos++] = input[uRowStart + col]; // Cb (U) first for NV12
+                output[outPos++] = input[vRowStart + col]; // Cr (V) second for NV12
+            }
+            // Zero padding bytes in UV output row
+            int uvRowEnd = rowStartOut + uvPaddedWidth;
+            while (outPos < uvRowEnd)
+            {
+                output[outPos++] = 0;
+            }
+        }
+        return output;
+    }
+
+    // FIX: Added outputPaddedWidth parameter for H264 encoder stride alignment (64-byte boundary).
+    // Input is stride-padded NV21. Output rows use outputPaddedWidth stride, padding bytes zeroed.
+    // Reads interleaved VU from stride-padded input rows, writes interleaved UV contiguously.
+    public static byte[] NV21toNV12(byte[] input, byte[] output, int width, int height, int yStride, int outputPaddedWidth)
+    {
+        final int halfW = width / 2;
+        final int halfH = height / 2;
+        final int yInSize = yStride * height;
+
+        // FIX: Copy Y plane row by row with padded output stride, zero padding bytes
+        for (int row = 0; row < height; row++)
+        {
+            System.arraycopy(input, row * yStride, output, row * outputPaddedWidth, width);
+            for (int pad = width; pad < outputPaddedWidth; pad++)
+            {
+                output[row * outputPaddedWidth + pad] = 0;
+            }
+        }
+
+        // FIX: Swap VU->UV with padded UV stride, zero padding bytes
+        int outPos = outputPaddedWidth * height;
+        int uvPaddedWidth = outputPaddedWidth; // UV row stride matches Y row stride
+        for (int row = 0; row < halfH; row++)
+        {
+            int uvRowStart = yInSize + row * yStride; // UV rows use same stride as Y in NV21
+            int rowStartOut = outPos;
+            for (int col = 0; col < halfW; col++)
+            {
+                int srcPair = uvRowStart + col * 2;
+                output[outPos++] = input[srcPair + 1]; // Cb (U) - was at odd position in NV21
+                output[outPos++] = input[srcPair];     // Cr (V) - was at even position in NV21
+            }
+            // Zero padding bytes in UV output row
+            int uvRowEnd = rowStartOut + uvPaddedWidth;
+            while (outPos < uvRowEnd)
+            {
+                output[outPos++] = 0;
+            }
+        }
+        return output;
+    }
+
+    static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px, long capture_ts)
+    {
+        if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && (MainActivity.PREF__use_H264_hw_encoding) &&
+            (Callstate.video_out_codec == VIDEO_CODEC_H264))
+        {
+            feed_h264_encoder(buf, frame_width_px, frame_height_px, capture_ts);
+
+            for (int jj = 0; jj < 2; jj++)
+            {
+                CallingActivity.h264_encoder_output_data h264_out_data = fetch_from_h264_encoder();
+                byte[] buf_out = h264_out_data.data;
+
+                if (h264_out_data.sps_pps != null)
+                {
+                    save_sps_pps_nal(h264_out_data.sps_pps, h264_out_data.data_len);
+                }
+
+                if (buf_out != null)
+                {
+                    if (global_sps_pps_nal_unit_bytes != null)
+                    {
+                        if (send_sps_pps_every_x_frames_current > send_sps_pps_every_x_frames)
+                        {
+                            // Log.i(TAG, "video_send_frame_uv_reversed_wrapper:send_sps_pps:2");
+                            MainActivity.video_buffer_2.rewind();
+                            MainActivity.video_buffer_2.put(global_sps_pps_nal_unit_bytes);
+                            MainActivity.toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                                                     global_sps_pps_nal_unit_bytes.length);
+                            send_sps_pps_every_x_frames_current = 0;
+                        }
+
+                        send_sps_pps_every_x_frames_current++;
+                    }
+
+                    MainActivity.video_buffer_2.rewind();
+                    MainActivity.video_buffer_2.put(buf_out, 0, h264_out_data.data_len);
+                    MainActivity.toxav_video_send_frame_h264(friendnum, frame_width_px, frame_height_px,
+                                                             h264_out_data.data_len);
+                }
+                else
+                {
+                    // Log.i(TAG, "toxav_video_send_frame_wrapper:buf_out==null");
+                }
+            }
+
+            return 0;
+        }
+        else
+        {
+            return MainActivity.toxav_video_send_frame(friendnum, frame_width_px, frame_height_px);
+        }
+    }
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
+    // VIDEO SENDING - ENCODING -------------------------------------------------------
 }
