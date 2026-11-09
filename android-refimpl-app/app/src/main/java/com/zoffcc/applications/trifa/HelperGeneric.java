@@ -3145,141 +3145,12 @@ public class HelperGeneric
         }
     }
 
-    // FIX: Added independent yStride, uStride, vStride parameters.
-    // Original assumed tightly-packed layout (width*height for Y offset).
-    // Now uses actual strides to locate U and V planes correctly in stride-padded buffers.
-    static void reverse_u_and_v_planes(byte[] buf, int frame_width_px, int frame_height_px,
-                                       int yStride, int uStride, int vStride)
-    {
-        // TODO: make this less slow and aweful!
-        try
-        {
-            int pos = 0;
-            int ySize = yStride * frame_height_px;
-            int uSize = uStride * (frame_height_px / 2);
-            int uvCount = (frame_width_px / 2) * (frame_height_px / 2);
-            int uStart = ySize;
-            int vStart = ySize + uSize;
-            byte b = 0;
-
-            for (pos = 0; pos < uvCount; pos++)
-            {
-                b = buf[uStart + pos];
-                buf[uStart + pos] = buf[vStart + pos];
-                buf[vStart + pos] = b;
-            }
-        }
-        catch (Exception e)
-        {
-            // e.printStackTrace();
-        }
-    }
-
     static void save_sps_pps_nal(byte[] sps_pps_nal_unit_bytes, int length)
     {
         if (sps_pps_nal_unit_bytes != null)
         {
             global_sps_pps_nal_unit_bytes = Arrays.copyOf(sps_pps_nal_unit_bytes, length);
         }
-    }
-
-    // FIX: Added independent yStride, uStride, vStride parameters.
-    // Input is stride-padded YV12. Output is tightly-packed NV12 for H264 encoder.
-    // Reads V and U from stride-padded input positions, writes interleaved UV contiguously.
-    public static byte[] YV12totoNV12(byte[] input, byte[] output, int width, int height,
-                                      int yStride, int uStride, int vStride)
-    {
-        final int frameSize = width * height;
-        final int qFrameSize = frameSize / 4;
-        final int yInSize = yStride * height;
-        final int uInSize = uStride * (height / 2);
-        final int halfW = width / 2;
-        final int halfH = height / 2;
-
-        // Copy Y plane row by row from stride-padded input to tight output
-        for (int row = 0; row < height; row++)
-        {
-            System.arraycopy(input, row * yStride, output, row * width, width);
-        }
-
-        // Interleave V then U from stride-padded YV12 into contiguous NV12
-        int outPos = frameSize;
-        for (int row = 0; row < halfH; row++)
-        {
-            int uRowStart = yInSize + row * uStride;
-            int vRowStart = yInSize + uInSize + row * vStride;
-            for (int col = 0; col < halfW; col++)
-            {
-                output[outPos++] = input[uRowStart + col]; // Cb (U) first for NV12
-                output[outPos++] = input[vRowStart + col]; // Cr (V) second for NV12
-            }
-        }
-        return output;
-    }
-
-    // FIX: Added independent yStride, uStride, vStride parameters.
-    // Input is stride-padded YV12. Output is tightly-packed NV21 for H264 encoder.
-    // Reads V and U from stride-padded input positions, writes interleaved VU contiguously.
-    public static byte[] YV12toNV21(final byte[] input, final byte[] output, final int width, final int height,
-                                    final int yStride, final int uStride, final int vStride)
-    {
-        final int frameSize = width * height;
-        final int yInSize = yStride * height;
-        final int uInSize = uStride * (height / 2);
-        final int halfW = width / 2;
-        final int halfH = height / 2;
-
-        // Copy Y plane row by row from stride-padded input to tight output
-        for (int row = 0; row < height; row++)
-        {
-            System.arraycopy(input, row * yStride, output, row * width, width);
-        }
-
-        // Interleave V then U from stride-padded YV12 into contiguous NV21
-        int outPos = frameSize;
-        for (int row = 0; row < halfH; row++)
-        {
-            int uRowStart = yInSize + row * uStride;
-            int vRowStart = yInSize + uInSize + row * vStride;
-            for (int col = 0; col < halfW; col++)
-            {
-                output[outPos++] = input[vRowStart + col]; // For NV21, V first
-                output[outPos++] = input[uRowStart + col]; // For NV21, U second
-            }
-        }
-        return output;
-    }
-
-    // FIX: Added yStride parameter.
-    // Input is stride-padded NV21. Output is tightly-packed NV12 for H264 encoder.
-    // Reads interleaved VU from stride-padded input rows, writes interleaved UV contiguously.
-    public static byte[] NV21toNV12(byte[] input, byte[] output, int width, int height, int yStride)
-    {
-        final int frameSize = width * height;
-        final int qFrameSize = frameSize / 4;
-        final int yInSize = yStride * height;
-        final int halfW = width / 2;
-        final int halfH = height / 2;
-
-        // Copy Y plane row by row from stride-padded input to tight output
-        for (int row = 0; row < height; row++)
-        {
-            System.arraycopy(input, row * yStride, output, row * width, width);
-        }
-
-        // Swap VU->UV from stride-padded NV21 input to contiguous NV12 output
-        int outPos = frameSize;
-        for (int row = 0; row < halfH; row++)
-        {
-            int uvRowStart = yInSize + row * yStride; // UV rows use same stride as Y in NV21
-            for (int col = 0; col < halfW; col++)
-            {
-                int srcPair = uvRowStart + col * 2;
-                output[outPos++] = input[srcPair + 1]; // Cb (U) - was at odd position in NV21
-                output[outPos++] = input[srcPair];     // Cr (V) - was at even position in NV21
-            }
-        }
-        return output;
     }
 
     static int toxav_video_send_frame_uv_reversed_wrapper(final byte[] buf2, final long friendnum, final int frame_width_px, final int frame_height_px, long capture_ts)
@@ -3311,6 +3182,12 @@ public class HelperGeneric
                 Callstate.java_video_encoder_delay_start_ts = System.currentTimeMillis();
             }
 
+            // FIX: Hardware H264 encoders require stride aligned to 64 bytes.
+            // In portrait mode (480 wide), unaligned stride causes diagonal grey lines.
+            // Pad width to next multiple of 64 and use padded size for encoder input.
+            final int paddedWidth = (frame_width_px + 63) & ~63;
+            final int paddedBufSize = paddedWidth * frame_height_px * 3 / 2;
+
             final Thread new_thread = new Thread()
             {
                 @Override
@@ -3323,37 +3200,47 @@ public class HelperGeneric
 
                         if (MainActivity.PREF__camera_get_preview_format.equals("YV12"))
                         {
+                            // FIX: Allocate buffer with padded size for H264 encoder
                             if (buf_video_send_frame == null)
                             {
-                                buf_video_send_frame = new byte[buf2.length];
+                                buf_video_send_frame = new byte[paddedBufSize];
                             }
-                            else if (buf_video_send_frame.length < buf2.length)
+                            else if (buf_video_send_frame.length < paddedBufSize)
                             {
-                                buf_video_send_frame = new byte[buf2.length];
+                                buf_video_send_frame = new byte[paddedBufSize];
                             }
-                            // FIX: Pass independent strides to conversion function
+                            // FIX: After rotation, buf2 is tightly packed with swapped dimensions.
+                            // Use frame_width_px/frame_height_px as strides (they are the POST-rotation dims).
+                            // For 90°/270° rotation these are already swapped by the caller.
+                            // For 0°/180° they match the original camera dims.
+                            int convYStride = frame_width_px;
+                            int convUStride = (frame_width_px + 1) / 2;
+                            int convVStride = (frame_width_px + 1) / 2;
+                            // FIX: Pass paddedWidth so output rows are 64-aligned for H264 encoder
                             buf_video_send_frame = YV12totoNV12(buf2, buf_video_send_frame, frame_width_px,
-                                                                frame_height_px,
-                                                                CameraWrapper.camera_y_stride,
-                                                                CameraWrapper.camera_u_stride,
-                                                                CameraWrapper.camera_v_stride);
-                            feed_h264_encoder(buf_video_send_frame, frame_width_px, frame_height_px, video_frame_age);
+                                                                frame_height_px, convYStride, convUStride, convVStride,
+                                                                paddedWidth);
+                            // FIX: Tell encoder the padded width so it reads rows correctly
+                            feed_h264_encoder(buf_video_send_frame, paddedWidth, frame_height_px, video_frame_age);
                         }
                         else // (PREF__camera_get_preview_format == "NV21")
                         {
+                            // FIX: Allocate buffer with padded size for H264 encoder
                             if (buf_video_send_frame == null)
                             {
-                                buf_video_send_frame = new byte[buf2.length];
+                                buf_video_send_frame = new byte[paddedBufSize];
                             }
-                            else if (buf_video_send_frame.length < buf2.length)
+                            else if (buf_video_send_frame.length < paddedBufSize)
                             {
-                                buf_video_send_frame = new byte[buf2.length];
+                                buf_video_send_frame = new byte[paddedBufSize];
                             }
-                            // FIX: Pass yStride to conversion function
+                            // FIX: Same — use post-rotation width as stride
+                            int convYStride = frame_width_px;
+                            // FIX: Pass paddedWidth so output rows are 64-aligned for H264 encoder
                             buf_video_send_frame = NV21toNV12(buf2, buf_video_send_frame, frame_width_px,
-                                                              frame_height_px,
-                                                              CameraWrapper.camera_y_stride);
-                            feed_h264_encoder(buf_video_send_frame, frame_width_px, frame_height_px, video_frame_age);
+                                                              frame_height_px, convYStride, paddedWidth);
+                            // FIX: Tell encoder the padded width so it reads rows correctly
+                            feed_h264_encoder(buf_video_send_frame, paddedWidth, frame_height_px, video_frame_age);
                         }
 
                         // Log.i(TAG, "toxav_video_send_frame_uv_reversed_wrapper:feed:--END--:" + (System.currentTimeMillis() - s_time) + "ms");
@@ -3544,6 +3431,94 @@ public class HelperGeneric
         {
             return MainActivity.toxav_video_send_frame_uv_reversed(friendnum, frame_width_px, frame_height_px);
         }
+    }
+
+    // FIX: Added outputPaddedWidth parameter for H264 encoder stride alignment (64-byte boundary).
+    // Output Y and UV rows are written with outputPaddedWidth stride, padding bytes zeroed.
+    public static byte[] YV12totoNV12(byte[] input, byte[] output, int width, int height,
+                                      int yStride, int uStride, int vStride, int outputPaddedWidth)
+    {
+        final int halfW = width / 2;
+        final int halfH = height / 2;
+        final int yInSize = yStride * height;
+        // FIX: YV12 layout is Y-V-U, so V plane starts at yInSize, U plane starts after V
+        final int vInSize = vStride * halfH;
+        final int vInStart = yInSize;           // V comes FIRST in YV12
+        final int uInStart = yInSize + vInSize; // U comes SECOND in YV12
+
+        // FIX: Copy Y plane row by row with padded output stride, zero padding bytes
+        for (int row = 0; row < height; row++)
+        {
+            System.arraycopy(input, row * yStride, output, row * outputPaddedWidth, width);
+            for (int pad = width; pad < outputPaddedWidth; pad++)
+            {
+                output[row * outputPaddedWidth + pad] = 0;
+            }
+        }
+
+        // FIX: Interleave U then V into NV12 output with padded UV stride, zero padding bytes
+        int outPos = outputPaddedWidth * height;
+        int uvPaddedWidth = outputPaddedWidth; // UV row stride matches Y row stride
+        for (int row = 0; row < halfH; row++)
+        {
+            int uRowStart = uInStart + row * uStride;
+            int vRowStart = vInStart + row * vStride;
+            int rowStartOut = outPos;
+            for (int col = 0; col < halfW; col++)
+            {
+                output[outPos++] = input[uRowStart + col]; // Cb (U) first for NV12
+                output[outPos++] = input[vRowStart + col]; // Cr (V) second for NV12
+            }
+            // Zero padding bytes in UV output row
+            int uvRowEnd = rowStartOut + uvPaddedWidth;
+            while (outPos < uvRowEnd)
+            {
+                output[outPos++] = 0;
+            }
+        }
+        return output;
+    }
+
+    // FIX: Added outputPaddedWidth parameter for H264 encoder stride alignment (64-byte boundary).
+    // Input is stride-padded NV21. Output rows use outputPaddedWidth stride, padding bytes zeroed.
+    // Reads interleaved VU from stride-padded input rows, writes interleaved UV contiguously.
+    public static byte[] NV21toNV12(byte[] input, byte[] output, int width, int height, int yStride, int outputPaddedWidth)
+    {
+        final int halfW = width / 2;
+        final int halfH = height / 2;
+        final int yInSize = yStride * height;
+
+        // FIX: Copy Y plane row by row with padded output stride, zero padding bytes
+        for (int row = 0; row < height; row++)
+        {
+            System.arraycopy(input, row * yStride, output, row * outputPaddedWidth, width);
+            for (int pad = width; pad < outputPaddedWidth; pad++)
+            {
+                output[row * outputPaddedWidth + pad] = 0;
+            }
+        }
+
+        // FIX: Swap VU->UV with padded UV stride, zero padding bytes
+        int outPos = outputPaddedWidth * height;
+        int uvPaddedWidth = outputPaddedWidth; // UV row stride matches Y row stride
+        for (int row = 0; row < halfH; row++)
+        {
+            int uvRowStart = yInSize + row * yStride; // UV rows use same stride as Y in NV21
+            int rowStartOut = outPos;
+            for (int col = 0; col < halfW; col++)
+            {
+                int srcPair = uvRowStart + col * 2;
+                output[outPos++] = input[srcPair + 1]; // Cb (U) - was at odd position in NV21
+                output[outPos++] = input[srcPair];     // Cr (V) - was at even position in NV21
+            }
+            // Zero padding bytes in UV output row
+            int uvRowEnd = rowStartOut + uvPaddedWidth;
+            while (outPos < uvRowEnd)
+            {
+                output[outPos++] = 0;
+            }
+        }
+        return output;
     }
 
     static int toxav_video_send_frame_wrapper(byte[] buf, long friendnum, int frame_width_px, int frame_height_px, long capture_ts)
