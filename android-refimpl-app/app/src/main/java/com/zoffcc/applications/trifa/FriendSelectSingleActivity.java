@@ -19,57 +19,64 @@
 
 package com.zoffcc.applications.trifa;
 
-import android.app.ListActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
+import com.l4digital.fastscroll.FastScrollRecyclerView;
 import com.zoffcc.applications.sorm.FriendList;
 import com.zoffcc.applications.sorm.GroupDB;
 
-import java.security.acl.Group;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import static com.zoffcc.applications.trifa.HelperGroup.tox_group_by_groupid__wrapper;
+import static com.zoffcc.applications.trifa.MainActivity.tox_group_is_connected;
+import static com.zoffcc.applications.trifa.ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
-public class FriendSelectSingleActivity extends ListActivity
+public class FriendSelectSingleActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.FrndSelSingleActy";
+
+    private static final int BUCKET_PINNED = 0;
+    private static final int BUCKET_ONLINE = 1;
+    private static final int BUCKET_REST = 2;
+
     List<FriendSelectSingle> friends_list;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.friend_select_single_layout);
 
         Log.i(TAG, "onCreate:001");
 
-        Bundle extras = getIntent().getExtras();
-        int also_offline_friends = 0;
-        if (extras != null)
-        {
-            also_offline_friends = extras.getInt("offline", 0);
-        }
+        final Bundle extras = getIntent().getExtras();
+        final int also_offline_friends = (extras != null) ? extras.getInt("offline", 0) : 0;
+        final int also_ngc_groups = (extras != null) ? extras.getInt("ngc_groups", 0) : 0;
 
-        int also_ngc_groups = 0;
-        if (extras != null)
-        {
-            also_ngc_groups = extras.getInt("ngc_groups", 0);
-        }
         Log.i(TAG, "onCreate:also_ngc_groups=" + also_ngc_groups);
 
-        List<com.zoffcc.applications.sorm.FriendList> fl = null;
+        List<FriendList> fl = null;
         try
         {
             if (also_offline_friends == 1)
             {
                 fl = orma.selectFromFriendList().
                         is_relayNotEq(true).
+                        orderByPinnedDesc().
                         orderByTOX_CONNECTION_on_offDesc().
                         orderByNotification_silentAsc().
                         orderByLast_online_timestampDesc().
@@ -80,40 +87,26 @@ public class FriendSelectSingleActivity extends ListActivity
                 fl = orma.selectFromFriendList().
                         is_relayNotEq(true).
                         TOX_CONNECTION_realNotEq(0).
+                        orderByPinnedDesc().
                         orderByTOX_CONNECTION_on_offDesc().
                         orderByNotification_silentAsc().
                         orderByLast_online_timestampDesc().
                         toList();
             }
-
-            if (also_ngc_groups == 0)
-            {
-                if (fl == null)
-                {
-                    this.finish();
-                }
-
-                if (fl.size() < 1)
-                {
-                    this.finish();
-                }
-            }
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            if (also_ngc_groups == 0)
-            {
-                this.finish();
-            }
         }
 
-        List<com.zoffcc.applications.sorm.GroupDB> gr = null;
+        List<GroupDB> gr = null;
         if (also_ngc_groups == 1)
         {
             try
             {
                 gr = orma.selectFromGroupDB().
+                        orderByPinnedDesc().
+                        orderByGroup_activeDesc().
                         orderByNotification_silentAsc().
                         orderByNameAsc().
                         toList();
@@ -124,98 +117,230 @@ public class FriendSelectSingleActivity extends ListActivity
             }
         }
 
-        try
-        {
-            Log.i(TAG, "onCreate:002:fl.size()=" + fl.size());
-        }
-        catch (Exception ignored)
-        {
-        }
+        Log.i(TAG, "onCreate:002:fl.size()=" + ((fl != null) ? fl.size() : -1));
+        Log.i(TAG, "onCreate:002:gr.size()=" + ((gr != null) ? gr.size() : -1));
 
-        try
-        {
-            Log.i(TAG, "onCreate:002:gr.size()=" + gr.size());
-        }
-        catch (Exception ignored)
-        {
-        }
+        final List<FriendSelectSingle> entries = new ArrayList<>();
 
-        try
+        // ------------- friends -------------
+        if (fl != null)
         {
-            friends_list = new ArrayList<>();
-
             for (FriendList f : fl)
             {
-                if (f.alias_name == null)
+                final String display_name = ((f.alias_name != null) && (f.alias_name.length() > 0))
+                        ? f.alias_name : f.name;
+
+                final FriendSelectSingle entry = new FriendSelectSingle(display_name, f.tox_public_key_string,
+                                                                        FriendSelectSingle.TYPE_FRIEND);
+                entry.friend_item = f;
+                entry.pinned = f.pinned;
+                entry.online = (f.TOX_CONNECTION_real != TOX_CONNECTION_NONE.value);
+                entry.section_text = bubble_char(display_name);
+                entries.add(entry);
+            }
+        }
+
+        // ------------- ngc groups -------------
+        if (gr != null)
+        {
+            for (GroupDB g : gr)
+            {
+                final FriendSelectSingle entry = new FriendSelectSingle(g.name, g.group_identifier,
+                                                                        FriendSelectSingle.TYPE_NGC_GROUP);
+                entry.group_item = g;
+                entry.pinned = g.pinned;
+                entry.online = is_group_connected_for_selection(g);
+                entry.section_text = bubble_char(g.name);
+                entries.add(entry);
+            }
+        }
+
+        // ------------- ordering: pinned -> online friends / connected groups -> rest -------------
+        // stable sort, so the DB ordering is kept inside each bucket
+        Collections.sort(entries, new Comparator<FriendSelectSingle>()
+        {
+            @Override
+            public int compare(FriendSelectSingle a, FriendSelectSingle b)
+            {
+                return selection_bucket(a) - selection_bucket(b);
+            }
+        });
+
+        // ------------- section headers -------------
+        friends_list = new ArrayList<>();
+        int last_bucket = -1;
+        for (FriendSelectSingle e : entries)
+        {
+            final int bucket = selection_bucket(e);
+            if (bucket != last_bucket)
+            {
+                if (bucket == BUCKET_PINNED)
                 {
-                    friends_list.add(new FriendSelectSingle(f.name, f.tox_public_key_string));
+                    friends_list.add(FriendSelectSingle.separator("Pinned"));
                 }
-                else if (f.alias_name.length() < 1)
+                else if (bucket == BUCKET_ONLINE)
                 {
-                    friends_list.add(new FriendSelectSingle(f.name, f.tox_public_key_string));
+                    friends_list.add(FriendSelectSingle.separator("Online"));
                 }
                 else
                 {
-                    friends_list.add(new FriendSelectSingle(f.alias_name, f.tox_public_key_string));
+                    friends_list.add(FriendSelectSingle.separator("Offline"));
                 }
+                last_bucket = bucket;
             }
+            friends_list.add(e);
+        }
 
-            try
+        // ------------- nothing selectable? show an explanation instead of closing -------------
+        if (entries.size() < 1)
+        {
+            friends_list.add(FriendSelectSingle.empty_info(
+                    build_empty_message(fl, gr, also_offline_friends, also_ngc_groups)));
+        }
+
+        final FastScrollRecyclerView listingsView =
+                (FastScrollRecyclerView) findViewById(R.id.friend_select_rv_list);
+        listingsView.setLayoutManager(new LinearLayoutManager(this));
+        listingsView.setItemAnimator(new DefaultItemAnimator());
+        listingsView.setHasFixedSize(true);
+
+        final FriendSelectSingleAdapter adapter = new FriendSelectSingleAdapter(this, friends_list,
+                                                                                new FriendSelectSingleAdapter.OnEntrySelectedListener()
+                                                                                {
+                                                                                    @Override
+                                                                                    public void onEntrySelected(FriendSelectSingle entry)
+                                                                                    {
+                                                                                        return_selected_entry(entry);
+                                                                                    }
+                                                                                });
+
+        // FastScrollRecyclerView.setAdapter() wires the SectionIndexer automatically
+        listingsView.setAdapter(adapter);
+
+        Log.i(TAG, "onCreate:010");
+    }
+
+    private void return_selected_entry(FriendSelectSingle entry)
+    {
+        if (entry == null)
+        {
+            return;
+        }
+
+        final Intent data = new Intent();
+        if (entry.getType() == FriendSelectSingle.TYPE_FRIEND)
+        {
+            data.setData(Uri.parse("0:" + entry.pubkey));
+        }
+        else if (entry.getType() == FriendSelectSingle.TYPE_NGC_GROUP)
+        {
+            data.setData(Uri.parse("2:" + entry.pubkey));
+        }
+        else
+        {
+            return;
+        }
+
+        setResult(RESULT_OK, data);
+        finish();
+    }
+
+    private String build_empty_message(@Nullable List<FriendList> fl, @Nullable List<GroupDB> gr,
+                                       int also_offline_friends, int also_ngc_groups)
+    {
+        final int friend_count = (fl != null) ? fl.size() : 0;
+        final int group_count = (gr != null) ? gr.size() : 0;
+
+        final boolean wants_groups = (also_ngc_groups == 1);
+        final boolean online_only = (also_offline_friends != 1);
+
+        if (wants_groups)
+        {
+            if ((friend_count == 0) && (group_count == 0))
             {
-                for (GroupDB g : gr)
+                if (online_only)
                 {
-                    // Log.i(TAG, "g___:" + g);
-                    friends_list.add(new FriendSelectSingle("NGC Group: " + g.name, g.group_identifier, 2));
+                    return "Nothing to select.\n\nYou have no friends or groups that are online right now.";
                 }
-            }
-            catch(Exception e)
-            {
-                Log.i(TAG, "onCreate:EE001:add:gr:" +e.getMessage());
+                return "Nothing to select.\n\nYou have no friends and no groups yet.";
             }
 
-            FriendSelectSingleAdapter adapter = new FriendSelectSingleAdapter(this,
-                                                                              R.layout.friend_select_single_single_list_item_view_custom,
-                                                                              friends_list);
-            this.setListAdapter(adapter);
-            ListView lv = getListView();
-
-            lv.setOnItemClickListener(new AdapterView.OnItemClickListener()
+            if (friend_count == 0)
             {
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+                if (online_only)
                 {
-                    Intent data = new Intent();
-                    try
-                    {
-                        if (friends_list.get((int) id).getType() == 0)
-                        {
-                            String return_friend_pubkey = "0:" + friends_list.get((int) id).pubkey;
-                            data.setData(Uri.parse(return_friend_pubkey));
-                        }
-                        else if (friends_list.get((int) id).getType() == 2)
-                        {
-                            String return_ngc_id = "2:" + friends_list.get((int) id).pubkey;
-                            data.setData(Uri.parse(return_ngc_id));
-                        }
-                        setResult(RESULT_OK, data);
-                    }
-                    catch (Exception e3)
-                    {
-                        e3.printStackTrace();
-                    }
-
-                    finish();
+                    return "Nothing to select.\n\nNone of your friends is online right now, " +
+                           "and you have no groups.";
                 }
-            });
+                return "Nothing to select.\n\nYou have no friends yet, and no groups.";
+            }
 
-            Log.i(TAG, "onCreate:009");
+            if (group_count == 0)
+            {
+                return "Nothing to select.\n\nNone of your friends is online right now, " +
+                       "and you have no groups.";
+            }
 
+            return "Nothing to select.\n\nNo friend is online right now, and no group is connected.";
+        }
+
+        // friends only
+        if (friend_count == 0)
+        {
+            if (online_only)
+            {
+                return "Nothing to select.\n\nNone of your friends is online right now.\n\n" +
+                       "Wait for a friend to come online, or add a friend first.";
+            }
+            return "Nothing to select.\n\nYou have no friends yet.\n\nAdd a friend first.";
+        }
+
+        return "Nothing to select.\n\nNone of your friends is online right now.";
+    }
+
+    private static String bubble_char(String name)
+    {
+        try
+        {
+            if ((name != null) && (name.trim().length() > 0))
+            {
+                return name.trim().substring(0, 1).toUpperCase(Locale.ENGLISH);
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+        return "#";
+    }
+
+    private static int selection_bucket(FriendSelectSingle e)
+    {
+        if (e.pinned)
+        {
+            return BUCKET_PINNED;
+        }
+        if (e.online)
+        {
+            return BUCKET_ONLINE;
+        }
+        return BUCKET_REST;
+    }
+
+    private static boolean is_group_connected_for_selection(GroupDB g)
+    {
+        try
+        {
+            if ((g == null) || (!g.group_active) || (g.group_we_left))
+            {
+                return false;
+            }
+
+            return (tox_group_is_connected(tox_group_by_groupid__wrapper(g.group_identifier)) ==
+                    TRIFAGlobals.TOX_GROUP_CONNECTION_STATUS.TOX_GROUP_CONNECTION_STATUS_CONNECTED.value);
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            this.finish();
+            return false;
         }
-
-        Log.i(TAG, "onCreate:010");
     }
 }

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:foreground="@drawable/friend_select_item_press_overlay"
+    android:orientation="vertical"
+    android:padding="0dip">
+
+    <RelativeLayout
+        android:id="@+id/f_conf_container_parent"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginBottom="2dp"
+        android:background="@drawable/friend_list_conf_round_bg"
+        android:elevation="2dp"
+        android:padding="2dip">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/f_avatar_icon"
+            android:layout_width="36dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginLeft="6dp"
+            android:layout_marginRight="6dip"
+            android:src="@drawable/circle_blue"
+            app:civ_border_color="#40000000"
+            app:civ_border_width="2dp" />
+
+        <ImageView
+            android:id="@+id/f_status_icon"
+            android:layout_width="14dp"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="6dip"
+            android:layout_toRightOf="@id/f_avatar_icon"
+            android:scaleType="centerInside"
+            android:src="@drawable/circle_red" />
+
+        <TextView
+            android:id="@+id/f_group_type_badge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="6dp"
+            android:background="@drawable/friend_select_group_badge_bg"
+            android:paddingLeft="5dp"
+            android:paddingTop="1dp"
+            android:paddingRight="5dp"
+            android:paddingBottom="1dp"
+            android:text="GROUP"
+            android:textColor="@color/friend_list_text_color"
+            android:textSize="9sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="6dip"
+            android:layout_toLeftOf="@id/f_group_type_badge"
+            android:layout_toRightOf="@id/f_status_icon"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/textViewName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="example group"
+                android:textColor="@color/md_black_1000"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/f_group_subtext"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="#ABC123"
+                android:textColor="@color/friend_list_text_color"
+                android:textSize="10sp"
+                android:typeface="monospace" />
+        </LinearLayout>
+
+    </RelativeLayout>
+
+</LinearLayout>
