@@ -253,8 +253,8 @@ android {
         minSdkVersion 21
         //noinspection OldTargetApi
         targetSdkVersion 33
-        versionCode 10316
-        versionName "1.0.316"
+        versionCode 10317
+        versionName "1.0.317"
 
         // Enabling multidex support
         multiDexEnabled true
