@@ -1100,7 +1100,11 @@ public class HelperGroup
         }
 
         HelperFriend.add_all_friends_clear_wrapper(0);
-
+        if (m.is_new && !do_notification)
+        {
+            HelperMsgNotification.set_unread_count_for_key(m.group_identifier,
+                                                           (HelperMsgNotification.get_unread_count_for_key(m.group_identifier) + 1));
+        }
         if (do_notification)
         {
             change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, groupname, m.text);
@@ -1288,7 +1292,11 @@ public class HelperGroup
         }
 
         HelperFriend.add_all_friends_clear_wrapper(0);
-
+        if (m.is_new && !do_notification)
+        {
+            HelperMsgNotification.set_unread_count_for_key(m.group_identifier,
+                                                           (HelperMsgNotification.get_unread_count_for_key(m.group_identifier) + 1));
+        }
         if (do_notification)
         {
             change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, groupname, m.text);
@@ -1801,7 +1809,11 @@ public class HelperGroup
             }
 
             HelperFriend.add_all_friends_clear_wrapper(0);
-
+            if (m.is_new && !do_notification)
+            {
+                HelperMsgNotification.set_unread_count_for_key(m.group_identifier,
+                                                               (HelperMsgNotification.get_unread_count_for_key(m.group_identifier) + 1));
+            }
             if (do_notification)
             {
                 change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, groupname, m.text);
@@ -2777,7 +2789,11 @@ public class HelperGroup
             }
 
             HelperFriend.add_all_friends_clear_wrapper(0);
-
+            if (m.is_new && !do_notification)
+            {
+                HelperMsgNotification.set_unread_count_for_key(m.group_identifier,
+                                                               (HelperMsgNotification.get_unread_count_for_key(m.group_identifier) + 1));
+            }
             if (do_notification)
             {
                 change_msg_notification(NOTIFICATION_EDIT_ACTION_ADD.value, m.group_identifier, groupname, m.text);

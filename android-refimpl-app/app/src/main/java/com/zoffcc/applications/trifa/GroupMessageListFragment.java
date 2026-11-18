@@ -98,6 +98,7 @@ public class GroupMessageListFragment extends Fragment
                         is_new(false).execute();
             }
             // reset "new" flags for messages -------
+            HelperMsgNotification.update_msg_notification_unread_count();
         }
         catch (Exception e)
         {
@@ -385,6 +386,7 @@ public class GroupMessageListFragment extends Fragment
                     // Log.i(TAG, "loading data:002");
                 }
                 // reset "new" flags for messages -------
+                HelperMsgNotification.update_msg_notification_unread_count();
             }
             catch (Exception e)
             {
@@ -521,6 +523,7 @@ public class GroupMessageListFragment extends Fragment
                         is_new(false).execute();
             }
             // reset "new" flags for messages -------
+            HelperMsgNotification.update_msg_notification_unread_count();
         }
         catch (Exception e)
         {

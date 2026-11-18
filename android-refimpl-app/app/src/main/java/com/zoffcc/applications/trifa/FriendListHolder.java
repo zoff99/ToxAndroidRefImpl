@@ -543,6 +543,9 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         {
             int new_messages_count = orma.selectFromMessage().tox_friendpubkeyEq(
                     fl.tox_public_key_string).is_newEq(true).count();
+
+            HelperMsgNotification.set_unread_count_for_key(fl.tox_public_key_string, new_messages_count);
+
             if (new_messages_count > 0)
             {
                 if (new_messages_count > 99)

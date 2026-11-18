@@ -261,6 +261,8 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             int new_messages_count = orma.selectFromGroupMessage().
                     group_identifierEq(fl.group_identifier.toLowerCase()).is_newEq(true).count();
 
+            HelperMsgNotification.set_unread_count_for_key(fl.group_identifier.toLowerCase(), new_messages_count);
+
             if (new_messages_count > 0)
             {
                 if (new_messages_count > 99)

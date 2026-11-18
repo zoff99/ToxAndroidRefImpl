@@ -224,6 +224,8 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             int new_messages_count = orma.selectFromConferenceMessage().
                     conference_identifierEq(fl.conference_identifier).is_newEq(true).count();
 
+            HelperMsgNotification.set_unread_count_for_key(fl.conference_identifier, new_messages_count);
+
             if (new_messages_count > 0)
             {
                 if (new_messages_count > 99)

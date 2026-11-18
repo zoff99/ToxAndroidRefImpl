@@ -102,9 +102,12 @@ public class ConferenceMessageListFragment extends Fragment
             // reset "new" flags for messages -------
             if (orma != null)
             {
+                int count_read = orma.selectFromConferenceMessage().
+                        conference_identifierEq(current_conf_id).is_newEq(true).count();
                 orma.updateConferenceMessage().
                         conference_identifierEq(current_conf_id).
                         is_new(false).execute();
+                HelperMsgNotification.subtract_unread_count_for_key(current_conf_id, count_read);
             }
             // reset "new" flags for messages -------
         }
@@ -333,9 +336,12 @@ public class ConferenceMessageListFragment extends Fragment
                 // reset "new" flags for messages -------
                 if (orma != null)
                 {
+                    int count_read = orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).is_newEq(true).count();
                     orma.updateConferenceMessage().
                             conference_identifierEq(current_conf_id).
                             is_new(false).execute();
+                    HelperMsgNotification.subtract_unread_count_for_key(current_conf_id, count_read);
                     // Log.i(TAG, "loading data:002");
                 }
                 // reset "new" flags for messages -------
@@ -454,9 +460,12 @@ public class ConferenceMessageListFragment extends Fragment
             // reset "new" flags for messages -------
             if (orma != null)
             {
+                int count_read = orma.selectFromConferenceMessage().
+                        conference_identifierEq(current_conf_id).is_newEq(true).count();
                 orma.updateConferenceMessage().
                         conference_identifierEq(current_conf_id).
                         is_new(false).execute();
+                HelperMsgNotification.subtract_unread_count_for_key(current_conf_id, count_read);
             }
             // reset "new" flags for messages -------
         }
