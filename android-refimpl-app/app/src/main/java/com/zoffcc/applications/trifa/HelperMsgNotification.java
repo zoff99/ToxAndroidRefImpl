@@ -74,7 +74,7 @@ public class HelperMsgNotification
             unread_count_map.remove(key);
         }
 
-        Log.i(TAG, "set_unread_count_for_key: key=" + key + " count=" + count + " TOTAL=" + get_total_unread_count());
+        // Log.i(TAG, "set_unread_count_for_key: key=" + key + " count=" + count + " TOTAL=" + get_total_unread_count());
 
         update_msg_notification_unread_count();
     }
@@ -203,7 +203,7 @@ public class HelperMsgNotification
      */
     static synchronized void update_msg_notification_unread_count()
     {
-        Log.i(TAG, "update_msg_notification_unread_count: posted=" + msg_notification_is_posted);
+        // Log.i(TAG, "update_msg_notification_unread_count: posted=" + msg_notification_is_posted);
 
         if (!msg_notification_is_posted)
         {
@@ -211,7 +211,7 @@ public class HelperMsgNotification
         }
 
         final int total = get_total_unread_count();
-        Log.i(TAG, "update_msg_notification_unread_count: updating notification number to " + total);
+        // Log.i(TAG, "update_msg_notification_unread_count: updating notification number to " + total);
 
         Runnable myRunnable = new Runnable()
         {
@@ -312,13 +312,13 @@ public class HelperMsgNotification
         {
             total += entry.getValue();
         }
-        Log.i(TAG, "get_total_unread_count: TOTAL=" + total);
+        // Log.i(TAG, "get_total_unread_count: TOTAL=" + total);
         return total;
     }
 
     static void remove_msg_notification()
     {
-        Log.i(TAG, "noti_and_badge:remove_notification:");
+        // Log.i(TAG, "noti_and_badge:remove_notification:");
         Runnable myRunnable = new Runnable()
         {
             @Override
@@ -351,7 +351,7 @@ public class HelperMsgNotification
 
     static void show_msg_notification(final String nf_title, final String nf_text)
     {
-        Log.i(TAG, "noti_and_badge:show_notification:");
+        // Log.i(TAG, "noti_and_badge:show_notification:");
         Runnable myRunnable = new Runnable()
         {
             @Override
