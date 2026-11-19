@@ -36,11 +36,10 @@ import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.hash_to_bucket;
 import static com.zoffcc.applications.trifa.HelperGeneric.isColorDarkBrightness;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__message_paging_num_msgs_per_page;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CONFERENCE_CHAT_BG_CORNER_RADIUS_IN_PX;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_EMOJI_SIZE;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LOAD_ALL_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_TEXT_SIZE;
 
 public class MessageListHolder_paging extends RecyclerView.ViewHolder implements View.OnClickListener
@@ -140,24 +139,15 @@ public class MessageListHolder_paging extends RecyclerView.ViewHolder implements
     {
         try
         {
-            if (message_.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_OLDER_HASH))
+            if (message_.msg_idv3_hash.equals(MESSAGE_PAGING_LOAD_ALL_HASH))
             {
-                if ((MessageListFragment.current_page_offset - PREF__message_paging_num_msgs_per_page) < 1)
+                // "load all messages" dummy entry: load the full history for this chat,
+                // stay at the top so the user keeps their place
+                MessageListFragment.load_all_messages = true;
+                if (MainActivity.message_list_fragment != null)
                 {
-                    MessageListFragment.current_page_offset = 0;
+                    MainActivity.message_list_fragment.update_all_messages(false, true, PREF__messageview_paging);
                 }
-                else
-                {
-                    MessageListFragment.current_page_offset =
-                            MessageListFragment.current_page_offset - PREF__message_paging_num_msgs_per_page;
-                }
-                MainActivity.message_list_fragment.update_all_messages(false, true, PREF__messageview_paging);
-            }
-            else
-            {
-                MessageListFragment.current_page_offset =
-                        MessageListFragment.current_page_offset + PREF__message_paging_num_msgs_per_page;
-                MainActivity.message_list_fragment.update_all_messages(false, false, PREF__messageview_paging);
             }
         }
         catch (Exception ignored)

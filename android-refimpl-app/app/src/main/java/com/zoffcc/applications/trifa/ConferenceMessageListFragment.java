@@ -49,9 +49,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__conference_show_s
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LAST_PAGE_MARGIN;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_NEWER_HASH;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LOAD_ALL_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_anygroupview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -64,7 +62,9 @@ public class ConferenceMessageListFragment extends Fragment
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     ConferenceMessagelistAdapter adapter = null;
     static boolean is_at_bottom = true;
-    static int current_page_offset = -1;
+    // when true, the full message history is loaded for this conference (via the "load all messages" dummy entry).
+    // reset to false every time the conference is opened (see reset_paging())
+    static boolean load_all_messages = false;
     static boolean faded_in = false;
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
@@ -448,7 +448,7 @@ public class ConferenceMessageListFragment extends Fragment
 
     void reset_paging()
     {
-        current_page_offset = -1; // reset paging when we change friend that is shown
+        load_all_messages = false; // reset "load all messages" when we change conference that is shown
     }
 
     void update_all_messages(final boolean stay_at_top, final boolean paging)
@@ -481,63 +481,41 @@ public class ConferenceMessageListFragment extends Fragment
                 data_values.clear();
             }
 
-            boolean later_messages = false;
-            boolean older_messages = false;
             List<com.zoffcc.applications.sorm.ConferenceMessage> ml = null;
+            boolean show_load_all_dummy = false;
+            int older_messages_count = 0;
 
-            if ((paging) && ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0)))
+            if ((paging) && (!load_all_messages) &&
+                ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0)))
             {
-                later_messages = true;
-                older_messages = true;
-
+                // ---- message load limit: only load the newest N messages ----
                 int count_messages = orma.selectFromConferenceMessage().
                         conference_identifierEq(current_conf_id).
                         tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                        orderBySent_timestampAsc().
                         count();
 
-                int offset = 0;
-                int rowcount = PREF__message_paging_num_msgs_per_page;
-
-                if (current_page_offset == -1) // HINT: page at the bottom (latest messages shown)
+                if (count_messages > PREF__message_paging_num_msgs_per_page)
                 {
-                    later_messages = false;
-                    offset = count_messages - PREF__message_paging_num_msgs_per_page;
-                    if (offset < 0)
-                    {
-                        offset = 0;
-                    }
-                    current_page_offset = offset;
-                    // HINT: we need MESSAGE_PAGING_LAST_PAGE_MARGIN in case new messages arrived
-                    //       since "count_messages" was calculated above
-                    rowcount = PREF__message_paging_num_msgs_per_page + MESSAGE_PAGING_LAST_PAGE_MARGIN;
+                    older_messages_count = count_messages - PREF__message_paging_num_msgs_per_page;
+
+                    ml = orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).
+                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                            orderBySent_timestampAsc().
+                            limit(PREF__message_paging_num_msgs_per_page, older_messages_count).
+                            toList();
+
+                    show_load_all_dummy = true;
                 }
                 else
                 {
-                    if ((count_messages - current_page_offset) < PREF__message_paging_num_msgs_per_page)
-                    {
-                        current_page_offset = count_messages - PREF__message_paging_num_msgs_per_page;
-                        rowcount = PREF__message_paging_num_msgs_per_page + MESSAGE_PAGING_LAST_PAGE_MARGIN;
-                    }
-                    offset = current_page_offset;
+                    ml = orma.selectFromConferenceMessage().
+                            conference_identifierEq(current_conf_id).
+                            tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                            orderBySent_timestampAsc().
+                            toList();
                 }
-
-                if ((count_messages - offset) <= PREF__message_paging_num_msgs_per_page)
-                {
-                    later_messages = false;
-                }
-
-                if (offset < 1)
-                {
-                    older_messages = false;
-                }
-
-                ml = orma.selectFromConferenceMessage().
-                        conference_identifierEq(current_conf_id).
-                        tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                        orderBySent_timestampAsc().
-                        limit(rowcount, offset).
-                        toList();
+                // ---- message load limit ----
             }
             else
             {
@@ -548,8 +526,6 @@ public class ConferenceMessageListFragment extends Fragment
                             tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                             orderBySent_timestampAsc().
                             toList();
-
-                    // adapter.add_list_clear();
                 }
                 else
                 {
@@ -573,45 +549,29 @@ public class ConferenceMessageListFragment extends Fragment
 
             if (ml != null)
             {
-                if (older_messages)
+                if (show_load_all_dummy)
                 {
-                    ConferenceMessage m_older = new ConferenceMessage();
-                    m_older.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
-                    m_older.is_new = false;
-                    m_older.direction = 0;
-                    m_older.message_id_tox = MESSAGE_PAGING_SHOW_OLDER_HASH;
-                    m_older.text = "older Messages";
-                    add_message(m_older, false, stay_at_top);
+                    // dummy entry at the top: clicking it loads the full history
+                    ConferenceMessage m_load_all = new ConferenceMessage();
+                    m_load_all.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+                    m_load_all.is_new = false;
+                    m_load_all.direction = 0;
+                    m_load_all.message_id_tox = MESSAGE_PAGING_LOAD_ALL_HASH;
+                    m_load_all.text = "Load all messages (" + older_messages_count + " older)";
+                    ml.add(0, m_load_all);
                 }
 
-                for (com.zoffcc.applications.sorm.ConferenceMessage message : ml)
-                {
-                    if (message == ml.get(ml.size() - 1))
-                    {
-                        add_message((ConferenceMessage) message, false, stay_at_top);
-                    }
-                    else
-                    {
-                        if (later_messages)
-                        {
-                            add_message((ConferenceMessage) message, false, stay_at_top);
-                        }
-                        else
-                        {
-                            add_message((ConferenceMessage) message, false, stay_at_top);
-                        }
-                    }
-                }
+                adapter.add_list_clear(ml);
 
-                if (later_messages)
+                if (stay_at_top)
                 {
-                    ConferenceMessage m_later = new ConferenceMessage();
-                    m_later.tox_peerpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
-                    m_later.is_new = false;
-                    m_later.direction = 0;
-                    m_later.message_id_tox = MESSAGE_PAGING_SHOW_NEWER_HASH;
-                    m_later.text = "newer Messages";
-                    add_message(m_later, false, stay_at_top);
+                    // used by the "load all messages" dummy entry: keep the user at the top
+                    is_at_bottom = false;
+                    listingsView.scrollToPosition(0);
+                }
+                else if (is_at_bottom)
+                {
+                    listingsView.scrollToPosition(adapter.getItemCount() - 1);
                 }
             }
         }

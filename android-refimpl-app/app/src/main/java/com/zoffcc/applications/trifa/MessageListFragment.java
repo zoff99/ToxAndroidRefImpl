@@ -45,10 +45,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import static com.zoffcc.applications.trifa.HelperFriend.tox_friend_get_public_key__wrapper;
 import static com.zoffcc.applications.trifa.HelperGeneric.do_fade_anim_on_fab;
 import static com.zoffcc.applications.trifa.HelperGeneric.get_sqlite_search_string;
+import static com.zoffcc.applications.trifa.MainActivity.PREF__message_paging_num_msgs_per_page;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__messageview_paging;
 import static com.zoffcc.applications.trifa.MainActivity.context_s;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LOAD_ALL_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.global_showing_messageview;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
@@ -61,7 +64,9 @@ public class MessageListFragment extends Fragment
     com.l4digital.fastscroll.FastScrollRecyclerView listingsView = null;
     MessagelistAdapter adapter = null;
     static boolean is_at_bottom = true;
-    static int current_page_offset = -1;
+    // when true, the full message history is loaded for this chat (via the "load all messages" dummy entry).
+    // reset to false every time the chat is opened (see reset_paging())
+    static boolean load_all_messages = false;
     static int messages_count_old = 0;
     static int count_messages_full = 0;
     static boolean faded_in = false;
@@ -493,7 +498,7 @@ public class MessageListFragment extends Fragment
 
     void reset_paging()
     {
-        current_page_offset = -1; // reset paging when we change friend that is shown
+        load_all_messages = false; // reset "load all messages" when we change friend that is shown
     }
 
     void update_all_messages(final boolean from_resume_fragment, final boolean stay_at_top, final boolean paging)
@@ -518,15 +523,37 @@ public class MessageListFragment extends Fragment
         try
         {
             int number_of_items_old = data_values.size();
+            int count_messages_full_old = messages_count_old;
             data_values.clear();
 
             List<com.zoffcc.applications.sorm.Message> ml = get_messages();
             adapter.add_list_clear(ml);
+
+            if (stay_at_top)
+            {
+                // used by the "load all messages" dummy entry: keep the user at the top
+                is_at_bottom = false;
+                listingsView.scrollToPosition(0);
+            }
+
             try
             {
                 if (from_resume_fragment)
                 {
-                    if ((number_of_items_old > 0) && (data_values.size() > number_of_items_old))
+                    boolean has_new_messages;
+                    if ((PREF__messageview_paging) && (!load_all_messages) && (!show_only_files) &&
+                        ((search_messages_text == null) || (search_messages_text.length() == 0)))
+                    {
+                        // limited view: the list size stays ~constant, so compare FULL message counts instead
+                        has_new_messages = (count_messages_full_old > 0) &&
+                                           (get_messages_count_full() > count_messages_full_old);
+                    }
+                    else
+                    {
+                        has_new_messages = (number_of_items_old > 0) && (data_values.size() > number_of_items_old);
+                    }
+
+                    if (has_new_messages)
                     {
                         if (is_at_bottom)
                         {
@@ -574,6 +601,44 @@ public class MessageListFragment extends Fragment
     private List<com.zoffcc.applications.sorm.Message> get_messages()
     {
         List<com.zoffcc.applications.sorm.Message> ml;
+
+        // ---- message load limit: only load the newest N messages ----
+        // HINT: applies to the default view only (not to search results or the "files only" filter)
+        if ((PREF__messageview_paging) && (!load_all_messages) && (!show_only_files) &&
+            ((search_messages_text == null) || (search_messages_text.length() == 0)))
+        {
+            int count_messages = orma.selectFromMessage().
+                    tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                    count();
+
+            if (count_messages > PREF__message_paging_num_msgs_per_page)
+            {
+                int older_messages_count = count_messages - PREF__message_paging_num_msgs_per_page;
+
+                ml = orma.selectFromMessage().
+                        tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
+                        orderBySent_timestampAsc().
+                        orderBySent_timestamp_msAsc().
+                        limit(PREF__message_paging_num_msgs_per_page, older_messages_count).
+                        toList();
+
+                if (ml != null)
+                {
+                    // dummy entry at the top: clicking it loads the full history
+                    Message m_load_all = new Message();
+                    m_load_all.tox_friendpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
+                    m_load_all.msg_idv3_hash = MESSAGE_PAGING_LOAD_ALL_HASH;
+                    m_load_all.is_new = false;
+                    m_load_all.direction = 0;
+                    m_load_all.text = "Load all messages (" + older_messages_count + " older)";
+                    ml.add(0, m_load_all);
+                }
+
+                return ml;
+            }
+        }
+        // ---- message load limit ----
+
         if (show_only_files)
         {
             ml = orma.selectFromMessage().

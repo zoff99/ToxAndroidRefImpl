@@ -36,6 +36,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LOAD_ALL_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_NEWER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
@@ -276,17 +277,19 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             if ((my_msg.tox_friendpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) && (
 
                     ((my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_OLDER_HASH)) ||
-                     (my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_NEWER_HASH)))
+                     (my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_NEWER_HASH)) ||
+                     (my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
 
             ))
             {
-                if (my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_OLDER_HASH))
+                if (my_msg.msg_idv3_hash.equals(MESSAGE_PAGING_SHOW_NEWER_HASH))
                 {
-                    return Message_model.PAGING_OLDER;
+                    return Message_model.PAGING_NEWER;
                 }
                 else
                 {
-                    return Message_model.PAGING_NEWER;
+                    // "older" and "load all" dummy entries both use the "older" layout
+                    return Message_model.PAGING_OLDER;
                 }
             }
             else if (my_msg.direction == 0)
@@ -566,6 +569,15 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         {
             Message getSectionText_message_object = (Message) messagelistitems.get(position);
 
+            // "load all messages" dummy entry has no meaningful timestamp
+            if ((getSectionText_message_object.tox_friendpubkey != null) &&
+                (getSectionText_message_object.tox_friendpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) &&
+                (getSectionText_message_object.msg_idv3_hash != null) &&
+                (getSectionText_message_object.msg_idv3_hash.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
+            {
+                return " ";
+            }
+
             if (getSectionText_message_object.direction == 0)
             {
                 // incoming msg
@@ -609,6 +621,15 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         try
         {
             Message getSectionText_message_object2 = (Message) messagelistitems.get(position);
+
+            // "load all messages" dummy entry has no meaningful timestamp
+            if ((getSectionText_message_object2.tox_friendpubkey != null) &&
+                (getSectionText_message_object2.tox_friendpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) &&
+                (getSectionText_message_object2.msg_idv3_hash != null) &&
+                (getSectionText_message_object2.msg_idv3_hash.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
+            {
+                return " ";
+            }
 
             if (getSectionText_message_object2.direction == 0)
             {

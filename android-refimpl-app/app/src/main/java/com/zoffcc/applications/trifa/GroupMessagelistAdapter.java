@@ -36,7 +36,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LOAD_ALL_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
 
 public class GroupMessagelistAdapter extends RecyclerView.Adapter implements FastScroller.SectionIndexer
 {
@@ -159,6 +161,11 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                                                                             false);
                 }
                 return new GroupMessageListHolder_file_outgoing_state_cancel(view, this.context);
+
+            case Message_model.PAGING_OLDER:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_paging_older, parent,
+                                                                        false);
+                return new GroupMessageListHolder_paging(view, this.context);
         }
 
         view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_error, parent, false);
@@ -170,6 +177,16 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     {
         GroupMessage my_msg = (GroupMessage) this.messagelistitems.get(position);
         {
+            // "load all messages" dummy entry (message load limit) -------------
+            if ((my_msg.tox_group_peer_pubkey != null) &&
+                (my_msg.tox_group_peer_pubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) &&
+                (my_msg.message_id_tox != null) &&
+                (my_msg.message_id_tox.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
+            {
+                return Message_model.PAGING_OLDER;
+            }
+            // "load all messages" dummy entry -------------
+
             if (my_msg.TRIFA_MESSAGE_TYPE == TRIFA_MSG_FILE.value)
             {
                 // FILE -------------
@@ -272,6 +289,10 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
 
                 case Message_model.FILE_OUTGOING_STATE_CANCEL:
                     ((GroupMessageListHolder_file_outgoing_state_cancel) holder).bindMessageList(m2);
+                    break;
+
+                case Message_model.PAGING_OLDER:
+                    ((GroupMessageListHolder_paging) holder).bindMessageList(m2);
                     break;
 
                 default:
@@ -415,6 +436,15 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
         try
         {
             GroupMessage getSectionText_message_object2 = (GroupMessage) messagelistitems.get(position);
+
+            // "load all messages" dummy entry has no meaningful timestamp
+            if ((getSectionText_message_object2.tox_group_peer_pubkey != null) &&
+                (getSectionText_message_object2.tox_group_peer_pubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) &&
+                (getSectionText_message_object2.message_id_tox != null) &&
+                (getSectionText_message_object2.message_id_tox.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
+            {
+                return " ";
+            }
 
             if (getSectionText_message_object2.direction == 0)
             {

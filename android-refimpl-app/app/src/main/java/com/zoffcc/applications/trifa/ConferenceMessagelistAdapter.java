@@ -35,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LOAD_ALL_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_NEWER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
@@ -142,17 +143,19 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
             if ((my_msg.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) && (
 
                     ((my_msg.message_id_tox.equals(MESSAGE_PAGING_SHOW_OLDER_HASH)) ||
-                     (my_msg.message_id_tox.equals(MESSAGE_PAGING_SHOW_NEWER_HASH)))
+                     (my_msg.message_id_tox.equals(MESSAGE_PAGING_SHOW_NEWER_HASH)) ||
+                     (my_msg.message_id_tox.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
 
             ))
             {
-                if (my_msg.message_id_tox.equals(MESSAGE_PAGING_SHOW_OLDER_HASH))
+                if (my_msg.message_id_tox.equals(MESSAGE_PAGING_SHOW_NEWER_HASH))
                 {
-                    return Message_model.PAGING_OLDER;
+                    return Message_model.PAGING_NEWER;
                 }
                 else
                 {
-                    return Message_model.PAGING_NEWER;
+                    // "older" and "load all" dummy entries both use the "older" layout
+                    return Message_model.PAGING_OLDER;
                 }
             }
             else if (my_msg.direction == 0)
@@ -375,6 +378,15 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
         try
         {
             ConferenceMessage getSectionText_message_object2 = messagelistitems.get(position);
+
+            // "load all messages" dummy entry has no meaningful timestamp
+            if ((getSectionText_message_object2.tox_peerpubkey != null) &&
+                (getSectionText_message_object2.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) &&
+                (getSectionText_message_object2.message_id_tox != null) &&
+                (getSectionText_message_object2.message_id_tox.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
+            {
+                return " ";
+            }
 
             if (getSectionText_message_object2.direction == 0)
             {

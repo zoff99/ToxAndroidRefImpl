@@ -568,7 +568,7 @@ public class MainActivity extends AppCompatActivity
     static boolean PREF__allow_push_server_ntfy = false;
     static boolean PREF__allow_push_server_sunup = false;
     static boolean PREF__messageview_paging = true;
-    static int PREF__message_paging_num_msgs_per_page = 50;
+    static int PREF__message_paging_num_msgs_per_page = 2000;
     static int PREF__ngc_video_bitrate = LOWER_NGC_VIDEO_BITRATE; // ~600 kbits/s -> ~60 kbytes/s
     static int PREF__ngc_video_frame_delta_ms = 120; // 120 ms -> 8.3 fps
     static int PREF__ngc_video_max_quantizer = LOWER_NGC_VIDEO_QUANTIZER; // 47 -> default, 51 -> lowest quality, 30 -> very high quality and lots of bandwidth!
@@ -3881,12 +3881,22 @@ public class MainActivity extends AppCompatActivity
 
         try
         {
-            int temp = Integer.parseInt(settings.getString("message_paging_num_msgs_per_page", "50"));
+            String paging_pref_str = settings.getString("message_paging_num_msgs_per_page", "2000");
+
+            // HINT: migrate old default (50) to new default (2000).
+            //       paging was globally disabled before, so "50" was never an intentional user choice
+            if ("50".equals(paging_pref_str))
+            {
+                paging_pref_str = "2000";
+                settings.edit().putString("message_paging_num_msgs_per_page", "2000").apply();
+            }
+
+            int temp = Integer.parseInt(paging_pref_str);
 
             // HINT: sanity check pref value
-            if ((temp < 0) || (temp > 999))
+            if ((temp < 0) || (temp > 99999))
             {
-                temp = 50;
+                temp = 2000;
             }
 
             PREF__message_paging_num_msgs_per_page = temp;
@@ -3902,19 +3912,10 @@ public class MainActivity extends AppCompatActivity
         }
         catch (Exception e)
         {
-            PREF__message_paging_num_msgs_per_page = 50;
+            PREF__message_paging_num_msgs_per_page = 2000;
             PREF__messageview_paging = true;
             e.printStackTrace();
         }
-
-        // HINT: disable paging for now!!!!!!!!!!!!
-        // HINT: disable paging for now!!!!!!!!!!!!
-        // HINT: disable paging for now!!!!!!!!!!!!
-        PREF__message_paging_num_msgs_per_page = 0;
-        PREF__messageview_paging = false;
-        // HINT: disable paging for now!!!!!!!!!!!!
-        // HINT: disable paging for now!!!!!!!!!!!!
-        // HINT: disable paging for now!!!!!!!!!!!!
 
         try
         {
