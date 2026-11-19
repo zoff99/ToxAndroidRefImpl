@@ -103,6 +103,7 @@ public class GroupMessageListFragment extends Fragment
             {
                 orma.updateGroupMessage().
                         group_identifierEq(current_group_id.toLowerCase()).
+                        is_newEq(true).
                         is_new(false).execute();
             }
             // reset "new" flags for messages -------
@@ -333,6 +334,7 @@ public class GroupMessageListFragment extends Fragment
                 {
                     orma.updateGroupMessage().
                             group_identifierEq(current_group_id.toLowerCase()).
+                            is_newEq(true).
                             is_new(false).execute();
                     // Log.i(TAG, "loading data:002");
                 }
@@ -471,6 +473,7 @@ public class GroupMessageListFragment extends Fragment
             {
                 orma.updateGroupMessage().
                         group_identifierEq(current_group_id.toLowerCase()).
+                        is_newEq(true).
                         is_new(false).execute();
             }
             // reset "new" flags for messages -------

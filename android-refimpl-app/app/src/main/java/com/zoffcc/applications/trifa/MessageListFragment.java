@@ -130,6 +130,7 @@ public class MessageListFragment extends Fragment
                 int count_read = orma.selectFromMessage().tox_friendpubkeyEq(friend_pubkey).is_newEq(true).count();
                 orma.updateMessage().
                         tox_friendpubkeyEq(friend_pubkey).
+                        is_newEq(true).
                         is_new(false).
                         execute();
                 HelperMsgNotification.subtract_unread_count_for_key(friend_pubkey, count_read);
@@ -420,8 +421,8 @@ public class MessageListFragment extends Fragment
             {
                 String friend_pubkey = tox_friend_get_public_key__wrapper(current_friendnum);
                 int count_read = orma.selectFromMessage().tox_friendpubkeyEq(friend_pubkey).is_newEq(true).count();
-                orma.updateMessage().tox_friendpubkeyEq(friend_pubkey).is_new(
-                        false).execute();
+                orma.updateMessage().tox_friendpubkeyEq(friend_pubkey).
+                        is_newEq(true).is_new(false).execute();
                 HelperMsgNotification.subtract_unread_count_for_key(friend_pubkey, count_read);
                 // Log.i(TAG, "loading data:002");
             }
@@ -510,8 +511,8 @@ public class MessageListFragment extends Fragment
             // reset "new" flags for messages -------
             String friend_pubkey = tox_friend_get_public_key__wrapper(current_friendnum);
             int count_read = orma.selectFromMessage().tox_friendpubkeyEq(friend_pubkey).is_newEq(true).count();
-            orma.updateMessage().tox_friendpubkeyEq(friend_pubkey).is_new(
-                    false).execute();
+            orma.updateMessage().tox_friendpubkeyEq(friend_pubkey).
+                    is_newEq(true).is_new(false).execute();
             HelperMsgNotification.subtract_unread_count_for_key(friend_pubkey, count_read);
             // reset "new" flags for messages -------
         }

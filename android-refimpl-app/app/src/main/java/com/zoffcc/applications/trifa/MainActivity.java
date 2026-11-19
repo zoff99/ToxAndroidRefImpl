@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean INSANE_TRACE_LOGGING = false; // set "false" for release builds
-    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10243; // increase for database schema changes
+    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10244; // increase for database schema changes
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
@@ -3246,6 +3246,15 @@ public class MainActivity extends AppCompatActivity
             run_multi_sql("ALTER TABLE FriendList ADD COLUMN pinned BOOLEAN DEFAULT 0");
             run_multi_sql("ALTER TABLE ConferenceDB ADD COLUMN pinned BOOLEAN DEFAULT 0");
             run_multi_sql("ALTER TABLE GroupDB ADD COLUMN pinned BOOLEAN DEFAULT 0");
+        }
+
+        if (new_version == 10244) {
+            // composite indices for the chat-open queries: WHERE chat_id=? ORDER BY sent_timestamp[, sent_timestamp_ms]
+            // the single-column indices can serve the WHERE but not the ORDER BY,
+            // so without these SQLite temp-sorts the entire chat history on every open/update
+            run_multi_sql("CREATE INDEX `index_chat_tail_on_Message` ON `Message` (`tox_friendpubkey`, `sent_timestamp`, `sent_timestamp_ms`)");
+            run_multi_sql("CREATE INDEX `index_chat_tail_on_ConferenceMessage` ON `ConferenceMessage` (`conference_identifier`, `sent_timestamp`)");
+            run_multi_sql("CREATE INDEX `index_chat_tail_on_GroupMessage` ON `GroupMessage` (`group_identifier`, `sent_timestamp`)");
         }
     }
 

@@ -106,6 +106,7 @@ public class ConferenceMessageListFragment extends Fragment
                         conference_identifierEq(current_conf_id).is_newEq(true).count();
                 orma.updateConferenceMessage().
                         conference_identifierEq(current_conf_id).
+                        is_newEq(true).
                         is_new(false).execute();
                 HelperMsgNotification.subtract_unread_count_for_key(current_conf_id, count_read);
             }
@@ -340,6 +341,7 @@ public class ConferenceMessageListFragment extends Fragment
                             conference_identifierEq(current_conf_id).is_newEq(true).count();
                     orma.updateConferenceMessage().
                             conference_identifierEq(current_conf_id).
+                            is_newEq(true).
                             is_new(false).execute();
                     HelperMsgNotification.subtract_unread_count_for_key(current_conf_id, count_read);
                     // Log.i(TAG, "loading data:002");
@@ -464,6 +466,7 @@ public class ConferenceMessageListFragment extends Fragment
                         conference_identifierEq(current_conf_id).is_newEq(true).count();
                 orma.updateConferenceMessage().
                         conference_identifierEq(current_conf_id).
+                        is_newEq(true).
                         is_new(false).execute();
                 HelperMsgNotification.subtract_unread_count_for_key(current_conf_id, count_read);
             }
