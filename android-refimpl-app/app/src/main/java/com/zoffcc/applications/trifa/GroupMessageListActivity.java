@@ -1572,11 +1572,74 @@ public class GroupMessageListActivity extends AppCompatActivity
         boolean self;
     }
 
+    // skip-if-unchanged state for the persistent peer list (guarded by this activity's monitor)
+    private String last_peer_list_fingerprint = null;
+    private long last_peer_list_db_version = -1;
+    private long next_new_tag_expiry = 0;
+
+    // fingerprint of everything from the snapshot that affects the drawer output.
+    // deliberately excludes last_seen/signing keys: those change without any UI effect.
+    private String peer_list_fingerprint(List<MainActivity.MidPeerEntry> peers, String self_pubkey)
+    {
+        StringBuilder sb = new StringBuilder();
+        sb.append(self_pubkey == null ? "" : self_pubkey).append('\u0000');
+        for (MainActivity.MidPeerEntry e : peers)
+        {
+            sb.append(e.identity_key_hex).append('\u0001').
+                    append(e.status).append('\u0001').
+                    append(e.connection_status).append('\u0001').
+                    append(e.role).append('\u0001').
+                    append(e.nickname == null ? "" : e.nickname).append('\u0002');
+        }
+        return sb.toString();
+    }
+
     synchronized void set_peer_names_and_avatars()
     {
         final long perf_t0 = SystemClock.elapsedRealtime();
         long perf_t = perf_t0;
         HelperGeneric.perf_log(TAG, "peers:enter t=" + perf_t0);
+
+        // skip the full rebuild when nothing that affects the drawer has changed:
+        // same snapshot (UI-relevant fields), same GroupPeerDB write version, and no
+        // "_NEW_" tag expiry due. avoids ~50ms of per-peer DB queries every second.
+        if (PREF__X_persistent_peerlist)
+        {
+            try
+            {
+                List<MainActivity.MidPeerEntry> snap = MainActivity.get_mid_peer_list_snapshot();
+                if ((snap != null) && (!snap.isEmpty()) && (last_peer_list_fingerprint != null))
+                {
+                    long conference_num_fp = tox_group_by_groupid__wrapper(group_id);
+                    String self_pubkey_fp = "";
+                    try
+                    {
+                        self_pubkey_fp = tox_group_self_get_public_key(conference_num_fp);
+                        if (self_pubkey_fp == null)
+                        {
+                            self_pubkey_fp = "";
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
+                    String fp = peer_list_fingerprint(snap, self_pubkey_fp);
+                    if (fp.equals(last_peer_list_fingerprint) &&
+                        (MainActivity.group_peer_db_write_version.get() == last_peer_list_db_version) &&
+                        (System.currentTimeMillis() < next_new_tag_expiry))
+                    {
+                        HelperGeneric.perf_log(TAG, "peers:skip-unchanged n=" + snap.size() + " +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
+                        return;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+
         try
         {
             remove_group_all_users();
@@ -1667,6 +1730,10 @@ public class GroupMessageListActivity extends AppCompatActivity
         perf_t = SystemClock.elapsedRealtime();
             List<group_list_peer> group_peers_combined = new ArrayList<>();
             int i = 0;
+            // capture BEFORE enriching: a DB write during the build must force a rebuild next cycle
+            final long db_version_at_build_start = MainActivity.group_peer_db_write_version.get();
+            long new_tag_expiry = Long.MAX_VALUE;
+            final long now_ms = System.currentTimeMillis();
 
             // 3. Iterate the sorted snapshot to build the UI list
             for (MainActivity.MidPeerEntry entry : sorted_mid_peers)
@@ -1701,10 +1768,14 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                     if (peer_from_db != null)
                     {
-                        if ((peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS) >
-                            System.currentTimeMillis())
+                        long tag_expiry = peer_from_db.first_join_timestamp + NGC_NEW_PEERS_TIMEDELTA_IN_MS;
+                        if (tag_expiry > now_ms)
                         {
                             peer_name = "_NEW_ " + peer_name;
+                            if (tag_expiry < new_tag_expiry)
+                            {
+                                new_tag_expiry = tag_expiry;
+                            }
                         }
                     }
 
@@ -1741,6 +1812,10 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
             HelperGeneric.perf_log(TAG, "peers:add-group-users +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
+            // remember what we built so unchanged refreshes can be skipped
+            last_peer_list_fingerprint = peer_list_fingerprint(mid_peers, self_pubkey);
+            last_peer_list_db_version = db_version_at_build_start;
+            next_new_tag_expiry = new_tag_expiry;
             HelperGeneric.perf_log(TAG, "peers:persistent-branch:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         }
         else
@@ -2850,6 +2925,8 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     synchronized void remove_group_all_users()
     {
+        // any full clear invalidates the skip-if-unchanged fingerprint
+        last_peer_list_fingerprint = null;
         try
         {
             Runnable myRunnable = new Runnable()

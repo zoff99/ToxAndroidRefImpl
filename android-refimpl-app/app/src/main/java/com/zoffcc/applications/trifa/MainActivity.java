@@ -127,6 +127,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
@@ -688,6 +689,10 @@ public class MainActivity extends AppCompatActivity
     // Swapped atomically after building the complete list in the background.
     static final AtomicReference<List<MidPeerEntry>> mid_peer_list_snapshot =
             new AtomicReference<>(Collections.emptyList());
+
+    // bumped on every GroupPeerDB write (HelperGroup) so open group activities can
+    // detect DB-side changes (e.g. per-peer mute) that do not alter the snapshot
+    public static final AtomicLong group_peer_db_write_version = new AtomicLong(0);
 
     /**
      * Data class representing one peer entry from the persistent middleware roster.

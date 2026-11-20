@@ -734,6 +734,7 @@ public class HelperGroup
                         Tox_Group_Role(aTox_Group_Role).
                         last_update_timestamp(System.currentTimeMillis()).
                         execute();
+                MainActivity.group_peer_db_write_version.incrementAndGet();
             }
 
             // Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
@@ -753,6 +754,7 @@ public class HelperGroup
                         notification_silent(silent).
                         last_update_timestamp(System.currentTimeMillis()).
                         execute();
+                MainActivity.group_peer_db_write_version.incrementAndGet();
                 // Log.i(TAG, "group_notification_silent_peer_set: " + silent);
             }
         }
@@ -812,6 +814,7 @@ public class HelperGroup
                 p.first_join_timestamp = System.currentTimeMillis();
                 p.Tox_Group_Role = aTox_Group_Role;
                 orma.insertIntoGroupPeerDB(p);
+                MainActivity.group_peer_db_write_version.incrementAndGet();
             }
             // Log.i(TAG, "add_group_peer_to_db:" + orma.selectFromGroupPeerDB().count());
         }
