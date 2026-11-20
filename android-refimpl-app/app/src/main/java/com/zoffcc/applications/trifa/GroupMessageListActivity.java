@@ -1127,15 +1127,19 @@ public class GroupMessageListActivity extends AppCompatActivity
         if (PREF__window_security)
         {
             // prevent screenshots and also dont show the window content in recent activity screen
-            HelperGeneric.perf_log(TAG, "group/act:onCreate:send-icons+keyboard +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
-        perf_t = SystemClock.elapsedRealtime();
-        initializeScreenshotSecurity(this);
+            initializeScreenshotSecurity(this);
         }
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:send-icons+keyboard +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         set_peer_count_header();
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:peer-count-header +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         set_peer_names_and_avatars();
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:peer-names+avatars +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         ml_button_recaudio.setOnLongClickListener(new View.OnLongClickListener()
@@ -1570,6 +1574,9 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     synchronized void set_peer_names_and_avatars()
     {
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
+        HelperGeneric.perf_log(TAG, "peers:enter t=" + perf_t0);
         try
         {
             remove_group_all_users();
@@ -1578,15 +1585,21 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             e.printStackTrace();
         }
+        HelperGeneric.perf_log(TAG, "peers:remove-all-users +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         if (PREF__X_persistent_peerlist)
         {
+            HelperGeneric.perf_log(TAG, "peers:branch=persistent");
             // 1. Get the atomic, thread-safe snapshot from the middleware
             List<MainActivity.MidPeerEntry> mid_peers = MainActivity.get_mid_peer_list_snapshot();
             if (mid_peers == null || mid_peers.isEmpty())
             {
+                HelperGeneric.perf_log(TAG, "peers:snapshot-empty:exit");
                 return;
             }
+            HelperGeneric.perf_log(TAG, "peers:snapshot n=" + mid_peers.size() + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+            perf_t = SystemClock.elapsedRealtime();
 
             final long conference_num = tox_group_by_groupid__wrapper(group_id);
 
@@ -1650,6 +1663,8 @@ public class GroupMessageListActivity extends AppCompatActivity
             {
             }
 
+            HelperGeneric.perf_log(TAG, "peers:sort +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             List<group_list_peer> group_peers_combined = new ArrayList<>();
             int i = 0;
 
@@ -1716,15 +1731,21 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
             }
 
+            HelperGeneric.perf_log(TAG, "peers:db-enrich n=" + group_peers_combined.size() + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+            perf_t = SystemClock.elapsedRealtime();
             // 4. Push to UI (already perfectly sorted by the Comparator above!)
             for (group_list_peer peerl : group_peers_combined)
             {
                 add_group_user(peerl.peer_pubkey, peerl.peer_num, peerl.peer_name, peerl.peer_connection_status,
                                peerl.self, peerl.notification_silent);
             }
+            HelperGeneric.perf_log(TAG, "peers:add-group-users +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+            HelperGeneric.perf_log(TAG, "peers:persistent-branch:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         }
         else
         {
+            HelperGeneric.perf_log(TAG, "peers:branch=legacy-tox-peerlist");
             final long conference_num = tox_group_by_groupid__wrapper(group_id);
             long num_peers = tox_group_peer_count(conference_num);
             final long self_peer_id = tox_group_self_get_peer_id(conference_num);
@@ -1788,6 +1809,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                 }
             }
 
+            HelperGeneric.perf_log(TAG, "peers:legacy-online n=" + num_peers + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             long offline_num_peers = tox_group_offline_peer_count(conference_num);
 
             if (offline_num_peers > 0)
@@ -1840,7 +1863,10 @@ public class GroupMessageListActivity extends AppCompatActivity
                 for (group_list_peer peerloffline : group_peers_offline) {
                     add_group_user(peerloffline.peer_pubkey, peerloffline.peer_num, peerloffline.peer_name, peerloffline.peer_connection_status, false, peerloffline.notification_silent);
                 }
+                HelperGeneric.perf_log(TAG, "peers:legacy-offline n=" + offline_num_peers + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             }
+            HelperGeneric.perf_log(TAG, "peers:legacy-branch:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         }
     }
 
