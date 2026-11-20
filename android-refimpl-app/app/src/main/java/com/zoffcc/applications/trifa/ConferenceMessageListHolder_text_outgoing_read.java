@@ -89,7 +89,60 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         img_corner = (ImageView) itemView.findViewById(R.id.img_corner);
         text_block_group = (LinearLayout) itemView.findViewById(R.id.text_block_group);
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
-    }
+
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                layout_message_container.performClick();
+            }
+        });
+
+        textView.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View view)
+            {
+                layout_message_container.performLongClick();
+                return true;
+            }
+        });
+
+        textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
+        {
+            @Override
+            public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText)
+            {
+                if (autoLinkMode == AutoLinkMode.MODE_URL)
+                {
+                    showDialog_url(context, "open URL?", matchedText.replaceFirst("^\\s", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_EMAIL)
+                {
+                    showDialog_email(context, "send Email?", matchedText.replaceFirst("^\\s", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
+                {
+                    showDialog_url(context, "open URL?", "https://twitter.com/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
+                {
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
+                {
+                    showDialog_tox(context, "add ToxID?", matchedText.replaceFirst("^\\s", ""));
+                }
+            }
+        });
+
+        textView.setCustomRegex(TOXURL_PATTERN);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
+}
 
     public void bindMessageList(ConferenceMessage m)
     {
@@ -119,30 +172,13 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
-        textView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                layout_message_container.performClick();
-            }
-        });
 
-        textView.setOnLongClickListener(new View.OnLongClickListener()
-        {
-            @Override
-            public boolean onLongClick(View view)
-            {
-                layout_message_container.performLongClick();
-                return true;
-            }
-        });
 
-        textView.setCustomRegex(TOXURL_PATTERN);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
-                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
 
-        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
+
+
+
+        if (is_only_emojis_cached_local(m.text))
         {
             // text consits only of emojis -> increase size
             textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_ONLY_EMOJI_SIZE[PREF__global_font_size]));
@@ -184,35 +220,7 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
         // textView.setSelectedStateColor(ContextCompat.getColor(this.context, android.R.color.holo_blue_dark));
         // textView.enableUnderLine();
 
-        textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
-        {
-            @Override
-            public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText)
-            {
-                if (autoLinkMode == AutoLinkMode.MODE_URL)
-                {
-                    showDialog_url(context, "open URL?", matchedText.replaceFirst("^\\s", ""));
-                }
-                else if (autoLinkMode == AutoLinkMode.MODE_EMAIL)
-                {
-                    showDialog_email(context, "send Email?", matchedText.replaceFirst("^\\s", ""));
-                }
-                else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
-                {
-                    showDialog_url(context, "open URL?", "https://twitter.com/" +
-                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
-                }
-                else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
-                {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
-                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
-                }
-                else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
-                {
-                    showDialog_tox(context, "add ToxID?", matchedText.replaceFirst("^\\s", ""));
-                }
-            }
-        });
+
 
         HelperGeneric.fill_own_avatar_icon(context, img_avatar);
 
@@ -417,4 +425,23 @@ public class ConferenceMessageListHolder_text_outgoing_read extends RecyclerView
             return res.ret_value;
         }
     };
+
+    private boolean is_only_emojis_cached_local(String text)
+    {
+        try
+        {
+            if ((MainActivity.conference_message_list_fragment != null) && (MainActivity.conference_message_list_fragment.adapter != null))
+            {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION)
+                {
+                    return MainActivity.conference_message_list_fragment.adapter.is_only_emojis_cached(pos, text);
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+        return com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(text);
+    }
 }

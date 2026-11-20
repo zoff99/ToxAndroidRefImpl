@@ -68,6 +68,8 @@ public class GroupMessageListFragment extends Fragment
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
     boolean is_data_loaded = true;
+    // C: full message count at the last load; used by onResume to detect whether anything changed while away
+    private int messages_count_at_last_load = -1;
     static String group_search_messages_text = null;
     FloatingActionButton unread_messages_notice_button = null;
 
@@ -128,6 +130,9 @@ public class GroupMessageListFragment extends Fragment
             // data_values is NULL here!!
         }
 
+        // C: remember the full count so onResume can skip the reload when nothing changed
+        messages_count_at_last_load = get_messages_count_full();
+
         // --------------
         // --------------
         // --------------
@@ -144,6 +149,9 @@ public class GroupMessageListFragment extends Fragment
         listingsView.setLayoutManager(linearLayoutManager);
         listingsView.setItemAnimator(new DefaultItemAnimator());
         listingsView.setHasFixedSize(false);
+        // G: keep more recycled text rows around to avoid re-inflation when scrolling back
+        listingsView.getRecycledViewPool().setMaxRecycledViews(Message_model.TEXT_INCOMING_NOT_READ, 12);
+        listingsView.getRecycledViewPool().setMaxRecycledViews(Message_model.TEXT_OUTGOING_HAVE_READ, 12);
 
         listingsView.setFastScrollListener(new FastScroller.FastScrollListener()
         {
@@ -325,7 +333,12 @@ public class GroupMessageListFragment extends Fragment
         Log.i(TAG, "onResume");
         super.onResume();
 
-        if (!is_data_loaded)
+        // C: skip the full reload when nothing changed while we were away
+        boolean reload_needed = (!is_data_loaded)
+                                || MainActivity.group_message_list_dirty_while_away
+                                || ((group_search_messages_text != null) && (group_search_messages_text.length() > 0))
+                                || (get_messages_count_full() != messages_count_at_last_load);
+        if (reload_needed)
         {
             try
             {
@@ -352,7 +365,13 @@ public class GroupMessageListFragment extends Fragment
             is_at_bottom = true;
         }
 
-        is_data_loaded = false;
+        else
+        {
+            // nothing changed: just rebind visible rows (cheap), no DB reload
+            adapter.redraw_all_items();
+        }
+
+        is_data_loaded = true;
 
         MainActivity.group_message_list_fragment = this;
     }
@@ -431,6 +450,12 @@ public class GroupMessageListFragment extends Fragment
                 try
                 {
                     adapter.add_item(m);
+
+                    // C: keep the resume-skip count in sync with live appends
+                    if (messages_count_at_last_load >= 0)
+                    {
+                        messages_count_at_last_load++;
+                    }
                     if (is_at_bottom)
                     {
                         listingsView.scrollToPosition(adapter.getItemCount() - 1);
@@ -469,7 +494,8 @@ public class GroupMessageListFragment extends Fragment
         try
         {
             // reset "new" flags for messages -------
-            if (orma != null)
+            // C: searching does not mark the whole chat as read
+            if ((orma != null) && ((group_search_messages_text == null) || (group_search_messages_text.length() == 0)))
             {
                 orma.updateGroupMessage().
                         group_identifierEq(current_group_id.toLowerCase()).
@@ -503,6 +529,42 @@ public class GroupMessageListFragment extends Fragment
             Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
 
+        // C: remember the full count so onResume can skip the reload when nothing changed
+        try
+        {
+            messages_count_at_last_load = get_messages_count_full();
+        }
+        catch (Exception e)
+        {
+            messages_count_at_last_load = -1;
+        }
+        MainActivity.group_message_list_dirty_while_away = false;
+
+    }
+
+    private int get_messages_count_full()
+    {
+        int c = 0;
+        try
+        {
+            if (PREF__conference_show_system_messages)
+            {
+                c = orma.selectFromGroupMessage().
+                        group_identifierEq(current_group_id.toLowerCase()).
+                        count();
+            }
+            else
+            {
+                c = orma.selectFromGroupMessage().
+                        group_identifierEq(current_group_id.toLowerCase()).
+                        tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                        count();
+            }
+        }
+        catch (Exception e)
+        {
+        }
+        return c;
     }
 
     void reset_paging()

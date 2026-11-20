@@ -156,6 +156,11 @@ import static com.zoffcc.applications.trifa.TrifaToxService.wakeup_tox_thread;
 /** @noinspection ConstantValue*/
 public class MessageListActivity extends AppCompatActivity
 {
+    // C: debounce search input so we don't run a full query + rebuild on every keystroke
+    private static final long SEARCH_DEBOUNCE_MS = 250;
+    private final android.os.Handler search_debounce_handler = new android.os.Handler(android.os.Looper.getMainLooper());
+    private Runnable search_debounce_runnable = null;
+
     private static final String TAG = "trifa.MsgListActivity";
     long friendnum = -1;
     long friendnum_prev = -1;
@@ -377,6 +382,11 @@ public class MessageListActivity extends AppCompatActivity
             public boolean onQueryTextSubmit(String query)
             {
                 // Log.i(TAG, "search:1:" + query);
+                if (search_debounce_runnable != null)
+                {
+                    search_debounce_handler.removeCallbacks(search_debounce_runnable);
+                    search_debounce_runnable = null;
+                }
 
                 if ((query == null) || (query.length() == 0))
                 {
@@ -414,6 +424,11 @@ public class MessageListActivity extends AppCompatActivity
             public boolean onQueryTextChange(String query)
             {
                 // Log.i(TAG, "search:2:" + query);
+                if (search_debounce_runnable != null)
+                {
+                    search_debounce_handler.removeCallbacks(search_debounce_runnable);
+                    search_debounce_runnable = null;
+                }
 
                 if ((query == null) || (query.length() == 0))
                 {
@@ -431,17 +446,27 @@ public class MessageListActivity extends AppCompatActivity
                 }
                 else
                 {
-                    try
+                    // C: debounce keystrokes; run the search once typing pauses
+                    final String debounce_query = query;
+                    search_debounce_runnable = new Runnable()
                     {
-                        // all messages and search string
-                        show_only_files = false;
-                        MessageListFragment.search_messages_text = query;
-                        MainActivity.message_list_fragment.update_all_messages(false, false, PREF__messageview_paging);
-                    }
-                    catch (Exception e2)
-                    {
-                        e2.printStackTrace();
-                    }
+                        @Override
+                        public void run()
+                        {
+                            try
+                            {
+                                // all messages and search string
+                                show_only_files = false;
+                                MessageListFragment.search_messages_text = debounce_query;
+                                MainActivity.message_list_fragment.update_all_messages(false, false, PREF__messageview_paging);
+                            }
+                            catch (Exception e2)
+                            {
+                                e2.printStackTrace();
+                            }
+                        }
+                    };
+                    search_debounce_handler.postDelayed(search_debounce_runnable, SEARCH_DEBOUNCE_MS);
                 }
 
                 return true;

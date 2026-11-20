@@ -69,6 +69,8 @@ public class ConferenceMessageListFragment extends Fragment
     TextView scrollDateHeader = null;
     ConversationDateHeader conversationDateHeader = null;
     boolean is_data_loaded = false;
+    // C: full message count at the last load; used by onResume to detect whether anything changed while away
+    private int messages_count_at_last_load = -1;
     static String conf_search_messages_text = null;
     FloatingActionButton unread_messages_notice_button = null;
 
@@ -146,6 +148,9 @@ public class ConferenceMessageListFragment extends Fragment
         listingsView.setLayoutManager(linearLayoutManager);
         listingsView.setItemAnimator(new DefaultItemAnimator());
         listingsView.setHasFixedSize(false);
+        // G: keep more recycled text rows around to avoid re-inflation when scrolling back
+        listingsView.getRecycledViewPool().setMaxRecycledViews(Message_model.TEXT_INCOMING_NOT_READ, 12);
+        listingsView.getRecycledViewPool().setMaxRecycledViews(Message_model.TEXT_OUTGOING_HAVE_READ, 12);
 
         listingsView.setFastScrollListener(new FastScroller.FastScrollListener()
         {
@@ -330,7 +335,12 @@ public class ConferenceMessageListFragment extends Fragment
         Log.i(TAG, "onResume");
         super.onResume();
 
-        if (!is_data_loaded)
+        // C: skip the full reload when nothing changed while we were away
+        boolean reload_needed = (!is_data_loaded)
+                                || MainActivity.conference_message_list_dirty_while_away
+                                || ((conf_search_messages_text != null) && (conf_search_messages_text.length() > 0))
+                                || (get_messages_count_full() != messages_count_at_last_load);
+        if (reload_needed)
         {
             try
             {
@@ -357,6 +367,12 @@ public class ConferenceMessageListFragment extends Fragment
 
             // default is: at bottom
             is_at_bottom = true;
+        }
+
+        else
+        {
+            // nothing changed: just rebind visible rows (cheap), no DB reload
+            adapter.redraw_all_items();
         }
 
         is_data_loaded = true;
@@ -408,6 +424,12 @@ public class ConferenceMessageListFragment extends Fragment
                 {
                     adapter.add_item(m);
 
+                    // C: keep the resume-skip count in sync with live appends
+                    if (messages_count_at_last_load >= 0)
+                    {
+                        messages_count_at_last_load++;
+                    }
+
                     if (stay_at_top)
                     {
                         is_at_bottom = false;
@@ -448,6 +470,22 @@ public class ConferenceMessageListFragment extends Fragment
         }
     }
 
+    private int get_messages_count_full()
+    {
+        int c = 0;
+        try
+        {
+            c = orma.selectFromConferenceMessage().
+                    conference_identifierEq(current_conf_id).
+                    tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
+                    count();
+        }
+        catch (Exception e)
+        {
+        }
+        return c;
+    }
+
     void reset_paging()
     {
         load_all_messages = false; // reset "load all messages" when we change conference that is shown
@@ -460,7 +498,8 @@ public class ConferenceMessageListFragment extends Fragment
         try
         {
             // reset "new" flags for messages -------
-            if (orma != null)
+            // C: searching does not mark the whole chat as read
+            if ((orma != null) && ((conf_search_messages_text == null) || (conf_search_messages_text.length() == 0)))
             {
                 int count_read = orma.selectFromConferenceMessage().
                         conference_identifierEq(current_conf_id).is_newEq(true).count();
@@ -583,6 +622,17 @@ public class ConferenceMessageListFragment extends Fragment
             e.printStackTrace();
             Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
+
+        // C: remember the full count so onResume can skip the reload when nothing changed
+        try
+        {
+            messages_count_at_last_load = get_messages_count_full();
+        }
+        catch (Exception e)
+        {
+            messages_count_at_last_load = -1;
+        }
+        MainActivity.conference_message_list_dirty_while_away = false;
 
     }
 

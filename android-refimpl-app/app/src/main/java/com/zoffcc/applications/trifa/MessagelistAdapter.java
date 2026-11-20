@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,6 +55,10 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
     private static final String TAG = "trifa.MessagelistAdptr";
 
     private final List<com.zoffcc.applications.sorm.Message> messagelistitems;
+    // HINT: precomputed per-position date headers (null value = no header shown at this position)
+    private final SparseArray<String> date_header_cache = new SparseArray<>();
+    // HINT: lazy per-position cache for the "text consists only of emojis" check
+    private final SparseArray<Boolean> only_emojis_cache = new SparseArray<>();
     private Context context;
     long getSectionText_message_object_ts = -1L;
     long getSectionText_message_object_ts2 = -1L;
@@ -462,6 +467,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
+            recompute_all_date_headers();
+            only_emojis_cache.clear();
             this.notifyDataSetChanged();
             // Log.i(TAG, "add_list_clear:002");
         }
@@ -478,7 +485,28 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
         try
         {
+            // HINT: synced messages can arrive out of order (older timestamps). while the chat is open
+            //       they are appended at the end; the next full reload re-sorts them. make sure the
+            //       resume-skip logic does not hide such an out-of-order append.
+            int cnt_old = this.messagelistitems.size();
+            if (cnt_old > 0)
+            {
+                Message prev_last = this.messagelistitems.get(cnt_old - 1);
+                if ((prev_last != null) &&
+                    ((new_item.sent_timestamp < prev_last.sent_timestamp) ||
+                     ((new_item.sent_timestamp == prev_last.sent_timestamp) &&
+                      (new_item.sent_timestamp_ms < prev_last.sent_timestamp_ms))))
+                {
+                    MainActivity.message_list_dirty_while_away = true;
+                }
+            }
+
             this.messagelistitems.add(new_item);
+            // date header for the appended position (previous positions are unchanged)
+            int pos_new = this.messagelistitems.size() - 1;
+            String h_new = getDateHeaderText(pos_new);
+            String h_prev = (pos_new > 0) ? getDateHeaderText(pos_new - 1) : null;
+            date_header_cache.put(pos_new, ((pos_new == 0) || (!h_new.equals(h_prev))) ? h_new : null);
             // TODO: use "notifyItemInserted" !!
             this.notifyDataSetChanged();
             // Log.i(TAG, "add_item:002:" + this.messagelistitems.size());
@@ -520,6 +548,10 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                     int pos = this.messagelistitems.indexOf(m2);
                     // Log.i(TAG, "update_item:003:" + pos);
                     this.messagelistitems.set(pos, new_item);
+                    // timestamps may have changed (e.g. read receipt): invalidate this and the next header
+                    date_header_cache.delete(pos);
+                    date_header_cache.delete(pos + 1);
+                    only_emojis_cache.delete(pos);
                     this.notifyItemChanged(pos);
                     break;
                 }
@@ -549,6 +581,9 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 {
                     int pos = this.messagelistitems.indexOf(m2);
                     this.messagelistitems.remove(pos);
+                    // positions shifted: rebuild the position-keyed caches
+                    recompute_all_date_headers();
+                    only_emojis_cache.clear();
                     this.notifyItemRemoved(pos);
                     break;
                 }
@@ -616,9 +651,61 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
         }
     }
 
-    public String getDateHeaderText(int position)
+    private void recompute_all_date_headers()
     {
-        try
+        date_header_cache.clear();
+        String prev = null;
+        for (int i = 0; i < this.messagelistitems.size(); i++)
+        {
+            String h = getDateHeaderText(i);
+            date_header_cache.put(i, ((i == 0) || (!h.equals(prev))) ? h : null);
+            prev = h;
+        }
+    }
+
+    /**
+     * Date header to show at this position, or null if none.
+     * Precomputed once when the list is (re)loaded; invalidated positions fall back to on-demand computation.
+     */
+    public String getPrecomputedDateHeader(int position)
+    {
+        if ((position < 0) || (position >= this.messagelistitems.size()))
+        {
+            return null;
+        }
+        int idx = date_header_cache.indexOfKey(position);
+        if (idx >= 0)
+        {
+            return date_header_cache.valueAt(idx);
+        }
+        String h = getDateHeaderText(position);
+        String prev = (position > 0) ? getDateHeaderText(position - 1) : null;
+        String result = ((position == 0) || (!h.equals(prev))) ? h : null;
+        date_header_cache.put(position, result);
+        return result;
+    }
+
+    /**
+     * Lazy per-position cache for EmojiUtils.isOnlyEmojis() (avoids re-scanning the text on every rebind).
+     */
+    public boolean is_only_emojis_cached(int position, String text)
+    {
+        int idx = only_emojis_cache.indexOfKey(position);
+        if (idx >= 0)
+        {
+            Boolean v = only_emojis_cache.valueAt(idx);
+            if (v != null)
+            {
+                return v;
+            }
+        }
+        boolean result = com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(text);
+        only_emojis_cache.put(position, result);
+        return result;
+    }
+
+    public String getDateHeaderText(int position)
+    {        try
         {
             Message getSectionText_message_object2 = (Message) messagelistitems.get(position);
 

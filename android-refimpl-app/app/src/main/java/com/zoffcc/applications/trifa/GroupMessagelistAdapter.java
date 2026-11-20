@@ -21,6 +21,7 @@ package com.zoffcc.applications.trifa;
 
 import android.content.Context;
 import android.util.Log;
+import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +46,8 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     private static final String TAG = "trifa.GrpMesgelistAdptr";
 
     private final List<com.zoffcc.applications.sorm.GroupMessage> messagelistitems;
+    // HINT: lazy per-position cache for the "text consists only of emojis" check
+    private final SparseArray<Boolean> only_emojis_cache = new SparseArray<>();
     private Context context;
 
     private GroupMessage getSectionText_message_object = null;
@@ -331,6 +334,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
             // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
+            only_emojis_cache.clear();
             this.notifyDataSetChanged();
             // Log.i(TAG, "add_list_clear:002");
         }
@@ -352,6 +356,19 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
 
         try
         {
+            // HINT: synced messages can arrive out of order (older timestamps). while the chat is open
+            //       they are appended at the end; the next full reload re-sorts them. make sure the
+            //       resume-skip logic does not hide such an out-of-order append.
+            int cnt_old = this.messagelistitems.size();
+            if (cnt_old > 0)
+            {
+                GroupMessage prev_last = this.messagelistitems.get(cnt_old - 1);
+                if ((prev_last != null) && (new_item.sent_timestamp < prev_last.sent_timestamp))
+                {
+                    MainActivity.group_message_list_dirty_while_away = true;
+                }
+            }
+
             this.messagelistitems.add(new_item);
             // TODO: use "notifyItemInserted" !!
             this.notifyDataSetChanged();
@@ -383,6 +400,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                     int pos = this.messagelistitems.indexOf(m2);
                     // Log.i(TAG, "update_item:003:" + pos);
                     this.messagelistitems.set(pos, new_item);
+                    only_emojis_cache.delete(pos);
                     this.notifyItemChanged(pos);
                     break;
                 }
@@ -412,6 +430,8 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                 {
                     int pos = this.messagelistitems.indexOf(m2);
                     this.messagelistitems.remove(pos);
+                    // positions shifted: rebuild the position-keyed cache
+                    only_emojis_cache.clear();
                     this.notifyItemRemoved(pos);
                     break;
                 }
@@ -429,6 +449,25 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     {
         // set fastscroller bluble text
         return " ";
+    }
+
+    /**
+     * Lazy per-position cache for EmojiUtils.isOnlyEmojis() (avoids re-scanning the text on every rebind).
+     */
+    public boolean is_only_emojis_cached(int position, String text)
+    {
+        int idx = only_emojis_cache.indexOfKey(position);
+        if (idx >= 0)
+        {
+            Boolean v = only_emojis_cache.valueAt(idx);
+            if (v != null)
+            {
+                return v;
+            }
+        }
+        boolean result = com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(text);
+        only_emojis_cache.put(position, result);
+        return result;
     }
 
     public String getDateHeaderText(int position)

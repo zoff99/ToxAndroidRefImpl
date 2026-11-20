@@ -89,7 +89,60 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         layout_message_container = (ViewGroup) itemView.findViewById(R.id.layout_message_container);
         message_text_date_string = (TextView) itemView.findViewById(R.id.message_text_date_string);
         message_text_date = (ViewGroup) itemView.findViewById(R.id.message_text_date);
-    }
+
+        textView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View view)
+            {
+                layout_message_container.performClick();
+            }
+        });
+
+        textView.setOnLongClickListener(new View.OnLongClickListener()
+        {
+            @Override
+            public boolean onLongClick(View view)
+            {
+                layout_message_container.performLongClick();
+                return true;
+            }
+        });
+
+        textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
+        {
+            @Override
+            public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText)
+            {
+                if (autoLinkMode == AutoLinkMode.MODE_URL)
+                {
+                    showDialog_url(context, "open URL?", matchedText.replaceFirst("^\\s", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_EMAIL)
+                {
+                    showDialog_email(context, "send Email?", matchedText.replaceFirst("^\\s", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
+                {
+                    showDialog_url(context, "open URL?", "https://twitter.com/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
+                {
+                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
+                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
+                }
+                else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
+                {
+                    showDialog_tox(context, "add ToxID?", matchedText.replaceFirst("^\\s", ""));
+                }
+            }
+        });
+
+        textView.setCustomRegex(TOXURL_PATTERN);
+        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
+                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
+}
 
     public void bindMessageList(Message m)
     {
@@ -127,21 +180,11 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
             {
                 if (MainActivity.message_list_fragment.adapter != null)
                 {
-                    if (my_position < 1)
+                    String date_header = MainActivity.message_list_fragment.adapter.getPrecomputedDateHeader(my_position);
+                    if (date_header != null)
                     {
-                        message_text_date_string.setText(
-                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
+                        message_text_date_string.setText(date_header);
                         message_text_date.setVisibility(View.VISIBLE);
-                    }
-                    else
-                    {
-                        if (!MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position).equals(
-                                MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position - 1)))
-                        {
-                            message_text_date_string.setText(
-                                    MainActivity.message_list_fragment.adapter.getDateHeaderText(my_position));
-                            message_text_date.setVisibility(View.VISIBLE);
-                        }
                     }
                 }
             }
@@ -157,23 +200,8 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         layout_message_container.setOnClickListener(onclick_listener);
         layout_message_container.setOnLongClickListener(onlongclick_listener);
 
-        textView.setOnClickListener(new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View view)
-            {
-                layout_message_container.performClick();
-            }
-        });
-        textView.setOnLongClickListener(new View.OnLongClickListener()
-        {
-            @Override
-            public boolean onLongClick(View view)
-            {
-                layout_message_container.performLongClick();
-                return true;
-            }
-        });
+
+
 
         final String unicode_PERSONAL_COMPUTER = "\uD83D\uDCBB";
         final String unicode_INCOMING_ENVELOPE = "\uD83D\uDCE8";
@@ -192,11 +220,9 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         }
 
 
-        textView.setCustomRegex(TOXURL_PATTERN);
-        textView.addAutoLinkMode(AutoLinkMode.MODE_URL, AutoLinkMode.MODE_EMAIL, AutoLinkMode.MODE_HASHTAG,
-                                 AutoLinkMode.MODE_MENTION, AutoLinkMode.MODE_CUSTOM);
 
-        if (com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(m.text))
+
+        if (is_only_emojis_cached_local(m.text))
         {
             // text consits only of emojis -> increase size
             textView.setEmojiSize((int) dp2px(MESSAGE_EMOJI_ONLY_EMOJI_SIZE[PREF__global_font_size]));
@@ -236,35 +262,7 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         // textView.setSelectedStateColor(ContextCompat.getColor(this.context, android.R.color.holo_blue_dark));
         // textView.enableUnderLine();
 
-        textView.setAutoLinkOnClickListener(new AutoLinkOnClickListener()
-        {
-            @Override
-            public void onAutoLinkTextClick(AutoLinkMode autoLinkMode, String matchedText)
-            {
-                if (autoLinkMode == AutoLinkMode.MODE_URL)
-                {
-                    showDialog_url(context, "open URL?", matchedText.replaceFirst("^\\s", ""));
-                }
-                else if (autoLinkMode == AutoLinkMode.MODE_EMAIL)
-                {
-                    showDialog_email(context, "send Email?", matchedText.replaceFirst("^\\s", ""));
-                }
-                else if (autoLinkMode == AutoLinkMode.MODE_MENTION)
-                {
-                    showDialog_url(context, "open URL?", "https://twitter.com/" +
-                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^@", ""));
-                }
-                else if (autoLinkMode == AutoLinkMode.MODE_HASHTAG)
-                {
-                    showDialog_url(context, "open URL?", "https://twitter.com/hashtag/" +
-                                                         matchedText.replaceFirst("^\\s", "").replaceFirst("^#", ""));
-                }
-                else if (autoLinkMode == AutoLinkMode.MODE_CUSTOM) // tox: urls
-                {
-                    showDialog_tox(context, "add ToxID?", matchedText.replaceFirst("^\\s", ""));
-                }
-            }
-        });
+
 
 
         HelperGeneric.fill_own_avatar_icon(context, img_avatar);
@@ -468,4 +466,23 @@ public class MessageListHolder_text_outgoing_read extends RecyclerView.ViewHolde
         }
     };
 
+
+    private boolean is_only_emojis_cached_local(String text)
+    {
+        try
+        {
+            if ((MainActivity.message_list_fragment != null) && (MainActivity.message_list_fragment.adapter != null))
+            {
+                int pos = getAdapterPosition();
+                if (pos != RecyclerView.NO_POSITION)
+                {
+                    return MainActivity.message_list_fragment.adapter.is_only_emojis_cached(pos, text);
+                }
+            }
+        }
+        catch (Exception ignored)
+        {
+        }
+        return com.vanniktech.emoji.EmojiUtils.isOnlyEmojis(text);
+    }
 }

@@ -273,6 +273,11 @@ public class HelperMessage
                 };
                 t.start();
             }
+            else
+            {
+                // chat not in foreground: remember that a live update was skipped (checked on resume)
+                MainActivity.message_list_dirty_while_away = true;
+            }
         }
         catch (Exception e)
         {
@@ -438,6 +443,11 @@ public class HelperMessage
                 };
                 t.start();
             }
+            else
+            {
+                // chat not in foreground: remember that a live update was skipped (checked on resume)
+                MainActivity.message_list_dirty_while_away = true;
+            }
         }
         catch (Exception e)
         {
@@ -459,6 +469,16 @@ public class HelperMessage
                     MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
                     MainActivity.message_list_fragment.modify_message(m);
                 }
+                else
+                {
+                    // throttled: live update skipped (checked on resume)
+                    MainActivity.message_list_dirty_while_away = true;
+                }
+            }
+            else
+            {
+                // chat not in foreground: live update skipped (checked on resume)
+                MainActivity.message_list_dirty_while_away = true;
             }
         }
         catch (Exception e)

@@ -427,6 +427,11 @@ public class MainActivity extends AppCompatActivity
     static volatile ConferenceMessageListActivity conference_message_list_activity = null;
     static volatile GroupMessageListFragment group_message_list_fragment = null;
     static volatile GroupMessageListActivity group_message_list_activity = null;
+    // HINT: set when a live message-list update could not be applied because the chat was not in the foreground
+    //       (or was throttled). checked on resume to decide whether a full reload is needed.
+    static volatile boolean message_list_dirty_while_away = false;
+    static volatile boolean conference_message_list_dirty_while_away = false;
+    static volatile boolean group_message_list_dirty_while_away = false;
     static ConferenceAudioActivity conference_audio_activity = null;
     final static String MAIN_DB_NAME = "main.db";
     final static String MAIN_VFS_NAME = "files.db";

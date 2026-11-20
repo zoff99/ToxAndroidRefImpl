@@ -2817,6 +2817,11 @@ public class HelperGroup
             else
             {
                 // we are not showing that ngc group now
+                if (MainActivity.group_message_list_fragment == null)
+                {
+                    // no group chat in foreground: remember that a live update was skipped (checked on resume)
+                    MainActivity.group_message_list_dirty_while_away = true;
+                }
                 return;
             }
 

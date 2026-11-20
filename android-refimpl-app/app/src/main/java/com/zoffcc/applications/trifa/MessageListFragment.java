@@ -74,6 +74,8 @@ public class MessageListFragment extends Fragment
     ConversationDateHeader conversationDateHeader = null;
     MessageListActivity mla = null;
     boolean is_data_loaded = false;
+    // C: full message count at the last load; used by onResume to detect whether anything changed while away
+    private int messages_count_at_last_load = -1;
     static boolean show_only_files = false;
     static String search_messages_text = null;
     FloatingActionButton unread_messages_notice_button = null;
@@ -234,6 +236,10 @@ public class MessageListFragment extends Fragment
         listingsView.setLayoutManager(linearLayoutManager);
         listingsView.setItemAnimator(new DefaultItemAnimator());
         listingsView.setHasFixedSize(false);
+        // G: keep more recycled text rows around to avoid re-inflation when scrolling back
+        listingsView.getRecycledViewPool().setMaxRecycledViews(Message_model.TEXT_INCOMING_NOT_READ, 12);
+        listingsView.getRecycledViewPool().setMaxRecycledViews(Message_model.TEXT_OUTGOING_NOT_READ, 12);
+        listingsView.getRecycledViewPool().setMaxRecycledViews(Message_model.TEXT_OUTGOING_HAVE_READ, 12);
 
         listingsView.setFastScrollListener(new FastScroller.FastScrollListener()
         {
@@ -433,7 +439,21 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
         }
 
-        update_all_messages(true, false, PREF__messageview_paging);
+        // C: skip the full reload when nothing changed while we were away
+        boolean reload_needed = (!is_data_loaded)
+                                || MainActivity.message_list_dirty_while_away
+                                || ((search_messages_text != null) && (search_messages_text.length() > 0))
+                                || show_only_files
+                                || (get_messages_count_full() != messages_count_at_last_load);
+        if (reload_needed)
+        {
+            update_all_messages(true, false, PREF__messageview_paging);
+        }
+        else
+        {
+            // nothing changed: just rebind visible rows (cheap), no DB reload
+            adapter.redraw_all_items();
+        }
 
         if (!is_data_loaded)
         {
@@ -509,11 +529,15 @@ public class MessageListFragment extends Fragment
         try
         {
             // reset "new" flags for messages -------
-            String friend_pubkey = tox_friend_get_public_key__wrapper(current_friendnum);
-            int count_read = orma.selectFromMessage().tox_friendpubkeyEq(friend_pubkey).is_newEq(true).count();
-            orma.updateMessage().tox_friendpubkeyEq(friend_pubkey).
-                    is_newEq(true).is_new(false).execute();
-            HelperMsgNotification.subtract_unread_count_for_key(friend_pubkey, count_read);
+            // C: searching does not mark the whole chat as read
+            if ((search_messages_text == null) || (search_messages_text.length() == 0))
+            {
+                String friend_pubkey = tox_friend_get_public_key__wrapper(current_friendnum);
+                int count_read = orma.selectFromMessage().tox_friendpubkeyEq(friend_pubkey).is_newEq(true).count();
+                orma.updateMessage().tox_friendpubkeyEq(friend_pubkey).
+                        is_newEq(true).is_new(false).execute();
+                HelperMsgNotification.subtract_unread_count_for_key(friend_pubkey, count_read);
+            }
             // reset "new" flags for messages -------
         }
         catch (Exception e)
@@ -596,6 +620,17 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
             Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
+
+        // C: remember the full count so onResume can skip the reload when nothing changed
+        try
+        {
+            messages_count_at_last_load = get_messages_count_full();
+        }
+        catch (Exception e)
+        {
+            messages_count_at_last_load = -1;
+        }
+        MainActivity.message_list_dirty_while_away = false;
 
     }
 
@@ -761,6 +796,12 @@ public class MessageListFragment extends Fragment
                 {
                     Log.i(TAG, "add_message:002");
                     adapter.add_item(m);
+
+                    // C: keep the resume-skip count in sync with live appends
+                    if (messages_count_at_last_load >= 0)
+                    {
+                        messages_count_at_last_load++;
+                    }
 
                     if (stay_at_top)
                     {
