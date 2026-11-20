@@ -35,6 +35,7 @@ import com.l4digital.fastscroll.FastScroller;
 import com.zoffcc.applications.sorm.Message;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.core.content.ContextCompat;
@@ -683,13 +684,18 @@ public class MessageListFragment extends Fragment
 
                 ml = orma.selectFromMessage().
                         tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
-                        orderBySent_timestampAsc().
-                        orderBySent_timestamp_msAsc().
-                        limit(PREF__message_paging_num_msgs_per_page, older_messages_count).
+                        orderBySent_timestampDesc().
+                        orderBySent_timestamp_msDesc().
+                        limit(PREF__message_paging_num_msgs_per_page).
                         toList();
 
                 if (ml != null)
                 {
+                    // newest N via index tail scan (DESC + LIMIT), then reverse to ascending.
+                    // the old ASC + OFFSET walked and discarded all "older" rows on every open,
+                    // and its stale offset could miss messages arriving between COUNT and SELECT.
+                    Collections.reverse(ml);
+
                     // dummy entry at the top: clicking it loads the full history
                     Message m_load_all = new Message();
                     m_load_all.tox_friendpubkey = TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;

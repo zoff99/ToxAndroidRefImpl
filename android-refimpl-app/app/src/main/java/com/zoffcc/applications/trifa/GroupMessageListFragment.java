@@ -34,6 +34,7 @@ import com.l4digital.fastscroll.FastScroller;
 import com.zoffcc.applications.sorm.GroupMessage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.core.content.ContextCompat;
@@ -643,8 +644,8 @@ public class GroupMessageListFragment extends Fragment
                     {
                         ml = orma.selectFromGroupMessage().
                                 group_identifierEq(current_group_id.toLowerCase()).
-                                orderBySent_timestampAsc().
-                                limit(PREF__message_paging_num_msgs_per_page, older_messages_count).
+                                orderBySent_timestampDesc().
+                                limit(PREF__message_paging_num_msgs_per_page).
                                 toList();
                     }
                     else
@@ -652,8 +653,8 @@ public class GroupMessageListFragment extends Fragment
                         ml = orma.selectFromGroupMessage().
                                 group_identifierEq(current_group_id.toLowerCase()).
                                 tox_group_peer_pubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                                orderBySent_timestampAsc().
-                                limit(PREF__message_paging_num_msgs_per_page, older_messages_count).
+                                orderBySent_timestampDesc().
+                                limit(PREF__message_paging_num_msgs_per_page).
                                 toList();
                     }
 
@@ -661,6 +662,11 @@ public class GroupMessageListFragment extends Fragment
                     {
                         ml = new ArrayList<>();
                     }
+
+                    // newest N via index tail scan (DESC + LIMIT), then reverse to ascending.
+                    // the old ASC + OFFSET walked and discarded all "older" rows on every open,
+                    // and its stale offset could miss messages arriving between COUNT and SELECT.
+                    Collections.reverse(ml);
 
                     // dummy entry at the top: clicking it loads the full history
                     GroupMessage m_load_all = new GroupMessage();

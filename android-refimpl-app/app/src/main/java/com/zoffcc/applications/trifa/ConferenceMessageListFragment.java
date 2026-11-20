@@ -35,6 +35,7 @@ import com.l4digital.fastscroll.FastScroller;
 import com.zoffcc.applications.sorm.ConferenceMessage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import androidx.core.content.ContextCompat;
@@ -565,9 +566,17 @@ public class ConferenceMessageListFragment extends Fragment
                     ml = orma.selectFromConferenceMessage().
                             conference_identifierEq(current_conf_id).
                             tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
-                            orderBySent_timestampAsc().
-                            limit(PREF__message_paging_num_msgs_per_page, older_messages_count).
+                            orderBySent_timestampDesc().
+                            limit(PREF__message_paging_num_msgs_per_page).
                             toList();
+
+                    if (ml != null)
+                    {
+                        // newest N via index tail scan (DESC + LIMIT), then reverse to ascending.
+                        // the old ASC + OFFSET walked and discarded all "older" rows on every open,
+                        // and its stale offset could miss messages arriving between COUNT and SELECT.
+                        Collections.reverse(ml);
+                    }
 
                     show_load_all_dummy = true;
                 }
