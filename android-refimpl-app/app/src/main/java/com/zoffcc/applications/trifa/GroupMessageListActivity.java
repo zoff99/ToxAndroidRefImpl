@@ -1606,6 +1606,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     }
 
     // gated diagnostic: why does an unchanged-looking refresh still need a rebuild?
+    // privacy-safe: logs only the changed FIELD and numeric values, never pubkeys or nicknames.
     private String peer_tuples_diff_summary(List<String> current)
     {
         if (last_peer_list_tuples == null)
@@ -1616,12 +1617,30 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             return "count " + last_peer_list_tuples.size() + "->" + current.size();
         }
+        final String[] field_names = {"pubkey", "status", "conn", "role", "nick"};
         for (int k = 0; k < current.size(); k++)
         {
             if (!current.get(k).equals(last_peer_list_tuples.get(k)))
             {
-                return "peer[" + k + "] old=" + last_peer_list_tuples.get(k).replace('\u0001', '|') +
-                       " new=" + current.get(k).replace('\u0001', '|');
+                String[] old_f = last_peer_list_tuples.get(k).split("\u0001", 5);
+                String[] new_f = current.get(k).split("\u0001", 5);
+                for (int f = 0; f < 5; f++)
+                {
+                    if (!old_f[f].equals(new_f[f]))
+                    {
+                        if (f == 0)
+                        {
+                            return "peer[" + k + "] field=pubkey changed (roster membership)";
+                        }
+                        if (f == 4)
+                        {
+                            return "peer[" + k + "] field=nick changed (len " + old_f[f].length() + "->" +
+                                   new_f[f].length() + ")";
+                        }
+                        return "peer[" + k + "] field=" + field_names[f] + " " + old_f[f] + "->" + new_f[f];
+                    }
+                }
+                return "peer[" + k + "] changed (field parse mismatch)";
             }
         }
         return "none";
