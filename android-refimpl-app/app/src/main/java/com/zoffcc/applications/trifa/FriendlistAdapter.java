@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.CombinedFriendsAndConferences.COMBINED_IS_CONFERENCE;
@@ -62,6 +63,16 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
     private Context context;
     private List<CombinedFriendsAndConferences> all_items;
     private String current_filter = "";
+
+    // bulk update window: while active, clear_items()/add_item()/sort_items() do not notify;
+    // end_bulk_update() dispatches one keyed diff for the whole batch.
+    // only ever touched on the main thread (begin and end run inside the same posted Runnable).
+    private boolean bulk_update_in_progress = false;
+    private List<CombinedFriendsAndConferences> bulk_update_old_visible = null;
+
+    // non-null change payload -> DefaultItemAnimator rebinds the row in place (no cross-fade,
+    // the item view is never detached, so touches/clicks in progress survive the update)
+    private static final Object CHANGE_PAYLOAD = new Object();
 
     public static class SeparatorViewHolder extends RecyclerView.ViewHolder {
         public SeparatorViewHolder(View itemView) {
@@ -219,7 +230,10 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
             this.all_items.add(new_item);
             if (matchesFilter(new_item)) {
                 this.friendlistitems.add(new_item);
-                this.notifyItemInserted(this.friendlistitems.size() - 1);
+                if (!bulk_update_in_progress)
+                {
+                    this.notifyItemInserted(this.friendlistitems.size() - 1);
+                }
             }
         }
         catch (Exception e) {
@@ -232,11 +246,17 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
     {
         this.all_items.clear();
         this.friendlistitems.clear();
-        this.notifyDataSetChanged();
+        if (!bulk_update_in_progress)
+        {
+            this.notifyDataSetChanged();
+        }
     }
 
     public boolean update_item(CombinedFriendsAndConferences new_item_combined, int is_friend) {
         boolean found_item = false;
+        // freeze the currently visible state BEFORE replacing the item below,
+        // so the diff can see that this row's content changed
+        List<CombinedFriendsAndConferences> old_visible = snapshot_visible();
         try {
             Iterator it = this.all_items.iterator(); // Changed from friendlistitems to all_items
             while (it.hasNext()) {
@@ -280,7 +300,9 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         }
 
         if (found_item) {
-            filterList(); // Re-apply filter after an item changes (e.g., a friend renames themselves)
+            // re-apply filter after an item changes (e.g., a friend renames themselves),
+            // but only notify the rows that actually changed instead of refreshing everything
+            rebuild_visible_and_diff(old_visible, false);
         }
         return found_item;
     }
@@ -298,18 +320,182 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
     }
 
     private void filterList() {
-        this.friendlistitems.clear();
-        if (this.current_filter == null || this.current_filter.isEmpty()) {
-            this.friendlistitems.addAll(this.all_items);
-        } else {
-            for (CombinedFriendsAndConferences item : this.all_items) {
-                if (matchesFilter(item)) {
-                    this.friendlistitems.add(item);
+        rebuild_visible_and_diff(snapshot_visible(), false);
+    }
+
+    // stable identity of a row across list rebuilds: type + public key / conference id / group id.
+    // the separator row has its own fixed key (there is at most one).
+    private static String item_key(CombinedFriendsAndConferences item)
+    {
+        if (item == null)
+        {
+            return "null";
+        }
+        if (item.is_friend == COMBINED_IS_SEPARATOR)
+        {
+            return "separator";
+        }
+        if (item.is_friend == COMBINED_IS_FRIEND)
+        {
+            if (item.friend_item != null && item.friend_item.tox_public_key_string != null)
+            {
+                return "friend:" + item.friend_item.tox_public_key_string;
+            }
+        }
+        else if (item.is_friend == COMBINED_IS_GROUP)
+        {
+            if (item.group_item != null && item.group_item.group_identifier != null)
+            {
+                return "group:" + item.group_item.group_identifier;
+            }
+        }
+        else if (item.is_friend == COMBINED_IS_CONFERENCE)
+        {
+            if (item.conference_item != null && item.conference_item.conference_identifier != null)
+            {
+                return "conference:" + item.conference_item.conference_identifier;
+            }
+        }
+        // defensive fallback: treat as unique per object (behaves like a full refresh for this row)
+        return "item:@" + System.identityHashCode(item);
+    }
+
+    // the model object a row renders. update_item()/rebuilds replace it with a fresh deep_copy,
+    // so reference inequality means "this row must be re-bound" (unread counts etc. are read at bind time).
+    private static Object inner_item(CombinedFriendsAndConferences item)
+    {
+        if (item == null)
+        {
+            return null;
+        }
+        if (item.is_friend == COMBINED_IS_FRIEND)
+        {
+            return item.friend_item;
+        }
+        if (item.is_friend == COMBINED_IS_GROUP)
+        {
+            return item.group_item;
+        }
+        if (item.is_friend == COMBINED_IS_CONFERENCE)
+        {
+            return item.conference_item;
+        }
+        return null;
+    }
+
+    // shallow copies of the visible rows: freezes the old inner-object references and order,
+    // so later in-place changes to the live wrappers are still detected by the diff.
+    private List<CombinedFriendsAndConferences> snapshot_visible()
+    {
+        List<CombinedFriendsAndConferences> snapshot = new ArrayList<>(this.friendlistitems.size());
+        for (CombinedFriendsAndConferences item : this.friendlistitems)
+        {
+            CombinedFriendsAndConferences copy = new CombinedFriendsAndConferences();
+            copy.id = item.id;
+            copy.is_friend = item.is_friend;
+            copy.friend_item = item.friend_item;
+            copy.conference_item = item.conference_item;
+            copy.group_item = item.group_item;
+            snapshot.add(copy);
+        }
+        return snapshot;
+    }
+
+    public void begin_bulk_update()
+    {
+        bulk_update_old_visible = snapshot_visible();
+        bulk_update_in_progress = true;
+    }
+
+    public void end_bulk_update()
+    {
+        bulk_update_in_progress = false;
+        List<CombinedFriendsAndConferences> old_visible = bulk_update_old_visible;
+        bulk_update_old_visible = null;
+        // old_visible == null only if end is called without begin (defensive):
+        // rebuild_visible_and_diff then falls back to a classic full refresh.
+        rebuild_visible_and_diff(old_visible, false);
+    }
+
+    // rebuild the visible (filtered + pinned separator) list from all_items and dispatch
+    // the minimal set of change/insert/remove/move notifications against old_visible.
+    // rows that kept their inner object are not re-bound; replaced rows are re-bound in place.
+    private void rebuild_visible_and_diff(List<CombinedFriendsAndConferences> old_visible, final boolean force_rebind)
+    {
+        final List<CombinedFriendsAndConferences> new_visible = new ArrayList<>(this.all_items.size() + 1);
+        if (this.current_filter == null || this.current_filter.isEmpty())
+        {
+            new_visible.addAll(this.all_items);
+        }
+        else
+        {
+            for (CombinedFriendsAndConferences item : this.all_items)
+            {
+                if (matchesFilter(item))
+                {
+                    new_visible.add(item);
                 }
             }
         }
-        insertPinnedSeparator();
-        this.notifyDataSetChanged();
+        insertPinnedSeparator(new_visible);
+
+        if (old_visible == null)
+        {
+            // defensive fallback: no old state known -> classic full refresh
+            this.friendlistitems.clear();
+            this.friendlistitems.addAll(new_visible);
+            this.notifyDataSetChanged();
+            return;
+        }
+
+        final List<CombinedFriendsAndConferences> old_list = old_visible;
+        DiffUtil.DiffResult diff = DiffUtil.calculateDiff(new DiffUtil.Callback()
+        {
+            @Override
+            public int getOldListSize()
+            {
+                return old_list.size();
+            }
+
+            @Override
+            public int getNewListSize()
+            {
+                return new_visible.size();
+            }
+
+            @Override
+            public boolean areItemsTheSame(int oldItemPosition, int newItemPosition)
+            {
+                return item_key(old_list.get(oldItemPosition)).equals(item_key(new_visible.get(newItemPosition)));
+            }
+
+            @Override
+            public boolean areContentsTheSame(int oldItemPosition, int newItemPosition)
+            {
+                CombinedFriendsAndConferences old_item = old_list.get(oldItemPosition);
+                CombinedFriendsAndConferences new_item = new_visible.get(newItemPosition);
+                if (old_item.is_friend == COMBINED_IS_SEPARATOR && new_item.is_friend == COMBINED_IS_SEPARATOR)
+                {
+                    return true;
+                }
+                if (force_rebind)
+                {
+                    return false;
+                }
+                return (old_item.is_friend == new_item.is_friend) && (inner_item(old_item) == inner_item(new_item));
+            }
+
+            @Override
+            public Object getChangePayload(int oldItemPosition, int newItemPosition)
+            {
+                // non-null payload: keep the same view holder, re-bind in place, no change animation
+                return CHANGE_PAYLOAD;
+            }
+        }, true);
+
+        this.friendlistitems.clear();
+        this.friendlistitems.addAll(new_visible);
+        diff.dispatchUpdatesTo(this);
     }
 
     private boolean matchesFilter(CombinedFriendsAndConferences row) {
@@ -353,25 +539,25 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         return false;
     }
 
-    private void insertPinnedSeparator() {
+    private void insertPinnedSeparator(List<CombinedFriendsAndConferences> visible_items) {
         // defensive: remove any existing separator first
-        for (int i = this.friendlistitems.size() - 1; i >= 0; i--) {
-            if (this.friendlistitems.get(i).is_friend == COMBINED_IS_SEPARATOR) {
-                this.friendlistitems.remove(i);
+        for (int i = visible_items.size() - 1; i >= 0; i--) {
+            if (visible_items.get(i).is_friend == COMBINED_IS_SEPARATOR) {
+                visible_items.remove(i);
             }
         }
 
         // find the boundary: first NON-pinned item that comes after at least one pinned item
         int pinnedSeen = 0;
-        for (int i = 0; i < this.friendlistitems.size(); i++) {
-            CombinedFriendsAndConferences it = this.friendlistitems.get(i);
+        for (int i = 0; i < visible_items.size(); i++) {
+            CombinedFriendsAndConferences it = visible_items.get(i);
             if (isPinned(it)) {
                 pinnedSeen++;
             } else {
                 if (pinnedSeen > 0) {
                     CombinedFriendsAndConferences sep = new CombinedFriendsAndConferences();
                     sep.is_friend = COMBINED_IS_SEPARATOR;
-                    this.friendlistitems.add(i, sep);   // insert right below the pinned block
+                    visible_items.add(i, sep);   // insert right below the pinned block
                     return;
                 }
             }
@@ -453,20 +639,16 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
 
             java.util.Collections.sort(this.all_items, comparator);
 
-            // Rebuild the visible filtered list
-            this.friendlistitems.clear();
-            if (this.current_filter == null || this.current_filter.isEmpty()) {
-                this.friendlistitems.addAll(this.all_items);
-            } else {
-                for (CombinedFriendsAndConferences item : this.all_items) {
-                    if (matchesFilter(item)) {
-                        this.friendlistitems.add(item);
-                    }
-                }
+            if (bulk_update_in_progress)
+            {
+                // end_bulk_update() will rebuild the visible list and dispatch one diff
+                return;
             }
 
-            insertPinnedSeparator();
-            this.notifyDataSetChanged();
+            // rebuild the visible filtered list with minimal notifications.
+            // force_rebind=true: this path is used after pin/unpin swipes, where the pinned
+            // flag was mutated in place on the existing objects -- refresh all rows like before.
+            rebuild_visible_and_diff(snapshot_visible(), true);
         }
         catch (Exception e)
         {

@@ -703,6 +703,9 @@ public class FriendListFragment extends Fragment
                             try
                             {
                                 Thread.sleep(delay);
+                                // keyed bulk update: keep the old rows on screen while the new list
+                                // is built, then apply one minimal diff (no full wipe -> clicks survive)
+                                adapter.begin_bulk_update();
                                 adapter.clear_items(); // clears friends AND conferences!!
 
                                 // ------------- add friends that were added recently first -------------
@@ -972,9 +975,13 @@ public class FriendListFragment extends Fragment
                                 // ===== SORT: pinned items to the top =====
                                 adapter.sort_items();
                                 // ===== SORT: pinned items to the top =====
+                                adapter.end_bulk_update();
                             }
                             catch (Exception e)
                             {
+                                // make sure the bulk window is closed even if building the list failed
+                                // (idempotent: without a begin snapshot it falls back to a full refresh)
+                                adapter.end_bulk_update();
                             }
                             // Log.i(TAG, "semaphore_friendlist_ui_01.release:2");
                             semaphore_friendlist_ui_01.release();
