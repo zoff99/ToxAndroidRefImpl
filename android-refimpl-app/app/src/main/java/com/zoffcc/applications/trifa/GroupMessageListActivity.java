@@ -2895,113 +2895,98 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         try
         {
-            Thread t = new Thread()
+            Runnable myRunnable = new Runnable()
             {
                 @Override
                 public void run()
                 {
                     try
                     {
-                        Runnable myRunnable = new Runnable()
+                        ConferenceCustomDrawerPeerItem new_item = null;
+                        boolean have_avatar_for_pubkey = false;
+
+                        try
                         {
-                            @Override
-                            public void run()
+                            int badge_color = R.color.md_green_700;
+                            if (connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value)
                             {
-                                try
-                                {
-                                    ConferenceCustomDrawerPeerItem new_item = null;
-                                    boolean have_avatar_for_pubkey = false;
-
-                                    try
-                                    {
-                                        int badge_color = R.color.md_green_700;
-                                        if (connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_NONE.value)
-                                        {
-                                            badge_color = R.color.md_red_700;
-                                        }
-                                        else if (connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value)
-                                        {
-                                            badge_color = R.color.md_orange_700;
-                                        }
-
-                                        new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
-                                                                                      peer_pubkey).withIdentifier(
-                                                peernum).withName(name).withBadge("" + peernum).withBadgeStyle(
-                                                new BadgeStyle().withTextColor(Color.WHITE).withColorRes(
-                                                        badge_color)).withOnDrawerItemClickListener(
-                                                new Drawer.OnDrawerItemClickListener()
-                                                {
-                                                    @Override
-                                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
-                                                    {
-                                                        Intent intent = new Intent(view.getContext(),
-                                                                                   GroupPeerInfoActivity.class);
-                                                        intent.putExtra("peer_pubkey", peer_pubkey);
-                                                        intent.putExtra("group_id", group_id);
-                                                        view.getContext().startActivity(intent);
-                                                        return true;
-                                                    }
-                                                });
-
-                                        if (self)
-                                        {
-                                            new_item.withTextColor(Color.parseColor("#FF5733"));
-                                        }
-                                        else if (notification_silent)
-                                        {
-                                            new_item.withTextColor(Color.parseColor("#d7b442"));
-                                        }
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        e.printStackTrace();
-                                        new_item = new ConferenceCustomDrawerPeerItem(false, null).withIdentifier(
-                                                peernum).withName(name).withIcon(
-                                                GoogleMaterial.Icon.gmd_face).withOnDrawerItemClickListener(
-                                                new Drawer.OnDrawerItemClickListener()
-                                                {
-                                                    @Override
-                                                    public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
-                                                    {
-                                                        /*
-                                                        Intent intent = new Intent(view.getContext(),
-                                                                                   ConferencePeerInfoActivity.class);
-                                                        intent.putExtra("peer_pubkey", peer_pubkey);
-                                                        intent.putExtra("group_id", group_id);
-                                                        intent.putExtra("offline", offline);
-                                                        view.getContext().startActivity(intent);
-                                                        */
-                                                        return true;
-                                                    }
-                                                });
-                                    }
-
-                                    // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
-                                    group_message_drawer.addItem(new_item);
-                                }
-                                catch (Exception e2)
-                                {
-                                    e2.printStackTrace();
-                                    Log.i(TAG, "add_group_user:EE2:" + e2.getMessage());
-                                }
+                                badge_color = R.color.md_red_700;
                             }
-                        };
+                            else if (connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value)
+                            {
+                                badge_color = R.color.md_orange_700;
+                            }
 
-                        if (group_handler_s != null)
+                            new_item = new ConferenceCustomDrawerPeerItem(have_avatar_for_pubkey,
+                                                                          peer_pubkey).withIdentifier(
+                                    peernum).withName(name).withBadge("" + peernum).withBadgeStyle(
+                                    new BadgeStyle().withTextColor(Color.WHITE).withColorRes(
+                                            badge_color)).withOnDrawerItemClickListener(
+                                    new Drawer.OnDrawerItemClickListener()
+                                    {
+                                        @Override
+                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                        {
+                                            Intent intent = new Intent(view.getContext(),
+                                                                       GroupPeerInfoActivity.class);
+                                            intent.putExtra("peer_pubkey", peer_pubkey);
+                                            intent.putExtra("group_id", group_id);
+                                            view.getContext().startActivity(intent);
+                                            return true;
+                                        }
+                                    });
+
+                            if (self)
+                            {
+                                new_item.withTextColor(Color.parseColor("#FF5733"));
+                            }
+                            else if (notification_silent)
+                            {
+                                new_item.withTextColor(Color.parseColor("#d7b442"));
+                            }
+                        }
+                        catch (Exception e)
                         {
-                            group_handler_s.post(myRunnable);
+                            e.printStackTrace();
+                            new_item = new ConferenceCustomDrawerPeerItem(false, null).withIdentifier(
+                                    peernum).withName(name).withIcon(
+                                    GoogleMaterial.Icon.gmd_face).withOnDrawerItemClickListener(
+                                    new Drawer.OnDrawerItemClickListener()
+                                    {
+                                        @Override
+                                        public boolean onItemClick(View view, int position, IDrawerItem drawerItem)
+                                        {
+                                            /*
+                                            Intent intent = new Intent(view.getContext(),
+                                                                       ConferencePeerInfoActivity.class);
+                                            intent.putExtra("peer_pubkey", peer_pubkey);
+                                            intent.putExtra("group_id", group_id);
+                                            intent.putExtra("offline", offline);
+                                            view.getContext().startActivity(intent);
+                                            */
+                                            return true;
+                                        }
+                                    });
                         }
 
+                        // Log.i(TAG, "conference_message_drawer.addItem:1:" + name3 + ":" + peernum);
+                        group_message_drawer.addItem(new_item);
                     }
-                    catch (Exception e3)
+                    catch (Exception e2)
                     {
-                        e3.printStackTrace();
-                        Log.i(TAG, "add_group_user:EE3:" + e3.getMessage());
+                        e2.printStackTrace();
+                        Log.i(TAG, "add_group_user:EE2:" + e2.getMessage());
                     }
                 }
             };
-            t.start();
-            t.join();
+
+            // post the peer add/update directly to the UI queue. the old thread + t.join()
+            // per peer only serialized the posts and cost ~0.5-1ms each (PERF logs showed
+            // 52-102ms for 121 peers). posting directly keeps the exact same FIFO order.
+            if (group_handler_s != null)
+            {
+                group_handler_s.post(myRunnable);
+            }
         }
         catch (Exception e)
         {
