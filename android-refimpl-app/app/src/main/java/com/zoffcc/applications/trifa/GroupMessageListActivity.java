@@ -1574,24 +1574,57 @@ public class GroupMessageListActivity extends AppCompatActivity
 
     // skip-if-unchanged state for the persistent peer list (guarded by this activity's monitor)
     private String last_peer_list_fingerprint = null;
+    private List<String> last_peer_list_tuples = null;
     private long last_peer_list_db_version = -1;
     private long next_new_tag_expiry = 0;
 
-    // fingerprint of everything from the snapshot that affects the drawer output.
+    // per-peer tuple of everything from the snapshot that affects the drawer output.
     // deliberately excludes last_seen/signing keys: those change without any UI effect.
-    private String peer_list_fingerprint(List<MainActivity.MidPeerEntry> peers, String self_pubkey)
+    // sorted -> order-independent: the drawer order is defined by the activity comparator,
+    // not by the (possibly unstable) JNI enumeration order of equal-ranked peers.
+    private List<String> peer_list_tuples(List<MainActivity.MidPeerEntry> peers)
+    {
+        List<String> tuples = new ArrayList<>(peers.size());
+        for (MainActivity.MidPeerEntry e : peers)
+        {
+            tuples.add(e.identity_key_hex + "\u0001" + e.status + "\u0001" + e.connection_status +
+                       "\u0001" + e.role + "\u0001" + (e.nickname == null ? "" : e.nickname));
+        }
+        Collections.sort(tuples);
+        return tuples;
+    }
+
+    private String peer_list_fingerprint(List<String> sorted_tuples, String self_pubkey)
     {
         StringBuilder sb = new StringBuilder();
         sb.append(self_pubkey == null ? "" : self_pubkey).append('\u0000');
-        for (MainActivity.MidPeerEntry e : peers)
+        for (String t : sorted_tuples)
         {
-            sb.append(e.identity_key_hex).append('\u0001').
-                    append(e.status).append('\u0001').
-                    append(e.connection_status).append('\u0001').
-                    append(e.role).append('\u0001').
-                    append(e.nickname == null ? "" : e.nickname).append('\u0002');
+            sb.append(t).append('\u0002');
         }
         return sb.toString();
+    }
+
+    // gated diagnostic: why does an unchanged-looking refresh still need a rebuild?
+    private String peer_tuples_diff_summary(List<String> current)
+    {
+        if (last_peer_list_tuples == null)
+        {
+            return "no-previous";
+        }
+        if (current.size() != last_peer_list_tuples.size())
+        {
+            return "count " + last_peer_list_tuples.size() + "->" + current.size();
+        }
+        for (int k = 0; k < current.size(); k++)
+        {
+            if (!current.get(k).equals(last_peer_list_tuples.get(k)))
+            {
+                return "peer[" + k + "] old=" + last_peer_list_tuples.get(k).replace('\u0001', '|') +
+                       " new=" + current.get(k).replace('\u0001', '|');
+            }
+        }
+        return "none";
     }
 
     synchronized void set_peer_names_and_avatars()
@@ -1624,13 +1657,28 @@ public class GroupMessageListActivity extends AppCompatActivity
                     {
                         e.printStackTrace();
                     }
-                    String fp = peer_list_fingerprint(snap, self_pubkey_fp);
+                    List<String> tuples = peer_list_tuples(snap);
+                    String fp = peer_list_fingerprint(tuples, self_pubkey_fp);
+                    long dbv = MainActivity.group_peer_db_write_version.get();
+                    long now = System.currentTimeMillis();
                     if (fp.equals(last_peer_list_fingerprint) &&
-                        (MainActivity.group_peer_db_write_version.get() == last_peer_list_db_version) &&
-                        (System.currentTimeMillis() < next_new_tag_expiry))
+                        (dbv == last_peer_list_db_version) &&
+                        (now < next_new_tag_expiry))
                     {
                         HelperGeneric.perf_log(TAG, "peers:skip-unchanged n=" + snap.size() + " +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
                         return;
+                    }
+                    if (!fp.equals(last_peer_list_fingerprint))
+                    {
+                        HelperGeneric.perf_log(TAG, "peers:rebuild-reason=fp-diff " + peer_tuples_diff_summary(tuples));
+                    }
+                    else if (dbv != last_peer_list_db_version)
+                    {
+                        HelperGeneric.perf_log(TAG, "peers:rebuild-reason=dbv old=" + last_peer_list_db_version + " new=" + dbv);
+                    }
+                    else
+                    {
+                        HelperGeneric.perf_log(TAG, "peers:rebuild-reason=new-tag-expiry now=" + now + " expiry=" + next_new_tag_expiry);
                     }
                 }
             }
@@ -1813,7 +1861,9 @@ public class GroupMessageListActivity extends AppCompatActivity
             HelperGeneric.perf_log(TAG, "peers:add-group-users +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
             // remember what we built so unchanged refreshes can be skipped
-            last_peer_list_fingerprint = peer_list_fingerprint(mid_peers, self_pubkey);
+            List<String> built_tuples = peer_list_tuples(mid_peers);
+            last_peer_list_tuples = built_tuples;
+            last_peer_list_fingerprint = peer_list_fingerprint(built_tuples, self_pubkey);
             last_peer_list_db_version = db_version_at_build_start;
             next_new_tag_expiry = new_tag_expiry;
             HelperGeneric.perf_log(TAG, "peers:persistent-branch:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
@@ -2927,6 +2977,7 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         // any full clear invalidates the skip-if-unchanged fingerprint
         last_peer_list_fingerprint = null;
+        last_peer_list_tuples = null;
         try
         {
             Runnable myRunnable = new Runnable()
