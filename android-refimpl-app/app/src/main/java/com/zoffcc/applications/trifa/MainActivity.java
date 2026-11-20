@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean INSANE_TRACE_LOGGING = false; // set "false" for release builds
-    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10245; // increase for database schema changes
+    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10246; // increase for database schema changes
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
@@ -3269,6 +3269,15 @@ public class MainActivity extends AppCompatActivity
             // no table lookup per historical row (measured ~50ms per count on a 35k-message group)
             run_multi_sql("CREATE INDEX `index_chat_count_cover_on_GroupMessage` ON `GroupMessage` (`group_identifier`, `tox_group_peer_pubkey`)");
             run_multi_sql("CREATE INDEX `index_chat_count_cover_on_ConferenceMessage` ON `ConferenceMessage` (`conference_identifier`, `tox_peerpubkey`)");
+        }
+
+        if (new_version == 10246) {
+            // composite indices for the chat-open mark-read UPDATE:
+            // WHERE chat_id=? AND is_new=1 -> two-column equality seek instead of scanning
+            // every row of the chat (measured 60-75ms on a 35k-message group, ~1ms on a tiny one)
+            run_multi_sql("CREATE INDEX `index_chat_markread_on_GroupMessage` ON `GroupMessage` (`group_identifier`, `is_new`)");
+            run_multi_sql("CREATE INDEX `index_chat_markread_on_ConferenceMessage` ON `ConferenceMessage` (`conference_identifier`, `is_new`)");
+            run_multi_sql("CREATE INDEX `index_chat_markread_on_Message` ON `Message` (`tox_friendpubkey`, `is_new`)");
         }
     }
 
