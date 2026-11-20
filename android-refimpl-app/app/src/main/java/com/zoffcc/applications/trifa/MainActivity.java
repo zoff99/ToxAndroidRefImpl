@@ -368,7 +368,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean NDK_STDOUT_LOGGING = false; // set "false" for release builds
     final static boolean DEBUG_BATTERY_OPTIMIZATION_LOGGING = false;  // set "false" for release builds
     final static boolean INSANE_TRACE_LOGGING = false; // set "false" for release builds
-    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10244; // increase for database schema changes
+    final static int ORMA_CURRENT_DB_SCHEMA_VERSION = 10245; // increase for database schema changes
     final static boolean DB_ENCRYPT = true; // set "true" always!
     final static boolean VFS_ENCRYPT = true; // set "true" always!
     final static boolean AEC_DEBUG_DUMP = false; // set "false" for release builds
@@ -3261,6 +3261,14 @@ public class MainActivity extends AppCompatActivity
             run_multi_sql("CREATE INDEX `index_chat_tail_on_Message` ON `Message` (`tox_friendpubkey`, `sent_timestamp`, `sent_timestamp_ms`)");
             run_multi_sql("CREATE INDEX `index_chat_tail_on_ConferenceMessage` ON `ConferenceMessage` (`conference_identifier`, `sent_timestamp`)");
             run_multi_sql("CREATE INDEX `index_chat_tail_on_GroupMessage` ON `GroupMessage` (`group_identifier`, `sent_timestamp`)");
+        }
+
+        if (new_version == 10245) {
+            // covering indices for the chat-open COUNT queries:
+            // WHERE chat_id=? AND peer_pubkey!=? (system-message filter) -> index-only count,
+            // no table lookup per historical row (measured ~50ms per count on a 35k-message group)
+            run_multi_sql("CREATE INDEX `index_chat_count_cover_on_GroupMessage` ON `GroupMessage` (`group_identifier`, `tox_group_peer_pubkey`)");
+            run_multi_sql("CREATE INDEX `index_chat_count_cover_on_ConferenceMessage` ON `ConferenceMessage` (`conference_identifier`, `tox_peerpubkey`)");
         }
     }
 

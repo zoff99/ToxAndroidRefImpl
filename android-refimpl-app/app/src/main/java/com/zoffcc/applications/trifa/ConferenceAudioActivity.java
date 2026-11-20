@@ -1103,49 +1103,32 @@ public class ConferenceAudioActivity extends AppCompatActivity
 
         try
         {
-            Thread t = new Thread()
+            Runnable myRunnable = new Runnable()
             {
                 @Override
                 public void run()
                 {
                     try
                     {
-                        Runnable myRunnable = new Runnable()
-                        {
-                            @Override
-                            public void run()
-                            {
-                                try
-                                {
-                                    lookup_peer_listnum_pubkey.clear();
-                                    conference_message_drawer.removeAllItems();
-                                }
-                                catch (Exception e2)
-                                {
-                                    e2.printStackTrace();
-                                }
-                            }
-                        };
-
-                        if (conferences_av_handler_s != null)
-                        {
-                            conferences_av_handler_s.post(myRunnable);
-                        }
-
-                        // TODO: hack to be synced with additions later
-                        Thread.sleep(120);
+                        lookup_peer_listnum_pubkey.clear();
+                        conference_message_drawer.removeAllItems();
                     }
-                    catch (Exception e)
+                    catch (Exception e2)
                     {
-                        e.printStackTrace();
+                        e2.printStackTrace();
                     }
-
-                    // Log.d(TAG, "remove_group_all_users:T:END");
-
                 }
             };
-            t.start();
-            t.join();
+
+            // post the removal directly to the UI queue. additions (add_group_user) are posted
+            // to the SAME queue afterwards, so FIFO already guarantees remove-before-add.
+            // the old thread + Thread.sleep(120) + t.join() "sync hack" blocked every caller
+            // for 120ms (measured via PERF logs) and, on the UI thread, even delayed the
+            // removal itself because the looper was blocked in join().
+            if (conferences_av_handler_s != null)
+            {
+                conferences_av_handler_s.post(myRunnable);
+            }
 
             // Log.d(TAG, "remove_group_all_users:T:099");
 
