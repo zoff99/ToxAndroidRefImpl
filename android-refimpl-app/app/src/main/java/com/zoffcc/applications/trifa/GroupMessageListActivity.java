@@ -509,6 +509,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         audio_rec_popup_button = findViewById(R.id.audio_rec_popup_button);
         audio_rec_popup_time = findViewById(R.id.audio_rec_popup_time);
         audio_rec_popup_container = findViewById(R.id.audio_rec_popup_container);
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:views-lookup +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         group_gallery_btn = findViewById(R.id.group_gallery_btn);
         group_gallery_btn.setOnClickListener(new View.OnClickListener() {
@@ -544,6 +546,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         }
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:gallery+notif-channel +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         final Drawable d9 = new IconicsDrawable(this).icon(GoogleMaterial.Icon.gmd_rotate_right).backgroundColor(
                 Color.TRANSPARENT).color(getResources().getColor(R.color.colorPrimaryDark)).sizeDp(50);
         ngc_camera_next_button.setImageDrawable(d9);
@@ -704,6 +708,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         });
 
         // on startup always mute mic
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:camera-buttons +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         ngc_audio_mute = true;
         ngc_audio_bar_in_v.setLevel(0);
 
@@ -795,6 +801,8 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
         });
 
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:mic-buttons +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         ngc_video_off = true;
         if (ngc_video_off == true)
         {
@@ -963,8 +971,12 @@ public class GroupMessageListActivity extends AppCompatActivity
         ngc_video_view_container.setVisibility(View.GONE);
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:video-off-buttons +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         ml_icon.setImageResource(R.drawable.circle_red);
         set_group_connection_status_icon();
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:connection-status-icon +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         messageSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener()
@@ -1062,7 +1074,11 @@ public class GroupMessageListActivity extends AppCompatActivity
         });
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:search-listeners +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         setUpEmojiPopup();
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:emoji-popup-setup +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         final Drawable d1 = new IconicsDrawable(getBaseContext()).icon(
@@ -1111,7 +1127,9 @@ public class GroupMessageListActivity extends AppCompatActivity
         if (PREF__window_security)
         {
             // prevent screenshots and also dont show the window content in recent activity screen
-            initializeScreenshotSecurity(this);
+            HelperGeneric.perf_log(TAG, "group/act:onCreate:send-icons+keyboard +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+        initializeScreenshotSecurity(this);
         }
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
@@ -1465,6 +1483,8 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:audio-rec-listeners +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         HelperGeneric.perf_log(TAG, "group/act:onCreate:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         Log.i(TAG, "onCreate:099");
         oncreate_finished = true;
