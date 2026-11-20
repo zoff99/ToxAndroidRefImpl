@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -78,6 +79,8 @@ public class GroupMessageListFragment extends Fragment
     {
         // Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.group_message_list_layout, container, false);
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         reset_paging();
 
@@ -117,6 +120,8 @@ public class GroupMessageListFragment extends Fragment
         }
 
 
+        HelperGeneric.perf_log(TAG, "group/frag:onCreateView:mark-read+notif +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         try
         {
             if (orma != null)
@@ -129,9 +134,13 @@ public class GroupMessageListFragment extends Fragment
             e.printStackTrace();
             // data_values is NULL here!!
         }
+        HelperGeneric.perf_log(TAG, "group/frag:onCreateView:get-messages rows=" + ((data_values != null) ? data_values.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         // C: remember the full count so onResume can skip the reload when nothing changed
         messages_count_at_last_load = get_messages_count_full();
+        HelperGeneric.perf_log(TAG, "group/frag:onCreateView:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         // --------------
         // --------------
@@ -302,6 +311,8 @@ public class GroupMessageListFragment extends Fragment
 
         is_data_loaded = true;
 
+        HelperGeneric.perf_log(TAG, "group/frag:onCreateView:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
+        HelperGeneric.perf_log_first_layout(TAG, "group/frag:onCreateView", listingsView, perf_t0);
         return view;
     }
 
@@ -332,6 +343,8 @@ public class GroupMessageListFragment extends Fragment
 
         Log.i(TAG, "onResume");
         super.onResume();
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         // C: skip the full reload when nothing changed while we were away
         boolean reload_needed = (!is_data_loaded)
@@ -359,7 +372,11 @@ public class GroupMessageListFragment extends Fragment
                 e.printStackTrace();
             }
 
+            HelperGeneric.perf_log(TAG, "group/frag:onResume:reload-check+mark-read+notif +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             update_all_messages(true, PREF__messageview_paging);
+            HelperGeneric.perf_log(TAG, "group/frag:onResume:update_all_messages +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
             // default is: at bottom
             is_at_bottom = true;
@@ -368,11 +385,14 @@ public class GroupMessageListFragment extends Fragment
         else
         {
             // nothing changed: just rebind visible rows (cheap), no DB reload
+            HelperGeneric.perf_log(TAG, "group/frag:onResume:redraw-only +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             adapter.redraw_all_items();
         }
 
         is_data_loaded = true;
 
+        HelperGeneric.perf_log(TAG, "group/frag:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.group_message_list_fragment = this;
     }
 
@@ -490,6 +510,8 @@ public class GroupMessageListFragment extends Fragment
     void update_all_messages(boolean always, boolean paging)
     {
         Log.i(TAG, "update_all_messages");
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         try
         {
@@ -510,6 +532,8 @@ public class GroupMessageListFragment extends Fragment
             e.printStackTrace();
         }
 
+        HelperGeneric.perf_log(TAG, "group/load:mark-read+notif +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         try
         {
             if ((always) || (data_values != null))
@@ -520,7 +544,12 @@ public class GroupMessageListFragment extends Fragment
                 }
 
                 List<com.zoffcc.applications.sorm.GroupMessage> ml = get_messages();
+                HelperGeneric.perf_log(TAG, "group/load:get-messages rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+                perf_t = SystemClock.elapsedRealtime();
                 adapter.add_list_clear(ml);
+                HelperGeneric.perf_log(TAG, "group/load:add_list_clear +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+                HelperGeneric.perf_log_first_layout(TAG, "group/load", listingsView, perf_t0);
             }
         }
         catch (Exception e)
@@ -538,6 +567,9 @@ public class GroupMessageListFragment extends Fragment
         {
             messages_count_at_last_load = -1;
         }
+        HelperGeneric.perf_log(TAG, "group/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+        HelperGeneric.perf_log(TAG, "group/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.group_message_list_dirty_while_away = false;
 
     }
@@ -574,6 +606,8 @@ public class GroupMessageListFragment extends Fragment
 
     private List<com.zoffcc.applications.sorm.GroupMessage> get_messages()
     {
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
         List<com.zoffcc.applications.sorm.GroupMessage> ml = new ArrayList<>();
 
         try
@@ -599,6 +633,8 @@ public class GroupMessageListFragment extends Fragment
                             count();
                 }
 
+                HelperGeneric.perf_log(TAG, "group/query:count n=" + count_messages + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
                 if (count_messages > PREF__message_paging_num_msgs_per_page)
                 {
                     int older_messages_count = count_messages - PREF__message_paging_num_msgs_per_page;
@@ -635,6 +671,7 @@ public class GroupMessageListFragment extends Fragment
                     m_load_all.text = "Load all messages (" + older_messages_count + " older)";
                     ml.add(0, m_load_all);
 
+                    HelperGeneric.perf_log(TAG, "group/query:select-limited rows=" + ml.size() + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms (total " + (SystemClock.elapsedRealtime() - perf_t0) + "ms)");
                     return ml;
                 }
             }
@@ -698,6 +735,7 @@ public class GroupMessageListFragment extends Fragment
             e.printStackTrace();
         }
 
+        HelperGeneric.perf_log(TAG, "group/query:select-full-or-search rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms (total " + (SystemClock.elapsedRealtime() - perf_t0) + "ms)");
         return ml;
     }
 

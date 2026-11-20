@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.content.Context;
 import android.util.Log;
 import android.util.SparseArray;
@@ -460,6 +461,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
 
     public void add_list_clear(List<com.zoffcc.applications.sorm.Message> new_items)
     {
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
         // Log.i(TAG, "add_list_clear:" + new_items);
 
         try
@@ -467,9 +470,14 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
+            HelperGeneric.perf_log(TAG, "friend/adapter:add_list_clear:copy rows=" + this.messagelistitems.size() + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             recompute_all_date_headers();
+            HelperGeneric.perf_log(TAG, "friend/adapter:add_list_clear:date-headers +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             only_emojis_cache.clear();
             this.notifyDataSetChanged();
+            HelperGeneric.perf_log(TAG, "friend/adapter:add_list_clear:TOTAL rows=" + this.messagelistitems.size() + " +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
             // Log.i(TAG, "add_list_clear:002");
         }
         catch (Exception e)

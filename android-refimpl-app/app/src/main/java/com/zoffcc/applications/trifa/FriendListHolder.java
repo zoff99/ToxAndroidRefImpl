@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -681,6 +682,7 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
             }
             else
             {
+                HelperGeneric.perf_log(TAG, "friend/click:open-friend t=" + SystemClock.elapsedRealtime());
                 show_messagelist_acticvity_for_friend(v.getContext(), this.friendlist.tox_public_key_string);
             }
         }

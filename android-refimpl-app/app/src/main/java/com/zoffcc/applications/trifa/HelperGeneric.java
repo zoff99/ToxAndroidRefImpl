@@ -3677,6 +3677,43 @@ public class HelperGeneric
      * log the source line where this function is called from.
      * good for trace logging.
      */
+    // --------- message list performance logging ---------
+    // single on/off switch: MainActivity.DEBUG_MESSAGE_LIST_PERF_LOGGING (global config block).
+    // every line is prefixed with "PERF:" -> filter with: adb logcat | grep PERF
+    static void perf_log(String tag, String msg)
+    {
+        if (MainActivity.DEBUG_MESSAGE_LIST_PERF_LOGGING)
+        {
+            Log.i(tag, "PERF: " + msg);
+        }
+    }
+
+    // one-shot: log when the message list has laid out its rows (the "fully shown" moment)
+    static void perf_log_first_layout(final String tag, final String label,
+                                      final androidx.recyclerview.widget.RecyclerView rv, final long t_start)
+    {
+        if (!MainActivity.DEBUG_MESSAGE_LIST_PERF_LOGGING)
+        {
+            return;
+        }
+        try
+        {
+            rv.getViewTreeObserver().addOnGlobalLayoutListener(new android.view.ViewTreeObserver.OnGlobalLayoutListener()
+            {
+                @Override
+                public void onGlobalLayout()
+                {
+                    rv.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    perf_log(tag, label + ":first-layout children=" + rv.getChildCount() +
+                                  " +" + (android.os.SystemClock.elapsedRealtime() - t_start) + "ms");
+                }
+            });
+        }
+        catch (Exception ignored)
+        {
+        }
+    }
+
     static void log_source_line()
     {
         try

@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.NotificationChannel;
@@ -334,6 +335,8 @@ public class GroupMessageListActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         oncreate_finished = false;
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
         Log.i(TAG, "onCreate:002");
@@ -359,6 +362,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         //
         sending_video_to_group = false;
         // ---------- video stuff ----------
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:video-alloc +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         amode = null;
         amode_save_menu_item = null;
@@ -386,6 +391,8 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         setContentView(R.layout.activity_group_message_list);
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:setContentView(incl-fragment) +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         MainActivity.group_message_list_activity = this;
@@ -446,6 +453,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         }).build();
 
 
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:drawer+header +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         rootView = (ViewGroup) findViewById(R.id.emoji_bar);
         ml_new_group_message = (com.vanniktech.emoji.EmojiEditText) findViewById(R.id.ml_new_message);
 
@@ -1456,6 +1465,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
+        HelperGeneric.perf_log(TAG, "group/act:onCreate:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         Log.i(TAG, "onCreate:099");
         oncreate_finished = true;
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
@@ -1878,6 +1888,8 @@ public class GroupMessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
@@ -1888,6 +1900,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         stop_group_video(this, true);
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         closeCamera();
+        HelperGeneric.perf_log(TAG, "group/act:onResume:video-stop+camera +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         ngc_video_packet_last_incoming_ts = -1;
@@ -1917,6 +1931,8 @@ public class GroupMessageListActivity extends AppCompatActivity
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, group_id, null, null);
+        HelperGeneric.perf_log(TAG, "group/act:onResume:notification-remove +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
 
         MainActivity.group_message_list_activity = this;
@@ -2019,6 +2035,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             }
 
         }
+        HelperGeneric.perf_log(TAG, "group/act:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
     }
 
     static void set_recording_pop_text_s(final String t)

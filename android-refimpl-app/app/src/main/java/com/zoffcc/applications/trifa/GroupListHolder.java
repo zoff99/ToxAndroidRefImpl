@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -328,6 +329,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
             }
             else
             {
+                HelperGeneric.perf_log(TAG, "group/click:open-group t=" + SystemClock.elapsedRealtime());
                 try
                 {
                     fl_loading_progressbar.setVisibility(View.VISIBLE);

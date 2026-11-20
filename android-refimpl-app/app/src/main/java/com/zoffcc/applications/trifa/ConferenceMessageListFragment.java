@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -79,6 +80,8 @@ public class ConferenceMessageListFragment extends Fragment
     {
         // Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.conference_message_list_layout, container, false);
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         reset_paging();
 
@@ -303,6 +306,8 @@ public class ConferenceMessageListFragment extends Fragment
 
         is_data_loaded = false;
 
+        HelperGeneric.perf_log(TAG, "conference/frag:onCreateView:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
+        HelperGeneric.perf_log_first_layout(TAG, "conference/frag:onCreateView", listingsView, perf_t0);
         return view;
     }
 
@@ -334,7 +339,11 @@ public class ConferenceMessageListFragment extends Fragment
 
         Log.i(TAG, "onResume");
         super.onResume();
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
+        HelperGeneric.perf_log(TAG, "conference/frag:onResume:reload-check +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         // C: skip the full reload when nothing changed while we were away
         boolean reload_needed = (!is_data_loaded)
                                 || MainActivity.conference_message_list_dirty_while_away
@@ -363,7 +372,11 @@ public class ConferenceMessageListFragment extends Fragment
                 e.printStackTrace();
             }
 
+            HelperGeneric.perf_log(TAG, "conference/frag:onResume:mark-read +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             update_all_messages(false, PREF__messageview_paging);
+            HelperGeneric.perf_log(TAG, "conference/frag:onResume:update_all_messages +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
             // default is: at bottom
             is_at_bottom = true;
@@ -372,11 +385,14 @@ public class ConferenceMessageListFragment extends Fragment
         else
         {
             // nothing changed: just rebind visible rows (cheap), no DB reload
+            HelperGeneric.perf_log(TAG, "conference/frag:onResume:redraw-only +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             adapter.redraw_all_items();
         }
 
         is_data_loaded = true;
 
+        HelperGeneric.perf_log(TAG, "conference/frag:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.conference_message_list_fragment = this;
     }
 
@@ -494,6 +510,8 @@ public class ConferenceMessageListFragment extends Fragment
     void update_all_messages(final boolean stay_at_top, final boolean paging)
     {
         Log.i(TAG, "update_all_messages");
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         try
         {
@@ -516,6 +534,8 @@ public class ConferenceMessageListFragment extends Fragment
             e.printStackTrace();
         }
 
+        HelperGeneric.perf_log(TAG, "conference/load:mark-read +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         try
         {
             if (data_values != null)
@@ -536,6 +556,8 @@ public class ConferenceMessageListFragment extends Fragment
                         tox_peerpubkeyNotEq(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY).
                         count();
 
+                HelperGeneric.perf_log(TAG, "conference/query:count n=" + count_messages + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
                 if (count_messages > PREF__message_paging_num_msgs_per_page)
                 {
                     older_messages_count = count_messages - PREF__message_paging_num_msgs_per_page;
@@ -589,6 +611,8 @@ public class ConferenceMessageListFragment extends Fragment
                 }
             }
 
+            HelperGeneric.perf_log(TAG, "conference/query:select rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             if (ml != null)
             {
                 if (show_load_all_dummy)
@@ -604,6 +628,9 @@ public class ConferenceMessageListFragment extends Fragment
                 }
 
                 adapter.add_list_clear(ml);
+                HelperGeneric.perf_log(TAG, "conference/load:add_list_clear +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+                HelperGeneric.perf_log_first_layout(TAG, "conference/load", listingsView, perf_t0);
 
                 if (stay_at_top)
                 {
@@ -632,6 +659,9 @@ public class ConferenceMessageListFragment extends Fragment
         {
             messages_count_at_last_load = -1;
         }
+        HelperGeneric.perf_log(TAG, "conference/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+        HelperGeneric.perf_log(TAG, "conference/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.conference_message_list_dirty_while_away = false;
 
     }

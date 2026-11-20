@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.content.Context;
 import android.util.Log;
 import android.util.SparseArray;
@@ -327,6 +328,8 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
 
     public void add_list_clear(List<com.zoffcc.applications.sorm.GroupMessage> new_items)
     {
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
         // Log.i(TAG, "add_list_clear:" + new_items);
 
         try
@@ -336,6 +339,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
             this.messagelistitems.addAll(new_items);
             only_emojis_cache.clear();
             this.notifyDataSetChanged();
+            HelperGeneric.perf_log(TAG, "group/adapter:add_list_clear rows=" + this.messagelistitems.size() + " +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
             // Log.i(TAG, "add_list_clear:002");
         }
         catch (Exception e)

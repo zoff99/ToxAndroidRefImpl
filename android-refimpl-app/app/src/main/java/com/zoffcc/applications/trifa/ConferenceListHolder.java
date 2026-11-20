@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -291,6 +292,7 @@ public class ConferenceListHolder extends RecyclerView.ViewHolder implements Vie
             }
             else
             {
+                HelperGeneric.perf_log(TAG, "conference/click:open-conference t=" + SystemClock.elapsedRealtime());
                 try
                 {
                     fl_loading_progressbar.setVisibility(View.VISIBLE);

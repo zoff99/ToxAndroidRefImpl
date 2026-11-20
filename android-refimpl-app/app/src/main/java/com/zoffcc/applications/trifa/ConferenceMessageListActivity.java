@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -143,6 +144,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
         Log.i(TAG, "onCreate:002");
 
         amode = null;
@@ -168,6 +171,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         conf_id_prev = conf_id;
 
         setContentView(R.layout.activity_conference_message_list);
+        HelperGeneric.perf_log(TAG, "conference/act:onCreate:setContentView(incl-fragment) +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         MainActivity.conference_message_list_activity = this;
 
@@ -427,8 +432,13 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             initializeScreenshotSecurity(this);
         }
 
+        HelperGeneric.perf_log(TAG, "conference/act:onCreate:setup-before-peers +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         set_peer_count_header();
         set_peer_names_and_avatars();
+        HelperGeneric.perf_log(TAG, "conference/act:onCreate:peer-headers +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+        HelperGeneric.perf_log(TAG, "conference/act:onCreate:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
 
         Log.i(TAG, "onCreate:099");
     }
@@ -582,6 +592,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         // Log.i(TAG, "onResume:001:conf_id=" + conf_id);
 
@@ -593,6 +605,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         change_msg_notification(NOTIFICATION_EDIT_ACTION_REMOVE.value, conf_id, null, null);
 
+        HelperGeneric.perf_log(TAG, "conference/act:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.conference_message_list_activity = this;
         wakeup_tox_thread("UI_GROUPVIEW");
     }

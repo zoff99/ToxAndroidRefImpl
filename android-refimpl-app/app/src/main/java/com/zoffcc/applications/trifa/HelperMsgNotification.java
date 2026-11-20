@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -203,14 +204,18 @@ public class HelperMsgNotification
      */
     static synchronized void update_msg_notification_unread_count()
     {
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
         // Log.i(TAG, "update_msg_notification_unread_count: posted=" + msg_notification_is_posted);
 
         if (!msg_notification_is_posted)
         {
+            HelperGeneric.perf_log(TAG, "notif:unread-update:skip(no-notification-posted)");
             return;
         }
 
         final int total = get_total_unread_count();
+        HelperGeneric.perf_log(TAG, "notif:unread-update total=" + total + " +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         // Log.i(TAG, "update_msg_notification_unread_count: updating notification number to " + total);
 
         Runnable myRunnable = new Runnable()

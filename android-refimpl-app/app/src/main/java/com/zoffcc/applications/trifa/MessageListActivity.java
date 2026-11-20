@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -205,6 +206,8 @@ public class MessageListActivity extends AppCompatActivity
         oncreate_finished = false;
         Log.i(TAG, "onCreate");
         super.onCreate(savedInstanceState);
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
         Log.i(TAG, "onCreate:002");
 
         amode = null;
@@ -256,6 +259,8 @@ public class MessageListActivity extends AppCompatActivity
         friendnum_prev = friendnum;
 
         setContentView(R.layout.activity_message_list);
+        HelperGeneric.perf_log(TAG, "friend/act:onCreate:setContentView(incl-fragment) +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
 
         message_list_activity = this;
 
@@ -947,6 +952,7 @@ public class MessageListActivity extends AppCompatActivity
             }
         });
 
+        HelperGeneric.perf_log(TAG, "friend/act:onCreate:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         Log.i(TAG, "onCreate:099");
         oncreate_finished = true;
     }
@@ -1000,6 +1006,8 @@ public class MessageListActivity extends AppCompatActivity
     {
         Log.i(TAG, "onResume");
         super.onResume();
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         // Log.i(TAG, "onResume:001:friendnum=" + friendnum);
 
@@ -1084,6 +1092,7 @@ public class MessageListActivity extends AppCompatActivity
         {
         }
 
+        HelperGeneric.perf_log(TAG, "friend/act:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         message_list_activity = this;
         wakeup_tox_thread("UI_MSGVIEW");
     }

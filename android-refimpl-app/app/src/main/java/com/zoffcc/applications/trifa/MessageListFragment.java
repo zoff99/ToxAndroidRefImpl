@@ -19,6 +19,7 @@
 
 package com.zoffcc.applications.trifa;
 
+import android.os.SystemClock;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
@@ -86,6 +87,8 @@ public class MessageListFragment extends Fragment
     {
         Log.i(TAG, "onCreateView");
         View view = inflater.inflate(R.layout.message_list_layout, container, false);
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         reset_paging();
 
@@ -388,6 +391,8 @@ public class MessageListFragment extends Fragment
 
         is_data_loaded = false;
 
+        HelperGeneric.perf_log(TAG, "friend/frag:onCreateView:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
+        HelperGeneric.perf_log_first_layout(TAG, "friend/frag:onCreateView", listingsView, perf_t0);
         return view;
     }
 
@@ -419,6 +424,8 @@ public class MessageListFragment extends Fragment
 
         Log.i(TAG, "onResume");
         super.onResume();
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         try
         {
@@ -439,6 +446,8 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
         }
 
+        HelperGeneric.perf_log(TAG, "friend/frag:onResume:mark-read +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         // C: skip the full reload when nothing changed while we were away
         boolean reload_needed = (!is_data_loaded)
                                 || MainActivity.message_list_dirty_while_away
@@ -448,10 +457,14 @@ public class MessageListFragment extends Fragment
         if (reload_needed)
         {
             update_all_messages(true, false, PREF__messageview_paging);
+            HelperGeneric.perf_log(TAG, "friend/frag:onResume:update_all_messages +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         }
         else
         {
             // nothing changed: just rebind visible rows (cheap), no DB reload
+            HelperGeneric.perf_log(TAG, "friend/frag:onResume:redraw-only +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             adapter.redraw_all_items();
         }
 
@@ -461,6 +474,7 @@ public class MessageListFragment extends Fragment
             is_data_loaded = true;
         }
 
+        HelperGeneric.perf_log(TAG, "friend/frag:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.message_list_fragment = this;
         // Log.i(TAG, "onResume:099");
     }
@@ -525,6 +539,8 @@ public class MessageListFragment extends Fragment
     void update_all_messages(final boolean from_resume_fragment, final boolean stay_at_top, final boolean paging)
     {
         Log.i(TAG, "update_all_messages");
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
 
         try
         {
@@ -545,6 +561,8 @@ public class MessageListFragment extends Fragment
             e.printStackTrace();
         }
 
+        HelperGeneric.perf_log(TAG, "friend/load:mark-read +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         try
         {
             int number_of_items_old = data_values.size();
@@ -552,7 +570,12 @@ public class MessageListFragment extends Fragment
             data_values.clear();
 
             List<com.zoffcc.applications.sorm.Message> ml = get_messages();
+            HelperGeneric.perf_log(TAG, "friend/load:get-messages rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+            perf_t = SystemClock.elapsedRealtime();
             adapter.add_list_clear(ml);
+            HelperGeneric.perf_log(TAG, "friend/load:add_list_clear +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+            HelperGeneric.perf_log_first_layout(TAG, "friend/load", listingsView, perf_t0);
 
             if (stay_at_top)
             {
@@ -630,12 +653,17 @@ public class MessageListFragment extends Fragment
         {
             messages_count_at_last_load = -1;
         }
+        HelperGeneric.perf_log(TAG, "friend/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
+        HelperGeneric.perf_log(TAG, "friend/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.message_list_dirty_while_away = false;
 
     }
 
     private List<com.zoffcc.applications.sorm.Message> get_messages()
     {
+        final long perf_t0 = SystemClock.elapsedRealtime();
+        long perf_t = perf_t0;
         List<com.zoffcc.applications.sorm.Message> ml;
 
         // ---- message load limit: only load the newest N messages ----
@@ -647,6 +675,8 @@ public class MessageListFragment extends Fragment
                     tox_friendpubkeyEq(tox_friend_get_public_key__wrapper(current_friendnum)).
                     count();
 
+            HelperGeneric.perf_log(TAG, "friend/query:count n=" + count_messages + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
             if (count_messages > PREF__message_paging_num_msgs_per_page)
             {
                 int older_messages_count = count_messages - PREF__message_paging_num_msgs_per_page;
@@ -670,6 +700,7 @@ public class MessageListFragment extends Fragment
                     ml.add(0, m_load_all);
                 }
 
+                HelperGeneric.perf_log(TAG, "friend/query:select-limited rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms (total " + (SystemClock.elapsedRealtime() - perf_t0) + "ms)");
                 return ml;
             }
         }
@@ -713,6 +744,7 @@ public class MessageListFragment extends Fragment
                         toList();
             }
         }
+        HelperGeneric.perf_log(TAG, "friend/query:select-full-or-search rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms (total " + (SystemClock.elapsedRealtime() - perf_t0) + "ms)");
         return ml;
     }
 
