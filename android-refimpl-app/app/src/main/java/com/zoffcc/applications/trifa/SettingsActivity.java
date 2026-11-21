@@ -82,6 +82,7 @@ public class SettingsActivity extends AppCompatActivity
     private EditText searchInput;
     private View searchClear;
     private TextView noResults;
+    private boolean fragmentReady = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -156,6 +157,15 @@ public class SettingsActivity extends AppCompatActivity
                 return false;
             }
         });
+
+        // Re-apply a search term that survived a recreate (e.g. dark-mode switch).
+        // Only filter when the fragment's screen is already built (the recreate case,
+        // where it is restored during super.onCreate()). On first launch the fragment
+        // is not initialized yet, so onSettingsReady() applies the search instead.
+        if (fragmentReady)
+        {
+            applySearch(searchInput.getText().toString());
+        }
     }
 
     /**
@@ -164,16 +174,28 @@ public class SettingsActivity extends AppCompatActivity
      */
     void onSettingsReady()
     {
-        applySearch(searchInput.getText().toString());
+        // The fragment's preference screen now exists, so filtering is safe. Record
+        // that for onCreate(). On a recreate this callback fires inside super.onCreate()
+        // BEFORE the search views exist, so only apply here when they are already
+        // present; otherwise onCreate() applies the search once the views are wired.
+        fragmentReady = true;
+        if (searchInput != null)
+        {
+            applySearch(searchInput.getText().toString());
+        }
     }
 
     private void applySearch(String query)
     {
+        if ((searchClear == null) || (noResults == null))
+        {
+            return;   // activity views not inflated yet (early recreate callback)
+        }
         final boolean empty = (query == null) || (query.trim().length() == 0);
         searchClear.setVisibility(empty ? View.GONE : View.VISIBLE);
 
         int matches = -1;
-        if (settingsFragment != null)
+        if (fragmentReady && (settingsFragment != null))
         {
             matches = settingsFragment.applySearchFilter(query);
         }
@@ -790,7 +812,12 @@ public class SettingsActivity extends AppCompatActivity
          */
         public int applySearchFilter(String query)
         {
-            final PreferenceScreen screen = getPreferenceScreen();
+            final PreferenceManager pm = getPreferenceManager();
+            if (pm == null)
+            {
+                return -1;   // fragment not initialized yet (no PreferenceManager)
+            }
+            final PreferenceScreen screen = pm.getPreferenceScreen();
             if (screen == null)
             {
                 return -1;   // preference screen not built yet

@@ -38,6 +38,7 @@
             android:inputType="text"
             android:maxLines="1"
             android:imeOptions="actionSearch"
+            android:freezesText="true"
             android:textSize="15sp"
             android:paddingTop="10dp"
             android:paddingBottom="10dp"
