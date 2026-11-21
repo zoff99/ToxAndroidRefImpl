@@ -173,7 +173,18 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         try
         {
-            ip_addr_text.setText(fl.ip_addr_str);
+            // show only the first IP address (the string may list several);
+            // full detail is on the friend profile page. cut at the first comma.
+            String ip_str = fl.ip_addr_str;
+            if (ip_str != null)
+            {
+                final int comma = ip_str.indexOf(',');
+                if (comma >= 0)
+                {
+                    ip_str = ip_str.substring(0, comma);
+                }
+            }
+            ip_addr_text.setText(ip_str);
         }
         catch(Exception ignored)
         {
