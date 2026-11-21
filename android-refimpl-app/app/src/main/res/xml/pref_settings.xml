@@ -13,7 +13,7 @@
             android:entryValues="@array/pref_dark_mode_values"
             android:key="dark_mode_pref"
             android:summary="change default theme to dark mode"
-            android:title="Dark Mode"
+            android:title="Dark mode"
             app:useSimpleSummaryProvider="true" />
         <ListPreference
             android:defaultValue="2"
@@ -148,8 +148,8 @@
         <SwitchPreference
             android:defaultValue="false"
             android:key="X_persistent_peerlist"
-            android:summary="Shows group members even when they are offline. In exchange, the group receives verifiable notices of when you are online.\nChange needs RESTART!"
-            android:title="Persistent Peerlist (NGC Middleware)" />
+            android:summary="Show group members even when they are offline.\n\nTrade-off: your online presence becomes cryptographically provable to the group (signed notices, cached about 30 days) instead of ephemeral and deniable. A warning explains the risks when you enable it.\n\nRequires restart."
+            android:title="Persistent peerlist (experimental)" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="U_keep_nospam"

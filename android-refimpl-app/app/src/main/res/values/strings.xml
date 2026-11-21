@@ -80,17 +80,17 @@
         <item>2</item>
     </string-array>
 
-    <string name="pref_title_auto_accept_image">auto accept images</string>
-    <string name="pref_description_auto_accept_image">auto accept Images and Photos up to 12 MByte in size</string>
+    <string name="pref_title_auto_accept_image">Auto-accept images</string>
+    <string name="pref_description_auto_accept_image">Automatically download incoming images and photos up to 12 MB.</string>
 
-    <string name="pref_title_auto_accept_video">auto accept videos</string>
-    <string name="pref_description_auto_accept_video">auto accept Videos up to 40 MByte in size</string>
+    <string name="pref_title_auto_accept_video">Auto-accept videos</string>
+    <string name="pref_description_auto_accept_video">Automatically download incoming videos up to 40 MB.</string>
 
-    <string name="pref_title_auto_accept_all_upto">auto accept all files</string>
-    <string name="pref_description_auto_accept_all_upto">auto accept all Files up to 200 MByte in size</string>
+    <string name="pref_title_auto_accept_all_upto">Auto-accept all files</string>
+    <string name="pref_description_auto_accept_all_upto">Automatically download incoming files of any type up to 200 MB.</string>
 
-    <string name="pref_title_video_uv_reversed">reverse UV in Video</string>
-    <string name="pref_description_video_uv_reversed">Reverse the order of UV planes in the camera video</string>
+    <string name="pref_title_video_uv_reversed">Swap video UV planes</string>
+    <string name="pref_description_video_uv_reversed">Swap the U/V color planes of the camera video. Use only if outgoing video has wrong or swapped colors on your phone.</string>
 
     <string name="pref_title_software_echo_cancel">Echo Cancellation</string>
     <string name="pref_description_software_echo_cancel">Use Software Echo Cancellation</string>
@@ -108,8 +108,8 @@
         <item>2</item>
     </string-array>
 
-    <string name="pref_title_video_cam_resolution">Camera Resolution</string>
-    <string name="pref_description_video_cam_resolution">What Resolution to use for Video Calling</string>
+    <string name="pref_title_video_cam_resolution">Camera resolution</string>
+    <string name="pref_description_video_cam_resolution">Resolution used for outgoing video. Higher looks better but uses more data and CPU.</string>
     <string-array name="pref_video_cam_resolution_titles">
         <item>640x480</item>
         <item>1280x720</item>
@@ -121,7 +121,7 @@
         <item>2</item>
     </string-array>
 
-    <string name="pref_title_global_font_size">Font Size</string>
+    <string name="pref_title_global_font_size">Font size</string>
     <string name="pref_description_global_font_size">Select Font Size</string>
     <string-array name="pref_global_font_size_titles">
         <item>very small</item>
@@ -142,8 +142,8 @@
         <item>6</item>
     </string-array>
 
-    <string name="pref_title_camera_get_preview_format">Camera Preview Format</string>
-    <string name="pref_description_camera_get_preview_format">Camera Preview Format seems to be in the wrong format on some phones</string>
+    <string name="pref_title_camera_get_preview_format">Camera preview format</string>
+    <string name="pref_description_camera_get_preview_format">Change the camera preview pixel format. Only needed if the preview looks wrong (for example corrupted colors) on your phone.</string>
     <string-array name="pref_camera_get_preview_format_titles">
         <item>default: YV12</item>
         <item>some phones: NV21</item>
@@ -156,20 +156,20 @@
     <string name="pref_title_use_H264_hw_encoding">H264 Hardware Encoding</string>
     <string name="pref_description_use_H264_hw_encoding">Use hardware acceleration for H264 video encoding</string>
 
-    <string name="pref_title_mic_gain_factor">Mic Gain</string>
-    <string name="pref_description_mic_gain_factor">Set a higher Gain if your microphone records with low volume</string>
+    <string name="pref_title_mic_gain_factor">Microphone gain</string>
+    <string name="pref_description_mic_gain_factor">Amplify your microphone if others hear you too quietly. Increase only as needed.</string>
 
-    <string name="pref_title_mic_gain_factor_toggle">Mic Gain to lower Volume</string>
-    <string name="pref_description_mic_gain_factor_toggle">If your microphone records with too much sensitivity, enable this setting and the Mic Gain Factor will actually lower the Volume of the microphone</string>
+    <string name="pref_title_mic_gain_factor_toggle">Reduce microphone volume</string>
+    <string name="pref_description_mic_gain_factor_toggle">If your microphone is too loud or sensitive, turn this on so the gain slider above lowers the volume instead of raising it.</string>
 
-    <string name="pref_title_gainprocessing_active">Microphone Gain</string>
-    <string name="pref_description_gainprocessing_active">adjust Microphone Gain semi automatically to make Sound louder.\nIf there is a problem during Calls try turning off this option</string>
-    <string name="pref_title_rnnoise_active">Background Noise</string>
-    <string name="pref_description_rnnoise_active">Remove Background Noise with RNNoise</string>
+    <string name="pref_title_gainprocessing_active">Automatic gain control</string>
+    <string name="pref_description_gainprocessing_active">Automatically adjust microphone volume so you sound consistent. If calls have audio problems, try turning this off.</string>
+    <string name="pref_title_rnnoise_active">Noise suppression (RNNoise)</string>
+    <string name="pref_description_rnnoise_active">Reduce background noise (keyboard, fans, street) with RNNoise so your voice is clearer.</string>
 
 
-    <string name="pref_title_higher_audio_quality">Audio Quality</string>
-    <string name="pref_description_higher_audio_quality">Use better Audio quality.\nChange needs RESTART!</string>
+    <string name="pref_title_higher_audio_quality">Audio quality</string>
+    <string name="pref_description_higher_audio_quality">Higher quality sounds better but uses more data.\n\nRequires restart.</string>
     <string-array name="pref_higher_audio_quality_titles">
         <item>low\n(6 kb/s)</item>
         <item>normal\n(32 kb/s)</item>
@@ -183,96 +183,96 @@
 
     <string name="stats_export_tooltip">Export chart as high-res image</string>
 
-    <string name="pref_title_udp_enabled">enable UDP</string>
-    <string name="pref_description_udp_enabled">for most mobile devices UDP will cause much more internet traffic.\nChange needs RESTART!\nDefault setting is OFF</string>
+    <string name="pref_title_udp_enabled">Enable UDP</string>
+    <string name="pref_description_udp_enabled">Use UDP for Tox connections. On mobile this usually means noticeably more data usage. Off by default.\n\nRequires restart.</string>
 
-    <string name="pref_title_force_udp_only">force UDP mode</string>
-    <string name="pref_description_force_udp_only">this will force UDP only mode, some contacts may not be reachable with this setting turned on\nChange needs RESTART!</string>
+    <string name="pref_title_force_udp_only">Force UDP only</string>
+    <string name="pref_description_force_udp_only">Use only UDP, with no TCP relay fallback. Some contacts may become unreachable. Use only if you know you need it.\n\nRequires restart.</string>
 
-    <string name="pref_title_orbot_enabled">enable Tor Proxy</string>
-    <string name="pref_description_orbot_enabled">You need to install Orbot to use this.\nChange needs RESTART!</string>
+    <string name="pref_title_orbot_enabled">Route traffic through Tor (Orbot)</string>
+    <string name="pref_description_orbot_enabled">Send Tox traffic through the Tor network via Orbot (must be installed), hiding your IP from contacts and bootstrap nodes.\n\nRequires restart.</string>
 
-    <string name="pref_title_fps_half">lower fps</string>
-    <string name="pref_description_fps_half">Video Framerate 1/2 : so 12fps instead of 25fps</string>
+    <string name="pref_title_fps_half">Half framerate</string>
+    <string name="pref_description_fps_half">Send video at half the framerate (about 12 instead of 25 fps) to save data and CPU.</string>
 
-    <string name="pref_title_h264_encoder_use_intra_refresh">H264 intra refresh</string>
-    <string name="pref_description_h264_encoder_use_intra_refresh">H264 encoder should use intra refresh frames</string>
+    <string name="pref_title_h264_encoder_use_intra_refresh">H264 intra-refresh</string>
+    <string name="pref_description_h264_encoder_use_intra_refresh">Use intra-refresh instead of full keyframes for H264 video. Can reduce stutter on weak connections; leave on unless you have video problems.</string>
 
-    <string name="pref_title_start_on_boot">start on boot</string>
-    <string name="pref_description_start_on_boot">start the application after boot.\nGoogle does not allow this anymore starting with Android 10</string>
+    <string name="pref_title_start_on_boot">Start on boot</string>
+    <string name="pref_description_start_on_boot">Launch TRIfA automatically after the phone boots.\n\nOn Android 10 and newer you must also allow Display over other apps for TRIfA; a dialog explains this when you enable it.</string>
 
-    <string name="pref_title_use_incognito_keyboard2">incognito Keyboard</string>
-    <string name="pref_description_use_incognito_keyboard2">turn on to tell keyboard not to learn from your entered words</string>
+    <string name="pref_title_use_incognito_keyboard2">Incognito keyboard</string>
+    <string name="pref_description_use_incognito_keyboard2">Ask the keyboard not to learn or store the words you type. Not all keyboards honor this.</string>
 
-    <string name="pref_title_window_security">prevent Screenshots</string>
-    <string name="pref_description_window_security">Enabling this setting adds FLAG_SECURE to Activities.\nIt prevents screenshots and screen recording and showing content in recents preview</string>
+    <string name="pref_title_window_security">Block screenshots</string>
+    <string name="pref_description_window_security">Hide TRIfA content from screenshots, screen recording and the recent-apps preview (Android FLAG_SECURE).</string>
 
-    <string name="pref_title_message_paging_num_msgs_per_page">Message Load Limit</string>
-    <string name="pref_description_message_paging_num_msgs_per_page">Load only the newest N messages when opening a chat. 0 means no limit. A \"load all messages\" button is shown when older messages exist</string>
+    <string name="pref_title_message_paging_num_msgs_per_page">Messages loaded per chat</string>
+    <string name="pref_description_message_paging_num_msgs_per_page">Open chats faster by loading only the newest N messages. 0 loads everything. A load-all-messages button appears when older messages exist.</string>
 
-    <string name="pref_title_compact_friendlist">Compact Friendlist</string>
-    <string name="pref_description_compact_friendlist">Make the Friendlist more compact, if you have a large list of Friends</string>
+    <string name="pref_title_compact_friendlist">Compact friend list</string>
+    <string name="pref_description_compact_friendlist">Show more friends on screen by using smaller rows. Useful for long friend lists.</string>
 
     <string name="pref_title_compact_chatlist">Compact Chatlist</string>
     <string name="pref_description_compact_chatlist">Display Chatmessage more compact saving space</string>
 
-    <string name="pref_title_notification_show_content">Show Notification Content</string>
-    <string name="pref_description_notification_show_content">Display the Messagetext and Sender in Notifications</string>
+    <string name="pref_title_notification_show_content">Show notification content</string>
+    <string name="pref_description_notification_show_content">Show the sender and message text in notifications. Turn off to hide message content on your lock screen.</string>
 
-    <string name="pref_title_use_push_service">Use Push Service</string>
-    <string name="pref_description_use_push_service">WARNING: This will use Google FCM or Unified Push to save Battery and Bandwidth.\nThe app will make HTTPS: connections to some PUSH servers directly (not via Tox).\nOnly activate this if you accept that.\nThis feature needs the Tox Push Message App installed.</string>
+    <string name="pref_title_use_push_service">Use push service</string>
+    <string name="pref_description_use_push_service">Save battery and data by receiving wake-up pushes (Google FCM or UnifiedPush) instead of keeping Tox always connected.\n\nTrade-off: TRIfA talks to push servers over HTTPS, outside Tox, which can reveal when you get messages. Needs the Tox Push Message app installed. Enable only if you accept this.</string>
 
-    <string name="pref_title_allow_push_server_ntfy">Allow ntfy.sh Server</string>
-    <string name="pref_description_allow_push_server_ntfy">WARNING: Allow ntfy.sh server for push notifications, this may leak your metadata of timestamps when you receive push notifications, if a friend subscribes with your push token. ntfy.sh has NO passwords and NO authentication. you have been warned.</string>
+    <string name="pref_title_allow_push_server_ntfy">Allow ntfy.sh push server</string>
+    <string name="pref_description_allow_push_server_ntfy">Use ntfy.sh for push delivery.\n\nWarning: ntfy.sh has no accounts or authentication. Anyone who learns your push token can subscribe and see when you receive pushes (timing metadata). Enable only if you accept this.</string>
 
-    <string name="pref_title_allow_push_server_sunup">Allow Mozilla sunup Server</string>
-    <string name="pref_description_allow_push_server_sunup">WARNING: Allow Mozilla sunup server for push notifications, this may leak your metadata of timestamps when you receive push notifications, if a friend subscribes with your push token. Mozilla sunup has NO passwords and NO authentication. you have been warned.</string>
+    <string name="pref_title_allow_push_server_sunup">Allow Mozilla sunup push server</string>
+    <string name="pref_description_allow_push_server_sunup">Use the Mozilla sunup server for push delivery.\n\nWarning: sunup has no accounts or authentication. Anyone who learns your push token can subscribe and see when you receive pushes (timing metadata). Enable only if you accept this.</string>
 
-    <string name="pref_title_download_push_msg_app">Download Push Message App</string>
+    <string name="pref_title_download_push_msg_app">Get the Tox Push Message app</string>
 
-    <string name="pref_title_custom_bootstrap_nodes">Use Custom Bootstrap nodes</string>
+    <string name="pref_title_custom_bootstrap_nodes">Custom bootstrap node</string>
 
-    <string name="pref_title_set_fps">set fps</string>
-    <string name="pref_description_set_fps">try to set 15fps video framerate, this may crash on some phones</string>
+    <string name="pref_title_set_fps">Limit to 15 fps</string>
+    <string name="pref_description_set_fps">Try to cap video at 15 fps. May crash on some phones; enable only if you need it.</string>
 
-    <string name="pref_title_conference_show_system_messages">System Messages</string>
-    <string name="pref_description_conference_show_system_messages">show System Messages in Conferences</string>
+    <string name="pref_title_conference_show_system_messages">Conference system messages</string>
+    <string name="pref_description_conference_show_system_messages">Show join/leave and other system notices in conference (group) chats.</string>
 
     <string name="pref_title_local_discovery_enabled">LAN discovery</string>
-    <string name="pref_description_local_discovery_enabled">use nodes on local LAN to bootstrap</string>
+    <string name="pref_description_local_discovery_enabled">Find and use Tox nodes on your local network to bootstrap. Useful for LAN-only or offline setups.</string>
 
-    <string name="pref_title_U_keep_nospam">keep NoSpam</string>
-    <string name="pref_description_U_keep_nospam">keep NoSpam value. This is not safe, only activate if you know what you are doing!</string>
+    <string name="pref_title_U_keep_nospam">Keep NoSpam (unsafe)</string>
+    <string name="pref_description_U_keep_nospam">Keep the same NoSpam value when resetting your Tox ID.\n\nUnsafe: this weakens spam protection. Only enable if you understand the consequences.</string>
 
-    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">share files</string>
-    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">share files to TRIfA via share Intent.</string>
+    <string name="pref_title_allow_file_sharing_to_trifa_via_intent">Receive shared files</string>
+    <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Allow other apps to share files into TRIfA using the Android share menu.</string>
 
-    <string name="pref_title_allow_open_encrypted_file_via_intent">open files from encrypted storage</string>
-    <string name="pref_description_allow_open_encrypted_file_via_intent">open files directly from encrypted storage via Intent. This can be potentially dangerous, because other malicious apps could open other files in TRIfA\'s encrypted storage.</string>
+    <string name="pref_title_allow_open_encrypted_file_via_intent">Open encrypted files via other apps</string>
+    <string name="pref_description_allow_open_encrypted_file_via_intent">Let other apps open files directly from the encrypted storage of TRIfA.\n\nWarning: a malicious app could use this to read other files in your encrypted storage. Enable only if you need it.</string>
 
-    <string name="pref_title_allow_screen_off_in_audio_call">Turn screen off</string>
-    <string name="pref_description_allow_screen_off_in_audio_call">If you experience troubles with screen turning off in an Audiocall, set this to off</string>
+    <string name="pref_title_allow_screen_off_in_audio_call">Allow screen off in calls</string>
+    <string name="pref_description_allow_screen_off_in_audio_call">Let the screen turn off during a voice call to save battery. If calls misbehave when the screen turns off, disable this.</string>
 
-    <string name="pref_title_speakerphone_tweak">Speaker fix for Calls</string>
-    <string name="pref_description_speakerphone_tweak">If the App does not switch to the Speaker in a call, then try to activate this fix.</string>
+    <string name="pref_title_speakerphone_tweak">Speakerphone fix</string>
+    <string name="pref_description_speakerphone_tweak">Workaround for phones that do not switch to the speaker during a call. Enable only if you have that problem.</string>
 
-    <string name="pref_title_X_zoom_incoming_video">Zoom Videocall Window</string>
-    <string name="pref_description_X_zoom_incoming_video">allow to pinch-zoom the Videocall Window. This is not working fully!</string>
+    <string name="pref_title_X_zoom_incoming_video">Pinch-zoom incoming video (experimental)</string>
+    <string name="pref_description_X_zoom_incoming_video">Allow pinch-to-zoom on the incoming video window. Experimental and not fully working yet.</string>
 
     <string name="pref_title_X_use_native_audio_play">Native Audio System</string>
     <string name="pref_description_X_use_native_audio_play">!! Experimental !!\nUse Native Audio to Play Sound</string>
 
-    <string name="pref_title_X_battery_saving_mode">Battery Savings Mode</string>
-    <string name="pref_description_X_battery_saving_mode">!! Experimental !!\nthis will save a bit more battery, but message will take longer to send and receive.\nProbably some other bad effects too!</string>
+    <string name="pref_title_X_battery_saving_mode">Battery saving mode (experimental)</string>
+    <string name="pref_description_X_battery_saving_mode">Save some battery by letting Tox sleep between checks.\n\nTrade-off: messages send and arrive more slowly, and there may be other side effects. Experimental.</string>
 
-    <string name="pref_title_X_misc_button_enabled">Misc. Button</string>
-    <string name="pref_description_X_misc_button_enabled">!! Experimental !!\nadd a Button on Calling Screen to send a fixed Message</string>
+    <string name="pref_title_X_misc_button_enabled">Quick-message button (experimental)</string>
+    <string name="pref_description_X_misc_button_enabled">Show a button on the call screen that sends a fixed preset message. Experimental.</string>
 
-    <string name="pref_title_X_tox_set_do_not_sync_av">do NOT sync AV</string>
-    <string name="pref_description_X_tox_set_do_not_sync_av">!! Experimental !!\nDo not sync Video or Audio. Use this setting if your have Videocall problems, as a last resort.</string>
+    <string name="pref_title_X_tox_set_do_not_sync_av">Do not sync audio/video (experimental)</string>
+    <string name="pref_description_X_tox_set_do_not_sync_av">Stop synchronizing audio and video streams. A last-resort workaround if video calls keep failing. Experimental.</string>
 
-    <string name="pref_title_X_eac_delay_ms">AEC delay</string>
-    <string name="pref_description_X_eac_delay_ms">!! Experimental !!\nAEC delay in ms</string>
+    <string name="pref_title_X_eac_delay_ms">Echo cancellation delay (experimental)</string>
+    <string name="pref_description_X_eac_delay_ms">Delay (in ms) the acoustic echo canceller uses to line up speaker and microphone signals. Only change this if you have echo problems and know the right value for your device. Default: 80 ms.</string>
 
     <string name="pref_title_use_camera_x">Background remove</string>
     <string name="pref_description_use_camera_x">!! Experimental !!\nUse CameraX and Remove background in Video Calls\nThis might not work fully yet, please be careful and do not depend on this to work always!</string>
@@ -280,8 +280,8 @@
     <string name="pref_title_allow_enable_ngc_features">NGC - New Group Chats</string>
     <string name="pref_description_enable_ngc_features">!! Experimental !!\nThis is NOT fully working!!</string>
 
-    <string name="pref_title_X_audio_play_buffer_custom">Audio play buffer</string>
-    <string name="pref_description_X_audio_play_buffer_custom">!! Experimental !!\nAudio play buffer in bytes, set to "0" to disable custom setting</string>
+    <string name="pref_title_X_audio_play_buffer_custom">Audio playback buffer (experimental)</string>
+    <string name="pref_description_X_audio_play_buffer_custom">Override the audio playback buffer size (in bytes) to fix choppy or delayed call audio. 0 uses the automatic default. Only change if you have playback problems.</string>
 
     <string name="pref_title_toxirc_muted_peers_01">Toxirc Bridge Muted Users</string>
     <string name="pref_description_toxirc_muted_peers_01">Muted User 1 (leave empty if not used)</string>
@@ -311,8 +311,8 @@
     </string-array>
 
 
-    <string name="pref_title_min_audio_samplingrate_out">Audio Samplingrate</string>
-    <string name="pref_description_min_audio_samplingrate_out">Default setting is 48000 Hz</string>
+    <string name="pref_title_min_audio_samplingrate_out">Audio sample rate</string>
+    <string name="pref_description_min_audio_samplingrate_out">Minimum output sample rate. 48000 Hz is the default and works for most devices.</string>
     <string-array name="pref_min_audio_samplingrate_out_titles">
         <item>Auto</item>
         <item>8000 Hz</item>
@@ -327,8 +327,8 @@
     </string-array>
 
 
-    <string name="pref_title_X_audio_recording_frame_size">Audiorecoding Framesize</string>
-    <string name="pref_description_X_audio_recording_frame_size">Default setting is 40 ms</string>
+    <string name="pref_title_X_audio_recording_frame_size">Audio recording frame size (experimental)</string>
+    <string name="pref_description_X_audio_recording_frame_size">Size of each captured audio frame. Default: 40 ms.</string>
     <string-array name="X_audio_recording_frame_size_titles">
         <item>120</item>
         <item>60</item>
@@ -342,8 +342,8 @@
         <item>20</item>
     </string-array>
 
-    <string name="pref_title_X_battery_saving_timeout">Offline Time in Batterysavings mode</string>
-    <string name="pref_description_X_battery_saving_timeout">Default setting is 15 minutes</string>
+    <string name="pref_title_X_battery_saving_timeout">Battery saving interval (experimental)</string>
+    <string name="pref_description_X_battery_saving_timeout">How long Tox sleeps between checks in battery saving mode. Default: 15 minutes.</string>
     <string-array name="X_battery_saving_timeout_titles">
         <item>5</item>
         <item>10</item>
