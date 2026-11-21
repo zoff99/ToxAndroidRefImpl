@@ -1513,11 +1513,11 @@ public class GroupMessageListActivity extends AppCompatActivity
             final float font_scale = getResources().getConfiguration().fontScale;
             if (font_scale > 1.0f)
             {
-                ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f / font_scale);
+                ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19f / font_scale);
             }
             else
             {
-                ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+                ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 19f);
             }
         }
         catch (Exception e)
