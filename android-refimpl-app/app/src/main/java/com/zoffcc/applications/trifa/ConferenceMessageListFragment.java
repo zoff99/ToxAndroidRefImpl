@@ -540,6 +540,18 @@ public class ConferenceMessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "conference/load:mark-read +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
+
+        // B: snapshot the full count BEFORE the SELECT (see group onCreateView note): "counted => fetched".
+        try
+        {
+            messages_count_at_last_load = get_messages_count_full();
+        }
+        catch (Exception e)
+        {
+            messages_count_at_last_load = -1;
+        }
+        HelperGeneric.perf_log(TAG, "conference/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         try
         {
             if (data_values != null)
@@ -662,17 +674,6 @@ public class ConferenceMessageListFragment extends Fragment
             Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
 
-        // C: remember the full count so onResume can skip the reload when nothing changed
-        try
-        {
-            messages_count_at_last_load = get_messages_count_full();
-        }
-        catch (Exception e)
-        {
-            messages_count_at_last_load = -1;
-        }
-        HelperGeneric.perf_log(TAG, "conference/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
-        perf_t = SystemClock.elapsedRealtime();
         HelperGeneric.perf_log(TAG, "conference/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.conference_message_list_dirty_while_away = false;
 

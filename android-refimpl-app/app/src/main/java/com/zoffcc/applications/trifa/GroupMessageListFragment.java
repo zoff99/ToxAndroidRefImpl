@@ -123,6 +123,13 @@ public class GroupMessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "group/frag:onCreateView:mark-read+notif +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
+
+        // B: snapshot the full count BEFORE the SELECT, so "counted => fetched": a message inserted
+        //    after this count is absent from the snapshot, so onResume sees a different count and
+        //    reloads. snapshotting AFTER the SELECT could count a row the SELECT missed (hidden forever).
+        messages_count_at_last_load = get_messages_count_full();
+        HelperGeneric.perf_log(TAG, "group/frag:onCreateView:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         try
         {
             if (orma != null)
@@ -136,11 +143,6 @@ public class GroupMessageListFragment extends Fragment
             // data_values is NULL here!!
         }
         HelperGeneric.perf_log(TAG, "group/frag:onCreateView:get-messages rows=" + ((data_values != null) ? data_values.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
-        perf_t = SystemClock.elapsedRealtime();
-
-        // C: remember the full count so onResume can skip the reload when nothing changed
-        messages_count_at_last_load = get_messages_count_full();
-        HelperGeneric.perf_log(TAG, "group/frag:onCreateView:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
 
         // --------------
@@ -538,6 +540,18 @@ public class GroupMessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "group/load:mark-read+notif +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
+
+        // B: snapshot the full count BEFORE the SELECT (see onCreateView note): "counted => fetched".
+        try
+        {
+            messages_count_at_last_load = get_messages_count_full();
+        }
+        catch (Exception e)
+        {
+            messages_count_at_last_load = -1;
+        }
+        HelperGeneric.perf_log(TAG, "group/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         try
         {
             if ((always) || (data_values != null))
@@ -562,17 +576,6 @@ public class GroupMessageListFragment extends Fragment
             Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
 
-        // C: remember the full count so onResume can skip the reload when nothing changed
-        try
-        {
-            messages_count_at_last_load = get_messages_count_full();
-        }
-        catch (Exception e)
-        {
-            messages_count_at_last_load = -1;
-        }
-        HelperGeneric.perf_log(TAG, "group/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
-        perf_t = SystemClock.elapsedRealtime();
         HelperGeneric.perf_log(TAG, "group/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.group_message_list_dirty_while_away = false;
 

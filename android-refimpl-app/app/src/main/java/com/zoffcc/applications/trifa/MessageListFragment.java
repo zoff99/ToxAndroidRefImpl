@@ -564,6 +564,18 @@ public class MessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "friend/load:mark-read +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
+
+        // B: snapshot the full count BEFORE the SELECT (see group onCreateView note): "counted => fetched".
+        try
+        {
+            messages_count_at_last_load = get_messages_count_full();
+        }
+        catch (Exception e)
+        {
+            messages_count_at_last_load = -1;
+        }
+        HelperGeneric.perf_log(TAG, "friend/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        perf_t = SystemClock.elapsedRealtime();
         try
         {
             int number_of_items_old = data_values.size();
@@ -645,17 +657,6 @@ public class MessageListFragment extends Fragment
             Log.i(TAG, "data_values:005:EE1:" + e.getMessage());
         }
 
-        // C: remember the full count so onResume can skip the reload when nothing changed
-        try
-        {
-            messages_count_at_last_load = get_messages_count_full();
-        }
-        catch (Exception e)
-        {
-            messages_count_at_last_load = -1;
-        }
-        HelperGeneric.perf_log(TAG, "friend/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
-        perf_t = SystemClock.elapsedRealtime();
         HelperGeneric.perf_log(TAG, "friend/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.message_list_dirty_while_away = false;
 
