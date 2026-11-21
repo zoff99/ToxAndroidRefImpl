@@ -240,6 +240,8 @@ public class HelperMessage
     {
         try
         {
+            HelperGeneric.incmsgflow_log(TAG, "conf/add_single: row=" + message_id + " force=" + force +
+                                          " ref=" + ((MainActivity.conference_message_list_fragment != null) ? "set" : "null"));
             if (MainActivity.conference_message_list_fragment != null)
             {
                 Thread t = new Thread()
@@ -261,7 +263,13 @@ public class HelperMessage
                                                     System.currentTimeMillis()))
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
+                                        HelperGeneric.incmsgflow_log(TAG, "conf/add_single: row=" + m.id + " ts=" + m.sent_timestamp +
+                                                                      " -> add_message");
                                         MainActivity.conference_message_list_fragment.add_message(m, true, false);
+                                    }
+                                    else
+                                    {
+                                        HelperGeneric.incmsgflow_log(TAG, "conf/add_single: row=" + m.id + " throttled -> skip");
                                     }
                                 }
                             }
@@ -279,6 +287,7 @@ public class HelperMessage
                 // C: this is the CONFERENCE arrival path -> set the CONFERENCE dirty flag. it was
                 //    wrongly setting the friend flag, so the conference resume-skip net never fired
                 //    (and the friend chat got a spurious reload).
+                HelperGeneric.incmsgflow_log(TAG, "conf/add_single: row=" + message_id + " ref=null -> drop, dirty=true");
                 MainActivity.conference_message_list_dirty_while_away = true;
             }
         }
@@ -293,6 +302,7 @@ public class HelperMessage
         try
         {
             // Log.i(TAG, "add_single_message_from_messge_id:1:message_id=" + message_id);
+            HelperGeneric.incmsgflow_log(TAG, "friend/add_single: row=" + message_id + " force=" + force);
             Thread t = new Thread()
             {
                 @Override
@@ -309,6 +319,8 @@ public class HelperMessage
                             if (m.id != -1)
                             {
                                 // Log.i(TAG, "add_single_message_from_messge_id:m.id=" + m.id);
+                                HelperGeneric.incmsgflow_log(TAG, "friend/add_single: row=" + m.id + " ts=" + m.sent_timestamp +
+                                                              " ref=" + ((MainActivity.message_list_fragment != null) ? "set" : "null"));
 
                                 if ((force) || (MainActivity.update_all_messages_global_timestamp +
                                                 MainActivity.UPDATE_MESSAGES_NORMAL_MILLIS <
@@ -321,6 +333,7 @@ public class HelperMessage
                                         // ok, we need to wait for onResume to finish
                                         // Log.i(TAG,
                                         //       "add_single_message_from_messge_id:ok, we need to wait for onResume to finish");
+                                        HelperGeneric.incmsgflow_log(TAG, "friend/add_single: row=" + m.id + " ref=null -> wait-loop (max 8s)");
                                         long loop = 0;
 
                                         while (loop < 40)  // wait 8 sec., then give up
@@ -342,13 +355,24 @@ public class HelperMessage
                                                 break;
                                             }
                                         }
+                                        HelperGeneric.incmsgflow_log(TAG, "friend/add_single: row=" + m.id + " wait-loop done polls=" + loop +
+                                                                      " ref=" + ((MainActivity.message_list_fragment != null) ? "set" : "null(gave up)"));
                                     }
 
                                     if (MainActivity.message_list_fragment != null)
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
+                                        HelperGeneric.incmsgflow_log(TAG, "friend/add_single: row=" + m.id + " -> add_message");
                                         MainActivity.message_list_fragment.add_message(m, true, false);
                                     }
+                                    else
+                                    {
+                                        HelperGeneric.incmsgflow_log(TAG, "friend/add_single: row=" + m.id + " ref still null -> drop");
+                                    }
+                                }
+                                else
+                                {
+                                    HelperGeneric.incmsgflow_log(TAG, "friend/add_single: row=" + m.id + " throttled -> skip");
                                 }
                             }
                         }
@@ -372,6 +396,8 @@ public class HelperMessage
     {
         try
         {
+            HelperGeneric.incmsgflow_log(TAG, "friend/update_by_id: row=" + message_id + " force=" + force +
+                                          " ref=" + ((MainActivity.message_list_fragment != null) ? "set" : "null"));
             if (MainActivity.message_list_fragment != null)
             {
                 Thread t = new Thread()
@@ -392,7 +418,12 @@ public class HelperMessage
                                                     System.currentTimeMillis()))
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
+                                        HelperGeneric.incmsgflow_log(TAG, "friend/update_by_id: row=" + m.id + " -> modify_message");
                                         MainActivity.message_list_fragment.modify_message(m);
+                                    }
+                                    else
+                                    {
+                                        HelperGeneric.incmsgflow_log(TAG, "friend/update_by_id: row=" + m.id + " throttled -> skip");
                                     }
                                 }
                             }
@@ -415,6 +446,8 @@ public class HelperMessage
     {
         try
         {
+            HelperGeneric.incmsgflow_log(TAG, "friend/update_ftid: ft=" + filetransfer_id + " force=" + force +
+                                          " ref=" + ((MainActivity.message_list_fragment != null) ? "set" : "null"));
             if (MainActivity.message_list_fragment != null)
             {
                 Thread t = new Thread()
@@ -434,7 +467,13 @@ public class HelperMessage
                                                 System.currentTimeMillis()))
                                 {
                                     MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
+                                    HelperGeneric.incmsgflow_log(TAG, "friend/update_ftid: ft=" + filetransfer_id + " row=" + m.id +
+                                                                  " -> modify_message");
                                     MainActivity.message_list_fragment.modify_message(m);
+                                }
+                                else
+                                {
+                                    HelperGeneric.incmsgflow_log(TAG, "friend/update_ftid: row=" + m.id + " throttled -> skip");
                                 }
                             }
                         }
@@ -449,6 +488,7 @@ public class HelperMessage
             else
             {
                 // chat not in foreground: remember that a live update was skipped (checked on resume)
+                HelperGeneric.incmsgflow_log(TAG, "friend/update_ftid: ft=" + filetransfer_id + " ref=null -> dirty=true");
                 MainActivity.message_list_dirty_while_away = true;
             }
         }
@@ -463,6 +503,8 @@ public class HelperMessage
     {
         try
         {
+            HelperGeneric.incmsgflow_log(TAG, "friend/update_msg: row=" + m.id + " force=" + force +
+                                          " ref=" + ((MainActivity.message_list_fragment != null) ? "set" : "null"));
             if (MainActivity.message_list_fragment != null)
             {
                 if ((force) ||
@@ -470,17 +512,20 @@ public class HelperMessage
                      System.currentTimeMillis()))
                 {
                     MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
+                    HelperGeneric.incmsgflow_log(TAG, "friend/update_msg: row=" + m.id + " -> modify_message");
                     MainActivity.message_list_fragment.modify_message(m);
                 }
                 else
                 {
                     // throttled: live update skipped (checked on resume)
+                    HelperGeneric.incmsgflow_log(TAG, "friend/update_msg: row=" + m.id + " throttled -> dirty=true");
                     MainActivity.message_list_dirty_while_away = true;
                 }
             }
             else
             {
                 // chat not in foreground: live update skipped (checked on resume)
+                HelperGeneric.incmsgflow_log(TAG, "friend/update_msg: row=" + m.id + " ref=null -> dirty=true");
                 MainActivity.message_list_dirty_while_away = true;
             }
         }
@@ -698,12 +743,19 @@ public class HelperMessage
             return -1;
         }
 
+        HelperGeneric.incmsgflow_log(TAG, "friend/insert_db: row=" + row_id + " view_flag=" + update_message_view_flag +
+                                      " type=" + m.TRIFA_MESSAGE_TYPE + " dir=" + m.direction);
         try
         {
             if ((row_id != -1) && (update_message_view_flag))
             {
                 // Log.i(TAG, "insert_into_message_db:add_single_message_from_messge_id, force=true");
+                HelperGeneric.incmsgflow_log(TAG, "friend/insert_db: row=" + row_id + " -> notify add_single");
                 add_single_message_from_messge_id(row_id, true);
+            }
+            else
+            {
+                HelperGeneric.incmsgflow_log(TAG, "friend/insert_db: row=" + row_id + " DB-only (no live notify)");
             }
 
             return row_id;

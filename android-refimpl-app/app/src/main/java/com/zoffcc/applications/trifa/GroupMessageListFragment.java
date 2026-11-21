@@ -129,6 +129,7 @@ public class GroupMessageListFragment extends Fragment
         //    reloads. snapshotting AFTER the SELECT could count a row the SELECT missed (hidden forever).
         messages_count_at_last_load = get_messages_count_full();
         HelperGeneric.perf_log(TAG, "group/frag:onCreateView:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        HelperGeneric.incmsgflow_log(TAG, "group/onCreateView: count-before-select=" + messages_count_at_last_load);
         perf_t = SystemClock.elapsedRealtime();
         try
         {
@@ -143,6 +144,7 @@ public class GroupMessageListFragment extends Fragment
             // data_values is NULL here!!
         }
         HelperGeneric.perf_log(TAG, "group/frag:onCreateView:get-messages rows=" + ((data_values != null) ? data_values.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        HelperGeneric.incmsgflow_log(TAG, "group/onCreateView: select rows=" + ((data_values != null) ? data_values.size() : -1));
         perf_t = SystemClock.elapsedRealtime();
 
         // --------------
@@ -354,8 +356,17 @@ public class GroupMessageListFragment extends Fragment
                                 || MainActivity.group_message_list_dirty_while_away
                                 || ((group_search_messages_text != null) && (group_search_messages_text.length() > 0))
                                 || (get_messages_count_full() != messages_count_at_last_load);
+        if (MainActivity.DEBUG_INCOMING_MSG_FLOW_LOGGING)
+        {
+            HelperGeneric.incmsgflow_log(TAG, "group/onResume: reload_needed=" + reload_needed +
+                                          " is_data_loaded=" + is_data_loaded +
+                                          " dirty=" + MainActivity.group_message_list_dirty_while_away +
+                                          " search=" + ((group_search_messages_text != null) && (group_search_messages_text.length() > 0)) +
+                                          " count_full=" + get_messages_count_full() + " count_last=" + messages_count_at_last_load);
+        }
         if (reload_needed)
         {
+            HelperGeneric.incmsgflow_log(TAG, "group/onResume: -> RELOAD");
             try
             {
                 // reset "new" flags for messages -------
@@ -388,6 +399,7 @@ public class GroupMessageListFragment extends Fragment
         else
         {
             // nothing changed: just rebind visible rows (cheap), no DB reload
+            HelperGeneric.incmsgflow_log(TAG, "group/onResume: -> REDRAW-ONLY (skip reload)");
             HelperGeneric.perf_log(TAG, "group/frag:onResume:redraw-only +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
             adapter.redraw_all_items();
@@ -397,13 +409,16 @@ public class GroupMessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "group/frag:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.group_message_list_fragment = this;
+        HelperGeneric.incmsgflow_log(TAG, "group/onResume: ref assigned");
 
         // D: a message may have arrived between the reload-check above and this ref assignment (the
         //    ref was still null, so the group arrival path dropped it). fix C marked the chat dirty.
         //    re-check the dirty flag now and reload so it shows in THIS view, not only next resume.
         //    cheap boolean check -- no extra COUNT query, so the resume-skip speedup is preserved.
+        HelperGeneric.incmsgflow_log(TAG, "group/onResume: D-recheck dirty=" + MainActivity.group_message_list_dirty_while_away);
         if (MainActivity.group_message_list_dirty_while_away)
         {
+            HelperGeneric.incmsgflow_log(TAG, "group/onResume: D-recheck -> RELOAD");
             update_all_messages(true, PREF__messageview_paging);
         }
     }
@@ -446,6 +461,7 @@ public class GroupMessageListFragment extends Fragment
 
         global_showing_anygroupview = false;
         MainActivity.group_message_list_fragment = null;
+        HelperGeneric.incmsgflow_log(TAG, "group/onPause: ref=null");
     }
 
     synchronized void modify_message(final GroupMessage m)
@@ -457,7 +473,8 @@ public class GroupMessageListFragment extends Fragment
             {
                 try
                 {
-                    adapter.update_item(m);
+                    boolean found = adapter.update_item(m);
+                    HelperGeneric.incmsgflow_log(TAG, "group/modify_message: row=" + m.id + " update_item found=" + found);
                 }
                 catch (Exception e)
                 {
@@ -483,7 +500,8 @@ public class GroupMessageListFragment extends Fragment
                 {
                     // A: only advance the resume-skip count when the append actually happened
                     //    (add_item dedups by row id and returns false on a duplicate)
-                    if (adapter.add_item(m))
+                    boolean appended = adapter.add_item(m);
+                    if (appended)
                     {
                         // C: keep the resume-skip count in sync with live appends
                         if (messages_count_at_last_load >= 0)
@@ -491,6 +509,8 @@ public class GroupMessageListFragment extends Fragment
                             messages_count_at_last_load++;
                         }
                     }
+                    HelperGeneric.incmsgflow_log(TAG, "group/add_message: row=" + m.id + " appended=" + appended +
+                                                  " count_last=" + messages_count_at_last_load + " at_bottom=" + is_at_bottom);
                     if (is_at_bottom)
                     {
                         listingsView.scrollToPosition(adapter.getItemCount() - 1);
@@ -525,6 +545,7 @@ public class GroupMessageListFragment extends Fragment
     void update_all_messages(boolean always, boolean paging)
     {
         Log.i(TAG, "update_all_messages");
+        HelperGeneric.incmsgflow_log(TAG, "group/update_all: start always=" + always + " paging=" + paging);
         final long perf_t0 = SystemClock.elapsedRealtime();
         long perf_t = perf_t0;
 
@@ -560,6 +581,7 @@ public class GroupMessageListFragment extends Fragment
             messages_count_at_last_load = -1;
         }
         HelperGeneric.perf_log(TAG, "group/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        HelperGeneric.incmsgflow_log(TAG, "group/update_all: count-before-select=" + messages_count_at_last_load);
         perf_t = SystemClock.elapsedRealtime();
         try
         {
@@ -572,6 +594,7 @@ public class GroupMessageListFragment extends Fragment
 
                 List<com.zoffcc.applications.sorm.GroupMessage> ml = get_messages();
                 HelperGeneric.perf_log(TAG, "group/load:get-messages rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+                HelperGeneric.incmsgflow_log(TAG, "group/update_all: select rows=" + ((ml != null) ? ml.size() : -1));
                 perf_t = SystemClock.elapsedRealtime();
                 adapter.add_list_clear(ml);
                 HelperGeneric.perf_log(TAG, "group/load:add_list_clear +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
@@ -587,6 +610,7 @@ public class GroupMessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "group/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.group_message_list_dirty_while_away = false;
+        HelperGeneric.incmsgflow_log(TAG, "group/update_all: done, dirty=false");
 
     }
 

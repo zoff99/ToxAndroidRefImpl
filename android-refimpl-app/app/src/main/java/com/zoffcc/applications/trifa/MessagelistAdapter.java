@@ -470,6 +470,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
+            HelperGeneric.incmsgflow_log(TAG, "friend/adapter.add_list_clear: rows=" + this.messagelistitems.size());
             HelperGeneric.perf_log(TAG, "friend/adapter:add_list_clear:copy rows=" + this.messagelistitems.size() + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
             recompute_all_date_headers();
@@ -501,6 +502,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             {
                 if ((existing != null) && (existing.id == new_item.id))
                 {
+                    HelperGeneric.incmsgflow_log(TAG, "friend/adapter.add_item: row=" + new_item.id + " DEDUP already-present -> skip");
                     return false;
                 }
             }
@@ -517,6 +519,8 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                      ((new_item.sent_timestamp == prev_last.sent_timestamp) &&
                       (new_item.sent_timestamp_ms < prev_last.sent_timestamp_ms))))
                 {
+                    HelperGeneric.incmsgflow_log(TAG, "friend/adapter.add_item: row=" + new_item.id + " out-of-order ts=" +
+                                                  new_item.sent_timestamp + "." + new_item.sent_timestamp_ms + " -> dirty=true");
                     MainActivity.message_list_dirty_while_away = true;
                 }
             }
@@ -530,6 +534,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             // TODO: use "notifyItemInserted" !!
             this.notifyDataSetChanged();
             // Log.i(TAG, "add_item:002:" + this.messagelistitems.size());
+            HelperGeneric.incmsgflow_log(TAG, "friend/adapter.add_item: row=" + new_item.id + " appended size=" + this.messagelistitems.size());
             return true;
         }
         catch (Exception e)
@@ -587,6 +592,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
             Log.i(TAG, "update_item:EE:" + e.getMessage());
         }
 
+        HelperGeneric.incmsgflow_log(TAG, "friend/adapter.update_item: row=" + new_item.id + " found=" + found_item);
         return found_item;
     }
 
@@ -603,6 +609,7 @@ public class MessagelistAdapter extends RecyclerView.Adapter implements FastScro
                 {
                     int pos = this.messagelistitems.indexOf(m2);
                     this.messagelistitems.remove(pos);
+                    HelperGeneric.incmsgflow_log(TAG, "friend/adapter.remove_item: row=" + del_item.id + " pos=" + pos);
                     // positions shifted: rebuild the position-keyed caches
                     recompute_all_date_headers();
                     only_emojis_cache.clear();

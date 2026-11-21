@@ -455,14 +455,28 @@ public class MessageListFragment extends Fragment
                                 || ((search_messages_text != null) && (search_messages_text.length() > 0))
                                 || show_only_files
                                 || (get_messages_count_full() != messages_count_at_last_load);
+        // INCMSGFLOW: log the resume decision components. guarded so the extra COUNT query only
+        //             runs when the diagnostic flag is on (log args are otherwise evaluated eagerly).
+        if (MainActivity.DEBUG_INCOMING_MSG_FLOW_LOGGING)
+        {
+            HelperGeneric.incmsgflow_log(TAG, "friend/onResume: reload_needed=" + reload_needed
+                                         + " is_data_loaded=" + is_data_loaded
+                                         + " dirty=" + MainActivity.message_list_dirty_while_away
+                                         + " search=" + ((search_messages_text != null) && (search_messages_text.length() > 0))
+                                         + " only_files=" + show_only_files
+                                         + " count_full=" + get_messages_count_full()
+                                         + " count_last=" + messages_count_at_last_load);
+        }
         if (reload_needed)
         {
+            HelperGeneric.incmsgflow_log(TAG, "friend/onResume: -> RELOAD");
             update_all_messages(true, false, PREF__messageview_paging);
             HelperGeneric.perf_log(TAG, "friend/frag:onResume:update_all_messages +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
         }
         else
         {
+            HelperGeneric.incmsgflow_log(TAG, "friend/onResume: -> REDRAW-ONLY");
             // nothing changed: just rebind visible rows (cheap), no DB reload
             HelperGeneric.perf_log(TAG, "friend/frag:onResume:redraw-only +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
@@ -477,12 +491,14 @@ public class MessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "friend/frag:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.message_list_fragment = this;
+        HelperGeneric.incmsgflow_log(TAG, "friend/onResume: ref assigned");
 
         // D: re-check the dirty flag after the ref assignment (see group note). the friend wait-loop
         //    normally appends after onResume, but a dirty flag set in the window (e.g. an out-of-order
         //    or edit update skipped while the ref was null) should still trigger a reload here.
         if (MainActivity.message_list_dirty_while_away)
         {
+            HelperGeneric.incmsgflow_log(TAG, "friend/onResume: D-recheck dirty=" + MainActivity.message_list_dirty_while_away + " -> RELOAD");
             update_all_messages(true, false, PREF__messageview_paging);
         }
         // Log.i(TAG, "onResume:099");
@@ -538,6 +554,7 @@ public class MessageListFragment extends Fragment
 
         global_showing_messageview = false;
         MainActivity.message_list_fragment = null;
+        HelperGeneric.incmsgflow_log(TAG, "friend/onPause: ref=null");
     }
 
     void reset_paging()
@@ -548,6 +565,8 @@ public class MessageListFragment extends Fragment
     void update_all_messages(final boolean from_resume_fragment, final boolean stay_at_top, final boolean paging)
     {
         Log.i(TAG, "update_all_messages");
+        HelperGeneric.incmsgflow_log(TAG, "friend/update_all: start from_resume=" + from_resume_fragment
+                                     + " stay_at_top=" + stay_at_top + " paging=" + paging);
         final long perf_t0 = SystemClock.elapsedRealtime();
         long perf_t = perf_t0;
 
@@ -583,6 +602,7 @@ public class MessageListFragment extends Fragment
             messages_count_at_last_load = -1;
         }
         HelperGeneric.perf_log(TAG, "friend/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        HelperGeneric.incmsgflow_log(TAG, "friend/update_all: count-before-select=" + messages_count_at_last_load);
         perf_t = SystemClock.elapsedRealtime();
         try
         {
@@ -592,6 +612,7 @@ public class MessageListFragment extends Fragment
 
             List<com.zoffcc.applications.sorm.Message> ml = get_messages();
             HelperGeneric.perf_log(TAG, "friend/load:get-messages rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+            HelperGeneric.incmsgflow_log(TAG, "friend/update_all: select rows=" + ((ml != null) ? ml.size() : -1));
             perf_t = SystemClock.elapsedRealtime();
             adapter.add_list_clear(ml);
             HelperGeneric.perf_log(TAG, "friend/load:add_list_clear +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
@@ -667,6 +688,7 @@ public class MessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "friend/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.message_list_dirty_while_away = false;
+        HelperGeneric.incmsgflow_log(TAG, "friend/update_all: done dirty=false");
 
     }
 
@@ -816,7 +838,8 @@ public class MessageListFragment extends Fragment
             {
                 try
                 {
-                    adapter.update_item(m);
+                    boolean found = adapter.update_item(m);
+                    HelperGeneric.incmsgflow_log(TAG, "friend/modify_message: row=" + m.id + " found=" + found);
                 }
                 catch (Exception e)
                 {
@@ -844,7 +867,8 @@ public class MessageListFragment extends Fragment
                     Log.i(TAG, "add_message:002");
                     // A: only advance the resume-skip count when the append actually happened
                     //    (add_item dedups by row id and returns false on a duplicate)
-                    if (adapter.add_item(m))
+                    boolean appended = adapter.add_item(m);
+                    if (appended)
                     {
                         // C: keep the resume-skip count in sync with live appends
                         if (messages_count_at_last_load >= 0)
@@ -852,6 +876,9 @@ public class MessageListFragment extends Fragment
                             messages_count_at_last_load++;
                         }
                     }
+                    HelperGeneric.incmsgflow_log(TAG, "friend/add_message: row=" + m.id
+                                                 + " appended=" + appended + " count_last=" + messages_count_at_last_load
+                                                 + " at_bottom=" + is_at_bottom);
 
                     if (stay_at_top)
                     {

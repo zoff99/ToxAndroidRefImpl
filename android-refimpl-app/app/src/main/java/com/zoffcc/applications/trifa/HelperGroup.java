@@ -309,6 +309,8 @@ public class HelperGroup
     static long insert_into_group_message_db(final GroupMessage m, final boolean update_group_view_flag)
     {
         long row_id = orma.insertIntoGroupMessage(m);
+        HelperGeneric.incmsgflow_log(TAG, "group/insert_db: row=" + row_id + " view_flag=" + update_group_view_flag +
+                                      " type=" + m.TRIFA_MESSAGE_TYPE + " dir=" + m.direction);
 
         try
         {
@@ -318,11 +320,17 @@ public class HelperGroup
                     (m.tox_group_peer_pubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)))
                 {
                     // HINT: dont show system message because of user PREF
+                    HelperGeneric.incmsgflow_log(TAG, "group/insert_db: row=" + row_id + " system-msg suppressed by PREF");
                 }
                 else
                 {
+                    HelperGeneric.incmsgflow_log(TAG, "group/insert_db: row=" + row_id + " -> notify add_single");
                     add_single_group_message_from_messge_id(row_id, true);
                 }
+            }
+            else
+            {
+                HelperGeneric.incmsgflow_log(TAG, "group/insert_db: row=" + row_id + " DB-only (no live notify)");
             }
 
             return row_id;
@@ -338,6 +346,8 @@ public class HelperGroup
     {
         try
         {
+            HelperGeneric.incmsgflow_log(TAG, "group/add_single: row=" + message_id + " force=" + force +
+                                          " ref=" + ((MainActivity.group_message_list_fragment != null) ? "set" : "null"));
             if (MainActivity.group_message_list_fragment != null)
             {
                 Thread t = new Thread()
@@ -358,7 +368,13 @@ public class HelperGroup
                                                     System.currentTimeMillis()))
                                     {
                                         MainActivity.update_all_messages_global_timestamp = System.currentTimeMillis();
+                                        HelperGeneric.incmsgflow_log(TAG, "group/add_single: row=" + m.id + " ts=" + m.sent_timestamp +
+                                                                      " -> add_message");
                                         MainActivity.group_message_list_fragment.add_message(m);
+                                    }
+                                    else
+                                    {
+                                        HelperGeneric.incmsgflow_log(TAG, "group/add_single: row=" + m.id + " throttled -> skip");
                                     }
                                 }
                             }
@@ -375,6 +391,7 @@ public class HelperGroup
                 // C: chat not in foreground: remember that a live append was skipped, so onResume
                 //    reloads instead of skipping. the group arrival path previously had no else
                 //    branch, so a message arriving while the ref was null left no dirty flag.
+                HelperGeneric.incmsgflow_log(TAG, "group/add_single: row=" + message_id + " ref=null -> drop, dirty=true");
                 MainActivity.group_message_list_dirty_while_away = true;
             }
         }
@@ -2830,6 +2847,7 @@ public class HelperGroup
                 if (MainActivity.group_message_list_fragment == null)
                 {
                     // no group chat in foreground: remember that a live update was skipped (checked on resume)
+                    HelperGeneric.incmsgflow_log(TAG, "group/update_in_list: row=" + gmsg.id + " ref=null -> dirty=true");
                     MainActivity.group_message_list_dirty_while_away = true;
                 }
                 return;

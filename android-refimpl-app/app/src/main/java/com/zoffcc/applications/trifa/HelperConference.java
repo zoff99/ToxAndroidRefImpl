@@ -378,12 +378,19 @@ public class HelperConference
     static long insert_into_conference_message_db(final ConferenceMessage m, final boolean update_conference_view_flag)
     {
         long row_id = orma.insertIntoConferenceMessage(m);
+        HelperGeneric.incmsgflow_log(TAG, "conf/insert_db: row=" + row_id + " view_flag=" + update_conference_view_flag +
+                                      " type=" + m.TRIFA_MESSAGE_TYPE + " dir=" + m.direction);
 
         try
         {
             if ((row_id != -1) && (update_conference_view_flag))
             {
+                HelperGeneric.incmsgflow_log(TAG, "conf/insert_db: row=" + row_id + " -> notify add_single");
                 HelperMessage.add_single_conference_message_from_messge_id(row_id, true);
+            }
+            else
+            {
+                HelperGeneric.incmsgflow_log(TAG, "conf/insert_db: row=" + row_id + " DB-only (no live notify)");
             }
             return row_id;
         }

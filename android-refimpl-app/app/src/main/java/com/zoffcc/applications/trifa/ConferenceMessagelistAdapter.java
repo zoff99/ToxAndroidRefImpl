@@ -279,6 +279,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
             // Log.i(TAG, "add_list_clear:001:new_items=" + new_items);
             this.messagelistitems.clear();
             this.messagelistitems.addAll(new_items);
+            HelperGeneric.incmsgflow_log(TAG, "conf/adapter.add_list_clear: rows=" + this.messagelistitems.size());
             only_emojis_cache.clear();
             this.notifyDataSetChanged();
             HelperGeneric.perf_log(TAG, "conference/adapter:add_list_clear rows=" + this.messagelistitems.size() + " +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
@@ -309,6 +310,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
             {
                 if ((existing != null) && (existing.id == new_item.id))
                 {
+                    HelperGeneric.incmsgflow_log(TAG, "conf/adapter.add_item: row=" + new_item.id + " DEDUP already-present -> skip");
                     return false;
                 }
             }
@@ -322,6 +324,8 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 ConferenceMessage prev_last = this.messagelistitems.get(cnt_old - 1);
                 if ((prev_last != null) && (new_item.sent_timestamp < prev_last.sent_timestamp))
                 {
+                    HelperGeneric.incmsgflow_log(TAG, "conf/adapter.add_item: row=" + new_item.id + " out-of-order ts=" +
+                                                  new_item.sent_timestamp + "<" + prev_last.sent_timestamp + " -> dirty=true");
                     MainActivity.conference_message_list_dirty_while_away = true;
                 }
             }
@@ -330,6 +334,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
             // TODO: use "notifyItemInserted" !!
             this.notifyDataSetChanged();
             // Log.i(TAG, "add_item:002:" + this.messagelistitems.size());
+            HelperGeneric.incmsgflow_log(TAG, "conf/adapter.add_item: row=" + new_item.id + " appended size=" + this.messagelistitems.size());
             return true;
         }
         catch (Exception e)
@@ -373,6 +378,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
             Log.i(TAG, "update_item:EE:" + e.getMessage());
         }
 
+        HelperGeneric.incmsgflow_log(TAG, "conf/adapter.update_item: row=" + new_item.id + " found=" + found_item);
         return found_item;
     }
 
@@ -389,6 +395,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 {
                     int pos = this.messagelistitems.indexOf(m2);
                     this.messagelistitems.remove(pos);
+                    HelperGeneric.incmsgflow_log(TAG, "conf/adapter.remove_item: row=" + del_item.id + " pos=" + pos);
                     // positions shifted: rebuild the position-keyed cache
                     only_emojis_cache.clear();
                     this.notifyItemRemoved(pos);

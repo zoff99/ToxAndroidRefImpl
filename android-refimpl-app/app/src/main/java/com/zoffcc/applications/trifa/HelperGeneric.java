@@ -3688,6 +3688,19 @@ public class HelperGeneric
         }
     }
 
+    // --------- incoming message flow / messagelist update logging ---------
+    // single on/off switch: MainActivity.DEBUG_INCOMING_MSG_FLOW_LOGGING (global config block).
+    // every line is prefixed with "INCMSGFLOW:" -> filter with: adb logcat | grep INCMSGFLOW
+    // privacy-safe: log only row ids, counts, timestamps, booleans and decisions -- never
+    //               peer pubkeys, nicknames, message text or raw chat ids.
+    static void incmsgflow_log(String tag, String msg)
+    {
+        if (MainActivity.DEBUG_INCOMING_MSG_FLOW_LOGGING)
+        {
+            Log.i(tag, "INCMSGFLOW: " + msg);
+        }
+    }
+
     // one-shot: log when the message list has laid out its rows (the "fully shown" moment)
     static void perf_log_first_layout(final String tag, final String label,
                                       final androidx.recyclerview.widget.RecyclerView rv, final long t_start)

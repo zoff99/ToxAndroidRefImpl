@@ -350,8 +350,20 @@ public class ConferenceMessageListFragment extends Fragment
                                 || MainActivity.conference_message_list_dirty_while_away
                                 || ((conf_search_messages_text != null) && (conf_search_messages_text.length() > 0))
                                 || (get_messages_count_full() != messages_count_at_last_load);
+        // INCMSGFLOW: log the resume decision components. guarded so the extra COUNT query only
+        //             runs when the diagnostic flag is on (log args are otherwise evaluated eagerly).
+        if (MainActivity.DEBUG_INCOMING_MSG_FLOW_LOGGING)
+        {
+            HelperGeneric.incmsgflow_log(TAG, "conf/onResume: reload_needed=" + reload_needed
+                                         + " is_data_loaded=" + is_data_loaded
+                                         + " dirty=" + MainActivity.conference_message_list_dirty_while_away
+                                         + " search=" + ((conf_search_messages_text != null) && (conf_search_messages_text.length() > 0))
+                                         + " count_full=" + get_messages_count_full()
+                                         + " count_last=" + messages_count_at_last_load);
+        }
         if (reload_needed)
         {
+            HelperGeneric.incmsgflow_log(TAG, "conf/onResume: -> RELOAD");
             try
             {
                 // reset "new" flags for messages -------
@@ -385,6 +397,7 @@ public class ConferenceMessageListFragment extends Fragment
 
         else
         {
+            HelperGeneric.incmsgflow_log(TAG, "conf/onResume: -> REDRAW-ONLY");
             // nothing changed: just rebind visible rows (cheap), no DB reload
             HelperGeneric.perf_log(TAG, "conference/frag:onResume:redraw-only +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
         perf_t = SystemClock.elapsedRealtime();
@@ -395,6 +408,7 @@ public class ConferenceMessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "conference/frag:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.conference_message_list_fragment = this;
+        HelperGeneric.incmsgflow_log(TAG, "conf/onResume: ref assigned");
 
         // D: a message may have arrived between the reload-check above and this ref assignment (the
         //    ref was still null, so the conference arrival path dropped it). fix C marked the chat
@@ -402,6 +416,7 @@ public class ConferenceMessageListFragment extends Fragment
         //    resume. cheap boolean check -- no extra COUNT query.
         if (MainActivity.conference_message_list_dirty_while_away)
         {
+            HelperGeneric.incmsgflow_log(TAG, "conf/onResume: D-recheck dirty=" + MainActivity.conference_message_list_dirty_while_away + " -> RELOAD");
             update_all_messages(false, PREF__messageview_paging);
         }
     }
@@ -413,6 +428,7 @@ public class ConferenceMessageListFragment extends Fragment
 
         global_showing_anygroupview = false;
         MainActivity.conference_message_list_fragment = null;
+        HelperGeneric.incmsgflow_log(TAG, "conf/onPause: ref=null");
     }
 
     synchronized void modify_message(final ConferenceMessage m)
@@ -424,7 +440,8 @@ public class ConferenceMessageListFragment extends Fragment
             {
                 try
                 {
-                    adapter.update_item(m);
+                    boolean found = adapter.update_item(m);
+                    HelperGeneric.incmsgflow_log(TAG, "conf/modify_message: row=" + m.id + " found=" + found);
                 }
                 catch (Exception e)
                 {
@@ -450,7 +467,8 @@ public class ConferenceMessageListFragment extends Fragment
                 {
                     // A: only advance the resume-skip count when the append actually happened
                     //    (add_item dedups by row id and returns false on a duplicate)
-                    if (adapter.add_item(m))
+                    boolean appended = adapter.add_item(m);
+                    if (appended)
                     {
                         // C: keep the resume-skip count in sync with live appends
                         if (messages_count_at_last_load >= 0)
@@ -458,6 +476,9 @@ public class ConferenceMessageListFragment extends Fragment
                             messages_count_at_last_load++;
                         }
                     }
+                    HelperGeneric.incmsgflow_log(TAG, "conf/add_message: row=" + m.id
+                                                 + " appended=" + appended + " count_last=" + messages_count_at_last_load
+                                                 + " at_bottom=" + is_at_bottom);
 
                     if (stay_at_top)
                     {
@@ -523,6 +544,7 @@ public class ConferenceMessageListFragment extends Fragment
     void update_all_messages(final boolean stay_at_top, final boolean paging)
     {
         Log.i(TAG, "update_all_messages");
+        HelperGeneric.incmsgflow_log(TAG, "conf/update_all: start stay_at_top=" + stay_at_top + " paging=" + paging);
         final long perf_t0 = SystemClock.elapsedRealtime();
         long perf_t = perf_t0;
 
@@ -560,6 +582,7 @@ public class ConferenceMessageListFragment extends Fragment
             messages_count_at_last_load = -1;
         }
         HelperGeneric.perf_log(TAG, "conference/load:count-full +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+        HelperGeneric.incmsgflow_log(TAG, "conf/update_all: count-before-select=" + messages_count_at_last_load);
         perf_t = SystemClock.elapsedRealtime();
         try
         {
@@ -645,6 +668,7 @@ public class ConferenceMessageListFragment extends Fragment
             }
 
             HelperGeneric.perf_log(TAG, "conference/query:select rows=" + ((ml != null) ? ml.size() : -1) + " +" + (SystemClock.elapsedRealtime() - perf_t) + "ms");
+            HelperGeneric.incmsgflow_log(TAG, "conf/update_all: select rows=" + ((ml != null) ? ml.size() : -1));
         perf_t = SystemClock.elapsedRealtime();
             if (ml != null)
             {
@@ -685,6 +709,7 @@ public class ConferenceMessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "conference/load:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.conference_message_list_dirty_while_away = false;
+        HelperGeneric.incmsgflow_log(TAG, "conf/update_all: done dirty=false");
 
     }
 
