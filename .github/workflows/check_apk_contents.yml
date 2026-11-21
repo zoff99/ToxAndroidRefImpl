@@ -1,0 +1,31 @@
+name: check apk contents
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  check_apk_contents:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: Install Java
+      uses: actions/setup-java@v6
+      with:
+        distribution: 'temurin'
+        java-version: |
+          17
+        cache: gradle
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v4
+      with:
+        packages: 'platforms;android-34 build-tools;34.0.0 platform-tools'
+
+    - name: check native libs and assets
+      run:  |
+            tools/check_apk_contents.sh
