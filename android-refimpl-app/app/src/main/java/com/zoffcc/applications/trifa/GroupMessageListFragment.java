@@ -354,15 +354,24 @@ public class GroupMessageListFragment extends Fragment
         // C: skip the full reload when nothing changed while we were away
         boolean reload_needed = (!is_data_loaded)
                                 || MainActivity.group_message_list_dirty_while_away
-                                || ((group_search_messages_text != null) && (group_search_messages_text.length() > 0))
-                                || (get_messages_count_full() != messages_count_at_last_load);
+                                || ((group_search_messages_text != null) && (group_search_messages_text.length() > 0));
+        // C: run the COUNT query only when the cheap checks above did not already force a reload.
+        //    capture its return value once and reuse it for the diagnostic log below: no second
+        //    COUNT query (saves resources, and avoids re-reading a DB that may have changed).
+        //    when the cheap checks already decided, count_full stays at count_last (not queried).
+        int count_full = messages_count_at_last_load;
+        if (!reload_needed)
+        {
+            count_full = get_messages_count_full();
+            reload_needed = (count_full != messages_count_at_last_load);
+        }
         if (MainActivity.DEBUG_INCOMING_MSG_FLOW_LOGGING)
         {
             HelperGeneric.incmsgflow_log(TAG, "group/onResume: reload_needed=" + reload_needed +
                                           " is_data_loaded=" + is_data_loaded +
                                           " dirty=" + MainActivity.group_message_list_dirty_while_away +
                                           " search=" + ((group_search_messages_text != null) && (group_search_messages_text.length() > 0)) +
-                                          " count_full=" + get_messages_count_full() + " count_last=" + messages_count_at_last_load);
+                                          " count_full=" + count_full + " count_last=" + messages_count_at_last_load);
         }
         if (reload_needed)
         {

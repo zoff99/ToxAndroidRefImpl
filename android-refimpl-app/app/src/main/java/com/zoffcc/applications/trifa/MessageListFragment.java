@@ -453,10 +453,18 @@ public class MessageListFragment extends Fragment
         boolean reload_needed = (!is_data_loaded)
                                 || MainActivity.message_list_dirty_while_away
                                 || ((search_messages_text != null) && (search_messages_text.length() > 0))
-                                || show_only_files
-                                || (get_messages_count_full() != messages_count_at_last_load);
-        // INCMSGFLOW: log the resume decision components. guarded so the extra COUNT query only
-        //             runs when the diagnostic flag is on (log args are otherwise evaluated eagerly).
+                                || show_only_files;
+        // C: run the COUNT query only when the cheap checks above did not already force a reload.
+        //    capture its return value once and reuse it for the diagnostic log below: no second
+        //    COUNT query (saves resources, and avoids re-reading a DB that may have changed).
+        //    when the cheap checks already decided, count_full stays at count_last (not queried).
+        int count_full = messages_count_at_last_load;
+        if (!reload_needed)
+        {
+            count_full = get_messages_count_full();
+            reload_needed = (count_full != messages_count_at_last_load);
+        }
+        // INCMSGFLOW: log the resume decision components (reuses count_full, no extra COUNT query).
         if (MainActivity.DEBUG_INCOMING_MSG_FLOW_LOGGING)
         {
             HelperGeneric.incmsgflow_log(TAG, "friend/onResume: reload_needed=" + reload_needed
@@ -464,7 +472,7 @@ public class MessageListFragment extends Fragment
                                          + " dirty=" + MainActivity.message_list_dirty_while_away
                                          + " search=" + ((search_messages_text != null) && (search_messages_text.length() > 0))
                                          + " only_files=" + show_only_files
-                                         + " count_full=" + get_messages_count_full()
+                                         + " count_full=" + count_full
                                          + " count_last=" + messages_count_at_last_load);
         }
         if (reload_needed)
