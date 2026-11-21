@@ -395,6 +395,15 @@ public class ConferenceMessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "conference/frag:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.conference_message_list_fragment = this;
+
+        // D: a message may have arrived between the reload-check above and this ref assignment (the
+        //    ref was still null, so the conference arrival path dropped it). fix C marked the chat
+        //    dirty. re-check the dirty flag now and reload so it shows in THIS view, not only next
+        //    resume. cheap boolean check -- no extra COUNT query.
+        if (MainActivity.conference_message_list_dirty_while_away)
+        {
+            update_all_messages(false, PREF__messageview_paging);
+        }
     }
 
     @Override

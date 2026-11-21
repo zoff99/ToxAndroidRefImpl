@@ -477,6 +477,14 @@ public class MessageListFragment extends Fragment
 
         HelperGeneric.perf_log(TAG, "friend/frag:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         MainActivity.message_list_fragment = this;
+
+        // D: re-check the dirty flag after the ref assignment (see group note). the friend wait-loop
+        //    normally appends after onResume, but a dirty flag set in the window (e.g. an out-of-order
+        //    or edit update skipped while the ref was null) should still trigger a reload here.
+        if (MainActivity.message_list_dirty_while_away)
+        {
+            update_all_messages(true, false, PREF__messageview_paging);
+        }
         // Log.i(TAG, "onResume:099");
     }
 
