@@ -210,7 +210,7 @@ public class GroupListHolder extends RecyclerView.ViewHolder implements View.OnC
                                              //
                                              + group_identifier_short(fl.group_identifier, true)
                                              //
-                                             + " " + "<b>" + peer_num_text_color_text + "Users:" + user_count + "(" +
+                                             + " " + "<b>" + peer_num_text_color_text + user_count + "(" +
                                              offline_user_count + ")" + peer_num_text_color_text_end + "</b>"));
         }
         catch (Exception e)

@@ -92,7 +92,7 @@
                 android:paddingRight="6dp"
                 android:paddingBottom="2dp"
                 android:singleLine="true"
-                android:text="#2 A12BEF Users:60(10)"
+                android:text="#2 A12BEF 60(10)"
                 android:textColor="@color/list_chip_text"
                 android:textSize="11sp"
                 android:fontFamily="monospace"
