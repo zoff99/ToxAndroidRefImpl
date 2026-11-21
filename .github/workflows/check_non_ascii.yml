@@ -1,0 +1,18 @@
+name: check non ascii
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: dummy
+        default: dummy
+
+jobs:
+  check_for_non_ascii:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v7
+
+    - name: check for non ascii
+      run:  |
+            tools/check_nonascii.sh
