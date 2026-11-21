@@ -66,10 +66,10 @@ ALLOW_GLOBAL="00E4 00C4 00F6 00D6 00FC 00DC 00DF"
 #
 # Other approved characters currently present in the source:
 #   221E infinity   00E6 ae-ligature   00C6 AE-ligature   00B0 degree sign
-#   2014 em dash (TODO: replace with '-' where it is only a comment)
 #   00A7 section sign   2192 rightwards arrow   2190 leftwards arrow
 #   1F354 hamburger   1F44D thumbs up   1F61C winking-tongue emoji
-ALLOW_GLOBAL="$ALLOW_GLOBAL 221E 00E6 00C6 00B0 2014 00A7 2192 2190 1F354 1F44D 1F61C"
+#   (2014 em dash is NOT global -- see the per-file entry for SettingsActivity)
+ALLOW_GLOBAL="$ALLOW_GLOBAL 221E 00E6 00C6 00B0 00A7 2192 2190 1F354 1F44D 1F61C"
 #
 # (2) PER-FILE exceptions -- allowed ONLY in the named file (path relative to
 #     the repo root). These MAY include otherwise-dangerous characters (e.g.
@@ -93,6 +93,9 @@ ALLOW_PERFILE=(
   "android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/CameraWrapper.java|00D7"
   # FriendSelectSingleAdapter.java -- 00B7 middle dot (separator in labels):
   "android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/FriendSelectSingleAdapter.java|00B7"
+  # SettingsActivity.java -- 2014 em dash, ONLY the user-visible UI separator
+  #   (append_separator); comment em dashes were converted to '-':
+  "android-refimpl-app/app/src/main/java/com/zoffcc/applications/trifa/SettingsActivity.java|2014"
 )
 # ===========================================================================
 # END EXCEPTION LIST
