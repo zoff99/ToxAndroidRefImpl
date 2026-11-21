@@ -242,7 +242,7 @@
     <string name="pref_description_local_discovery_enabled">Find and use Tox nodes on your local network to bootstrap. Useful for LAN-only or offline setups.</string>
 
     <string name="pref_title_U_keep_nospam">Keep NoSpam (unsafe)</string>
-    <string name="pref_description_U_keep_nospam">Keep the same NoSpam value when resetting your Tox ID.\n\nUnsafe: this weakens spam protection. Only enable if you understand the consequences.</string>
+    <string name="pref_description_U_keep_nospam">Keep the same NoSpam value fixed.\n\nUnsafe: this weakens spam protection. Only enable if you understand the consequences.</string>
 
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">Receive shared files</string>
     <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Allow other apps to share files into TRIfA using the Android share menu.</string>
@@ -312,7 +312,7 @@
 
 
     <string name="pref_title_min_audio_samplingrate_out">Audio sample rate</string>
-    <string name="pref_description_min_audio_samplingrate_out">Minimum output sample rate. 48000 Hz is the default and works for most devices.</string>
+    <string name="pref_description_min_audio_samplingrate_out">Audio sample rate 48000 Hz is the default and works for most devices.</string>
     <string-array name="pref_min_audio_samplingrate_out_titles">
         <item>Auto</item>
         <item>8000 Hz</item>
