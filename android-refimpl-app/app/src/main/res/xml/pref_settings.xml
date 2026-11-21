@@ -13,14 +13,16 @@
             android:entryValues="@array/pref_dark_mode_values"
             android:key="dark_mode_pref"
             android:summary="change default theme to dark mode"
-            android:title="Dark Mode" />
+            android:title="Dark Mode"
+            app:useSimpleSummaryProvider="true" />
         <ListPreference
             android:defaultValue="2"
             android:entries="@array/pref_global_font_size_titles"
             android:entryValues="@array/pref_global_font_size_values"
             android:key="global_font_size"
             android:summary="@string/pref_description_global_font_size"
-            android:title="@string/pref_title_global_font_size" />
+            android:title="@string/pref_title_global_font_size"
+            app:useSimpleSummaryProvider="true" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="compact_friendlist"
@@ -208,7 +210,8 @@
             android:entryValues="@array/X_battery_saving_timeout_values"
             android:key="X_battery_saving_timeout"
             android:summary="@string/pref_description_X_battery_saving_timeout"
-            android:title="@string/pref_title_X_battery_saving_timeout" />
+            android:title="@string/pref_title_X_battery_saving_timeout"
+            app:useSimpleSummaryProvider="true" />
     </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
     <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
@@ -229,7 +232,8 @@
             android:entryValues="@array/pref_min_audio_samplingrate_out_values"
             android:key="min_audio_samplingrate_out"
             android:summary="@string/pref_description_min_audio_samplingrate_out"
-            android:title="@string/pref_title_min_audio_samplingrate_out" />
+            android:title="@string/pref_title_min_audio_samplingrate_out"
+            app:useSimpleSummaryProvider="true" />
         <SeekBarPreference
             android:defaultValue="1"
             android:max="30"
@@ -281,7 +285,8 @@
             android:entryValues="@array/X_audio_recording_frame_size_values"
             android:key="X_audio_recording_frame_size"
             android:summary="@string/pref_description_X_audio_recording_frame_size"
-            android:title="@string/pref_title_X_audio_recording_frame_size" />
+            android:title="@string/pref_title_X_audio_recording_frame_size"
+            app:useSimpleSummaryProvider="true" />
     </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
     <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
@@ -295,7 +300,8 @@
             android:entryValues="@array/pref_video_cam_resolution_values"
             android:key="video_cam_resolution"
             android:summary="@string/pref_description_video_cam_resolution"
-            android:title="@string/pref_title_video_cam_resolution" />
+            android:title="@string/pref_title_video_cam_resolution"
+            app:useSimpleSummaryProvider="true" />
         <SwitchPreference
             android:defaultValue="true"
             android:key="use_H264_hw_encoding"

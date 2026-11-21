@@ -51,6 +51,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
@@ -335,6 +336,23 @@ public class SettingsActivity extends AppCompatActivity
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey)
         {
             setPreferencesFromResource(R.xml.pref_settings, rootKey);
+
+            // ---- section icons ----
+            setSectionIcon("section_appearance", R.drawable.ic_section_appearance);
+            setSectionIcon("section_notifications", R.drawable.ic_section_notifications);
+            setSectionIcon("section_push", R.drawable.ic_section_push);
+            setSectionIcon("section_chats_files", R.drawable.ic_section_chats);
+            setSectionIcon("section_privacy_security", R.drawable.ic_section_privacy);
+            setSectionIcon("section_network", R.drawable.ic_section_network);
+            setSectionIcon("section_background", R.drawable.ic_section_background);
+            setSectionIcon("section_voice_calls", R.drawable.ic_section_voice);
+            setSectionIcon("section_video_calls", R.drawable.ic_section_video);
+
+            // ---- warning accents on privacy/security-risk toggles (visible even when off) ----
+            setWarningIcon("X_persistent_peerlist", R.color.md_red_600);
+            setWarningIcon("allow_open_encrypted_file_via_intent", R.color.md_orange_600);
+            setWarningIcon("allow_push_server_ntfy", R.color.md_orange_600);
+            setWarningIcon("allow_push_server_sunup", R.color.md_orange_600);
 
             // ---- unsafe: keep nospam (warning icon when enabled) ----
             final SwitchPreference pref_keepnpspam = (SwitchPreference) findPreference("U_keep_nospam");
@@ -862,6 +880,39 @@ public class SettingsActivity extends AppCompatActivity
                 }
             }
             return false;
+        }
+
+        private void setSectionIcon(String key, int drawableRes)
+        {
+            final Preference cat = findPreference(key);
+            if (cat != null)
+            {
+                final Drawable d = ContextCompat.getDrawable(requireContext(), drawableRes);
+                if (d != null)
+                {
+                    cat.setIcon(d);
+                }
+            }
+        }
+
+        private void setWarningIcon(String key, int colorRes)
+        {
+            final Preference p = findPreference(key);
+            if (p != null)
+            {
+                try
+                {
+                    final Drawable d = new IconicsDrawable(requireContext()).
+                            icon(FontAwesome.Icon.faw_exclamation_circle).
+                            color(getResources().getColor(colorRes)).
+                            sizeDp(24);
+                    p.setIcon(d);
+                }
+                catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
+            }
         }
 
         private void bindNumericEditText(String key, final int maxLength)
