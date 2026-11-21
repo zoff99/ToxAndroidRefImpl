@@ -20,6 +20,7 @@
 package com.zoffcc.applications.trifa;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,11 +29,16 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -50,6 +56,7 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 import androidx.preference.PreferenceManager;
+import androidx.preference.PreferenceScreen;
 import androidx.preference.SwitchPreference;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.IPisValid;
@@ -70,6 +77,11 @@ public class SettingsActivity extends AppCompatActivity
 {
     private static final String TAG = "trifa.SettingsActivity";
 
+    private SettingsFragment settingsFragment;
+    private EditText searchInput;
+    private View searchClear;
+    private TextView noResults;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -86,11 +98,100 @@ public class SettingsActivity extends AppCompatActivity
             }
         });
 
+        searchInput = findViewById(R.id.settings_search_input);
+        searchClear = findViewById(R.id.settings_search_clear);
+        noResults = findViewById(R.id.settings_no_results);
+
         if (savedInstanceState == null)
         {
+            settingsFragment = new SettingsFragment();
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.settings_container, new SettingsFragment())
+                    .replace(R.id.settings_container, settingsFragment)
                     .commit();
+        }
+        else
+        {
+            settingsFragment = (SettingsFragment) getSupportFragmentManager().findFragmentById(R.id.settings_container);
+        }
+
+        searchInput.addTextChangedListener(new TextWatcher()
+        {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after)
+            {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count)
+            {
+            }
+
+            @Override
+            public void afterTextChanged(Editable s)
+            {
+                applySearch(s.toString());
+            }
+        });
+
+        searchClear.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                searchInput.setText("");
+            }
+        });
+
+        searchInput.setOnEditorActionListener(new TextView.OnEditorActionListener()
+        {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event)
+            {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH)
+                {
+                    hideKeyboard();
+                    return true;
+                }
+                return false;
+            }
+        });
+    }
+
+    /**
+     * Called by the fragment once its preference screen exists, so a search term
+     * that survived a recreate (e.g. dark-mode change) is applied again.
+     */
+    void onSettingsReady()
+    {
+        applySearch(searchInput.getText().toString());
+    }
+
+    private void applySearch(String query)
+    {
+        final boolean empty = (query == null) || (query.trim().length() == 0);
+        searchClear.setVisibility(empty ? View.GONE : View.VISIBLE);
+
+        int matches = -1;
+        if (settingsFragment != null)
+        {
+            matches = settingsFragment.applySearchFilter(query);
+        }
+        noResults.setVisibility((matches == 0) ? View.VISIBLE : View.GONE);
+    }
+
+    private void hideKeyboard()
+    {
+        try
+        {
+            final InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (imm != null)
+            {
+                imm.hideSoftInputFromWindow(searchInput.getWindowToken(), 0);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
         }
     }
 
@@ -653,6 +754,114 @@ public class SettingsActivity extends AppCompatActivity
             bindNumericEditText("message_paging_num_msgs_per_page", 5);
             bindNumericEditText("X_eac_delay_ms_2", 3);
             bindNumericEditText("X_audio_play_buffer_custom", 6);
+
+            // let the activity (re)apply any search term now that the screen exists
+            if (getActivity() instanceof SettingsActivity)
+            {
+                ((SettingsActivity) getActivity()).onSettingsReady();
+            }
+        }
+
+        /**
+         * Live settings search. Matches a preference's title, summary, key (and, for
+         * lists, its entries); a matching section title reveals the whole section.
+         * Sections with hits are expanded and shown, everything else is hidden.
+         * Clearing the query restores each section's own remembered fold state.
+         *
+         * @return number of matching preferences, or -1 when not filtering / not ready.
+         */
+        public int applySearchFilter(String query)
+        {
+            final PreferenceScreen screen = getPreferenceScreen();
+            if (screen == null)
+            {
+                return -1;   // preference screen not built yet
+            }
+
+            final String q = (query == null) ? "" : query.trim().toLowerCase();
+
+            if (q.length() == 0)
+            {
+                // clear: show every section again and restore the user's fold state
+                for (int i = 0; i < screen.getPreferenceCount(); i++)
+                {
+                    final Preference p = screen.getPreference(i);
+                    if (p instanceof CollapsiblePreferenceCategory)
+                    {
+                        final CollapsiblePreferenceCategory cat = (CollapsiblePreferenceCategory) p;
+                        cat.setSearchMode(false);
+                        cat.setVisible(true);
+                        cat.restorePersistedState();
+                    }
+                }
+                return -1;
+            }
+
+            int matches = 0;
+            for (int i = 0; i < screen.getPreferenceCount(); i++)
+            {
+                final Preference p = screen.getPreference(i);
+                if (!(p instanceof CollapsiblePreferenceCategory))
+                {
+                    continue;
+                }
+                final CollapsiblePreferenceCategory cat = (CollapsiblePreferenceCategory) p;
+                cat.setSearchMode(true);
+
+                final boolean sectionMatch = textMatches(cat.getTitle(), q) || textMatches(cat.getSummary(), q);
+                boolean anyMatch = false;
+                for (int j = 0; j < cat.getPreferenceCount(); j++)
+                {
+                    final Preference child = cat.getPreference(j);
+                    final boolean m = sectionMatch || prefMatches(child, q);
+                    child.setVisible(m);
+                    if (m)
+                    {
+                        anyMatch = true;
+                        matches++;
+                    }
+                }
+                cat.setVisible(anyMatch);
+                if (anyMatch)
+                {
+                    // chevron up; child visibility stays as filtered (searchMode is on)
+                    cat.setExpandedTransient(true);
+                }
+            }
+            return matches;
+        }
+
+        private static boolean textMatches(CharSequence cs, String q)
+        {
+            return (cs != null) && cs.toString().toLowerCase().contains(q);
+        }
+
+        private boolean prefMatches(Preference p, String q)
+        {
+            if (textMatches(p.getTitle(), q) || textMatches(p.getSummary(), q))
+            {
+                return true;
+            }
+            final String key = p.getKey();
+            if ((key != null) && key.toLowerCase().contains(q))
+            {
+                return true;
+            }
+            if (p instanceof ListPreference)
+            {
+                final CharSequence[] entries = ((ListPreference) p).getEntries();
+                if (entries != null)
+                {
+                    for (CharSequence e : entries)
+                    {
+                        if (textMatches(e, q))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
         private void bindNumericEditText(String key, final int maxLength)

@@ -48,6 +48,9 @@ public class CollapsiblePreferenceCategory extends PreferenceCategory
     private boolean defaultExpanded = false;
     private boolean expanded = false;
     private boolean stateLoaded = false;
+    // while the settings search is active it owns child visibility directly;
+    // the category must not blanket-apply its own fold state on top of that
+    private boolean searchMode = false;
 
     private ImageView chevronView = null;
     private TextView countView = null;
@@ -160,8 +163,21 @@ public class CollapsiblePreferenceCategory extends PreferenceCategory
         applyChildVisibility();
     }
 
+    /**
+     * While search is active the filter owns child visibility; the category's own
+     * fold/expand must not override it (e.g. when a header re-binds on scroll).
+     */
+    public void setSearchMode(boolean on)
+    {
+        searchMode = on;
+    }
+
     private void applyChildVisibility()
     {
+        if (searchMode)
+        {
+            return;
+        }
         for (int i = 0; i < getPreferenceCount(); i++)
         {
             // setVisible is a no-op when the value did not change, so this is cheap

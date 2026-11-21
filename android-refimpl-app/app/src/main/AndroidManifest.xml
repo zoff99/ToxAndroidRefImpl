@@ -233,7 +233,8 @@
         </activity>
         <activity
             android:name=".SettingsActivity"
-            android:label="@string/title_activity_settings">
+            android:label="@string/title_activity_settings"
+            android:windowSoftInputMode="adjustResize">
         </activity>
         <activity
             android:name=".Aboutpage"
