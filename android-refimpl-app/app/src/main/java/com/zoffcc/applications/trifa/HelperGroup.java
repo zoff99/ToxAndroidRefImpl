@@ -370,6 +370,13 @@ public class HelperGroup
                 };
                 t.start();
             }
+            else
+            {
+                // C: chat not in foreground: remember that a live append was skipped, so onResume
+                //    reloads instead of skipping. the group arrival path previously had no else
+                //    branch, so a message arriving while the ref was null left no dirty flag.
+                MainActivity.group_message_list_dirty_while_away = true;
+            }
         }
         catch (Exception e)
         {

@@ -276,7 +276,10 @@ public class HelperMessage
             else
             {
                 // chat not in foreground: remember that a live update was skipped (checked on resume)
-                MainActivity.message_list_dirty_while_away = true;
+                // C: this is the CONFERENCE arrival path -> set the CONFERENCE dirty flag. it was
+                //    wrongly setting the friend flag, so the conference resume-skip net never fired
+                //    (and the friend chat got a spurious reload).
+                MainActivity.conference_message_list_dirty_while_away = true;
             }
         }
         catch (Exception e)
