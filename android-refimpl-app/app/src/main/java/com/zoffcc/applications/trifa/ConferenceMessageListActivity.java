@@ -22,11 +22,13 @@ package com.zoffcc.applications.trifa;
 import android.os.SystemClock;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -277,6 +279,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
         insert_emoji = (ImageView) findViewById(R.id.insert_emoji);
         ml_maintext = (TextView) findViewById(R.id.ml_maintext);
+        adjust_header_font_size();
         ml_icon = (ImageView) findViewById(R.id.ml_icon);
         ml_status_icon = (ImageView) findViewById(R.id.ml_status_icon);
         ml_phone_icon = (ImageButton) findViewById(R.id.ml_phone_icon);
@@ -441,6 +444,43 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         HelperGeneric.perf_log(TAG, "conference/act:onCreate:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
 
         Log.i(TAG, "onCreate:099");
+    }
+
+    // the header row has a fixed height (60dp). at large OS font scale the
+    // second line ("active: .. offline: ..") would be clipped, so shrink the
+    // sp size proportionally to keep the header at its default physical size.
+    void adjust_header_font_size()
+    {
+        try
+        {
+            if (ml_maintext == null)
+            {
+                return;
+            }
+
+            final float font_scale = getResources().getConfiguration().fontScale;
+            if (font_scale > 1.0f)
+            {
+                ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f / font_scale);
+            }
+            else
+            {
+                ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 15f);
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration newConfig)
+    {
+        super.onConfigurationChanged(newConfig);
+        // fontScale is in the manifest configChanges list, so the activity
+        // is NOT recreated on OS font size changes -> re-apply here
+        adjust_header_font_size();
     }
 
     synchronized void set_peer_count_header()
