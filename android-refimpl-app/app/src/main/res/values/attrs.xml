@@ -14,6 +14,11 @@
         <attr name="lucem_maxScale" format="float" />
     </declare-styleable>
 
+    <!-- collapsible settings section header -->
+    <declare-styleable name="CollapsiblePreferenceCategory">
+        <attr name="defaultExpanded" format="boolean" />
+    </declare-styleable>
+
     <!-- for emoji 0.5.1 ?? -->
     <attr name="cardBackgroundColor" format="color"></attr>
     <attr name="cardCornerRadius" format="dimension"></attr>

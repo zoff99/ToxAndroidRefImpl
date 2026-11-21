@@ -2,8 +2,11 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <PreferenceCategory android:title="general">
-
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_appearance"
+        android:title="@string/settings_section_appearance"
+        android:summary="@string/settings_section_appearance_summary"
+        app:defaultExpanded="true">
         <ListPreference
             android:defaultValue="2"
             android:entries="@array/pref_dark_mode_titles"
@@ -11,79 +14,6 @@
             android:key="dark_mode_pref"
             android:summary="change default theme to dark mode"
             android:title="Dark Mode" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="start_on_boot"
-            android:summary="@string/pref_description_start_on_boot"
-            android:title="@string/pref_title_start_on_boot" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="use_push_service"
-            android:summary="@string/pref_description_use_push_service"
-            android:title="@string/pref_title_use_push_service" />
-
-        <Preference
-            android:key="download_push_msg_app"
-            android:summary="__"
-            android:title="@string/pref_title_download_push_msg_app" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="allow_push_server_ntfy"
-            android:summary="@string/pref_description_allow_push_server_ntfy"
-            android:title="@string/pref_title_allow_push_server_ntfy" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="allow_push_server_sunup"
-            android:summary="@string/pref_description_allow_push_server_sunup"
-            android:title="@string/pref_title_allow_push_server_sunup" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="compact_friendlist"
-            android:summary="@string/pref_description_compact_friendlist"
-            android:title="@string/pref_title_compact_friendlist" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="use_incognito_keyboard"
-            android:summary="@string/pref_description_use_incognito_keyboard2"
-            android:title="@string/pref_title_use_incognito_keyboard2" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="window_security"
-            android:summary="@string/pref_description_window_security"
-            android:title="@string/pref_title_window_security" />
-
-        <EditTextPreference
-            android:defaultValue="2000"
-            android:inputType="number"
-            android:key="message_paging_num_msgs_per_page"
-            android:summary="@string/pref_description_message_paging_num_msgs_per_page"
-            android:title="@string/pref_title_message_paging_num_msgs_per_page" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="auto_accept_image"
-            android:summary="@string/pref_description_auto_accept_image"
-            android:title="@string/pref_title_auto_accept_image" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="auto_accept_video"
-            android:summary="@string/pref_description_auto_accept_video"
-            android:title="@string/pref_title_auto_accept_video" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="auto_accept_all_upto"
-            android:summary="@string/pref_description_auto_accept_all_upto"
-            android:title="@string/pref_title_auto_accept_all_upto" />
-
         <ListPreference
             android:defaultValue="2"
             android:entries="@array/pref_global_font_size_titles"
@@ -91,240 +21,186 @@
             android:key="global_font_size"
             android:summary="@string/pref_description_global_font_size"
             android:title="@string/pref_title_global_font_size" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="allow_file_sharing_to_trifa_via_intent"
-            android:summary="@string/pref_description_allow_file_sharing_to_trifa_via_intent"
-            android:title="@string/pref_title_allow_file_sharing_to_trifa_via_intent" />
-
         <SwitchPreference
             android:defaultValue="false"
-            android:key="allow_open_encrypted_file_via_intent"
-            android:summary="@string/pref_description_allow_open_encrypted_file_via_intent"
-            android:title="@string/pref_title_allow_open_encrypted_file_via_intent" />
+            android:key="compact_friendlist"
+            android:summary="@string/pref_description_compact_friendlist"
+            android:title="@string/pref_title_compact_friendlist" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="video_uv_reversed"
-            android:summary="@string/pref_description_video_uv_reversed"
-            android:title="@string/pref_title_video_uv_reversed" />
-
-        <ListPreference
-            android:defaultValue="YV12"
-            android:entries="@array/pref_camera_get_preview_format_titles"
-            android:entryValues="@array/pref_camera_get_preview_format_values"
-            android:key="camera_get_preview_format"
-            android:summary="@string/pref_description_camera_get_preview_format"
-            android:title="@string/pref_title_camera_get_preview_format" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="use_H264_hw_encoding"
-            android:summary="@string/pref_description_use_H264_hw_encoding"
-            android:title="@string/pref_title_use_H264_hw_encoding" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="orbot_enabled"
-            android:summary="@string/pref_description_orbot_enabled"
-            android:title="@string/pref_title_orbot_enabled" />
-
-        <ListPreference
-            android:defaultValue="0"
-            android:entries="@array/pref_video_cam_resolution_titles"
-            android:entryValues="@array/pref_video_cam_resolution_values"
-            android:key="video_cam_resolution"
-            android:summary="@string/pref_description_video_cam_resolution"
-            android:title="@string/pref_title_video_cam_resolution" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="h264_encoder_use_intra_refresh"
-            android:summary="@string/pref_description_h264_encoder_use_intra_refresh"
-            android:title="@string/pref_title_h264_encoder_use_intra_refresh" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="fps_half"
-            android:summary="@string/pref_description_fps_half"
-            android:title="@string/pref_title_fps_half" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="set_fps"
-            android:summary="@string/pref_description_set_fps"
-            android:title="@string/pref_title_set_fps" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="speakerphone_tweak"
-            android:summary="@string/pref_description_speakerphone_tweak"
-            android:title="@string/pref_title_speakerphone_tweak" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="allow_screen_off_in_audio_call"
-            android:summary="@string/pref_description_allow_screen_off_in_audio_call"
-            android:title="@string/pref_title_allow_screen_off_in_audio_call" />
-
-        <SeekBarPreference
-            android:defaultValue="1"
-            android:max="30"
-            android:key="mic_gain_factor"
-            android:summary="@string/pref_description_mic_gain_factor"
-            android:title="@string/pref_title_mic_gain_factor"
-            app:min="1"
-            app:showSeekBarValue="true" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="mic_gain_factor_toggle"
-            android:summary="@string/pref_description_mic_gain_factor_toggle"
-            android:title="@string/pref_title_mic_gain_factor_toggle" />
-
-        <SwitchPreference
-            android:defaultValue="true"
-            android:key="gainprocessing_active"
-            android:summary="@string/pref_description_gainprocessing_active"
-            android:title="@string/pref_title_gainprocessing_active" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="rnnoise_active"
-            android:summary="@string/pref_description_rnnoise_active"
-            android:title="@string/pref_title_rnnoise_active" />
-
-        <ListPreference
-            android:defaultValue="1"
-            android:entries="@array/pref_higher_audio_quality_titles"
-            android:entryValues="@array/pref_higher_audio_quality_values"
-            android:key="higher_audio_quality"
-            android:summary="@string/pref_description_higher_audio_quality"
-            android:title="@string/pref_title_higher_audio_quality" />
-
-        <ListPreference
-            android:defaultValue="48000"
-            android:entries="@array/pref_min_audio_samplingrate_out_titles"
-            android:entryValues="@array/pref_min_audio_samplingrate_out_values"
-            android:key="min_audio_samplingrate_out"
-            android:summary="@string/pref_description_min_audio_samplingrate_out"
-            android:title="@string/pref_title_min_audio_samplingrate_out" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="conference_show_system_messages"
-            android:summary="@string/pref_description_conference_show_system_messages"
-            android:title="@string/pref_title_conference_show_system_messages" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="local_discovery_enabled"
-            android:summary="@string/pref_description_local_discovery_enabled"
-            android:title="@string/pref_title_local_discovery_enabled" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="udp_enabled"
-            android:summary="@string/pref_description_udp_enabled"
-            android:title="@string/pref_title_udp_enabled" />
-
-        <SwitchPreference
-            android:defaultValue="false"
-            android:key="force_udp_only"
-            android:summary="@string/pref_description_force_udp_only"
-            android:title="@string/pref_title_force_udp_only" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="notifications">
-
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_notifications"
+        android:title="@string/settings_section_notifications"
+        android:summary="@string/settings_section_notifications_summary"
+        app:defaultExpanded="true">
         <SwitchPreference
             android:defaultValue="true"
             android:key="notifications_new_message"
             android:title="@string/pref_title_new_message_notifications" />
-
         <SwitchPreference
             android:defaultValue="false"
             android:key="notification_show_content"
             android:summary="@string/pref_description_notification_show_content"
             android:title="@string/pref_title_notification_show_content" />
-
         <com.zoffcc.applications.trifa.RingtonePreferenceCompat
             android:defaultValue="content://settings/system/notification_sound"
             android:dependency="notifications_new_message"
             android:key="notifications_new_message_ringtone"
             android:title="@string/pref_title_ringtone" />
-
         <SwitchPreference
             android:defaultValue="true"
             android:dependency="notifications_new_message"
             android:key="notifications_new_message_sound"
             android:title="@string/pref_title_sound" />
-
         <SwitchPreference
             android:defaultValue="true"
             android:dependency="notifications_new_message"
             android:key="notifications_new_message_vibrate"
             android:title="@string/pref_title_vibrate" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="network">
-
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_push"
+        android:title="@string/settings_section_push"
+        android:summary="@string/settings_section_push_summary"
+        app:defaultExpanded="false">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="use_push_service"
+            android:summary="@string/pref_description_use_push_service"
+            android:title="@string/pref_title_use_push_service" />
         <Preference
-            android:key="custom_bootstrap_nodes"
+            android:key="download_push_msg_app"
             android:summary="__"
-            android:title="@string/pref_title_custom_bootstrap_nodes" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="! unsafe !">
-
+            android:title="@string/pref_title_download_push_msg_app" />
         <SwitchPreference
             android:defaultValue="false"
-            android:key="U_keep_nospam"
-            android:summary="@string/pref_description_U_keep_nospam"
-            android:title="@string/pref_title_U_keep_nospam" />
+            android:key="allow_push_server_ntfy"
+            android:summary="@string/pref_description_allow_push_server_ntfy"
+            android:title="@string/pref_title_allow_push_server_ntfy" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="allow_push_server_sunup"
+            android:summary="@string/pref_description_allow_push_server_sunup"
+            android:title="@string/pref_title_allow_push_server_sunup" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
-    </PreferenceCategory>
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_chats_files"
+        android:title="@string/settings_section_chats_files"
+        android:summary="@string/settings_section_chats_files_summary"
+        app:defaultExpanded="false">
+        <EditTextPreference
+            android:defaultValue="2000"
+            android:inputType="number"
+            android:key="message_paging_num_msgs_per_page"
+            android:summary="@string/pref_description_message_paging_num_msgs_per_page"
+            android:title="@string/pref_title_message_paging_num_msgs_per_page" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="conference_show_system_messages"
+            android:summary="@string/pref_description_conference_show_system_messages"
+            android:title="@string/pref_title_conference_show_system_messages" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="auto_accept_image"
+            android:summary="@string/pref_description_auto_accept_image"
+            android:title="@string/pref_title_auto_accept_image" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="auto_accept_video"
+            android:summary="@string/pref_description_auto_accept_video"
+            android:title="@string/pref_title_auto_accept_video" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="auto_accept_all_upto"
+            android:summary="@string/pref_description_auto_accept_all_upto"
+            android:title="@string/pref_title_auto_accept_all_upto" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="allow_file_sharing_to_trifa_via_intent"
+            android:summary="@string/pref_description_allow_file_sharing_to_trifa_via_intent"
+            android:title="@string/pref_title_allow_file_sharing_to_trifa_via_intent" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
-    <PreferenceCategory android:title="! eXperimental !">
-
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_privacy_security"
+        android:title="@string/settings_section_privacy_security"
+        android:summary="@string/settings_section_privacy_security_summary"
+        app:defaultExpanded="false">
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="use_incognito_keyboard"
+            android:summary="@string/pref_description_use_incognito_keyboard2"
+            android:title="@string/pref_title_use_incognito_keyboard2" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="window_security"
+            android:summary="@string/pref_description_window_security"
+            android:title="@string/pref_title_window_security" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="allow_open_encrypted_file_via_intent"
+            android:summary="@string/pref_description_allow_open_encrypted_file_via_intent"
+            android:title="@string/pref_title_allow_open_encrypted_file_via_intent" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="X_persistent_peerlist"
             android:summary="Shows group members even when they are offline. In exchange, the group receives verifiable notices of when you are online.\nChange needs RESTART!"
             android:title="Persistent Peerlist (NGC Middleware)" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="U_keep_nospam"
+            android:summary="@string/pref_description_U_keep_nospam"
+            android:title="@string/pref_title_U_keep_nospam" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
-        <EditTextPreference
-            android:defaultValue="80"
-            android:inputType="number"
-            android:key="X_eac_delay_ms_2"
-            android:summary="@string/pref_description_X_eac_delay_ms"
-            android:title="@string/pref_title_X_eac_delay_ms" />
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_network"
+        android:title="@string/settings_section_network"
+        android:summary="@string/settings_section_network_summary"
+        app:defaultExpanded="false">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="orbot_enabled"
+            android:summary="@string/pref_description_orbot_enabled"
+            android:title="@string/pref_title_orbot_enabled" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="udp_enabled"
+            android:summary="@string/pref_description_udp_enabled"
+            android:title="@string/pref_title_udp_enabled" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="force_udp_only"
+            android:summary="@string/pref_description_force_udp_only"
+            android:title="@string/pref_title_force_udp_only" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="local_discovery_enabled"
+            android:summary="@string/pref_description_local_discovery_enabled"
+            android:title="@string/pref_title_local_discovery_enabled" />
+        <Preference
+            android:key="custom_bootstrap_nodes"
+            android:summary="__"
+            android:title="@string/pref_title_custom_bootstrap_nodes" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
-        <EditTextPreference
-            android:defaultValue="0"
-            android:inputType="number"
-            android:key="X_audio_play_buffer_custom"
-            android:summary="@string/pref_description_X_audio_play_buffer_custom"
-            android:title="@string/pref_title_X_audio_play_buffer_custom" />
-
-        <ListPreference
-            android:defaultValue="40"
-            android:entries="@array/X_audio_recording_frame_size_titles"
-            android:entryValues="@array/X_audio_recording_frame_size_values"
-            android:key="X_audio_recording_frame_size"
-            android:summary="@string/pref_description_X_audio_recording_frame_size"
-            android:title="@string/pref_title_X_audio_recording_frame_size" />
-
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_background"
+        android:title="@string/settings_section_background"
+        android:summary="@string/settings_section_background_summary"
+        app:defaultExpanded="false">
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="start_on_boot"
+            android:summary="@string/pref_description_start_on_boot"
+            android:title="@string/pref_title_start_on_boot" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="X_battery_saving_mode"
             android:summary="@string/pref_description_X_battery_saving_mode"
             android:title="@string/pref_title_X_battery_saving_mode" />
-
         <ListPreference
             android:defaultValue="15"
             android:dependency="X_battery_saving_mode"
@@ -333,25 +209,140 @@
             android:key="X_battery_saving_timeout"
             android:summary="@string/pref_description_X_battery_saving_timeout"
             android:title="@string/pref_title_X_battery_saving_timeout" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_voice_calls"
+        android:title="@string/settings_section_voice_calls"
+        android:summary="@string/settings_section_voice_calls_summary"
+        app:defaultExpanded="false">
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/pref_higher_audio_quality_titles"
+            android:entryValues="@array/pref_higher_audio_quality_values"
+            android:key="higher_audio_quality"
+            android:summary="@string/pref_description_higher_audio_quality"
+            android:title="@string/pref_title_higher_audio_quality" />
+        <ListPreference
+            android:defaultValue="48000"
+            android:entries="@array/pref_min_audio_samplingrate_out_titles"
+            android:entryValues="@array/pref_min_audio_samplingrate_out_values"
+            android:key="min_audio_samplingrate_out"
+            android:summary="@string/pref_description_min_audio_samplingrate_out"
+            android:title="@string/pref_title_min_audio_samplingrate_out" />
+        <SeekBarPreference
+            android:defaultValue="1"
+            android:max="30"
+            android:key="mic_gain_factor"
+            android:summary="@string/pref_description_mic_gain_factor"
+            android:title="@string/pref_title_mic_gain_factor"
+            app:min="1"
+            app:showSeekBarValue="true" />
         <SwitchPreference
             android:defaultValue="false"
-            android:key="X_misc_button_enabled"
-            android:summary="@string/pref_description_X_misc_button_enabled"
-            android:title="@string/pref_title_X_misc_button_enabled" />
-
+            android:key="mic_gain_factor_toggle"
+            android:summary="@string/pref_description_mic_gain_factor_toggle"
+            android:title="@string/pref_title_mic_gain_factor_toggle" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="gainprocessing_active"
+            android:summary="@string/pref_description_gainprocessing_active"
+            android:title="@string/pref_title_gainprocessing_active" />
         <SwitchPreference
             android:defaultValue="false"
-            android:key="X_tox_set_do_not_sync_av"
-            android:summary="@string/pref_description_X_tox_set_do_not_sync_av"
-            android:title="@string/pref_title_X_tox_set_do_not_sync_av" />
+            android:key="rnnoise_active"
+            android:summary="@string/pref_description_rnnoise_active"
+            android:title="@string/pref_title_rnnoise_active" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="speakerphone_tweak"
+            android:summary="@string/pref_description_speakerphone_tweak"
+            android:title="@string/pref_title_speakerphone_tweak" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="allow_screen_off_in_audio_call"
+            android:summary="@string/pref_description_allow_screen_off_in_audio_call"
+            android:title="@string/pref_title_allow_screen_off_in_audio_call" />
+        <EditTextPreference
+            android:defaultValue="80"
+            android:inputType="number"
+            android:key="X_eac_delay_ms_2"
+            android:summary="@string/pref_description_X_eac_delay_ms"
+            android:title="@string/pref_title_X_eac_delay_ms" />
+        <EditTextPreference
+            android:defaultValue="0"
+            android:inputType="number"
+            android:key="X_audio_play_buffer_custom"
+            android:summary="@string/pref_description_X_audio_play_buffer_custom"
+            android:title="@string/pref_title_X_audio_play_buffer_custom" />
+        <ListPreference
+            android:defaultValue="40"
+            android:entries="@array/X_audio_recording_frame_size_titles"
+            android:entryValues="@array/X_audio_recording_frame_size_values"
+            android:key="X_audio_recording_frame_size"
+            android:summary="@string/pref_description_X_audio_recording_frame_size"
+            android:title="@string/pref_title_X_audio_recording_frame_size" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
+    <com.zoffcc.applications.trifa.CollapsiblePreferenceCategory
+        android:key="section_video_calls"
+        android:title="@string/settings_section_video_calls"
+        android:summary="@string/settings_section_video_calls_summary"
+        app:defaultExpanded="false">
+        <ListPreference
+            android:defaultValue="0"
+            android:entries="@array/pref_video_cam_resolution_titles"
+            android:entryValues="@array/pref_video_cam_resolution_values"
+            android:key="video_cam_resolution"
+            android:summary="@string/pref_description_video_cam_resolution"
+            android:title="@string/pref_title_video_cam_resolution" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="use_H264_hw_encoding"
+            android:summary="@string/pref_description_use_H264_hw_encoding"
+            android:title="@string/pref_title_use_H264_hw_encoding" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="h264_encoder_use_intra_refresh"
+            android:summary="@string/pref_description_h264_encoder_use_intra_refresh"
+            android:title="@string/pref_title_h264_encoder_use_intra_refresh" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="fps_half"
+            android:summary="@string/pref_description_fps_half"
+            android:title="@string/pref_title_fps_half" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="set_fps"
+            android:summary="@string/pref_description_set_fps"
+            android:title="@string/pref_title_set_fps" />
+        <ListPreference
+            android:defaultValue="YV12"
+            android:entries="@array/pref_camera_get_preview_format_titles"
+            android:entryValues="@array/pref_camera_get_preview_format_values"
+            android:key="camera_get_preview_format"
+            android:summary="@string/pref_description_camera_get_preview_format"
+            android:title="@string/pref_title_camera_get_preview_format" />
+        <SwitchPreference
+            android:defaultValue="true"
+            android:key="video_uv_reversed"
+            android:summary="@string/pref_description_video_uv_reversed"
+            android:title="@string/pref_title_video_uv_reversed" />
         <SwitchPreference
             android:defaultValue="false"
             android:key="X_zoom_incoming_video"
             android:summary="@string/pref_description_X_zoom_incoming_video"
             android:title="@string/pref_title_X_zoom_incoming_video" />
-
-    </PreferenceCategory>
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_misc_button_enabled"
+            android:summary="@string/pref_description_X_misc_button_enabled"
+            android:title="@string/pref_title_X_misc_button_enabled" />
+        <SwitchPreference
+            android:defaultValue="false"
+            android:key="X_tox_set_do_not_sync_av"
+            android:summary="@string/pref_description_X_tox_set_do_not_sync_av"
+            android:title="@string/pref_title_X_tox_set_do_not_sync_av" />
+    </com.zoffcc.applications.trifa.CollapsiblePreferenceCategory>
 
 </PreferenceScreen>

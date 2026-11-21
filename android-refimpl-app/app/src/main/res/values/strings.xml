@@ -39,6 +39,26 @@
 
     <string name="settings_toolbar_title">Settings</string>
 
+    <!-- settings sections -->
+    <string name="settings_section_appearance">Appearance</string>
+    <string name="settings_section_appearance_summary">Theme, text size and friend list density</string>
+    <string name="settings_section_notifications">Notifications</string>
+    <string name="settings_section_notifications_summary">Alerts for new messages</string>
+    <string name="settings_section_push">Push delivery (battery saving)</string>
+    <string name="settings_section_push_summary">External push servers: saves battery, leaks metadata</string>
+    <string name="settings_section_chats_files">Chats and file transfers</string>
+    <string name="settings_section_chats_files_summary">Message loading, auto-accept and sharing</string>
+    <string name="settings_section_privacy_security">Privacy and security</string>
+    <string name="settings_section_privacy_security_summary">Keyboard, screen and storage protection</string>
+    <string name="settings_section_network">Network</string>
+    <string name="settings_section_network_summary">Tox connectivity, Tor and bootstrap nodes</string>
+    <string name="settings_section_background">Background and startup</string>
+    <string name="settings_section_background_summary">Start on boot and battery saving</string>
+    <string name="settings_section_voice_calls">Voice calls</string>
+    <string name="settings_section_voice_calls_summary">Audio quality, microphone and echo handling</string>
+    <string name="settings_section_video_calls">Video calls</string>
+    <string name="settings_section_video_calls_summary">Camera, encoding and framerate</string>
+
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
     <!-- Strings related to Settings -->
