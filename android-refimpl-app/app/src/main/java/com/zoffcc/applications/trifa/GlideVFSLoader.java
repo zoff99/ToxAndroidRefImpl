@@ -63,9 +63,9 @@ public class GlideVFSLoader implements ModelLoader<info.guardianproject.iocipher
         return true;
     }
 
-    // ────────────────────────────────────────────────────────────────
+    // ----------------------------------------------------------------
     // Factory
-    // ────────────────────────────────────────────────────────────────
+    // ----------------------------------------------------------------
 
     public static class Factory implements ModelLoaderFactory<info.guardianproject.iocipher.File, java.io.InputStream> {
         @NonNull
@@ -80,9 +80,9 @@ public class GlideVFSLoader implements ModelLoader<info.guardianproject.iocipher
         }
     }
 
-    // ────────────────────────────────────────────────────────────────
+    // ----------------------------------------------------------------
     // Cache Key - based on stable file identity, NOT FileDescriptor
-    // ────────────────────────────────────────────────────────────────
+    // ----------------------------------------------------------------
 
     static class VFSCacheKey implements Key {
         private final String filePath;
@@ -127,9 +127,9 @@ public class GlideVFSLoader implements ModelLoader<info.guardianproject.iocipher
         }
     }
 
-    // ────────────────────────────────────────────────────────────────
+    // ----------------------------------------------------------------
     // DataFetcher - opens stream on Glide's worker thread, safe lifecycle
-    // ────────────────────────────────────────────────────────────────
+    // ----------------------------------------------------------------
 
     static class VFSDataFetcher implements DataFetcher<java.io.InputStream> {
         private final info.guardianproject.iocipher.File vfsFile;

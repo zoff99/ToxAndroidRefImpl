@@ -189,7 +189,7 @@ public class HelperMsgNotification
             }
             else
             {
-                // Still have active notifications — refresh the number silently
+                // Still have active notifications - refresh the number silently
                 update_msg_notification_unread_count();
             }
         }
@@ -227,7 +227,7 @@ public class HelperMsgNotification
                 {
                     if (total <= 0)
                     {
-                        // All unread cleared while notification was still up — cancel it
+                        // All unread cleared while notification was still up - cancel it
                         msg_notification_is_posted = false;
                         NotificationManager nm = (NotificationManager) context_s.getSystemService(
                                 Context.NOTIFICATION_SERVICE);
@@ -252,7 +252,7 @@ public class HelperMsgNotification
                             PendingIntent.FLAG_IMMUTABLE | PendingIntent.FLAG_UPDATE_CURRENT
                     );
 
-                    // Use silent channel — this is a number-only refresh, not a new alert
+                    // Use silent channel - this is a number-only refresh, not a new alert
                     String channelId = MainActivity.channelId_newmessage_silent;
 
                     NotificationCompat.Builder b = new NotificationCompat.Builder(context_s, channelId);

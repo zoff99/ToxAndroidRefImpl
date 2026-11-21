@@ -61,7 +61,7 @@ public class SelectLanguageActivity extends ListActivity
                         "ru" + ":\n" + "Russian",
                         "sv" + ":\n" + "Swedish",
                         "tr" + ":\n" + "Turkish",
-                    "zh-rCN" + ":\n" + "Chinese - 中国人",
+                    "zh-rCN" + ":\n" + "Chinese - \u4E2D\u56FD\u4EBA",
             };
 
             this.setListAdapter(

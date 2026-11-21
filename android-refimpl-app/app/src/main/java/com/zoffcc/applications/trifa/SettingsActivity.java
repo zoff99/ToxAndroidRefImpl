@@ -132,7 +132,7 @@ public class SettingsActivity extends AppCompatPreferenceActivity
      * "Persistent Peerlist" confirmation dialog.
      *
      * Layout per scenario:
-     *   ————————————————   (separator)
+     *   ----------------   (separator)
      *   Scenario title     (bold)
      *   Likelihood: VALUE  (bold label, colored value)
      *   effect text        (gray body)

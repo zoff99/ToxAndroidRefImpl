@@ -1034,7 +1034,7 @@ public class CameraWrapper
 
                         // FIX: Camera1 delivers TIGHTLY PACKED data (no hardware stride padding).
                         // Y stride = width, U stride = width/2, V stride = width/2.
-                        // Do NOT use ceil(width/16)*16 — that is for hardware buffers, not callback data.
+                        // Do NOT use ceil(width/16)*16 - that is for hardware buffers, not callback data.
                         int yStride = camera_preview_size2.width;
                         int uStride = (camera_preview_size2.width + 1) / 2;  // round up for odd widths
                         int vStride = (camera_preview_size2.width + 1) / 2;

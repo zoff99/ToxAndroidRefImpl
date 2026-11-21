@@ -248,7 +248,7 @@ public class CallAudioService extends Service
                         }
                         else
                         {
-                            // Behind schedule — skip sleep but don't accumulate debt
+                            // Behind schedule - skip sleep but don't accumulate debt
                             nextWakeTime = now;
                         }
 

@@ -5180,7 +5180,7 @@ public class HelperGeneric
                             {
                                 buf_video_send_frame = new byte[paddedBufSize];
                             }
-                            // FIX: Same — use post-rotation width as stride
+                            // FIX: Same - use post-rotation width as stride
                             int convYStride = frame_width_px;
                             // FIX: Pass paddedWidth so output rows are 64-aligned for H264 encoder
                             buf_video_send_frame = NV21toNV12(buf2, buf_video_send_frame, frame_width_px,
