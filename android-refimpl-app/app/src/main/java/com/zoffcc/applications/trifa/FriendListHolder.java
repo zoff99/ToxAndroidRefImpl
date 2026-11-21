@@ -296,6 +296,21 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
 
         statusText.setText(fl.status_message);
 
+        // no status text -> hide the line entirely so the row shrinks.
+        // compact friend rows never show the status line; they can be
+        // recognized by having no IP address view in their layout.
+        if (ip_addr_text != null)
+        {
+            if ((fl.status_message == null) || (fl.status_message.length() == 0))
+            {
+                statusText.setVisibility(View.GONE);
+            }
+            else
+            {
+                statusText.setVisibility(View.VISIBLE);
+            }
+        }
+
         /*
         statusText.setText("ft:s:" + tox_friend_by_public_key__wrapper(fl.tox_public_key_string) + " " +
                            tox_file_sending_active(tox_friend_by_public_key__wrapper(fl.tox_public_key_string)) + "/" +

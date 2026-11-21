@@ -117,7 +117,7 @@
                 android:paddingTop="2dp"
                 android:paddingRight="6dp"
                 android:paddingBottom="2dp"
-                android:singleLine="true"
+                android:maxLines="1"
                 android:text="0.0.0.0"
                 android:textColor="@color/list_chip_text"
                 android:textSize="11sp"
