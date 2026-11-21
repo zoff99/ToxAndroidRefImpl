@@ -377,7 +377,7 @@ public class MainActivity extends AppCompatActivity
     final static boolean DEBUG_USE_LOGFRIEND = false; // set "false" for release builds
     final static boolean DEBUG_VIDEO_CAPTURE_SEND = false; // set "false" for release builds
     public final static boolean DEBUG_BSN_ON_PROFILE = false; // set "false" for release builds
-    final static boolean DEBUG_MESSAGE_LIST_PERF_LOGGING = true; // set "false" for release builds (chat open/load timing logs, filter logcat for "PERF:")
+    final static boolean DEBUG_MESSAGE_LIST_PERF_LOGGING = false; // set "false" for release builds (chat open/load timing logs, filter logcat for "PERF:")
     // --------- global config ---------
     // --------- global config ---------
     // --------- global config ---------
