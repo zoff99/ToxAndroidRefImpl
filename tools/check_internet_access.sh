@@ -73,8 +73,8 @@ PATTERNS=(
 # --- benign uses to exclude (URI parsing / MIME lookup / encoding / exception) ---
 BENIGN='android\.net\.Uri|guessContentTypeFrom|getFileNameMap|UnknownHostException|URLEncoder|URLDecoder'
 
-# --- "real usage" markers (for --usage-only; otherwise imports are listed too) ---
-USAGE='new[[:space:]]|\.openConnection\(|\.openStream\(|\.newCall\(|\.execute\(|\.enqueue\(|\.connect\(|getByName|getAllByName|getByAddress|getActiveNetworkInfo|getAllNetworks|registerNetworkCallback|sslSocketFactory|setHostnameVerifier|\.loadUrl\(|loadDataWithBaseURL|postUrl|getInstance\('
+# --usage-only excludes import statements and type/field/method declarations,
+# keeping actual call sites (e.g. OrbotHelper.requestStartTor(this), newCall().execute()).
 
 usage() { sed -n '2,48p' "$0"; }
 
@@ -99,7 +99,7 @@ trap 'rm -rf "$tmpd"' EXIT
 
 # Join patterns with TAB for awk (regexes may contain '|', so split on first '|').
 joined=$(printf '%s\t' "${PATTERNS[@]}")
-export CHK_PATTERNS="$joined" CHK_BENIGN="$BENIGN" CHK_USAGE="$USAGE" CHK_USAGE_ONLY="$usage_only"
+export CHK_PATTERNS="$joined" CHK_BENIGN="$BENIGN" CHK_USAGE_ONLY="$usage_only"
 
 # grep all candidate lines, then classify / filter in awk.
 grep_args=(-rnE --include='*.java')
@@ -116,7 +116,6 @@ BEGIN {
         re[i]  = substr(arr[i], p + 1);
     }
     benign = ENVIRON["CHK_BENIGN"];
-    usg    = ENVIRON["CHK_USAGE"];
     uo     = ENVIRON["CHK_USAGE_ONLY"];
 }
 {
@@ -124,6 +123,7 @@ BEGIN {
     i2 = index(rest, ":"); line = substr(rest, 1, i2 - 1); content = substr(rest, i2 + 1);
     t = content; sub(/^[ \t]+/, "", t);
     if (t ~ /^\/\// || t ~ /^\*/ || t ~ /^\/\*/) next;   # full comment lines
+    if (t ~ /^package[[:space:]]/) next;                 # package declaration (never an access point)
     # Match against the line with string literals and comments removed, so a
     # keyword that only appears inside text (e.g. setTitle("com.squareup.okhttp3"))
     # is NOT an access point. Real calls still match (new Socket("h",p) -> new Socket().
@@ -132,7 +132,13 @@ BEGIN {
     sub(/\/\/.*$/, "", code);            # trailing line comment
     gsub(/\/\*[^*]*\*\//, "", code);     # inline block comment
     if (code ~ benign) next;                               # benign URI / MIME / encoding
-    if (uo == "1" && code !~ usg) next;                    # usage-only filter
+    if (uo == "1") {                                       # usage-only: drop imports + declarations, keep call sites
+        if (code ~ /^import[[:space:]]/) next;
+        if (code ~ /(^|[[:space:]])(class|interface|enum)[[:space:]]+[A-Za-z_$]/) next;
+        if (code ~ /^[[:space:]]*(public|private|protected|static|final|abstract|synchronized|native|strictfp|default)[[:space:]]/ && code ~ /\)[[:space:]]*(throws[^{;]*)?$/ && code !~ /=/) next;
+        if (code ~ /^[[:space:]]*(public|private|protected|static|final)[[:space:]]/ && code !~ /\(/ && code !~ /=/ && code ~ /;[[:space:]]*$/) next;
+        if (code ~ /[A-Za-z0-9_$>][[:space:]]+[A-Za-z_$][A-Za-z0-9_$]*[[:space:]]*=[[:space:]]*null[[:space:]]*;/) next;
+    }
     c = "";
     for (i = 1; i <= n; i++) { if (re[i] != "" && code ~ re[i]) { c = cat[i]; break; } }
     if (c == "") next;
