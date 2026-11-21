@@ -26,8 +26,11 @@
 #   CONNECTIVITY   ConnectivityManager / NetworkInfo / NetworkRequest  (network STATE, not traffic)
 #
 # Excluded as non-access (false positives):
+#   keywords inside string literals or comments (e.g. about-page library names),
 #   android.net.Uri (URI parsing), URLConnection.guessContentType* / getFileNameMap
-#   (MIME lookup), UnknownHostException, URLEncoder / URLDecoder, and comment lines.
+#   (MIME lookup), UnknownHostException, URLEncoder / URLDecoder.
+#   NOTE: info.guardianproject.iocipher.* is encrypted FILE I/O, NOT network -- only
+#   info.guardianproject.netcipher.* (the Tor proxy library) counts as TOR-PROXY.
 #
 # Usage:
 #   tools/check_internet_access.sh                  # full report to stdout
@@ -61,7 +64,7 @@ PATTERNS=(
     'SOCKET|java\.net\.Socket|java\.net\.ServerSocket|java\.net\.DatagramSocket|java\.net\.MulticastSocket|new[[:space:]]+Socket[[:space:]]*\(|new[[:space:]]+ServerSocket[[:space:]]*\(|new[[:space:]]+DatagramSocket[[:space:]]*\(|java\.net\.Proxy|new[[:space:]]+Proxy[[:space:]]*\(|java\.net\.InetSocketAddress|new[[:space:]]+InetSocketAddress[[:space:]]*\('
     'DNS|InetAddress|getAllByName|getByName|getByAddress'
     'TLS-TRUST|TrustManager|X509TrustManager|HostnameVerifier|AllowAllHostnameVerifier|sslSocketFactory|SSLContext|trustAllCerts|checkServerTrusted|checkClientTrusted|setHostnameVerifier'
-    'TOR-PROXY|OrbotHelper|StrongBuilder|StrongOkHttpClientBuilder|TorSocket|info\.guardianproject'
+    'TOR-PROXY|OrbotHelper|StrongBuilder|StrongOkHttpClientBuilder|TorSocket|info\.guardianproject\.netcipher'
     'WEBVIEW|WebView|loadUrl|loadDataWithBaseURL|postUrl'
     'DOWNLOAD|DownloadManager'
     'CONNECTIVITY|ConnectivityManager|NetworkInfo|NetworkRequest|NetworkCapabilities|registerNetworkCallback|getActiveNetworkInfo|getAllNetworks'
@@ -73,7 +76,7 @@ BENIGN='android\.net\.Uri|guessContentTypeFrom|getFileNameMap|UnknownHostExcepti
 # --- "real usage" markers (for --usage-only; otherwise imports are listed too) ---
 USAGE='new[[:space:]]|\.openConnection\(|\.openStream\(|\.newCall\(|\.execute\(|\.enqueue\(|\.connect\(|getByName|getAllByName|getByAddress|getActiveNetworkInfo|getAllNetworks|registerNetworkCallback|sslSocketFactory|setHostnameVerifier|\.loadUrl\(|loadDataWithBaseURL|postUrl|getInstance\('
 
-usage() { sed -n '2,46p' "$0"; }
+usage() { sed -n '2,48p' "$0"; }
 
 usage_only=0
 baseline=''
@@ -120,13 +123,20 @@ BEGIN {
     i1 = index($0, ":"); file = substr($0, 1, i1 - 1); rest = substr($0, i1 + 1);
     i2 = index(rest, ":"); line = substr(rest, 1, i2 - 1); content = substr(rest, i2 + 1);
     t = content; sub(/^[ \t]+/, "", t);
-    if (t ~ /^\/\// || t ~ /^\*/ || t ~ /^\/\*/) next;   # comment lines
-    if (t ~ benign) next;                                # benign URI / MIME / encoding
-    if (uo == "1" && t !~ usg) next;                     # usage-only filter
+    if (t ~ /^\/\// || t ~ /^\*/ || t ~ /^\/\*/) next;   # full comment lines
+    # Match against the line with string literals and comments removed, so a
+    # keyword that only appears inside text (e.g. setTitle("com.squareup.okhttp3"))
+    # is NOT an access point. Real calls still match (new Socket("h",p) -> new Socket().
+    code = t;
+    gsub(/"([^"\\]|\\.)*"/, "", code);   # double-quoted string literals (incl. escaped quotes)
+    sub(/\/\/.*$/, "", code);            # trailing line comment
+    gsub(/\/\*[^*]*\*\//, "", code);     # inline block comment
+    if (code ~ benign) next;                               # benign URI / MIME / encoding
+    if (uo == "1" && code !~ usg) next;                    # usage-only filter
     c = "";
-    for (i = 1; i <= n; i++) { if (re[i] != "" && t ~ re[i]) { c = cat[i]; break; } }
+    for (i = 1; i <= n; i++) { if (re[i] != "" && code ~ re[i]) { c = cat[i]; break; } }
     if (c == "") next;
-    printf "%s:%s: [%s] %s\n", file, line, c, t;
+    printf "%s:%s: [%s] %s\n", file, line, c, t;           # report the ORIGINAL source line
 }
 ' | sort > "$tmpd/findings"
 
