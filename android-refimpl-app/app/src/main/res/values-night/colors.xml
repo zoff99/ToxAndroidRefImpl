@@ -325,4 +325,9 @@
     <color name="md_blue_grey_800">#37474F</color>
     <color name="md_blue_grey_900">#263238</color>
 
+    <!-- main list row card + meta chips -->
+    <color name="list_card_bg">#1E1E1E</color>
+    <color name="list_chip_bg">#37474F</color>
+    <color name="list_chip_text">#ECEFF1</color>
+
 </resources>

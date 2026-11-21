@@ -2,24 +2,22 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/outside_friend_info_container"
     android:layout_width="fill_parent"
-    android:layout_height="90dp"
-    android:layout_margin="0dp"
-    android:background="@null"
-    android:elevation="0dp"
+    android:layout_height="wrap_content"
+    android:layout_marginLeft="4dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginBottom="2dp"
+    android:background="@drawable/list_card_bg"
     android:orientation="vertical"
     android:padding="0dip">
 
     <RelativeLayout
         android:id="@+id/friend_line_container"
         android:layout_width="fill_parent"
-        android:layout_height="88dp"
-        android:layout_marginLeft="0dp"
-        android:layout_marginTop="0dp"
-        android:layout_marginRight="0dp"
-        android:layout_marginBottom="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="72dp"
         android:background="@null"
-        android:elevation="2dp"
-        android:padding="2dip">
+        android:padding="6dp">
 
         <ImageView
             android:id="@+id/f_notification"
@@ -81,149 +79,87 @@
             android:scaleType="centerInside"
             android:src="@drawable/circle_green" />
 
-
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/f_status_info_container"
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentBottom="true"
-            android:layout_marginRight="6dip"
-            android:layout_toRightOf="@id/f_user_status_icon">
-
-
-            <TextView
-                android:id="@+id/f_status_message"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/f_name"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:ellipsize="marquee"
-                android:fontFamily="monospace"
-                android:gravity="center_vertical"
-                android:maxLines="1"
-                android:paddingRight="6dp"
-                android:text="this is my status message long line this is my status message long line this is my status message long line"
-                android:textColor="@color/friend_list_text_color"
-                android:textSize="11sp"
-                android:typeface="monospace" />
-
-            <TextView
-                android:id="@+id/f_ip_addr_text"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/f_status_message"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:ellipsize="marquee"
-                android:fontFamily="monospace"
-                android:gravity="left"
-                android:maxLines="1"
-                android:paddingRight="6dp"
-                android:text="0.0.0.0"
-                android:textColor="@color/friend_list_text_color"
-                android:textSize="11sp"
-                android:typeface="monospace" />
-
-            <TextView
-                android:id="@+id/f_last_online_timestamp"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/f_ip_addr_text"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentBottom="true"
-                android:layout_marginTop="0dp"
-                android:ellipsize="marquee"
-                android:fontFamily="monospace"
-                android:gravity="bottom"
-                android:paddingTop="1dp"
-                android:paddingRight="5dp"
-                android:paddingBottom="0dp"
-                android:singleLine="true"
-                android:text="2017-02-02 16:30:15"
-                android:textColor="@color/friend_list_text_color"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:typeface="serif" />
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="6dp"
+            android:layout_toRightOf="@id/f_user_status_icon"
+            android:layout_alignParentRight="true"
+            android:orientation="vertical">
 
             <TextView
                 android:id="@+id/f_name"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:layout_alignWithParentIfMissing="true"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="0dp"
-                android:layout_marginBottom="0dp"
-                android:gravity="top"
-                android:maxLines="1"
-                android:paddingRight="5dp"
-                android:paddingBottom="0dp"
+                android:paddingRight="30dp"
                 android:text="example name"
                 android:textColor="@color/md_black_1000"
-                android:textSize="14sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
-        </RelativeLayout>
-
-        <FrameLayout
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_alignParentRight="true"
-            android:layout_centerInParent="true"
-            android:clipToPadding="false"
-            android:paddingLeft="3dp"
-            android:paddingTop="3dp"
-            android:paddingRight="3dp"
-            android:paddingBottom="3dp">
 
             <TextView
-                android:id="@+id/f_unread_count"
-                android:layout_width="30dp"
-                android:layout_height="30dp"
-                android:layout_gravity="center"
-                android:background="@drawable/widget_unread_count_background"
-                android:elevation="4dp"
-                android:paddingLeft="5dp"
-                android:paddingTop="8.5dp"
-                android:paddingRight="5dp"
-                android:paddingBottom="0.5dp"
-                android:text="120"
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="10sp"
-                android:textStyle="bold"
-                android:visibility="invisible" />
+                android:id="@+id/f_status_message"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="2dp"
+                android:text="this is my status message long line this is my status message long line"
+                android:textColor="@color/friend_list_text_color"
+                android:textSize="13sp" />
 
-        </FrameLayout>
+            <TextView
+                android:id="@+id/f_ip_addr_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:background="@drawable/list_chip_bg"
+                android:maxWidth="160dp"
+                android:paddingLeft="6dp"
+                android:paddingTop="2dp"
+                android:paddingRight="6dp"
+                android:paddingBottom="2dp"
+                android:singleLine="true"
+                android:text="0.0.0.0"
+                android:textColor="@color/list_chip_text"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:typeface="monospace" />
+
+            <TextView
+                android:id="@+id/f_last_online_timestamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:background="@drawable/list_chip_bg"
+                android:paddingLeft="6dp"
+                android:paddingTop="2dp"
+                android:paddingRight="6dp"
+                android:paddingBottom="2dp"
+                android:text="2017-02-02 16:30:15"
+                android:textColor="@color/list_chip_text"
+                android:textSize="11sp"
+                android:fontFamily="monospace"
+                android:typeface="monospace" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/f_unread_count"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="4dp"
+            android:layout_marginRight="4dp"
+            android:background="@drawable/widget_unread_count_background"
+            android:gravity="center"
+            android:text="120"
+            android:textAlignment="center"
+            android:textColor="#ffffff"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            android:visibility="invisible" />
 
     </RelativeLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="2dp">
-
-        <TextView
-            android:layout_width="20dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@null" />
-
-        <ImageView
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_gravity="center_vertical"
-            android:layout_weight="100"
-            android:background="@color/md_grey_300_seperator" />
-
-        <TextView
-            android:layout_width="20dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@null" />
-
-    </LinearLayout>
-
 </LinearLayout>
-

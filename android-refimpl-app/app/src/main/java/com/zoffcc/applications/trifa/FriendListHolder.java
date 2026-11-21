@@ -185,6 +185,15 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
                 }
             }
             ip_addr_text.setText(ip_str);
+            // no empty chip bubble when there is no IP text
+            if ((ip_str == null) || (ip_str.length() == 0))
+            {
+                ip_addr_text.setVisibility(View.GONE);
+            }
+            else
+            {
+                ip_addr_text.setVisibility(View.VISIBLE);
+            }
         }
         catch(Exception ignored)
         {
@@ -225,6 +234,16 @@ public class FriendListHolder extends RecyclerView.ViewHolder implements View.On
         else
         {
             f_last_online_timestamp.setText("");
+        }
+
+        // no empty chip bubble when there is no timestamp text
+        if (f_last_online_timestamp.getText().length() == 0)
+        {
+            f_last_online_timestamp.setVisibility(View.GONE);
+        }
+        else
+        {
+            f_last_online_timestamp.setVisibility(View.VISIBLE);
         }
 
         if (fl.notification_silent)
