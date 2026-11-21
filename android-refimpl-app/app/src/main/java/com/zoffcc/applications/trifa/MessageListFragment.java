@@ -833,12 +833,15 @@ public class MessageListFragment extends Fragment
                 try
                 {
                     Log.i(TAG, "add_message:002");
-                    adapter.add_item(m);
-
-                    // C: keep the resume-skip count in sync with live appends
-                    if (messages_count_at_last_load >= 0)
+                    // A: only advance the resume-skip count when the append actually happened
+                    //    (add_item dedups by row id and returns false on a duplicate)
+                    if (adapter.add_item(m))
                     {
-                        messages_count_at_last_load++;
+                        // C: keep the resume-skip count in sync with live appends
+                        if (messages_count_at_last_load >= 0)
+                        {
+                            messages_count_at_last_load++;
+                        }
                     }
 
                     if (stay_at_top)

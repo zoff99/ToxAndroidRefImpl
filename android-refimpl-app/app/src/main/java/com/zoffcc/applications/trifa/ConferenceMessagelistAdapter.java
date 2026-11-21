@@ -296,12 +296,23 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
         this.notifyDataSetChanged();
     }
 
-    public void add_item(ConferenceMessage new_item)
+    public boolean add_item(ConferenceMessage new_item)
     {
         // Log.i(TAG, "add_item:" + new_item + ":" + this.messagelistitems.size());
 
         try
         {
+            // A: dedup by DB row id. a live append can race a load/reload that already placed this
+            //    same row in the list; appending it again would display it twice. the scan is bounded
+            //    by the load limit and live appends are infrequent, so it is cheap.
+            for (ConferenceMessage existing : this.messagelistitems)
+            {
+                if ((existing != null) && (existing.id == new_item.id))
+                {
+                    return false;
+                }
+            }
+
             // HINT: synced messages can arrive out of order (older timestamps). while the chat is open
             //       they are appended at the end; the next full reload re-sorts them. make sure the
             //       resume-skip logic does not hide such an out-of-order append.
@@ -319,12 +330,14 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
             // TODO: use "notifyItemInserted" !!
             this.notifyDataSetChanged();
             // Log.i(TAG, "add_item:002:" + this.messagelistitems.size());
+            return true;
         }
         catch (Exception e)
         {
             e.printStackTrace();
             Log.i(TAG, "add_item:EE:" + e.getMessage());
         }
+        return false;
     }
 
     synchronized public boolean update_item(final ConferenceMessage new_item)
