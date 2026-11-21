@@ -56,8 +56,10 @@ import androidx.preference.EditTextPreference;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceGroup;
 import androidx.preference.PreferenceManager;
 import androidx.preference.PreferenceScreen;
+import androidx.preference.SeekBarPreference;
 import androidx.preference.SwitchPreference;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.IPisValid;
@@ -358,6 +360,11 @@ public class SettingsActivity extends AppCompatActivity
         public void onCreatePreferences(Bundle savedInstanceState, String rootKey)
         {
             setPreferencesFromResource(R.xml.pref_settings, rootKey);
+
+            // Use our own wrapping row layout for the text-carrying preferences so
+            // long titles/summaries are not clipped at large OS font sizes. Widgets,
+            // section headers and the seekbar row keep their existing layouts.
+            applyWrappedRowLayout(getPreferenceScreen());
 
             // ---- section icons ----
             setSectionIcon("section_appearance", R.drawable.ic_section_appearance);
@@ -799,6 +806,43 @@ public class SettingsActivity extends AppCompatActivity
             if (getActivity() instanceof SettingsActivity)
             {
                 ((SettingsActivity) getActivity()).onSettingsReady();
+            }
+        }
+
+        @Override
+        public void onViewCreated(@NonNull View view, Bundle savedInstanceState)
+        {
+            super.onViewCreated(view, savedInstanceState);
+            // The list's vertical scrollbar is a non-draggable indicator; hide it so
+            // it cannot look "stuck". The list still scrolls by swiping.
+            getListView().setVerticalScrollBarEnabled(false);
+        }
+
+        /**
+         * Point every text-carrying preference at our own wrapping row layout and let
+         * titles be multi-line. Section headers (PreferenceGroup) keep their custom
+         * collapsible layout and the SeekBarPreference keeps its seekbar layout; only
+         * their title line-cap is relaxed. Uses public Preference APIs and a NEW layout
+         * resource, so it stays compatible if androidx.preference is updated.
+         */
+        private void applyWrappedRowLayout(PreferenceGroup group)
+        {
+            if (group == null)
+            {
+                return;
+            }
+            for (int i = 0; i < group.getPreferenceCount(); i++)
+            {
+                final Preference p = group.getPreference(i);
+                p.setSingleLineTitle(false);
+                if (p instanceof PreferenceGroup)
+                {
+                    applyWrappedRowLayout((PreferenceGroup) p);
+                }
+                else if (!(p instanceof SeekBarPreference))
+                {
+                    p.setLayoutResource(R.layout.preference_row_text);
+                }
             }
         }
 
