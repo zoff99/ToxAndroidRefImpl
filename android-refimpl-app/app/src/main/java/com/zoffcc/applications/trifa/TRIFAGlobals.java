@@ -129,6 +129,8 @@ public class TRIFAGlobals
     final static String TOX_TRIFA_PUBLIC_GROUPID = "154b3973bd0e66304fd6179a8a54759073649e09e6e368f0334fc6ed666ab762";
     // ----------
 
+    final static String DEBUG_VIDEO_CAPTURE_TAG = "DEBUG_VIDEO_CAPTURE"; // grep-able tag for video capture/send debug logs (adb logcat -s DEBUG_VIDEO_CAPTURE)
+
     final static boolean ADD_BOTS_ON_STARTUP = true;
     final static boolean DELETE_SQL_AND_VFS_ON_ERROR = false; // true -> will delete all data on any ERROR with SQL and VFS !!!
 

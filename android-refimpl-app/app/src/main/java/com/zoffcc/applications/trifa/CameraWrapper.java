@@ -46,6 +46,7 @@ import static com.zoffcc.applications.trifa.MainActivity.yv12Rotate180_native;
 import static com.zoffcc.applications.trifa.MainActivity.yv12Rotate270_native;
 import static com.zoffcc.applications.trifa.MainActivity.yv12Rotate90_native;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.CAMPREVIEW_NUM_BUFFERS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.DEBUG_VIDEO_CAPTURE_TAG;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.VIDEO_FRAME_RATE_OUTGOING;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.count_video_frame_sent;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.last_video_frame_sent;
@@ -85,7 +86,7 @@ public class CameraWrapper
 
     public static synchronized CameraWrapper getInstance()
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "getInstance:mCameraWrapper=" + (mCameraWrapper != null)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "getInstance:mCameraWrapper=" + (mCameraWrapper != null)); }
         if (mCameraWrapper == null)
         {
             mCameraWrapper = new CameraWrapper();
@@ -96,13 +97,13 @@ public class CameraWrapper
 
     public void doOpenCamera(CamOpenOverCallback callback, boolean front_camera)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doOpenCamera:front_camera=" + front_camera); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doOpenCamera:front_camera=" + front_camera); }
         doOpenCamera_wrapper(callback, front_camera);
     }
 
     public void doOpenCamera_wrapper(CamOpenOverCallback callback, boolean front_camera)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doOpenCamera_wrapper:front_camera=" + front_camera + " numCameras=" + Camera.getNumberOfCameras()); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doOpenCamera_wrapper:front_camera=" + front_camera + " numCameras=" + Camera.getNumberOfCameras()); }
         Log.i(TAG, "doOpenCamera_wrapper:Camera open....");
         int numCameras = Camera.getNumberOfCameras();
         int camera_type = Camera.CameraInfo.CAMERA_FACING_FRONT;
@@ -183,7 +184,7 @@ public class CameraWrapper
 
     public void doStartPreview(SurfaceHolder holder, float previewRate)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doStartPreview:mIsPreviewing=" + mIsPreviewing); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doStartPreview:mIsPreviewing=" + mIsPreviewing); }
         Log.i(TAG, "doStartPreview...");
 
         if (mIsPreviewing)
@@ -239,7 +240,7 @@ public class CameraWrapper
 
     public void doStopCamera()
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doStopCamera:mCamera=" + (mCamera != null)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doStopCamera:mCamera=" + (mCamera != null)); }
         Log.i(TAG, "doStopCamera");
 
         if (mCamera != null)
@@ -257,7 +258,7 @@ public class CameraWrapper
 
     static int getRotation()
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "getRotation:device_orientation=" + device_orientation + " facing=" + (cameraInfo != null ? cameraInfo.facing : -1)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "getRotation:device_orientation=" + device_orientation + " facing=" + (cameraInfo != null ? cameraInfo.facing : -1)); }
         Log.i(TAG, "[sum]================");
         Display display = CallingActivity.ca.getWindowManager().getDefaultDisplay();
         int rotation = display.getRotation();
@@ -318,13 +319,13 @@ public class CameraWrapper
         Log.i(TAG, "cam:getRotation:[display]degrees=" + degrees);
         Log.i(TAG, "cam:getRotation:[sum]result=" + result);
         Log.i(TAG, "cam:getRotation:[sum]================");
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "getRotation:result=" + result); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "getRotation:result=" + result); }
         return result;
     }
 
     private void initCamera()
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "initCamera:mCamera=" + (mCamera != null)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "initCamera:mCamera=" + (mCamera != null)); }
         Log.i(TAG, "initCamera:camera:startPreview:initCamera:start");
 
         if (mCamera != null)
@@ -579,7 +580,7 @@ public class CameraWrapper
 
     private void setupCallback(int bufferSize)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "setupCallback:bufferSize=" + bufferSize + " CAMPREVIEW_NUM_BUFFERS=" + CAMPREVIEW_NUM_BUFFERS); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "setupCallback:bufferSize=" + bufferSize + " CAMPREVIEW_NUM_BUFFERS=" + CAMPREVIEW_NUM_BUFFERS); }
         for (int i = 0; i < CAMPREVIEW_NUM_BUFFERS; ++i)
         {
             byte[] cameraBuffer = new byte[bufferSize];
@@ -598,7 +599,7 @@ public class CameraWrapper
 
         proccesImageOnBackground(final byte[] _data, CameraPreviewCallback _cb)
         {
-            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "proccesImageOnBackground:data.length=" + (_data != null ? _data.length : 0)); }
+            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "proccesImageOnBackground:data.length=" + (_data != null ? _data.length : 0)); }
             // Log.i(TAG, "proccesImageOnBackground:--START--");
             // s_time = System.currentTimeMillis();
 
@@ -611,7 +612,7 @@ public class CameraWrapper
         @Override
         protected Void doInBackground(Void... voids)
         {
-            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:my_video_enabled=" + Callstate.my_video_enabled + " tox_call_state=" + Callstate.tox_call_state + " rotate_angle=" + CameraWrapper.camera_video_rotate_angle + " format=" + PREF__camera_get_preview_format + " data.length=" + (data != null ? data.length : 0)); }
+            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:my_video_enabled=" + Callstate.my_video_enabled + " tox_call_state=" + Callstate.tox_call_state + " rotate_angle=" + CameraWrapper.camera_video_rotate_angle + " format=" + PREF__camera_get_preview_format + " data.length=" + (data != null ? data.length : 0)); }
 /*
             try
             {
@@ -657,7 +658,7 @@ public class CameraWrapper
                                         data_new = new byte[data.length];
                                     }
                                     // FIX: Pass independent strides to native rotation
-                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling YV12rotate90 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys + " us=" + us + " vs=" + vs); }
+                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling YV12rotate90 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys + " us=" + us + " vs=" + vs); }
                                     data_new = YV12rotate90(data, data_new, camera_preview_size2.width,
                                                             camera_preview_size2.height, ys, us, vs);
                                 }
@@ -672,7 +673,7 @@ public class CameraWrapper
                                         data_new = new byte[data.length];
                                     }
                                     // FIX: Pass yStride to NV21 rotation
-                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling NV21rotate90 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys); }
+                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling NV21rotate90 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys); }
                                     data_new = NV21rotate90(data, data_new, camera_preview_size2.width,
                                                             camera_preview_size2.height, ys);
                                 }
@@ -680,7 +681,7 @@ public class CameraWrapper
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new);
 
-                                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling toxav_video_send_frame_uv_reversed_wrapper w=" + camera_preview_size2.height + " h=" + camera_preview_size2.width); }
+                                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling toxav_video_send_frame_uv_reversed_wrapper w=" + camera_preview_size2.height + " h=" + camera_preview_size2.width); }
                                 if (PREF__UV_reversed)
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new,
@@ -721,7 +722,7 @@ public class CameraWrapper
                                         data_new = new byte[data.length];
                                     }
                                     // FIX: Pass independent strides to native rotation
-                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling YV12rotate270 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys + " us=" + us + " vs=" + vs); }
+                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling YV12rotate270 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys + " us=" + us + " vs=" + vs); }
                                     data_new = YV12rotate270(data, data_new, camera_preview_size2.width,
                                                              camera_preview_size2.height, ys, us, vs);
                                 }
@@ -736,7 +737,7 @@ public class CameraWrapper
                                         data_new = new byte[data.length];
                                     }
                                     // FIX: Pass yStride to NV21 rotation
-                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling NV21rotate270 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys); }
+                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling NV21rotate270 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys); }
                                     data_new = NV21rotate270(data, data_new, camera_preview_size2.width,
                                                              camera_preview_size2.height, ys);
                                 }
@@ -744,7 +745,7 @@ public class CameraWrapper
                                 MainActivity.video_buffer_2.rewind();
                                 MainActivity.video_buffer_2.put(data_new);
 
-                                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling toxav_video_send_frame_uv_reversed_wrapper w=" + camera_preview_size2.height + " h=" + camera_preview_size2.width); }
+                                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling toxav_video_send_frame_uv_reversed_wrapper w=" + camera_preview_size2.height + " h=" + camera_preview_size2.width); }
                                 if (PREF__UV_reversed)
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new,
@@ -783,7 +784,7 @@ public class CameraWrapper
                                         data_new = new byte[data.length];
                                     }
                                     // FIX: Pass independent strides to native rotation
-                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling YV12rotate180 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys + " us=" + us + " vs=" + vs); }
+                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling YV12rotate180 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys + " us=" + us + " vs=" + vs); }
                                     data_new = YV12rotate180(data, data_new, camera_preview_size2.width,
                                                              camera_preview_size2.height, ys, us, vs);
                                 }
@@ -798,7 +799,7 @@ public class CameraWrapper
                                         data_new = new byte[data.length];
                                     }
                                     // FIX: Pass yStride to NV21 rotation
-                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling NV21rotate180 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys); }
+                                    if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling NV21rotate180 w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height + " ys=" + ys); }
                                     data_new = NV21rotate180(data, data_new, camera_preview_size2.width,
                                                              camera_preview_size2.height, ys);
                                 }
@@ -811,7 +812,7 @@ public class CameraWrapper
                                 // android has the order YVU (instead of YUV) !!
                                 // so we need to call ..._uv_reversed here
                                 // -------------------------------------------------
-                                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling toxav_video_send_frame_uv_reversed_wrapper w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height); }
+                                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling toxav_video_send_frame_uv_reversed_wrapper w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height); }
                                 if (PREF__UV_reversed)
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data_new,
@@ -846,7 +847,7 @@ public class CameraWrapper
                                 // android has the order YVU (instead of YUV) !!
                                 // so we need to call ..._uv_reversed here
                                 // -------------------------------------------------
-                                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "doInBackground:calling toxav_video_send_frame_uv_reversed_wrapper w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height); }
+                                if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "doInBackground:calling toxav_video_send_frame_uv_reversed_wrapper w=" + camera_preview_size2.width + " h=" + camera_preview_size2.height); }
                                 if (PREF__UV_reversed)
                                 {
                                     video_send_res = HelperGeneric.toxav_video_send_frame_uv_reversed_wrapper(data,
@@ -926,7 +927,7 @@ public class CameraWrapper
         @Override
         protected void onPostExecute(Void voids)
         {
-            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "onPostExecute:returning buffer data.length=" + (data != null ? data.length : 0)); }
+            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "onPostExecute:returning buffer data.length=" + (data != null ? data.length : 0)); }
             // Log.i(TAG, "doInBackground:end:#" + num);
             if (data != null)
             {
@@ -963,7 +964,7 @@ public class CameraWrapper
 
         private CameraPreviewCallback()
         {
-            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "CameraPreviewCallback:constructor"); }
+            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "CameraPreviewCallback:constructor"); }
             Log.i(TAG, "CameraPreviewCallback");
             // videoEncoder = new VideoEncoderFromBuffer(CameraWrapper.IMAGE_WIDTH, CameraWrapper.IMAGE_HEIGHT);
             // HINT: save timestamp here, and if there is no buffercallback within 5 seconds, reopen the camera again!
@@ -972,7 +973,7 @@ public class CameraWrapper
 
         public void reset()
         {
-            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "CameraPreviewCallback:reset"); }
+            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "CameraPreviewCallback:reset"); }
             camera_preview_call_back_ts_first_frame = -1;
             camera_preview_call_back_start_ts = System.currentTimeMillis();
 
@@ -985,7 +986,7 @@ public class CameraWrapper
 
         void close()
         {
-            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "CameraPreviewCallback:close"); }
+            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "CameraPreviewCallback:close"); }
             camera_preview_call_back_ts_first_frame = -1;
             camera_preview_call_back_start_ts = -1;
 
@@ -1003,7 +1004,7 @@ public class CameraWrapper
         @Override
         public void onPreviewFrame(final byte[] data, Camera camera)
         {
-            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "onPreviewFrame:data.length=" + (data != null ? data.length : 0) + " camera_preview_size2=" + (camera_preview_size2 != null ? (camera_preview_size2.width + "x" + camera_preview_size2.height) : "null")); }
+            if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "onPreviewFrame:data.length=" + (data != null ? data.length : 0) + " camera_preview_size2=" + (camera_preview_size2 != null ? (camera_preview_size2.width + "x" + camera_preview_size2.height) : "null")); }
             // ----------------------------
             if (data == null)
             {
@@ -1048,7 +1049,7 @@ public class CameraWrapper
                         Log.i(TAG, "onPreviewFrame:y_size=" + y_size + " u_size=" + u_size + " v_size=" + v_size);
                         Log.i(TAG, "onPreviewFrame:total_size=" + total_size + " data.length=" + data.length);
 
-                        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "onPreviewFrame:init yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " total_size=" + total_size + " data.length=" + data.length); }
+                        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "onPreviewFrame:init yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " total_size=" + total_size + " data.length=" + data.length); }
                         // Store strides for use by rotation functions
                         camera_y_stride = yStride;
                         camera_u_stride = uStride;
@@ -1095,7 +1096,7 @@ public class CameraWrapper
     // FIX: Output is tightly packed with stride = imageHeight (rotated width)
     public static byte[] NV21rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight, int inputStride)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "NV21rotate90:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " inputStride=" + inputStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "NV21rotate90:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " inputStride=" + inputStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         // After 90° CW: output is imageHeight × imageWidth, tightly packed
         int outW = imageHeight;
         int outH = imageWidth;
@@ -1130,7 +1131,7 @@ public class CameraWrapper
     // FIX: Output is tightly packed with stride = imageHeight (rotated width)
     public static byte[] YUV420rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "YUV420rotate90:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "YUV420rotate90:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         // After 90° CW: output is imageHeight × imageWidth, tightly packed
         int outW = imageHeight;
         int outH = imageWidth;
@@ -1169,7 +1170,7 @@ public class CameraWrapper
     // FIX: Output is tightly packed with stride = imageWidth (dimensions unchanged)
     public static byte[] NV21rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight, int inputStride)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "NV21rotate180:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " inputStride=" + inputStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "NV21rotate180:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " inputStride=" + inputStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         // 180°: dimensions unchanged, output tightly packed with stride = imageWidth
         int count = 0;
         int yInPlaneSize = inputStride * imageHeight;
@@ -1197,7 +1198,7 @@ public class CameraWrapper
     // FIX: Output is tightly packed with stride = imageHeight (rotated width)
     public static byte[] NV21rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight, int inputStride)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "NV21rotate270:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " inputStride=" + inputStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "NV21rotate270:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " inputStride=" + inputStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         // After 270° CW: output is imageHeight × imageWidth, tightly packed
         int outW = imageHeight;
         int outH = imageWidth;
@@ -1233,7 +1234,7 @@ public class CameraWrapper
     public static byte[] YV12rotate90(byte[] data, byte[] output, int imageWidth, int imageHeight,
                                       int yStride, int uStride, int vStride)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "YV12rotate90:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "YV12rotate90:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         yv12Rotate90_native(data, output, imageWidth, imageHeight, yStride, uStride, vStride);
         return output;
     }
@@ -1241,7 +1242,7 @@ public class CameraWrapper
     public static byte[] YV12rotate180(byte[] data, byte[] output, int imageWidth, int imageHeight,
                                        int yStride, int uStride, int vStride)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "YV12rotate180:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "YV12rotate180:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         yv12Rotate180_native(data, output, imageWidth, imageHeight, yStride, uStride, vStride);
         return output;
     }
@@ -1249,7 +1250,7 @@ public class CameraWrapper
     public static byte[] YV12rotate270(byte[] data, byte[] output, int imageWidth, int imageHeight,
                                        int yStride, int uStride, int vStride)
     {
-        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(TAG, "YV12rotate270:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
+        if (MainActivity.DEBUG_VIDEO_CAPTURE_SEND) { Log.i(DEBUG_VIDEO_CAPTURE_TAG, "YV12rotate270:imageWidth=" + imageWidth + " imageHeight=" + imageHeight + " yStride=" + yStride + " uStride=" + uStride + " vStride=" + vStride + " data.length=" + (data != null ? data.length : 0) + " output.length=" + (output != null ? output.length : 0)); }
         yv12Rotate270_native(data, output, imageWidth, imageHeight, yStride, uStride, vStride);
         return output;
     }
