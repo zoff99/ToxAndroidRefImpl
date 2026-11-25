@@ -268,6 +268,12 @@ public class TrifaToxService extends Service
     public static int push_history_count = 0;
     public static long push_flood_last_log_ts = 0;
 
+    // [ADDED] "fast start" boost: iterate quickly for a short time after the
+    // main tox loop starts, and after a long battery saving sleep (see main loop)
+    public static final int FAST_START_ITERATE_INTERVAL_MS = 20; // iteration interval during the boost
+    public static final int FAST_START_DURATION_MS = 20_000; // the boost lasts 20 seconds
+    public static final int FAST_START_MIN_BATTERY_SLEEP_MS = 5 * MINUTE_IN_MILLIS; // only boost after a battery sleep of at least 5 minutes
+
     // [ADDED] Ring buffer of REAL battery-sleep intervals (start/end ms).
     // Written ONLY by the tox-loop thread at sleep exit. The chart uses this
     // to draw magenta ASLEEP bars only for actual sleeps, never for missing samples.
@@ -1719,6 +1725,13 @@ public class TrifaToxService extends Service
                 long fast_iteration_start_ms = 0;
                 boolean fast_iteration_logged = false;
 
+                // [ADDED] "fast start" boost: iterate every 20ms for the first
+                // 20 seconds after the main loop starts, so we get online and
+                // catch up with the network quickly. the same boost is also
+                // started after a long battery saving sleep (see below).
+                // fast_iteration_until_ms = the time when the boost ends.
+                long fast_iteration_until_ms = System.currentTimeMillis() + FAST_START_DURATION_MS;
+
                 no_internet_last_ec = no_internet_edge_count.get();
                 no_internet_prev_offline = !HAVE_INTERNET_CONNECTIVITY;
 
@@ -1801,8 +1814,18 @@ public class TrifaToxService extends Service
                                 }
                             }
 
+                            // how long did the battery saving sleep actually last?
+                            long battery_sleep_duration_ms = System.currentTimeMillis() - battery_sleep_start_ms;
+
                             // ---- SINGLE EXIT: every path is recorded ----
                             record_sleep_interval_now(wakeup_reason, ended_early);
+
+                            // if battery saving lasted at least 5 minutes, start the
+                            // "fast start" boost: iterate every 20ms for 20 seconds
+                            if (battery_sleep_duration_ms >= FAST_START_MIN_BATTERY_SLEEP_MS)
+                            {
+                                fast_iteration_until_ms = System.currentTimeMillis() + FAST_START_DURATION_MS;
+                            }
                             wakeup_trigger_reason = "";
                             need_wakeup_now = false;
                             trifa_service_thread = null;
@@ -1854,6 +1877,16 @@ public class TrifaToxService extends Service
                         int TOX_CONNECTION_a = tox_self_get_connection_status();
                         tox_notification_change_wrapper(TOX_CONNECTION_a, "");
                         battery_sleep_start_ms = 0; // belt & braces (helper already cleared it)
+                    }
+
+                    // "fast start" boost active? then iterate every 20ms.
+                    // Math.min() keeps an interval that is already faster
+                    // (for example 5ms during a call), it never slows things down.
+                    // when the boost time is over, the normal interval (computed
+                    // at the end of every loop iteration) is used again automatically.
+                    if (System.currentTimeMillis() < fast_iteration_until_ms)
+                    {
+                        tox_iteration_interval_ms = Math.min(tox_iteration_interval_ms, FAST_START_ITERATE_INTERVAL_MS);
                     }
 
                     try
