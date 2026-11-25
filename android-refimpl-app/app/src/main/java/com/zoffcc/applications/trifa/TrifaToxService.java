@@ -270,8 +270,8 @@ public class TrifaToxService extends Service
 
     // [ADDED] "fast start" boost: iterate quickly for a short time after the
     // main tox loop starts, and after a long battery saving sleep (see main loop)
-    public static final int FAST_START_ITERATE_INTERVAL_MS = 20; // iteration interval during the boost
-    public static final int FAST_START_DURATION_MS = 20_000; // the boost lasts 20 seconds
+    public static final int FAST_START_ITERATE_INTERVAL_MS = 5; // iteration interval during the boost
+    public static final int FAST_START_DURATION_MS = MINUTE_IN_MILLIS; // the boost lasts 1 minute
     public static final int FAST_START_MIN_BATTERY_SLEEP_MS = 5 * MINUTE_IN_MILLIS; // only boost after a battery sleep of at least 5 minutes
 
     // [ADDED] Ring buffer of REAL battery-sleep intervals (start/end ms).
@@ -1754,8 +1754,8 @@ public class TrifaToxService extends Service
         long fast_iteration_start_ms = 0;
         boolean fast_iteration_logged = false;
 
-        // [ADDED] "fast start" boost: iterate every 20ms for the first
-        // 20 seconds after the main loop starts, so we get online and
+        // [ADDED] "fast start" boost: iterate every 5ms for the first
+        // 1 minute after the main loop starts, so we get online and
         // catch up with the network quickly. the same boost is also
         // started after a long battery saving sleep (see below).
         // fast_iteration_until_ms = the time when the boost ends.
@@ -1850,7 +1850,7 @@ public class TrifaToxService extends Service
                     record_sleep_interval_now(wakeup_reason, ended_early);
 
                     // if battery saving lasted at least 5 minutes, start the
-                    // "fast start" boost: iterate every 20ms for 20 seconds
+                    // "fast start" boost: iterate every 5ms for 1 minute
                     if (battery_sleep_duration_ms >= FAST_START_MIN_BATTERY_SLEEP_MS)
                     {
                         fast_iteration_until_ms = System.currentTimeMillis() + FAST_START_DURATION_MS;
@@ -1908,9 +1908,9 @@ public class TrifaToxService extends Service
                 battery_sleep_start_ms = 0; // belt & braces (helper already cleared it)
             }
 
-            // "fast start" boost active? then iterate every 20ms.
+            // "fast start" boost active? then iterate every 5ms.
             // Math.min() keeps an interval that is already faster
-            // (for example 5ms during a call), it never slows things down.
+            // (for example during a call or file transfer), it never slows things down.
             // when the boost time is over, the normal interval (computed
             // at the end of every loop iteration) is used again automatically.
             if (System.currentTimeMillis() < fast_iteration_until_ms)
