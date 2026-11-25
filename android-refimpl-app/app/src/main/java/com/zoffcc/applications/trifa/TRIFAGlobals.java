@@ -66,6 +66,11 @@ public class TRIFAGlobals
     final static int FAST_ITERATION_THRESHOLD_MS = 15;
     final static int FAST_ITERATION_THRESHOLD_DURATION_MS = 5000;
 
+    // fraction of the list width the user must swipe to commit a pin/unpin swipe.
+    // unpinning is intentionally harder: it needs a much longer swipe than pinning.
+    final static float SWIPE_PIN_THRESHOLD = 0.3f; // right swipe (pin): 30% of the list width
+    final static float SWIPE_UNPIN_THRESHOLD = 0.6f; // left swipe (unpin): 60% of the list width
+
     static volatile boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_MIN_INTERVAL_SECS = 60; // 60 seconds
     final static int TOX_BOOTSTRAP_AGAIN_AFTER_OFFLINE_MILLIS =

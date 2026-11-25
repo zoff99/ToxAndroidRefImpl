@@ -22,9 +22,6 @@ package com.zoffcc.applications.trifa;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -40,7 +37,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 
 import androidx.annotation.NonNull;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -112,11 +108,14 @@ public class FriendListFragment extends Fragment
 
         ItemTouchHelper.SimpleCallback simpleItemTouchCallback = new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
 
-            // colors + icons used during the swipe
-            private final Paint backgroundPaint = new Paint();
-            // replace these with your own R.drawable.ic_pin / R.drawable.ic_unpin if you have them
-            private final Drawable pinIcon = ContextCompat.getDrawable(getContext(), android.R.drawable.star_big_on);
-            private final Drawable unpinIcon = ContextCompat.getDrawable(getContext(), android.R.drawable.ic_menu_close_clear_cancel);
+            // the item the user started swiping. used at commit time to check that a
+            // concurrent list rebuild did not swap another item into this row.
+            private CombinedFriendsAndConferences swipe_started_item = null;
+
+            // last horizontal swipe offset seen in onChildDraw. getSwipeThreshold()
+            // is not told the swipe direction, so we remember it here to pick the
+            // right threshold (pin vs unpin) when the finger is released.
+            private float last_swipe_dx = 0f;
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -124,44 +123,70 @@ public class FriendListFragment extends Fragment
             }
 
             @Override
+            public float getSwipeThreshold(@NonNull RecyclerView.ViewHolder viewHolder) {
+                // unpin (left swipe) must go much farther than pin (right swipe).
+                // both values are defines in TRIFAGlobals so they are easy to tweak.
+                if (last_swipe_dx < 0) {
+                    return SWIPE_UNPIN_THRESHOLD;
+                }
+                return SWIPE_PIN_THRESHOLD;
+            }
+
+            @Override
+            public void onSelectedChanged(RecyclerView.ViewHolder viewHolder, int actionState) {
+                super.onSelectedChanged(viewHolder, actionState);
+                if ((actionState == ItemTouchHelper.ACTION_STATE_SWIPE) && (viewHolder != null)) {
+                    int position = viewHolder.getBindingAdapterPosition();
+                    swipe_started_item = (position == RecyclerView.NO_POSITION) ? null : adapter.getItem(position);
+                }
+            }
+
+            @Override
             public void onSwiped(RecyclerView.ViewHolder viewHolder, int swipeDir) {
                 int position = viewHolder.getBindingAdapterPosition();
-                if (position == RecyclerView.NO_POSITION) return;
-
-                CombinedFriendsAndConferences cfac = adapter.getItem(position);
-                if (cfac == null) return;
+                CombinedFriendsAndConferences cfac = (position == RecyclerView.NO_POSITION) ? null : adapter.getItem(position);
 
                 final boolean newPinnedState = (swipeDir == ItemTouchHelper.RIGHT);
+                boolean pin_write_ok = false;
 
-                try {
-                    if (cfac.is_friend == COMBINED_IS_FRIEND) {
-                        cfac.friend_item.pinned = newPinnedState;
-                        orma.updateFriendList()
-                                .tox_public_key_stringEq(cfac.friend_item.tox_public_key_string)
-                                .pinned(newPinnedState).execute();
-                    } else if (cfac.is_friend == COMBINED_IS_CONFERENCE) {
-                        cfac.conference_item.pinned = newPinnedState;
-                        orma.updateConferenceDB()
-                                .conference_identifierEq(cfac.conference_item.conference_identifier)
-                                .pinned(newPinnedState).execute();
-                    } else if (cfac.is_friend == COMBINED_IS_GROUP) {
-                        cfac.group_item.pinned = newPinnedState;
-                        orma.updateGroupDB()
-                                .group_identifierEq(cfac.group_item.group_identifier)
-                                .pinned(newPinnedState).execute();
+                // only write if this row still shows the item the user started swiping
+                if ((cfac != null) && ((swipe_started_item == null) || FriendlistAdapter.same_item(cfac, swipe_started_item))) {
+                    try {
+                        if (cfac.is_friend == COMBINED_IS_FRIEND) {
+                            cfac.friend_item.pinned = newPinnedState;
+                            orma.updateFriendList()
+                                    .tox_public_key_stringEq(cfac.friend_item.tox_public_key_string)
+                                    .pinned(newPinnedState).execute();
+                        } else if (cfac.is_friend == COMBINED_IS_CONFERENCE) {
+                            cfac.conference_item.pinned = newPinnedState;
+                            orma.updateConferenceDB()
+                                    .conference_identifierEq(cfac.conference_item.conference_identifier)
+                                    .pinned(newPinnedState).execute();
+                        } else if (cfac.is_friend == COMBINED_IS_GROUP) {
+                            cfac.group_item.pinned = newPinnedState;
+                            orma.updateGroupDB()
+                                    .group_identifierEq(cfac.group_item.group_identifier)
+                                    .pinned(newPinnedState).execute();
+                        }
+                        pin_write_ok = true;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
 
-                if (newPinnedState) {
+                // step 1: remove the swiped row. its view detaches after the remove
+                // animation, which makes ItemTouchHelper reset all swipe visuals.
+                // this is what prevents any swipe background from getting stuck.
+                adapter.swipe_remove_visible(position);
+
+                // step 2: rebuild. the keyed diff re-inserts the item at its new position.
+                if (pin_write_ok && newPinnedState) {
                     // PIN: move it to the top
                     adapter.sort_items();
                 } else {
-                    // UNPIN: rebuild the whole list, otherwise it wont return to its normal position
-                    if (friend_list_fragment != null) {
-                        friend_list_fragment.add_all_friends_clear(0);
-                    }
+                    // UNPIN (or aborted swipe): rebuild from the DB so the item returns
+                    // to its normal position. bypass the throttle so it happens right away.
+                    add_all_friends_clear_real(0);
                 }
             }
 
@@ -183,41 +208,71 @@ public class FriendListFragment extends Fragment
             public void onChildDraw(Canvas c, RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder,
                                     float dX, float dY, int actionState, boolean isCurrentlyActive) {
                 if (actionState == ItemTouchHelper.ACTION_STATE_SWIPE) {
-                    View itemView = viewHolder.itemView;
-                    float height = (float) itemView.getBottom() - (float) itemView.getTop();
-                    int margin = (int) (16 * itemView.getContext().getResources().getDisplayMetrics().density);
-
-                    if (dX > 0) {
-                        // swiping RIGHT -> green background + pin icon
-                        backgroundPaint.setColor(Color.parseColor("#388E3C"));
-                        c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(),
-                                   dX, (float) itemView.getBottom(), backgroundPaint);
-
-                        if (pinIcon != null) {
-                            int iconTop = itemView.getTop() + (int) (height - pinIcon.getIntrinsicHeight()) / 2;
-                            int iconLeft = itemView.getLeft() + margin;
-                            int iconRight = iconLeft + pinIcon.getIntrinsicWidth();
-                            int iconBottom = iconTop + pinIcon.getIntrinsicHeight();
-                            pinIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-                            pinIcon.draw(c);
-                        }
-                    } else if (dX < 0) {
-                        // swiping LEFT -> red background + unpin icon
-                        backgroundPaint.setColor(Color.parseColor("#D32F2F"));
-                        c.drawRect((float) itemView.getRight() + dX, (float) itemView.getTop(),
-                                   (float) itemView.getRight(), (float) itemView.getBottom(), backgroundPaint);
-
-                        if (unpinIcon != null) {
-                            int iconTop = itemView.getTop() + (int) (height - unpinIcon.getIntrinsicHeight()) / 2;
-                            int iconRight = itemView.getRight() - margin;
-                            int iconLeft = iconRight - unpinIcon.getIntrinsicWidth();
-                            int iconBottom = iconTop + unpinIcon.getIntrinsicHeight();
-                            unpinIcon.setBounds(iconLeft, iconTop, iconRight, iconBottom);
-                            unpinIcon.draw(c);
-                        }
-                    }
+                    // move only the card; the reveal layer behind it stays in place.
+                    // do NOT call super here: it would move the whole row, reveal included.
+                    last_swipe_dx = dX;
+                    apply_swipe_visuals(viewHolder.itemView, dX);
+                } else {
+                    super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
                 }
-                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+            @Override
+            public void clearView(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
+                super.clearView(recyclerView, viewHolder);
+                // always leave the row in its normal look when the swipe is over
+                reset_swipe_visuals(viewHolder.itemView);
+            }
+
+            // the card is the view that carries the row background; it is the part that moves
+            private View swipe_card(View row) {
+                View card = row.findViewById(R.id.outside_friend_info_container);
+                if (card == null) {
+                    card = row.findViewById(R.id.f_conf_container_parent);
+                }
+                return card;
+            }
+
+            // move the card with the finger and show the matching reveal behind it:
+            // right (dX > 0) = green + pin icon, left (dX < 0) = red + unpin icon
+            private void apply_swipe_visuals(View row, float dX) {
+                View card = swipe_card(row);
+                View reveal = row.findViewById(R.id.swipe_reveal);
+                if ((card == null) || (reveal == null)) {
+                    return;
+                }
+
+                card.setTranslationX(dX);
+
+                View pin_icon = row.findViewById(R.id.swipe_reveal_pin_icon);
+                View unpin_icon = row.findViewById(R.id.swipe_reveal_unpin_icon);
+                if (dX > 0) {
+                    reveal.setBackgroundResource(R.drawable.swipe_reveal_pin_bg);
+                    if (pin_icon != null) { pin_icon.setVisibility(View.VISIBLE); }
+                    if (unpin_icon != null) { unpin_icon.setVisibility(View.GONE); }
+                } else if (dX < 0) {
+                    reveal.setBackgroundResource(R.drawable.swipe_reveal_unpin_bg);
+                    if (pin_icon != null) { pin_icon.setVisibility(View.GONE); }
+                    if (unpin_icon != null) { unpin_icon.setVisibility(View.VISIBLE); }
+                } else {
+                    reset_swipe_visuals(row);
+                }
+            }
+
+            // put the row back to its normal look: card in place, reveal hidden
+            private void reset_swipe_visuals(View row) {
+                View card = swipe_card(row);
+                if (card != null) {
+                    card.setTranslationX(0f);
+                }
+                View reveal = row.findViewById(R.id.swipe_reveal);
+                if (reveal != null) {
+                    reveal.setBackground(null);
+                }
+                View pin_icon = row.findViewById(R.id.swipe_reveal_pin_icon);
+                if (pin_icon != null) { pin_icon.setVisibility(View.GONE); }
+                View unpin_icon = row.findViewById(R.id.swipe_reveal_unpin_icon);
+                if (unpin_icon != null) { unpin_icon.setVisibility(View.GONE); }
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);

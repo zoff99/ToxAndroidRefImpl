@@ -612,6 +612,28 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
         return row;
     }
 
+    // true if both entries refer to the same friend/conference/group (or both are the separator).
+    // used by the swipe callback to verify that a live list rebuild did not swap another
+    // item into the swiped row while the gesture was running.
+    public static boolean same_item(CombinedFriendsAndConferences a, CombinedFriendsAndConferences b)
+    {
+        return item_key(a).equals(item_key(b));
+    }
+
+    // swipe pin/unpin step 1: temporarily remove the swiped row from the visible list.
+    // RecyclerView detaches the row view after the remove animation, which makes
+    // ItemTouchHelper reset all swipe visuals (so no swipe background can get stuck).
+    // step 2 is the normal rebuild (sort_items / bulk update): its keyed diff then
+    // re-inserts the item at its new position with a clean insert animation.
+    public void swipe_remove_visible(int position)
+    {
+        if ((position >= 0) && (position < this.friendlistitems.size()))
+        {
+            this.friendlistitems.remove(position);
+            this.notifyItemRemoved(position);
+        }
+    }
+
     public void sort_items()
     {
         try
