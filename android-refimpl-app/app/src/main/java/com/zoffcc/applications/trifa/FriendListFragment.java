@@ -51,6 +51,8 @@ import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ONE_HOUR_IN_MS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_PIN_THRESHOLD;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_UNPIN_THRESHOLD;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
 
 public class FriendListFragment extends Fragment
