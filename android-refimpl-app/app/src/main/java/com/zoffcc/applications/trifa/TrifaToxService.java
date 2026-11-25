@@ -1220,7 +1220,6 @@ public class TrifaToxService extends Service
             @Override
             public void run()
             {
-
                 tox_thread_starting_up = 0;
 
                 try
@@ -1231,1128 +1230,1160 @@ public class TrifaToxService extends Service
                 {
                 }
 
-                // ------ correct startup order ------
-                boolean old_is_tox_started = is_tox_started;
-                Log.i(TAG, "is_tox_started:==============================");
-                Log.i(TAG, "is_tox_started=" + is_tox_started);
-                Log.i(TAG, "is_tox_started:==============================");
-
-                // Register the modern network monitor as soon as the app starts
-                ConnectionManager.registerModernNetworkCallback(getApplicationContext());
-
-                is_tox_started = true;
-
-                Runnable myRunnable = new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        if (!global_toxid_text_set)
-                        {
-                            global_toxid_text_set = true;
-                            // MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + get_my_toxid());
-                        }
-                    }
-                };
-
-                if (main_handler_s != null)
-                {
-                    main_handler_s.post(myRunnable);
-                }
-
-                if (!old_is_tox_started)
-                {
-                    Log.i(TAG, "set_all_conferences_inactive:004");
-                    set_all_friends_offline();
-                    set_all_conferences_inactive();
-                    set_all_filetransfers_inactive();
-                    MainActivity.init_tox_callbacks();
-                    HelperGeneric.update_savedata_file_wrapper();
-                }
-                // ------ correct startup order ------
-
-                cache_pubkey_fnum.clear();
-                cache_fnum_pubkey.clear();
-                cache_confid_confnum.clear();
-
-                try
-                {
-                    orma.updateFriendList().ip_addr_str("").execute();
-                }
-                catch(Exception e)
-                {
-                }
-
-                tox_self_capabilites = tox_self_get_capabilities();
-                //Log.i(TAG, "tox_self_capabilites:" + tox_self_capabilites + " decoded:" +
-                //           TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(tox_self_capabilites)) + " " +
-                //           (1L << 63L));
-
-                // ----- convert old conference messages which did not contain a sent timestamp -----
-                try
-                {
-                    boolean need_migrate_old_conf_msg_date = true;
-
-                    if (get_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done") != null)
-                    {
-                        if (get_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done").equals("true"))
-                        {
-                            need_migrate_old_conf_msg_date = false;
-                        }
-                    }
-
-                    if (need_migrate_old_conf_msg_date == true)
-                    {
-                        try
-                        {
-                            orma.run_multi_sql(
-                                    "update ConferenceMessage set sent_timestamp=rcvd_timestamp" + " where " +
-                                    " sent_timestamp='0'");
-                            Log.i(TAG, "onCreate:migrate_old_conf_msg_date");
-                        }
-                        catch (Exception e)
-                        {
-                            Log.i(TAG, "onCreate:migrate_old_conf_msg_date:EE01");
-                        }
-                        // now remember that we did that, and don't do it again
-                        set_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done", "true");
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "onCreate:migrate_old_conf_msg_date:EE:" + e.getMessage());
-                }
-                // ----- convert old conference messages which did not contain a sent timestamp -----
-
-                // ----- convert old NULL's into false -----
-                try
-                {
-                    orma.run_multi_sql(
-                            "update ConferenceMessage set was_synced=false" + " where " + " was_synced is NULL");
-                    Log.i(TAG, "onCreate:migrate_was_synced");
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "onCreate:migrate_was_synced:EE01");
-                }
-                // ----- convert old NULL's into false -----
-
-                // ----- convert old NULL's into false -----
-                try
-                {
-                    orma.run_multi_sql(
-                            "update GroupDB set group_we_left=false" + " where " + " group_we_left is NULL");
-                    Log.i(TAG, "onCreate:migrate_group_we_left");
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                    Log.i(TAG, "onCreate:migrate_group_we_left:EE01");
-                }
-                // ----- convert old NULL's into false -----
-
-
-                // ----- convert old NULL's into 0 -----
-                try
-                {
-                    orma.run_multi_sql("update Message set sent_push='0' where sent_push is NULL");
-                    Log.i(TAG, "onCreate:sent_push");
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "onCreate:sent_push:EE01");
-                }
-                // ----- convert old NULL's into 0 -----
-
-                // ----- convert old NULL's into 0 -----
-                try
-                {
-                    orma.run_multi_sql(
-                            "update FriendList set msgv3_capability='0' where msgv3_capability is NULL");
-                    Log.i(TAG, "onCreate:msgv3_capability");
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "onCreate:msgv3_capability:EE01");
-                }
-                // ----- convert old NULL's into 0 -----
-
-                // ----- convert old NULL's into 0 -----
-                try
-                {
-                    orma.run_multi_sql(
-                            "update Message set filetransfer_kind='0' where filetransfer_kind is NULL");
-                    Log.i(TAG, "onCreate:filetransfer_kind");
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "onCreate:filetransfer_kind:EE01");
-                }
-                // ----- convert old NULL's into 0 -----
-
-                // ----- convert old NULL's into 0 -----
-                try
-                {
-                    orma.run_multi_sql(
-                            "update GroupMessage set TRIFA_SYNC_TYPE='0' where TRIFA_SYNC_TYPE is NULL");
-                    Log.i(TAG, "onCreate:TRIFA_SYNC_TYPE");
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "onCreate:TRIFA_SYNC_TYPE:EE01");
-                }
-                // ----- convert old NULL's into 0 -----
-
-                // ----- convert old NULL's into 0 -----
-                try
-                {
-                    orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_01_sent_timestamp='0' where tox_group_peer_pubkey_syncer_01_sent_timestamp is NULL");
-                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_01_sent_timestamp");
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_01_sent_timestamp:EE01");
-                }
-                try
-                {
-                    orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_02_sent_timestamp='0' where tox_group_peer_pubkey_syncer_02_sent_timestamp is NULL");
-                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_02_sent_timestamp");
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_02_sent_timestamp:EE01");
-                }
-                try
-                {
-                    orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_03_sent_timestamp='0' where tox_group_peer_pubkey_syncer_03_sent_timestamp is NULL");
-                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_03_sent_timestamp");
-                }
-                catch (Exception e)
-                {
-                    Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_03_sent_timestamp:EE01");
-                }
-                // ----- convert old NULL's into 0 -----
-
-
-                // TODO --------
-                String my_tox_id_local = get_my_toxid();
-                global_my_toxid = my_tox_id_local;
-                if (tox_self_get_name_size() > 0)
-                {
-                    String tmp_name = tox_self_get_name();
-                    if (tmp_name != null)
-                    {
-                        if (tmp_name.length() > 0)
-                        {
-                            global_my_name = tmp_name;
-                            // Log.i(TAG, "AAA:003:" + global_my_name + " size=" + tox_self_get_name_size());
-                        }
-                    }
-                }
-                else
-                {
-                    tox_self_set_name("TRIfA " + my_tox_id_local.substring(0, 4));
-                    global_my_name = ("TRIfA " + my_tox_id_local.substring(0, 4));
-                    Log.i(TAG, "AAA:005");
-                }
-
-                if (tox_self_get_status_message_size() > 0)
-                {
-                    String tmp_status = tox_self_get_status_message();
-                    if (tmp_status != null)
-                    {
-                        if (tmp_status.length() > 0)
-                        {
-                            global_my_status_message = tmp_status;
-                            // Log.i(TAG, "AAA:008:" + global_my_status_message + " size=" + tox_self_get_status_message_size());
-                        }
-                    }
-                }
-                else
-                {
-                    tox_self_set_status_message("this is TRIfA");
-                    global_my_status_message = "this is TRIfA";
-                    Log.i(TAG, "AAA:010");
-                }
-                Log.i(TAG, "AAA:011");
-
-                HelperGeneric.update_savedata_file_wrapper();
-
-                load_and_add_all_friends();
-
-                // HINT: keep this before the first bootstrapping, to also record that
-                last_bootstrap_me_real_ec = bootstrap_me_real_edge_count.get();
-
-                // --------------- bootstrap ---------------
-                // --------------- bootstrap ---------------
-                // --------------- bootstrap ---------------
-                if (!old_is_tox_started)
-                {
-                    bootstrapping = true;
-                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                    Log.i(TAG, "global_self_last_went_offline_timestamp[1]=" + global_self_last_went_offline_timestamp +
-                               " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
-                    Log.i(TAG, "bootrapping:set to true[1]");
-                    try
-                    {
-                        tox_notification_change(context_s, nmn2, 0, "", false); // set notification to "bootstrapping"
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    try
-                    {
-                        TrifaToxService.write_debug_file("STARTUP__start__bootstrapping");
-                        bootstrap_me(true);
-                        TrifaToxService.write_debug_file("STARTUP__finish__bootstrapping");
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                        Log.i(TAG, "bootstrap_me:001:EE:" + e.getMessage());
-                    }
-
-                    check_if_still_bootstrapping();
-                }
-
-                // --------------- bootstrap ---------------
-                // --------------- bootstrap ---------------
-                // --------------- bootstrap ---------------
-
-                long tox_iteration_interval_ms = tox_iteration_interval();
-                Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
-
-                MainActivity.tox_iterate();
-
-                if (ADD_BOTS_ON_STARTUP)
-                {
-                    boolean need_add_bots = true;
-
-                    try
-                    {
-                        if (get_g_opts("ADD_BOTS_ON_STARTUP_done") != null)
-                        {
-                            if (get_g_opts("ADD_BOTS_ON_STARTUP_done").equals("true"))
-                            {
-                                need_add_bots = false;
-                                Log.i(TAG, "need_add_bots=false");
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    if (need_add_bots)
-                    {
-                        Log.i(TAG, "need_add_bots:start");
-                        add_friend_real(ECHOBOT_TOXID);
-                        set_g_opts("ADD_BOTS_ON_STARTUP_done", "true");
-
-                        FriendList f_echobot = main_get_friend(ECHOBOT_TOXID.substring(0, 32 * 2).toUpperCase());
-                        if (f_echobot != null)
-                        {
-                            f_echobot.status_message = ECHOBOT_INIT_STATUSMSG;
-                            f_echobot.name = ECHOBOT_INIT_NAME;
-                            HelperFriend.update_friend_in_db_name(f_echobot);
-                            HelperFriend.update_friend_in_db_status_message(f_echobot);
-                            HelperFriend.update_single_friend_in_friendlist_view(f_echobot);
-                        }
-
-                        Log.i(TAG, "need_add_bots=true (INSERT)");
-                    }
-                }
-
-                // -------- add log friend --------
-                // -------- add log friend --------
-                // -------- add log friend --------
-                if (DEBUG_USE_LOGFRIEND)
-                {
-                    boolean need_add_log_pseudo_friend = true;
-                    try
-                    {
-                        if (get_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY) != null)
-                        {
-                            if (get_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY).equals("true"))
-                            {
-                                if (get_g_opts(LOGFRIEND_TOXID_DB_KEY) != null)
-                                {
-                                    if (get_g_opts(LOGFRIEND_TOXID_DB_KEY).length() > 2)
-                                    {
-                                        LOG_FRIEND_TOXID = get_g_opts(LOGFRIEND_TOXID_DB_KEY);
-                                        need_add_log_pseudo_friend = false;
-                                        Log.i(TAG, "need_add_log_pseudo_friend=false");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        e.printStackTrace();
-                    }
-
-                    if (need_add_log_pseudo_friend)
-                    {
-                        Log.i(TAG, "need_add_log_pseudo_friend:start");
-
-                        ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
-                        MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
-                        LOG_FRIEND_TOXID = bytebuffer_to_hexstring(hash_bytes, true);
-                        if (LOG_FRIEND_TOXID == null)
-                        {
-                            del_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY);
-                            del_g_opts(LOGFRIEND_TOXID_DB_KEY);
-                            Log.i(TAG, "need_add_log_pseudo_friend:some error generating the ID for log_pseudo_friend");
-                        }
-                        else
-                        {
-                            Log.i(TAG, "need_add_log_pseudo_friend:LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID + " len=" +
-                                       LOG_FRIEND_TOXID.length());
-                            add_friend_real_norequest(LOG_FRIEND_TOXID);
-                            set_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY, "true");
-                            set_g_opts(LOGFRIEND_TOXID_DB_KEY, LOG_FRIEND_TOXID);
-                            // Log.i(TAG, "need_add_log_pseudo_friend:get:" + LOG_FRIEND_TOXID + " :: " + (LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase()));
-                            FriendList f_log_friend = main_get_friend(
-                                    LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase());
-                            if (f_log_friend != null)
-                            {
-                                f_log_friend.status_message = LOG_FRIEND_INIT_STATUSMSG;
-                                f_log_friend.name = LOG_FRIEND_INIT_NAME;
-                                HelperFriend.update_friend_in_db_name(f_log_friend);
-                                HelperFriend.update_friend_in_db_status_message(f_log_friend);
-                                HelperFriend.update_single_friend_in_friendlist_view(f_log_friend);
-                                Log.i(TAG, "need_add_log_pseudo_friend=update meta data");
-                            }
-                            Log.i(TAG, "need_add_log_pseudo_friend=true (INSERT)");
-                            append_logger_msg("need_add_log_pseudo_friend=true (INSERT)");
-                        }
-                    }
-                    else
-                    {
-                        if ((LOG_FRIEND_TOXID != null) && (LOG_FRIEND_TOXID.length() > 2))
-                        {
-                            add_friend_real_norequest(LOG_FRIEND_TOXID);
-                            FriendList f_log_friend = main_get_friend(
-                                    LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase());
-                            if (f_log_friend != null)
-                            {
-                                f_log_friend.status_message = LOG_FRIEND_INIT_STATUSMSG;
-                                f_log_friend.name = LOG_FRIEND_INIT_NAME;
-                                HelperFriend.update_friend_in_db_name(f_log_friend);
-                                HelperFriend.update_friend_in_db_status_message(f_log_friend);
-                                HelperFriend.update_single_friend_in_friendlist_view(f_log_friend);
-                                Log.i(TAG, "need_add_log_pseudo_friend=update meta data");
-                            }
-                            Log.i(TAG, "need_add_log_pseudo_friend=true (refresh)");
-                        }
-                    }
-                }
-                // -------- add log friend --------
-                // -------- add log friend --------
-                // -------- add log friend --------
-
-                try
-                {
-                    load_and_add_all_conferences();
-                }
-                catch (Exception e)
-                {
-                }
-
-                try
-                {
-                    load_and_add_all_groups();
-                }
-                catch (Exception e)
-                {
-                }
-
-                global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
-                global_last_activity_for_battery_savings_reason = "TOX_SERIVCE_START";
-
-                global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp +
-                           " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
-
-                int current_health_init = tox_self_get_network_health();
-                String health_text_init = ToxVars.TOX_NETWORK_HEALTH.value_str(current_health_init).replace("TOX_NETWORK_HEALTH_", "");
-                append_logger_msg(TAG + "::" + "network health initial value: " + current_health_init + " (" + health_text_init + ")");
-                try
-                {
-                    updateToxHealthUI(current_health_init);
-                }
-                catch(Exception e)
-                {
-                }
-
-                int current_gc_health_init = tox_group_get_health();
-                String gc_health_text_init = ToxVars.TOX_GROUP_HEALTH.value_str(current_gc_health_init).replace("TOX_GROUP_HEALTH_", "");
-                append_logger_msg(TAG + "::" + "gc health initial value: " + current_gc_health_init + " (" + gc_health_text_init + ")");
-
-                long stats_last_history_ms = 0;
-
-                // [ADDED] Track when we last checked network health
-                long last_health_check_ms = 0;
-                int last_network_health = current_health_init;
-                int last_gc_health = current_gc_health_init;
-
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                append_logger_msg(TAG + "::" + "tox main loop START");
-                tox_thread_starting_up = 1;
-
-                tox_startup_timestamp = System.currentTimeMillis();
-
-                // [ADDED] Tracking variables for iteration vs sleep stats
-                stats_time_tox_not_iterating_ms = 0;
-                last_awake_start_time_ms = System.currentTimeMillis();
-                long stats_time_tox_iterating_ms = 0;
-                long stats_last_log_ms = System.currentTimeMillis();
-
-                // [ADDED] Tracking variables for iteration vs sleep stats
-                stats_time_tox_not_iterating_ms = 0;
-                last_awake_start_time_ms = System.currentTimeMillis();
-
-                // [ADDED] Tracking variables for fast iteration warning
-                long fast_iteration_start_ms = 0;
-                boolean fast_iteration_logged = false;
-
-                // [ADDED] "fast start" boost: iterate every 20ms for the first
-                // 20 seconds after the main loop starts, so we get online and
-                // catch up with the network quickly. the same boost is also
-                // started after a long battery saving sleep (see below).
-                // fast_iteration_until_ms = the time when the boost ends.
-                long fast_iteration_until_ms = System.currentTimeMillis() + FAST_START_DURATION_MS;
-
-                no_internet_last_ec = no_internet_edge_count.get();
-                no_internet_prev_offline = !HAVE_INTERNET_CONNECTIVITY;
-
-                while (!stop_me)
-                {
-                    long iteration_start_ms = System.currentTimeMillis(); // [ADDED] Track loop start
-
-                    if (tox_iteration_interval_ms < 2)
-                    {
-                        tox_iteration_interval_ms = 2;
-                    }
-
-                    try
-                    {
-                        if ((PREF__X_battery_saving_mode) && (battery_saving_can_sleep()))
-                        {
-                            need_wakeup_now = false;
-                            trifa_service_thread = Thread.currentThread();
-
-                            BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
-                            append_logger_msg(TAG + "::" + "entering BATTERY SAVINGS MODE ... BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS=" + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS);
-
-                            append_logger_msg(TAG + "::" + "setting alarm ...");
-                            set_alarm_for_battery_saving_sleep();
-
-                            tox_notification_change_wrapper(TOX_CONNECTION_NONE.value, "", true);
-                            set_all_friends_offline();
-                            set_all_conferences_inactive();
-                            global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                            global_self_connection_status = TOX_CONNECTION_NONE.value;
-
-                            try { updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
-                            try { updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
-
-                            long sleep_in_sec = BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
-                            // add some random value, so that the sleep is not always exactly the same
-                            sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
-                            sleep_in_sec = sleep_in_sec / 1000;
-                            append_logger_msg(TAG + "::" + "entering BATTERY SAVINGS MODE ... sleep for " + (sleep_in_sec) + "s");
-
-                            // Mark the time we start sleeping
-                            battery_sleep_start_ms = System.currentTimeMillis();
-                            HelperGeneric.battery_sleep_log_add("SLEEP_ENTER:target=" + (sleep_in_sec) + "s");
-
-                            try { updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
-                            try { updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
-
-                            String wakeup_reason = "SCHED_FULL"; // loop ran to completion = scheduled sleep finished
-                            boolean ended_early = false;
-
-                            Thread.interrupted(); // clear stale interrupt flag BEFORE sleeping
-
-                            if ((global_showing_messageview) || (global_showing_anygroupview))
-                            {
-                                wakeup_reason = global_showing_messageview ? "UI_MSGVIEW" : "UI_GROUPVIEW";
-                                request_wakeup(wakeup_reason); // flag only, NO self-interrupt
-                                ended_early = true;
-                            }
-                            else if (need_wakeup_now)
-                            {
-                                wakeup_reason = (wakeup_trigger_reason == null || wakeup_trigger_reason.isEmpty())
-                                        ? "TRIG_EARLY" : wakeup_trigger_reason;
-                                ended_early = true;
-                            }
-                            else
-                            {
-                                try { updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
-                                try { updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
-                                try
-                                {
-                                    Thread.sleep(sleep_in_sec * 1000); // android OS freezes CPU here
-                                }
-                                catch (Exception es)
-                                {
-                                    String r2 = battery_saving_must_wake_reason();
-                                    wakeup_reason = (r2 != null) ? r2
-                                            : ("INT:" + es.getClass().getSimpleName()
-                                               + (es.getMessage() != null ? (":" + es.getMessage()) : ""));
-                                    ended_early = true;
-                                }
-                            }
-
-                            // how long did the battery saving sleep actually last?
-                            long battery_sleep_duration_ms = System.currentTimeMillis() - battery_sleep_start_ms;
-
-                            // ---- SINGLE EXIT: every path is recorded ----
-                            record_sleep_interval_now(wakeup_reason, ended_early);
-
-                            // if battery saving lasted at least 5 minutes, start the
-                            // "fast start" boost: iterate every 20ms for 20 seconds
-                            if (battery_sleep_duration_ms >= FAST_START_MIN_BATTERY_SLEEP_MS)
-                            {
-                                fast_iteration_until_ms = System.currentTimeMillis() + FAST_START_DURATION_MS;
-                            }
-                            wakeup_trigger_reason = "";
-                            need_wakeup_now = false;
-                            trifa_service_thread = null;
-
-                            long t0 = System.nanoTime() / 1_000_000;
-                            update_friends_and_groups();
-                            long t1 = System.nanoTime() / 1_000_000;
-                            if ((t1 - t0) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=update_friends_and_groups|dur=" + (t1 - t0) + "ms");
-
-
-                            int TOX_CONNECTION_a = tox_self_get_connection_status();
-                            global_self_connection_status = TOX_CONNECTION_a;
-                            bootstrapping = true;
-                            global_self_last_went_offline_timestamp = System.currentTimeMillis();
-                            tox_notification_change_wrapper(TOX_CONNECTION_a, "");
-
-                            long t2 = System.nanoTime() / 1_000_000;
-                            bootstrap_me(true);
-                            long t3 = System.nanoTime() / 1_000_000;
-                            if ((t3 - t2) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=bootstrap_me|dur=" + (t3 - t2) + "ms");
-
-                            long t4 = System.nanoTime() / 1_000_000;
-                            tox_iterate();
-                            long t5 = System.nanoTime() / 1_000_000;
-                            if ((t5 - t4) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=tox_iterate_post_sleep|dur=" + (t5 - t4) + "ms");
-
-                            check_if_still_bootstrapping();
-                            // NO break / NO continue: loop iterates normally
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        // Marker != 0  => exception hit AFTER sleep began but BEFORE (or during)
-                        // recording -> close and record the (possibly partial) interval now,
-                        // so the slept time is never lost.
-                        // Marker == 0  => exception hit either BEFORE sleep started (nothing
-                        // to record) or AFTER recording (already recorded) -> do nothing.
-                        if (battery_sleep_start_ms != 0)
-                        {
-                            record_sleep_interval_now("LOOP_EXCEPT", true);
-                        }
-
-                        String r3 = battery_saving_must_wake_reason();
-                        String info = "LOOP_EXCEPT:" + ((r3 != null) ? r3 : "UNKNOWN") +
-                                      "|need_wakeup=" + need_wakeup_now +
-                                      "|trig=" + wakeup_trigger_reason;
-                        append_logger_msg(TAG + "::" + info);
-                        HelperGeneric.battery_sleep_log_add(info);
-                        int TOX_CONNECTION_a = tox_self_get_connection_status();
-                        tox_notification_change_wrapper(TOX_CONNECTION_a, "");
-                        battery_sleep_start_ms = 0; // belt & braces (helper already cleared it)
-                    }
-
-                    // "fast start" boost active? then iterate every 20ms.
-                    // Math.min() keeps an interval that is already faster
-                    // (for example 5ms during a call), it never slows things down.
-                    // when the boost time is over, the normal interval (computed
-                    // at the end of every loop iteration) is used again automatically.
-                    if (System.currentTimeMillis() < fast_iteration_until_ms)
-                    {
-                        tox_iteration_interval_ms = Math.min(tox_iteration_interval_ms, FAST_START_ITERATE_INTERVAL_MS);
-                    }
-
-                    try
-                    {
-                        Thread.sleep(tox_iteration_interval_ms);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        String r3 = battery_saving_must_wake_reason();
-                        String info = "LOOP_INT2:" + ((r3 != null) ? r3 : "UNKNOWN") +
-                                      "|need_wakeup=" + need_wakeup_now +
-                                      "|trig=" + wakeup_trigger_reason;
-                        append_logger_msg(TAG + "::" + info);
-                        HelperGeneric.battery_sleep_log_add(info);
-                    }
-                    catch (Exception e)
-                    {
-                        String r3 = battery_saving_must_wake_reason();
-                        String info = "LOOP_EXCEPT2:" + ((r3 != null) ? r3 : "UNKNOWN") +
-                                      "|need_wakeup=" + need_wakeup_now +
-                                      "|trig=" + wakeup_trigger_reason;
-                        append_logger_msg(TAG + "::" + info);
-                        HelperGeneric.battery_sleep_log_add(info);
-                    }
-
-                    // HINT: always reset the values on every loop ----------
-                    need_wakeup_now = false;
-                    trifa_service_thread = null;
-                    // HINT: always reset the values on every loop ----------
-
-                    // [ADDED] Check for sustained fast iteration (< xx ms)
-                    if (tox_iteration_interval_ms < FAST_ITERATION_THRESHOLD_MS)
-                    {
-                        if (fast_iteration_start_ms == 0)
-                        {
-                            fast_iteration_start_ms = System.currentTimeMillis();
-                        }
-                        else
-                        {
-                            long fast_duration_ms = System.currentTimeMillis() - fast_iteration_start_ms;
-                            // Trigger warning if it stays < xx ms for yy continuous seconds
-                            if (fast_duration_ms >= FAST_ITERATION_THRESHOLD_DURATION_MS && !fast_iteration_logged)
-                            {
-                                String info = "FAST_ITER_WARNING: interval=" + tox_iteration_interval_ms + "ms sustained for " + fast_duration_ms + "ms";
-                                append_logger_msg(TAG + "::" + info);
-                                HelperGeneric.battery_sleep_log_add(info);
-                                fast_iteration_logged = true; // Prevent log spam
-                            }
-                        }
-                    }
-                    else
-                    {
-                        if (fast_iteration_start_ms != 0)
-                        {
-                            long fast_duration_ms = System.currentTimeMillis() - fast_iteration_start_ms;
-                            if (fast_iteration_logged)
-                            {
-                                String info = "FAST_ITER_WARNING_END: fast interval lasted " + fast_duration_ms + "ms";
-                                append_logger_msg(TAG + "::" + info);
-                                HelperGeneric.battery_sleep_log_add(info);
-                            }
-                            fast_iteration_start_ms = 0;
-                            fast_iteration_logged = false;
-                        }
-                    }
-
-                    // --- CONTINUOUS NETWORK BURST DETECTION (Checked every x seconds) ---
-                    long current_time_ms_net = System.currentTimeMillis();
-                    if ((current_time_ms_net - last_netprof_check_ms) >= (NETWORK_SPEED_SAMPLE_EVERY_SECONDS * 1000)) {
-                        last_netprof_check_ms = current_time_ms_net;
-
-                        long total_bytes_now = MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_SENT.value) +
-                                               MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_SENT.value) +
-                                               MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_RECV.value) +
-                                               MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_RECV.value);
-
-                        if (last_netprof_ts > 0) {
-                            long delta_bytes = total_bytes_now - last_netprof_bytes;
-                            long delta_ms = current_time_ms_net - last_netprof_ts;
-
-                            if (delta_ms > 0 && delta_bytes > 0) {
-                                long current_bytes_per_second = (delta_bytes * 1000) / delta_ms;
-
-                                // Log.i(TAG, "NNNNNNNN: " + current_bytes_per_second + " " + delta_bytes + " " + delta_ms);
-                                // If threshold is reached at ANY time, latch it to true for the 1-minute window
-                                if (current_bytes_per_second > (HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES * 1024)) {
-                                    high_network_activity_this_minute = true;
-                                }
-                            }
-                        }
-                        // Keep the old value for the next sample period
-                        last_netprof_bytes = total_bytes_now;
-                        last_netprof_ts = current_time_ms_net;
-                    }
-
-                    try
-                    {
-                        // [ADDED] Record 1-minute App State History
-                        long current_time_ms2 = System.currentTimeMillis();
-                        if ((current_time_ms2 - stats_last_history_ms) >= MINUTE_IN_MILLIS)
-                        {
-                            long t_hist_start = System.nanoTime() / 1_000_000;
-
-                            long window_start = stats_last_history_ms;
-                            stats_last_history_ms = current_time_ms2;
-
-                            // --- 3. EVALUATE ALL STATES INDEPENDENTLY ---
-                            long now = System.currentTimeMillis();
-
-                            // Clear ALL state tracks for this minute first to ensure clean data
-                            for (int s = 0; s < app_state_histories.length; s++) {
-                                app_state_histories[s][app_state_history_index] = false;
-                            }
-
-                            // Evaluate each state independently. Multiple states can be true simultaneously.
-                            if (fast_iteration_logged) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_ITERATE_FAST.value][app_state_history_index] = true;
-                            }
-
-                            if (Callstate.state != 0) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_CALL_1ON1.value][app_state_history_index] = true;
-                            }
-
-                            if (Callstate.audio_group_active || Callstate.audio_ngc_group_active) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_CALL_GROUP.value][app_state_history_index] = true;
-                            }
-
-                            if (global_last_activity_outgoung_ft_ts > window_start) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_OUT.value][app_state_history_index] = true;
-                            }
-
-                            if (global_last_activity_incoming_ft_ts > window_start) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_IN.value][app_state_history_index] = true;
-                            }
-
-                            if (global_last_activity_for_FRIEND_MSG_INCOMING_ts > window_start) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_FRIEND_MSG_INCOMING.value][app_state_history_index] = true;
-                            }
-
-                            if (global_last_activity_for_GROUP_MSG_INCOMING_ts > window_start) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_GROUP_MSG_INCOMING.value][app_state_history_index] = true;
-                            }
-
-                            if (high_network_activity_this_minute) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_HIGH_NETWORK_ACTIVITY.value][app_state_history_index] = true;
-                            }
-                            // Reset the latch for the next 1-minute window
-                            high_network_activity_this_minute = false;
-
-                            int bootstrap_ec = bootstrap_me_real_edge_count.get();
-                            if (bootstrap_ec != last_bootstrap_me_real_ec) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_BOOTSTRAPPING.value][app_state_history_index] = true;
-                                last_bootstrap_me_real_ec = bootstrap_ec;
-                            }
-
-                            if (global_showing_messageview || global_showing_anygroupview) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_UI_FOREGROUND.value][app_state_history_index] = true;
-                            }
-
-                            if (!HelperGeneric.battery_saving_can_sleep() && PREF__X_battery_saving_mode) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_AWAKE_COOLDOWN.value][app_state_history_index] = true;
-                            }
-
-                            // Connection states are mutually exclusive, but we still use independent assignment
-                            if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_UDP.value) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_ONLINE_UDP.value][app_state_history_index] = true;
-                            } else if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_ONLINE_TCP.value][app_state_history_index] = true;
-                            } else if (!HAVE_INTERNET_CONNECTIVITY) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.value][app_state_history_index] = true;
-                            } else if (global_self_connection_status == TOX_CONNECTION_NONE.value) {
-                                app_state_histories[TRIFAGlobals.APP_STATE.STATE_OFFLINE_IDLE.value][app_state_history_index] = true;
-                            }
-
-                            // --- CAPTURE NETWORK TRANSPORT LATCHES ---
-                            // Trip the latch for the CURRENT state.
-                            // This solves the "stayed in the same state for 3 minutes straight" problem.
-                            ConnectionManager.trip_latch_for_current_state();
-
-                            // Clear all transport tracks for this minute first
-                            for (int t = 0; t < app_transport_histories.length; t++) {
-                                app_transport_histories[t][app_state_history_index] = false;
-                            }
-
-                            // Read the latches into the transport history array
-                            app_transport_histories[ConnectionManager.NetworkTransportType.WIFI_NET.value][app_state_history_index] = ConnectionManager.latch_wifi_net;
-                            app_transport_histories[ConnectionManager.NetworkTransportType.MOBILE_NET.value][app_state_history_index] = ConnectionManager.latch_mobile_net;
-                            app_transport_histories[ConnectionManager.NetworkTransportType.MOBILE_BAD.value][app_state_history_index] = ConnectionManager.latch_mobile_bad;
-                            app_transport_histories[ConnectionManager.NetworkTransportType.NO_NET.value][app_state_history_index] = ConnectionManager.latch_no_net;
-                            app_transport_histories[ConnectionManager.NetworkTransportType.FALLBACK_ASSUME_CONNECTED.value][app_state_history_index] = ConnectionManager.latch_fallback;
-
-                            // Reset the latches for the next 1-minute window
-                            ConnectionManager.latch_wifi_net = false;
-                            ConnectionManager.latch_mobile_net = false;
-                            ConnectionManager.latch_mobile_bad = false;
-                            ConnectionManager.latch_no_net = false;
-                            ConnectionManager.latch_fallback = false;
-                            // -----------------------------------------
-
-                            // --- 4. WRITE TO RING BUFFER ---
-                            // 1. Write timestamp to the CURRENT index
-                            app_state_history_ts[app_state_history_index] = current_time_ms2;
-
-                            // 2. Lock-free no-internet latch (writes to the SAME CURRENT index)
-                            int ec = TrifaToxService.no_internet_edge_count.get();
-                            boolean cur_off = !HAVE_INTERNET_CONNECTIVITY;
-                            no_internet_history[app_state_history_index] =
-                                    no_internet_prev_offline || cur_off || (ec != no_internet_last_ec);
-                            no_internet_last_ec = ec;
-                            no_internet_prev_offline = cur_off;
-
-                            // 3. Advance index ONCE at the very end
-                            app_state_history_index = (app_state_history_index + 1) % HISTORY_SIZE;
-                            if (app_state_history_count < HISTORY_SIZE) app_state_history_count++;
-                            app_state_last_record_ts = current_time_ms2;
-
-                            long t_hist_end = System.nanoTime() / 1_000_000;
-                            if ((t_hist_end - t_hist_start) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=1min_history_record|dur=" + (t_hist_end - t_hist_start) + "ms");
-                        }
-                    }
-                    catch(Exception ignored)
-                    {
-                    }
-
-                    long t_bs = System.nanoTime() / 1_000_000;
-                    check_if_need_bootstrap_again();
-                    long t_bs_end = System.nanoTime() / 1_000_000;
-                    if ((t_bs_end - t_bs) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=check_if_need_bootstrap_again|dur=" + (t_bs_end - t_bs) + "ms");
-
-                    long t_iter = System.nanoTime() / 1_000_000;
-                    MainActivity.tox_iterate();
-                    long t_iter_end = System.nanoTime() / 1_000_000;
-                    if ((t_iter_end - t_iter) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=tox_iterate_main|dur=" + (t_iter_end - t_iter) + "ms");
-
-                    // [ADDED] Check network health every 3 seconds
-                    long current_time_ms = System.currentTimeMillis();
-                    if ((current_time_ms - last_health_check_ms) >= 3000)
-                    {
-                        last_health_check_ms = current_time_ms;
-                        long t_hc = System.nanoTime() / 1_000_000;
-
-                        try
-                        {
-                            int current_health = tox_self_get_network_health();
-
-                            if (current_health != last_network_health)
-                            {
-                                String health_text = ToxVars.TOX_NETWORK_HEALTH.value_str(current_health).replace("TOX_NETWORK_HEALTH_", "");
-                                append_logger_msg(TAG + "::" + "network health changed: " + last_network_health + " -> " + current_health + " (" + health_text + ")");
-                                last_network_health = current_health;
-
-                                try
-                                {
-                                    updateToxHealthUI(current_health);
-                                }
-                                catch(Exception e)
-                                {
-                                }
-                            }
-
-                            int current_gc_health = tox_group_get_health();
-
-                            if (current_gc_health != last_gc_health)
-                            {
-                                String gc_health_text = ToxVars.TOX_GROUP_HEALTH.value_str(current_gc_health).replace("TOX_GROUP_HEALTH_", "");
-                                append_logger_msg(TAG + "::" + "gc health changed: " + last_gc_health + " -> " + current_gc_health + " (" + gc_health_text + ")");
-                                last_gc_health = current_gc_health;
-
-                                try
-                                {
-                                    updateToxGcHealthUI(current_gc_health);
-                                }
-                                catch(Exception e)
-                                {
-                                }
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            append_logger_msg(TAG + "::" + "error checking network health: " + e.getMessage());
-                        }
-
-                        long t_hc_end = System.nanoTime() / 1_000_000;
-                        if ((t_hc_end - t_hc) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=health_check|dur=" + (t_hc_end - t_hc) + "ms");
-                    }
-
-                    if ((Callstate.state != 0) || (Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
-                    {
-                        if ((Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
-                        {
-                            tox_iteration_interval_ms = 5; // if we are in a group audio call iterate more often
-                        }
-                        else
-                        {
-                            tox_iteration_interval_ms = 10; // if we are in a video/audio call iterate more often
-                        }
-                    }
-                    else
-                    {
-                        if (global_last_activity_outgoung_ft_ts > -1)
-                        {
-                            if ((global_last_activity_outgoung_ft_ts + 200) > System.currentTimeMillis())
-                            {
-                                // iterate faster if outgoing filetransfers are active
-                                tox_iteration_interval_ms = 5;
-                            }
-                            else
-                            {
-                                tox_iteration_interval_ms = Math.max(TOX_MIN_NORMAL_ITERATE_DELTA_MS, MainActivity.tox_iteration_interval());
-                            }
-                        }
-                        else if (global_last_activity_incoming_ft_ts > -1)
-                        {
-                            if ((global_last_activity_incoming_ft_ts + 200) > System.currentTimeMillis())
-                            {
-                                // iterate faster if incoming filetransfers are active
-                                tox_iteration_interval_ms = 5;
-                            }
-                            else
-                            {
-                                tox_iteration_interval_ms = Math.max(TOX_MIN_NORMAL_ITERATE_DELTA_MS, MainActivity.tox_iteration_interval());
-                            }
-                        }
-                        else
-                        {
-                            tox_iteration_interval_ms = Math.max(TOX_MIN_NORMAL_ITERATE_DELTA_MS, MainActivity.tox_iteration_interval());
-                        }
-
-                        /*
-                        // [ADDED] Apply health-based throttling on top of the computed interval
-                        // This only applies when NOT in active calls or file transfers
-                        int health = MainActivity.tox_self_get_network_health();
-                        switch (health) {
-                            case TOX_NETWORK_HEALTH_BAD:
-                                // BAD: 2 seconds max to let radio idle
-                                tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 2000);
-                                break;
-                            case TOX_NETWORK_HEALTH_POOR:
-                                // POOR: 1 second max
-                                tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 1000);
-                                break;
-                            case TOX_NETWORK_HEALTH_FAIR:
-                                // FAIR: 500ms max
-                                tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 500);
-                                break;
-                            default:
-                                // EXCELLENT, GOOD, UNKNOWN: use computed interval as-is
-                                break;
-                        }
-                         */
-                    }
-
-                    if (global_self_connection_status != TOX_CONNECTION_NONE.value)
-                    {
-                        long t_msg = System.nanoTime() / 1_000_000;
-                        send_or_resend_pending_messages();
-                        long t_msg_end = System.nanoTime() / 1_000_000;
-                        if ((t_msg_end - t_msg) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=send_or_resend_pending_messages|dur=" + (t_msg_end - t_msg) + "ms");
-                    }
-                    if (global_self_connection_status != TOX_CONNECTION_NONE.value)
-                    {
-                        long t_ft = System.nanoTime() / 1_000_000;
-                        start_queued_filetransfers();
-                        long t_ft_end = System.nanoTime() / 1_000_000;
-                        if ((t_ft_end - t_ft) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=start_queued_filetransfers|dur=" + (t_ft_end - t_ft) + "ms");
-                    }
-
-                    long iteration_end_ms = System.currentTimeMillis();
-                    stats_time_tox_iterating_ms += (iteration_end_ms - iteration_start_ms);
-                    long stats_total_time_ms = stats_time_tox_iterating_ms + stats_time_tox_not_iterating_ms;
-
-                    if ((iteration_end_ms - stats_last_log_ms) >= 60000) // Log summary every 60 seconds
-                    {
-                        stats_last_log_ms = iteration_end_ms;
-
-                        double percent_not_iterating = 0.0;
-                        if (stats_total_time_ms > 0) {
-                            percent_not_iterating = (stats_time_tox_not_iterating_ms * 100.0) / stats_total_time_ms;
-                        }
-
-                        String human_not_iterating = formatDuration(stats_time_tox_not_iterating_ms);
-                        String human_total = formatDuration(stats_total_time_ms);
-
-                        /*
-                        append_logger_msg(TAG + "::" + "Tox_Loop_Stats: Sleeping (Not iterating): "
-                                          + human_not_iterating
-                                          + " (" + String.format("%.2f", percent_not_iterating) + "%) | Total Uptime: "
-                                          + human_total);
-                         */
-                    }
-                }
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-                // ------- MAIN TOX LOOP ---------------------------------------------------------------
-
-                append_logger_msg(TAG + "::" + "tox main loop stop");
-
-                tox_thread_starting_up = 2;
-                tox_startup_timestamp = -1L;
-
-                // Clean up the callback when the app is fully closed
-                ConnectionManager.unregisterModernNetworkCallback(getApplicationContext());
-
-                try
-                {
-                    Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    NativeAudio.shutdownEngine();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    // this stops Tox
-                    MainActivity.tox_kill();
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value);
-                }
-                catch(Exception e)
-                {
-                }
-
-                try
-                {
-                    updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value);
-                }
-                catch(Exception e)
-                {
-                }
-
-                //Log.i(TAG, "VFS:detachThread:(TrifaToxService):" + Thread.currentThread().getId() + ":" +
-                //           Thread.currentThread().getName());
-                //vfs.detachThread();
-                //Log.i(TAG, "VFS:detachThread:(TrifaToxService):OK");
+                // the tox thread runs 3 phases, one after the other:
+                long initial_iteration_interval_ms = tox_thread_startup(); // phase 1: prepare everything
+                tox_main_loop(initial_iteration_interval_ms);              // phase 2: iterate until stopped
+                tox_thread_shutdown();                                     // phase 3: clean up
             }
         };
 
         ToxServiceThread.start();
+    }
+
+    // phase 1 of the tox thread: prepare everything before the main loop runs.
+    // returns the initial tox iteration interval in milliseconds.
+    private long tox_thread_startup()
+    {
+        // ------ correct startup order ------
+        boolean old_is_tox_started = is_tox_started;
+        Log.i(TAG, "is_tox_started:==============================");
+        Log.i(TAG, "is_tox_started=" + is_tox_started);
+        Log.i(TAG, "is_tox_started:==============================");
+
+        // Register the modern network monitor as soon as the app starts
+        ConnectionManager.registerModernNetworkCallback(getApplicationContext());
+
+        is_tox_started = true;
+
+        Runnable myRunnable = new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                if (!global_toxid_text_set)
+                {
+                    global_toxid_text_set = true;
+                    // MainActivity.mt.setText(MainActivity.mt.getText() + "\n" + "my_ToxId=" + get_my_toxid());
+                }
+            }
+        };
+
+        if (main_handler_s != null)
+        {
+            main_handler_s.post(myRunnable);
+        }
+
+        if (!old_is_tox_started)
+        {
+            Log.i(TAG, "set_all_conferences_inactive:004");
+            set_all_friends_offline();
+            set_all_conferences_inactive();
+            set_all_filetransfers_inactive();
+            MainActivity.init_tox_callbacks();
+            HelperGeneric.update_savedata_file_wrapper();
+        }
+        // ------ correct startup order ------
+
+        cache_pubkey_fnum.clear();
+        cache_fnum_pubkey.clear();
+        cache_confid_confnum.clear();
+
+        try
+        {
+            orma.updateFriendList().ip_addr_str("").execute();
+        }
+        catch(Exception e)
+        {
+        }
+
+        tox_self_capabilites = tox_self_get_capabilities();
+        //Log.i(TAG, "tox_self_capabilites:" + tox_self_capabilites + " decoded:" +
+        //           TOX_CAPABILITY_DECODE_TO_STRING(TOX_CAPABILITY_DECODE(tox_self_capabilites)) + " " +
+        //           (1L << 63L));
+
+        // one-time database migrations (each step is independent)
+        migrate_old_db_values();
+
+        // TODO --------
+        String my_tox_id_local = get_my_toxid();
+        global_my_toxid = my_tox_id_local;
+        if (tox_self_get_name_size() > 0)
+        {
+            String tmp_name = tox_self_get_name();
+            if (tmp_name != null)
+            {
+                if (tmp_name.length() > 0)
+                {
+                    global_my_name = tmp_name;
+                    // Log.i(TAG, "AAA:003:" + global_my_name + " size=" + tox_self_get_name_size());
+                }
+            }
+        }
+        else
+        {
+            tox_self_set_name("TRIfA " + my_tox_id_local.substring(0, 4));
+            global_my_name = ("TRIfA " + my_tox_id_local.substring(0, 4));
+            Log.i(TAG, "AAA:005");
+        }
+
+        if (tox_self_get_status_message_size() > 0)
+        {
+            String tmp_status = tox_self_get_status_message();
+            if (tmp_status != null)
+            {
+                if (tmp_status.length() > 0)
+                {
+                    global_my_status_message = tmp_status;
+                    // Log.i(TAG, "AAA:008:" + global_my_status_message + " size=" + tox_self_get_status_message_size());
+                }
+            }
+        }
+        else
+        {
+            tox_self_set_status_message("this is TRIfA");
+            global_my_status_message = "this is TRIfA";
+            Log.i(TAG, "AAA:010");
+        }
+        Log.i(TAG, "AAA:011");
+
+        HelperGeneric.update_savedata_file_wrapper();
+
+        load_and_add_all_friends();
+
+        // HINT: keep this before the first bootstrapping, to also record that
+        last_bootstrap_me_real_ec = bootstrap_me_real_edge_count.get();
+
+        // --------------- bootstrap ---------------
+        // --------------- bootstrap ---------------
+        // --------------- bootstrap ---------------
+        if (!old_is_tox_started)
+        {
+            bootstrapping = true;
+            global_self_last_went_offline_timestamp = System.currentTimeMillis();
+            Log.i(TAG, "global_self_last_went_offline_timestamp[1]=" + global_self_last_went_offline_timestamp +
+                       " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
+            Log.i(TAG, "bootrapping:set to true[1]");
+            try
+            {
+                tox_notification_change(context_s, nmn2, 0, "", false); // set notification to "bootstrapping"
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            try
+            {
+                TrifaToxService.write_debug_file("STARTUP__start__bootstrapping");
+                bootstrap_me(true);
+                TrifaToxService.write_debug_file("STARTUP__finish__bootstrapping");
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                Log.i(TAG, "bootstrap_me:001:EE:" + e.getMessage());
+            }
+
+            check_if_still_bootstrapping();
+        }
+
+        // --------------- bootstrap ---------------
+        // --------------- bootstrap ---------------
+        // --------------- bootstrap ---------------
+
+        long tox_iteration_interval_ms = tox_iteration_interval();
+        Log.i(TAG, "tox_iteration_interval_ms=" + tox_iteration_interval_ms);
+
+        MainActivity.tox_iterate();
+
+        if (ADD_BOTS_ON_STARTUP)
+        {
+            boolean need_add_bots = true;
+
+            try
+            {
+                if (get_g_opts("ADD_BOTS_ON_STARTUP_done") != null)
+                {
+                    if (get_g_opts("ADD_BOTS_ON_STARTUP_done").equals("true"))
+                    {
+                        need_add_bots = false;
+                        Log.i(TAG, "need_add_bots=false");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            if (need_add_bots)
+            {
+                Log.i(TAG, "need_add_bots:start");
+                add_friend_real(ECHOBOT_TOXID);
+                set_g_opts("ADD_BOTS_ON_STARTUP_done", "true");
+
+                FriendList f_echobot = main_get_friend(ECHOBOT_TOXID.substring(0, 32 * 2).toUpperCase());
+                if (f_echobot != null)
+                {
+                    f_echobot.status_message = ECHOBOT_INIT_STATUSMSG;
+                    f_echobot.name = ECHOBOT_INIT_NAME;
+                    HelperFriend.update_friend_in_db_name(f_echobot);
+                    HelperFriend.update_friend_in_db_status_message(f_echobot);
+                    HelperFriend.update_single_friend_in_friendlist_view(f_echobot);
+                }
+
+                Log.i(TAG, "need_add_bots=true (INSERT)");
+            }
+        }
+
+        // -------- add log friend --------
+        // -------- add log friend --------
+        // -------- add log friend --------
+        if (DEBUG_USE_LOGFRIEND)
+        {
+            boolean need_add_log_pseudo_friend = true;
+            try
+            {
+                if (get_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY) != null)
+                {
+                    if (get_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY).equals("true"))
+                    {
+                        if (get_g_opts(LOGFRIEND_TOXID_DB_KEY) != null)
+                        {
+                            if (get_g_opts(LOGFRIEND_TOXID_DB_KEY).length() > 2)
+                            {
+                                LOG_FRIEND_TOXID = get_g_opts(LOGFRIEND_TOXID_DB_KEY);
+                                need_add_log_pseudo_friend = false;
+                                Log.i(TAG, "need_add_log_pseudo_friend=false");
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+            }
+
+            if (need_add_log_pseudo_friend)
+            {
+                Log.i(TAG, "need_add_log_pseudo_friend:start");
+
+                ByteBuffer hash_bytes = ByteBuffer.allocateDirect(TOX_HASH_LENGTH);
+                MainActivity.tox_messagev3_get_new_message_id(hash_bytes);
+                LOG_FRIEND_TOXID = bytebuffer_to_hexstring(hash_bytes, true);
+                if (LOG_FRIEND_TOXID == null)
+                {
+                    del_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY);
+                    del_g_opts(LOGFRIEND_TOXID_DB_KEY);
+                    Log.i(TAG, "need_add_log_pseudo_friend:some error generating the ID for log_pseudo_friend");
+                }
+                else
+                {
+                    Log.i(TAG, "need_add_log_pseudo_friend:LOG_FRIEND_TOXID=" + LOG_FRIEND_TOXID + " len=" +
+                               LOG_FRIEND_TOXID.length());
+                    add_friend_real_norequest(LOG_FRIEND_TOXID);
+                    set_g_opts(LOGFRIEND_ON_STARTUP_DONE_DB_KEY, "true");
+                    set_g_opts(LOGFRIEND_TOXID_DB_KEY, LOG_FRIEND_TOXID);
+                    // Log.i(TAG, "need_add_log_pseudo_friend:get:" + LOG_FRIEND_TOXID + " :: " + (LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase()));
+                    FriendList f_log_friend = main_get_friend(
+                            LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase());
+                    if (f_log_friend != null)
+                    {
+                        f_log_friend.status_message = LOG_FRIEND_INIT_STATUSMSG;
+                        f_log_friend.name = LOG_FRIEND_INIT_NAME;
+                        HelperFriend.update_friend_in_db_name(f_log_friend);
+                        HelperFriend.update_friend_in_db_status_message(f_log_friend);
+                        HelperFriend.update_single_friend_in_friendlist_view(f_log_friend);
+                        Log.i(TAG, "need_add_log_pseudo_friend=update meta data");
+                    }
+                    Log.i(TAG, "need_add_log_pseudo_friend=true (INSERT)");
+                    append_logger_msg("need_add_log_pseudo_friend=true (INSERT)");
+                }
+            }
+            else
+            {
+                if ((LOG_FRIEND_TOXID != null) && (LOG_FRIEND_TOXID.length() > 2))
+                {
+                    add_friend_real_norequest(LOG_FRIEND_TOXID);
+                    FriendList f_log_friend = main_get_friend(
+                            LOG_FRIEND_TOXID.substring(0, 32 * 2).toUpperCase());
+                    if (f_log_friend != null)
+                    {
+                        f_log_friend.status_message = LOG_FRIEND_INIT_STATUSMSG;
+                        f_log_friend.name = LOG_FRIEND_INIT_NAME;
+                        HelperFriend.update_friend_in_db_name(f_log_friend);
+                        HelperFriend.update_friend_in_db_status_message(f_log_friend);
+                        HelperFriend.update_single_friend_in_friendlist_view(f_log_friend);
+                        Log.i(TAG, "need_add_log_pseudo_friend=update meta data");
+                    }
+                    Log.i(TAG, "need_add_log_pseudo_friend=true (refresh)");
+                }
+            }
+        }
+        // -------- add log friend --------
+        // -------- add log friend --------
+        // -------- add log friend --------
+
+        try
+        {
+            load_and_add_all_conferences();
+        }
+        catch (Exception e)
+        {
+        }
+
+        try
+        {
+            load_and_add_all_groups();
+        }
+        catch (Exception e)
+        {
+        }
+
+        global_last_activity_for_battery_savings_ts = System.currentTimeMillis();
+        global_last_activity_for_battery_savings_reason = "TOX_SERIVCE_START";
+
+        global_self_last_went_offline_timestamp = System.currentTimeMillis();
+        Log.i(TAG, "global_self_last_went_offline_timestamp[2]=" + global_self_last_went_offline_timestamp +
+                   " HAVE_INTERNET_CONNECTIVITY=" + HAVE_INTERNET_CONNECTIVITY);
+
+        return tox_iteration_interval_ms;
+    }
+
+    // one-time database migrations: convert old rows to the current format.
+    // every step has its own try/catch, so one failing step does not stop the others.
+    private void migrate_old_db_values()
+    {
+        // ----- convert old conference messages which did not contain a sent timestamp -----
+        try
+        {
+            boolean need_migrate_old_conf_msg_date = true;
+
+            if (get_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done") != null)
+            {
+                if (get_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done").equals("true"))
+                {
+                    need_migrate_old_conf_msg_date = false;
+                }
+            }
+
+            if (need_migrate_old_conf_msg_date == true)
+            {
+                try
+                {
+                    orma.run_multi_sql(
+                            "update ConferenceMessage set sent_timestamp=rcvd_timestamp" + " where " +
+                            " sent_timestamp='0'");
+                    Log.i(TAG, "onCreate:migrate_old_conf_msg_date");
+                }
+                catch (Exception e)
+                {
+                    Log.i(TAG, "onCreate:migrate_old_conf_msg_date:EE01");
+                }
+                // now remember that we did that, and don't do it again
+                set_g_opts("MIGRATE_OLD_CONF_MSG_DATE_done", "true");
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onCreate:migrate_old_conf_msg_date:EE:" + e.getMessage());
+        }
+        // ----- convert old conference messages which did not contain a sent timestamp -----
+
+        // ----- convert old NULL's into false -----
+        try
+        {
+            orma.run_multi_sql(
+                    "update ConferenceMessage set was_synced=false" + " where " + " was_synced is NULL");
+            Log.i(TAG, "onCreate:migrate_was_synced");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "onCreate:migrate_was_synced:EE01");
+        }
+        // ----- convert old NULL's into false -----
+
+        // ----- convert old NULL's into false -----
+        try
+        {
+            orma.run_multi_sql(
+                    "update GroupDB set group_we_left=false" + " where " + " group_we_left is NULL");
+            Log.i(TAG, "onCreate:migrate_group_we_left");
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+            Log.i(TAG, "onCreate:migrate_group_we_left:EE01");
+        }
+        // ----- convert old NULL's into false -----
+
+
+        // ----- convert old NULL's into 0 -----
+        try
+        {
+            orma.run_multi_sql("update Message set sent_push='0' where sent_push is NULL");
+            Log.i(TAG, "onCreate:sent_push");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "onCreate:sent_push:EE01");
+        }
+        // ----- convert old NULL's into 0 -----
+
+        // ----- convert old NULL's into 0 -----
+        try
+        {
+            orma.run_multi_sql(
+                    "update FriendList set msgv3_capability='0' where msgv3_capability is NULL");
+            Log.i(TAG, "onCreate:msgv3_capability");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "onCreate:msgv3_capability:EE01");
+        }
+        // ----- convert old NULL's into 0 -----
+
+        // ----- convert old NULL's into 0 -----
+        try
+        {
+            orma.run_multi_sql(
+                    "update Message set filetransfer_kind='0' where filetransfer_kind is NULL");
+            Log.i(TAG, "onCreate:filetransfer_kind");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "onCreate:filetransfer_kind:EE01");
+        }
+        // ----- convert old NULL's into 0 -----
+
+        // ----- convert old NULL's into 0 -----
+        try
+        {
+            orma.run_multi_sql(
+                    "update GroupMessage set TRIFA_SYNC_TYPE='0' where TRIFA_SYNC_TYPE is NULL");
+            Log.i(TAG, "onCreate:TRIFA_SYNC_TYPE");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "onCreate:TRIFA_SYNC_TYPE:EE01");
+        }
+        // ----- convert old NULL's into 0 -----
+
+        // ----- convert old NULL's into 0 -----
+        try
+        {
+            orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_01_sent_timestamp='0' where tox_group_peer_pubkey_syncer_01_sent_timestamp is NULL");
+            Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_01_sent_timestamp");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_01_sent_timestamp:EE01");
+        }
+        try
+        {
+            orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_02_sent_timestamp='0' where tox_group_peer_pubkey_syncer_02_sent_timestamp is NULL");
+            Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_02_sent_timestamp");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_02_sent_timestamp:EE01");
+        }
+        try
+        {
+            orma.run_multi_sql("update GroupMessage set tox_group_peer_pubkey_syncer_03_sent_timestamp='0' where tox_group_peer_pubkey_syncer_03_sent_timestamp is NULL");
+            Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_03_sent_timestamp");
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "onCreate:tox_group_peer_pubkey_syncer_03_sent_timestamp:EE01");
+        }
+        // ----- convert old NULL's into 0 -----
+
+    }
+
+    // phase 2 of the tox thread: the main tox loop.
+    // iterates toxcore until stop_me is set. the initial iteration interval
+    // comes from tox_thread_startup().
+    private void tox_main_loop(long tox_iteration_interval_ms)
+    {
+        int current_health_init = tox_self_get_network_health();
+        String health_text_init = ToxVars.TOX_NETWORK_HEALTH.value_str(current_health_init).replace("TOX_NETWORK_HEALTH_", "");
+        append_logger_msg(TAG + "::" + "network health initial value: " + current_health_init + " (" + health_text_init + ")");
+        try
+        {
+            updateToxHealthUI(current_health_init);
+        }
+        catch(Exception e)
+        {
+        }
+
+        int current_gc_health_init = tox_group_get_health();
+        String gc_health_text_init = ToxVars.TOX_GROUP_HEALTH.value_str(current_gc_health_init).replace("TOX_GROUP_HEALTH_", "");
+        append_logger_msg(TAG + "::" + "gc health initial value: " + current_gc_health_init + " (" + gc_health_text_init + ")");
+
+        long stats_last_history_ms = 0;
+
+        // [ADDED] Track when we last checked network health
+        long last_health_check_ms = 0;
+        int last_network_health = current_health_init;
+        int last_gc_health = current_gc_health_init;
+
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        append_logger_msg(TAG + "::" + "tox main loop START");
+        tox_thread_starting_up = 1;
+
+        tox_startup_timestamp = System.currentTimeMillis();
+
+        // [ADDED] Tracking variables for iteration vs sleep stats
+        stats_time_tox_not_iterating_ms = 0;
+        last_awake_start_time_ms = System.currentTimeMillis();
+        long stats_time_tox_iterating_ms = 0;
+        long stats_last_log_ms = System.currentTimeMillis();
+
+        // [ADDED] Tracking variables for iteration vs sleep stats
+        stats_time_tox_not_iterating_ms = 0;
+        last_awake_start_time_ms = System.currentTimeMillis();
+
+        // [ADDED] Tracking variables for fast iteration warning
+        long fast_iteration_start_ms = 0;
+        boolean fast_iteration_logged = false;
+
+        // [ADDED] "fast start" boost: iterate every 20ms for the first
+        // 20 seconds after the main loop starts, so we get online and
+        // catch up with the network quickly. the same boost is also
+        // started after a long battery saving sleep (see below).
+        // fast_iteration_until_ms = the time when the boost ends.
+        long fast_iteration_until_ms = System.currentTimeMillis() + FAST_START_DURATION_MS;
+
+        no_internet_last_ec = no_internet_edge_count.get();
+        no_internet_prev_offline = !HAVE_INTERNET_CONNECTIVITY;
+
+        while (!stop_me)
+        {
+            long iteration_start_ms = System.currentTimeMillis(); // [ADDED] Track loop start
+
+            if (tox_iteration_interval_ms < 2)
+            {
+                tox_iteration_interval_ms = 2;
+            }
+
+            try
+            {
+                if ((PREF__X_battery_saving_mode) && (battery_saving_can_sleep()))
+                {
+                    need_wakeup_now = false;
+                    trifa_service_thread = Thread.currentThread();
+
+                    BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS = PREF__X_battery_saving_timeout * 1000 * 60;
+                    append_logger_msg(TAG + "::" + "entering BATTERY SAVINGS MODE ... BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS=" + BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS);
+
+                    append_logger_msg(TAG + "::" + "setting alarm ...");
+                    set_alarm_for_battery_saving_sleep();
+
+                    tox_notification_change_wrapper(TOX_CONNECTION_NONE.value, "", true);
+                    set_all_friends_offline();
+                    set_all_conferences_inactive();
+                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                    global_self_connection_status = TOX_CONNECTION_NONE.value;
+
+                    try { updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+                    try { updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+
+                    long sleep_in_sec = BATTERY_OPTIMIZATION_SLEEP_IN_MILLIS;
+                    // add some random value, so that the sleep is not always exactly the same
+                    sleep_in_sec = sleep_in_sec + (int) (Math.random() * 15000d) + 5000;
+                    sleep_in_sec = sleep_in_sec / 1000;
+                    append_logger_msg(TAG + "::" + "entering BATTERY SAVINGS MODE ... sleep for " + (sleep_in_sec) + "s");
+
+                    // Mark the time we start sleeping
+                    battery_sleep_start_ms = System.currentTimeMillis();
+                    HelperGeneric.battery_sleep_log_add("SLEEP_ENTER:target=" + (sleep_in_sec) + "s");
+
+                    try { updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+                    try { updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+
+                    String wakeup_reason = "SCHED_FULL"; // loop ran to completion = scheduled sleep finished
+                    boolean ended_early = false;
+
+                    Thread.interrupted(); // clear stale interrupt flag BEFORE sleeping
+
+                    if ((global_showing_messageview) || (global_showing_anygroupview))
+                    {
+                        wakeup_reason = global_showing_messageview ? "UI_MSGVIEW" : "UI_GROUPVIEW";
+                        request_wakeup(wakeup_reason); // flag only, NO self-interrupt
+                        ended_early = true;
+                    }
+                    else if (need_wakeup_now)
+                    {
+                        wakeup_reason = (wakeup_trigger_reason == null || wakeup_trigger_reason.isEmpty())
+                                ? "TRIG_EARLY" : wakeup_trigger_reason;
+                        ended_early = true;
+                    }
+                    else
+                    {
+                        try { updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+                        try { updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value); } catch (Exception ignored) {}
+                        try
+                        {
+                            Thread.sleep(sleep_in_sec * 1000); // android OS freezes CPU here
+                        }
+                        catch (Exception es)
+                        {
+                            String r2 = battery_saving_must_wake_reason();
+                            wakeup_reason = (r2 != null) ? r2
+                                    : ("INT:" + es.getClass().getSimpleName()
+                                       + (es.getMessage() != null ? (":" + es.getMessage()) : ""));
+                            ended_early = true;
+                        }
+                    }
+
+                    // how long did the battery saving sleep actually last?
+                    long battery_sleep_duration_ms = System.currentTimeMillis() - battery_sleep_start_ms;
+
+                    // ---- SINGLE EXIT: every path is recorded ----
+                    record_sleep_interval_now(wakeup_reason, ended_early);
+
+                    // if battery saving lasted at least 5 minutes, start the
+                    // "fast start" boost: iterate every 20ms for 20 seconds
+                    if (battery_sleep_duration_ms >= FAST_START_MIN_BATTERY_SLEEP_MS)
+                    {
+                        fast_iteration_until_ms = System.currentTimeMillis() + FAST_START_DURATION_MS;
+                    }
+                    wakeup_trigger_reason = "";
+                    need_wakeup_now = false;
+                    trifa_service_thread = null;
+
+                    long t0 = System.nanoTime() / 1_000_000;
+                    update_friends_and_groups();
+                    long t1 = System.nanoTime() / 1_000_000;
+                    if ((t1 - t0) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=update_friends_and_groups|dur=" + (t1 - t0) + "ms");
+
+
+                    int TOX_CONNECTION_a = tox_self_get_connection_status();
+                    global_self_connection_status = TOX_CONNECTION_a;
+                    bootstrapping = true;
+                    global_self_last_went_offline_timestamp = System.currentTimeMillis();
+                    tox_notification_change_wrapper(TOX_CONNECTION_a, "");
+
+                    long t2 = System.nanoTime() / 1_000_000;
+                    bootstrap_me(true);
+                    long t3 = System.nanoTime() / 1_000_000;
+                    if ((t3 - t2) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=bootstrap_me|dur=" + (t3 - t2) + "ms");
+
+                    long t4 = System.nanoTime() / 1_000_000;
+                    tox_iterate();
+                    long t5 = System.nanoTime() / 1_000_000;
+                    if ((t5 - t4) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=tox_iterate_post_sleep|dur=" + (t5 - t4) + "ms");
+
+                    check_if_still_bootstrapping();
+                    // NO break / NO continue: loop iterates normally
+                }
+            }
+            catch (Exception e)
+            {
+                // Marker != 0  => exception hit AFTER sleep began but BEFORE (or during)
+                // recording -> close and record the (possibly partial) interval now,
+                // so the slept time is never lost.
+                // Marker == 0  => exception hit either BEFORE sleep started (nothing
+                // to record) or AFTER recording (already recorded) -> do nothing.
+                if (battery_sleep_start_ms != 0)
+                {
+                    record_sleep_interval_now("LOOP_EXCEPT", true);
+                }
+
+                String r3 = battery_saving_must_wake_reason();
+                String info = "LOOP_EXCEPT:" + ((r3 != null) ? r3 : "UNKNOWN") +
+                              "|need_wakeup=" + need_wakeup_now +
+                              "|trig=" + wakeup_trigger_reason;
+                append_logger_msg(TAG + "::" + info);
+                HelperGeneric.battery_sleep_log_add(info);
+                int TOX_CONNECTION_a = tox_self_get_connection_status();
+                tox_notification_change_wrapper(TOX_CONNECTION_a, "");
+                battery_sleep_start_ms = 0; // belt & braces (helper already cleared it)
+            }
+
+            // "fast start" boost active? then iterate every 20ms.
+            // Math.min() keeps an interval that is already faster
+            // (for example 5ms during a call), it never slows things down.
+            // when the boost time is over, the normal interval (computed
+            // at the end of every loop iteration) is used again automatically.
+            if (System.currentTimeMillis() < fast_iteration_until_ms)
+            {
+                tox_iteration_interval_ms = Math.min(tox_iteration_interval_ms, FAST_START_ITERATE_INTERVAL_MS);
+            }
+
+            try
+            {
+                Thread.sleep(tox_iteration_interval_ms);
+            }
+            catch (InterruptedException e)
+            {
+                String r3 = battery_saving_must_wake_reason();
+                String info = "LOOP_INT2:" + ((r3 != null) ? r3 : "UNKNOWN") +
+                              "|need_wakeup=" + need_wakeup_now +
+                              "|trig=" + wakeup_trigger_reason;
+                append_logger_msg(TAG + "::" + info);
+                HelperGeneric.battery_sleep_log_add(info);
+            }
+            catch (Exception e)
+            {
+                String r3 = battery_saving_must_wake_reason();
+                String info = "LOOP_EXCEPT2:" + ((r3 != null) ? r3 : "UNKNOWN") +
+                              "|need_wakeup=" + need_wakeup_now +
+                              "|trig=" + wakeup_trigger_reason;
+                append_logger_msg(TAG + "::" + info);
+                HelperGeneric.battery_sleep_log_add(info);
+            }
+
+            // HINT: always reset the values on every loop ----------
+            need_wakeup_now = false;
+            trifa_service_thread = null;
+            // HINT: always reset the values on every loop ----------
+
+            // [ADDED] Check for sustained fast iteration (< xx ms)
+            if (tox_iteration_interval_ms < FAST_ITERATION_THRESHOLD_MS)
+            {
+                if (fast_iteration_start_ms == 0)
+                {
+                    fast_iteration_start_ms = System.currentTimeMillis();
+                }
+                else
+                {
+                    long fast_duration_ms = System.currentTimeMillis() - fast_iteration_start_ms;
+                    // Trigger warning if it stays < xx ms for yy continuous seconds
+                    if (fast_duration_ms >= FAST_ITERATION_THRESHOLD_DURATION_MS && !fast_iteration_logged)
+                    {
+                        String info = "FAST_ITER_WARNING: interval=" + tox_iteration_interval_ms + "ms sustained for " + fast_duration_ms + "ms";
+                        append_logger_msg(TAG + "::" + info);
+                        HelperGeneric.battery_sleep_log_add(info);
+                        fast_iteration_logged = true; // Prevent log spam
+                    }
+                }
+            }
+            else
+            {
+                if (fast_iteration_start_ms != 0)
+                {
+                    long fast_duration_ms = System.currentTimeMillis() - fast_iteration_start_ms;
+                    if (fast_iteration_logged)
+                    {
+                        String info = "FAST_ITER_WARNING_END: fast interval lasted " + fast_duration_ms + "ms";
+                        append_logger_msg(TAG + "::" + info);
+                        HelperGeneric.battery_sleep_log_add(info);
+                    }
+                    fast_iteration_start_ms = 0;
+                    fast_iteration_logged = false;
+                }
+            }
+
+            // --- CONTINUOUS NETWORK BURST DETECTION (Checked every x seconds) ---
+            long current_time_ms_net = System.currentTimeMillis();
+            if ((current_time_ms_net - last_netprof_check_ms) >= (NETWORK_SPEED_SAMPLE_EVERY_SECONDS * 1000)) {
+                last_netprof_check_ms = current_time_ms_net;
+
+                long total_bytes_now = MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_SENT.value) +
+                                       MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_SENT.value) +
+                                       MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_TCP.value, TOX_NETPROF_DIRECTION_RECV.value) +
+                                       MainActivity.tox_netprof_get_packet_total_bytes(TOX_NETPROF_PACKET_TYPE_UDP.value, TOX_NETPROF_DIRECTION_RECV.value);
+
+                if (last_netprof_ts > 0) {
+                    long delta_bytes = total_bytes_now - last_netprof_bytes;
+                    long delta_ms = current_time_ms_net - last_netprof_ts;
+
+                    if (delta_ms > 0 && delta_bytes > 0) {
+                        long current_bytes_per_second = (delta_bytes * 1000) / delta_ms;
+
+                        // Log.i(TAG, "NNNNNNNN: " + current_bytes_per_second + " " + delta_bytes + " " + delta_ms);
+                        // If threshold is reached at ANY time, latch it to true for the 1-minute window
+                        if (current_bytes_per_second > (HIGH_NETWORK_ACTIVITY_THRESHOLD_KBYTES * 1024)) {
+                            high_network_activity_this_minute = true;
+                        }
+                    }
+                }
+                // Keep the old value for the next sample period
+                last_netprof_bytes = total_bytes_now;
+                last_netprof_ts = current_time_ms_net;
+            }
+
+            try
+            {
+                // [ADDED] Record 1-minute App State History
+                long current_time_ms2 = System.currentTimeMillis();
+                if ((current_time_ms2 - stats_last_history_ms) >= MINUTE_IN_MILLIS)
+                {
+                    long t_hist_start = System.nanoTime() / 1_000_000;
+
+                    long window_start = stats_last_history_ms;
+                    stats_last_history_ms = current_time_ms2;
+
+                    // --- 3. EVALUATE ALL STATES INDEPENDENTLY ---
+                    long now = System.currentTimeMillis();
+
+                    // Clear ALL state tracks for this minute first to ensure clean data
+                    for (int s = 0; s < app_state_histories.length; s++) {
+                        app_state_histories[s][app_state_history_index] = false;
+                    }
+
+                    // Evaluate each state independently. Multiple states can be true simultaneously.
+                    if (fast_iteration_logged) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_ITERATE_FAST.value][app_state_history_index] = true;
+                    }
+
+                    if (Callstate.state != 0) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_CALL_1ON1.value][app_state_history_index] = true;
+                    }
+
+                    if (Callstate.audio_group_active || Callstate.audio_ngc_group_active) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_CALL_GROUP.value][app_state_history_index] = true;
+                    }
+
+                    if (global_last_activity_outgoung_ft_ts > window_start) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_OUT.value][app_state_history_index] = true;
+                    }
+
+                    if (global_last_activity_incoming_ft_ts > window_start) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_FT_IN.value][app_state_history_index] = true;
+                    }
+
+                    if (global_last_activity_for_FRIEND_MSG_INCOMING_ts > window_start) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_FRIEND_MSG_INCOMING.value][app_state_history_index] = true;
+                    }
+
+                    if (global_last_activity_for_GROUP_MSG_INCOMING_ts > window_start) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_GROUP_MSG_INCOMING.value][app_state_history_index] = true;
+                    }
+
+                    if (high_network_activity_this_minute) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_HIGH_NETWORK_ACTIVITY.value][app_state_history_index] = true;
+                    }
+                    // Reset the latch for the next 1-minute window
+                    high_network_activity_this_minute = false;
+
+                    int bootstrap_ec = bootstrap_me_real_edge_count.get();
+                    if (bootstrap_ec != last_bootstrap_me_real_ec) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_BOOTSTRAPPING.value][app_state_history_index] = true;
+                        last_bootstrap_me_real_ec = bootstrap_ec;
+                    }
+
+                    if (global_showing_messageview || global_showing_anygroupview) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_UI_FOREGROUND.value][app_state_history_index] = true;
+                    }
+
+                    if (!HelperGeneric.battery_saving_can_sleep() && PREF__X_battery_saving_mode) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_AWAKE_COOLDOWN.value][app_state_history_index] = true;
+                    }
+
+                    // Connection states are mutually exclusive, but we still use independent assignment
+                    if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_UDP.value) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_ONLINE_UDP.value][app_state_history_index] = true;
+                    } else if (global_self_connection_status == ToxVars.TOX_CONNECTION.TOX_CONNECTION_TCP.value) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_ONLINE_TCP.value][app_state_history_index] = true;
+                    } else if (!HAVE_INTERNET_CONNECTIVITY) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_NO_INTERNET.value][app_state_history_index] = true;
+                    } else if (global_self_connection_status == TOX_CONNECTION_NONE.value) {
+                        app_state_histories[TRIFAGlobals.APP_STATE.STATE_OFFLINE_IDLE.value][app_state_history_index] = true;
+                    }
+
+                    // --- CAPTURE NETWORK TRANSPORT LATCHES ---
+                    // Trip the latch for the CURRENT state.
+                    // This solves the "stayed in the same state for 3 minutes straight" problem.
+                    ConnectionManager.trip_latch_for_current_state();
+
+                    // Clear all transport tracks for this minute first
+                    for (int t = 0; t < app_transport_histories.length; t++) {
+                        app_transport_histories[t][app_state_history_index] = false;
+                    }
+
+                    // Read the latches into the transport history array
+                    app_transport_histories[ConnectionManager.NetworkTransportType.WIFI_NET.value][app_state_history_index] = ConnectionManager.latch_wifi_net;
+                    app_transport_histories[ConnectionManager.NetworkTransportType.MOBILE_NET.value][app_state_history_index] = ConnectionManager.latch_mobile_net;
+                    app_transport_histories[ConnectionManager.NetworkTransportType.MOBILE_BAD.value][app_state_history_index] = ConnectionManager.latch_mobile_bad;
+                    app_transport_histories[ConnectionManager.NetworkTransportType.NO_NET.value][app_state_history_index] = ConnectionManager.latch_no_net;
+                    app_transport_histories[ConnectionManager.NetworkTransportType.FALLBACK_ASSUME_CONNECTED.value][app_state_history_index] = ConnectionManager.latch_fallback;
+
+                    // Reset the latches for the next 1-minute window
+                    ConnectionManager.latch_wifi_net = false;
+                    ConnectionManager.latch_mobile_net = false;
+                    ConnectionManager.latch_mobile_bad = false;
+                    ConnectionManager.latch_no_net = false;
+                    ConnectionManager.latch_fallback = false;
+                    // -----------------------------------------
+
+                    // --- 4. WRITE TO RING BUFFER ---
+                    // 1. Write timestamp to the CURRENT index
+                    app_state_history_ts[app_state_history_index] = current_time_ms2;
+
+                    // 2. Lock-free no-internet latch (writes to the SAME CURRENT index)
+                    int ec = TrifaToxService.no_internet_edge_count.get();
+                    boolean cur_off = !HAVE_INTERNET_CONNECTIVITY;
+                    no_internet_history[app_state_history_index] =
+                            no_internet_prev_offline || cur_off || (ec != no_internet_last_ec);
+                    no_internet_last_ec = ec;
+                    no_internet_prev_offline = cur_off;
+
+                    // 3. Advance index ONCE at the very end
+                    app_state_history_index = (app_state_history_index + 1) % HISTORY_SIZE;
+                    if (app_state_history_count < HISTORY_SIZE) app_state_history_count++;
+                    app_state_last_record_ts = current_time_ms2;
+
+                    long t_hist_end = System.nanoTime() / 1_000_000;
+                    if ((t_hist_end - t_hist_start) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=1min_history_record|dur=" + (t_hist_end - t_hist_start) + "ms");
+                }
+            }
+            catch(Exception ignored)
+            {
+            }
+
+            long t_bs = System.nanoTime() / 1_000_000;
+            check_if_need_bootstrap_again();
+            long t_bs_end = System.nanoTime() / 1_000_000;
+            if ((t_bs_end - t_bs) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=check_if_need_bootstrap_again|dur=" + (t_bs_end - t_bs) + "ms");
+
+            long t_iter = System.nanoTime() / 1_000_000;
+            MainActivity.tox_iterate();
+            long t_iter_end = System.nanoTime() / 1_000_000;
+            if ((t_iter_end - t_iter) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=tox_iterate_main|dur=" + (t_iter_end - t_iter) + "ms");
+
+            // [ADDED] Check network health every 3 seconds
+            long current_time_ms = System.currentTimeMillis();
+            if ((current_time_ms - last_health_check_ms) >= 3000)
+            {
+                last_health_check_ms = current_time_ms;
+                long t_hc = System.nanoTime() / 1_000_000;
+
+                try
+                {
+                    int current_health = tox_self_get_network_health();
+
+                    if (current_health != last_network_health)
+                    {
+                        String health_text = ToxVars.TOX_NETWORK_HEALTH.value_str(current_health).replace("TOX_NETWORK_HEALTH_", "");
+                        append_logger_msg(TAG + "::" + "network health changed: " + last_network_health + " -> " + current_health + " (" + health_text + ")");
+                        last_network_health = current_health;
+
+                        try
+                        {
+                            updateToxHealthUI(current_health);
+                        }
+                        catch(Exception e)
+                        {
+                        }
+                    }
+
+                    int current_gc_health = tox_group_get_health();
+
+                    if (current_gc_health != last_gc_health)
+                    {
+                        String gc_health_text = ToxVars.TOX_GROUP_HEALTH.value_str(current_gc_health).replace("TOX_GROUP_HEALTH_", "");
+                        append_logger_msg(TAG + "::" + "gc health changed: " + last_gc_health + " -> " + current_gc_health + " (" + gc_health_text + ")");
+                        last_gc_health = current_gc_health;
+
+                        try
+                        {
+                            updateToxGcHealthUI(current_gc_health);
+                        }
+                        catch(Exception e)
+                        {
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    append_logger_msg(TAG + "::" + "error checking network health: " + e.getMessage());
+                }
+
+                long t_hc_end = System.nanoTime() / 1_000_000;
+                if ((t_hc_end - t_hc) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=health_check|dur=" + (t_hc_end - t_hc) + "ms");
+            }
+
+            if ((Callstate.state != 0) || (Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
+            {
+                if ((Callstate.audio_group_active) || (Callstate.audio_ngc_group_active))
+                {
+                    tox_iteration_interval_ms = 5; // if we are in a group audio call iterate more often
+                }
+                else
+                {
+                    tox_iteration_interval_ms = 10; // if we are in a video/audio call iterate more often
+                }
+            }
+            else
+            {
+                if (global_last_activity_outgoung_ft_ts > -1)
+                {
+                    if ((global_last_activity_outgoung_ft_ts + 200) > System.currentTimeMillis())
+                    {
+                        // iterate faster if outgoing filetransfers are active
+                        tox_iteration_interval_ms = 5;
+                    }
+                    else
+                    {
+                        tox_iteration_interval_ms = Math.max(TOX_MIN_NORMAL_ITERATE_DELTA_MS, MainActivity.tox_iteration_interval());
+                    }
+                }
+                else if (global_last_activity_incoming_ft_ts > -1)
+                {
+                    if ((global_last_activity_incoming_ft_ts + 200) > System.currentTimeMillis())
+                    {
+                        // iterate faster if incoming filetransfers are active
+                        tox_iteration_interval_ms = 5;
+                    }
+                    else
+                    {
+                        tox_iteration_interval_ms = Math.max(TOX_MIN_NORMAL_ITERATE_DELTA_MS, MainActivity.tox_iteration_interval());
+                    }
+                }
+                else
+                {
+                    tox_iteration_interval_ms = Math.max(TOX_MIN_NORMAL_ITERATE_DELTA_MS, MainActivity.tox_iteration_interval());
+                }
+
+                /*
+                // [ADDED] Apply health-based throttling on top of the computed interval
+                // This only applies when NOT in active calls or file transfers
+                int health = MainActivity.tox_self_get_network_health();
+                switch (health) {
+                    case TOX_NETWORK_HEALTH_BAD:
+                        // BAD: 2 seconds max to let radio idle
+                        tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 2000);
+                        break;
+                    case TOX_NETWORK_HEALTH_POOR:
+                        // POOR: 1 second max
+                        tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 1000);
+                        break;
+                    case TOX_NETWORK_HEALTH_FAIR:
+                        // FAIR: 500ms max
+                        tox_iteration_interval_ms = Math.max(tox_iteration_interval_ms, 500);
+                        break;
+                    default:
+                        // EXCELLENT, GOOD, UNKNOWN: use computed interval as-is
+                        break;
+                }
+                 */
+            }
+
+            if (global_self_connection_status != TOX_CONNECTION_NONE.value)
+            {
+                long t_msg = System.nanoTime() / 1_000_000;
+                send_or_resend_pending_messages();
+                long t_msg_end = System.nanoTime() / 1_000_000;
+                if ((t_msg_end - t_msg) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=send_or_resend_pending_messages|dur=" + (t_msg_end - t_msg) + "ms");
+            }
+            if (global_self_connection_status != TOX_CONNECTION_NONE.value)
+            {
+                long t_ft = System.nanoTime() / 1_000_000;
+                start_queued_filetransfers();
+                long t_ft_end = System.nanoTime() / 1_000_000;
+                if ((t_ft_end - t_ft) > 10000) HelperGeneric.battery_sleep_log_add("SLOW_LOOP:part=start_queued_filetransfers|dur=" + (t_ft_end - t_ft) + "ms");
+            }
+
+            long iteration_end_ms = System.currentTimeMillis();
+            stats_time_tox_iterating_ms += (iteration_end_ms - iteration_start_ms);
+            long stats_total_time_ms = stats_time_tox_iterating_ms + stats_time_tox_not_iterating_ms;
+
+            if ((iteration_end_ms - stats_last_log_ms) >= 60000) // Log summary every 60 seconds
+            {
+                stats_last_log_ms = iteration_end_ms;
+
+                double percent_not_iterating = 0.0;
+                if (stats_total_time_ms > 0) {
+                    percent_not_iterating = (stats_time_tox_not_iterating_ms * 100.0) / stats_total_time_ms;
+                }
+
+                String human_not_iterating = formatDuration(stats_time_tox_not_iterating_ms);
+                String human_total = formatDuration(stats_total_time_ms);
+
+                /*
+                append_logger_msg(TAG + "::" + "Tox_Loop_Stats: Sleeping (Not iterating): "
+                                  + human_not_iterating
+                                  + " (" + String.format("%.2f", percent_not_iterating) + "%) | Total Uptime: "
+                                  + human_total);
+                 */
+            }
+        }
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+        // ------- MAIN TOX LOOP ---------------------------------------------------------------
+
+        append_logger_msg(TAG + "::" + "tox main loop stop");
+
+        tox_thread_starting_up = 2;
+        tox_startup_timestamp = -1L;
+
+    }
+
+    // phase 3 of the tox thread: clean up after the main loop has stopped.
+    private void tox_thread_shutdown()
+    {
+        // Clean up the callback when the app is fully closed
+        ConnectionManager.unregisterModernNetworkCallback(getApplicationContext());
+
+        try
+        {
+            Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            NativeAudio.shutdownEngine();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            // this stops Tox
+            MainActivity.tox_kill();
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            Thread.sleep(100); // wait a bit, for "something" to finish up in the native code
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            updateToxHealthUI(TOX_NETWORK_HEALTH_UNKNOWN.value);
+        }
+        catch(Exception e)
+        {
+        }
+
+        try
+        {
+            updateToxGcHealthUI(ToxVars.TOX_GROUP_HEALTH.TOX_GROUP_HEALTH_UNKNOWN.value);
+        }
+        catch(Exception e)
+        {
+        }
+
+        //Log.i(TAG, "VFS:detachThread:(TrifaToxService):" + Thread.currentThread().getId() + ":" +
+        //           Thread.currentThread().getName());
+        //vfs.detachThread();
+        //Log.i(TAG, "VFS:detachThread:(TrifaToxService):OK");
+
     }
 
     private void update_friends_and_groups()
