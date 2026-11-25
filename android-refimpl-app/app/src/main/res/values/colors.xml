@@ -330,4 +330,12 @@
     <color name="list_chip_bg">#E8EEF7</color>
     <color name="list_chip_text">#33507A</color>
 
+    <!-- swipe pin/unpin reveal icons: calm soft white while below the commit
+         threshold, bright accent color once the swipe will commit on release.
+         same colors in day and night mode: they sit on the fixed green/red
+         reveal backgrounds. -->
+    <color name="swipe_icon_idle">#99FFFFFF</color>
+    <color name="swipe_pin_icon_armed">#FFD740</color>
+    <color name="swipe_unpin_icon_armed">#FF8A80</color>
+
 </resources>

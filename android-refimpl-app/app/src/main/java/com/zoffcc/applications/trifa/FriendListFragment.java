@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.zoffcc.applications.sorm.ConferenceDB;
 import com.zoffcc.applications.sorm.FriendList;
@@ -51,6 +52,8 @@ import static com.zoffcc.applications.trifa.MainActivity.friend_list_fragment;
 import static com.zoffcc.applications.trifa.MainActivity.main_handler_s;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.INTERVAL_ADD_ALL_FRIENDS_CLEAR_MS;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.ONE_HOUR_IN_MS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_ICON_ANIM_MS;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_ICON_ARMED_SCALE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_PIN_THRESHOLD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_UNPIN_THRESHOLD;
 import static com.zoffcc.applications.trifa.TrifaToxService.orma;
@@ -118,6 +121,14 @@ public class FriendListFragment extends Fragment
             // is not told the swipe direction, so we remember it here to pick the
             // right threshold (pin vs unpin) when the finger is released.
             private float last_swipe_dx = 0f;
+
+            // "armed" = the swipe has passed the commit threshold for its direction.
+            // while armed the reveal icon lights up and grows a little; dropping back
+            // under the threshold returns it to its calm idle look. we remember the
+            // state so the color/scale animation is only triggered on the crossing,
+            // not on every single draw frame.
+            private boolean swipe_armed = false;
+            private int last_swipe_dir = 0; // -1 = left (unpin), +1 = right (pin), 0 = none
 
             @Override
             public boolean onMove(@NonNull RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
@@ -236,7 +247,10 @@ public class FriendListFragment extends Fragment
             }
 
             // move the card with the finger and show the matching reveal behind it:
-            // right (dX > 0) = green + pin icon, left (dX < 0) = red + unpin icon
+            // right (dX > 0) = green + pin icon, left (dX < 0) = red + unpin icon.
+            // once the swipe passes the commit threshold for its direction the icon
+            // "arms": bright accent color + gentle grow ("release to commit").
+            // going back under the threshold calms it down again.
             private void apply_swipe_visuals(View row, float dX) {
                 View card = swipe_card(row);
                 View reveal = row.findViewById(R.id.swipe_reveal);
@@ -246,18 +260,82 @@ public class FriendListFragment extends Fragment
 
                 card.setTranslationX(dX);
 
-                View pin_icon = row.findViewById(R.id.swipe_reveal_pin_icon);
-                View unpin_icon = row.findViewById(R.id.swipe_reveal_unpin_icon);
+                ImageView pin_icon = (ImageView) row.findViewById(R.id.swipe_reveal_pin_icon);
+                ImageView unpin_icon = (ImageView) row.findViewById(R.id.swipe_reveal_unpin_icon);
+
+                int dir = 0;
                 if (dX > 0) {
+                    dir = 1;
+                } else if (dX < 0) {
+                    dir = -1;
+                }
+
+                if (dir == 0) {
+                    reset_swipe_visuals(row);
+                    return;
+                }
+
+                if (dir > 0) {
                     reveal.setBackgroundResource(R.drawable.swipe_reveal_pin_bg);
                     if (pin_icon != null) { pin_icon.setVisibility(View.VISIBLE); }
                     if (unpin_icon != null) { unpin_icon.setVisibility(View.GONE); }
-                } else if (dX < 0) {
+                } else {
                     reveal.setBackgroundResource(R.drawable.swipe_reveal_unpin_bg);
                     if (pin_icon != null) { pin_icon.setVisibility(View.GONE); }
                     if (unpin_icon != null) { unpin_icon.setVisibility(View.VISIBLE); }
-                } else {
-                    reset_swipe_visuals(row);
+                }
+
+                // direction changed (or first frame of this swipe)? start both icons
+                // from the calm idle look so no stale armed color/scale is left over.
+                if (dir != last_swipe_dir) {
+                    last_swipe_dir = dir;
+                    swipe_armed = false;
+                    set_icon_idle(pin_icon);
+                    set_icon_idle(unpin_icon);
+                }
+
+                // has the swipe crossed the commit threshold for THIS direction?
+                boolean armed = false;
+                if (row.getWidth() > 0) {
+                    float threshold = SWIPE_PIN_THRESHOLD;
+                    if (dir < 0) {
+                        threshold = SWIPE_UNPIN_THRESHOLD;
+                    }
+                    armed = (Math.abs(dX) >= (row.getWidth() * threshold));
+                }
+
+                // only animate on the actual crossing, not on every draw frame
+                if (armed != swipe_armed) {
+                    swipe_armed = armed;
+                    ImageView active_icon = pin_icon;
+                    if (dir < 0) {
+                        active_icon = unpin_icon;
+                    }
+                    if (active_icon != null) {
+                        int color = getResources().getColor(R.color.swipe_icon_idle);
+                        float scale = 1.0f;
+                        if (armed) {
+                            scale = SWIPE_ICON_ARMED_SCALE;
+                            if (dir > 0) {
+                                color = getResources().getColor(R.color.swipe_pin_icon_armed);
+                            } else {
+                                color = getResources().getColor(R.color.swipe_unpin_icon_armed);
+                            }
+                        }
+                        active_icon.setColorFilter(color);
+                        active_icon.animate().scaleX(scale).scaleY(scale).setDuration(SWIPE_ICON_ANIM_MS).start();
+                    }
+                }
+            }
+
+            // calm idle look for a reveal icon: soft white, normal size.
+            // also cancels a grow/shrink animation that might still be running.
+            private void set_icon_idle(ImageView icon) {
+                if (icon != null) {
+                    icon.animate().cancel();
+                    icon.setColorFilter(getResources().getColor(R.color.swipe_icon_idle));
+                    icon.setScaleX(1.0f);
+                    icon.setScaleY(1.0f);
                 }
             }
 
@@ -271,10 +349,14 @@ public class FriendListFragment extends Fragment
                 if (reveal != null) {
                     reveal.setBackground(null);
                 }
-                View pin_icon = row.findViewById(R.id.swipe_reveal_pin_icon);
+                ImageView pin_icon = (ImageView) row.findViewById(R.id.swipe_reveal_pin_icon);
+                set_icon_idle(pin_icon);
                 if (pin_icon != null) { pin_icon.setVisibility(View.GONE); }
-                View unpin_icon = row.findViewById(R.id.swipe_reveal_unpin_icon);
+                ImageView unpin_icon = (ImageView) row.findViewById(R.id.swipe_reveal_unpin_icon);
+                set_icon_idle(unpin_icon);
                 if (unpin_icon != null) { unpin_icon.setVisibility(View.GONE); }
+                last_swipe_dir = 0;
+                swipe_armed = false;
             }
         };
         ItemTouchHelper itemTouchHelper = new ItemTouchHelper(simpleItemTouchCallback);

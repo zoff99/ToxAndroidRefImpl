@@ -70,6 +70,10 @@ public class TRIFAGlobals
     // unpinning is intentionally harder: it needs a much longer swipe than pinning.
     final static float SWIPE_PIN_THRESHOLD = 0.45f; // right swipe (pin): xx% of the list width
     final static float SWIPE_UNPIN_THRESHOLD = 0.6f; // left swipe (unpin): xx% of the list width
+    // once a swipe passes its commit threshold the reveal icon "arms": it changes
+    // color and gently grows to this scale, then shrinks back below the threshold.
+    final static float SWIPE_ICON_ARMED_SCALE = 1.25f; // armed icon size: 125% of normal
+    final static int SWIPE_ICON_ANIM_MS = 150; // grow/shrink animation duration in ms
 
     static volatile boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_MIN_INTERVAL_SECS = 60; // 60 seconds
