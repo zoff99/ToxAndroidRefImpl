@@ -1,24 +1,30 @@
-<com.daimajia.swipe.SwipeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/msg_swipe_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:drag_edge="left"
-    app:leftEdgeSwipeOffset="0dp">
-    <!-- Bottom View Start-->
-    <LinearLayout
-        android:id="@+id/msg_swipe_bottom_wrapper"
-        android:layout_width="500dp"
-        android:layout_height="wrap_content"
-        android:background="#552288ff"
-        android:orientation="horizontal"
-        android:weightSum="1">
-        <!--What you want to show-->
-    </LinearLayout>
-    <!-- Bottom View End-->
+    android:layout_height="wrap_content">
+
+    <FrameLayout
+        android:id="@+id/swipe_reveal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="4dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginRight="4dp"
+        android:layout_marginBottom="2dp">
+
+        <ImageView
+            android:id="@+id/swipe_reveal_reply_icon"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="left|center_vertical"
+            android:layout_marginLeft="16dp"
+            android:src="@drawable/swipe_reply_icon"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <!-- Surface View Start -->
     <LinearLayout
+        android:id="@+id/msg_swipe_surface"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@null"
@@ -223,6 +229,6 @@
         </RelativeLayout>
     </LinearLayout>
     <!-- Surface View End -->
-</com.daimajia.swipe.SwipeLayout>
+</FrameLayout>
 
 

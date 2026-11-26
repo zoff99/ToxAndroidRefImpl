@@ -74,6 +74,9 @@ public class TRIFAGlobals
     // color and gently grows to this scale, then shrinks back below the threshold.
     final static float SWIPE_ICON_ARMED_SCALE = 1.25f; // armed icon size: 125% of normal
     final static int SWIPE_ICON_ANIM_MS = 150; // grow/shrink animation duration in ms
+    // fraction of the list width the user must swipe to quote (reply to) an
+    // incoming message in the friend/group/conference message lists.
+    final static float SWIPE_REPLY_THRESHOLD = 0.25f;
 
     static volatile boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_MIN_INTERVAL_SECS = 60; // 60 seconds

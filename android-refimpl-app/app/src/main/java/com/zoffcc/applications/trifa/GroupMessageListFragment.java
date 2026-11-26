@@ -40,6 +40,7 @@ import java.util.List;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -305,6 +306,51 @@ public class GroupMessageListFragment extends Fragment
 
         listingsView.addOnScrollListener(mScrollListener);
         listingsView.setAdapter(adapter);
+
+        // swipe right on an incoming text message to quote (reply to) it.
+        // same reveal-layer pattern as the friendlist pin/unpin swipe.
+        MessageListSwipeCallback swipe_callback = new MessageListSwipeCallback(new MessageListSwipeCallback.SwipeQuoteHandler()
+        {
+            @Override
+            public boolean can_swipe(int position)
+            {
+                try
+                {
+                    if (!MainActivity.selected_messages.isEmpty())
+                    {
+                        return false; // selection mode active: no swiping
+                    }
+                    return adapter.getItemViewType(position) == Message_model.TEXT_INCOMING_NOT_READ;
+                }
+                catch (Exception e)
+                {
+                    return false;
+                }
+            }
+
+            @Override
+            public long item_id(int position)
+            {
+                GroupMessage m = adapter.get_message_item(position);
+                if (m != null)
+                {
+                    return m.id;
+                }
+                return -1;
+            }
+
+            @Override
+            public void quote_message(int position)
+            {
+                GroupMessage m = adapter.get_message_item(position);
+                if (m != null)
+                {
+                    GroupMessageListActivity.add_quote_group_message_text(m.text);
+                }
+            }
+        });
+        ItemTouchHelper swipe_touch_helper = new ItemTouchHelper(swipe_callback);
+        swipe_touch_helper.attachToRecyclerView(listingsView);
         // --------------
         // --------------
 

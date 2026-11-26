@@ -176,6 +176,23 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
         return new GroupMessageListHolder_error(view, this.context);
     }
 
+    // used by the swipe-to-quote callback: read the item at a position safely
+    public com.zoffcc.applications.sorm.GroupMessage get_message_item(int position)
+    {
+        try
+        {
+            if ((position >= 0) && (position < this.messagelistitems.size()))
+            {
+                return this.messagelistitems.get(position);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "get_message_item:" + e.getMessage());
+        }
+        return null;
+    }
+
     @Override
     public int getItemViewType(int position)
     {
