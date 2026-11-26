@@ -566,7 +566,6 @@ public class MainActivity extends AppCompatActivity
     static int PREF__global_font_size = PREF_GLOBAL_FONT_SIZE_DEFAULT;
     static boolean PREF__allow_open_encrypted_file_via_intent = false;
     static boolean PREF__allow_file_sharing_to_trifa_via_intent = true;
-    static boolean PREF__compact_friendlist = false;
     static boolean PREF__compact_chatlist = true;
     static boolean PREF__use_push_service = true;
     static String[] PREF__toxirc_muted_peers = {};
@@ -1551,14 +1550,15 @@ public class MainActivity extends AppCompatActivity
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 
 
+        // compact friendlist mode was removed: the friendlist always uses the
+        // full rows now. drop the old setting so no stale value is left behind
         try
         {
-            PREF__compact_friendlist = settings.getBoolean("compact_friendlist", false);
+            settings.edit().remove("compact_friendlist").apply();
         }
         catch (Exception e)
         {
             e.printStackTrace();
-            PREF__compact_friendlist = false;
         }
 
         try
@@ -4276,15 +4276,6 @@ public class MainActivity extends AppCompatActivity
 
         PREF__camera_get_preview_format = settings.getString("camera_get_preview_format", "YV12");
 
-        try
-        {
-            PREF__compact_friendlist = settings.getBoolean("compact_friendlist", false);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            PREF__compact_friendlist = false;
-        }
 
         try
         {

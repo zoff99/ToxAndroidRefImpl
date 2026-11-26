@@ -216,8 +216,6 @@
     <string name="pref_title_toxirc_muted_peers_01">Toxirc Bridge nutildyti vartotojai</string>
     <string name="pref_description_compact_chatlist">Pateikite susirašinėjimus kompaktiškiau taupydami vietą</string>
     <string name="pref_title_compact_chatlist">Suglaudinti susirašinėjimų sąrašą</string>
-    <string name="pref_description_compact_friendlist">Padaryti draugų sąrašą kompaktiškesnį, jei turite didelį jų sąrašą</string>
-    <string name="pref_title_compact_friendlist">Suglaudinti draugų sąrašą</string>
     <string name="pref_description_window_security">Įgalinus šį nustatymą, prie veiklų bus pridėta FLAG_SECURE.
 \nTai apsaugos nuo ekrano nuotraukų darymo, ekrano vaizdo įrašinėjimo bei turinio rodymo \"Naujausieji\" peržiūroje</string>
     <string name="pref_title_window_security">neleisti daryti ekrano nuotraukų</string>

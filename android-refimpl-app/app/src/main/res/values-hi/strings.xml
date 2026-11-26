@@ -306,7 +306,6 @@
     <string name="pref_description_global_font_size">अक्षर का आकार चुनें</string>
     <string name="pref_title_download_push_msg_app">(Push Message App)पुश मैसेज एप डाउनलोड करें</string>
     <string name="pref_title_use_incognito_keyboard2">गुप्त कुंजीपटल</string>
-    <string name="pref_title_compact_friendlist">संक्षिप्त मित्र सूची</string>
     <string name="pref_title_toxirc_muted_peers_01">Toxirc ब्रिज म्यूट किए गए उपयोगकर्ता</string>
     <string name="pref_description_toxirc_muted_peers_02">म्यूट किया गया उपयोगकर्ता 2 (उपयोग न होने पर खाली छोड़ दें)</string>
     <string name="join_public_group_joined">आप सार्वजनिक समूह में शामिल हो गए हैं</string>
@@ -372,7 +371,6 @@
 \n परिवर्तन को पुनरारंभ करने की आवश्यकता है!</string>
     <string name="pref_description_use_incognito_keyboard2">कीबोर्ड को यह बताने के लिए चालू करें कि आपके दर्ज किए गए शब्दों से न सीखें</string>
     <string name="pref_title_h264_encoder_use_intra_refresh">H264 अंतः आंतर पुनश्चर्या</string>
-    <string name="pref_description_compact_friendlist">यदि आपके पास मित्रों की एक बड़ी सूची है, तो मित्र सूची को और अधिक संक्षिप्त बनाएं</string>
     <string name="pref_title_compact_chatlist">संक्षिप्त चैट सूची</string>
     <string name="pref_description_compact_chatlist">यह चैट संदेश को अधिक कॉम्पैक्ट सेविंग स्पेस में प्रदर्शित करता है</string>
     <string name="pref_description_speakerphone_tweak">यदि ऐप कॉल में स्पीकर पर स्विच नहीं करता है, तो इस फिक्स को सक्रिय करने का प्रयास करें।</string>

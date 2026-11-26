@@ -309,8 +309,6 @@
     <string name="pref_title_start_on_boot">Start beim Booten</string>
     <string name="pref_description_compact_chatlist">Anzeige der Chatnachricht kompakter und platzsparender</string>
     <string name="pref_title_compact_chatlist">Kompakte Chatliste</string>
-    <string name="pref_description_compact_friendlist">Machen Sie die Freundesliste kompakter, wenn Sie eine große Liste von Freunden haben</string>
-    <string name="pref_title_compact_friendlist">Kompakte Freundesliste</string>
     <string name="pref_description_allow_file_sharing_to_trifa_via_intent">Dateien über Share Intent an TRIfA weitergeben.</string>
     <string name="layout___remove_friends_pushurl">Freunde Push-URL entfernen</string>
     <string name="layout___export_tox_encrypted_chats_unsecure">Verschlüsselte Chats exportieren *unsicher*</string>

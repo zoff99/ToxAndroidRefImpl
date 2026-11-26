@@ -331,7 +331,6 @@
 \nНачиная с Android 10, Google отобрал эту возможность</string>
     <string name="pref_title_start_on_boot">запускать при загрузке</string>
     <string name="pref_title_window_security">запретить скриншоты</string>
-    <string name="pref_title_compact_friendlist">Сжать список друзей</string>
     <string name="title_activity_groupinfo">Информация о группе</string>
     <string name="pref_description_window_security">Включение этой настройки добавит флаг FLAG_SECURE всем активити.
 \nЭто не позволит сделать скриншот программы, записать её на видео и увидеть миниатюру с содержимым в списке последних программ</string>
@@ -361,7 +360,6 @@
     <string name="group_message_list_activity_name">Группа</string>
     <string name="pref_title_use_incognito_keyboard2">клавиатура в режиме инкогнито</string>
     <string name="pref_description_use_incognito_keyboard2">клавиатура не будет обучаться и обрабатывать вводимые слова</string>
-    <string name="pref_description_compact_friendlist">Сделать список друзей более компактным. Удобно, если у вас много друзей</string>
     <string name="pref_title_allow_file_sharing_to_trifa_via_intent">поделиться файлами</string>
     <string name="layout___capabilities">Возможности:</string>
     <string name="layout___conf_title">Название:</string>

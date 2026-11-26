@@ -73,8 +73,6 @@
     <string name="pref_title_use_push_service">Użyj usługi Push</string>
     <string name="pref_description_compact_chatlist">Wyświetlanie wiadomości czatu bardziej kompaktowo, oszczędzając miejsce</string>
     <string name="pref_title_compact_chatlist">Kompaktowa lista czatów</string>
-    <string name="pref_description_compact_friendlist">Spraw, aby lista kontaktów była bardziej zwarta, jeśli masz dużą listę kontaktów</string>
-    <string name="pref_title_compact_friendlist">Kompaktowa lista kontaktów</string>
     <string name="pref_description_window_security">Włączenie tego ustawienia powoduje dodanie FLAG_SECURE do działań
 \nUniemożliwia ono wykonywanie zrzutów ekranu i nagrywanie ekranu oraz wyświetlanie zawartości w podglądzie przypomnień</string>
     <string name="pref_title_window_security">Wyłącz możliwość robienia Zrzutu z ekranu</string>

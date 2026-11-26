@@ -235,8 +235,6 @@
     <string name="pref_title_use_push_service">Usar o serviço Push</string>
     <string name="pref_description_compact_chatlist">Exibir mensagem de bate-papo mais compacta, economizando espaço</string>
     <string name="pref_title_compact_chatlist">Lista de bate-papo compacta</string>
-    <string name="pref_description_compact_friendlist">Torne a Lista de Amigos mais compacta, se tiver uma grande lista de Amigos</string>
-    <string name="pref_title_compact_friendlist">Lista de amigos compacta</string>
     <string name="pref_description_window_security">A ativação desta configuração adiciona FLAG_SECURE às atividades.
 \nImpede capturas de ecrã, gravação de ecrã e exibição de conteúdo na visualização de recentes</string>
     <string name="pref_title_window_security">impedir capturas de ecrã</string>

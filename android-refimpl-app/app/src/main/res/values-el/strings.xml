@@ -21,8 +21,6 @@
     <string name="pref_title_use_push_service">Χρήση της υπηρεσίας Push</string>
     <string name="pref_description_compact_chatlist">Εμφάνιση Chatmessage πιο συμπαγής εξοικονόμηση χώρου</string>
     <string name="pref_title_compact_chatlist">Συμπτύξτε τη λίστα συνομιλίας</string>
-    <string name="pref_description_compact_friendlist">Κάντε τη λίστα φίλων πιο συμπαγή, αν έχετε μεγάλη λίστα φίλων</string>
-    <string name="pref_title_compact_friendlist">Συμπαγής λίστα φίλων</string>
     <string name="pref_description_window_security">Η ενεργοποίηση αυτής της ρύθμισης προσθέτει το FLAG_SECURE στις Δραστηριότητες.
 \nΑποτρέπει τα στιγμιότυπα οθόνης και την καταγραφή οθόνης και την προβολή περιεχομένου στην προεπισκόπηση ανακλήσεων</string>
     <string name="pref_title_window_security">Αποτροπή λήψης στιγμιότυπου οθόνης</string>

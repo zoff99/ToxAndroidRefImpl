@@ -323,7 +323,6 @@
     <string name="pref_title_download_push_msg_app">ಪುಶ್ ಮೆಸೇಜ್ ಅಪ್ಲಿಕೇಶನ್ ಡೌನ್ ಲೋಡ್ ಮಾಡಿ</string>
     <string name="title_activity_groupinfo">ಗುಂಪು ಮಾಹಿತಿ</string>
     <string name="pref_title_use_incognito_keyboard2">ಅಜ್ಞಾತ ಕೀಲಿಮಣೆ</string>
-    <string name="pref_description_compact_friendlist">ನೀವು ಸ್ನೇಹಿತರ ದೊಡ್ಡ ಪಟ್ಟಿಯನ್ನು ಹೊಂದಿದ್ದರೆ, ಸ್ನೇಹಿತರ ಪಟ್ಟಿಯನ್ನು ಹೆಚ್ಚು ಕಾಂಪ್ಯಾಕ್ಟ್ ಮಾಡಿ</string>
     <string name="pref_title_compact_chatlist">ಕಾಂಪ್ಯಾಕ್ಟ್ ಚಾಟ್ ಲಿಸ್ಟ್</string>
     <string name="add_public_group_activity_help">ನೀಡಿರುವ ಗುಂಪಿನ ಹೆಸರಿನೊಂದಿಗೆ ಹೊಸ ಸಾರ್ವಜನಿಕ ಗುಂಪನ್ನು ರಚಿಸಿ.</string>
     <string name="join_public_group_activity_help">ನೀಡಿರುವ ಗುಂಪು ID ಯೊಂದಿಗೆ ಸಾರ್ವಜನಿಕ ಗುಂಪಿಗೆ ಸೇರಿಕೊಳ್ಳಿ.</string>
@@ -345,7 +344,6 @@
     <string name="FriendListHolder_toggle_notification_silent_title">ಅಧಿಸೂಚನೆಯನ್ನು ಟಾಗಲ್ ಮಾಡಿ</string>
     <string name="pref_description_use_incognito_keyboard2">ನೀವು ನಮೂದಿಸಿದ ಪದಗಳಿಂದ ಕಲಿಯಬೇಡಿ ಎಂದು ಕೀಲಿಮಣೆಗೆ ಹೇಳಲು ಆನ್ ಮಾಡಿ</string>
     <string name="pref_title_use_push_service">ಪುಶ್ ಸೇವೆಯನ್ನು ಬಳಸಿ</string>
-    <string name="pref_title_compact_friendlist">ಕಾಂಪ್ಯಾಕ್ಟ್ ಫ್ರೆಂಡ್ ಲಿಸ್ಟ್</string>
     <string name="pref_title_allow_open_encrypted_file_via_intent">ಎನ್‌ಕ್ರಿಪ್ಟ್ ಮಾಡಿದ ಸಂಗ್ರಹಣೆಯಿಂದ ಫೈಲ್‌ಗಳನ್ನು ತೆರೆಯಿರಿ</string>
     <string name="pref_description_use_push_service">ಎಚ್ಚರಿಕೆ: ಬ್ಯಾಟರಿ ಮತ್ತು ಬ್ಯಾಂಡ್ವಿಡ್ತ್ ಅನ್ನು ಉಳಿಸಲು ಇದು ಗೂಗಲ್ ಎಫ್ಸಿಎಂ ಅಥವಾ ಯುನಿಫೈಡ್ ಪುಶ್ ಅನ್ನು ಬಳಸುತ್ತದೆ.
 \nಅಪ್ಲಿಕೇಶನ್ HTTPS: ಕೆಲವು PUSH ಸರ್ವರ್ ಗಳಿಗೆ ನೇರವಾಗಿ (Tox ಮೂಲಕ ಅಲ್ಲ) ಸಂಪರ್ಕಗಳನ್ನು ಮಾಡುತ್ತದೆ.

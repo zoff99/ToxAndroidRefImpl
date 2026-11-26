@@ -51,8 +51,6 @@
     <string name="pref_description_orbot_enabled">За да използвате настройката инсталирайте Orbot.\nПромяната изисква РЕСТАРТ!</string>
     <string name="pref_title_window_security">Забраняване на екранни снимки</string>
     <string name="pref_description_window_security">Когато е отметнато към дейностите бива добавен флаг FLAG_SECURE.\nТой предотвратява правенето на екранни снимки и запис на екрана, както и миниатюрата екрана при превключване на приложенията</string>
-    <string name="pref_title_compact_friendlist">Компактен списък на контактите</string>
-    <string name="pref_description_compact_friendlist">Прави списъка с контакти компактен. Удобно, ако имате много контакти.</string>
     <string name="pref_title_compact_chatlist">Компактен списък с разговори</string>
     <string name="pref_description_compact_chatlist">Показване на съобщенията в разговорите по-компактно</string>
     <string name="pref_title_use_push_service">Използване на услугата Push</string>

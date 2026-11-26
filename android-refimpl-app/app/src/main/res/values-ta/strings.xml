@@ -210,8 +210,6 @@
     <string name="pref_description_use_incognito_keyboard2">நீங்கள் உள்ளிட்ட சொற்களிலிருந்து கற்றுக்கொள்ள வேண்டாம் என்று விசைப்பலகை சொல்லவும்</string>
     <string name="pref_title_window_security">திரை சாட்களைத் தடுக்கவும்</string>
     <string name="pref_description_window_security">இந்த அமைப்பை இயக்குவது செயல்பாடுகளுக்கு FLAG_SECURE ஐ சேர்க்கிறது.\n இது திரை சாட்கள் மற்றும் திரை பதிவைத் தடுக்கிறது மற்றும் ரெசென்ட் முன்னோட்டத்தில் உள்ளடக்கத்தைக் காட்டுகிறது</string>
-    <string name="pref_title_compact_friendlist">சிறிய நண்பர்கள் பட்டியல்</string>
-    <string name="pref_description_compact_friendlist">உங்களிடம் நண்பர்களின் பெரிய பட்டியல் இருந்தால், நட்பு மொழியை மேலும் சுருக்கமாக ஆக்குங்கள்</string>
     <string name="pref_title_compact_chatlist">சிறிய அரட்டை</string>
     <string name="pref_description_use_push_service">எச்சரிக்கை: இது பேட்டரி மற்றும் அலைவரிசையை சேமிக்க Google FCM அல்லது ஒருங்கிணைந்த உந்துதலைப் பயன்படுத்தும்.\n பயன்பாடு HTTPS: சில புச் சேவையகங்களுக்கான இணைப்புகளை நேரடியாக உருவாக்கும் (TOX வழியாக அல்ல).\n நீங்கள் அதை ஏற்றுக்கொண்டால் மட்டுமே இதைச் செயல்படுத்தவும்.\n இந்த அம்சத்திற்கு நிறுவப்பட்ட டாக்ச் புச் செய்தி பயன்பாடு தேவை.</string>
     <string name="pref_title_allow_push_server_ntfy">Ntfy.sh சேவையகத்தை அனுமதிக்கவும்</string>
