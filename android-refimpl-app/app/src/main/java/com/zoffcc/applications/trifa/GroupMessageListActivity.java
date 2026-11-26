@@ -2805,10 +2805,12 @@ public class GroupMessageListActivity extends AppCompatActivity
                 if (selected_group_messages.size() == 1)
                 {
                     amode_info_menu_item.setVisible(true);
+                    ToolbarActionMode.update_fullscreen_menu_visibility(amode);
                 }
                 else
                 {
                     amode_info_menu_item.setVisible(false);
+                    ToolbarActionMode.update_fullscreen_menu_visibility(amode);
                 }
 
                 if (selected_group_messages.isEmpty())
@@ -2857,10 +2859,12 @@ public class GroupMessageListActivity extends AppCompatActivity
                     if (selected_group_messages.size() == 1)
                     {
                         amode_info_menu_item.setVisible(true);
+                        ToolbarActionMode.update_fullscreen_menu_visibility(amode);
                     }
                     else
                     {
                         amode_info_menu_item.setVisible(false);
+                        ToolbarActionMode.update_fullscreen_menu_visibility(amode);
                     }
 
                     if (amode != null)
@@ -2932,10 +2936,12 @@ public class GroupMessageListActivity extends AppCompatActivity
                         if (selected_group_messages.size() == 1)
                         {
                             amode_info_menu_item.setVisible(true);
+                            ToolbarActionMode.update_fullscreen_menu_visibility(amode);
                         }
                         else
                         {
                             amode_info_menu_item.setVisible(false);
+                            ToolbarActionMode.update_fullscreen_menu_visibility(amode);
                         }
 
                         if (amode != null)

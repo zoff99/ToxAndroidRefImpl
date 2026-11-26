@@ -330,4 +330,8 @@
     <color name="list_chip_bg">#37474F</color>
     <color name="list_chip_text">#ECEFF1</color>
 
+    <!-- fullscreen message reader -->
+    <color name="message_fullscreen_bg">#1E1E1E</color>
+    <color name="message_fullscreen_text">#E0E0E0</color>
+
 </resources>

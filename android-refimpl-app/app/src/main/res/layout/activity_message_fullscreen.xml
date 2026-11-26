@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/message_fullscreen_bg"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <!-- vertical scrolling (pinch zoom aware) with horizontal scrolling inside
+         for wide formatted lines. the text is a plain native TextView. -->
+    <com.zoffcc.applications.trifa.PinchZoomScrollView
+        android:id="@+id/message_fullscreen_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true">
+
+        <HorizontalScrollView
+            android:id="@+id/message_fullscreen_hscroll"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fillViewport="true">
+
+            <TextView
+                android:id="@+id/message_fullscreen_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="monospace"
+                android:lineSpacingExtra="2dp"
+                android:padding="12dp"
+                android:textColor="@color/message_fullscreen_text"
+                android:textIsSelectable="true"
+                android:textSize="16sp"
+                android:typeface="monospace" />
+
+        </HorizontalScrollView>
+
+    </com.zoffcc.applications.trifa.PinchZoomScrollView>
+
+</LinearLayout>

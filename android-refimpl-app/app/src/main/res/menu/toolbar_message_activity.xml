@@ -23,4 +23,10 @@
         android:title="@string/layout___info"
         android:visible="false"
         app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/action_fullscreen"
+        android:icon="@drawable/ic_fullscreen_white_24dp"
+        android:title="@string/layout___fullscreen"
+        android:visible="false"
+        app:showAsAction="always"/>
 </menu>

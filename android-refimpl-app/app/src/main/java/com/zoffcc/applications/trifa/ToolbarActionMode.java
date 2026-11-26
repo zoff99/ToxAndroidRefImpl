@@ -38,6 +38,7 @@ import static com.zoffcc.applications.trifa.HelperMessage.save_selected_messages
 import static com.zoffcc.applications.trifa.HelperMessage.show_select_conference_message_info;
 import static com.zoffcc.applications.trifa.HelperMessage.show_select_group_message_info;
 import static com.zoffcc.applications.trifa.HelperMessage.show_select_message_info;
+import static com.zoffcc.applications.trifa.HelperMessage.show_selected_message_fullscreen;
 import static com.zoffcc.applications.trifa.MainActivity.selected_conference_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages;
 import static com.zoffcc.applications.trifa.MainActivity.selected_group_messages_incoming_file;
@@ -59,6 +60,50 @@ public class ToolbarActionMode implements ActionMode.Callback
     public ToolbarActionMode(Context context)
     {
         this.context = context;
+    }
+
+    // show the fullscreen action only when exactly ONE text message is selected.
+    // called from the selection handlers right where the info action visibility
+    // is updated. conferences carry text only, so there the count is enough.
+    public static void update_fullscreen_menu_visibility(ActionMode mode)
+    {
+        try
+        {
+            if (mode == null)
+            {
+                return;
+            }
+            MenuItem item = mode.getMenu().findItem(R.id.action_fullscreen);
+            if (item == null)
+            {
+                return;
+            }
+
+            boolean one_text_selected = false;
+            if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
+            {
+                if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
+                {
+                    // normal chat view
+                    one_text_selected = (selected_messages.size() == 1) && (selected_messages_text_only.size() == 1);
+                }
+                else
+                {
+                    // group chat view
+                    one_text_selected = (selected_group_messages.size() == 1) && (selected_group_messages_text_only.size() == 1);
+                }
+            }
+            else
+            {
+                // conference view (text only)
+                one_text_selected = (selected_conference_messages.size() == 1);
+            }
+            item.setVisible(one_text_selected);
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "update_fullscreen_menu_visibility:" + e.getMessage());
+        }
     }
 
     @Override
@@ -184,6 +229,13 @@ public class ToolbarActionMode implements ActionMode.Callback
                     // conference view
                     show_select_conference_message_info(context);
                 }
+                mode.finish(); // Finish action mode
+                break;
+
+            case R.id.action_fullscreen:
+                action_active = true;
+                // show the single selected text message full screen for reading
+                show_selected_message_fullscreen(context);
                 mode.finish(); // Finish action mode
                 break;
         }

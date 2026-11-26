@@ -122,6 +122,11 @@
             android:label="@string/message_list_activity_name">
         </activity>
         <activity
+            android:name=".MessageFullscreenActivity"
+            android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
+            android:label="@string/message_fullscreen_activity_name">
+        </activity>
+        <activity
             android:name=".ConferenceMessageListActivity"
             android:configChanges="screenSize|locale|touchscreen|navigation|orientation|fontScale|keyboard|keyboardHidden"
             android:label="@string/conference_message_list_activity_name">

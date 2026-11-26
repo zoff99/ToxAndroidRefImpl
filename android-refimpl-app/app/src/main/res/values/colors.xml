@@ -339,4 +339,8 @@
     <color name="swipe_unpin_icon_armed">#FF8A80</color>
     <color name="swipe_reply_icon_armed">#FFD740</color>
 
+    <!-- fullscreen message reader -->
+    <color name="message_fullscreen_bg">#FFFFFF</color>
+    <color name="message_fullscreen_text">#212121</color>
+
 </resources>

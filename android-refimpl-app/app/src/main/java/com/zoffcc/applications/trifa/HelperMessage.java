@@ -23,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.Cursor;
 import android.util.Log;
 import android.widget.TextView;
@@ -1069,6 +1070,58 @@ public class HelperMessage
         catch (Exception e2)
         {
             e2.printStackTrace();
+        }
+    }
+
+    // open the single selected text message in the fullscreen reader.
+    // works for the friend, group and conference message lists.
+    static void show_selected_message_fullscreen(Context c)
+    {
+        try
+        {
+            String message_text = null;
+
+            if ((MainActivity.selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
+            {
+                if ((MainActivity.selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
+                {
+                    // normal chat view
+                    if (MainActivity.selected_messages.size() == 1)
+                    {
+                        final Message m = (Message) orma.selectFromMessage().idEq(MainActivity.selected_messages.get(0)).get(0);
+                        message_text = m.text;
+                    }
+                }
+                else
+                {
+                    // group chat view
+                    if (MainActivity.selected_group_messages.size() == 1)
+                    {
+                        final GroupMessage m = (GroupMessage) orma.selectFromGroupMessage().idEq(MainActivity.selected_group_messages.get(0)).get(0);
+                        message_text = m.text;
+                    }
+                }
+            }
+            else
+            {
+                // conference view
+                if (MainActivity.selected_conference_messages.size() == 1)
+                {
+                    final ConferenceMessage m = (ConferenceMessage) orma.selectFromConferenceMessage().idEq(MainActivity.selected_conference_messages.get(0)).get(0);
+                    message_text = m.text;
+                }
+            }
+
+            if (message_text != null)
+            {
+                Intent intent = new Intent(c, MessageFullscreenActivity.class);
+                intent.putExtra("message_text", message_text);
+                c.startActivity(intent);
+            }
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "show_selected_message_fullscreen:" + e.getMessage());
         }
     }
 
