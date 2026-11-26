@@ -49,7 +49,7 @@ import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encryp
 public class IOCipherContentProvider extends AbstractFileProvider
 {
     public static final String TAG = "IOCipherContentProvider";
-    public static final Uri FILES_URI = Uri.parse("content://com.zoffcc.applications.trifa.ext1_fileprovider/");
+    public static final Uri FILES_URI = Uri.parse("content://" + TRIFAGlobals.EXT1_FILEPROVIDER_AUTHORITY + "/");
     private static final int PIPE_BLOCKSIZE = 8192; // do not change this. its the blocksize of IOCipher.
     private MimeTypeMap mimeTypeMap;
 

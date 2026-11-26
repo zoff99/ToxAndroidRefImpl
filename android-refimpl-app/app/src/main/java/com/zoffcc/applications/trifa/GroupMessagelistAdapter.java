@@ -320,6 +320,11 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                     ((GroupMessageListHolder_error) holder).bindMessageList(null);
                     break;
             }
+            ChatUI.decorate(holder.itemView, getItemViewType(position), m2.sent_timestamp, m2.direction != 0,
+                            m2.read, false, false, MainActivity.selected_group_messages.contains(m2.id), true, m2.was_synced, m2.sync_confirmations);
+            if (getItemViewType(position) != Message_model.PAGING_OLDER && getItemViewType(position) != Message_model.PAGING_NEWER)
+            ChatUI.bindDate(holder.itemView, getDateHeaderText(position), position > 0 ? getDateHeaderText(position - 1) : null,
+                            m2.sent_timestamp, m2.direction != 0);
         }
         catch (Exception e)
         {
@@ -515,53 +520,18 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
     {
         try
         {
-            GroupMessage getSectionText_message_object2 = (GroupMessage) messagelistitems.get(position);
-
-            // "load all messages" dummy entry has no meaningful timestamp
-            if ((getSectionText_message_object2.tox_group_peer_pubkey != null) &&
-                (getSectionText_message_object2.tox_group_peer_pubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) &&
-                (getSectionText_message_object2.message_id_tox != null) &&
-                (getSectionText_message_object2.message_id_tox.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
-            {
-                return " ";
-            }
-
-            if (getSectionText_message_object2.direction == 0)
-            {
-                // incoming msg
-                if (getSectionText_message_object2.rcvd_timestamp == getSectionText_message_object_ts2)
-                {
-                    return getSectionText_message_object_ts_string2;
-                }
-                else
-                {
-                    getSectionText_message_object_ts2 = getSectionText_message_object2.rcvd_timestamp;
-                    getSectionText_message_object_ts_string2 =
-                            "" + only_date_time_format(getSectionText_message_object2.rcvd_timestamp);
-                    return getSectionText_message_object_ts_string2;
-                }
-            }
-            else
-            {
-                // outgoing msg
-                if (getSectionText_message_object2.sent_timestamp == getSectionText_message_object_ts2)
-                {
-                    return getSectionText_message_object_ts_string2;
-                }
-                else
-                {
-                    getSectionText_message_object_ts2 = getSectionText_message_object2.sent_timestamp;
-                    getSectionText_message_object_ts_string2 =
-                            "" + only_date_time_format(getSectionText_message_object2.sent_timestamp);
-                    return getSectionText_message_object_ts_string2;
-                }
-            }
+            if (position < 0 || position >= messagelistitems.size()) return "";
+            return ChatUI.date(context, messageTimestamp(position));
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            return " ";
+            return "";
         }
+    }
+
+    long messageTimestamp(int position)
+    {
+        return ChatUI.messageTimestamp(messagelistitems.get(position));
     }
 
     public GroupMessage get_item(int position)

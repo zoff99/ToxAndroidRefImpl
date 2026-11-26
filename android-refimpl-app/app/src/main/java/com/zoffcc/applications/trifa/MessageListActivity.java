@@ -365,7 +365,8 @@ public class MessageListActivity extends AppCompatActivity
         ml_video_icon = (ImageButton) findViewById(R.id.ml_video_icon);
         ml_attach_button_01 = (ImageButton) findViewById(R.id.ml_button_01);
         ml_button_recaudio = (ImageButton) findViewById(R.id.ml_button_recaudio);
-        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        ml_button_recaudio.setBackgroundResource(R.drawable.chat_send_bg);
+        ml_button_recaudio.setColorFilter(Color.WHITE);
         audio_rec_popup_button = findViewById(R.id.audio_rec_popup_button);
         audio_rec_popup_time = findViewById(R.id.audio_rec_popup_time);
         audio_rec_popup_container = findViewById(R.id.audio_rec_popup_container);
@@ -486,7 +487,8 @@ public class MessageListActivity extends AppCompatActivity
                         getColor(R.color.icon_colors)).
                 sizeDp(80);
 
-        insert_emoji.setImageDrawable(d1);
+        insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
         // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
 
         insert_emoji.setOnClickListener(new View.OnClickListener()
@@ -676,7 +678,7 @@ public class MessageListActivity extends AppCompatActivity
                     @Override
                     public void run()
                     {
-                        ml_maintext.setText(f_name);
+                        runOnUiThread(() -> ChatUI.setHeader(MessageListActivity.this, f_name, ""));
                     }
                 };
 
@@ -734,7 +736,7 @@ public class MessageListActivity extends AppCompatActivity
                             catch(Exception e)
                             {
                                 ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                                v.setBackgroundColor(Color.TRANSPARENT);
+                                ChatUI.select(v, false);
                                 set_recording_pop_visibilty_s(false);
                                 ml_is_recording = false;
                                 ml_is_rec_ok = false;
@@ -755,7 +757,7 @@ public class MessageListActivity extends AppCompatActivity
                                 catch(Exception e)
                                 {
                                     ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                                    v.setBackgroundColor(Color.TRANSPARENT);
+                                    ChatUI.select(v, false);
                                     set_recording_pop_visibilty_s(false);
                                     ml_is_recording = false;
                                     ml_is_rec_ok = false;
@@ -775,7 +777,7 @@ public class MessageListActivity extends AppCompatActivity
                                 {
                                     // HINT: just in case of an endless loop, we return here
                                     ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                                    v.setBackgroundColor(Color.TRANSPARENT);
+                                    ChatUI.select(v, false);
                                     set_recording_pop_visibilty_s(false);
                                     ml_is_recording = false;
                                     ml_is_rec_ok = false;
@@ -792,7 +794,7 @@ public class MessageListActivity extends AppCompatActivity
                             {
                                 // HINT: some problem on starting the recording
                                 ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                                v.setBackgroundColor(Color.TRANSPARENT);
+                                ChatUI.select(v, false);
                                 set_recording_pop_visibilty_s(false);
                                 ml_is_recording = false;
                                 ml_is_rec_ok = false;
@@ -820,7 +822,7 @@ public class MessageListActivity extends AppCompatActivity
                                 }
                             }
                             ((ImageButton) v).setImageResource(R.drawable.baseline_pending_24);
-                            v.setBackgroundColor(Color.TRANSPARENT);
+                            ChatUI.select(v, false);
                             set_recording_pop_visibilty_s(false);
                             int rec_result = mAudioRecorder.stopRecord();
                             Log.i(TAG, "onCreate:record_audio:finished:res=" + rec_result);
@@ -835,7 +837,7 @@ public class MessageListActivity extends AppCompatActivity
                             e.printStackTrace();
                         }
                         ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                        v.setBackgroundColor(Color.TRANSPARENT);
+                        ChatUI.select(v, false);
                         set_recording_pop_visibilty_s(false);
 
                         if (ml_is_rec_ok)
@@ -954,7 +956,20 @@ public class MessageListActivity extends AppCompatActivity
 
         HelperGeneric.perf_log(TAG, "friend/act:onCreate:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         Log.i(TAG, "onCreate:099");
+        ChatUI.setup(this, ChatUI.FRIEND, messageSearchView);
+        ChatUI.friendAvatar(this, tox_friend_get_public_key__wrapper(friendnum));
         oncreate_finished = true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        if (item.getItemId() == android.R.id.home)
+        {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -971,8 +986,9 @@ public class MessageListActivity extends AppCompatActivity
         Log.i(TAG, "onPause");
         super.onPause();
 
-        ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
-        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        ml_button_recaudio.setImageResource(R.drawable.chat_ic_mic);
+        ml_button_recaudio.setBackgroundResource(R.drawable.chat_send_bg);
+        ml_button_recaudio.setColorFilter(Color.WHITE);
         set_recording_pop_visibilty_s(false);
         ml_is_recording = false;
         ml_is_rec_ok = false;
@@ -995,8 +1011,9 @@ public class MessageListActivity extends AppCompatActivity
     protected void onStop()
     {
         super.onStop();
-        ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
-        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        ml_button_recaudio.setImageResource(R.drawable.chat_ic_mic);
+        ml_button_recaudio.setBackgroundResource(R.drawable.chat_send_bg);
+        ml_button_recaudio.setColorFilter(Color.WHITE);
         ml_is_recording = false;
         ml_is_rec_ok = false;
     }
@@ -1094,6 +1111,8 @@ public class MessageListActivity extends AppCompatActivity
 
         HelperGeneric.perf_log(TAG, "friend/act:onResume:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         message_list_activity = this;
+        ChatUI.friendAvatar(this, tox_friend_get_public_key__wrapper(friendnum));
+        ChatUI.updatePresence(this, ChatUI.FRIEND);
         wakeup_tox_thread("UI_MSGVIEW");
     }
 
@@ -1249,7 +1268,8 @@ public class MessageListActivity extends AppCompatActivity
                                 getColor(R.color.icon_colors)).
                         sizeDp(80);
 
-                insert_emoji.setImageDrawable(d1);
+                insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
                 // insert_emoji.setImageResource(R.drawable.about_icon_email);
             }
         }).setOnSoftKeyboardOpenListener(new OnSoftKeyboardOpenListener()
@@ -1270,7 +1290,8 @@ public class MessageListActivity extends AppCompatActivity
                                 getColor(R.color.icon_colors)).
                         sizeDp(80);
 
-                insert_emoji.setImageDrawable(d1);
+                insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
                 // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
             }
         }).setOnSoftKeyboardCloseListener(new OnSoftKeyboardCloseListener()
@@ -1314,6 +1335,7 @@ public class MessageListActivity extends AppCompatActivity
                     else
                     {
                         ml_status_icon.setImageResource(R.drawable.circle_red);
+                    ChatUI.updatePresence(MessageListActivity.this, ChatUI.FRIEND);
                     }
                 }
                 catch (Exception e)
@@ -1345,6 +1367,7 @@ public class MessageListActivity extends AppCompatActivity
                     else
                     {
                         ml_icon.setImageResource(R.drawable.circle_green);
+                    ChatUI.updatePresence(MessageListActivity.this, ChatUI.FRIEND);
                     }
                 }
                 catch (Exception e)
@@ -1415,6 +1438,11 @@ public class MessageListActivity extends AppCompatActivity
                         return true;
                     }
             }
+        }
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && findViewById(R.id.chat_search_bar).getVisibility() == View.VISIBLE)
+        {
+            findViewById(R.id.chat_search_close).performClick();
+            return true;
         }
         return super.dispatchKeyEvent(event);
     }
@@ -2409,7 +2437,7 @@ public class MessageListActivity extends AppCompatActivity
         {
             if (is_selected)
             {
-                v.setBackgroundColor(Color.TRANSPARENT);
+                ChatUI.select(v, false);
                 is_selected = false;
                 selected_messages.remove(message_.id);
                 selected_messages_text_only.remove(message_.id);
@@ -2443,7 +2471,7 @@ public class MessageListActivity extends AppCompatActivity
                 {
                     if (amode != null)
                     {
-                        amode.setTitle("" + selected_messages.size() + " selected");
+                        amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_messages.size()));
                     }
                 }
             }
@@ -2451,7 +2479,7 @@ public class MessageListActivity extends AppCompatActivity
             {
                 if (!selected_messages.isEmpty())
                 {
-                    v.setBackgroundColor(Color.GRAY);
+                    ChatUI.select(v, true);
                     is_selected = true;
                     selected_messages.add(message_.id);
                     if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_TYPE_TEXT.value)
@@ -2488,7 +2516,7 @@ public class MessageListActivity extends AppCompatActivity
 
                     if (amode != null)
                     {
-                        amode.setTitle("" + selected_messages.size() + " selected");
+                        amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_messages.size()));
                     }
                 }
             }
@@ -2525,7 +2553,7 @@ public class MessageListActivity extends AppCompatActivity
                         amode = message_list_activity.startSupportActionMode(new ToolbarActionMode(context));
                         amode_save_menu_item = amode.getMenu().findItem(R.id.action_save);
                         amode_info_menu_item = amode.getMenu().findItem(R.id.action_info);
-                        v.setBackgroundColor(Color.GRAY);
+                        ChatUI.select(v, true);
                         ret.is_selected = true;
                         selected_messages.add(message_.id);
                         if (message_.TRIFA_MESSAGE_TYPE == TRIFA_MSG_TYPE_TEXT.value)
@@ -2562,7 +2590,7 @@ public class MessageListActivity extends AppCompatActivity
 
                         if (amode != null)
                         {
-                            amode.setTitle("" + selected_messages.size() + " selected");
+                            amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_messages.size()));
                         }
                         ret.ret_value = true;
                         return ret;

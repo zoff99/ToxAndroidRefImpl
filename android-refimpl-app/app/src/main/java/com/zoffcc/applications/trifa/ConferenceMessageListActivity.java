@@ -397,7 +397,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                         getColor(R.color.icon_colors)).
                 sizeDp(80);
 
-        insert_emoji.setImageDrawable(d1);
+        insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
 
         insert_emoji.setOnClickListener(new View.OnClickListener()
         {
@@ -443,6 +444,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         perf_t = SystemClock.elapsedRealtime();
         HelperGeneric.perf_log(TAG, "conference/act:onCreate:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
 
+        ChatUI.setup(this, ChatUI.CONFERENCE, messageSearchView);
         Log.i(TAG, "onCreate:099");
     }
 
@@ -507,13 +509,12 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
                             if (peer_count > -1)
                             {
-                                ml_maintext.setText(
-                                        f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count +
-                                        " " + getString(R.string.GroupActivityOffline) + " " + frozen_peer_count);
+                                ChatUI.setHeader(ConferenceMessageListActivity.this, f_name, getString(R.string.GroupActivityActive) + " " + peer_count +
+                                        " · " + getString(R.string.GroupActivityOffline) + " " + frozen_peer_count);
                             }
                             else
                             {
-                                ml_maintext.setText(f_name);
+                                ChatUI.setHeader(ConferenceMessageListActivity.this, f_name, "");
                                 // ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                             }
                         }
@@ -672,7 +673,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                 getColor(R.color.icon_colors)).
                         sizeDp(80);
 
-                insert_emoji.setImageDrawable(d1);
+                insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
                 // insert_emoji.setImageResource(R.drawable.about_icon_email);
             }
         }).setOnSoftKeyboardOpenListener(new OnSoftKeyboardOpenListener()
@@ -693,7 +695,8 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                                 getColor(R.color.icon_colors)).
                         sizeDp(80);
 
-                insert_emoji.setImageDrawable(d1);
+                insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
                 // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
             }
         }).setOnSoftKeyboardCloseListener(new OnSoftKeyboardCloseListener()
@@ -865,7 +868,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         {
             if (is_selected)
             {
-                v.setBackgroundColor(Color.TRANSPARENT);
+                ChatUI.select(v, false);
                 is_selected = false;
                 selected_conference_messages.remove(message_.id);
                 if (selected_conference_messages.size() == 1)
@@ -888,7 +891,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                 {
                     if (amode != null)
                     {
-                        amode.setTitle("" + selected_conference_messages.size() + " selected");
+                        amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_conference_messages.size()));
                     }
                 }
             }
@@ -896,7 +899,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
             {
                 if (!selected_conference_messages.isEmpty())
                 {
-                    v.setBackgroundColor(Color.GRAY);
+                    ChatUI.select(v, true);
                     is_selected = true;
                     selected_conference_messages.add(message_.id);
 
@@ -913,7 +916,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
                     if (amode != null)
                     {
-                        amode.setTitle("" + selected_conference_messages.size() + " selected");
+                        amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_conference_messages.size()));
                     }
                 }
             }
@@ -950,7 +953,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
                         amode = MainActivity.conference_message_list_activity.startSupportActionMode(
                                 new ToolbarActionMode(context));
                         amode_info_menu_item = amode.getMenu().findItem(R.id.action_info);
-                        v.setBackgroundColor(Color.GRAY);
+                        ChatUI.select(v, true);
                         ret.is_selected = true;
                         selected_conference_messages.add(message_.id);
 
@@ -967,7 +970,7 @@ public class ConferenceMessageListActivity extends AppCompatActivity
 
                         if (amode != null)
                         {
-                            amode.setTitle("" + selected_conference_messages.size() + " selected");
+                            amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_conference_messages.size()));
                         }
                         ret.ret_value = true;
                         return ret;
@@ -995,6 +998,10 @@ public class ConferenceMessageListActivity extends AppCompatActivity
         {
             conference_message_drawer.closeDrawer();
         }
+        else if (findViewById(R.id.chat_search_bar).getVisibility() == View.VISIBLE)
+            {
+                findViewById(R.id.chat_search_close).performClick();
+            }
         else
         {
             super.onBackPressed();

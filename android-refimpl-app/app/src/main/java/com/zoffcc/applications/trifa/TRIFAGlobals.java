@@ -100,7 +100,10 @@ public class TRIFAGlobals
     static int AUTO_ACCEPT_FT_MAX_VIDEO_SIZE_IN_MB = 40;
     static int AUTO_ACCEPT_FT_MAX_ANYKIND_SIZE_IN_MB = 200;
 
-    public static final String MY_PACKAGE_NAME = "com.zoffcc.applications.trifa";
+    public static final String MY_PACKAGE_NAME = BuildConfig.APPLICATION_ID;
+    public static final String STD_FILEPROVIDER_AUTHORITY = MY_PACKAGE_NAME + ".std_fileprovider";
+    public static final String EXT2_PROVIDER_AUTHORITY = MY_PACKAGE_NAME + ".ext2_provider";
+    public static final String EXT1_FILEPROVIDER_AUTHORITY = MY_PACKAGE_NAME + ".ext1_fileprovider";
     public static final int CONFERENCE_COOKIE_LENGTH = 35;
     public static final int CONFERENCE_ID_LENGTH = 32;
     public static final int GROUP_ID_LENGTH = 32;

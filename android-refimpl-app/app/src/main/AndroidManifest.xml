@@ -422,7 +422,7 @@
 
         <provider
             android:name=".StdContentProvider"
-            android:authorities="com.zoffcc.applications.trifa.std_fileprovider"
+            android:authorities="${applicationId}.std_fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
             <meta-data
@@ -432,7 +432,7 @@
 
         <provider
             android:name=".Ext2ContentProvider"
-            android:authorities="com.zoffcc.applications.trifa.ext2_provider"
+            android:authorities="${applicationId}.ext2_provider"
             android:grantUriPermissions="true"
             android:exported="false">
             <meta-data
@@ -442,7 +442,7 @@
 
         <provider
             android:name=".IOCipherContentProvider"
-            android:authorities="com.zoffcc.applications.trifa.ext1_fileprovider"
+            android:authorities="${applicationId}.ext1_fileprovider"
             android:grantUriPermissions="true"
             android:exported="true">
         </provider>

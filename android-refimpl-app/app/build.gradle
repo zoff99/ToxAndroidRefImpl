@@ -249,7 +249,7 @@ android {
     }
 
     defaultConfig {
-        applicationId "com.zoffcc.applications.trifa"
+        applicationId "com.zoffcc.applications.trifama"
         minSdkVersion 21
         //noinspection OldTargetApi
         targetSdkVersion 33

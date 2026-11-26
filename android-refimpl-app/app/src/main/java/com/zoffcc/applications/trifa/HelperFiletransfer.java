@@ -1187,7 +1187,7 @@ public class HelperFiletransfer
 
     static void share_local_file(final String filename_fullpath, final Context context)
     {
-        Uri file_uri = FileProvider.getUriForFile(context, "com.zoffcc.applications.trifa.std_fileprovider",
+        Uri file_uri = FileProvider.getUriForFile(context, TRIFAGlobals.STD_FILEPROVIDER_AUTHORITY,
                                                   new java.io.File(filename_fullpath));
 
         Intent intent = new Intent(Intent.ACTION_SEND, file_uri);
@@ -1218,7 +1218,7 @@ public class HelperFiletransfer
         {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             {
-                Uri file_uri = FileProvider.getUriForFile(context, "com.zoffcc.applications.trifa.std_fileprovider",
+                Uri file_uri = FileProvider.getUriForFile(context, TRIFAGlobals.STD_FILEPROVIDER_AUTHORITY,
                                                           new java.io.File(filename_fullpath));
                 MimeTypeMap myMime = MimeTypeMap.getSingleton();
                 String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));
@@ -1254,7 +1254,7 @@ public class HelperFiletransfer
         {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
             {
-                Uri file_uri = FileProvider.getUriForFile(context, "com.zoffcc.applications.trifa.ext2_provider",
+                Uri file_uri = FileProvider.getUriForFile(context, TRIFAGlobals.EXT2_PROVIDER_AUTHORITY,
                                                           new java.io.File(filename_fullpath));
                 MimeTypeMap myMime = MimeTypeMap.getSingleton();
                 String mimeType = myMime.getMimeTypeFromExtension(getFileExtensionFromUrl(filename_fullpath));

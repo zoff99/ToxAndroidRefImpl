@@ -262,6 +262,11 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                     ((ConferenceMessageListHolder_error) holder).bindMessageList(null);
                     break;
             }
+            ChatUI.decorate(holder.itemView, getItemViewType(position), m2.sent_timestamp, m2.direction != 0,
+                            m2.read, false, false, MainActivity.selected_conference_messages.contains(m2.id), true, false, 0);
+            if (getItemViewType(position) != Message_model.PAGING_OLDER && getItemViewType(position) != Message_model.PAGING_NEWER)
+            ChatUI.bindDate(holder.itemView, getDateHeaderText(position), position > 0 ? getDateHeaderText(position - 1) : null,
+                            m2.sent_timestamp, m2.direction != 0);
         }
         catch (Exception e)
         {
@@ -457,53 +462,18 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
     {
         try
         {
-            ConferenceMessage getSectionText_message_object2 = messagelistitems.get(position);
-
-            // "load all messages" dummy entry has no meaningful timestamp
-            if ((getSectionText_message_object2.tox_peerpubkey != null) &&
-                (getSectionText_message_object2.tox_peerpubkey.equals(TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY)) &&
-                (getSectionText_message_object2.message_id_tox != null) &&
-                (getSectionText_message_object2.message_id_tox.equals(MESSAGE_PAGING_LOAD_ALL_HASH)))
-            {
-                return " ";
-            }
-
-            if (getSectionText_message_object2.direction == 0)
-            {
-                // incoming msg
-                if (getSectionText_message_object2.rcvd_timestamp == getSectionText_message_object_ts2)
-                {
-                    return getSectionText_message_object_ts_string2;
-                }
-                else
-                {
-                    getSectionText_message_object_ts2 = getSectionText_message_object2.rcvd_timestamp;
-                    getSectionText_message_object_ts_string2 =
-                            "" + only_date_time_format(getSectionText_message_object2.rcvd_timestamp);
-                    return getSectionText_message_object_ts_string2;
-                }
-            }
-            else
-            {
-                // outgoing msg
-                if (getSectionText_message_object2.sent_timestamp == getSectionText_message_object_ts2)
-                {
-                    return getSectionText_message_object_ts_string2;
-                }
-                else
-                {
-                    getSectionText_message_object_ts2 = getSectionText_message_object2.sent_timestamp;
-                    getSectionText_message_object_ts_string2 =
-                            "" + only_date_time_format(getSectionText_message_object2.sent_timestamp);
-                    return getSectionText_message_object_ts_string2;
-                }
-            }
+            if (position < 0 || position >= messagelistitems.size()) return "";
+            return ChatUI.date(context, messageTimestamp(position));
         }
         catch (Exception e)
         {
-            e.printStackTrace();
-            return " ";
+            return "";
         }
+    }
+
+    long messageTimestamp(int position)
+    {
+        return ChatUI.messageTimestamp(messagelistitems.get(position));
     }
 
     public ConferenceMessage get_item(int position)

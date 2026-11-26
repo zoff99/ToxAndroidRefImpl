@@ -114,7 +114,7 @@ public class WatchdogService extends Service
             {
                 Intent notificationIntent = new Intent(this, StartMainActivityWrapper.class);
                 notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                notificationIntent.setAction("com.zoffcc.applications.trifa." + (long) (Math.random() * 100000));
+                notificationIntent.setAction(TRIFAGlobals.MY_PACKAGE_NAME + "." + (long) (Math.random() * 100000));
                 notificationIntent.putExtra("CLEAR_NEW_MESSAGE_NOTIFICATION", "1");
                 PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
                                                                         notificationIntent, PendingIntent.FLAG_IMMUTABLE);

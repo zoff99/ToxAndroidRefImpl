@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Original conversation palette; no third-party branding or assets. -->
+    <color name="chat_header">#125C56</color>
+    <color name="chat_header_dark">#172725</color>
+    <color name="chat_on_header">#FFFFFF</color>
+    <color name="chat_on_header_secondary">#D0E5E1</color>
+    <color name="chat_canvas">#F3F1EA</color>
+    <color name="chat_canvas_dark">#101B19</color>
+    <color name="chat_incoming">#FFFFFF</color>
+    <color name="chat_incoming_dark">#20332F</color>
+    <color name="chat_outgoing">#DCF4E6</color>
+    <color name="chat_outgoing_dark">#174D3D</color>
+    <color name="chat_text">#17231F</color>
+    <color name="chat_text_dark">#EDF5F2</color>
+    <color name="chat_metadata">#586B63</color>
+    <color name="chat_metadata_dark">#B1C7BE</color>
+    <color name="chat_link">#087A83</color>
+    <color name="chat_link_dark">#7DD6DC</color>
+    <color name="chat_accent">#168574</color>
+    <color name="chat_read">#1689A0</color>
+    <color name="chat_selection">#3320A18A</color>
+    <color name="chat_date_bg">#E2EAE5</color>
+    <color name="chat_date_bg_dark">#2B403A</color>
+    <color name="chat_composer">#F8FAF8</color>
+    <color name="chat_composer_dark">#172725</color>
+    <color name="chat_input">#FFFFFF</color>
+    <color name="chat_input_dark">#243A34</color>
+    <dimen name="chat_bubble_radius">14dp</dimen>
+    <dimen name="chat_action_size">44dp</dimen>
+    <string name="chat_input_hint">Message</string>
+    <string name="chat_search">Search messages</string>
+    <string name="chat_media_gallery">Media gallery</string>
+    <string name="chat_all_messages">All messages</string>
+    <string name="chat_only_files">Only files</string>
+    <string name="chat_participants">Participants</string>
+    <string name="chat_more_options">More options</string>
+    <string name="chat_avatar">Conversation avatar</string>
+    <string name="chat_online">Online</string>
+    <string name="chat_offline">Offline</string>
+    <string name="chat_away">Away</string>
+    <string name="chat_busy">Busy</string>
+    <string name="chat_today">Today</string>
+    <string name="chat_yesterday">Yesterday</string>
+    <string name="chat_selected">%1$d selected</string>
+    <string name="chat_reply">Reply</string>
+    <string name="chat_pending">Pending</string>
+    <string name="chat_sent">Sent</string>
+    <string name="chat_relayed">Stored at offline relay</string>
+    <string name="chat_push_requested">Push notification requested</string>
+    <string name="chat_read">Read receipt received</string>
+    <string name="chat_sync_confirmations">Sync confirmations: %1$d</string>
+    <string name="chat_emoji">Emoji</string>
+    <string name="chat_attach">Attach a file</string>
+    <string name="chat_send">Send message</string>
+    <string name="chat_record">Record audio message</string>
+    <string name="chat_attachment_state">File transfer state</string>
+    <string name="chat_quote_hint">Replying to message</string>
+    <!-- Keep the legacy coordinator style valid when Jetifier is disabled. -->
+    <style name="Widget.Support.CoordinatorLayout" parent="android:Widget">
+        <item name="statusBarBackground">@color/md_black_1000</item>
+    </style>
+</resources>

@@ -1,0 +1,4 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/chat_outgoing"/>
+    <corners android:topLeftRadius="@dimen/chat_bubble_radius" android:topRightRadius="4dp" android:bottomLeftRadius="@dimen/chat_bubble_radius" android:bottomRightRadius="@dimen/chat_bubble_radius"/>
+</shape>

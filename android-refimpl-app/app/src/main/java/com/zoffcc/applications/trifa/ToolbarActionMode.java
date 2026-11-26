@@ -26,6 +26,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.zoffcc.applications.sorm.Message;
+
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.view.MenuItemCompat;
@@ -72,6 +74,21 @@ public class ToolbarActionMode implements ActionMode.Callback
     // show the fullscreen action only when exactly ONE text message is selected.
     // called from the selection handlers right where the info action visibility
     // is updated. conferences carry text only, so there the count is enough.
+    public static void update_reply_menu_visibility(ActionMode mode)
+    {
+        try
+        {
+            MenuItem reply = mode.getMenu().findItem(R.id.action_reply);
+            if (reply == null) return;
+            boolean visible = false;
+            if (MainActivity.message_list_activity != null) visible = MainActivity.selected_messages_text_only.size() == 1 && MainActivity.selected_messages.size() == 1;
+            else if (MainActivity.group_message_list_activity != null) visible = MainActivity.selected_group_messages_text_only.size() == 1 && MainActivity.selected_group_messages.size() == 1;
+            else if (MainActivity.conference_message_list_activity != null) visible = MainActivity.selected_conference_messages.size() == 1;
+            reply.setVisible(visible);
+        }
+        catch (Exception ignored) {}
+    }
+
     public static void update_fullscreen_menu_visibility(ActionMode mode)
     {
         try
@@ -141,6 +158,7 @@ public class ToolbarActionMode implements ActionMode.Callback
         }
 
         action_active = false;
+        update_reply_menu_visibility(mode);
         return true;
     }
 
@@ -156,6 +174,29 @@ public class ToolbarActionMode implements ActionMode.Callback
                 // in the meantime). the delete itself only runs on confirm.
                 action_active = true;
                 confirm_and_delete_selected_messages(mode);
+                break;
+
+            case R.id.action_reply:
+                action_active = false;
+                if (MainActivity.message_list_activity != null && !MainActivity.selected_messages_text_only.isEmpty())
+                {
+                    long id = MainActivity.selected_messages_text_only.iterator().next();
+                    Message m = TrifaToxService.orma.selectFromMessage().idEq(id).get(0);
+                    MessageListActivity.add_quote_message_text(m.text);
+                }
+                else if (MainActivity.group_message_list_activity != null && !MainActivity.selected_group_messages_text_only.isEmpty())
+                {
+                    long id = MainActivity.selected_group_messages_text_only.iterator().next();
+                    com.zoffcc.applications.sorm.GroupMessage m = TrifaToxService.orma.selectFromGroupMessage().idEq(id).get(0);
+                    GroupMessageListActivity.add_quote_group_message_text(m.text);
+                }
+                else if (MainActivity.conference_message_list_activity != null && !MainActivity.selected_conference_messages.isEmpty())
+                {
+                    long id = MainActivity.selected_conference_messages.iterator().next();
+                    com.zoffcc.applications.sorm.ConferenceMessage m = TrifaToxService.orma.selectFromConferenceMessage().idEq(id).get(0);
+                    ConferenceMessageListActivity.add_quote_conf_message_text(m.text);
+                }
+                mode.finish();
                 break;
 
             case R.id.action_copy:

@@ -508,7 +508,8 @@ public class GroupMessageListActivity extends AppCompatActivity
         ml_button_recaudio = (ImageButton) findViewById(R.id.ml_button_recaudio);
         ngc_audio_bar_in_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_in_v);
         ngc_audio_bar_out_v = (BarLevelDrawable) findViewById(R.id.ngc_audio_bar_out_v);
-        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        ml_button_recaudio.setBackgroundResource(R.drawable.chat_send_bg);
+        ml_button_recaudio.setColorFilter(Color.WHITE);
         audio_rec_popup_button = findViewById(R.id.audio_rec_popup_button);
         audio_rec_popup_time = findViewById(R.id.audio_rec_popup_time);
         audio_rec_popup_container = findViewById(R.id.audio_rec_popup_container);
@@ -1089,7 +1090,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                 80);
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
-        insert_emoji.setImageDrawable(d1);
+        insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
 
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
         insert_emoji.setOnClickListener(new View.OnClickListener()
@@ -1193,7 +1195,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                             catch (Exception e)
                             {
                                 ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                                v.setBackgroundColor(Color.TRANSPARENT);
+                                ChatUI.select(v, false);
                                 set_recording_pop_visibilty_s(false);
                                 ml_is_recording = false;
                                 ml_is_rec_ok = false;
@@ -1215,7 +1217,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 catch (Exception e)
                                 {
                                     ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                                    v.setBackgroundColor(Color.TRANSPARENT);
+                                    ChatUI.select(v, false);
                                     set_recording_pop_visibilty_s(false);
                                     ml_is_recording = false;
                                     ml_is_rec_ok = false;
@@ -1235,7 +1237,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 {
                                     // HINT: just in case of an endless loop, we return here
                                     ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                                    v.setBackgroundColor(Color.TRANSPARENT);
+                                    ChatUI.select(v, false);
                                     set_recording_pop_visibilty_s(false);
                                     ml_is_recording = false;
                                     ml_is_rec_ok = false;
@@ -1255,7 +1257,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                             {
                                 // HINT: some problem on starting the recording
                                 ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                                v.setBackgroundColor(Color.TRANSPARENT);
+                                ChatUI.select(v, false);
                                 set_recording_pop_visibilty_s(false);
                                 ml_is_recording = false;
                                 ml_is_rec_ok = false;
@@ -1283,7 +1285,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 }
                             }
                             ((ImageButton) v).setImageResource(R.drawable.baseline_pending_24);
-                            v.setBackgroundColor(Color.TRANSPARENT);
+                            ChatUI.select(v, false);
                             set_recording_pop_visibilty_s(false);
                             int rec_result = mAudioRecorder.stopRecord();
                             Log.i(TAG, "onCreate:record_audio:finished:res=" + rec_result);
@@ -1298,7 +1300,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                             e.printStackTrace();
                         }
                         ((ImageButton) v).setImageResource(R.drawable.baseline_keyboard_voice_24);
-                        v.setBackgroundColor(Color.TRANSPARENT);
+                        ChatUI.select(v, false);
                         set_recording_pop_visibilty_s(false);
 
                         if (ml_is_rec_ok)
@@ -1494,6 +1496,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         perf_t = SystemClock.elapsedRealtime();
         HelperGeneric.perf_log(TAG, "group/act:onCreate:TOTAL +" + (SystemClock.elapsedRealtime() - perf_t0) + "ms");
         Log.i(TAG, "onCreate:099");
+        ChatUI.setup(this, ChatUI.GROUP, messageSearchView);
         oncreate_finished = true;
         if (com.zoffcc.applications.trifa.MainActivity.INSANE_TRACE_LOGGING) { com.zoffcc.applications.trifa.HelperGeneric.log_source_line(); }
     }
@@ -1574,13 +1577,12 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                             if (peer_count > -1)
                             {
-                                ml_maintext.setText(
-                                        f_name + "\n" + getString(R.string.GroupActivityActive) + " " + peer_count +
-                                        " " + getString(R.string.GroupActivityOffline) + " " + frozen_peer_count);
+                                ChatUI.setHeader(GroupMessageListActivity.this, f_name, getString(R.string.GroupActivityActive) + " " + peer_count +
+                                        " · " + getString(R.string.GroupActivityOffline) + " " + frozen_peer_count);
                             }
                             else
                             {
-                                ml_maintext.setText(f_name);
+                                ChatUI.setHeader(GroupMessageListActivity.this, f_name, "");
                                 // ml_maintext.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
                             }
                         }
@@ -2060,8 +2062,9 @@ public class GroupMessageListActivity extends AppCompatActivity
         Log.i(TAG, "onPause");
         super.onPause();
 
-        ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
-        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        ml_button_recaudio.setImageResource(R.drawable.chat_ic_mic);
+        ml_button_recaudio.setBackgroundResource(R.drawable.chat_send_bg);
+        ml_button_recaudio.setColorFilter(Color.WHITE);
         set_recording_pop_visibilty_s(false);
         ml_is_recording = false;
         ml_is_rec_ok = false;
@@ -2107,8 +2110,9 @@ public class GroupMessageListActivity extends AppCompatActivity
             emojiPopup.dismiss();
         }
         super.onStop();
-        ml_button_recaudio.setImageResource(R.drawable.baseline_keyboard_voice_24);
-        ml_button_recaudio.setBackgroundColor(Color.TRANSPARENT);
+        ml_button_recaudio.setImageResource(R.drawable.chat_ic_mic);
+        ml_button_recaudio.setBackgroundResource(R.drawable.chat_send_bg);
+        ml_button_recaudio.setColorFilter(Color.WHITE);
         ml_is_recording = false;
         ml_is_rec_ok = false;
     }
@@ -2346,7 +2350,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                 final Drawable d1 = new IconicsDrawable(getBaseContext()).icon(FontAwesome.Icon.faw_keyboard).color(
                         getResources().getColor(R.color.icon_colors)).sizeDp(80);
 
-                insert_emoji.setImageDrawable(d1);
+                insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
                 // insert_emoji.setImageResource(R.drawable.about_icon_email);
             }
         }).setOnSoftKeyboardOpenListener(new OnSoftKeyboardOpenListener()
@@ -2365,7 +2370,8 @@ public class GroupMessageListActivity extends AppCompatActivity
                         GoogleMaterial.Icon.gmd_sentiment_satisfied).color(
                         getResources().getColor(R.color.icon_colors)).sizeDp(80);
 
-                insert_emoji.setImageDrawable(d1);
+                insert_emoji.setImageResource(R.drawable.chat_ic_smile);
+                insert_emoji.setColorFilter(ChatUI.metadataColor(insert_emoji.getContext()));
                 // insert_emoji.setImageResource(R.drawable.emoji_ios_category_people);
             }
         }).setOnSoftKeyboardCloseListener(new OnSoftKeyboardCloseListener()
@@ -2788,7 +2794,7 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             if (is_selected)
             {
-                v.setBackgroundColor(Color.TRANSPARENT);
+                ChatUI.select(v, false);
                 is_selected = false;
                 selected_group_messages.remove(message_.id);
                 selected_group_messages_text_only.remove(message_.id);
@@ -2822,7 +2828,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                 {
                     if (amode != null)
                     {
-                        amode.setTitle("" + selected_group_messages.size() + " selected");
+                        amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_group_messages.size()));
                     }
                 }
             }
@@ -2830,7 +2836,7 @@ public class GroupMessageListActivity extends AppCompatActivity
             {
                 if (!selected_group_messages.isEmpty())
                 {
-                    v.setBackgroundColor(Color.GRAY);
+                    ChatUI.select(v, true);
                     is_selected = true;
                     selected_group_messages.add(message_.id);
 
@@ -2869,7 +2875,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                     if (amode != null)
                     {
-                        amode.setTitle("" + selected_group_messages.size() + " selected");
+                        amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_group_messages.size()));
                     }
                 }
             }
@@ -2907,7 +2913,7 @@ public class GroupMessageListActivity extends AppCompatActivity
                                 new ToolbarActionMode(context));
                         amode_save_menu_item = amode.getMenu().findItem(R.id.action_save);
                         amode_info_menu_item = amode.getMenu().findItem(R.id.action_info);
-                        v.setBackgroundColor(Color.GRAY);
+                        ChatUI.select(v, true);
                         ret.is_selected = true;
                         selected_group_messages.add(message_.id);
 
@@ -2946,7 +2952,7 @@ public class GroupMessageListActivity extends AppCompatActivity
 
                         if (amode != null)
                         {
-                            amode.setTitle("" + selected_group_messages.size() + " selected");
+                            amode.setTitle(MainActivity.context_s.getString(R.string.chat_selected, selected_group_messages.size()));
                         }
                         ret.ret_value = true;
                         return ret;
@@ -2974,6 +2980,10 @@ public class GroupMessageListActivity extends AppCompatActivity
         {
             group_message_drawer.closeDrawer();
         }
+        else if (findViewById(R.id.chat_search_bar).getVisibility() == View.VISIBLE)
+            {
+                findViewById(R.id.chat_search_close).performClick();
+            }
         else
         {
             super.onBackPressed();

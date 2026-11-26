@@ -555,7 +555,7 @@ public class ImageviewerActivity extends AppCompatActivity
                     {
                         shareUri = androidx.core.content.FileProvider.getUriForFile(
                                 this,
-                                "com.zoffcc.applications.trifa.ext2_provider",
+                                TRIFAGlobals.EXT2_PROVIDER_AUTHORITY,
                                 file
                         );
 
