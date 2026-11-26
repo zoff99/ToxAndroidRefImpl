@@ -586,4 +586,11 @@
     <!-- Layout texts -->
     <!-- Layout texts -->
 
+    <!-- delete selected messages confirmation dialog -->
+    <string name="delete_messages_confirm_title">Delete messages?</string>
+    <plurals name="delete_messages_confirm_text">
+        <item quantity="one">Delete %d selected message? This cannot be undone.</item>
+        <item quantity="other">Delete %d selected messages? This cannot be undone.</item>
+    </plurals>
+
 </resources>

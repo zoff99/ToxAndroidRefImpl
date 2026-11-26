@@ -20,11 +20,13 @@
 package com.zoffcc.applications.trifa;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Build;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.ActionMode;
 import androidx.core.view.MenuItemCompat;
 
@@ -143,28 +145,12 @@ public class ToolbarActionMode implements ActionMode.Callback
         switch (item.getItemId())
         {
             case R.id.action_delete:
+                // ask for confirmation first: accidental taps must not delete
+                // messages. action_active=true keeps the selection alive while
+                // the dialog is up (also if the action mode is closed with X
+                // in the meantime). the delete itself only runs on confirm.
                 action_active = true;
-                // Toast.makeText(context, "You selected Delete menu.", Toast.LENGTH_SHORT).show(); // Show toast
-                if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
-                {
-
-                    if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
-                    {
-                        // normal chat view
-                        delete_selected_messages(context, true, false, "deleting Messages ...");
-                    }
-                    else
-                    {
-                        // group chat view
-                        delete_selected_group_messages(context, true, "deleting Messages ...");
-                    }
-                }
-                else
-                {
-                    // conference view
-                    delete_selected_conference_messages(context, true, "deleting Messages ...");
-                }
-                mode.finish(); // Finish action mode
+                confirm_and_delete_selected_messages(mode);
                 break;
 
             case R.id.action_copy:
@@ -242,6 +228,169 @@ public class ToolbarActionMode implements ActionMode.Callback
         return false;
     }
 
+    // ask the user before deleting: accidental taps on the delete icon must
+    // not destroy messages. the action mode (and the selection) stays alive
+    // while the dialog is up; only a confirmed "Delete" runs the real delete.
+    private void confirm_and_delete_selected_messages(final ActionMode mode)
+    {
+        try
+        {
+            // how many messages are selected in the currently active list?
+            int count = 0;
+            if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
+            {
+                if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
+                {
+                    // normal chat view
+                    count = selected_messages.size();
+                }
+                else
+                {
+                    // group chat view
+                    count = selected_group_messages.size();
+                }
+            }
+            else
+            {
+                // conference view
+                count = selected_conference_messages.size();
+            }
+
+            if (count <= 0)
+            {
+                // nothing selected: just close everything cleanly
+                cancel_selection_and_finish(mode);
+                return;
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setTitle(R.string.delete_messages_confirm_title);
+            builder.setMessage(context.getResources().getQuantityString(R.plurals.delete_messages_confirm_text, count, count));
+            builder.setCancelable(true);
+            builder.setPositiveButton(R.string.layout___delete, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    // confirmed: run the real delete. action_active stays true so
+                    // mode.finish() does NOT clear the selection -- the delete
+                    // AsyncTask consumes it and cleans up afterwards (as before).
+                    action_active = true;
+                    delete_selected_messages_dispatch();
+                    mode.finish();
+                }
+            });
+            builder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener()
+            {
+                @Override
+                public void onClick(DialogInterface dialog, int which)
+                {
+                    cancel_selection_and_finish(mode);
+                }
+            });
+            builder.setOnCancelListener(new DialogInterface.OnCancelListener()
+            {
+                @Override
+                public void onCancel(DialogInterface dialog)
+                {
+                    // dismissed via back button or outside tap: same as "Cancel"
+                    cancel_selection_and_finish(mode);
+                }
+            });
+            builder.show();
+        }
+        catch (Exception e)
+        {
+            Log.i(TAG, "confirm_and_delete_selected_messages:" + e.getMessage());
+        }
+    }
+
+    // the actual delete dispatch over the three message lists (unchanged logic)
+    private void delete_selected_messages_dispatch()
+    {
+        if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
+        {
+            if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
+            {
+                // normal chat view
+                delete_selected_messages(context, true, false, "deleting Messages ...");
+            }
+            else
+            {
+                // group chat view
+                delete_selected_group_messages(context, true, "deleting Messages ...");
+            }
+        }
+        else
+        {
+            // conference view
+            delete_selected_conference_messages(context, true, "deleting Messages ...");
+        }
+    }
+
+    // "Cancel" path: drop the selection, redraw the rows, end the action mode.
+    // the explicit clear also covers the case where the action mode was already
+    // closed (X button) while the dialog was still open.
+    private void cancel_selection_and_finish(ActionMode mode)
+    {
+        action_active = false;
+        clear_all_message_selections();
+        mode.finish();
+    }
+
+    // clear all message selections and redraw the rows in all three lists
+    static void clear_all_message_selections()
+    {
+        selected_conference_messages.clear();
+
+        selected_group_messages.clear();
+        selected_group_messages_incoming_file.clear();
+        selected_group_messages_text_only.clear();
+
+        selected_messages.clear();
+        selected_messages_incoming_file.clear();
+        selected_messages_text_only.clear();
+
+        try
+        {
+            if (MainActivity.conference_message_list_fragment != null)
+            {
+                // need to redraw all items again here, to remove the selections
+                MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (MainActivity.group_message_list_fragment != null)
+            {
+                // need to redraw all items again here, to remove the selections
+                MainActivity.group_message_list_fragment.adapter.redraw_all_items();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
+        try
+        {
+            if (MainActivity.message_list_fragment != null)
+            {
+                // need to redraw all items again here, to remove the selections
+                MainActivity.message_list_fragment.adapter.redraw_all_items();
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void onDestroyActionMode(ActionMode mode)
     {
@@ -249,54 +398,7 @@ public class ToolbarActionMode implements ActionMode.Callback
         {
             if (action_active == false)
             {
-                selected_conference_messages.clear();
-
-                selected_group_messages.clear();
-                selected_group_messages_incoming_file.clear();
-                selected_group_messages_text_only.clear();
-
-                selected_messages.clear();
-                selected_messages_incoming_file.clear();
-                selected_messages_text_only.clear();
-
-                try
-                {
-                    if (MainActivity.conference_message_list_fragment != null)
-                    {
-                        // need to redraw all items again here, to remove the selections
-                        MainActivity.conference_message_list_fragment.adapter.redraw_all_items();
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    if (MainActivity.group_message_list_fragment != null)
-                    {
-                        // need to redraw all items again here, to remove the selections
-                        MainActivity.group_message_list_fragment.adapter.redraw_all_items();
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
-
-                try
-                {
-                    if (MainActivity.message_list_fragment != null)
-                    {
-                        // need to redraw all items again here, to remove the selections
-                        MainActivity.message_list_fragment.adapter.redraw_all_items();
-                    }
-                }
-                catch (Exception e)
-                {
-                    e.printStackTrace();
-                }
+                clear_all_message_selections();
             }
 
             try
