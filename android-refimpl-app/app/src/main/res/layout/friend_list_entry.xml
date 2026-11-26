@@ -40,9 +40,9 @@
             android:background="?attr/selectableItemBackground"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:paddingLeft="16dp"
+            android:paddingLeft="20dp"
             android:paddingTop="8dp"
-            android:paddingRight="12dp"
+            android:paddingRight="20dp"
             android:paddingBottom="8dp">
 
         <FrameLayout
@@ -141,7 +141,7 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
+            android:layout_marginLeft="10dp"
             android:gravity="end|center_vertical"
             android:orientation="vertical">
 
@@ -160,7 +160,7 @@
                 android:id="@+id/f_notification"
                 android:layout_width="16dp"
                 android:layout_height="16dp"
-                android:layout_marginTop="6dp"
+                android:layout_marginTop="4dp"
                 android:scaleType="centerInside"
                 android:src="@drawable/circle_red" />
         </LinearLayout>
@@ -171,7 +171,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_gravity="bottom"
-            android:layout_marginLeft="76dp"
+            android:layout_marginLeft="80dp"
             android:background="@color/main_list_divider" />
     </FrameLayout>
 </FrameLayout>

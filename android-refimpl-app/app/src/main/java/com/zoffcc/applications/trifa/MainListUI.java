@@ -49,6 +49,7 @@ final class MainListUI
         {
             line.setBackgroundColor(Color.TRANSPARENT);
             line.setElevation(0f);
+            line.setPadding(dp(c, 20), dp(c, 8), dp(c, 20), dp(c, 8));
             selectable(line);
         }
 
@@ -94,6 +95,10 @@ final class MainListUI
         final TextView unread = row.findViewById(R.id.f_unread_count);
         if (unread != null)
         {
+            if (unread.getVisibility() != View.VISIBLE || TextUtils.isEmpty(unread.getText()) || "0".contentEquals(unread.getText()))
+            {
+                unread.setVisibility(View.GONE);
+            }
             unread.setBackgroundResource(R.drawable.main_list_unread_badge);
             unread.setTextColor(color(c, R.color.main_list_badge_text));
             unread.setTextSize(TypedValue.COMPLEX_UNIT_SP, 11);
