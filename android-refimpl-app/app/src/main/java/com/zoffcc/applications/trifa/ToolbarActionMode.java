@@ -57,6 +57,11 @@ public class ToolbarActionMode implements ActionMode.Callback
     private static final String TAG = "trifa.ToolbarActionMode";
 
     private Context context;
+    // true = the clicked action consumes the selection itself (e.g. the
+    // delete/save AsyncTask or the copy helper), so onDestroyActionMode must
+    // NOT clear it. false = onDestroyActionMode clears the selection and
+    // redraws the rows. actions that only SHOW something (info, fullscreen)
+    // must use false, otherwise rows stay highlighted after they finish.
     private boolean action_active = false;
 
     public ToolbarActionMode(Context context)
@@ -178,24 +183,29 @@ public class ToolbarActionMode implements ActionMode.Callback
                 break;
 
             case R.id.action_save:
-                action_active = true;
-                // Toast.makeText(context, "You selected Copy menu.", Toast.LENGTH_SHORT).show(); // Show toast
                 if ((selected_group_messages.isEmpty()) && (MainActivity.group_message_list_activity == null))
                 {
-                    // normal chat view
+                    // normal chat view: the save AsyncTask consumes the selection
+                    action_active = true;
                     save_selected_messages(context);
                 }
                 else
                 {
                     // group chat view
                     // TODO: write me
+                    // nothing consumes the selection here: let the action mode
+                    // cleanup clear it, so no rows stay highlighted
+                    action_active = false;
                 }
 
                 mode.finish(); // Finish action mode
                 break;
 
             case R.id.action_info:
-                action_active = true;
+                // the info dialog does not consume the selection: let the
+                // action mode cleanup clear it, so no rows stay highlighted
+                // after the dialog is dismissed
+                action_active = false;
 
                 if ((selected_conference_messages.isEmpty()) && (MainActivity.conference_message_list_activity == null))
                 {
@@ -219,7 +229,10 @@ public class ToolbarActionMode implements ActionMode.Callback
                 break;
 
             case R.id.action_fullscreen:
-                action_active = true;
+                // the fullscreen reader does not consume the selection: let
+                // the action mode cleanup clear it, so no rows stay
+                // highlighted when coming back
+                action_active = false;
                 // show the single selected text message full screen for reading
                 show_selected_message_fullscreen(context);
                 mode.finish(); // Finish action mode
