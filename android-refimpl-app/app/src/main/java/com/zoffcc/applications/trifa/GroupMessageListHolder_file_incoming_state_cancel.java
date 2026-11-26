@@ -74,7 +74,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.string_is_in_list;
 import static com.zoffcc.applications.trifa.HelperGroup.tox_group_peer_get_name__wrapper;
 import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
@@ -460,14 +459,7 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
             // TODO: do we need to reset here? -> yes
             img_avatar.setVisibility(View.VISIBLE);
-            if (PREF__compact_chatlist)
-            {
-                img_corner.setVisibility(View.GONE);
-            }
-            else
-            {
-                img_corner.setVisibility(View.VISIBLE);
-            }
+            img_corner.setVisibility(View.GONE);
             imageView.setVisibility(View.VISIBLE);
             textView_container.setMinimumHeight((int) dp2px(0));
             textView_container.setPadding(0, textView_container.getPaddingTop(), 0,
@@ -710,16 +702,8 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
 
             ft_preview_image.setImageResource(R.drawable.round_loading_animation);
 
-            if (PREF__compact_chatlist)
-            {
-                textView.setVisibility(View.GONE);
-                imageView.setVisibility(View.GONE);
-            }
-            else
-            {
-                textView.setVisibility(View.VISIBLE);
-                textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
-            }
+            textView.setVisibility(View.GONE);
+            imageView.setVisibility(View.GONE);
 
             if (VFS_ENCRYPT)
             {
@@ -792,11 +776,8 @@ public class GroupMessageListHolder_file_incoming_state_cancel extends RecyclerV
         }
         else if (is_audio) // ---- an audio file ----
         {
-            if (PREF__compact_chatlist)
-            {
-                imageView.setVisibility(View.GONE);
-                textView.setVisibility(View.GONE);
-            }
+            imageView.setVisibility(View.GONE);
+            textView.setVisibility(View.GONE);
 
             ft_preview_container.setVisibility(View.VISIBLE);
             ft_preview_image.setVisibility(View.GONE);

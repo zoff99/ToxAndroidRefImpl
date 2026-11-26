@@ -36,7 +36,6 @@ import java.util.List;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LOAD_ALL_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_NEWER_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_SHOW_OLDER_HASH;
@@ -84,22 +83,14 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                                                                         false);
                 return new ConferenceMessageListHolder_paging(view, this.context);
             case Message_model.TEXT_INCOMING_NOT_READ:
-                if (PREF__compact_chatlist)
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact,
-                                                                            parent, false);
-                }
-                else
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
-                                                                            false);
-                }
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact,
+                                                                        parent, false);
                 return new ConferenceMessageListHolder_text_incoming_not_read(view, this.context);
             case Message_model.TEXT_INCOMING_HAVE_READ:
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact, parent,
                                                                         false);
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
@@ -111,7 +102,7 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent,
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_compact, parent,
                                                                         false);
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
@@ -119,16 +110,8 @@ public class ConferenceMessagelistAdapter extends RecyclerView.Adapter implement
                 // return new ConferenceMessageListHolder_text_outgoing_not_read(view, this.context);
                 return new ConferenceMessageListHolder_error(view, this.context);
             case Message_model.TEXT_OUTGOING_HAVE_READ:
-                if (PREF__compact_chatlist)
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(
-                            R.layout.message_list_self_entry_read_compact, parent, false);
-                }
-                else
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read,
-                                                                            parent, false);
-                }
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.message_list_self_entry_read_compact, parent, false);
                 return new ConferenceMessageListHolder_text_outgoing_read(view, this.context);
 
         }

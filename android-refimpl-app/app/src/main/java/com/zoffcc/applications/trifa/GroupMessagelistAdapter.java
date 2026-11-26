@@ -37,7 +37,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.HelperGeneric.only_date_time_format;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_PAGING_LOAD_ALL_HASH;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_MSG_TYPE.TRIFA_MSG_FILE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.TRIFA_SYSTEM_MESSAGE_PEER_PUBKEY;
@@ -93,23 +92,15 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
         switch (viewType)
         {
             case Message_model.TEXT_INCOMING_NOT_READ:
-                if (PREF__compact_chatlist)
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact,
-                                                                            parent, false);
-                }
-                else
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
-                                                                            false);
-                }
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact,
+                                                                        parent, false);
                 return new GroupMessageListHolder_text_incoming_not_read(view, this.context);
 
             case Message_model.TEXT_INCOMING_HAVE_READ:
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read, parent,
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_entry_read_compact, parent,
                                                                         false);
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
@@ -120,7 +111,7 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
-                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry, parent,
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_compact, parent,
                                                                         false);
                 // ******** NOT USED ******** //
                 // ******** NOT USED ******** //
@@ -128,42 +119,18 @@ public class GroupMessagelistAdapter extends RecyclerView.Adapter implements Fas
                 return new GroupMessageListHolder_error(view, this.context);
 
             case Message_model.TEXT_OUTGOING_HAVE_READ:
-                if (PREF__compact_chatlist)
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(
-                            R.layout.message_list_self_entry_read_compact, parent, false);
-                }
-                else
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_self_entry_read,
-                                                                            parent, false);
-                }
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.message_list_self_entry_read_compact, parent, false);
                 return new GroupMessageListHolder_text_outgoing_read(view, this.context);
 
             case Message_model.FILE_INCOMING_STATE_CANCEL:
-                if (PREF__compact_chatlist)
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_group_list_ft_incoming_compact,
-                                                                            parent, false);
-                }
-                else
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_group_list_ft_incoming, parent,
-                                                                            false);
-                }
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_group_list_ft_incoming_compact,
+                                                                        parent, false);
                 return new GroupMessageListHolder_file_incoming_state_cancel(view, this.context);
 
             case Message_model.FILE_OUTGOING_STATE_CANCEL:
-                if (PREF__compact_chatlist)
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing_compact,
-                                                                            parent, false);
-                }
-                else
-                {
-                    view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing, parent,
-                                                                            false);
-                }
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.message_list_ft_outgoing_compact,
+                                                                        parent, false);
                 return new GroupMessageListHolder_file_outgoing_state_cancel(view, this.context);
 
             case Message_model.PAGING_OLDER:

@@ -61,7 +61,6 @@ import static com.zoffcc.applications.trifa.HelperFiletransfer.try_to_share_inco
 import static com.zoffcc.applications.trifa.HelperGeneric.dp2px;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__allow_open_encrypted_file_via_intent;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.SD_CARD_FILES_EXPORT_DIR;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
@@ -341,16 +340,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
                 ft_preview_image.setImageResource(R.drawable.round_loading_animation);
                 // final ImageButton ft_preview_image_ = ft_preview_image;
 
-                if (PREF__compact_chatlist)
-                {
-                    textView.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
-                }
-                else
-                {
-                    textView.setVisibility(View.VISIBLE);
-                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, MESSAGE_TEXT_SIZE[PREF__global_font_size]);
-                }
+                textView.setVisibility(View.GONE);
+                imageView.setVisibility(View.GONE);
 
                 if (VFS_ENCRYPT)
                 {
@@ -459,11 +450,8 @@ public class MessageListHolder_file_incoming_state_cancel extends RecyclerView.V
             }
             else if (is_audio) // ---- an audio file ----
             {
-                if (PREF__compact_chatlist)
-                {
-                    textView.setVisibility(View.GONE);
-                    imageView.setVisibility(View.GONE);
-                }
+                textView.setVisibility(View.GONE);
+                imageView.setVisibility(View.GONE);
 
                 ft_progressbar.setVisibility(View.GONE);
                 ft_buttons_container.setVisibility(View.GONE);

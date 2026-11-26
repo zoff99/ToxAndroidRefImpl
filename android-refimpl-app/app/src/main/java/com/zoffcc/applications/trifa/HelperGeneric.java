@@ -116,7 +116,6 @@ import static com.zoffcc.applications.trifa.HelperMsgNotification.change_msg_not
 import static com.zoffcc.applications.trifa.MainActivity.DEBUG_USE_LOGFRIEND;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__DB_secrect_key;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__X_battery_saving_mode;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_CUSTOM_WRITE_CACHE;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
@@ -132,7 +131,6 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.LAST_ONLINE_TIMSTAMP_ON
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOGFRIEND_TOXID_DB_KEY;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.LOG_FRIEND_TOXID;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_AVATAR_HEIGHT_COMPACT_LAYOUT;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_AVATAR_HEIGHT_NORMAL_LAYOUT;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.MESSAGE_V2_MSG_SENT_OK;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.NOTIFICATION_EDIT_ACTION.NOTIFICATION_EDIT_ACTION_ADD;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SECONDS_TO_STAY_ONLINE_IN_BATTERY_SAVINGS_MODE;
@@ -4448,14 +4446,7 @@ public class HelperGeneric
     public static void set_avatar_img_height_in_chat(CircleImageView v)
     {
         ViewGroup.LayoutParams p = v.getLayoutParams();
-        if (PREF__compact_chatlist)
-        {
-            p.height = (int) dp2px(MESSAGE_AVATAR_HEIGHT_COMPACT_LAYOUT[PREF__global_font_size]);
-        }
-        else
-        {
-            p.height = (int) dp2px(MESSAGE_AVATAR_HEIGHT_NORMAL_LAYOUT[PREF__global_font_size]);
-        }
+        p.height = (int) dp2px(MESSAGE_AVATAR_HEIGHT_COMPACT_LAYOUT[PREF__global_font_size]);
         v.setLayoutParams(p);
     }
 

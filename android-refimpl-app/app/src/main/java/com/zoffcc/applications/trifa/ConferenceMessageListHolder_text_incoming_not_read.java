@@ -59,7 +59,6 @@ import static com.zoffcc.applications.trifa.HelperGeneric.lightenColor;
 import static com.zoffcc.applications.trifa.HelperGeneric.long_date_time_format;
 import static com.zoffcc.applications.trifa.HelperGeneric.string_is_in_list;
 import static com.zoffcc.applications.trifa.Identicon.bytesToHex;
-import static com.zoffcc.applications.trifa.MainActivity.PREF__compact_chatlist;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__global_font_size;
 import static com.zoffcc.applications.trifa.MainActivity.PREF__toxirc_muted_peers;
 import static com.zoffcc.applications.trifa.MainActivity.VFS_ENCRYPT;
@@ -488,14 +487,7 @@ public class ConferenceMessageListHolder_text_incoming_not_read extends Recycler
         {
             // TODO: do we need to reset here? -> yes
             img_avatar.setVisibility(View.VISIBLE);
-            if (PREF__compact_chatlist)
-            {
-                img_corner.setVisibility(View.GONE);
-            }
-            else
-            {
-                img_corner.setVisibility(View.VISIBLE);
-            }
+            img_corner.setVisibility(View.GONE);
             imageView.setVisibility(View.VISIBLE);
             textView_container.setMinimumHeight((int) dp2px(0));
             textView_container.setPadding(0, textView_container.getPaddingTop(), 0,
