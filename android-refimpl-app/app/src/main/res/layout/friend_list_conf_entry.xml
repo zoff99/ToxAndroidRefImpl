@@ -6,11 +6,7 @@
     <FrameLayout
         android:id="@+id/swipe_reveal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginLeft="5dp"
-        android:layout_marginTop="2dp"
-        android:layout_marginRight="5dp"
-        android:layout_marginBottom="2dp">
+        android:layout_height="match_parent">
 
         <ImageView
             android:id="@+id/swipe_reveal_pin_icon"
@@ -32,123 +28,126 @@
     </FrameLayout>
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:id="@+id/f_conf_container_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="0dp"
-        android:background="@null"
+        android:minHeight="72dp"
+        android:background="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:padding="0dip">
+        android:paddingLeft="16dp"
+        android:paddingTop="8dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="8dp">
 
-        <RelativeLayout
-            android:id="@+id/f_conf_container_parent"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:minHeight="72dp"
-            android:layout_marginLeft="5dp"
-            android:layout_marginTop="2dp"
-            android:layout_marginRight="5dp"
-            android:layout_marginBottom="2dp"
-            android:background="@drawable/friend_list_conf_round_bg"
-            android:elevation="2dp"
-            android:padding="6dp">
-
-            <ImageView
-                android:id="@+id/f_notification"
-                android:layout_width="33dp"
-                android:layout_height="33dp"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="6dip"
-                android:padding="6dp"
-                android:scaleType="centerInside"
-                android:src="@drawable/circle_red" />
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/f_avatar_icon"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="6dip"
-                android:layout_toRightOf="@id/f_notification"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
                 android:src="@drawable/circle_blue"
-                app:civ_border_color="#40000000"
-                app:civ_border_width="2dp" />
+                app:civ_border_width="0dp" />
 
             <ImageView
                 android:id="@+id/f_status_icon"
-                android:layout_width="18dp"
-                android:layout_height="18dp"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="6dip"
-                android:layout_toRightOf="@id/f_avatar_icon"
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_gravity="bottom|end"
                 android:scaleType="centerInside"
-                android:src="@drawable/circle_red" />
+                android:src="@drawable/circle_green" />
+
+            <ImageView
+                android:id="@+id/f_relay_icon"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="bottom|start"
+                android:scaleType="centerInside"
+                android:src="@drawable/circle_red"
+                android:visibility="invisible" />
 
             <ImageView
                 android:id="@+id/f_user_status_icon"
                 android:layout_width="10dp"
                 android:layout_height="10dp"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="6dip"
-                android:layout_toRightOf="@id/f_status_icon"
+                android:layout_gravity="top|end"
                 android:scaleType="centerInside"
                 android:src="@drawable/circle_green" />
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginLeft="12dp"
+            android:orientation="vertical">
 
             <LinearLayout
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginRight="6dp"
-                android:layout_toRightOf="@id/f_user_status_icon"
-                android:layout_alignParentRight="true"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
                 <TextView
                     android:id="@+id/f_name"
-                    android:layout_width="fill_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:paddingRight="30dp"
-                    android:text="example name long name long name long name long name long name"
-                    android:textColor="@color/md_black_1000"
+                    android:layout_weight="1"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/main_list_text"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/f_status_message"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:background="@drawable/list_chip_bg"
-                    android:maxWidth="240dp"
-                    android:paddingLeft="6dp"
-                    android:paddingTop="2dp"
-                    android:paddingRight="6dp"
-                    android:paddingBottom="2dp"
-                    android:maxLines="1"
-                    android:text="#2 A12BEF 60(10)"
-                    android:textColor="@color/list_chip_text"
-                    android:textSize="12sp"
-                    android:fontFamily="monospace"
-                    android:typeface="monospace" />
             </LinearLayout>
 
             <TextView
+                android:id="@+id/f_status_message"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="@color/main_list_metadata"
+                android:textSize="13sp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:gravity="end|center_vertical"
+            android:orientation="vertical">
+
+            <TextView
                 android:id="@+id/f_unread_count"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_alignParentTop="true"
-                android:layout_alignParentRight="true"
-                android:layout_marginTop="4dp"
-                android:layout_marginRight="4dp"
-                android:background="@drawable/widget_unread_count_background"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:background="@drawable/main_list_unread_badge"
                 android:gravity="center"
-                android:text="120"
-                android:textAlignment="center"
-                android:textColor="#ffffff"
-                android:textSize="10sp"
+                android:textColor="@color/main_list_badge_text"
+                android:textSize="11sp"
                 android:textStyle="bold"
                 android:visibility="invisible" />
 
-        </RelativeLayout>
+            <ImageView
+                android:id="@+id/f_notification"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_marginTop="6dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/circle_red" />
+        </LinearLayout>
 
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="bottom"
+        android:layout_marginLeft="76dp"
+        android:background="@color/main_list_divider" />
 </FrameLayout>

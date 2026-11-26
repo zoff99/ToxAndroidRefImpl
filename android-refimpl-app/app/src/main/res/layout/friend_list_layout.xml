@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!--android:background="@android:color/transparent"-->
+    <!--android:background="@color/main_list_canvas"-->
 
     <com.l4digital.fastscroll.FastScrollRecyclerView
         android:id="@+id/rv_list"
@@ -15,21 +15,21 @@
         android:layout_marginTop="0dp"
         android:layout_marginRight="0dp"
         android:layout_marginBottom="0dp"
-        android:background="@android:color/transparent"
+        android:background="@color/main_list_canvas"
         android:divider="@null"
         android:dividerHeight="0dp"
         android:paddingLeft="0dp"
         android:paddingTop="0dp"
         android:paddingRight="0dp"
         android:paddingBottom="0dp"
-        app:bubbleColor="@color/fast_scroller_color"
+        app:bubbleColor="@color/main_list_accent"
         app:bubbleSize="normal"
         app:bubbleTextColor="#ffffff"
         app:bubbleTextSize="20sp"
-        app:handleColor="@color/fast_scroller_color"
+        app:handleColor="@color/main_list_accent"
         app:hideScrollbar="true"
         app:showTrack="false"
-        app:trackColor="@color/fast_scroller_color" />
+        app:trackColor="@color/main_list_accent" />
 
     <!--<include layout="@layout/floating_action_button"/>-->
 
@@ -53,7 +53,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/md_grey_300_seperator"
+                android:background="@color/main_list_surface"
                 android:orientation="vertical"
                 android:padding="10dp">
 

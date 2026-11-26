@@ -122,3 +122,6 @@ code in Copilot.
 <br>
 No part of this work may be used or reproduced in any manner for the purpose of training artificial intelligence technologies or systems.
 
+## Main list redesign
+
+See `docs/MAIN_LIST_REDESIGN.md` for the main friend/conference/group list restyle.

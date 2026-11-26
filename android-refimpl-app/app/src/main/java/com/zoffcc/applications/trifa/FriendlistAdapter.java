@@ -199,6 +199,8 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
                     ((GroupListHolder) holder).bindFriendList(fl2.group_item);
                     break;
             }
+
+            MainListUI.decorate(holder.itemView, type);
         }
         catch (Exception e)
         {
@@ -568,8 +570,8 @@ public class FriendlistAdapter extends RecyclerView.Adapter implements FastScrol
     private View buildPinnedSeparatorView(Context ctx) {
         boolean dark = is_nightmode_active(ctx);
 
-        int lineColor = dark ? Color.parseColor("#4A4A4A") : Color.parseColor("#DDDDDD");
-        int accent    = dark ? Color.parseColor("#9E9E9E") : Color.parseColor("#8A8A8A");
+        int lineColor = ctx.getResources().getColor(R.color.main_list_divider);
+        int accent    = ctx.getResources().getColor(R.color.main_list_metadata);
 
         LinearLayout row = new LinearLayout(ctx);
         row.setOrientation(LinearLayout.HORIZONTAL);

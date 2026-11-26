@@ -10,7 +10,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
+        android:background="@color/main_list_header"
         android:contentInsetStart="0dp"
         android:contentInsetLeft="0dp"
         android:minHeight="?attr/actionBarSize"
@@ -33,7 +33,7 @@
             android:layout_marginLeft="0dp"
             android:paddingLeft="0dp"
             android:text="@string/app_name"
-            android:textColor="@android:color/primary_text_dark"
+            android:textColor="@color/main_list_on_header"
             android:textSize="18sp"
             android:textStyle="bold" />
     </androidx.appcompat.widget.Toolbar>
@@ -49,7 +49,7 @@
             android:id="@+id/waiting_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@color/md_white_1000"
+            android:background="@color/main_list_canvas"
             android:visibility="visible">
 
             <TextView
@@ -58,7 +58,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginBottom="40dp"
-                android:background="@color/md_white_1000"
+                android:background="@color/main_list_canvas"
                 android:gravity="center"
                 android:text="@string/layout___waiting_for_orbot"
                 android:textSize="20sp"
@@ -103,7 +103,7 @@
                             android:paddingLeft="5dp"
                             android:paddingRight="5dp"
                             android:text="..."
-                            android:textColor="@color/md_black_1000"
+                            android:textColor="@color/main_list_metadata"
                             android:textSize="12sp"
                             android:visibility="visible" />
 
@@ -171,7 +171,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="off"
-                                android:textColor="@color/md_black_1000"
+                                android:textColor="@color/main_list_metadata"
                                 android:textSize="10sp"
                                 android:textStyle="bold"
                                 android:gravity="center" />
@@ -201,7 +201,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="?"
-                                android:textColor="@color/md_black_1000"
+                                android:textColor="@color/main_list_metadata"
                                 android:textSize="10sp"
                                 android:textStyle="bold"
                                 android:gravity="center"
@@ -231,7 +231,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="?"
-                                android:textColor="@color/md_black_1000"
+                                android:textColor="@color/main_list_metadata"
                                 android:textSize="10sp"
                                 android:textStyle="bold"
                                 android:gravity="center"
@@ -254,10 +254,11 @@
                             android:singleLine="true"
                             android:imeOptions="actionDone"
                             android:inputType="text"
-                            android:background="@android:color/transparent"
-                            android:paddingLeft="4dp"
-                            android:paddingRight="4dp"
-                            android:textColorHint="@android:color/darker_gray"
+                            android:background="@drawable/main_list_search_bg"
+                            android:paddingLeft="14dp"
+                            android:paddingRight="14dp"
+                            android:textColor="@color/main_list_text"
+                            android:textColorHint="@color/main_list_metadata"
                             tools:ignore="HardcodedText" />
 
                         <ImageView

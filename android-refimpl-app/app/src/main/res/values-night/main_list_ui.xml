@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="main_list_header">#172725</color>
+    <color name="main_list_on_header">#EDF5F2</color>
+    <color name="main_list_canvas">#101B19</color>
+    <color name="main_list_surface">#101B19</color>
+    <color name="main_list_text">#EDF5F2</color>
+    <color name="main_list_metadata">#B1C7BE</color>
+    <color name="main_list_divider">#2B403A</color>
+    <color name="main_list_accent">#20A18A</color>
+    <color name="main_list_badge">#20A18A</color>
+    <color name="main_list_badge_text">#FFFFFF</color>
+</resources>

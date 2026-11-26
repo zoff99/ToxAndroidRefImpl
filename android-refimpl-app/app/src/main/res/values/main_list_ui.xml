@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Original main-list palette; no third-party branding or assets. -->
+    <color name="main_list_header">#125C56</color>
+    <color name="main_list_on_header">#FFFFFF</color>
+    <color name="main_list_canvas">#FFFFFF</color>
+    <color name="main_list_surface">#FFFFFF</color>
+    <color name="main_list_text">#111B21</color>
+    <color name="main_list_metadata">#667781</color>
+    <color name="main_list_divider">#E9EDEF</color>
+    <color name="main_list_accent">#168574</color>
+    <color name="main_list_badge">#168574</color>
+    <color name="main_list_badge_text">#FFFFFF</color>
+</resources>
