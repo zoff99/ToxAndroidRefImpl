@@ -298,7 +298,7 @@ public class ConferenceMessageListFragment extends Fragment
         listingsView.addOnScrollListener(mScrollListener);
         listingsView.setAdapter(adapter);
 
-        // swipe right on an incoming text message to quote (reply to) it.
+        // swipe right on a text message (incoming or own) to quote (reply to) it.
         // same reveal-layer pattern as the friendlist pin/unpin swipe.
         MessageListSwipeCallback swipe_callback = new MessageListSwipeCallback(new MessageListSwipeCallback.SwipeQuoteHandler()
         {
@@ -311,7 +311,7 @@ public class ConferenceMessageListFragment extends Fragment
                     {
                         return false; // selection mode active: no swiping
                     }
-                    return adapter.getItemViewType(position) == Message_model.TEXT_INCOMING_NOT_READ;
+                    return MessageListSwipeCallback.is_swipeable_text_type(adapter.getItemViewType(position));
                 }
                 catch (Exception e)
                 {

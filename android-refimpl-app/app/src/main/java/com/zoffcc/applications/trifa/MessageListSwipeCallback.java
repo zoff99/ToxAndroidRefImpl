@@ -16,9 +16,10 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_REPLY_THRESHOLD;
 /**
  * swipe-to-quote for the friend, group and conference message lists.
  *
- * swipe an incoming text message to the right: a blue reveal layer with a
- * reply arrow appears behind the row. once the swipe passes the commit
- * threshold the arrow lights up and grows a little ("release to quote").
+ * swipe a text message (incoming or our own) to the right: a blue reveal
+ * layer with a reply arrow appears behind the row. once the swipe passes
+ * the commit threshold the arrow lights up and grows a little ("release to
+ * quote").
  * releasing then quotes the message into the input box and the row snaps
  * back into place. the row is NEVER removed, so unlike the friendlist
  * pin/unpin swipe there is no remove/reinsert here: ItemTouchHelper animates
@@ -65,6 +66,16 @@ public class MessageListSwipeCallback extends ItemTouchHelper.SimpleCallback
         this.handler = handler;
     }
 
+    // the row types that carry plain text and can be swipe-quoted:
+    // incoming text and our own outgoing text (both read states).
+    // file transfers, paging rows and error rows are NOT swipeable.
+    public static boolean is_swipeable_text_type(int view_type)
+    {
+        return (view_type == Message_model.TEXT_INCOMING_NOT_READ)
+               || (view_type == Message_model.TEXT_OUTGOING_NOT_READ)
+               || (view_type == Message_model.TEXT_OUTGOING_HAVE_READ);
+    }
+
     @Override
     public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder,
                           @NonNull RecyclerView.ViewHolder target)
@@ -96,7 +107,7 @@ public class MessageListSwipeCallback extends ItemTouchHelper.SimpleCallback
                 Log.i(TAG, "getMovementFlags:" + e.getMessage());
             }
         }
-        // not swipeable: outgoing messages, file transfers, paging rows,
+        // not swipeable: file transfers, paging rows, error rows,
         // selection mode, ...
         return makeMovementFlags(0, 0);
     }
