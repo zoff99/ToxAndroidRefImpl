@@ -337,6 +337,6 @@
     <color name="swipe_icon_idle">#99FFFFFF</color>
     <color name="swipe_pin_icon_armed">#FFD740</color>
     <color name="swipe_unpin_icon_armed">#FF8A80</color>
-    <color name="swipe_reply_icon_armed">#FFFFFFFF</color>
+    <color name="swipe_reply_icon_armed">#FFD740</color>
 
 </resources>

@@ -77,6 +77,9 @@ public class TRIFAGlobals
     // fraction of the list width the user must swipe to quote (reply to) an
     // incoming message in the friend/group/conference message lists.
     final static float SWIPE_REPLY_THRESHOLD = 0.25f;
+    // the reply icon grows even larger than the friendlist swipe icons when
+    // armed, so the "release to quote" moment is unmistakable.
+    final static float SWIPE_REPLY_ICON_ARMED_SCALE = 1.5f; // armed reply icon: 150% of normal
 
     static volatile boolean HAVE_INTERNET_CONNECTIVITY = true;
     final static int TOX_BOOTSTRAP_MIN_INTERVAL_SECS = 60; // 60 seconds

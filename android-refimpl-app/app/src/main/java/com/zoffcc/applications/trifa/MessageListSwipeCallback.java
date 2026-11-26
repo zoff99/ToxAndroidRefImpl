@@ -10,7 +10,7 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_ICON_ANIM_MS;
-import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_ICON_ARMED_SCALE;
+import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_REPLY_ICON_ARMED_SCALE;
 import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_REPLY_THRESHOLD;
 
 /**
@@ -18,8 +18,8 @@ import static com.zoffcc.applications.trifa.TRIFAGlobals.SWIPE_REPLY_THRESHOLD;
  *
  * swipe a text message (incoming or our own) to the right: a blue reveal
  * layer with a reply arrow appears behind the row. once the swipe passes
- * the commit threshold the arrow lights up and grows a little ("release to
- * quote").
+ * the commit threshold the arrow lights up in bright amber and grows to
+ * 150% ("release to quote").
  * releasing then quotes the message into the input box and the row snaps
  * back into place. the row is NEVER removed, so unlike the friendlist
  * pin/unpin swipe there is no remove/reinsert here: ItemTouchHelper animates
@@ -183,8 +183,9 @@ public class MessageListSwipeCallback extends ItemTouchHelper.SimpleCallback
     }
 
     // move the row content with the finger and show the reply reveal behind it.
-    // once the swipe passes the commit threshold the icon "arms": bright white
-    // + gentle grow ("release to quote"). going back under calms it down again.
+    // once the swipe passes the commit threshold the icon "arms": bright amber
+    // highlight + big grow to 150% ("release to quote"). going back under the
+    // threshold calms it down again.
     private void apply_swipe_visuals(View row, float dX)
     {
         View surface = row.findViewById(R.id.msg_swipe_surface);
@@ -228,7 +229,7 @@ public class MessageListSwipeCallback extends ItemTouchHelper.SimpleCallback
                 if (armed)
                 {
                     color = getResources_color(row, R.color.swipe_reply_icon_armed);
-                    scale = SWIPE_ICON_ARMED_SCALE;
+                    scale = SWIPE_REPLY_ICON_ARMED_SCALE;
                 }
                 reply_icon.setColorFilter(color);
                 reply_icon.animate().scaleX(scale).scaleY(scale).setDuration(SWIPE_ICON_ANIM_MS).start();
