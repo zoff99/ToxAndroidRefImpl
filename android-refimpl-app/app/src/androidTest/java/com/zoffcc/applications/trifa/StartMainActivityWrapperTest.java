@@ -213,53 +213,67 @@ public class StartMainActivityWrapperTest
         {
         }
 
+        Log.i(TAG, "JOIN PUB_GROUP:001");
         join_pubgroup();
+        Log.i(TAG, "JOIN PUB_GROUP:002");
         wait_(1);
 
+        Log.i(TAG, "CLICK PUB_GROUP:003");
         Matcher<View> m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
+        Log.i(TAG, "CLICK PUB_GROUP:004");
         ViewInteraction pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
-        String text001 = getViewInteractionText(pub_group);
-        Log.i(TAG, "text_is=" + text001);
+        Log.i(TAG, "CLICK PUB_GROUP:005");
 
-        screenshot("006");
 
-        boolean group_connected = false;
-        int sleep_cycles = 0;
-        int rejoin_cycles = 0;
-        while (!group_connected)
+        if (2 == 1 - 1)
         {
-            if (sleep_cycles > 20)
+            String text001 = getViewInteractionText(pub_group);
+            Log.i(TAG, "text_is=" + text001);
+
+            screenshot("006");
+
+            boolean group_connected = false;
+            int sleep_cycles = 0;
+            int rejoin_cycles = 0;
+            while (!group_connected)
             {
-                if (rejoin_cycles > 3)
+                if (sleep_cycles > 20)
                 {
-                    Log.i(TAG, "rejoin_cycles:STOP=" + rejoin_cycles);
-                    Log.i(TAG, "group never joined");
-                    cause_error(3);
+                    if (rejoin_cycles > 3)
+                    {
+                        Log.i(TAG, "rejoin_cycles:STOP=" + rejoin_cycles);
+                        Log.i(TAG, "group never joined");
+                        cause_error(3);
+                    }
+                    Log.i(TAG, "sleep_cycles:STOP:sleep_cycles=" + sleep_cycles + " rejoin_cycles=" + rejoin_cycles);
+                    sleep_cycles = 0;
+                    group_connected = false;
+
+                    remove_pubgroup();
+                    join_pubgroup();
+                    rejoin_cycles++;
                 }
-                Log.i(TAG, "sleep_cycles:STOP:sleep_cycles=" + sleep_cycles+ " rejoin_cycles=" + rejoin_cycles);
-                sleep_cycles = 0;
-                group_connected = false;
 
-                remove_pubgroup();
-                join_pubgroup();
-                rejoin_cycles++;
+                // find group again
+                m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
+                pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
+                String text002 = getViewInteractionText(pub_group);
+                Log.i(TAG, "text_is[2]=" + text002 + " sleep_cycles=" + sleep_cycles);
+                if (text002.contains("Users:1(0)"))
+                {
+                    wait_(2, "for group to connect");
+                    sleep_cycles++;
+                }
+                else
+                {
+                    Log.i(TAG, "group_is_connected");
+                    group_connected = true;
+                }
             }
-
-            // find group again
-            m = allOf(withId(R.id.f_status_message), withParent(withId(R.id.f_conf_container_parent)));
-            pub_group = onView(allOf(getElementFromMatchAtPosition(m, 0), isDisplayed()));
-            String text002 = getViewInteractionText(pub_group);
-            Log.i(TAG, "text_is[2]=" + text002 + " sleep_cycles=" + sleep_cycles);
-            if (text002.contains("Users:1(0)"))
-            {
-                wait_(2, "for group to connect");
-                sleep_cycles++;
-            }
-            else
-            {
-                Log.i(TAG, "group_is_connected");
-                group_connected = true;
-            }
+        }
+        else
+        {
+            wait_(120);
         }
 
         screenshot("007");
