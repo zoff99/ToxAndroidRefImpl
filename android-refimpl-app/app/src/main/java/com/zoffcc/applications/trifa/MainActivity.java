@@ -392,6 +392,7 @@ public class MainActivity extends AppCompatActivity
     static String app_files_directory = "";
     static EditText main_search_edittext = null;
     ImageView main_search_icon = null;
+    View main_status_items = null;
     // static boolean stop_me = false;
     // static Thread ToxServiceThread = null;
     static Semaphore semaphore_videoout_bitmap = new Semaphore(1);
@@ -767,6 +768,60 @@ public class MainActivity extends AppCompatActivity
     }
 
 
+    // Toggle the friend-list header between the normal status row and a
+    // full-width search input.  When the search field is open every other
+    // item in that row is hidden so the field gets the whole width.
+    void set_main_search_open(boolean open, boolean manage_keyboard)
+    {
+        try
+        {
+            if (main_status_items != null)
+            {
+                main_status_items.setVisibility(open ? View.GONE : View.VISIBLE);
+            }
+
+            if (main_search_edittext != null)
+            {
+                main_search_edittext.setVisibility(open ? View.VISIBLE : View.GONE);
+            }
+
+            if (main_search_icon != null)
+            {
+                main_search_icon.setImageResource(open ? R.drawable.main_search_close : R.drawable.main_search_open);
+                main_search_icon.setContentDescription(getString(open ? R.string.main_search_close_desc :
+                                                                      R.string.main_search_open_desc));
+            }
+
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            if (open)
+            {
+                if (main_search_edittext != null)
+                {
+                    main_search_edittext.requestFocus();
+                    if (manage_keyboard && imm != null)
+                    {
+                        imm.showSoftInput(main_search_edittext, InputMethodManager.SHOW_IMPLICIT);
+                    }
+                }
+            }
+            else
+            {
+                if (main_search_edittext != null)
+                {
+                    main_search_edittext.clearFocus();
+                    if (manage_keyboard && imm != null)
+                    {
+                        imm.hideSoftInputFromWindow(main_search_edittext.getWindowToken(), 0);
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
@@ -818,6 +873,7 @@ public class MainActivity extends AppCompatActivity
         try {
             main_search_edittext = (EditText) findViewById(R.id.main_search_edittext);
             main_search_icon = (ImageView) findViewById(R.id.main_search_icon);
+            main_status_items = findViewById(R.id.main_status_items);
 
             final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
             String saved_filter = prefs.getString("MAIN_SEARCH_FILTER", "");
@@ -825,29 +881,24 @@ public class MainActivity extends AppCompatActivity
             // Restore filter on startup
             if (saved_filter != null && !saved_filter.isEmpty()) {
                 main_search_edittext.setText(saved_filter);
-                main_search_edittext.setVisibility(View.VISIBLE);
+                set_main_search_open(true, false);
                 if (MainActivity.friend_list_fragment != null && MainActivity.friend_list_fragment.adapter != null) {
                     MainActivity.friend_list_fragment.adapter.setFilter(saved_filter);
                 }
             } else {
-                main_search_edittext.setVisibility(View.GONE);
+                set_main_search_open(false, false);
             }
 
-            // Handle Search Icon Click
+            // Handle Search Icon Click: toggle between the status row and a
+            // full-width search field.
             main_search_icon.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if (main_search_edittext.getVisibility() == View.VISIBLE) {
-                        main_search_edittext.setVisibility(View.GONE);
+                    boolean opening = main_search_edittext.getVisibility() != View.VISIBLE;
+                    if (!opening) {
                         main_search_edittext.setText("");
-                    } else {
-                        main_search_edittext.setVisibility(View.VISIBLE);
-                        main_search_edittext.requestFocus();
-                        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-                        if (imm != null) {
-                            imm.showSoftInput(main_search_edittext, InputMethodManager.SHOW_IMPLICIT);
-                        }
                     }
+                    set_main_search_open(opening, true);
                 }
             });
 

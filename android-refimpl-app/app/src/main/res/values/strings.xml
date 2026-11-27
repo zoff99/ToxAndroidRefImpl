@@ -1,5 +1,8 @@
 <resources>
     <string name="app_name" translatable="false">TRIfA</string>
+    <string name="main_search_hint">Search</string>
+    <string name="main_search_open_desc">Search friends</string>
+    <string name="main_search_close_desc">Close search</string>
     <string name="add_friend_activity_name">Add Friend</string>
     <string name="add_group_activity_name">Create Private Group</string>
     <string name="add_public_group_activity_name">Create Public Group</string>
