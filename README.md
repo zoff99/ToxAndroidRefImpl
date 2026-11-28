@@ -25,12 +25,12 @@ Status
 [![Liberapay](https://img.shields.io/liberapay/goal/zoff.svg?logo=liberapay)](https://liberapay.com/zoff/donate)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/zoff99/ToxAndroidRefImpl)
 
-🚀 Featured Applications
-=
+#### 🚀 Featured Applications
 
 Join a growing community of security-conscious people. Check out these featured applications:
 
 *   **[TRIfA](https://github.com/zoff99/ToxAndroidRefImpl)**: The Tox flagship secure messenger for Android.
+*   **[TRIfAma](https://github.com/zoff99/trifa_ma)**: The Tox flagship messenger - More Appeal, same Tox.
 *   **[TRIfA for Desktop](https://github.com/Zoxcore/trifa_material)**: The feature rich Tox Desktop Messaging Client.
 *   **[Tox Push Msgs](https://github.com/zoff99/tox_push_msg_app)**: The Companion App for TRIfA and TRIfA for Desktop to enable Push Messages.
 *   **[ToxProxy](https://github.com/zoff99/ToxProxy)**: Offline message relay functionality for TRIfA and TRIfA for Desktop.
