@@ -25,7 +25,8 @@ Status
 [![Liberapay](https://img.shields.io/liberapay/goal/zoff.svg?logo=liberapay)](https://liberapay.com/zoff/donate)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/zoff99/ToxAndroidRefImpl)
 
-#### 🚀 Featured Applications
+🚀 Featured Applications
+=
 
 Join a growing community of security-conscious people. Check out these featured applications:
 
